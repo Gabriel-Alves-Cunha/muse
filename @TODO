@@ -1,0 +1,5 @@
+* Change size of svg on History
+* See about changing clipboard for electron (full of security issues)
+
+*** FUTURE OPTIMIZATIONS:
+	* Change lib to change metadata for ffmpeg itself (See ffmpeg docs).

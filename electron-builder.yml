@@ -1,0 +1,6 @@
+appId: com.muse.electron_react
+productName: Muse
+directories:
+  output: dist
+  buildResources: build
+  app: app

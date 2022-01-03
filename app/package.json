@@ -1,0 +1,26 @@
+{
+	"name": "vite-project",
+	"version": "0.1.0",
+	"license": "MIT",
+	"main": "index.js",
+	"dependencies": {
+		"electron": "^16.0.5",
+		"@emotion/react": "^11.7.1",
+		"@emotion/styled": "^11.6.0",
+		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"@types/electron-clipboard-extended": "^1.0.1",
+		"axios": "^0.24.0",
+		"chokidar": "^3.5.2",
+		"electron-clipboard-extended": "^1.1.1",
+		"fluent-ffmpeg": "^2.1.2",
+		"music-metadata": "^7.11.4",
+		"node-taglib-sharp": "^4.0.0",
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0",
+		"react-router-dom": "^6.2.1",
+		"react-toastify": "^8.1.0",
+		"react-window": "^1.8.6",
+		"reactjs-popup": "^2.0.5",
+		"ytdl-core": "^4.9.2"
+	}
+}

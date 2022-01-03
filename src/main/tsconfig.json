@@ -1,0 +1,10 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"target": "ESNEXT",
+		"module": "esnext",
+		"outDir": "../../app"
+	},
+	"include": ["../electron/**/*", "../common/**/*"],
+	"exclude": ["../react/**/*"]
+}
