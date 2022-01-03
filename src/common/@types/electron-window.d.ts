@@ -1,6 +1,6 @@
 /* eslint-disable no-var */
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import type { DownloadValues } from "src/contexts/communicationBetweenChildren";
+import type { DownloadValues } from "@renderer/contexts/communicationBetweenChildren";
 import type { Media, Path } from "./types";
 import type { videoInfo } from "ytdl-core";
 

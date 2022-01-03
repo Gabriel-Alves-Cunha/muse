@@ -21,8 +21,8 @@ import {
 import { isDevelopment } from "@common/utils";
 import { logoPath } from "./utils";
 
-var electronWindow: Electron.BrowserWindow | undefined;
-var tray: Electron.Tray | undefined;
+let electronWindow: Electron.BrowserWindow | undefined;
+let tray: Electron.Tray | undefined;
 
 function createWindow() {
 	const window = new BrowserWindow({
@@ -101,11 +101,11 @@ const createTrayIcon = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
 	electronWindow = createWindow();
 	tray = createTrayIcon();
 
-	const clipboard = require("electron-clipboard-extended");
+	const clipboard = (await import("electron-clipboard-extended")).default;
 	clipboard
 		.on("text-changed", async () => {
 			const txt = clipboard.readText("clipboard");

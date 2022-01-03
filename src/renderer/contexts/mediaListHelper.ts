@@ -1,4 +1,3 @@
-import type { CurrentPlaying, Playlist } from "./types";
 import type { Media, Path } from "@common/@types/types";
 
 import { allowedMedias, getBasename } from "@common/utils";
@@ -6,25 +5,6 @@ const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
 } = electron;
-
-const defaultLists = [
-	"sorted by date",
-	"sorted by name",
-	"favorites",
-	"mediaList",
-	"history",
-] as const;
-const temp: Playlist[] = defaultLists.map((name) => ({ name, list: [] }));
-temp.push({ name: "none", list: [] });
-export const defaultPlaylists: readonly Playlist[] = temp;
-export type DefaultLists = typeof defaultLists[number];
-
-export const defaultCurrentPlaying: CurrentPlaying = {
-	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-	playlist: defaultPlaylists.find(({ name }) => name === "none")!,
-	seconds: undefined,
-	media: undefined,
-};
 
 // fns
 const maxSizeOfHistory = 100;
@@ -82,8 +62,8 @@ export const searchDirectoryForMedias = async (directory: Path) =>
 export const getAllowedMedias = (
 	filenames: readonly string[]
 ): readonly string[] =>
-	filenames.filter((filename) =>
-		allowedMedias.some((extension) => extension === getExtension(filename))
+	filenames.filter(filename =>
+		allowedMedias.some(extension => extension === getExtension(filename))
 	);
 
 type ListWithOrder<T> = ReadonlyArray<

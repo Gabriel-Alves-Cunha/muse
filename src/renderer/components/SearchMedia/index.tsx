@@ -6,11 +6,11 @@ import { useEffect, useReducer, useRef } from "react";
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { IoReloadSharp as Reload } from "react-icons/io5";
-import { FaTrash as Clean } from "react-icons/fa";
+import { FiTrash as Clean } from "react-icons/fi";
 import { FixedSizeList } from "react-window";
 
+import { useCurrentPlaying, useOnClickOutside, usePlaylists } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
-import { useOnClickOutside } from "@hooks";
 import { useMediaList } from "@contexts/mediaList";
 import { dbg } from "@utils/app";
 
@@ -34,8 +34,8 @@ type Props = {
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const {
 		functions: { searchLocalComputerForMedias, searchForMedia },
-		dispatches: { dispatchPlaylists },
 	} = useMediaList();
+	const [, dispatchPlaylists] = usePlaylists();
 
 	const [searcher, dispatchSearcher] = useReducer(searcherReducer, {
 		isLoading: false,
@@ -79,6 +79,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		);
 
 		return () => clearTimeout(searchTimeout);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searcher.searchTerm]);
 
 	return (
@@ -87,7 +88,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 				<Search>
 					<SearchIcon size="1.2em" />
 					<input
-						onChange={(e) =>
+						onChange={e =>
 							dispatchSearcher({
 								value: e.target.value,
 								type: "setSearchTerm",
@@ -130,7 +131,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					case "clean": {
 						return (
 							<Button>
-								<Clean size={20} onClick={cleanHistory} />
+								<Clean size={14} onClick={cleanHistory} />
 							</Button>
 						);
 						break;
@@ -156,10 +157,8 @@ function SearchResults({
 	fromList: MediaListKindProps["mediaType"];
 	results: readonly Media[];
 }) {
-	const {
-		dispatches: { dispatchCurrentPlaying },
-		playlists,
-	} = useMediaList();
+	const [, dispatchCurrentPlaying] = useCurrentPlaying();
+	const [playlists] = usePlaylists();
 
 	const listWrapperReference = useRef<HTMLElement>(null);
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion

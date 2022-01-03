@@ -1,4 +1,4 @@
-import type { DefaultLists } from "@contexts/mediaListHelper";
+import type { DefaultLists } from "@renderer/hooks/usePlaylists";
 import type { Media, Path } from "@common/@types/types";
 
 import { useState } from "react";
@@ -43,7 +43,7 @@ export function Change({
 	return (
 		<InputWrapper>
 			<input
-				onChange={(e) => setValue(e.target.value)}
+				onChange={e => setValue(e.target.value)}
 				onKeyPress={writeChange}
 				autoCapitalize="on"
 				autoComplete="off"
@@ -78,4 +78,4 @@ const allowedOptionToChange: Readonly<
 > = ["imageURL", "genres", "artist", "album", "title"];
 
 export const isChangeable = (option: string): option is ChangeOptions =>
-	allowedOptionToChange.some((opt) => opt === option);
+	allowedOptionToChange.some(opt => opt === option);

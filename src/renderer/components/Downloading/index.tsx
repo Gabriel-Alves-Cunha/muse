@@ -191,6 +191,7 @@ export function Downloading() {
 				);
 			}
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [downloadValues.canStartDownload]);
 
 	useOnClickOutside(popupRef, () => toggleShowPopup());
