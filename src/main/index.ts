@@ -1,5 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import type { IpcMainInvokeEvent } from "electron";
+import type { ClipboardExtended } from "./clipboardExtended";
 import type { NotificationType } from "@common/@types/electron-window";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
@@ -21,8 +22,8 @@ import {
 import { isDevelopment } from "@common/utils";
 import { logoPath } from "./utils";
 
-let electronWindow: Electron.BrowserWindow | undefined;
-let tray: Electron.Tray | undefined;
+let electronWindow: BrowserWindow | undefined;
+let tray: Tray | undefined;
 
 function createWindow() {
 	const window = new BrowserWindow({
@@ -36,9 +37,9 @@ function createWindow() {
 		webPreferences: {
 			preload: join(__dirname, "preload.js"),
 			allowRunningInsecureContent: false,
-			contextIsolation: true, // <-- Needed to use contextBridge :(
+			contextIsolation: true, // <-- Needed to use contextBridge
 			nodeIntegration: true,
-			webSecurity: true, // <-- I needed this for ytdl to work :(
+			webSecurity: true,
 			webgl: false,
 		},
 	}).once("ready-to-show", () => {
@@ -105,10 +106,11 @@ app.whenReady().then(async () => {
 	electronWindow = createWindow();
 	tray = createTrayIcon();
 
-	const clipboard = (await import("electron-clipboard-extended")).default;
-	clipboard
+	const extendedClipboard = (await import("./clipboardExtended"))
+		.ExtendedClipboard;
+	(extendedClipboard as ClipboardExtended)
 		.on("text-changed", async () => {
-			const txt = clipboard.readText("clipboard");
+			const txt = extendedClipboard.readText("clipboard");
 
 			if (validateURL(txt)) {
 				const {

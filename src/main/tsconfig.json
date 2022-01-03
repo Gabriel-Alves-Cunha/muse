@@ -5,6 +5,6 @@
 		"module": "esnext",
 		"outDir": "../../app"
 	},
-	"include": ["../electron/**/*", "../common/**/*"],
-	"exclude": ["../react/**/*"]
+	"include": ["../main/**/*", "../common/**/*"],
+	"exclude": ["../renderer/**/*"]
 }

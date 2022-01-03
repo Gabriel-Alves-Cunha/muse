@@ -1,4 +1,4 @@
-const notify = window.electron.notificationApi.sendNotificationToElectron;
+const notify = electron.notificationApi.sendNotificationToElectron;
 
 export const toggleMaximize = () => notify({ type: "maximize" });
 export const minimizeWindow = () => notify({ type: "minimize" });
