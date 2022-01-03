@@ -1,7 +1,7 @@
 # Muse
 
 <h1 align="center">
-	<img src="src/assets/icons/logo_with_name.svg" alt="logo">
+	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="logo">
 </h1>
 
 > Just a simple Electron-React app to download audio from Youtube and play them.
