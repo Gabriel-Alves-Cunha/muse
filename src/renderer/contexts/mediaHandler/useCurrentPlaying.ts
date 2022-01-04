@@ -1,10 +1,13 @@
+import type { PlaylistsReducer_Action, Playlist } from "./usePlaylists";
+import type { PlayOptions_Action, PlayOptions } from "./usePlayOptions";
+import type { Dispatch } from "react";
 import type { Media } from "@common/@types/types";
 
 import { useEffect, useReducer } from "react";
 
-import { defaultPlaylists, Playlist, usePlaylists } from "./usePlaylists";
 import { assertUnreachable, getRandomInt } from "@renderer/utils/utils";
-import { useLocalStorage, usePlayOptions } from ".";
+import { defaultPlaylists } from "./usePlaylists";
+import { useLocalStorage } from "@hooks";
 import { dbg, keyPrefix } from "@renderer/utils/app";
 const {
 	fs: { readFile },
@@ -12,10 +15,12 @@ const {
 
 const currentPlayingKey = keyPrefix + "current_playing";
 
-export function useCurrentPlaying() {
-	const [playOptions, dispatchPlayOptions] = usePlayOptions();
-	const [playlists, dispatchPlaylists] = usePlaylists();
-
+export function useCurrentPlaying({
+	dispatchPlayOptions,
+	dispatchPlaylists,
+	playOptions,
+	playlists,
+}: Props) {
 	const [cachedCurrentPlaying, setCachedCurrentPlaying] = useLocalStorage(
 		currentPlayingKey,
 		defaultCurrentPlaying
@@ -80,6 +85,7 @@ export function useCurrentPlaying() {
 
 			case "play this media": {
 				dbg("currentPlaying 'play this media' action =", action);
+				// debugger;
 
 				if (!action.media) {
 					// ^ In case it received the [0] item from a Media[] that is empty.
@@ -222,11 +228,11 @@ export function useCurrentPlaying() {
 		(async function setAudioToHTMLAudioElement() {
 			if (!window || !currentPlaying.media) return;
 
-			console.time("Reading file");
+			console.time("Reading <audio> file");
 			const url = URL.createObjectURL(
 				new Blob([await readFile(currentPlaying.media.path)])
 			);
-			console.timeEnd("Reading file");
+			console.timeEnd("Reading <audio> file");
 
 			const audio = document.getElementById("audio") as HTMLAudioElement;
 			audio.src = url;
@@ -234,17 +240,17 @@ export function useCurrentPlaying() {
 			audio.addEventListener("canplay", () => {
 				console.log("Audio can play");
 			});
-			audio.addEventListener("invalid", e => {
+			audio.addEventListener("invalid", (e) => {
 				console.error("Audio is invalid:", e);
 			});
-			audio.addEventListener("stalled", e => {
+			audio.addEventListener("stalled", (e) => {
 				console.log("Audio is stalled:", e);
 			});
-			audio.addEventListener("securitypolicyviolation", e =>
+			audio.addEventListener("securitypolicyviolation", (e) =>
 				console.error("Audio has a security policy violation:", e)
 			);
-			audio.addEventListener("error", e => console.error("Audio error:", e));
-			audio.addEventListener("abort", e =>
+			audio.addEventListener("error", (e) => console.error("Audio error:", e));
+			audio.addEventListener("abort", (e) =>
 				console.log("Audio was aborted:", e)
 			);
 		})();
@@ -252,6 +258,11 @@ export function useCurrentPlaying() {
 
 	return [currentPlaying, dispatchCurrentPlaying] as const;
 }
+
+useCurrentPlaying.whyDidYouRender = {
+	customName: "useCurrentPlaying",
+	logOnDifferentValues: false,
+};
 
 const defaultCurrentPlaying: CurrentPlaying = {
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
@@ -266,7 +277,7 @@ export type CurrentPlaying = Readonly<{
 	media?: Media;
 }>;
 
-type currentPlayingReducer_Action =
+export type currentPlayingReducer_Action =
 	| Readonly<{ type: "play this media"; media: Media; playlist: Playlist }>
 	| Readonly<{ type: "new"; media: Media; playlist: Playlist }>
 	| Readonly<{ type: "play previous"; playlist: Playlist }>
@@ -274,3 +285,10 @@ type currentPlayingReducer_Action =
 	| Readonly<{ type: "resume"; atSecond: number }>
 	| Readonly<{ type: "pause"; atSecond: number }>
 	| Readonly<{ type: "there is no media" }>;
+
+type Props = Readonly<{
+	dispatchPlaylists: Dispatch<PlaylistsReducer_Action>;
+	dispatchPlayOptions: Dispatch<PlayOptions_Action>;
+	playlists: readonly Playlist[];
+	playOptions: PlayOptions;
+}>;

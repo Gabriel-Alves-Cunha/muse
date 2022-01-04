@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useLocalStorage } from "@hooks";
+import { keyPrefix } from "@renderer/utils/app";
+
+const themeKey = keyPrefix + "theme";
 
 export function ThemeToggler() {
 	const [presetTheme, setLocalStoragedTheme] = useLocalStorage<
 		"light" | "dark"
-	>("@muse:theme", "light");
+	>(themeKey, "light");
 
 	const [theme, setTheme] = useState(presetTheme);
+
 	const nextTheme = theme === "light" ? "dark" : "light";
 
 	useEffect(() => {

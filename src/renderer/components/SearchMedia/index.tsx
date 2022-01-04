@@ -9,9 +9,9 @@ import { IoReloadSharp as Reload } from "react-icons/io5";
 import { FiTrash as Clean } from "react-icons/fi";
 import { FixedSizeList } from "react-window";
 
-import { useCurrentPlaying, useOnClickOutside, usePlaylists } from "@hooks";
+import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
-import { useMediaList } from "@contexts/mediaList";
+import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { dbg } from "@utils/app";
 
 import { Img, Info, SubTitle, Title } from "../MediaListKind/styles";
@@ -33,9 +33,12 @@ type Props = {
 
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const {
-		functions: { searchLocalComputerForMedias, searchForMedia },
-	} = useMediaList();
-	const [, dispatchPlaylists] = usePlaylists();
+		functions: {
+			searchLocalComputerForMedias,
+			dispatchPlaylists,
+			searchForMedia,
+		},
+	} = useMediaHandler();
 
 	const [searcher, dispatchSearcher] = useReducer(searcherReducer, {
 		isLoading: false,
@@ -88,7 +91,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 				<Search>
 					<SearchIcon size="1.2em" />
 					<input
-						onChange={e =>
+						onChange={(e) =>
 							dispatchSearcher({
 								value: e.target.value,
 								type: "setSearchTerm",
@@ -157,14 +160,18 @@ function SearchResults({
 	fromList: MediaListKindProps["mediaType"];
 	results: readonly Media[];
 }) {
-	const [, dispatchCurrentPlaying] = useCurrentPlaying();
-	const [playlists] = usePlaylists();
+	const {
+		functions: { dispatchCurrentPlaying },
+		values: { playlists },
+	} = useMediaHandler();
 
 	const listWrapperReference = useRef<HTMLElement>(null);
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 	const playlist = playlists.find(({ name }) => name === fromList)!;
-	if (!playlist)
+	if (!playlist) {
 		console.error(`There should be "${fromList}" to search through!`);
+		return null;
+	}
 
 	const playMedia = (media: Media) =>
 		dispatchCurrentPlaying({

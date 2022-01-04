@@ -6,8 +6,8 @@ import { useState } from "react";
 import Popup from "reactjs-popup";
 
 import { isChangeable, options, Change } from "../Change";
-import { overlayStyle } from "../index";
-import { useMediaList } from "@contexts/mediaList";
+import { useMediaHandler } from "@renderer/contexts/mediaHandler";
+import { overlayStyle } from "../";
 import { capitalize } from "@utils/utils";
 
 import { Confirm, Option, OptionsModalWrapper } from "./styles";
@@ -15,7 +15,7 @@ import { Confirm, Option, OptionsModalWrapper } from "./styles";
 export function MediaOptionsModal({ media }: { media: Media }) {
 	const {
 		functions: { deleteMedia },
-	} = useMediaList();
+	} = useMediaHandler();
 
 	const [whatToChange, setWhatToChange] = useState<WhatToChange>();
 	const [showConfirm, setShowConfirm] = useState(false);

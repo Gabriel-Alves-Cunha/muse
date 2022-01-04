@@ -24,6 +24,7 @@ export function useScrollLock() {
 			document.body.style.position = "fixed";
 			document.body.style.width = "100%";
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const unlockScroll = useCallback(() => {
@@ -39,6 +40,7 @@ export function useScrollLock() {
 		}
 
 		delete document.body.dataset.scrollLock;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useLayoutEffect(() => {

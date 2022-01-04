@@ -62,8 +62,8 @@ export const searchDirectoryForMedias = async (directory: Path) =>
 export const getAllowedMedias = (
 	filenames: readonly string[]
 ): readonly string[] =>
-	filenames.filter(filename =>
-		allowedMedias.some(extension => extension === getExtension(filename))
+	filenames.filter((filename) =>
+		allowedMedias.some((extension) => extension === getExtension(filename))
 	);
 
 type ListWithOrder<T> = ReadonlyArray<

@@ -5,7 +5,7 @@ import { BsPauseFill as Pause } from "react-icons/bs";
 import { GrFormNext as Next } from "react-icons/gr";
 import { BsPlayFill as Play } from "react-icons/bs";
 
-import { useCurrentPlaying, usePlayOptions } from "@hooks";
+import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { formatTime } from "@common/utils";
 
 import { theme } from "@styles/theme";
@@ -19,8 +19,10 @@ import {
 } from "./styles";
 
 export function MediaPlayer() {
-	const [currentPlaying, dispatchCurrentPlaying] = useCurrentPlaying();
-	const [playOptions] = usePlayOptions();
+	const {
+		values: { currentPlaying, playOptions },
+		functions: { dispatchCurrentPlaying },
+	} = useMediaHandler();
 
 	const [progress, setProgress] = useState<Progress>({
 		percentage: 0,
@@ -147,12 +149,12 @@ export function MediaPlayer() {
 	);
 }
 
-type Progress = Readonly<{
-	percentage: number;
-	current: number;
-}>;
-
 MediaPlayer.whyDidYouRender = {
 	logOnDifferentValues: false,
 	customName: "MediaPlayer",
 };
+
+type Progress = Readonly<{
+	percentage: number;
+	current: number;
+}>;

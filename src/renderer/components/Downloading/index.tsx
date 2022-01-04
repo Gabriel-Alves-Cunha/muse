@@ -4,30 +4,30 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 
-import { reaplyOrderedIndex } from "@contexts/mediaListHelper";
-import { assertUnreachable } from "@utils/utils";
+import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylistsHelper";
 import { useOnClickOutside } from "@hooks";
+import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
+import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { Progress, icon } from "../Progress";
-import { useMediaList } from "@contexts/mediaList";
 import { useInterComm } from "@contexts/communicationBetweenChildren";
 
 import { Circle, Popup, Title } from "./styles";
 
 export function Downloading() {
 	const {
+		functions: { searchLocalComputerForMedias },
+	} = useMediaHandler();
+	const {
 		values: { downloadValues },
 		sendMsg,
 	} = useInterComm();
-	const {
-		functions: { searchLocalComputerForMedias },
-	} = useMediaList();
 
+	const [showPopup, toggleShowPopup] = useReducer((prev) => !prev, false);
+	const popupRef = useRef<HTMLDivElement>(null);
 	const [downloadList, setDownloadList] = useState(
 		[] as readonly DownloadingMedia[]
 	);
-	const [showPopup, toggleShowPopup] = useReducer((prev) => !prev, false);
-	const popupRef = useRef<HTMLDivElement>(null);
 
 	function createNewDownload(): MessagePort {
 		const indexIfThereIsOneAlready = downloadList.findIndex(
@@ -191,7 +191,7 @@ export function Downloading() {
 				);
 			}
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [downloadValues.canStartDownload]);
 
 	useOnClickOutside(popupRef, () => toggleShowPopup());
@@ -230,7 +230,7 @@ export function Downloading() {
 	) : null;
 }
 
-export type DownloadingMedia = Readonly<{
+type DownloadingMedia = Readonly<{
 	status: ProgressProps["status"];
 	isDownloading: boolean;
 	percentage: number;

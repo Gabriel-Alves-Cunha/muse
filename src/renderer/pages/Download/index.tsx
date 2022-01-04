@@ -15,9 +15,9 @@ export function Download() {
 	const { sendMsg } = useInterComm();
 
 	const [searcher, dispatchSearcher] = useReducer(searcherReducer, {
+		result: undefined,
 		isLoading: false,
 		searchTerm: "",
-		result: null,
 		error: "",
 	});
 
@@ -143,8 +143,8 @@ function searcherReducer(
 			const ret: SearcherProps = {
 				searchTerm: previous.searchTerm,
 				error: action.value,
+				result: undefined,
 				isLoading: false,
-				result: null,
 			};
 
 			return ret;
@@ -164,8 +164,8 @@ function searcherReducer(
 		case "setSearchTerm": {
 			const ret: SearcherProps = {
 				searchTerm: action.value,
+				result: undefined,
 				isLoading: false,
-				result: null,
 				error: "",
 			};
 
@@ -188,7 +188,7 @@ function searcherReducer(
 	}
 }
 
-export type UrlMediaMetadata = Readonly<{
+type UrlMediaMetadata = Readonly<{
 	songTitle: string;
 	imageURL: string;
 	artist: string;
@@ -196,14 +196,14 @@ export type UrlMediaMetadata = Readonly<{
 }>;
 
 type SearcherProps = Readonly<{
-	result: UrlMediaMetadata | null;
+	result: UrlMediaMetadata | undefined;
 	isLoading: boolean;
 	searchTerm: string;
 	error: string;
 }>;
 
 type Action =
-	| Readonly<{ type: "setResult"; value: UrlMediaMetadata | null }>
+	| Readonly<{ type: "setResult"; value: UrlMediaMetadata | undefined }>
 	| Readonly<{ type: "setError"; value: NonNullable<string> }>
 	| Readonly<{ type: "setSearchTerm"; value: string }>
 	| Readonly<{ type: "setLoadingToTrue" }>;

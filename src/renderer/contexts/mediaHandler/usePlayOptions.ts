@@ -1,7 +1,7 @@
 import { useReducer } from "react";
 
 import { assertUnreachable } from "@renderer/utils/utils";
-import { useLocalStorage } from ".";
+import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@renderer/utils/app";
 
 const playOptionsKey = keyPrefix + "play_options";
@@ -99,6 +99,11 @@ export function usePlayOptions() {
 
 	return [playOptions, dispatchPlayOptions] as const;
 }
+
+usePlayOptions.whyDidYouRender = {
+	customName: "usePlayOptions",
+	logOnDifferentValues: false,
+};
 
 export type PlayOptions = Readonly<{
 	repeatAllMedia: boolean;

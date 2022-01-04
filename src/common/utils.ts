@@ -1,3 +1,5 @@
+const { trunc, floor } = Math;
+
 export const isDevelopment = process.env.NODE_ENV === "development";
 console.log("Electron isDevelopment =", isDevelopment);
 
@@ -25,16 +27,16 @@ export const getPathWithoutExtension = (filename: string) =>
 
 export function formatTime(time: number | undefined) {
 	if (time === undefined) return "";
-	time = Math.trunc(time);
+	time = trunc(time);
 
-	const days = Math.floor(time / 86_400),
-		hour = ("0" + (Math.floor(time / 3_600) % 24)).slice(-2),
-		minutes = ("0" + (Math.floor(time / 60) % 60)).slice(-2),
+	const days = floor(time / 86_400),
+		hour = ("0" + (floor(time / 3_600) % 24)).slice(-2),
+		minutes = ("0" + (floor(time / 60) % 60)).slice(-2),
 		seconds = ("0" + (time % 60)).slice(-2);
 
 	return (
 		(days > 0 ? days + "d " : "") +
-		(+hour > 0 ? hour + ":" : "") +
+		(Number(hour) > 0 ? hour + ":" : "") +
 		(minutes + ":" + seconds)
 	);
 }

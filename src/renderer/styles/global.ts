@@ -28,6 +28,7 @@ export const GlobalCSS = css`
 	}
 
 	body {
+		/* Make a vertical red line at the middle */
 		/* height: 100vh;
 		background: linear-gradient(red, red) no-repeat center/1px 100%; */
 	}

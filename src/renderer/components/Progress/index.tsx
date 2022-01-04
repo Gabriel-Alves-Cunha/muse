@@ -43,6 +43,6 @@ map.set("convert", <Convert size={12} />);
 
 export type ProgressProps = {
 	status: "success" | "fail" | "active" | "cancel";
-	percent_0_to_100: number;
 	readonly showStatus: boolean;
+	percent_0_to_100: number;
 };

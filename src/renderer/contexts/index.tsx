@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 
-import { MediaList_Provider } from "./mediaList";
+import { MediaHandler_Provider } from "./mediaHandler";
 import { Comm_Provider } from "./communicationBetweenChildren";
 
 export function Contexts({ children }: { children: ReactNode }) {
 	return (
-		<MediaList_Provider>
+		<MediaHandler_Provider>
 			<Comm_Provider>
 				<>{children}</>
 			</Comm_Provider>
-		</MediaList_Provider>
+		</MediaHandler_Provider>
 	);
 }

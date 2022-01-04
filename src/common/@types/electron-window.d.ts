@@ -1,10 +1,10 @@
-/* eslint-disable no-var */
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import type { DownloadValues } from "@renderer/contexts/communicationBetweenChildren";
 import type { Media, Path } from "./types";
 import type { videoInfo } from "ytdl-core";
 
 declare global {
+	/* eslint-disable no-var */
 	var twoWayComm_React_Electron: MessagePort | undefined;
 	var electron: VisibleElectron;
 }
@@ -19,16 +19,16 @@ type VisibleElectron = Readonly<{
 		): void;
 		receiveMsgFromElectron(handleMsg: (msgObject: MsgObject) => void): void;
 		request<ConfigType>(
-			config: AxiosRequestConfig<ConfigType>
-		): Promise<void | AxiosResponse<unknown, ConfigType>>;
-		getInfo(url: string): Promise<void | videoInfo>;
+			config: Readonly<AxiosRequestConfig<ConfigType>>
+		): Promise<void | Readonly<AxiosResponse<unknown, ConfigType>>>;
+		getInfo(url: string): Promise<void | Readonly<videoInfo>>;
 	};
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory(
 			dir: Path
 		): Promise<readonly Path[]>;
 		readdir(dir: Path): Promise<readonly Path[]>;
-		readFile(path: Path): Promise<Buffer>;
+		readFile(path: Path): Promise<Readonly<Buffer>>;
 		rm(path: Path): Promise<void>;
 	};
 	os: {
@@ -42,7 +42,7 @@ type VisibleElectron = Readonly<{
 	media: {
 		transformPathsToMedias(paths: readonly Path[]): Promise<readonly Media[]>;
 		convertToAudio(mediaPath: Path, extension: ExtensionToBeConvertedTo): void;
-		writeTags(pathOfMedia: Path, data: WriteTag): Promise<boolean>;
+		writeTags(pathOfMedia: Path, data: WriteTag): Promise<Readonly<boolean>>;
 	};
 }>;
 

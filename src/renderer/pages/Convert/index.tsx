@@ -38,6 +38,7 @@ export function Convert() {
 
 	useEffect(() => {
 		if (selectedMediasPath[0]) convertTo();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedMediasPath]);
 
 	const handleClick = () => inputRef.current?.click();

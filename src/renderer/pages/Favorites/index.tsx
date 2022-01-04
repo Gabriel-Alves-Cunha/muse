@@ -1,6 +1,6 @@
 import { SearchMedia, MediaListKind } from "@components";
 
-import { MainArea } from "../Home/styles";
+import { MainArea } from "../Home";
 
 export function Favorites() {
 	return (

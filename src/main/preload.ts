@@ -43,7 +43,7 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory: async (dir: Path) =>
-			(await readdir(dir)).map(filename => join(dir, filename)),
+			(await readdir(dir)).map((filename) => join(dir, filename)),
 		readFile: async (path: Path) => await readFile(path),
 		readdir: async (dir: Path) => await readdir(dir),
 		rm: async (path: Path) => await unlink(path),
@@ -170,7 +170,7 @@ async function transformPathsToMedias(
 	return medias;
 }
 
-window.onmessage = event => {
+window.onmessage = (event) => {
 	switch (event.data) {
 		case "download media": {
 			const electronPort = event.ports[0];
@@ -273,7 +273,7 @@ window.onmessage = event => {
 };
 
 const addListeners = (port: MessagePort): Readonly<MessagePort> => {
-	port.onmessage = event => {
+	port.onmessage = (event) => {
 		const { data } = event;
 
 		console.log(
@@ -322,7 +322,7 @@ function makeStream(
 	const titleWithExtension = `${title}.${extension}`;
 	const saveSite = `${dirs.music}/${titleWithExtension}`;
 	const startTime = Date.now();
-	let interval: NodeJS.Timer | null = null;
+	let interval: NodeJS.Timer | undefined = undefined;
 	let percentageToSend = "";
 	let prettyTotal = "";
 
@@ -393,7 +393,7 @@ function makeStream(
 			// Put picture cover:
 			await writeTags(saveSite, { imageURL });
 		})
-		.once("error", error => {
+		.once("error", (error) => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
 
 			// to react
@@ -449,16 +449,16 @@ function convertToAudio(
 	const readStream = createReadStream(mediaPath);
 
 	const msgToSend = { timeConverted: "", sizeConverted: 0 };
-	let interval: NodeJS.Timer | null = null;
+	let interval: NodeJS.Timer | undefined = undefined;
 
 	fluent_ffmpeg(readStream)
 		.toFormat(toExtension)
 		.save(saveSite)
 		.addOptions(["-threads", String(cpus().length)])
-		.on("start", cmdLine =>
+		.on("start", (cmdLine) =>
 			console.log(`Started ffmpeg with command: "${cmdLine}"`)
 		)
-		.on("progress", p => {
+		.on("progress", (p) => {
 			// targetSize: current size of the target file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
 			msgToSend.sizeConverted = p.targetSize;
@@ -473,7 +473,7 @@ function convertToAudio(
 				);
 			}
 		})
-		.once("error", error => {
+		.once("error", (error) => {
 			console.error(`Error Converting file: "${titleWithExtension}"!`, error);
 
 			// To react:
@@ -572,8 +572,8 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 
 function watchForDirectories(dirs: readonly string[]) {
 	const wildcardList = dirs
-		.map(dir =>
-			allowedMedias.map(extension => normalize(dir + "/**/*." + extension))
+		.map((dir) =>
+			allowedMedias.map((extension) => normalize(dir + "/**/*." + extension))
 		)
 		.flat();
 
@@ -591,7 +591,7 @@ function watchForDirectories(dirs: readonly string[]) {
 	// ^ Something to use when events are received.
 
 	watcher
-		.on("error", error =>
+		.on("error", (error) =>
 			console.error("%c[Chokidar]", logStyle, " Error happened", error)
 		)
 		.on("ready", () => {
@@ -608,14 +608,14 @@ function watchForDirectories(dirs: readonly string[]) {
 				watcher.getWatched()
 			);
 		})
-		.on("unlink", path => {
+		.on("unlink", (path) => {
 			log(`%c[Chokidar] File "${path}" has been removed.`, logStyle);
 			window.twoWayComm_React_Electron?.postMessage({
 				msg: "remove media",
 				path,
 			});
 		})
-		.on("add", path => {
+		.on("add", (path) => {
 			log(`%c[Chokidar] File "${path}" has been added.`, logStyle);
 			window.twoWayComm_React_Electron?.postMessage({ msg: "add media", path });
 		});

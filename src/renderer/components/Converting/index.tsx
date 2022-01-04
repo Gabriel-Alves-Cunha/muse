@@ -6,11 +6,11 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 
-import { reaplyOrderedIndex } from "@contexts/mediaListHelper";
+import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
+import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { remove, replace } from "@utils/array";
-import { useMediaList } from "@contexts/mediaList";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { icon } from "../Progress";
@@ -23,18 +23,18 @@ import { Circle, Popup, Progress, Title } from "./styles";
 
 export function Converting() {
 	const {
+		functions: { searchLocalComputerForMedias },
+	} = useMediaHandler();
+	const {
 		values: { convertValues },
 		sendMsg,
 	} = useInterComm();
-	const {
-		functions: { searchLocalComputerForMedias },
-	} = useMediaList();
 
+	const [showPopup, toggleShowPopup] = useReducer((prev) => !prev, false);
+	const popupRef = useRef<HTMLDivElement>(null);
 	const [convertList, setConvertList] = useState(
 		[] as readonly MediaBeingConverted[]
 	);
-	const [showPopup, toggleShowPopup] = useReducer((prev) => !prev, false);
-	const popupRef = useRef<HTMLDivElement>(null);
 
 	function createNewConvert(values: ConvertValues): MessagePort {
 		const indexIfThereIsOneAlready = convertList.findIndex(
@@ -252,7 +252,7 @@ export function Converting() {
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
 
-export type MediaBeingConverted = Readonly<{
+type MediaBeingConverted = Readonly<{
 	toExtension: ExtensionToBeConvertedTo;
 	status: ProgressProps["status"];
 	sizeConverted: number;

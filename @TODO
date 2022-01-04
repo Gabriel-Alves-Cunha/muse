@@ -1,5 +1,6 @@
-* Change size of svg on History
-* See about changing clipboard for electron (full of security issues)
+* TODO: send to run this elsewhere outside this react component on Change.tsx
+* TODO: play new audio is calling twice!
+* test download again.
 
 *** FUTURE OPTIMIZATIONS:
 	* Change lib to change metadata for ffmpeg itself (See ffmpeg docs).

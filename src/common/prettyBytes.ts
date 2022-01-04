@@ -1,3 +1,5 @@
+const { log10, floor, abs, min } = Math;
+
 const UNITS = Object.freeze([
 	"B",
 	"KB",
@@ -11,10 +13,10 @@ const UNITS = Object.freeze([
 ]);
 
 export const prettyBytes = (num: number, precision = 3, addSpace = true) => {
-	if (Math.abs(num) < 1) return num + (addSpace ? " " : "") + "B";
+	if (abs(num) < 1) return num + (addSpace ? " " : "") + "B";
 
-	const exponent = Math.min(
-		Math.floor(Math.log10(num < 0 ? -num : num) / 3),
+	const exponent = min(
+		floor(log10(num < 0 ? -num : num) / 3),
 		UNITS.length - 1
 	);
 

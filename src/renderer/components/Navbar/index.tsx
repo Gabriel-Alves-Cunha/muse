@@ -16,7 +16,6 @@ import { FolderButton, Nav, Text } from "./styles";
 
 export function Navbar() {
 	const { pathname } = useLocation();
-
 	const navigate = useNavigate();
 
 	return (

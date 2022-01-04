@@ -7,16 +7,18 @@ import { FixedSizeList, areEqual } from "react-window";
 import { memo, useRef, useState } from "react";
 import Popup from "reactjs-popup";
 
-import { useCurrentPlaying, usePlaylists } from "@hooks";
 import { MediaOptionsModal } from "./MediaOptions";
-import { Dots } from "../Dots";
+import { useMediaHandler } from "@renderer/contexts/mediaHandler";
+import { Dots } from "../";
 
 import { ListWrapper, SubTitle, Options, Title, Info, Img } from "./styles";
 import { pulse } from "@styles/animations";
 
 export function MediaListKind({ mediaType }: MediaListKindProps) {
-	const [currentPlaying, dispatchCurrentPlaying] = useCurrentPlaying();
-	const [playlists] = usePlaylists();
+	const {
+		functions: { dispatchCurrentPlaying },
+		values: { currentPlaying, playlists },
+	} = useMediaHandler();
 
 	const [showPopup, setShowPopup] = useState<Media>();
 	const listWrapperRef = useRef<HTMLElement>(null);
