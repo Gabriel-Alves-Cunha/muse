@@ -43,7 +43,7 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory: async (dir: Path) =>
-			(await readdir(dir)).map((filename) => join(dir, filename)),
+			(await readdir(dir)).map(filename => join(dir, filename)),
 		readFile: async (path: Path) => await readFile(path),
 		readdir: async (dir: Path) => await readdir(dir),
 		rm: async (path: Path) => await unlink(path),
@@ -170,7 +170,7 @@ async function transformPathsToMedias(
 	return medias;
 }
 
-window.onmessage = (event) => {
+window.onmessage = event => {
 	switch (event.data) {
 		case "download media": {
 			const electronPort = event.ports[0];
@@ -185,14 +185,12 @@ window.onmessage = (event) => {
 				data,
 			}: {
 				data: Readonly<{
-					imageURL: string;
 					destroy: boolean;
 					title: string;
 					url: string;
 				}>;
 			}) =>
 				handleCreateOrCancelDownload(
-					data.imageURL,
 					data.destroy,
 					data.url,
 					data.title,
@@ -273,7 +271,7 @@ window.onmessage = (event) => {
 };
 
 const addListeners = (port: MessagePort): Readonly<MessagePort> => {
-	port.onmessage = (event) => {
+	port.onmessage = event => {
 		const { data } = event;
 
 		console.log(
@@ -286,14 +284,12 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 };
 
 function handleCreateOrCancelDownload(
-	imageURL: Readonly<string>,
 	destroy: Readonly<boolean>,
 	url: Readonly<string>,
 	title: Readonly<string>,
 	electronPort: Readonly<MessagePort>
 ) {
-	if (url && !currentDownloads.has(url))
-		makeStream(imageURL, url, title, electronPort);
+	if (url && !currentDownloads.has(url)) makeStream(url, title, electronPort);
 	else if (url && destroy) {
 		const stream = currentDownloads.get(url);
 		stream?.emit("destroy");
@@ -313,7 +309,6 @@ function handleCreateOrCancelDownload(
 }
 
 function makeStream(
-	imageURL: Readonly<string>,
 	url: Readonly<string>,
 	title: Readonly<string>,
 	electronPort: Readonly<MessagePort>
@@ -385,15 +380,13 @@ function makeStream(
 			electronPort.postMessage({
 				isDownloading: false,
 				status: "success",
+				saveSite,
 			});
 			electronPort.close();
 
 			interval && clearInterval(interval);
-
-			// Put picture cover:
-			await writeTags(saveSite, { imageURL });
 		})
-		.once("error", (error) => {
+		.once("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
 
 			// to react
@@ -455,10 +448,10 @@ function convertToAudio(
 		.toFormat(toExtension)
 		.save(saveSite)
 		.addOptions(["-threads", String(cpus().length)])
-		.on("start", (cmdLine) =>
+		.on("start", cmdLine =>
 			console.log(`Started ffmpeg with command: "${cmdLine}"`)
 		)
-		.on("progress", (p) => {
+		.on("progress", p => {
 			// targetSize: current size of the target file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
 			msgToSend.sizeConverted = p.targetSize;
@@ -473,7 +466,7 @@ function convertToAudio(
 				);
 			}
 		})
-		.once("error", (error) => {
+		.once("error", error => {
 			console.error(`Error Converting file: "${titleWithExtension}"!`, error);
 
 			// To react:
@@ -536,13 +529,16 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 
 	if (data.imageURL) {
 		// Get picture:
-		const res = await axios.get(data.imageURL);
-		if (!res.data)
-			console.error("There was an error getting the picture data.\nres =", res);
+		try {
+			console.log({ imageUrl: data.imageURL });
+			const res = await axios.get(data.imageURL);
 
-		const pictureByteVector = ByteVector.fromByteArray(Buffer.from(res.data));
-		console.log("pictureByteVector =", pictureByteVector);
-		file.tag.pictures.push(Picture.fromData(pictureByteVector));
+			const pictureByteVector = ByteVector.fromByteArray(Buffer.from(res.data));
+			console.log("pictureByteVector =", pictureByteVector);
+			file.tag.pictures.push(Picture.fromData(pictureByteVector));
+		} catch (error) {
+			console.error("There was an error getting the picture data.", error);
+		}
 	}
 
 	Object.entries(data).forEach(([tag, value]) => {
@@ -556,24 +552,12 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 
 	file.save();
 	file.dispose();
-
-	// @TODO: verify why this does not work!
-	try {
-		console.log("Sending 'refresh media'. Should receive on React side!");
-		// @ts-ignore: I want to see why this doesnt work!!
-		window.twoWayComm_React_Electron.postMessage({
-			msg: "refresh media",
-			path: pathOfMedia,
-		});
-	} catch (error) {
-		console.error(error);
-	}
 }
 
 function watchForDirectories(dirs: readonly string[]) {
 	const wildcardList = dirs
-		.map((dir) =>
-			allowedMedias.map((extension) => normalize(dir + "/**/*." + extension))
+		.map(dir =>
+			allowedMedias.map(extension => normalize(dir + "/**/*." + extension))
 		)
 		.flat();
 
@@ -591,7 +575,7 @@ function watchForDirectories(dirs: readonly string[]) {
 	// ^ Something to use when events are received.
 
 	watcher
-		.on("error", (error) =>
+		.on("error", error =>
 			console.error("%c[Chokidar]", logStyle, " Error happened", error)
 		)
 		.on("ready", () => {
@@ -608,14 +592,14 @@ function watchForDirectories(dirs: readonly string[]) {
 				watcher.getWatched()
 			);
 		})
-		.on("unlink", (path) => {
+		.on("unlink", path => {
 			log(`%c[Chokidar] File "${path}" has been removed.`, logStyle);
 			window.twoWayComm_React_Electron?.postMessage({
 				msg: "remove media",
 				path,
 			});
 		})
-		.on("add", (path) => {
+		.on("add", path => {
 			log(`%c[Chokidar] File "${path}" has been added.`, logStyle);
 			window.twoWayComm_React_Electron?.postMessage({ msg: "add media", path });
 		});

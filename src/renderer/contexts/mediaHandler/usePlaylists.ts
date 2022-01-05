@@ -219,14 +219,16 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 				const updateSortedListsAndFinish = (newMediaList: readonly Media[]) => {
 					const previousPlaylistList_1 = playlistsReducer(prevPlaylistArray, {
-						type: "update sorted by date",
-						list: newMediaList,
+						type: "create or update playlists",
+						list: sortByDate(newMediaList),
+						name: "sorted by date",
 					});
 					const previousPlaylistList_2 = playlistsReducer(
 						previousPlaylistList_1,
 						{
-							type: "update sorted by name",
-							list: newMediaList,
+							type: "create or update playlists",
+							list: sortByName(newMediaList),
+							name: "sorted by name",
 						}
 					);
 
@@ -254,7 +256,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 						];
 
 						dbg(
-							"playlistsReducer on 'update favorites'->'add' (To be sorted). newMediaList =",
+							"playlistsReducer on 'update mediaList'->'add' (yet to be sorted). newMediaList =",
 							newMediaList
 						);
 
@@ -273,7 +275,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 						);
 
 						dbg(
-							"playlistsReducer on 'update favorites'->'remove' (To be sorted). newMediaList =",
+							"playlistsReducer on 'update mediaList'->'remove' (yet to be sorted). newMediaList =",
 							newMediaList
 						);
 
@@ -309,15 +311,11 @@ export function usePlaylists(): usePlaylistsReturnType {
 						);
 
 						dbg(
-							"playlistsReducer on 'update favorites'->'new list'. newMediaList =",
+							"playlistsReducer on 'update mediaList'->'new list' (yet to be sorted). newMediaList =",
 							newMediaList
 						);
 
-						return playlistsReducer(prevPlaylistArray, {
-							type: "create or update playlists",
-							list: newMediaList,
-							name: "mediaList",
-						});
+						return updateSortedListsAndFinish(newMediaList);
 						break;
 					}
 
@@ -353,7 +351,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 						);
 
 						dbg(
-							"playlistsReducer on 'update favorites'->'refresh one'. newMediaWithRightIndex =",
+							"playlistsReducer on 'update mediaList'->'refresh one'. newMediaWithRightIndex =",
 							newMediaWithRightIndex,
 							"\nnewMediaList =",
 							newMediaList
@@ -369,66 +367,16 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					case "clean": {
 						dbg(
-							"playlistsReducer on 'update favorites'->'clean'. newMediaList = []"
+							"playlistsReducer on 'update mediaList'->'clean' (yet to be sorted). newMediaList = []"
 						);
 
-						return playlistsReducer(prevPlaylistArray, {
-							type: "create or update playlists",
-							name: "mediaList",
-							list: [],
-						});
+						return updateSortedListsAndFinish([]);
 						break;
 					}
 
 					default:
 						return assertUnreachable(whatToDo);
 				}
-				break;
-			}
-
-			case "update sorted by name": {
-				const newSortedByName = reaplyOrderedIndex(
-					sort(action.list, (a, b) => {
-						if (a.title > b.title) return 1;
-						if (a.title < b.title) return -1;
-						// a must be equal to b:
-						return 0;
-					})
-				);
-
-				dbg(
-					"playlistsReducer on 'update sorted by name'. newSortedByName =",
-					newSortedByName
-				);
-
-				return playlistsReducer(prevPlaylistArray, {
-					type: "create or update playlists",
-					name: "sorted by name",
-					list: newSortedByName,
-				});
-				break;
-			}
-
-			case "update sorted by date": {
-				const newSortedByDate = reaplyOrderedIndex(
-					sort(action.list, (a, b) => {
-						if (a.dateOfArival > b.dateOfArival) return 1;
-						if (a.dateOfArival < b.dateOfArival) return -1;
-						// a must be equal to b:
-						return 0;
-					})
-				);
-
-				dbg(
-					"playlistsReducer on 'update sorted by date'. newSortedByDate =",
-					newSortedByDate
-				);
-
-				return playlistsReducer(prevPlaylistArray, {
-					type: "create or update playlists",
-					name: "sorted by date",
-					list: newSortedByDate,
-				});
 				break;
 			}
 
@@ -494,7 +442,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 	}
 
 	function addListeners(port: MessagePort) {
-		port.onmessage = async (event) => {
+		port.onmessage = async event => {
 			dbg(
 				"Received message from MessagePort on React side.\ndata =",
 				event.data
@@ -677,6 +625,26 @@ usePlaylists.whyDidYouRender = {
 	customName: "usePlaylists",
 };
 
+const sortByDate = (list: readonly Media[]): readonly Media[] =>
+	reaplyOrderedIndex(
+		sort(list, (a, b) => {
+			if (a.dateOfArival > b.dateOfArival) return 1;
+			if (a.dateOfArival < b.dateOfArival) return -1;
+			// a must be equal to b:
+			return 0;
+		})
+	);
+
+const sortByName = (list: readonly Media[]): readonly Media[] =>
+	reaplyOrderedIndex(
+		sort(list, (a, b) => {
+			if (a.title > b.title) return 1;
+			if (a.title < b.title) return -1;
+			// a must be equal to b:
+			return 0;
+		})
+	);
+
 type usePlaylistsReturnType = Readonly<{
 	searchLocalComputerForMedias(force?: boolean): Promise<void>;
 	dispatchPlaylists: React.Dispatch<PlaylistsReducer_Action>;
@@ -692,7 +660,7 @@ const defaultLists = [
 	"mediaList",
 	"history",
 ] as const;
-const temp: Playlist[] = defaultLists.map((name) => ({ name, list: [] }));
+const temp: Playlist[] = defaultLists.map(name => ({ name, list: [] }));
 temp.push({ name: "none", list: [] });
 export const defaultPlaylists: readonly Playlist[] = temp;
 export type DefaultLists = typeof defaultLists[number];
@@ -723,6 +691,4 @@ export type PlaylistsReducer_Action =
 			whatToDo: "add" | "clean";
 			type: "update history";
 			media?: Media;
-	  }>
-	| Readonly<{ type: "update sorted by date"; list: readonly Media[] }>
-	| Readonly<{ type: "update sorted by name"; list: readonly Media[] }>;
+	  }>;

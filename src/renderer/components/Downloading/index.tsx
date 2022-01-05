@@ -8,26 +8,24 @@ import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylists
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
-import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { Progress, icon } from "../Progress";
 import { useInterComm } from "@contexts/communicationBetweenChildren";
+const { writeTags } = electron.media;
 
 import { Circle, Popup, Title } from "./styles";
+import { Path } from "@common/@types/types";
 
 export function Downloading() {
-	const {
-		functions: { searchLocalComputerForMedias },
-	} = useMediaHandler();
 	const {
 		values: { downloadValues },
 		sendMsg,
 	} = useInterComm();
 
-	const [showPopup, toggleShowPopup] = useReducer((prev) => !prev, false);
-	const popupRef = useRef<HTMLDivElement>(null);
+	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
 	const [downloadList, setDownloadList] = useState(
 		[] as readonly DownloadingMedia[]
 	);
+	const popupRef = useRef<HTMLDivElement>(null);
 
 	function createNewDownload(): MessagePort {
 		const indexIfThereIsOneAlready = downloadList.findIndex(
@@ -65,7 +63,7 @@ export function Downloading() {
 			port: myPort,
 		};
 
-		setDownloadList((prev) => [...prev, downloadStatus]);
+		setDownloadList(prev => [...prev, downloadStatus]);
 
 		myPort.postMessage({
 			imageUrl: downloadValues.imageURL,
@@ -74,8 +72,12 @@ export function Downloading() {
 			// ^ On every `postMessage` you have to send the url (as an ID)!
 		});
 
-		myPort.onmessage = ({ data }: { data: Partial<DownloadingMedia> }) => {
-			setDownloadList((prev) =>
+		myPort.onmessage = ({
+			data,
+		}: {
+			data: Partial<DownloadingMedia & { saveSite: Path }>;
+		}) => {
+			setDownloadList(prev =>
 				replace(prev, downloadStatus.index, {
 					...downloadStatus,
 					...data,
@@ -111,7 +113,13 @@ export function Downloading() {
 						draggable: true,
 					});
 
-					(async () => await searchLocalComputerForMedias(true))();
+					(async () => {
+						// Put picture cover:
+						data.saveSite &&
+							(await writeTags(data.saveSite, {
+								imageURL: downloadStatus.imageURL,
+							}));
+					})();
 					break;
 				}
 
@@ -162,7 +170,7 @@ export function Downloading() {
 		if (download.isDownloading)
 			download.port.postMessage({ destroy: true, url: download.url });
 
-		setDownloadList((prev) => reaplyOrderedIndex(remove(prev, index)));
+		setDownloadList(prev => reaplyOrderedIndex(remove(prev, index)));
 	}
 
 	useEffect(() => {
@@ -202,7 +210,7 @@ export function Downloading() {
 
 			{showPopup && (
 				<Popup ref={popupRef}>
-					{downloadList.map((download) => (
+					{downloadList.map(download => (
 						<div key={download.url}>
 							<Title>
 								<p>{download.title}</p>

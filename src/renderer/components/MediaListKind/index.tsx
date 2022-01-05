@@ -81,7 +81,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	return (
 		<ListWrapper ref={listWrapperRef}>
 			<FixedSizeList
-				itemKey={(index, data) => data[index].path}
+				itemKey={(index, data) => data[index].path + new Date()}
 				itemCount={mediaList.list.length}
 				itemData={mediaList.list}
 				className="list"

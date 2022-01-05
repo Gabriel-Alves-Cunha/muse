@@ -1,6 +1,5 @@
 import type { AxiosRequestConfig } from "axios";
 import type { IpcMainInvokeEvent } from "electron";
-import type { ClipboardExtended } from "./clipboardExtended";
 import type { NotificationType } from "@common/@types/electron-window";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
@@ -106,46 +105,51 @@ app.whenReady().then(async () => {
 	electronWindow = createWindow();
 	tray = createTrayIcon();
 
-	const extendedClipboard = (await import("./clipboardExtended"))
-		.ExtendedClipboard;
-	(extendedClipboard as ClipboardExtended)
-		.on("text-changed", async () => {
-			const txt = extendedClipboard.readText("clipboard");
+	try {
+		const extendedClipboard = (await import("./clipboardExtended"))
+			.ExtendedClipboard;
 
-			if (validateURL(txt)) {
-				const {
-					videoDetails: { title, thumbnails },
-				} = await getBasicInfo(txt);
+		(extendedClipboard as ClipboardExtended)
+			.on("text-changed", async () => {
+				const txt = extendedClipboard.readText("clipboard");
 
-				const notification = new Notification({
-					title: "Click to download this video as 'mp3'",
-					timeoutType: "never",
-					urgency: "normal",
-					icon: logoPath,
-					silent: true,
-					body: title,
-				});
+				if (validateURL(txt)) {
+					const {
+						videoDetails: { title, thumbnails },
+					} = await getBasicInfo(txt);
 
-				notification.on("click", () => {
-					console.log("Clicked notification!");
-
-					// Send msg to ipcRenderer:
-					electronWindow?.webContents.send("async-msg", {
-						type: "download media",
-						params: {
-							imageURL: thumbnails.at(-1),
-							type: "download media",
-							canStartDownload: true,
-							url: txt,
-							title,
-						},
+					const notification = new Notification({
+						title: "Click to download this video as 'mp3'",
+						timeoutType: "never",
+						urgency: "normal",
+						icon: logoPath,
+						silent: true,
+						body: title,
 					});
-				});
 
-				notification.show();
-			}
-		})
-		.startWatching();
+					notification.on("click", () => {
+						console.log("Clicked notification!");
+
+						// Send msg to ipcRenderer:
+						electronWindow?.webContents.send("async-msg", {
+							type: "download media",
+							params: {
+								imageURL: thumbnails.at(-1)?.url ?? "",
+								type: "download media",
+								canStartDownload: true,
+								url: txt,
+								title,
+							},
+						});
+					});
+
+					notification.show();
+				}
+			})
+			.startWatching();
+	} catch (error) {
+		console.error(error);
+	}
 
 	app.on("activate", () => {
 		// On macOS it's common to re-create a window in the app when the
@@ -212,3 +216,18 @@ ipcMain.handle(
 	"get-info-ytdl",
 	async (_event: IpcMainInvokeEvent, url: string) => await getInfo(url)
 );
+
+// Also defining it here with all types required so typescript doesn't complain...
+type ClipboardExtended = Electron.Clipboard & {
+	startWatching: () => ClipboardExtended;
+	stopWatching: () => ClipboardExtended;
+	off: <T>(
+		event: string,
+		listener?: (...args: T[]) => void
+	) => ClipboardExtended;
+	on: <T>(event: string, listener: (...args: T[]) => void) => ClipboardExtended;
+	once: <T>(
+		event: string,
+		listener: (...args: T[]) => void
+	) => ClipboardExtended;
+};
