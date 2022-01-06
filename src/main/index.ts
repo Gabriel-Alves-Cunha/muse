@@ -1,4 +1,3 @@
-import type { AxiosRequestConfig } from "axios";
 import type { IpcMainInvokeEvent } from "electron";
 import type { NotificationType } from "@common/@types/electron-window";
 
@@ -6,7 +5,7 @@ import { validateURL, getBasicInfo } from "ytdl-core";
 import { pathToFileURL } from "url";
 import { getInfo } from "ytdl-core";
 import { join } from "path";
-import axios from "axios";
+import { get } from "https";
 import {
 	BrowserWindow,
 	Notification,
@@ -90,20 +89,14 @@ function createWindow() {
 	return window;
 }
 
-const createTrayIcon = () => {
-	const tray = new Tray(nativeImage.createFromPath(logoPath));
-	tray.setToolTip("Music player and downloader");
-	tray.setTitle("Muse");
-
-	return tray;
-};
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
 	electronWindow = createWindow();
-	tray = createTrayIcon();
+	tray = new Tray(nativeImage.createFromPath(logoPath));
+	tray.setToolTip("Music player and downloader");
+	tray.setTitle("Muse");
 
 	try {
 		const extendedClipboard = (await import("./clipboardExtended"))
@@ -207,9 +200,23 @@ ipcMain.on(
 );
 
 ipcMain.handle(
-	"request",
-	async <T>(_event: IpcMainInvokeEvent, axiosConfig: AxiosRequestConfig<T>) =>
-		await axios(axiosConfig)
+	"get-image",
+	async (_event: IpcMainInvokeEvent, url: string): Promise<string | Error> => {
+		return new Promise((resolve, reject) => {
+			get(url, resp => {
+				resp.setEncoding("base64");
+				let body = "";
+				// let body = "data:" + resp.headers["content-type"] + ";base64,";
+				// console.log("body =", body);
+
+				resp.on("data", chunk => (body += chunk));
+				resp.on("end", () => resolve(body));
+			}).on("error", e => {
+				console.error(`Got error getting image on Electron side: ${e.message}`);
+				reject(e);
+			});
+		});
+	}
 );
 
 ipcMain.handle(

@@ -1,4 +1,3 @@
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import type { Media, Path } from "@common/@types/types";
 import type { videoInfo } from "ytdl-core";
 import type { Readable } from "stream";
@@ -13,23 +12,21 @@ import { readdir, readFile, stat, unlink } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
-import { parseFile } from "music-metadata";
 import { normalize } from "path";
 import { watch } from "chokidar";
 import { join } from "path";
 import { cpus } from "os";
 import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
-import axios from "axios";
 import ytdl from "ytdl-core";
 
 import { homeDir, dirs } from "./utils";
 import { prettyBytes } from "@common/prettyBytes";
 import {
+	formatDuration,
 	isDevelopment,
 	allowedMedias,
 	getBasename,
-	formatTime,
 } from "@common/utils";
 
 // Expose protected methods that allow the renderer process to use
@@ -39,7 +36,6 @@ contextBridge.exposeInMainWorld("electron", {
 		sendNotificationToElectron,
 		receiveMsgFromElectron,
 		getInfo,
-		request,
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory: async (dir: Path) =>
@@ -85,17 +81,6 @@ function receiveMsgFromElectron(
 	);
 }
 
-async function request<ConfigType>(
-	config: AxiosRequestConfig<ConfigType>
-): Promise<AxiosResponse<unknown, ConfigType> | undefined> {
-	try {
-		return await ipcRenderer.invoke("request", config);
-	} catch (error) {
-		console.error(error);
-		return;
-	}
-}
-
 async function getInfo(url: string): Promise<videoInfo | undefined> {
 	try {
 		return await ipcRenderer.invoke("get-info-ytdl", url);
@@ -113,51 +98,57 @@ async function transformPathsToMedias(
 	const medias: Media[] = [];
 
 	for (const [index, path] of paths.entries()) {
+		console.time(`for (const [${index}, "${path}"])`);
+		const now = new Date();
+		const date = `${now.getMinutes}:${now.getSeconds}:${now.getMilliseconds}`;
+		console.log("Initialized at", date);
 		console.time(`Reading metadata of "${path}"`);
 		const {
-			common: { picture, title, album, genre, artist },
-			format: { duration },
-		} = await parseFile(path, { duration: true });
+			tag: { pictures, title, album, genres, albumArtists },
+			properties: { durationMilliseconds },
+		} = MediaFile.createFromPath(path);
 		console.timeEnd(`Reading metadata of "${path}"`);
 
-		console.log("file parsed by metadata:", {
-			duration,
-			picture,
-			artist,
-			title,
-			album,
-			genre,
-		});
+		const duration = durationMilliseconds / 1_000;
+		// console.log("file parsed:", {
+		// 	albumArtists,
+		// 	duration,
+		// 	pictures,
+		// 	genres,
+		// 	title,
+		// 	album,
+		// });
 
-		if (ignoreMediaWithLessThan60Seconds && duration && duration < 60) {
-			console.log(`Jumping "${path}" because time is ${duration} seconds!`);
+		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
+			console.log(
+				`Jumping "${path}" because time is ${duration} seconds (< 60 seconds)!`
+			);
 			continue;
 		}
 
 		const { size: sizeInBytes } = await stat(path);
 		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
-			console.log(`Jumping "${path}" because size is ${sizeInBytes} bytes!`);
+			console.log(
+				`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`
+			);
 			continue;
 		}
 
-		const format = picture?.[0].format;
-		const data = picture?.[0].data;
+		const data_: Uint8Array | undefined = pictures?.[0]?.data?.data;
+		const mimeType: string | undefined = data_ && pictures?.[0]?.mimeType;
+		const buffer = data_ && Buffer.from(data_);
 		const img =
-			data && format
-				? {
-						data: `data:${format};base64,${data.toString("base64")}`,
-						// ^ Would love some better way of doing this...
-						format,
-				  }
+			buffer && mimeType
+				? `data:${mimeType};base64,${buffer.toString("base64")}`
 				: undefined;
 
 		const media: Media = {
+			duration: formatDuration(duration),
 			title: title ?? getBasename(path),
-			duration: formatTime(duration),
 			size: prettyBytes(sizeInBytes),
+			artist: albumArtists[0] ?? "",
 			dateOfArival: new Date(),
-			genres: genre,
-			artist,
+			genres,
 			album,
 			index,
 			path,
@@ -165,6 +156,8 @@ async function transformPathsToMedias(
 		};
 
 		medias.push(media);
+		console.timeEnd(`for (const [${index}, "${path}"])`);
+		console.log("%cmedia =", "background-color: #f9ca4c80;", media);
 	}
 
 	return medias;
@@ -522,6 +515,7 @@ function convertToAudio(
 	console.log("Medias converting =", mediasConverting);
 }
 
+// const imageTypeRegex = new RegExp(/data:(image\/[a-z]+)+/);
 async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	const file = MediaFile.createFromPath(pathOfMedia);
 	// console.log("File =", file);
@@ -530,12 +524,16 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	if (data.imageURL) {
 		// Get picture:
 		try {
-			console.log({ imageUrl: data.imageURL });
-			const res = await axios.get(data.imageURL);
+			const imgAsString: string = await ipcRenderer.invoke(
+				"get-image",
+				data.imageURL
+			);
+			// const match = imageTypeRegex.exec(imgAsString);
 
-			const pictureByteVector = ByteVector.fromByteArray(Buffer.from(res.data));
-			console.log("pictureByteVector =", pictureByteVector);
-			file.tag.pictures.push(Picture.fromData(pictureByteVector));
+			const picture = Picture.fromData(ByteVector.fromString(imgAsString));
+			// picture.mimeType = match?.[1] ?? "";
+
+			if (picture.mimeType) file.tag.pictures = [picture];
 		} catch (error) {
 			console.error("There was an error getting the picture data.", error);
 		}
@@ -553,6 +551,40 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	file.save();
 	file.dispose();
 }
+
+// setTimeout(async () => {
+// 	console.log("Starting");
+
+// 	const imgAsString: string = await ipcRenderer.invoke(
+// 		"get-image",
+// 		"https://i.ytimg.com/vi/fO_uNc49iNE/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLAOD0x7klMGEfYr5h4z7sLI3iwx5A"
+// 	);
+// 	console.log("image =", imgAsString);
+
+// 	// const match = imageTypeRegex.exec(imgAsString);
+
+// 	// const data = ByteVector.fromString(imgAsString);
+// 	// const mime = Picture.getExtensionFromData(data);
+// 	// console.log({ mime });
+
+// 	// const picture = Picture.fromFullData(data, 6, "image/webp", "no description");
+// 	// console.log({ picture });
+
+// 	// const picture = Picture.fromData(
+// 	// 	ByteVector.fromByteArray(Buffer.from(imgAsString))
+// 	// );
+// 	// picture.mimeType = match?.[1] ?? "";
+
+// 	const file = MediaFile.createFromPath(
+// 		"/home/gabriel/Music/BENEE - Same Effect (Official Audio).mp3"
+// 	);
+
+// 	file.tag.pictures = [imgAsString];
+// 	console.log("File tags =", file.tag.pictures);
+
+// 	file.save();
+// 	file.dispose();
+// }, 5_000);
 
 function watchForDirectories(dirs: readonly string[]) {
 	const wildcardList = dirs

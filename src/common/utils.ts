@@ -25,7 +25,7 @@ export const getBasename = (filename: string) =>
 export const getPathWithoutExtension = (filename: string) =>
 	filename.slice(0, filename.lastIndexOf("."));
 
-export function formatTime(time: number | undefined) {
+export function formatDuration(time: number | undefined) {
 	if (time === undefined) return "";
 	time = trunc(time);
 

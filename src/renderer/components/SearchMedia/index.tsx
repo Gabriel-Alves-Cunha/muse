@@ -191,7 +191,7 @@ function SearchResults({
 			<Result key={media.path} onClick={() => playMedia(media)} style={style}>
 				<Img>
 					{media.img ? (
-						<img src={media.img.data} />
+						<img src={media.img} />
 					) : (
 						<MusicNote size="1.4em" />
 					)}

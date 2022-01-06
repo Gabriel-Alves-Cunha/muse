@@ -6,7 +6,7 @@ import { GrFormNext as Next } from "react-icons/gr";
 import { BsPlayFill as Play } from "react-icons/bs";
 
 import { useMediaHandler } from "@renderer/contexts/mediaHandler";
-import { formatTime } from "@common/utils";
+import { formatDuration } from "@common/utils";
 
 import { theme } from "@styles/theme";
 import {
@@ -86,8 +86,8 @@ export function MediaPlayer() {
 			<audio id="audio" preload="none" ref={audioRef} />
 
 			<Img>
-				{currentPlaying?.media?.img?.data ? (
-					<img src={currentPlaying.media.img.data} />
+				{currentPlaying?.media?.img ? (
+					<img src={currentPlaying.media.img} />
 				) : (
 					<MusicNote size="1.4em" />
 				)}
@@ -99,7 +99,7 @@ export function MediaPlayer() {
 			</Info>
 
 			<SeekerWrapper>
-				<span>{formatTime(progress.current)}</span>
+				<span>{formatDuration(progress.current)}</span>
 
 				<ProgressWrapper onClick={seek} id="goto">
 					<div

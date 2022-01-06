@@ -414,9 +414,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 		};
 
 		try {
-			console.time("Getting paths");
 			const paths = getAllowedMedias(await searchDirectoryResult());
-			console.timeEnd("Getting paths");
 			dbg("Finished searching. Paths =", paths);
 
 			if (force || isThereNewMedia(paths)) {

@@ -51,8 +51,8 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				>
 					<div className="play-button" onClick={() => playMedia(media)}>
 						<Img>
-							{media.img?.data ? (
-								<img src={media.img.data} />
+							{media.img ? (
+								<img src={media.img} />
 							) : (
 								<MusicNote size="1.4em" />
 							)}

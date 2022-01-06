@@ -1,4 +1,3 @@
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import type { DownloadValues } from "@renderer/contexts/communicationBetweenChildren";
 import type { Media, Path } from "./types";
 import type { videoInfo } from "ytdl-core";
@@ -18,9 +17,6 @@ type VisibleElectron = Readonly<{
 			}>
 		): void;
 		receiveMsgFromElectron(handleMsg: (msgObject: MsgObject) => void): void;
-		request<ConfigType>(
-			config: Readonly<AxiosRequestConfig<ConfigType>>
-		): Promise<void | Readonly<AxiosResponse<unknown, ConfigType>>>;
 		getInfo(url: string): Promise<void | Readonly<videoInfo>>;
 	};
 	fs: {

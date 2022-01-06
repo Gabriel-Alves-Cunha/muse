@@ -5,7 +5,6 @@ export type PrettyBytes = Readonly<string>;
 export type Path = Readonly<string>;
 
 export type Media = Readonly<{
-	img?: Readonly<{ format: string; data: string }>;
 	genres?: readonly string[];
 	dateOfArival: Date;
 	size: PrettyBytes;
@@ -14,5 +13,6 @@ export type Media = Readonly<{
 	album?: string;
 	title: string;
 	index: number;
+	img?: string;
 	path: Path;
 }>;
