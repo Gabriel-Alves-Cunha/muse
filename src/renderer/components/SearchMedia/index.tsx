@@ -78,7 +78,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					value: searchForMedia(searcher.searchTerm),
 					type: "setResults",
 				}),
-			500
+			500,
 		);
 
 		return () => clearTimeout(searchTimeout);
@@ -91,7 +91,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 				<Search>
 					<SearchIcon size="1.2em" />
 					<input
-						onChange={(e) =>
+						onChange={e =>
 							dispatchSearcher({
 								value: e.target.value,
 								type: "setSearchTerm",
@@ -190,11 +190,7 @@ function SearchResults({
 		return media ? (
 			<Result key={media.path} onClick={() => playMedia(media)} style={style}>
 				<Img>
-					{media.img ? (
-						<img src={media.img} />
-					) : (
-						<MusicNote size="1.4em" />
-					)}
+					{media.img ? <img src={media.img} /> : <MusicNote size="1.4em" />}
 				</Img>
 
 				<Info>

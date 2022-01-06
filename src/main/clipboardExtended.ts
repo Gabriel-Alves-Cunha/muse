@@ -8,7 +8,7 @@ let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).on = <T>(
 	event: string,
-	listener: (...args: T[]) => void
+	listener: (...args: T[]) => void,
 ) => {
 	clipboardEmitter.on(event, listener);
 
@@ -17,7 +17,7 @@ let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).once = <T>(
 	event: string,
-	listener: (...args: T[]) => void
+	listener: (...args: T[]) => void,
 ) => {
 	clipboardEmitter.once(event, listener);
 
@@ -26,7 +26,7 @@ let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).off = <T>(
 	event: string,
-	listener?: (...args: T[]) => void
+	listener?: (...args: T[]) => void,
 ) => {
 	if (listener) clipboardEmitter.removeListener(event, listener);
 	else clipboardEmitter.removeAllListeners(event);
@@ -62,14 +62,14 @@ type ClipboardExtended = Electron.Clipboard &
 		stopWatching: () => ClipboardExtended;
 		off: <T>(
 			event: string,
-			listener?: (...args: T[]) => void
+			listener?: (...args: T[]) => void,
 		) => ClipboardExtended;
 		on: <T>(
 			event: string,
-			listener: (...args: T[]) => void
+			listener: (...args: T[]) => void,
 		) => ClipboardExtended;
 		once: <T>(
 			event: string,
-			listener: (...args: T[]) => void
+			listener: (...args: T[]) => void,
 		) => ClipboardExtended;
 	}>;

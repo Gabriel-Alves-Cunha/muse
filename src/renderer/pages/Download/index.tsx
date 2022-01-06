@@ -72,7 +72,7 @@ export function Download() {
 
 		const searchTimeout = setTimeout(
 			async () => await search(searcher.searchTerm),
-			400
+			400,
 		);
 
 		return () => clearTimeout(searchTimeout);
@@ -135,7 +135,7 @@ Download.whyDidYouRender = {
 
 function searcherReducer(
 	previous: SearcherProps,
-	action: Action
+	action: Action,
 ): SearcherProps {
 	const { type } = action;
 	switch (type) {

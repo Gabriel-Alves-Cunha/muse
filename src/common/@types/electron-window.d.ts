@@ -14,14 +14,14 @@ type VisibleElectron = Readonly<{
 			object: Readonly<{
 				type: NotificationType;
 				msg?: string;
-			}>
+			}>,
 		): void;
 		receiveMsgFromElectron(handleMsg: (msgObject: MsgObject) => void): void;
 		getInfo(url: string): Promise<void | Readonly<videoInfo>>;
 	};
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory(
-			dir: Path
+			dir: Path,
 		): Promise<readonly Path[]>;
 		readdir(dir: Path): Promise<readonly Path[]>;
 		readFile(path: Path): Promise<Readonly<Buffer>>;

@@ -23,13 +23,13 @@ export function Downloading() {
 
 	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
 	const [downloadList, setDownloadList] = useState(
-		[] as readonly DownloadingMedia[]
+		[] as readonly DownloadingMedia[],
 	);
 	const popupRef = useRef<HTMLDivElement>(null);
 
 	function createNewDownload(): MessagePort {
 		const indexIfThereIsOneAlready = downloadList.findIndex(
-			({ url }) => url === downloadValues.url
+			({ url }) => url === downloadValues.url,
 		);
 		if (indexIfThereIsOneAlready !== -1) {
 			const info = `There is already one download of "${downloadValues.title}"`;
@@ -66,7 +66,7 @@ export function Downloading() {
 		setDownloadList(prev => [...prev, downloadStatus]);
 
 		myPort.postMessage({
-			imageUrl: downloadValues.imageURL,
+			imageURL: downloadValues.imageURL,
 			title: downloadStatus.title,
 			url: downloadValues.url,
 			// ^ On every `postMessage` you have to send the url (as an ID)!
@@ -81,7 +81,7 @@ export function Downloading() {
 				replace(prev, downloadStatus.index, {
 					...downloadStatus,
 					...data,
-				})
+				}),
 			);
 
 			switch (data.status) {
@@ -160,7 +160,7 @@ export function Downloading() {
 		if (index === -1) {
 			console.error(
 				`There should be a download with url "${url_}"!\ndownloadList =`,
-				downloadList
+				downloadList,
 			);
 			return;
 		}
@@ -195,7 +195,7 @@ export function Downloading() {
 						pauseOnHover: true,
 						autoClose: 5000,
 						draggable: true,
-					}
+					},
 				);
 			}
 		}

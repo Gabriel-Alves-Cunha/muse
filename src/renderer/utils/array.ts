@@ -1,6 +1,6 @@
 export const remove = <T>(
 	array: readonly T[],
-	indexToRemove: Readonly<number>
+	indexToRemove: Readonly<number>,
 ): readonly T[] => [
 	...array.slice(0, indexToRemove),
 	...array.slice(indexToRemove + 1),
@@ -9,7 +9,7 @@ export const remove = <T>(
 export const concatFromIndex = <T>(
 	array: readonly T[],
 	indexToConcatFrom: Readonly<number>,
-	arrayToBeAdded: readonly T[]
+	arrayToBeAdded: readonly T[],
 ): readonly T[] => [
 	...array,
 	...arrayToBeAdded.slice(indexToConcatFrom, arrayToBeAdded.length),
@@ -18,7 +18,7 @@ export const concatFromIndex = <T>(
 export const replace = <T>(
 	array: readonly T[],
 	indexToRemove: Readonly<number>,
-	replacement: Readonly<T>
+	replacement: Readonly<T>,
 ): readonly T[] => [
 	...array.slice(0, indexToRemove),
 	replacement,
@@ -27,14 +27,14 @@ export const replace = <T>(
 
 export const sort = <T>(
 	array: readonly T[],
-	compareFunction?: (a: Readonly<T>, b: Readonly<T>) => Readonly<number>
+	compareFunction?: (a: Readonly<T>, b: Readonly<T>) => Readonly<number>,
 ): readonly T[] => [...array].sort(compareFunction);
 
 export const pop = <T>(array: readonly T[]): readonly T[] => array.slice(0, -1);
 
 export const push = <T>(
 	array: readonly T[],
-	newEntry: Readonly<T>
+	newEntry: Readonly<T>,
 ): readonly T[] => [...array, newEntry];
 
 export const shift = <T>(array: readonly T[]): readonly T[] => array.slice(1);

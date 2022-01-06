@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 
 export function useSelections<T>(
 	items: readonly T[],
-	defaultSelected: readonly T[] = []
+	defaultSelected: readonly T[] = [],
 ) {
 	const [selected, setSelected] = useState<readonly T[]>(defaultSelected);
 
@@ -29,19 +29,19 @@ export function useSelections<T>(
 
 	const allActions = useMemo(() => {
 		const selectAll = () => {
-			items.forEach((item) => setOfSelected.add(item));
+			items.forEach(item => setOfSelected.add(item));
 			setSelected(Array.from(setOfSelected));
 		};
 
 		const unselectAll = () => {
-			items.forEach((item) => setOfSelected.delete(item));
+			items.forEach(item => setOfSelected.delete(item));
 			setSelected(Array.from(setOfSelected));
 		};
 
-		const isNoneSelected = items.every((item) => !setOfSelected.has(item));
+		const isNoneSelected = items.every(item => !setOfSelected.has(item));
 
 		const isAllSelected =
-			items.every((item) => setOfSelected.has(item)) && !isNoneSelected;
+			items.every(item => setOfSelected.has(item)) && !isNoneSelected;
 
 		const isPartiallySelected = !isNoneSelected && !isAllSelected;
 

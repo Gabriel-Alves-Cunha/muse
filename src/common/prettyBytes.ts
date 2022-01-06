@@ -17,11 +17,11 @@ export const prettyBytes = (num: number, precision = 3, addSpace = true) => {
 
 	const exponent = min(
 		floor(log10(num < 0 ? -num : num) / 3),
-		UNITS.length - 1
+		UNITS.length - 1,
 	);
 
 	const n = Number(
-		((num < 0 ? -num : num) / 1_000 ** exponent).toPrecision(precision)
+		((num < 0 ? -num : num) / 1_000 ** exponent).toPrecision(precision),
 	);
 
 	return (num < 0 ? "-" : "") + n + (addSpace ? " " : "") + UNITS[exponent];

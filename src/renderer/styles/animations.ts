@@ -1,6 +1,6 @@
 export function pulse(
 	e: React.MouseEvent<HTMLButtonElement>,
-	timeOfAnimation = 600
+	timeOfAnimation = 600,
 ) {
 	e.preventDefault();
 
@@ -14,6 +14,6 @@ export function pulse(
 				boxShadow: "0 0 0 10px rgba(211, 186, 250, 0)",
 			},
 		],
-		timeOfAnimation
+		timeOfAnimation,
 	);
 }

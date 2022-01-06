@@ -28,7 +28,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	if (!mediaList)
 		console.error(
 			`There should/must be a "${mediaType}"!\nplaylists =`,
-			playlists
+			playlists,
 		);
 
 	const playMedia = (media: Media) =>
@@ -51,11 +51,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				>
 					<div className="play-button" onClick={() => playMedia(media)}>
 						<Img>
-							{media.img ? (
-								<img src={media.img} />
-							) : (
-								<MusicNote size="1.4em" />
-							)}
+							{media.img ? <img src={media.img} /> : <MusicNote size="1.4em" />}
 						</Img>
 
 						<Info>
@@ -74,7 +70,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				</div>
 			) : null;
 		},
-		areEqual
+		areEqual,
 	);
 	Row.displayName = "Row";
 

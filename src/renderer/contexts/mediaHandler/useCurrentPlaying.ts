@@ -23,17 +23,17 @@ export function useCurrentPlaying({
 }: Props) {
 	const [cachedCurrentPlaying, setCachedCurrentPlaying] = useLocalStorage(
 		currentPlayingKey,
-		defaultCurrentPlaying
+		defaultCurrentPlaying,
 	);
 
 	const [currentPlaying, dispatchCurrentPlaying] = useReducer(
 		currentPlayingReducer,
-		cachedCurrentPlaying
+		cachedCurrentPlaying,
 	);
 
 	function currentPlayingReducer(
 		previousPlaying: CurrentPlaying,
-		action: currentPlayingReducer_Action
+		action: currentPlayingReducer_Action,
 	): CurrentPlaying {
 		const { type } = action;
 		switch (type) {
@@ -52,7 +52,7 @@ export function useCurrentPlaying({
 				if (!action.media) return previousPlaying;
 				if (action.playlist.name === "none") {
 					console.error(
-						"Received 'none' playlist to play (from 'new' currentPlaying)!"
+						"Received 'none' playlist to play (from 'new' currentPlaying)!",
 					);
 
 					return currentPlayingReducer(previousPlaying, {
@@ -188,7 +188,7 @@ export function useCurrentPlaying({
 				} else {
 					if (!prevMedia) {
 						console.error(
-							"Can't play next media if there isn't one selected already!"
+							"Can't play next media if there isn't one selected already!",
 						);
 
 						return currentPlayingReducer(previousPlaying, {
@@ -230,7 +230,7 @@ export function useCurrentPlaying({
 
 			console.time("Reading <audio> file");
 			const url = URL.createObjectURL(
-				new Blob([await readFile(currentPlaying.media.path)])
+				new Blob([await readFile(currentPlaying.media.path)]),
 			);
 			console.timeEnd("Reading <audio> file");
 
@@ -240,18 +240,18 @@ export function useCurrentPlaying({
 			audio.addEventListener("canplay", () => {
 				console.log("Audio can play");
 			});
-			audio.addEventListener("invalid", (e) => {
+			audio.addEventListener("invalid", e => {
 				console.error("Audio is invalid:", e);
 			});
-			audio.addEventListener("stalled", (e) => {
+			audio.addEventListener("stalled", e => {
 				console.log("Audio is stalled:", e);
 			});
-			audio.addEventListener("securitypolicyviolation", (e) =>
-				console.error("Audio has a security policy violation:", e)
+			audio.addEventListener("securitypolicyviolation", e =>
+				console.error("Audio has a security policy violation:", e),
 			);
-			audio.addEventListener("error", (e) => console.error("Audio error:", e));
-			audio.addEventListener("abort", (e) =>
-				console.log("Audio was aborted:", e)
+			audio.addEventListener("error", e => console.error("Audio error:", e));
+			audio.addEventListener("abort", e =>
+				console.log("Audio was aborted:", e),
 			);
 		})();
 	}, [currentPlaying]);

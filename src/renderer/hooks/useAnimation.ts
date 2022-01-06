@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export function useAnimation(
 	easingName: keyof typeof easing = "linear",
 	duration = 500,
-	delay = 0
+	delay = 0,
 ) {
 	// The useAnimationTimer hook calls useState every animation frame
 	// giving us elapsed time and causing a rerender as frequently
@@ -60,7 +60,7 @@ function useAnimationTimer(duration = 1000, delay = 0) {
 				clearTimeout(timerStop);
 			};
 		},
-		[duration, delay] // Only re-run effect if duration or delay changes
+		[duration, delay], // Only re-run effect if duration or delay changes
 	);
 
 	return elapsed;

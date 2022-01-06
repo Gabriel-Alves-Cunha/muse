@@ -18,12 +18,12 @@ export function usePlayOptions() {
 
 	const [playOptions, dispatchPlayOptions] = useReducer(
 		playOptionsReducer,
-		cachedPlayOptions
+		cachedPlayOptions,
 	);
 
 	function playOptionsReducer(
 		previousPlayOptions: PlayOptions,
-		action: PlayOptions_Action
+		action: PlayOptions_Action,
 	): PlayOptions {
 		const { type } = action;
 

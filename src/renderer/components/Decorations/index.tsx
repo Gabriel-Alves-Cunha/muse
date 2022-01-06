@@ -47,7 +47,7 @@ export function Decorations() {
 		<Wrapper onClick={handleMaximizeOnDoubleClick}>
 			{/* ^ window-draggable-region */}
 			<AppIcon>
-				<img src={imageUrl.href} width="24px" height="24px" />
+				<img src={imageUrl.href} width="24px" height="24px" alt="Muse's logo" />
 			</AppIcon>
 
 			<AppName_Folder />
@@ -65,15 +65,22 @@ Decorations.whyDidYouRender = {
 function Buttons() {
 	return (
 		<WindowButtons>
-			<WindowButton onClick={closeWindow} isToClose={true}>
+			<WindowButton
+				aria-label="Close window"
+				onClick={closeWindow}
+				isToClose={true}
+			>
 				<Close size="16px" />
 			</WindowButton>
 
-			<WindowButton onClick={toggleMaximize}>
+			<WindowButton
+				onClick={toggleMaximize}
+				aria-label="Toggle maximize window"
+			>
 				<Maximize size="16px" />
 			</WindowButton>
 
-			<WindowButton onClick={minimizeWindow}>
+			<WindowButton onClick={minimizeWindow} aria-label="Minize window">
 				<Minimize size="16px" />
 			</WindowButton>
 		</WindowButtons>

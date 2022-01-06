@@ -1,6 +1,7 @@
 import type { Media, Path } from "@common/@types/types";
 import type { videoInfo } from "ytdl-core";
 import type { Readable } from "stream";
+import type { IPicture } from "node-taglib-sharp";
 import type {
 	NotificationType,
 	MsgObject,
@@ -12,6 +13,7 @@ import { readdir, readFile, stat, unlink } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
+import { StringType } from "node-taglib-sharp";
 import { normalize } from "path";
 import { watch } from "chokidar";
 import { join } from "path";
@@ -68,16 +70,16 @@ function sendNotificationToElectron(
 	object: Readonly<{
 		type: NotificationType;
 		msg?: string;
-	}>
+	}>,
 ): void {
 	ipcRenderer.send("notify", object);
 }
 
 function receiveMsgFromElectron(
-	handleMsg: (msgObject: MsgObject) => void
+	handleMsg: (msgObject: MsgObject) => void,
 ): void {
 	ipcRenderer.on("async-msg", (_, msgObject: MsgObject) =>
-		handleMsg(msgObject)
+		handleMsg(msgObject),
 	);
 }
 
@@ -93,7 +95,7 @@ async function getInfo(url: string): Promise<videoInfo | undefined> {
 async function transformPathsToMedias(
 	paths: readonly string[],
 	assureMediaSizeIsGreaterThan60KB = true,
-	ignoreMediaWithLessThan60Seconds = true
+	ignoreMediaWithLessThan60Seconds = true,
 ) {
 	const medias: Media[] = [];
 
@@ -121,7 +123,7 @@ async function transformPathsToMedias(
 
 		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
 			console.log(
-				`Jumping "${path}" because time is ${duration} seconds (< 60 seconds)!`
+				`Jumping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
 			);
 			continue;
 		}
@@ -129,18 +131,15 @@ async function transformPathsToMedias(
 		const { size: sizeInBytes } = await stat(path);
 		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
 			console.log(
-				`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`
+				`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
 			);
 			continue;
 		}
 
-		const data_: Uint8Array | undefined = pictures?.[0]?.data?.data;
-		const mimeType: string | undefined = data_ && pictures?.[0]?.mimeType;
-		const buffer = data_ && Buffer.from(data_);
-		const img =
-			buffer && mimeType
-				? `data:${mimeType};base64,${buffer.toString("base64")}`
-				: undefined;
+		const picture: IPicture | undefined = pictures[0];
+		const mimeType = picture?.mimeType;
+		const str = picture?.data.toString();
+		const img = str && mimeType ? `data:${mimeType};base64,${str}` : undefined;
 
 		const media: Media = {
 			duration: formatDuration(duration),
@@ -169,7 +168,7 @@ window.onmessage = event => {
 			const electronPort = event.ports[0];
 			if (!electronPort) {
 				console.error(
-					"There is no message port to handle 'download media' event!"
+					"There is no message port to handle 'download media' event!",
 				);
 				return;
 			}
@@ -178,20 +177,22 @@ window.onmessage = event => {
 				data,
 			}: {
 				data: Readonly<{
+					imageURL: string;
 					destroy: boolean;
 					title: string;
 					url: string;
 				}>;
 			}) =>
 				handleCreateOrCancelDownload(
+					data.imageURL,
 					data.destroy,
 					data.url,
 					data.title,
-					electronPort
+					electronPort,
 				);
 
 			electronPort.addEventListener("close", () =>
-				console.log("Closing ports (electronPort).")
+				console.log("Closing ports (electronPort)."),
 			);
 
 			// MessagePortMain queues messages until the .start() method has been called.
@@ -203,7 +204,7 @@ window.onmessage = event => {
 			const electronPort = event.ports[0];
 			if (!electronPort) {
 				console.error(
-					"There is no MessagePort to handle 'convert media' event!"
+					"There is no MessagePort to handle 'convert media' event!",
 				);
 				return;
 			}
@@ -221,11 +222,11 @@ window.onmessage = event => {
 					data.destroy,
 					data.toExtension,
 					data.path,
-					electronPort
+					electronPort,
 				);
 
 			electronPort.addEventListener("close", () =>
-				console.log("Closing ports (electronPort).")
+				console.log("Closing ports (electronPort)."),
 			);
 
 			// MessagePortMain queues messages until the .start() method has been called.
@@ -239,7 +240,7 @@ window.onmessage = event => {
 			const electronPort = event.ports[0];
 			if (!electronPort) {
 				console.error(
-					"There should be an electronPort for 2-way communication with React!"
+					"There should be an electronPort for 2-way communication with React!",
 				);
 				return;
 			}
@@ -256,7 +257,7 @@ window.onmessage = event => {
 				`There is no method to handle this event: (${typeof event.data}) "${
 					event.data
 				}";\nEvent =`,
-				event
+				event,
 			);
 			break;
 		}
@@ -269,7 +270,7 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 
 		console.log(
 			"Message received on electron side of 2way-comm (currently doing nothing!!):",
-			data
+			data,
 		);
 	};
 
@@ -277,17 +278,19 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 };
 
 function handleCreateOrCancelDownload(
+	imageURL: Readonly<string>,
 	destroy: Readonly<boolean>,
 	url: Readonly<string>,
 	title: Readonly<string>,
-	electronPort: Readonly<MessagePort>
+	electronPort: Readonly<MessagePort>,
 ) {
-	if (url && !currentDownloads.has(url)) makeStream(url, title, electronPort);
+	if (url && !currentDownloads.has(url))
+		makeStream(imageURL, url, title, electronPort);
 	else if (url && destroy) {
 		const stream = currentDownloads.get(url);
 		stream?.emit("destroy");
 		const readAnswer = stream?.destroy(
-			new Error("This readStream is being destroyed!")
+			new Error("This readStream is being destroyed!"),
 		);
 
 		console.log("readStream 'destroy()' answer =", readAnswer);
@@ -296,15 +299,16 @@ function handleCreateOrCancelDownload(
 			`Was "${url}" deleted from map? `,
 			currentDownloads.delete(url),
 			"\ncurrentDownloads =",
-			currentDownloads
+			currentDownloads,
 		);
 	}
 }
 
 function makeStream(
+	imageURL: Readonly<string>,
 	url: Readonly<string>,
 	title: Readonly<string>,
-	electronPort: Readonly<MessagePort>
+	electronPort: Readonly<MessagePort>,
 ) {
 	const extension: Readonly<typeof allowedMedias[number]> = "mp3";
 	const titleWithExtension = `${title}.${extension}`;
@@ -322,7 +326,7 @@ function makeStream(
 		.once("destroy", () => {
 			console.log(
 				"%cDestroy was called on readStream!",
-				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;"
+				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
 
 			electronPort.postMessage({
@@ -349,7 +353,7 @@ function makeStream(
 
 				interval = setInterval(
 					() => electronPort.postMessage({ percentage: percentageToSend }),
-					2_000
+					2_000,
 				);
 			}
 
@@ -358,15 +362,15 @@ function makeStream(
 				readline.cursorTo(process.stdout, 0);
 				process.stdout.write(
 					`${percentage}% downloaded (${prettyBytes(
-						downloaded
-					)} of ${prettyTotal}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes `
+						downloaded,
+					)} of ${prettyTotal}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes `,
 				);
 			}
 		})
 		.once("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
-				"color: green; font-weight: bold;"
+				"color: green; font-weight: bold;",
 			);
 
 			// to react:
@@ -378,6 +382,8 @@ function makeStream(
 			electronPort.close();
 
 			interval && clearInterval(interval);
+
+			await writeTags(saveSite, { imageURL });
 		})
 		.once("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
@@ -403,7 +409,7 @@ function handleCreateOrCancelConvert(
 	destroy: Readonly<boolean>,
 	toExtension: Readonly<typeof allowedMedias[number]>,
 	path: Readonly<Path>,
-	electronPort: Readonly<MessagePort>
+	electronPort: Readonly<MessagePort>,
 ) {
 	if (path && !mediasConverting.has(path))
 		convertToAudio(path, toExtension, electronPort);
@@ -411,7 +417,7 @@ function handleCreateOrCancelConvert(
 		const stream = mediasConverting.get(path);
 		stream?.emit("destroy");
 		const readAnswer = stream?.destroy(
-			new Error("This readStream is being destroyed!")
+			new Error("This readStream is being destroyed!"),
 		);
 
 		console.log("readStream 'destroy()' answer =", readAnswer);
@@ -420,7 +426,7 @@ function handleCreateOrCancelConvert(
 			`Was "${path}" deleted from map? `,
 			mediasConverting.delete(path),
 			"\nmediasConverting =",
-			mediasConverting
+			mediasConverting,
 		);
 	}
 }
@@ -428,7 +434,7 @@ function handleCreateOrCancelConvert(
 function convertToAudio(
 	mediaPath: Readonly<Path>,
 	toExtension: Readonly<typeof allowedMedias[number]>,
-	electronPort: Readonly<MessagePort>
+	electronPort: Readonly<MessagePort>,
 ) {
 	const titleWithExtension = `${getBasename(mediaPath)}.${toExtension}`;
 	const saveSite = `${dirs.music}/${titleWithExtension}`;
@@ -442,7 +448,7 @@ function convertToAudio(
 		.save(saveSite)
 		.addOptions(["-threads", String(cpus().length)])
 		.on("start", cmdLine =>
-			console.log(`Started ffmpeg with command: "${cmdLine}"`)
+			console.log(`Started ffmpeg with command: "${cmdLine}"`),
 		)
 		.on("progress", p => {
 			// targetSize: current size of the target file in kilobytes
@@ -455,7 +461,7 @@ function convertToAudio(
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort.postMessage(msgToSend),
-					2_000
+					2_000,
 				);
 			}
 		})
@@ -476,7 +482,7 @@ function convertToAudio(
 		.once("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
-				"color: green; font-weight: bold;"
+				"color: green; font-weight: bold;",
 			);
 
 			// To react:
@@ -493,13 +499,13 @@ function convertToAudio(
 				"Deleting from map:",
 				mediasConverting.delete(mediaPath),
 				"\n\nconverting =",
-				mediasConverting
+				mediasConverting,
 			);
 		})
 		.once("destroy", () => {
 			console.log(
 				"%cDestroy was called on readStream for converter!",
-				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;"
+				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
 
 			electronPort.postMessage({
@@ -515,7 +521,8 @@ function convertToAudio(
 	console.log("Medias converting =", mediasConverting);
 }
 
-// const imageTypeRegex = new RegExp(/data:(image\/[a-z]+)+/);
+const imageTypeRegex = new RegExp(/data:(image\/[a-z]+)+/);
+const textToExclude = new RegExp(/(data:(.+\/.+);base64,)/);
 async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	const file = MediaFile.createFromPath(pathOfMedia);
 	// console.log("File =", file);
@@ -526,12 +533,18 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 		try {
 			const imgAsString: string = await ipcRenderer.invoke(
 				"get-image",
-				data.imageURL
+				data.imageURL,
 			);
-			// const match = imageTypeRegex.exec(imgAsString);
+			const txtForByteVector = imgAsString.replace(textToExclude, "");
 
-			const picture = Picture.fromData(ByteVector.fromString(imgAsString));
-			// picture.mimeType = match?.[1] ?? "";
+			const byteVector = ByteVector.fromString(
+				txtForByteVector,
+				StringType.Latin1,
+			);
+			const picture = Picture.fromData(byteVector);
+
+			const match = imageTypeRegex.exec(imgAsString);
+			picture.mimeType = match?.[1] ?? "";
 
 			if (picture.mimeType) file.tag.pictures = [picture];
 		} catch (error) {
@@ -553,34 +566,31 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 }
 
 // setTimeout(async () => {
-// 	console.log("Starting");
+// 	// console.log("Starting");
 
-// 	const imgAsString: string = await ipcRenderer.invoke(
-// 		"get-image",
-// 		"https://i.ytimg.com/vi/fO_uNc49iNE/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLAOD0x7klMGEfYr5h4z7sLI3iwx5A"
-// 	);
-// 	console.log("image =", imgAsString);
-
+// 	// const imgAsString: string = await ipcRenderer.invoke(
+// 	// 	"get-image",
+// 	// 	"https://i.ytimg.com/vi/fO_uNc49iNE/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLAOD0x7klMGEfYr5h4z7sLI3iwx5A"
+// 	// );
 // 	// const match = imageTypeRegex.exec(imgAsString);
 
-// 	// const data = ByteVector.fromString(imgAsString);
-// 	// const mime = Picture.getExtensionFromData(data);
-// 	// console.log({ mime });
-
-// 	// const picture = Picture.fromFullData(data, 6, "image/webp", "no description");
+// 	// const data = ByteVector.fromString(imgAsString, StringType.Latin1);
+// 	// const picture = Picture.fromData(data);
+// 	// picture.mimeType = match?.[1] ?? "";
 // 	// console.log({ picture });
 
-// 	// const picture = Picture.fromData(
-// 	// 	ByteVector.fromByteArray(Buffer.from(imgAsString))
+// 	// const file = MediaFile.createFromPath(
+// 	// 	"/home/gabriel/Music/BENEE - Same Effect (Official Audio).mp3"
 // 	// );
-// 	// picture.mimeType = match?.[1] ?? "";
 
-// 	const file = MediaFile.createFromPath(
-// 		"/home/gabriel/Music/BENEE - Same Effect (Official Audio).mp3"
+// 	// file.tag.pictures = [picture];
+// 	// console.log("File tags =", file.tag.pictures);
+
+// 	const picture_ = (file.tag.pictures[0] as IPicture).data;
+// 	console.log(
+// 		"Picture decoded =\n\n",
+// 		picture_.toString(picture_.length, StringType.Latin1)
 // 	);
-
-// 	file.tag.pictures = [imgAsString];
-// 	console.log("File tags =", file.tag.pictures);
 
 // 	file.save();
 // 	file.dispose();
@@ -589,7 +599,7 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 function watchForDirectories(dirs: readonly string[]) {
 	const wildcardList = dirs
 		.map(dir =>
-			allowedMedias.map(extension => normalize(dir + "/**/*." + extension))
+			allowedMedias.map(extension => normalize(dir + "/**/*." + extension)),
 		)
 		.flat();
 
@@ -608,20 +618,20 @@ function watchForDirectories(dirs: readonly string[]) {
 
 	watcher
 		.on("error", error =>
-			console.error("%c[Chokidar]", logStyle, " Error happened", error)
+			console.error("%c[Chokidar]", logStyle, " Error happened", error),
 		)
 		.on("ready", () => {
 			log(
 				"%c[Chokidar]",
 				logStyle,
-				" Initial scan complete. Listening for changes."
+				" Initial scan complete. Listening for changes.",
 			);
 
 			console.log(
 				"%c[Chokidar]",
 				logStyle,
 				" Files being watched:\n",
-				watcher.getWatched()
+				watcher.getWatched(),
 			);
 		})
 		.on("unlink", path => {

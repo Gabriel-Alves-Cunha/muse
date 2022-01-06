@@ -5,7 +5,7 @@ export const minimizeWindow = () => notify({ type: "minimize" });
 export const closeWindow = () => notify({ type: "quitApp" });
 
 export const handleMaximizeOnDoubleClick = (
-	e: React.MouseEvent<HTMLElement, MouseEvent>
+	e: React.MouseEvent<HTMLElement, MouseEvent>,
 ) => {
 	e.preventDefault();
 
@@ -15,5 +15,5 @@ export const handleMaximizeOnDoubleClick = (
 
 export const imageUrl = new URL(
 	"../../assets/icons/logo.svg?width=16",
-	import.meta.url
+	import.meta.url,
 );

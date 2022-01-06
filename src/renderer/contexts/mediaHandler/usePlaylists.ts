@@ -28,12 +28,12 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 	const [playlists, dispatchPlaylists] = useReducer(
 		playlistsReducer,
-		cachedPlaylists
+		cachedPlaylists,
 	);
 
 	function playlistsReducer(
 		prevPlaylistArray: readonly Playlist[],
-		action: PlaylistsReducer_Action
+		action: PlaylistsReducer_Action,
 	): readonly Playlist[] {
 		const { type } = action;
 
@@ -41,7 +41,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 			case "create or update playlists": {
 				const update = () => {
 					const index = prevPlaylistArray.findIndex(
-						({ name }) => name === action.name
+						({ name }) => name === action.name,
 					);
 
 					const updatedPlaylist: Playlist = {
@@ -51,12 +51,12 @@ export function usePlaylists(): usePlaylistsReturnType {
 					const newPlaylistArray = replace(
 						prevPlaylistArray,
 						index,
-						updatedPlaylist
+						updatedPlaylist,
 					);
 
 					dbg(
 						"playlistsReducer on 'create or update playlists'->'update'. New playlist =",
-						newPlaylistArray
+						newPlaylistArray,
 					);
 					setCachedPlaylists(newPlaylistArray);
 
@@ -71,7 +71,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					dbg(
 						"playlistsReducer on 'create or update playlists'->'create'. New playlist =",
-						newPlaylistArray
+						newPlaylistArray,
 					);
 					setCachedPlaylists(newPlaylistArray);
 
@@ -79,7 +79,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 				};
 
 				const isOneAlreadyCreated = prevPlaylistArray.some(
-					({ name }) => name === action.name
+					({ name }) => name === action.name,
 				);
 
 				return isOneAlreadyCreated ? update() : create();
@@ -89,7 +89,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 			case "update history": {
 				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 				const prevHistory = prevPlaylistArray.find(
-					({ name }) => name === "history"
+					({ name }) => name === "history",
 				)?.list;
 				if (!prevHistory) {
 					console.error("There should be a previous history!!");
@@ -101,19 +101,19 @@ export function usePlaylists(): usePlaylistsReturnType {
 					case "add": {
 						if (!action.media) {
 							console.error(
-								"There should be a media when calling 'add' on history!"
+								"There should be a media when calling 'add' on history!",
 							);
 							return prevPlaylistArray;
 						}
 
 						const newHistory = returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
 							prevHistory,
-							action.media
+							action.media,
 						);
 
 						dbg(
 							"playlistsReducer on 'update history'->'add'. newHistory =",
-							newHistory
+							newHistory,
 						);
 
 						if (newHistory === prevHistory) return prevPlaylistArray;
@@ -128,7 +128,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					case "clean": {
 						dbg(
-							"playlistsReducer on 'update history'->'clean'. newHistory = []"
+							"playlistsReducer on 'update history'->'clean'. newHistory = []",
 						);
 
 						return playlistsReducer(prevPlaylistArray, {
@@ -147,7 +147,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 			case "update favorites": {
 				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 				const prevFavorites = prevPlaylistArray.find(
-					({ name }) => name === "favorites"
+					({ name }) => name === "favorites",
 				)!.list;
 
 				const { whatToDo } = action;
@@ -163,7 +163,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 						dbg(
 							"playlistsReducer on 'update favorites'->'add'. newFavorites =",
-							newFavorites
+							newFavorites,
 						);
 
 						return playlistsReducer(prevPlaylistArray, {
@@ -176,12 +176,12 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					case "remove": {
 						const newFavorites = reaplyOrderedIndex(
-							remove(prevFavorites, action.media.index)
+							remove(prevFavorites, action.media.index),
 						);
 
 						dbg(
 							"playlistsReducer on 'update favorites'->'remove'. newFavorites =",
-							newFavorites
+							newFavorites,
 						);
 
 						return playlistsReducer(prevPlaylistArray, {
@@ -194,7 +194,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					case "clean": {
 						dbg(
-							"playlistsReducer on 'update favorites'->'clean'. newFavorites = []"
+							"playlistsReducer on 'update favorites'->'clean'. newFavorites = []",
 						);
 
 						return playlistsReducer(prevPlaylistArray, {
@@ -214,7 +214,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 			case "update mediaList": {
 				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 				const prevMediaList = prevPlaylistArray.find(
-					({ name }) => name === "mediaList"
+					({ name }) => name === "mediaList",
 				)!.list;
 
 				const updateSortedListsAndFinish = (newMediaList: readonly Media[]) => {
@@ -229,7 +229,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 							type: "create or update playlists",
 							list: sortByName(newMediaList),
 							name: "sorted by name",
-						}
+						},
 					);
 
 					return playlistsReducer(previousPlaylistList_2, {
@@ -257,7 +257,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 						dbg(
 							"playlistsReducer on 'update mediaList'->'add' (yet to be sorted). newMediaList =",
-							newMediaList
+							newMediaList,
 						);
 
 						return updateSortedListsAndFinish(newMediaList);
@@ -271,12 +271,12 @@ export function usePlaylists(): usePlaylistsReturnType {
 						}
 
 						const newMediaList = reaplyOrderedIndex(
-							remove(prevMediaList, action.media.index)
+							remove(prevMediaList, action.media.index),
 						);
 
 						dbg(
 							"playlistsReducer on 'update mediaList'->'remove' (yet to be sorted). newMediaList =",
-							newMediaList
+							newMediaList,
 						);
 
 						return updateSortedListsAndFinish(newMediaList);
@@ -298,7 +298,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 											dateOfArival: prevMedia.dateOfArival,
 									  }
 									: // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-									  action.list![index]
+									  action.list![index],
 							)
 							.filter(({ path }) => path);
 
@@ -306,13 +306,13 @@ export function usePlaylists(): usePlaylistsReturnType {
 							concatFromIndex(
 								updatedButWithOriginalDateOfArival,
 								updatedButWithOriginalDateOfArival.length,
-								action.list
-							)
+								action.list,
+							),
 						);
 
 						dbg(
 							"playlistsReducer on 'update mediaList'->'new list' (yet to be sorted). newMediaList =",
-							newMediaList
+							newMediaList,
 						);
 
 						return updateSortedListsAndFinish(newMediaList);
@@ -322,19 +322,19 @@ export function usePlaylists(): usePlaylistsReturnType {
 					case "refresh one": {
 						if (!action.media) {
 							console.error(
-								"There should be a media when CALLING 'refresh one'!"
+								"There should be a media when CALLING 'refresh one'!",
 							);
 							return prevPlaylistArray;
 						}
 
 						const oldMediaIndex = prevMediaList.findIndex(
 							// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-							({ path }) => path === action.media!.path
+							({ path }) => path === action.media!.path,
 						);
 
 						if (oldMediaIndex === -1) {
 							console.error(
-								"There should be a not-refreshed media when CALLING 'refresh one' but I did not find one!"
+								"There should be a not-refreshed media when CALLING 'refresh one' but I did not find one!",
 							);
 							return prevPlaylistArray;
 						}
@@ -347,14 +347,14 @@ export function usePlaylists(): usePlaylistsReturnType {
 						const newMediaList = replace(
 							prevMediaList,
 							oldMediaIndex,
-							newMediaWithRightIndex
+							newMediaWithRightIndex,
 						);
 
 						dbg(
 							"playlistsReducer on 'update mediaList'->'refresh one'. newMediaWithRightIndex =",
 							newMediaWithRightIndex,
 							"\nnewMediaList =",
-							newMediaList
+							newMediaList,
 						);
 
 						return playlistsReducer(prevPlaylistArray, {
@@ -367,7 +367,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					case "clean": {
 						dbg(
-							"playlistsReducer on 'update mediaList'->'clean' (yet to be sorted). newMediaList = []"
+							"playlistsReducer on 'update mediaList'->'clean' (yet to be sorted). newMediaList = []",
 						);
 
 						return updateSortedListsAndFinish([]);
@@ -394,7 +394,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 		const mediaList = playlists.find(({ name }) => name === "mediaList")!.list;
 
 		const results = mediaList.filter(({ title }) =>
-			title.toLowerCase().includes(searchTerm.toLowerCase())
+			title.toLowerCase().includes(searchTerm.toLowerCase()),
 		);
 		console.timeEnd("Searching for file");
 
@@ -408,7 +408,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 		const isThereNewMedia = (paths: readonly string[]) => {
 			const isThereNewMedia = paths.length !== mediaList.length;
 			dbg(
-				`mediaList.length = ${mediaList.length}. Is there new media? ${isThereNewMedia}`
+				`mediaList.length = ${mediaList.length}. Is there new media? ${isThereNewMedia}`,
 			);
 			return isThereNewMedia;
 		};
@@ -443,7 +443,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 		port.onmessage = async event => {
 			dbg(
 				"Received message from MessagePort on React side.\ndata =",
-				event.data
+				event.data,
 			);
 
 			const {
@@ -471,7 +471,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 				case "del media": {
 					if (!path) {
 						console.error(
-							"There should be a path if you want to remove a media!"
+							"There should be a path if you want to remove a media!",
 						);
 						break;
 					}
@@ -493,7 +493,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 				case "refresh media": {
 					if (!path) {
 						console.error(
-							"There should be a path if you want to refresh a media!"
+							"There should be a path if you want to refresh a media!",
 						);
 						break;
 					}
@@ -505,7 +505,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					if (mediaIndex === -1) {
 						console.error(
-							`There should be a media with path = "${path}" to be refreshed, but there isn't!`
+							`There should be a media with path = "${path}" to be refreshed, but there isn't!`,
 						);
 						break;
 					}
@@ -514,7 +514,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					if (!refreshedMedia) {
 						console.error(
-							`I wasn't able to transform this path (${path}) to a media to be refreshed!`
+							`I wasn't able to transform this path (${path}) to a media to be refreshed!`,
 						);
 						break;
 					}
@@ -535,7 +535,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					if (!media) {
 						console.error(
-							`I wasn't able to find this path (${path}) to a media to be removed!`
+							`I wasn't able to find this path (${path}) to a media to be removed!`,
 						);
 						break;
 					}
@@ -630,7 +630,7 @@ const sortByDate = (list: readonly Media[]): readonly Media[] =>
 			if (a.dateOfArival < b.dateOfArival) return -1;
 			// a must be equal to b:
 			return 0;
-		})
+		}),
 	);
 
 const sortByName = (list: readonly Media[]): readonly Media[] =>
@@ -640,7 +640,7 @@ const sortByName = (list: readonly Media[]): readonly Media[] =>
 			if (a.title < b.title) return -1;
 			// a must be equal to b:
 			return 0;
-		})
+		}),
 	);
 
 type usePlaylistsReturnType = Readonly<{

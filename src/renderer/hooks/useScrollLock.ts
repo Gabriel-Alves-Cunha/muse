@@ -48,7 +48,7 @@ export function useScrollLock() {
 
 		document.body.style.setProperty(
 			`${scrollBarCompensationName}`,
-			`${scrollBarCompensation}px`
+			`${scrollBarCompensation}px`,
 		);
 	}, []);
 

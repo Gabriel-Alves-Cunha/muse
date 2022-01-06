@@ -30,15 +30,15 @@ export function Converting() {
 		sendMsg,
 	} = useInterComm();
 
-	const [showPopup, toggleShowPopup] = useReducer((prev) => !prev, false);
+	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
 	const popupRef = useRef<HTMLDivElement>(null);
 	const [convertList, setConvertList] = useState(
-		[] as readonly MediaBeingConverted[]
+		[] as readonly MediaBeingConverted[],
 	);
 
 	function createNewConvert(values: ConvertValues): MessagePort {
 		const indexIfThereIsOneAlready = convertList.findIndex(
-			({ path }) => path === values.path
+			({ path }) => path === values.path,
 		);
 		if (indexIfThereIsOneAlready !== -1) {
 			const info = `There is already one convert of "${values.path}"!`;
@@ -72,7 +72,7 @@ export function Converting() {
 			port: myPort,
 		};
 
-		setConvertList((prev) => [...prev, convertStatus]);
+		setConvertList(prev => [...prev, convertStatus]);
 
 		myPort.postMessage({
 			toExtension: convertStatus.toExtension,
@@ -84,11 +84,11 @@ export function Converting() {
 		myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
 			// dbg("myPort msg received =", data);
 
-			setConvertList((prev) =>
+			setConvertList(prev =>
 				replace(prev, convertStatus.index, {
 					...convertStatus,
 					...data,
-				})
+				}),
 			);
 
 			switch (data.status) {
@@ -161,7 +161,7 @@ export function Converting() {
 		if (index === -1) {
 			console.error(
 				`There should be a download with path "${path_}"!\nconvertList =`,
-				convertList
+				convertList,
 			);
 			return;
 		}
@@ -171,11 +171,11 @@ export function Converting() {
 		if (convert.isConverting)
 			convert.port.postMessage({ destroy: true, path: convert.path });
 
-		setConvertList((prev) => reaplyOrderedIndex(remove(prev, index)));
+		setConvertList(prev => reaplyOrderedIndex(remove(prev, index)));
 	}
 
 	useEffect(() => {
-		convertValues.forEach((convertValue) => {
+		convertValues.forEach(convertValue => {
 			if (convertValue.canStartConvert) {
 				try {
 					const electronPort = createNewConvert(convertValue);
@@ -193,7 +193,7 @@ export function Converting() {
 							pauseOnHover: true,
 							autoClose: 5000,
 							draggable: true,
-						}
+						},
 					);
 				}
 			}
@@ -215,7 +215,7 @@ export function Converting() {
 
 			{showPopup && (
 				<Popup ref={popupRef}>
-					{convertList.map((convert) => (
+					{convertList.map(convert => (
 						<div key={convert.path}>
 							<Title>
 								<p>{getBasename(convert.path) + "." + convert.toExtension}</p>

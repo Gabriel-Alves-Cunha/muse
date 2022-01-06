@@ -59,7 +59,7 @@ function useMediaHandler() {
 
 	if (!context)
 		throw new Error(
-			"`useMediaList` must be used within a `<MediaHandler_Context>`"
+			"`useMediaList` must be used within a `<MediaHandler_Context>`",
 		);
 
 	return context;
@@ -80,7 +80,7 @@ type MediaList_ContextProps = Readonly<{
 		dispatchPlayOptions: Dispatch<PlayOptions_Action>;
 		deleteMedia: (media: Media) => Promise<void>;
 		searchLocalComputerForMedias: (
-			force?: boolean | undefined
+			force?: boolean | undefined,
 		) => Promise<void>;
 	};
 	values: {

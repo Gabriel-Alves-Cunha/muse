@@ -15,7 +15,7 @@ export function Convert() {
 	const { sendMsg } = useInterComm();
 
 	function convertTo() {
-		const value = selectedMediasPath.map((path) => ({
+		const value = selectedMediasPath.map(path => ({
 			toExtension: selectedExtensionToBeConvertedTo,
 			canStartConvert: true,
 			path,

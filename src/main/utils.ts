@@ -13,7 +13,7 @@ export const logoPath = join(
 	"electron",
 	"assets",
 	"icons",
-	"logo.png"
+	"logo.png",
 );
 // console.log("logoPath =", logoPath);
 

@@ -45,11 +45,11 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 
 			case "startConvert": {
 				setConvertValues(
-					action.value.map((values) => ({
+					action.value.map(values => ({
 						toExtension: values.toExtension,
 						canStartConvert: true,
 						path: values.path,
-					}))
+					})),
 				);
 
 				break;
@@ -66,10 +66,10 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 		sendMsg({ type: "startDownload", value });
 
 	useEffect(() => {
-		receiveMsgFromElectron((object) => {
+		receiveMsgFromElectron(object => {
 			dbg(
 				"Received 'async-msg' from Electron on React side.\nobject =",
-				object
+				object,
 			);
 
 			switch (object.type) {
@@ -81,7 +81,7 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 				default: {
 					console.error(
 						"This 'async-msg' event has no receiver function!\nobject =",
-						object
+						object,
 					);
 					break;
 				}

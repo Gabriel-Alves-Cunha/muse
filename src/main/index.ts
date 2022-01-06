@@ -58,7 +58,7 @@ function createWindow() {
 					},
 				},
 			],
-		})
+		}),
 	);
 	menu.append(
 		new MenuItem({
@@ -74,7 +74,7 @@ function createWindow() {
 					},
 				},
 			],
-		})
+		}),
 	);
 	Menu.setApplicationMenu(menu);
 
@@ -168,7 +168,7 @@ ipcMain.on(
 		object: Readonly<{
 			type: NotificationType;
 			msg?: string;
-		}>
+		}>,
 	) => {
 		switch (object.type) {
 			case "quitApp": {
@@ -191,12 +191,12 @@ ipcMain.on(
 			default: {
 				console.error(
 					"This 'notify' event has no receiver function!\nEvent =",
-					event
+					event,
 				);
 				break;
 			}
 		}
-	}
+	},
 );
 
 ipcMain.handle(
@@ -205,9 +205,8 @@ ipcMain.handle(
 		return new Promise((resolve, reject) => {
 			get(url, resp => {
 				resp.setEncoding("base64");
-				let body = "";
-				// let body = "data:" + resp.headers["content-type"] + ";base64,";
-				// console.log("body =", body);
+
+				let body = "data:" + resp.headers["content-type"] + ";base64,";
 
 				resp.on("data", chunk => (body += chunk));
 				resp.on("end", () => resolve(body));
@@ -216,12 +215,12 @@ ipcMain.handle(
 				reject(e);
 			});
 		});
-	}
+	},
 );
 
 ipcMain.handle(
 	"get-info-ytdl",
-	async (_event: IpcMainInvokeEvent, url: string) => await getInfo(url)
+	async (_event: IpcMainInvokeEvent, url: string) => await getInfo(url),
 );
 
 // Also defining it here with all types required so typescript doesn't complain...
@@ -230,11 +229,11 @@ type ClipboardExtended = Electron.Clipboard & {
 	stopWatching: () => ClipboardExtended;
 	off: <T>(
 		event: string,
-		listener?: (...args: T[]) => void
+		listener?: (...args: T[]) => void,
 	) => ClipboardExtended;
 	on: <T>(event: string, listener: (...args: T[]) => void) => ClipboardExtended;
 	once: <T>(
 		event: string,
-		listener: (...args: T[]) => void
+		listener: (...args: T[]) => void,
 	) => ClipboardExtended;
 };

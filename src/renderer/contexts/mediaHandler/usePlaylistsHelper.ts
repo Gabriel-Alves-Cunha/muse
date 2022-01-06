@@ -10,7 +10,7 @@ const {
 const maxSizeOfHistory = 100;
 export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
 	previousHistory: readonly Media[],
-	media: Readonly<Media>
+	media: Readonly<Media>,
 ): readonly Media[] {
 	if (media.path === previousHistory[0]?.path) return previousHistory;
 
@@ -39,13 +39,13 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 }
 
 const documentsDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-	dirs.documents
+	dirs.documents,
 );
 const downloadDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-	dirs.downloads
+	dirs.downloads,
 );
 const musicDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-	dirs.music
+	dirs.music,
 );
 
 export async function searchDirectoryResult() {
@@ -60,10 +60,10 @@ export const searchDirectoryForMedias = async (directory: Path) =>
 	getAllowedMedias(await readdir(directory));
 
 export const getAllowedMedias = (
-	filenames: readonly string[]
+	filenames: readonly string[],
 ): readonly string[] =>
-	filenames.filter((filename) =>
-		allowedMedias.some((extension) => extension === getExtension(filename))
+	filenames.filter(filename =>
+		allowedMedias.some(extension => extension === getExtension(filename)),
 	);
 
 type ListWithOrder<T> = ReadonlyArray<

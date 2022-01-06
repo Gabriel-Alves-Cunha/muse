@@ -20,14 +20,15 @@ export function Navbar() {
 
 	return (
 		<Nav>
-			{folders.map((folder) => (
+			{folders.map(folder => (
 				<FolderButton
 					className={
 						folder === capitalize(pathname.replace("/", "")) ? "active" : ""
 					}
 					onClick={() => navigate("/" + folder.toLowerCase())}
-					onMouseDown={(e) => e.preventDefault()}
+					onMouseDown={e => e.preventDefault()}
 					// ^ Takes focus off of button so that the `outline` css can be applied
+					aria-label={folder}
 					key={folder}
 				>
 					<span>{icon(folder)}</span>
