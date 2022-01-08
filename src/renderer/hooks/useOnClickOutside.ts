@@ -1,3 +1,5 @@
+import type { RefObject } from "react";
+
 import { useEffect } from "react";
 
 type Handler = (event: MouseEvent | TouchEvent) => void;
@@ -10,7 +12,7 @@ type Handler = (event: MouseEvent | TouchEvent) => void;
  * passing it into this hook.
  */
 export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
-	ref: React.RefObject<T>,
+	ref: RefObject<T>,
 	handler: Handler,
 ) {
 	useEffect(() => {

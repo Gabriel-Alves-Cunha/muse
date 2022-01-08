@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction, KeyboardEvent } from "react";
 import type { DefaultLists } from "@renderer/contexts/mediaHandler/usePlaylists";
 import type { Media, Path } from "@common/@types/types";
 
@@ -12,8 +13,8 @@ export function Change({
 	whatToChange,
 	mediaPath,
 }: {
-	setWhatToChange: React.Dispatch<
-		React.SetStateAction<
+	setWhatToChange: Dispatch<
+		SetStateAction<
 			| {
 					whatToChange: ChangeOptions;
 					current: string;
@@ -29,7 +30,7 @@ export function Change({
 }) {
 	const [value, setValue] = useState(() => whatToChange.current);
 
-	const writeChange = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const writeChange = async (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" && value) {
 			setWhatToChange(undefined);
 

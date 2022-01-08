@@ -1,5 +1,6 @@
 import type { ListenToNotification } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/types";
+import type { Dispatch } from "react";
 
 import { useEffect, useReducer } from "react";
 
@@ -646,7 +647,7 @@ const sortByName = (list: readonly Media[]): readonly Media[] =>
 
 type usePlaylistsReturnType = Readonly<{
 	searchLocalComputerForMedias(force?: boolean): Promise<void>;
-	dispatchPlaylists: React.Dispatch<PlaylistsReducer_Action>;
+	dispatchPlaylists: Dispatch<PlaylistsReducer_Action>;
 	searchForMedia(searchTerm: string): readonly Media[];
 	deleteMedia(media: Media): Promise<void>;
 	playlists: readonly Playlist[];

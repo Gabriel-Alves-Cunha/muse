@@ -1,8 +1,10 @@
 import { ToastContainer } from "react-toastify";
 import { Global } from "@emotion/react";
-import { Outlet } from "react-router-dom";
 
+import { Convert, Download, Favorites, History, Home, Settings } from "./pages";
+import { assertUnreachable } from "./utils/utils";
 import { Contexts } from "@contexts";
+import { usePage } from "./contexts/page";
 import {
 	Decorations,
 	MediaPlayer,
@@ -49,12 +51,33 @@ const Main = () => (
 		</>
 
 		<>
-			<Outlet />
+			<PageToShow />
 		</>
 
 		<MediaPlayer />
 	</MainView>
 );
+
+const PageToShow = () => {
+	const { page } = usePage();
+
+	switch (page) {
+		case "Convert":
+			return <Convert />;
+		case "Download":
+			return <Download />;
+		case "Favorites":
+			return <Favorites />;
+		case "History":
+			return <History />;
+		case "Home":
+			return <Home />;
+		case "Settings":
+			return <Settings />;
+		default:
+			return assertUnreachable(page);
+	}
+};
 
 App.whyDidYouRender = {
 	logOnDifferentValues: false,

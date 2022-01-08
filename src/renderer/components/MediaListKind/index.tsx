@@ -41,6 +41,11 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	const Row = memo(
 		({ index, data, style }: ListChildComponentProps<readonly Media[]>) => {
 			const media = data[index];
+			const img = new Image();
+			img.src = media.img ?? "";
+			img.onerror = () => {
+				img.remove();
+			};
 
 			return media ? (
 				<div
@@ -51,7 +56,11 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				>
 					<div className="play-button" onClick={() => playMedia(media)}>
 						<Img>
-							{media.img ? <img src={media.img} /> : <MusicNote size="1.4em" />}
+							{img.complete ? (
+								<img src={media.img} />
+							) : (
+								<MusicNote size="1.4em" />
+							)}
 						</Img>
 
 						<Info>

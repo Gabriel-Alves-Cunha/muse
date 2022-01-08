@@ -1,3 +1,4 @@
+import type { ChangeEvent } from "react";
 import type { videoInfo } from "ytdl-core";
 
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
@@ -78,7 +79,7 @@ export function Download() {
 		return () => clearTimeout(searchTimeout);
 	}, [searcher.searchTerm]);
 
-	const setSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) =>
+	const setSearchTerm = (e: ChangeEvent<HTMLInputElement>) =>
 		dispatchSearcher({
 			value: e.target.value.trim(),
 			type: "setSearchTerm",

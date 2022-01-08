@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import {
 	VscChromeMaximize as Maximize,
 	VscChromeMinimize as Minimize,
 	VscClose as Close,
 } from "react-icons/vsc";
 
-import { capitalizedAppName } from "@utils/app";
-import { capitalize } from "@utils/utils";
+import { capitalizedAppName } from "@common/utils";
+import { usePage } from "@contexts/page";
 import {
 	handleMaximizeOnDoubleClick,
 	toggleMaximize,
@@ -87,14 +86,12 @@ function Buttons() {
 	);
 }
 
-function AppName_Folder() {
-	const { pathname } = useLocation();
-
-	const page = capitalize(pathname.replace("/", ""));
+const AppName_Folder = () => {
+	const { page } = usePage();
 
 	return (
 		<AppName_Folder_Wrapper>
-			{page ? page + " - " + capitalizedAppName : capitalizedAppName}
+			{page + " - " + capitalizedAppName}
 		</AppName_Folder_Wrapper>
 	);
-}
+};

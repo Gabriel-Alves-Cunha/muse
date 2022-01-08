@@ -1,4 +1,5 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
+import type { ChangeEvent } from "react";
 import type { Path } from "@common/@types/types";
 
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +9,7 @@ import { useInterComm } from "@contexts/communicationBetweenChildren";
 import { Wrapper } from "./styles";
 
 export function Convert() {
-	const [selectedExtensionToBeConvertedTo, setExtensionToBeConvertedTo] =
+	const [selectedExtensionToBeConvertedTo] =
 		useState<ExtensionToBeConvertedTo>("mp3");
 	const [selectedMediasPath, setSelectedMediasPath] = useState<Path[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -26,7 +27,7 @@ export function Convert() {
 		setSelectedMediasPath([]);
 	}
 
-	function handleSelectedFiles(e: React.ChangeEvent<HTMLInputElement>) {
+	function handleSelectedFiles(e: ChangeEvent<HTMLInputElement>) {
 		const files = e.target.files;
 		if (!files) return;
 

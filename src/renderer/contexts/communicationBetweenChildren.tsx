@@ -98,14 +98,14 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 	);
 }
 
-function useInterComm() {
+const useInterComm = () => {
 	const context = useContext(Comm_Context);
 
 	if (!context)
 		throw new Error("`useComm` must be used within a `<Comm_Provider>`");
 
 	return context;
-}
+};
 
 export { useInterComm, Comm_Provider };
 
