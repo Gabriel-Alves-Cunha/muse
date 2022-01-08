@@ -1,7 +1,16 @@
+import { debug, enable } from "debug";
 const { trunc, floor } = Math;
 
 export const isDevelopment = process.env.NODE_ENV === "development";
 console.log("Electron isDevelopment =", isDevelopment);
+
+export const capitalizedAppName = "Muse" as const;
+export const lowercaseAppName = "muse" as const;
+
+export const dbg = debug(lowercaseAppName);
+
+isDevelopment && enable(lowercaseAppName);
+dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 export const allowedMedias = [
 	"vorbis",
@@ -25,7 +34,7 @@ export const getBasename = (filename: string) =>
 export const getPathWithoutExtension = (filename: string) =>
 	filename.slice(0, filename.lastIndexOf("."));
 
-export function formatDuration(time: number | undefined) {
+export const formatDuration = (time: number | undefined) => {
 	if (time === undefined) return "";
 	time = trunc(time);
 
@@ -39,4 +48,4 @@ export function formatDuration(time: number | undefined) {
 		(Number(hour) > 0 ? hour + ":" : "") +
 		(minutes + ":" + seconds)
 	);
-}
+};

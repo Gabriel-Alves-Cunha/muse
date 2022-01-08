@@ -12,7 +12,7 @@ import { FixedSizeList } from "react-window";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { useMediaHandler } from "@renderer/contexts/mediaHandler";
-import { dbg } from "@utils/app";
+import { dbg } from "@common/utils";
 
 import { Img, Info, SubTitle, Title } from "../MediaListKind/styles";
 import { Loading } from "@styles/appStyles";

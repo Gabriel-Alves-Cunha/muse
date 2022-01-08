@@ -4,9 +4,11 @@ export type Page = Readonly<typeof folders[number]>;
 export type PrettyBytes = Readonly<string>;
 export type Path = Readonly<string>;
 
+type DateAsNumber = Readonly<number>;
+
 export type Media = Readonly<{
 	genres?: readonly string[];
-	dateOfArival: Date;
+	dateOfArival: DateAsNumber;
 	size: PrettyBytes;
 	duration: string;
 	artist?: string;

@@ -5,7 +5,7 @@ import type { Path } from "@common/@types/types";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { assertUnreachable } from "@utils/utils";
-import { dbg } from "@utils/app";
+import { dbg } from "@common/utils";
 const {
 	notificationApi: { receiveMsgFromElectron },
 } = electron;

@@ -1,6 +1,6 @@
 import React from "react";
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV === "development") {
 	(async () => {
 		console.log(
 			"%cwhy-did-you-render enabled!",

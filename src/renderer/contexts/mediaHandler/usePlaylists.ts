@@ -6,7 +6,8 @@ import { useEffect, useReducer } from "react";
 import { concatFromIndex, remove, replace, sort } from "@renderer/utils/array";
 import { assertUnreachable } from "@renderer/utils/utils";
 import { useLocalStorage } from "@hooks";
-import { dbg, keyPrefix } from "@renderer/utils/app";
+import { keyPrefix } from "@renderer/utils/app";
+import { dbg } from "@common/utils";
 import {
 	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
 	searchDirectoryResult,

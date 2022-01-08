@@ -4,17 +4,15 @@
 		<meta charset="UTF-8" />
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'self'; style-src 'self' 'unsafe-inline'; style-src-elem fonts.gstatic.com fonts.googleapis.com 'unsafe-inline'; font-src fonts.gstatic.com fonts.googleapis.com; img-src 'self' http: data:; media-src 'self' blob:"
+			content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' https://fonts.gstatic.com https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' http: data:; media-src 'self' blob:"
 		/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			rel="preload"
+			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500&display=swap"
-			as="style"
-			onload="this.rel='stylesheet'"
 		/>
 
 		<title>Muse</title>

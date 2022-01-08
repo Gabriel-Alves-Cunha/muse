@@ -1,11 +1,11 @@
 {
-	"name": "vite-electron-esbuild-starter",
-	"version": "0.9.0",
+	"name": "muse",
+	"version": "0.9.1",
 	"license": "MIT",
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development elecrun --vite --preload 'preload.ts'",
 		"preview": "yarn build && cross-env NODE_ENV=production electron ./app/",
-		"build": "elecrun build && vite build",
+		"build": "elecrun build --preload 'preload.ts' && vite build",
 		"clean": "elecrun clean",
 		"pack": "yarn run build && yarn run rebuild && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -c ./electron-builder.yml --win --linux",
 		"pack:all": "yarn run build && yarn run rebuild && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -c ./electron-builder.yml --win --linux --mac",
@@ -15,7 +15,6 @@
 		"rebuild": "electron-rebuild -m ./app",
 		"postinstall": "electron-builder install-app-deps",
 		"fmt": "prettier --use-tabs -w .",
-		"prettier": "prettier",
 		"lint": "eslint ./ --ext .ts --ext .tsx --ext .ts"
 	},
 	"eslintConfig": {

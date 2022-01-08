@@ -11,12 +11,11 @@ import type {
 import { File as MediaFile, Picture, ByteVector } from "node-taglib-sharp";
 import { readdir, readFile, stat, unlink } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
+import { StringType, PictureType } from "node-taglib-sharp";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
-import { StringType } from "node-taglib-sharp";
-import { normalize } from "path";
+import { join, normalize } from "path";
 import { watch } from "chokidar";
-import { join } from "path";
 import { cpus } from "os";
 import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
@@ -24,6 +23,7 @@ import ytdl from "ytdl-core";
 
 import { homeDir, dirs } from "./utils";
 import { prettyBytes } from "@common/prettyBytes";
+import { dbg } from "@common/utils";
 import {
 	formatDuration,
 	isDevelopment,
@@ -97,67 +97,91 @@ async function transformPathsToMedias(
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
 ) {
-	const medias: Media[] = [];
+	const getMedia = async (
+		path: string,
+		index: number,
+	): Promise<Media | undefined> => {
+		try {
+			console.time(`for (const [${index}, "${path}"])`);
+			// const now = new Date();
+			// const date = `${now.getMinutes()}:${now.getSeconds()}:${now.getMilliseconds()}`;
+			// dbg(`Initialized reading "${path}" at ${date}`);
+			// console.time("Reading metadata");
+			const {
+				tag: { pictures, title, album, genres, albumArtists },
+				properties: { durationMilliseconds },
+			} = MediaFile.createFromPath(path);
+			// console.timeEnd("Reading metadata");
 
-	for (const [index, path] of paths.entries()) {
-		console.time(`for (const [${index}, "${path}"])`);
-		const now = new Date();
-		const date = `${now.getMinutes}:${now.getSeconds}:${now.getMilliseconds}`;
-		console.log("Initialized at", date);
-		console.time(`Reading metadata of "${path}"`);
-		const {
-			tag: { pictures, title, album, genres, albumArtists },
-			properties: { durationMilliseconds },
-		} = MediaFile.createFromPath(path);
-		console.timeEnd(`Reading metadata of "${path}"`);
+			const duration = durationMilliseconds / 1_000;
 
-		const duration = durationMilliseconds / 1_000;
-		// console.log("file parsed:", {
-		// 	albumArtists,
-		// 	duration,
-		// 	pictures,
-		// 	genres,
-		// 	title,
-		// 	album,
-		// });
+			if (ignoreMediaWithLessThan60Seconds && duration < 60) {
+				console.log(
+					`Jumping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
+				);
+				return undefined;
+			}
 
-		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
-			console.log(
-				`Jumping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
-			);
-			continue;
+			const { size: sizeInBytes } = await stat(path);
+			if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
+				console.log(
+					`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
+				);
+				return undefined;
+			}
+
+			const picture: IPicture | undefined = pictures[0];
+			const mimeType = picture?.mimeType;
+			let img = "";
+			if (picture && mimeType) {
+				const str =
+					// If the picture wasn't made by us. (That's the only way I found to
+					// make this work, cause, when we didn't make the picture in
+					// `writeTag`, we can't decode it!):
+					picture.type === PictureType.NotAPicture ||
+					picture.type === PictureType.Other
+						? Buffer.from(picture.data.data).toString("base64")
+						: picture?.data.toString();
+				img = `data:${mimeType};base64,${str}`;
+			}
+
+			const media: Media = {
+				duration: formatDuration(duration),
+				title: title ?? getBasename(path),
+				size: prettyBytes(sizeInBytes),
+				artist: albumArtists[0] ?? "",
+				dateOfArival: Date.now(),
+				genres,
+				album,
+				index,
+				path,
+				img,
+			};
+
+			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
+			return media;
+		} catch (error) {
+			console.error(error);
+			// console.timeEnd("Reading metadata");
+			return undefined;
+		} finally {
+			console.timeEnd(`for (const [${index}, "${path}"])`);
 		}
+	};
 
-		const { size: sizeInBytes } = await stat(path);
-		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
-			console.log(
-				`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
-			);
-			continue;
-		}
+	console.time("Creating promises");
+	const promises = paths
+		.map((path, index) => getMedia(path, index))
+		.filter(Boolean);
+	console.timeEnd("Creating promises");
 
-		const picture: IPicture | undefined = pictures[0];
-		const mimeType = picture?.mimeType;
-		const str = picture?.data.toString();
-		const img = str && mimeType ? `data:${mimeType};base64,${str}` : undefined;
+	console.time("Running promises");
+	const promisesResolved = await Promise.allSettled(promises);
+	console.timeEnd("Running promises");
 
-		const media: Media = {
-			duration: formatDuration(duration),
-			title: title ?? getBasename(path),
-			size: prettyBytes(sizeInBytes),
-			artist: albumArtists[0] ?? "",
-			dateOfArival: new Date(),
-			genres,
-			album,
-			index,
-			path,
-			img,
-		};
-
-		medias.push(media);
-		console.timeEnd(`for (const [${index}, "${path}"])`);
-		console.log("%cmedia =", "background-color: #f9ca4c80;", media);
-	}
+	const medias = promisesResolved
+		.map(p => (p.status === "fulfilled" ? p.value : undefined))
+		.filter(Boolean);
 
 	return medias;
 }
@@ -192,7 +216,7 @@ window.onmessage = event => {
 				);
 
 			electronPort.addEventListener("close", () =>
-				console.log("Closing ports (electronPort)."),
+				dbg("Closing ports (electronPort)."),
 			);
 
 			// MessagePortMain queues messages until the .start() method has been called.
@@ -226,7 +250,7 @@ window.onmessage = event => {
 				);
 
 			electronPort.addEventListener("close", () =>
-				console.log("Closing ports (electronPort)."),
+				dbg("Closing ports (electronPort)."),
 			);
 
 			// MessagePortMain queues messages until the .start() method has been called.
@@ -235,7 +259,7 @@ window.onmessage = event => {
 		}
 
 		case "async two way comm": {
-			console.log("Window received 'async two way comm':", event);
+			dbg("Window received 'async two way comm':", event);
 
 			const electronPort = event.ports[0];
 			if (!electronPort) {
@@ -268,7 +292,7 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	port.onmessage = event => {
 		const { data } = event;
 
-		console.log(
+		dbg(
 			"Message received on electron side of 2way-comm (currently doing nothing!!):",
 			data,
 		);
@@ -293,9 +317,9 @@ function handleCreateOrCancelDownload(
 			new Error("This readStream is being destroyed!"),
 		);
 
-		console.log("readStream 'destroy()' answer =", readAnswer);
+		dbg("readStream 'destroy()' answer =", readAnswer);
 
-		console.log(
+		dbg(
 			`Was "${url}" deleted from map? `,
 			currentDownloads.delete(url),
 			"\ncurrentDownloads =",
@@ -420,9 +444,9 @@ function handleCreateOrCancelConvert(
 			new Error("This readStream is being destroyed!"),
 		);
 
-		console.log("readStream 'destroy()' answer =", readAnswer);
+		dbg("readStream 'destroy()' answer =", readAnswer);
 
-		console.log(
+		dbg(
 			`Was "${path}" deleted from map? `,
 			mediasConverting.delete(path),
 			"\nmediasConverting =",
@@ -447,9 +471,6 @@ function convertToAudio(
 		.toFormat(toExtension)
 		.save(saveSite)
 		.addOptions(["-threads", String(cpus().length)])
-		.on("start", cmdLine =>
-			console.log(`Started ffmpeg with command: "${cmdLine}"`),
-		)
 		.on("progress", p => {
 			// targetSize: current size of the target file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
@@ -518,15 +539,15 @@ function convertToAudio(
 		});
 
 	mediasConverting.set(mediaPath, readStream);
-	console.log("Medias converting =", mediasConverting);
+	dbg("Medias converting =", mediasConverting);
 }
 
 const imageTypeRegex = new RegExp(/data:(image\/[a-z]+)+/);
 const textToExclude = new RegExp(/(data:(.+\/.+);base64,)/);
 async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	const file = MediaFile.createFromPath(pathOfMedia);
-	// console.log("File =", file);
-	// console.log("File tags =", file.tag);
+	// dbg("File =", file);
+	// dbg("File tags =", file.tag);
 
 	if (data.imageURL) {
 		// Get picture:
@@ -535,6 +556,7 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 				"get-image",
 				data.imageURL,
 			);
+			console.time("Getting image");
 			const txtForByteVector = imgAsString.replace(textToExclude, "");
 
 			const byteVector = ByteVector.fromString(
@@ -542,11 +564,13 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 				StringType.Latin1,
 			);
 			const picture = Picture.fromData(byteVector);
+			picture.type = PictureType.Media;
 
 			const match = imageTypeRegex.exec(imgAsString);
 			picture.mimeType = match?.[1] ?? "";
 
 			if (picture.mimeType) file.tag.pictures = [picture];
+			console.timeEnd("Getting image");
 		} catch (error) {
 			console.error("There was an error getting the picture data.", error);
 		}
@@ -554,10 +578,10 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 
 	Object.entries(data).forEach(([tag, value]) => {
 		if (tag !== "imageURL") {
-			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag
+			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 			file.tag[tag] = value;
-			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag
-			console.log(`file.tag[${tag}] = ${file.tag[tag]}`);
+			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
+			dbg(`file.tag[${tag}] = ${file.tag[tag]}`);
 		}
 	});
 
@@ -566,7 +590,7 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 }
 
 // setTimeout(async () => {
-// 	// console.log("Starting");
+// 	// dbg("Starting");
 
 // 	// const imgAsString: string = await ipcRenderer.invoke(
 // 	// 	"get-image",
@@ -577,17 +601,17 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 // 	// const data = ByteVector.fromString(imgAsString, StringType.Latin1);
 // 	// const picture = Picture.fromData(data);
 // 	// picture.mimeType = match?.[1] ?? "";
-// 	// console.log({ picture });
+// 	// dbg({ picture });
 
 // 	// const file = MediaFile.createFromPath(
 // 	// 	"/home/gabriel/Music/BENEE - Same Effect (Official Audio).mp3"
 // 	// );
 
 // 	// file.tag.pictures = [picture];
-// 	// console.log("File tags =", file.tag.pictures);
+// 	// dbg("File tags =", file.tag.pictures);
 
 // 	const picture_ = (file.tag.pictures[0] as IPicture).data;
-// 	console.log(
+// 	dbg(
 // 		"Picture decoded =\n\n",
 // 		picture_.toString(picture_.length, StringType.Latin1)
 // 	);
@@ -599,7 +623,7 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 function watchForDirectories(dirs: readonly string[]) {
 	const wildcardList = dirs
 		.map(dir =>
-			allowedMedias.map(extension => normalize(dir + "/**/*." + extension)),
+			allowedMedias.map(extension => normalize(dir + "/*." + extension)),
 		)
 		.flat();
 
@@ -624,13 +648,13 @@ function watchForDirectories(dirs: readonly string[]) {
 			log(
 				"%c[Chokidar]",
 				logStyle,
-				" Initial scan complete. Listening for changes.",
+				"Initial scan complete. Listening for changes.",
 			);
 
-			console.log(
+			log(
 				"%c[Chokidar]",
 				logStyle,
-				" Files being watched:\n",
+				"Files being watched:",
 				watcher.getWatched(),
 			);
 		})

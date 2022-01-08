@@ -8,7 +8,8 @@ import { useEffect, useReducer } from "react";
 import { assertUnreachable, getRandomInt } from "@renderer/utils/utils";
 import { defaultPlaylists } from "./usePlaylists";
 import { useLocalStorage } from "@hooks";
-import { dbg, keyPrefix } from "@renderer/utils/app";
+import { keyPrefix } from "@renderer/utils/app";
+import { dbg } from "@common/utils";
 const {
 	fs: { readFile },
 } = electron;
