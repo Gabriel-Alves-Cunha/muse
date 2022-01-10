@@ -54,7 +54,7 @@ function MediaHandler_Provider({ children }: { children: ReactNode }) {
 	);
 }
 
-function useMediaHandler() {
+const useMediaHandler = () => {
 	const context = useContext(MediaList_Context);
 
 	if (!context)
@@ -63,7 +63,7 @@ function useMediaHandler() {
 		);
 
 	return context;
-}
+};
 
 export { useMediaHandler, MediaHandler_Provider };
 
@@ -74,14 +74,12 @@ MediaHandler_Provider.whyDidYouRender = {
 
 type MediaList_ContextProps = Readonly<{
 	functions: {
+		searchLocalComputerForMedias: (force?: boolean) => Promise<void>;
 		dispatchCurrentPlaying: Dispatch<currentPlayingReducer_Action>;
 		searchForMedia: (searchTerm: string) => readonly Media[];
 		dispatchPlaylists: Dispatch<PlaylistsReducer_Action>;
 		dispatchPlayOptions: Dispatch<PlayOptions_Action>;
 		deleteMedia: (media: Media) => Promise<void>;
-		searchLocalComputerForMedias: (
-			force?: boolean | undefined,
-		) => Promise<void>;
 	};
 	values: {
 		playlists: readonly Playlist[];

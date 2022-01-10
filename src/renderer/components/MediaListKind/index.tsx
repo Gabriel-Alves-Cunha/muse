@@ -42,10 +42,8 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 		({ index, data, style }: ListChildComponentProps<readonly Media[]>) => {
 			const media = data[index];
 			const img = new Image();
+			img.decoding = "async";
 			img.src = media.img ?? "";
-			img.onerror = () => {
-				img.remove();
-			};
 
 			return media ? (
 				<div

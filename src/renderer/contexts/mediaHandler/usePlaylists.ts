@@ -409,7 +409,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 		const isThereNewMedia = (paths: readonly string[]) => {
 			const isThereNewMedia = paths.length !== mediaList.length;
-			dbg(
+			console.log(
 				`mediaList.length = ${mediaList.length}. Is there new media? ${isThereNewMedia}`,
 			);
 			return isThereNewMedia;

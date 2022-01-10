@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development elecrun --vite --preload 'preload.ts'",
-		"preview": "yarn build && cross-env NODE_ENV=production electron ./app/",
+		"preview": "yarn build && cross-env NODE_ENV=production electron --trace-warnings --unhandled-rejections=strict --inspect ./app/",
 		"build": "elecrun build --preload 'preload.ts' && vite build",
 		"clean": "elecrun clean",
 		"pack": "yarn run build && yarn run rebuild && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -c ./electron-builder.yml --win --linux",
@@ -52,7 +52,6 @@
 		"@emotion/react": "^11.7.1",
 		"@emotion/styled": "^11.6.0",
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
-		"chokidar": "^3.5.2",
 		"electron": "^16.0.6",
 		"fluent-ffmpeg": "^2.1.2",
 		"node-taglib-sharp": "^4.0.0",

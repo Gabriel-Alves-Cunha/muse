@@ -1,3 +1,4 @@
+import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/types";
 import type { videoInfo } from "ytdl-core";
 import type { Readable } from "stream";
@@ -14,22 +15,16 @@ import { contextBridge, ipcRenderer } from "electron";
 import { StringType, PictureType } from "node-taglib-sharp";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
-import { join, normalize } from "path";
-import { watch } from "chokidar";
+import { join } from "path";
 import { cpus } from "os";
 import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
+import { formatDuration, isDevelopment, getBasename } from "@common/utils";
 import { homeDir, dirs } from "./utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
-import {
-	formatDuration,
-	isDevelopment,
-	allowedMedias,
-	getBasename,
-} from "@common/utils";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -60,11 +55,25 @@ contextBridge.exposeInMainWorld("electron", {
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
-watchForDirectories(Object.values(dirs));
+// watchForDirectories(Object.values(dirs));
 
-type StreamMap = Readonly<Map<string, Readable>>;
-const currentDownloads: StreamMap = new Map();
-const mediasConverting: StreamMap = new Map();
+type Stream = Readonly<{ url: string; stream: Readable }>;
+const currentDownloads: Stream[] = [];
+const mediasConverting: Stream[] = [];
+
+const has = (array: readonly Stream[], url_: Readonly<string>): boolean =>
+	array.findIndex(({ url }) => url === url_) === -1 ? false : true;
+
+const get = (array: readonly Stream[], url_: Readonly<string>) =>
+	array.find(({ url }) => url === url_);
+
+const remove = (array: Stream[], url_: Readonly<string>) =>
+	(array = array.filter(({ url }) => url !== url_));
+
+const push = (array: Stream[], stream: Stream) => {
+	array.push(stream);
+	if (array.length > 10) array.length = 10;
+};
 
 function sendNotificationToElectron(
 	object: Readonly<{
@@ -237,7 +246,7 @@ window.onmessage = event => {
 				data,
 			}: {
 				data: Readonly<{
-					toExtension: typeof allowedMedias[number];
+					toExtension: AllowedMedias;
 					destroy: boolean;
 					path: Path;
 				}>;
@@ -308,12 +317,13 @@ function handleCreateOrCancelDownload(
 	title: Readonly<string>,
 	electronPort: Readonly<MessagePort>,
 ) {
-	if (url && !currentDownloads.has(url))
+	if (url && !has(currentDownloads, url))
 		makeStream(imageURL, url, title, electronPort);
 	else if (url && destroy) {
-		const stream = currentDownloads.get(url);
-		stream?.emit("destroy");
-		const readAnswer = stream?.destroy(
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const { stream } = get(currentDownloads, url)!;
+		stream.emit("destroy");
+		const readAnswer = stream.destroy(
 			new Error("This readStream is being destroyed!"),
 		);
 
@@ -321,9 +331,8 @@ function handleCreateOrCancelDownload(
 
 		dbg(
 			`Was "${url}" deleted from map? `,
-			currentDownloads.delete(url),
 			"\ncurrentDownloads =",
-			currentDownloads,
+			remove(currentDownloads, url),
 		);
 	}
 }
@@ -334,7 +343,7 @@ function makeStream(
 	title: Readonly<string>,
 	electronPort: Readonly<MessagePort>,
 ) {
-	const extension: Readonly<typeof allowedMedias[number]> = "mp3";
+	const extension: AllowedMedias = "mp3";
 	const titleWithExtension = `${title}.${extension}`;
 	const saveSite = `${dirs.music}/${titleWithExtension}`;
 	const startTime = Date.now();
@@ -387,7 +396,7 @@ function makeStream(
 				process.stdout.write(
 					`${percentage}% downloaded (${prettyBytes(
 						downloaded,
-					)} of ${prettyTotal}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes `,
+					)} of ${prettyTotal}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes.`,
 				);
 			}
 		})
@@ -401,13 +410,13 @@ function makeStream(
 			electronPort.postMessage({
 				isDownloading: false,
 				status: "success",
-				saveSite,
 			});
 			electronPort.close();
 
 			interval && clearInterval(interval);
 
 			await writeTags(saveSite, { imageURL });
+			remove(currentDownloads, url);
 		})
 		.once("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
@@ -426,21 +435,22 @@ function makeStream(
 
 	fluent_ffmpeg(readStream).toFormat(extension).save(saveSite);
 
-	currentDownloads.set(url, readStream);
+	push(currentDownloads, { url, stream: readStream });
 }
 
 function handleCreateOrCancelConvert(
 	destroy: Readonly<boolean>,
-	toExtension: Readonly<typeof allowedMedias[number]>,
+	toExtension: AllowedMedias,
 	path: Readonly<Path>,
 	electronPort: Readonly<MessagePort>,
 ) {
-	if (path && !mediasConverting.has(path))
+	if (path && !has(mediasConverting, path))
 		convertToAudio(path, toExtension, electronPort);
 	else if (path && destroy) {
-		const stream = mediasConverting.get(path);
-		stream?.emit("destroy");
-		const readAnswer = stream?.destroy(
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const { stream } = get(mediasConverting, path)!;
+		stream.emit("destroy");
+		const readAnswer = stream.destroy(
 			new Error("This readStream is being destroyed!"),
 		);
 
@@ -448,7 +458,7 @@ function handleCreateOrCancelConvert(
 
 		dbg(
 			`Was "${path}" deleted from map? `,
-			mediasConverting.delete(path),
+			remove(mediasConverting, path),
 			"\nmediasConverting =",
 			mediasConverting,
 		);
@@ -457,7 +467,7 @@ function handleCreateOrCancelConvert(
 
 function convertToAudio(
 	mediaPath: Readonly<Path>,
-	toExtension: Readonly<typeof allowedMedias[number]>,
+	toExtension: AllowedMedias,
 	electronPort: Readonly<MessagePort>,
 ) {
 	const titleWithExtension = `${getBasename(mediaPath)}.${toExtension}`;
@@ -518,7 +528,7 @@ function convertToAudio(
 			////////////////////////////////////////
 			console.log(
 				"Deleting from map:",
-				mediasConverting.delete(mediaPath),
+				remove(mediasConverting, mediaPath),
 				"\n\nconverting =",
 				mediasConverting,
 			);
@@ -538,12 +548,10 @@ function convertToAudio(
 			interval && clearInterval(interval);
 		});
 
-	mediasConverting.set(mediaPath, readStream);
+	push(mediasConverting, { url: mediaPath, stream: readStream });
 	dbg("Medias converting =", mediasConverting);
 }
 
-const imageTypeRegex = new RegExp(/data:(image\/[a-z]+)+/);
-const textToExclude = new RegExp(/(data:(.+\/.+);base64,)/);
 async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	const file = MediaFile.createFromPath(pathOfMedia);
 	// dbg("File =", file);
@@ -552,25 +560,27 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	if (data.imageURL) {
 		// Get picture:
 		try {
-			const imgAsString: string = await ipcRenderer.invoke(
-				"get-image",
-				data.imageURL,
-			);
-			console.time("Getting image");
-			const txtForByteVector = imgAsString.replace(textToExclude, "");
+			const imgAsString: `data:${string};base64,${string}` =
+				await ipcRenderer.invoke("get-image", data.imageURL);
 
-			const byteVector = ByteVector.fromString(
-				txtForByteVector,
-				StringType.Latin1,
+			const txtForByteVector = imgAsString.slice(
+				imgAsString.indexOf(",") + 1,
+				imgAsString.length,
 			);
-			const picture = Picture.fromData(byteVector);
+			const mimeType = imgAsString.slice(
+				imgAsString.indexOf(":") + 1,
+				imgAsString.indexOf(";"),
+			);
+
+			const picture = Picture.fromData(
+				ByteVector.fromString(txtForByteVector, StringType.Latin1),
+			);
+
+			console.time("Setting image, mimeType and type");
 			picture.type = PictureType.Media;
-
-			const match = imageTypeRegex.exec(imgAsString);
-			picture.mimeType = match?.[1] ?? "";
-
-			if (picture.mimeType) file.tag.pictures = [picture];
-			console.timeEnd("Getting image");
+			file.tag.pictures = [picture];
+			picture.mimeType = mimeType;
+			console.timeEnd("Setting image, mimeType and type");
 		} catch (error) {
 			console.error("There was an error getting the picture data.", error);
 		}
@@ -581,7 +591,7 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 			file.tag[tag] = value;
 			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
-			dbg(`file.tag[${tag}] = ${file.tag[tag]}`);
+			console.log(`file.tag[${tag}] = ${file.tag[tag]}`);
 		}
 	});
 
@@ -620,56 +630,59 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 // 	file.dispose();
 // }, 5_000);
 
-function watchForDirectories(dirs: readonly string[]) {
-	const wildcardList = dirs
-		.map(dir =>
-			allowedMedias.map(extension => normalize(dir + "/*." + extension)),
-		)
-		.flat();
+// function watchForDirectories(dirs: readonly string[]) {
+// 	const wildcardList = dirs
+// 		.map(dir =>
+// 			allowedMedias.map(extension => normalize(dir + "/*." + extension)),
+// 		)
+// 		.flat();
 
-	const watcher = watch(wildcardList, {
-		awaitWriteFinish: { stabilityThreshold: 10_000, pollInterval: 10_000 },
-		ignorePermissionErrors: true,
-		followSymlinks: false,
-		ignoreInitial: true,
-		usePolling: false,
-		alwaysStat: false,
-		depth: 0,
-	});
+// 	const watcher = watch(wildcardList, {
+// 		awaitWriteFinish: { stabilityThreshold: 10_000, pollInterval: 10_000 },
+// 		ignorePermissionErrors: true,
+// 		followSymlinks: false,
+// 		ignoreInitial: true,
+// 		usePolling: false,
+// 		alwaysStat: false,
+// 		depth: 0,
+// 	});
 
-	const log = console.log.bind(console);
-	// ^ Something to use when events are received.
+// 	const log = console.log.bind(console);
+// 	// ^ Something to use when events are received.
 
-	watcher
-		.on("error", error =>
-			console.error("%c[Chokidar]", logStyle, " Error happened", error),
-		)
-		.on("ready", () => {
-			log(
-				"%c[Chokidar]",
-				logStyle,
-				"Initial scan complete. Listening for changes.",
-			);
+// 	watcher
+// 		.on("error", error =>
+// 			console.error("%c[Chokidar]", logStyle, " Error happened", error),
+// 		)
+// 		.on("ready", () => {
+// 			log(
+// 				"%c[Chokidar]",
+// 				logStyle,
+// 				"Initial scan complete. Listening for changes.",
+// 			);
 
-			log(
-				"%c[Chokidar]",
-				logStyle,
-				"Files being watched:",
-				watcher.getWatched(),
-			);
-		})
-		.on("unlink", path => {
-			log(`%c[Chokidar] File "${path}" has been removed.`, logStyle);
-			window.twoWayComm_React_Electron?.postMessage({
-				msg: "remove media",
-				path,
-			});
-		})
-		.on("add", path => {
-			log(`%c[Chokidar] File "${path}" has been added.`, logStyle);
-			window.twoWayComm_React_Electron?.postMessage({ msg: "add media", path });
-		});
-}
+// 			log(
+// 				"%c[Chokidar]",
+// 				logStyle,
+// 				"Files being watched:",
+// 				watcher.getWatched(),
+// 			);
+// 		})
+// 		.on("unlink", path => {
+// 			log(`%c[Chokidar] File "${path}" has been removed.`, logStyle);
+// 			window.twoWayComm_React_Electron?.postMessage({
+// 				msg: "remove media",
+// 				path,
+// 			});
+// 		})
+// 		.on("add", path => {
+// 			log(`%c[Chokidar] File "${path}" has been added.`, logStyle);
+// 			window.twoWayComm_React_Electron?.postMessage({ msg: "add media", path });
+// 		});
+// }
 
-const logStyle =
-	"background-color: green; font-size: 0.8rem; font-weight: bold; color: white;";
+// const logStyle =
+// 	"background-color: green; font-size: 0.8rem; font-weight: bold; color: white;";
+
+// const used = process.memoryUsage().heapUsed / 1024 / 1024;
+// console.log(`The script uses approximately ${used} MB`);

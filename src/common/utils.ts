@@ -27,6 +27,7 @@ export const allowedMedias = [
 	"m4r",
 	"m4v",
 ] as const;
+export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
 export const getBasename = (filename: string) =>
 	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";

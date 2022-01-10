@@ -10,10 +10,8 @@ import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
 import { Progress, icon } from "../Progress";
 import { useInterComm } from "@contexts/communicationBetweenChildren";
-const { writeTags } = electron.media;
 
 import { Circle, Popup, Title } from "./styles";
-import { Path } from "@common/@types/types";
 
 export function Downloading() {
 	const {
@@ -72,11 +70,7 @@ export function Downloading() {
 			// ^ On every `postMessage` you have to send the url (as an ID)!
 		});
 
-		myPort.onmessage = ({
-			data,
-		}: {
-			data: Partial<DownloadingMedia & { saveSite: Path }>;
-		}) => {
+		myPort.onmessage = ({ data }: { data: Partial<DownloadingMedia> }) => {
 			setDownloadList(prev =>
 				replace(prev, downloadStatus.index, {
 					...downloadStatus,
@@ -112,14 +106,6 @@ export function Downloading() {
 						autoClose: 5000,
 						draggable: true,
 					});
-
-					(async () => {
-						// Put picture cover:
-						data.saveSite &&
-							(await writeTags(data.saveSite, {
-								imageURL: downloadStatus.imageURL,
-							}));
-					})();
 					break;
 				}
 

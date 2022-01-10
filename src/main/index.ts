@@ -107,36 +107,40 @@ app.whenReady().then(async () => {
 				const txt = extendedClipboard.readText("clipboard");
 
 				if (validateURL(txt)) {
-					const {
-						videoDetails: { title, thumbnails },
-					} = await getBasicInfo(txt);
+					try {
+						const {
+							videoDetails: { title, thumbnails },
+						} = await getBasicInfo(txt);
 
-					const notification = new Notification({
-						title: "Click to download this video as 'mp3'",
-						timeoutType: "never",
-						urgency: "normal",
-						icon: logoPath,
-						silent: true,
-						body: title,
-					});
-
-					notification.on("click", () => {
-						console.log("Clicked notification!");
-
-						// Send msg to ipcRenderer:
-						electronWindow?.webContents.send("async-msg", {
-							type: "download media",
-							params: {
-								imageURL: thumbnails.at(-1)?.url ?? "",
-								type: "download media",
-								canStartDownload: true,
-								url: txt,
-								title,
-							},
+						const notification = new Notification({
+							title: "Click to download this video as 'mp3'",
+							timeoutType: "never",
+							urgency: "normal",
+							icon: logoPath,
+							silent: true,
+							body: title,
 						});
-					});
 
-					notification.show();
+						notification.on("click", () => {
+							console.log("Clicked notification!");
+
+							// Send msg to ipcRenderer:
+							electronWindow?.webContents.send("async-msg", {
+								type: "download media",
+								params: {
+									imageURL: thumbnails.at(-1)?.url ?? "",
+									type: "download media",
+									canStartDownload: true,
+									url: txt,
+									title,
+								},
+							});
+						});
+
+						notification.show();
+					} catch (error) {
+						console.error(error);
+					}
 				}
 			})
 			.startWatching();
