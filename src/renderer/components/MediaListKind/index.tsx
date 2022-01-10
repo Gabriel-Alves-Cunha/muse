@@ -8,7 +8,8 @@ import { memo, useRef, useState } from "react";
 import Popup from "reactjs-popup";
 
 import { MediaOptionsModal } from "./MediaOptions";
-import { useMediaHandler } from "@renderer/contexts/mediaHandler";
+import { ImgWithFallback } from "./ImgWithFallback";
+import { useMediaHandler } from "@contexts/mediaHandler";
 import { Dots } from "../";
 
 import { ListWrapper, SubTitle, Options, Title, Info, Img } from "./styles";
@@ -41,9 +42,6 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	const Row = memo(
 		({ index, data, style }: ListChildComponentProps<readonly Media[]>) => {
 			const media = data[index];
-			const img = new Image();
-			img.decoding = "async";
-			img.src = media.img ?? "";
 
 			return media ? (
 				<div
@@ -54,11 +52,11 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				>
 					<div className="play-button" onClick={() => playMedia(media)}>
 						<Img>
-							{img.complete ? (
-								<img src={media.img} />
-							) : (
-								<MusicNote size="1.4em" />
-							)}
+							<ImgWithFallback
+								Fallback={<MusicNote size="1.4em" />}
+								imgAsString={media.img ?? ""}
+								key={media.path}
+							/>
 						</Img>
 
 						<Info>
@@ -84,7 +82,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	return (
 		<ListWrapper ref={listWrapperRef}>
 			<FixedSizeList
-				itemKey={(index, data) => data[index].path + new Date()}
+				itemKey={(index, data) => data[index].path + Date.now()}
 				itemCount={mediaList.list.length}
 				itemData={mediaList.list}
 				className="list"
@@ -97,10 +95,10 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 
 			<Popup
 				onClose={() => setShowPopup(undefined)}
+				open={Boolean(showPopup)}
 				position="center center"
 				{...{ overlayStyle }}
 				defaultOpen={false}
-				open={!!showPopup}
 				repositionOnResize
 				closeOnEscape
 				lockScroll

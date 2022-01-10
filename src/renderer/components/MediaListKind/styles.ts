@@ -24,6 +24,10 @@ export const Img = styled.div`
 		border-radius: 13px;
 		border: none;
 	}
+
+	img:before {
+		display: none;
+	}
 `;
 
 export const Info = styled.div`

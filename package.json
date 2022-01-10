@@ -1,6 +1,8 @@
 {
 	"name": "muse",
 	"version": "0.9.1",
+	"description": "Just an Youtube music downloader and player.",
+	"author": "Gabriel Alves Cunha",
 	"license": "MIT",
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development elecrun --vite --preload 'preload.ts'",

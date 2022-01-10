@@ -1,8 +1,8 @@
 import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/types";
 import type { videoInfo } from "ytdl-core";
-import type { Readable } from "stream";
 import type { IPicture } from "node-taglib-sharp";
+import type { Stream } from "./utils";
 import type {
 	NotificationType,
 	MsgObject,
@@ -22,7 +22,7 @@ import readline from "readline";
 import ytdl from "ytdl-core";
 
 import { formatDuration, isDevelopment, getBasename } from "@common/utils";
-import { homeDir, dirs } from "./utils";
+import { homeDir, dirs, get, has, push, remove } from "./utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
 
@@ -52,28 +52,113 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 });
 
+window.onmessage = event => {
+	switch (event.data) {
+		case "download media": {
+			const electronPort = event.ports[0];
+			if (!electronPort) {
+				console.error(
+					"There is no message port to handle 'download media' event!",
+				);
+				return;
+			}
+
+			electronPort.onmessage = ({
+				data,
+			}: {
+				data: Readonly<{
+					imageURL: string;
+					destroy: boolean;
+					title: string;
+					url: string;
+				}>;
+			}) =>
+				handleCreateOrCancelDownload(
+					data.imageURL,
+					data.destroy,
+					data.url,
+					data.title,
+					electronPort,
+				);
+
+			electronPort.addEventListener("close", () =>
+				dbg("Closing ports (electronPort)."),
+			);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		case "convert media": {
+			const electronPort = event.ports[0];
+			if (!electronPort) {
+				console.error(
+					"There is no MessagePort to handle 'convert media' event!",
+				);
+				return;
+			}
+
+			electronPort.onmessage = ({
+				data,
+			}: {
+				data: Readonly<{
+					toExtension: AllowedMedias;
+					destroy: boolean;
+					path: Path;
+				}>;
+			}) =>
+				handleCreateOrCancelConvert(
+					data.destroy,
+					data.toExtension,
+					data.path,
+					electronPort,
+				);
+
+			electronPort.addEventListener("close", () =>
+				dbg("Closing ports (electronPort)."),
+			);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		case "async two way comm": {
+			dbg("Window received 'async two way comm':", event);
+
+			const electronPort = event.ports[0];
+			if (!electronPort) {
+				console.error(
+					"There should be an electronPort for 2-way communication with React!",
+				);
+				return;
+			}
+
+			window.twoWayComm_React_Electron = addListeners(electronPort);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		default: {
+			console.error(
+				`There is no method to handle this event: (${typeof event.data}) "${
+					event.data
+				}";\nEvent =`,
+				event,
+			);
+			break;
+		}
+	}
+};
+
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
-// watchForDirectories(Object.values(dirs));
-
-type Stream = Readonly<{ url: string; stream: Readable }>;
 const currentDownloads: Stream[] = [];
 const mediasConverting: Stream[] = [];
-
-const has = (array: readonly Stream[], url_: Readonly<string>): boolean =>
-	array.findIndex(({ url }) => url === url_) === -1 ? false : true;
-
-const get = (array: readonly Stream[], url_: Readonly<string>) =>
-	array.find(({ url }) => url === url_);
-
-const remove = (array: Stream[], url_: Readonly<string>) =>
-	(array = array.filter(({ url }) => url !== url_));
-
-const push = (array: Stream[], stream: Stream) => {
-	array.push(stream);
-	if (array.length > 10) array.length = 10;
-};
 
 function sendNotificationToElectron(
 	object: Readonly<{
@@ -195,113 +280,11 @@ async function transformPathsToMedias(
 	return medias;
 }
 
-window.onmessage = event => {
-	switch (event.data) {
-		case "download media": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There is no message port to handle 'download media' event!",
-				);
-				return;
-			}
-
-			electronPort.onmessage = ({
-				data,
-			}: {
-				data: Readonly<{
-					imageURL: string;
-					destroy: boolean;
-					title: string;
-					url: string;
-				}>;
-			}) =>
-				handleCreateOrCancelDownload(
-					data.imageURL,
-					data.destroy,
-					data.url,
-					data.title,
-					electronPort,
-				);
-
-			electronPort.addEventListener("close", () =>
-				dbg("Closing ports (electronPort)."),
-			);
-
-			// MessagePortMain queues messages until the .start() method has been called.
-			electronPort.start();
-			break;
-		}
-
-		case "convert media": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There is no MessagePort to handle 'convert media' event!",
-				);
-				return;
-			}
-
-			electronPort.onmessage = ({
-				data,
-			}: {
-				data: Readonly<{
-					toExtension: AllowedMedias;
-					destroy: boolean;
-					path: Path;
-				}>;
-			}) =>
-				handleCreateOrCancelConvert(
-					data.destroy,
-					data.toExtension,
-					data.path,
-					electronPort,
-				);
-
-			electronPort.addEventListener("close", () =>
-				dbg("Closing ports (electronPort)."),
-			);
-
-			// MessagePortMain queues messages until the .start() method has been called.
-			electronPort.start();
-			break;
-		}
-
-		case "async two way comm": {
-			dbg("Window received 'async two way comm':", event);
-
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There should be an electronPort for 2-way communication with React!",
-				);
-				return;
-			}
-
-			window.twoWayComm_React_Electron = addListeners(electronPort);
-
-			// MessagePortMain queues messages until the .start() method has been called.
-			electronPort.start();
-			break;
-		}
-
-		default: {
-			console.error(
-				`There is no method to handle this event: (${typeof event.data}) "${
-					event.data
-				}";\nEvent =`,
-				event,
-			);
-			break;
-		}
-	}
-};
-
 const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	port.onmessage = event => {
 		const { data } = event;
 
-		dbg(
+		console.log(
 			"Message received on electron side of 2way-comm (currently doing nothing!!):",
 			data,
 		);
@@ -680,6 +663,8 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 // 			window.twoWayComm_React_Electron?.postMessage({ msg: "add media", path });
 // 		});
 // }
+
+// watchForDirectories(Object.values(dirs));
 
 // const logStyle =
 // 	"background-color: green; font-size: 0.8rem; font-weight: bold; color: white;";
