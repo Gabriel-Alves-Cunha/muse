@@ -3,21 +3,25 @@ import type { Readable } from "stream";
 import { homedir } from "os";
 import { join } from "path";
 
+import { isDevelopment } from "@common/utils";
+
 // This path has to be like this cause of the transpiling of
 // Typescript -> Javascript output dir is different for 'main'
 // compared to 'electron' (confirm with the log):
-export const logoPath = join(
-	__dirname,
-	"..",
-	"..",
-	"..",
-	"src",
-	"electron",
-	"assets",
-	"icons",
-	"logo.png",
-);
-// console.log("logoPath =", logoPath);
+export const logoPath = isDevelopment
+	? join(
+			__dirname,
+			"..",
+			"..",
+			"..",
+			"src",
+			"renderer",
+			"assets",
+			"icons",
+			"logo.png",
+	  )
+	: join(__dirname, "..", "src", "renderer", "assets", "icons", "logo.png");
+console.log(`logoPath = "${logoPath}"`);
 
 export const homeDir = homedir();
 export const dirs = Object.freeze({

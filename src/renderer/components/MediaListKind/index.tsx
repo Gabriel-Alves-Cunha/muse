@@ -55,7 +55,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4em" />}
 								imgAsString={media.img ?? ""}
-								key={media.path}
+								urlAsACachekey={media.path}
 							/>
 						</Img>
 

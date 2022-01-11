@@ -2,7 +2,7 @@ import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/types";
 import type { videoInfo } from "ytdl-core";
 import type { IPicture } from "node-taglib-sharp";
-import type { Stream } from "./utils";
+import type { Stream } from "./utils.js";
 import type {
 	NotificationType,
 	MsgObject,
@@ -22,7 +22,7 @@ import readline from "readline";
 import ytdl from "ytdl-core";
 
 import { formatDuration, isDevelopment, getBasename } from "@common/utils";
-import { homeDir, dirs, get, has, push, remove } from "./utils";
+import { homeDir, dirs, get, has, push, remove } from "./utils.js";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
 

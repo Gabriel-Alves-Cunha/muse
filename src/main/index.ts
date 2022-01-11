@@ -18,7 +18,7 @@ import {
 } from "electron";
 
 import { isDevelopment } from "@common/utils";
-import { logoPath } from "./utils";
+import { logoPath } from "./utils.js";
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
