@@ -10,10 +10,8 @@ export function usePlayOptions() {
 	const [cachedPlayOptions, setCachedPlayOptions] =
 		useLocalStorage<PlayOptions>(playOptionsKey, {
 			loopThisMedia: false,
-			repeatAllMedia: true,
+			loopAllMedia: true,
 			isRandom: false,
-			isPaused: true,
-			muted: false,
 		});
 
 	const [playOptions, dispatchPlayOptions] = useReducer(
@@ -43,38 +41,13 @@ export function usePlayOptions() {
 				break;
 			}
 
-			case "repeat all media": {
+			case "loop all media": {
 				const newPlayOptions: PlayOptions = {
 					...previousPlayOptions,
-					repeatAllMedia: action.value,
+					loopAllMedia: action.value,
 				};
 
 				setCachedPlayOptions(newPlayOptions);
-
-				return newPlayOptions;
-				break;
-			}
-
-			case "muted": {
-				const newPlayOptions: PlayOptions = {
-					...previousPlayOptions,
-					muted: action.value,
-				};
-
-				console.time("doc get audio");
-				(document.getElementById("audio") as HTMLAudioElement).muted =
-					action.value;
-				console.timeEnd("doc get audio");
-
-				return newPlayOptions;
-				break;
-			}
-
-			case "is paused": {
-				const newPlayOptions: PlayOptions = {
-					...previousPlayOptions,
-					isPaused: action.value,
-				};
 
 				return newPlayOptions;
 				break;
@@ -106,16 +79,12 @@ usePlayOptions.whyDidYouRender = {
 };
 
 export type PlayOptions = Readonly<{
-	repeatAllMedia: boolean;
 	loopThisMedia: boolean;
+	loopAllMedia: boolean;
 	isRandom: boolean;
-	isPaused: boolean;
-	muted: boolean;
 }>;
 
 export type PlayOptions_Action =
-	| Readonly<{ type: "repeat all media"; value: PlayOptions["repeatAllMedia"] }>
 	| Readonly<{ type: "loop this media"; value: PlayOptions["loopThisMedia"] }>
-	| Readonly<{ type: "is random"; value: PlayOptions["isRandom"] }>
-	| Readonly<{ type: "is paused"; value: PlayOptions["isPaused"] }>
-	| Readonly<{ type: "muted"; value: PlayOptions["muted"] }>;
+	| Readonly<{ type: "loop all media"; value: PlayOptions["loopAllMedia"] }>
+	| Readonly<{ type: "is random"; value: PlayOptions["isRandom"] }>;

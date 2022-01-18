@@ -32,8 +32,12 @@ export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 export const getBasename = (filename: string) =>
 	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
 
-export const getPathWithoutExtension = (filename: string) =>
-	filename.slice(0, filename.lastIndexOf("."));
+export const getPathWithoutExtension = (filename: string) => {
+	const lastIndex =
+		filename.indexOf(".") === -1 ? filename.length : filename.indexOf(".");
+
+	return filename.slice(0, lastIndex);
+};
 
 export const formatDuration = (time: number | undefined) => {
 	if (time === undefined) return "";

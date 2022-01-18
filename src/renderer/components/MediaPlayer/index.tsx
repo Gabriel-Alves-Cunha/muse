@@ -20,8 +20,8 @@ import {
 
 export function MediaPlayer() {
 	const {
-		values: { currentPlaying, playOptions },
 		functions: { dispatchCurrentPlaying },
+		values: { currentPlaying },
 	} = useMediaHandler();
 
 	const [progress, setProgress] = useState<Progress>({
@@ -33,11 +33,10 @@ export function MediaPlayer() {
 	const playOrPauseMedia = () => {
 		const audio = audioRef.current;
 		if (!audio) return;
-		const { currentTime, paused } = audio;
 
-		paused
-			? dispatchCurrentPlaying({ type: "resume", atSecond: currentTime })
-			: dispatchCurrentPlaying({ type: "pause", atSecond: currentTime });
+		audio.paused
+			? dispatchCurrentPlaying({ type: "resume" })
+			: dispatchCurrentPlaying({ type: "pause" });
 	};
 
 	const playPreviousMedia = () =>
@@ -74,11 +73,11 @@ export function MediaPlayer() {
 		const div = document.getElementById("goto");
 		if (!audio || !div || !duration) return;
 
-		const width = +getComputedStyle(div).width.replace("px", "");
+		const width = Number(getComputedStyle(div).width.replace("px", ""));
 		const clickX = e.nativeEvent.offsetX;
-		const gotoSeconds = (clickX / width) * duration;
+		const gotoTime = (clickX / width) * duration;
 
-		audio.currentTime = gotoSeconds;
+		audio.currentTime = gotoTime;
 	}
 
 	return (
@@ -138,7 +137,7 @@ export function MediaPlayer() {
 				</span>
 
 				<span className="play-pause" onClick={playOrPauseMedia}>
-					{playOptions?.isPaused ? <Play size="28" /> : <Pause size="28" />}
+					{audioRef.current?.paused ? <Play size="28" /> : <Pause size="28" />}
 				</span>
 
 				<span className="previous-or-next" onClick={playNextMedia}>

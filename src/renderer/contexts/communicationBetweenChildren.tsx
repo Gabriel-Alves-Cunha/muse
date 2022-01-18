@@ -68,7 +68,7 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		receiveMsgFromElectron(object => {
 			dbg(
-				"Received 'async-msg' from Electron on React side.\nobject =",
+				"Received 'async-msg' from Electron on React side.\nObject =",
 				object,
 			);
 

@@ -1,5 +1,5 @@
 import type { PlaylistsReducer_Action, Playlist } from "./usePlaylists";
-import type { PlayOptions_Action, PlayOptions } from "./usePlayOptions";
+import type { PlayOptions } from "./usePlayOptions";
 import type { Dispatch } from "react";
 import type { Media } from "@common/@types/types";
 
@@ -17,7 +17,6 @@ const {
 const currentPlayingKey = keyPrefix + "current_playing";
 
 export function useCurrentPlaying({
-	dispatchPlayOptions,
 	dispatchPlaylists,
 	playOptions,
 	playlists,
@@ -75,7 +74,7 @@ export function useCurrentPlaying({
 				const newCurrentPlaying: CurrentPlaying = {
 					playlist: action.playlist,
 					media: action.media,
-					seconds: 0.0,
+					currentTime: 0.0,
 				};
 
 				setCachedCurrentPlaying(newCurrentPlaying);
@@ -135,18 +134,24 @@ export function useCurrentPlaying({
 						document.getElementById("audio") as HTMLAudioElement
 					).play())();
 
-				dispatchPlayOptions({ type: "is paused", value: false });
-
 				return previousPlaying;
 				break;
 			}
 
 			case "pause": {
-				(document.getElementById("audio") as HTMLAudioElement).pause();
+				const audio = document.getElementById("audio") as HTMLAudioElement;
 
-				dispatchPlayOptions({ type: "is paused", value: true });
+				audio.pause();
 
-				return previousPlaying;
+				const newCurrentPlaying: CurrentPlaying = {
+					playlist: previousPlaying.playlist,
+					currentTime: audio.currentTime,
+					media: previousPlaying.media,
+				};
+
+				setCachedCurrentPlaying(newCurrentPlaying);
+
+				return newCurrentPlaying;
 				break;
 			}
 
@@ -240,6 +245,7 @@ export function useCurrentPlaying({
 
 			audio.addEventListener("canplay", () => {
 				console.log("Audio can play");
+				audio.currentTime = currentPlaying.currentTime;
 			});
 			audio.addEventListener("invalid", e => {
 				console.error("Audio is invalid:", e);
@@ -268,13 +274,13 @@ useCurrentPlaying.whyDidYouRender = {
 const defaultCurrentPlaying: CurrentPlaying = {
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 	playlist: defaultPlaylists.find(({ name }) => name === "none")!,
-	seconds: undefined,
+	currentTime: 0.0,
 	media: undefined,
 };
 
 export type CurrentPlaying = Readonly<{
+	currentTime: number;
 	playlist: Playlist;
-	seconds?: number;
 	media?: Media;
 }>;
 
@@ -283,13 +289,12 @@ export type currentPlayingReducer_Action =
 	| Readonly<{ type: "new"; media: Media; playlist: Playlist }>
 	| Readonly<{ type: "play previous"; playlist: Playlist }>
 	| Readonly<{ type: "play next"; playlist: Playlist }>
-	| Readonly<{ type: "resume"; atSecond: number }>
-	| Readonly<{ type: "pause"; atSecond: number }>
-	| Readonly<{ type: "there is no media" }>;
+	| Readonly<{ type: "there is no media" }>
+	| Readonly<{ type: "resume" }>
+	| Readonly<{ type: "pause" }>;
 
 type Props = Readonly<{
 	dispatchPlaylists: Dispatch<PlaylistsReducer_Action>;
-	dispatchPlayOptions: Dispatch<PlayOptions_Action>;
 	playlists: readonly Playlist[];
 	playOptions: PlayOptions;
 }>;

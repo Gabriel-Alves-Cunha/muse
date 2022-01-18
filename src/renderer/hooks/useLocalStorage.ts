@@ -12,7 +12,7 @@ export function useLocalStorage<T>(
 
 			return item ? (JSON.parse(item) as T) : initialValue;
 		} catch (error) {
-			console.error(`Error reading localStorage key: “${key}”:`, error);
+			console.error(`Error reading localStorage key: "${key}":`, error);
 			return initialValue;
 		}
 	});

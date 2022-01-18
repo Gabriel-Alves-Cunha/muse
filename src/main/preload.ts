@@ -169,7 +169,7 @@ function sendNotificationToElectron(
 	ipcRenderer.send("notify", object);
 }
 
-function receiveMsgFromElectron(
+export function receiveMsgFromElectron(
 	handleMsg: (msgObject: MsgObject) => void,
 ): void {
 	ipcRenderer.on("async-msg", (_, msgObject: MsgObject) =>
@@ -186,7 +186,7 @@ async function getInfo(url: string): Promise<videoInfo | undefined> {
 	}
 }
 
-async function transformPathsToMedias(
+export async function transformPathsToMedias(
 	paths: readonly string[],
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
@@ -293,7 +293,7 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	return port;
 };
 
-function handleCreateOrCancelDownload(
+export function handleCreateOrCancelDownload(
 	imageURL: Readonly<string>,
 	destroy: Readonly<boolean>,
 	url: Readonly<string>,
@@ -320,7 +320,7 @@ function handleCreateOrCancelDownload(
 	}
 }
 
-function makeStream(
+export function makeStream(
 	imageURL: Readonly<string>,
 	url: Readonly<string>,
 	title: Readonly<string>,
@@ -421,7 +421,7 @@ function makeStream(
 	push(currentDownloads, { url, stream: readStream });
 }
 
-function handleCreateOrCancelConvert(
+export function handleCreateOrCancelConvert(
 	destroy: Readonly<boolean>,
 	toExtension: AllowedMedias,
 	path: Readonly<Path>,
@@ -448,7 +448,7 @@ function handleCreateOrCancelConvert(
 	}
 }
 
-function convertToAudio(
+export function convertToAudio(
 	mediaPath: Readonly<Path>,
 	toExtension: AllowedMedias,
 	electronPort: Readonly<MessagePort>,
@@ -535,7 +535,7 @@ function convertToAudio(
 	dbg("Medias converting =", mediasConverting);
 }
 
-async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
+export async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 	const file = MediaFile.createFromPath(pathOfMedia);
 	// dbg("File =", file);
 	// dbg("File tags =", file.tag);
@@ -613,7 +613,7 @@ async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 // 	file.dispose();
 // }, 5_000);
 
-// function watchForDirectories(dirs: readonly string[]) {
+// export function watchForDirectories(dirs: readonly string[]) {
 // 	const wildcardList = dirs
 // 		.map(dir =>
 // 			allowedMedias.map(extension => normalize(dir + "/*." + extension)),

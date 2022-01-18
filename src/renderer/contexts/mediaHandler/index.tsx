@@ -25,7 +25,6 @@ function MediaHandler_Provider({ children }: { children: ReactNode }) {
 		playlists,
 	} = usePlaylists();
 	const [currentPlaying, dispatchCurrentPlaying] = useCurrentPlaying({
-		dispatchPlayOptions,
 		dispatchPlaylists,
 		playOptions,
 		playlists,

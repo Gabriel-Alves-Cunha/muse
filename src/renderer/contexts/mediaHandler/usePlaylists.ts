@@ -89,14 +89,10 @@ export function usePlaylists(): usePlaylistsReturnType {
 			}
 
 			case "update history": {
-				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				const prevHistory = prevPlaylistArray.find(
 					({ name }) => name === "history",
-				)?.list;
-				if (!prevHistory) {
-					console.error("There should be a previous history!!");
-					return prevPlaylistArray;
-				}
+				)!.list;
 
 				const { whatToDo } = action;
 				switch (whatToDo) {
@@ -462,6 +458,11 @@ export function usePlaylists(): usePlaylistsReturnType {
 
 					const media: Media = (await transformPathsToMedias([path]))[0];
 
+					if (!media) {
+						console.error("Could not transform to media.");
+						break;
+					}
+
 					dispatchPlaylists({
 						type: "update mediaList",
 						whatToDo: "add",
@@ -473,7 +474,7 @@ export function usePlaylists(): usePlaylistsReturnType {
 				case "del media": {
 					if (!path) {
 						console.error(
-							"There should be a path if you want to remove a media!",
+							"There should be a path if you want to delete a media!",
 						);
 						break;
 					}
