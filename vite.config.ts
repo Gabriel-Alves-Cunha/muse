@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 
-const outDirRenderer = resolve(__dirname, "./renderer-build");
+const outDirRenderer = resolve(__dirname, "./vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
 
 export default defineConfig({
@@ -12,6 +12,7 @@ export default defineConfig({
 	build: {
 		outDir: outDirRenderer,
 		emptyOutDir: true,
+		sourcemap: false,
 		rollupOptions: {
 			output: {
 				entryFileNames: "[name].js",
