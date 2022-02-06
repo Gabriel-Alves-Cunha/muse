@@ -1,7 +1,7 @@
 import type { ChangeOptions } from "../Change";
-import type { Media } from "@common/@types/types";
+import type { Media } from "@common/@types/typesAndEnums";
 
-import { FaTrash as Remove } from "react-icons/fa";
+import { TrashIcon as Remove } from "@radix-ui/react-icons";
 import { useState } from "react";
 import Popup from "reactjs-popup";
 
@@ -20,15 +20,15 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 	const [whatToChange, setWhatToChange] = useState<WhatToChange>();
 	const [showConfirm, setShowConfirm] = useState(false);
 
-	const changePropsIfAllowed = (option: string, value: string) =>
+	const changePropsIfAllowed = (option: string, value: unknown) =>
 		isChangeable(option) &&
-		setWhatToChange({ whatToChange: option, current: value });
+		setWhatToChange({ whatToChange: option, current: value as string });
 
 	return (
 		<OptionsModalWrapper>
 			{Object.entries(options(media)).map(([option, value]) => (
 				<Option
-					onClick={() => changePropsIfAllowed(option, value as string)}
+					onClick={() => changePropsIfAllowed(option, value)}
 					className={isChangeable(option) ? "hoverable" : ""}
 					key={option}
 				>
@@ -38,7 +38,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 
 			<Option onClick={() => setShowConfirm(true)} className="rm" key="rm">
 				Remove
-				<Remove size={18} />
+				<Remove />
 			</Option>
 
 			<Popup
@@ -52,7 +52,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 			>
 				<Confirm>
 					<p>Are you sure you want to delete this media from your computer?</p>
-					<Remove size={20} />
+					<Remove />
 					<span onClick={async () => await deleteMedia(media)} className="yes">
 						Yes
 					</span>

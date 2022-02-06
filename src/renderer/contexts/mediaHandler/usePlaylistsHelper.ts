@@ -1,4 +1,4 @@
-import type { Media, Path } from "@common/@types/types";
+import type { Media, Path } from "@common/@types/typesAndEnums";
 
 import { allowedMedias, getBasename } from "@common/utils";
 const {

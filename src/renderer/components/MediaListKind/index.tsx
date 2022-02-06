@@ -1,10 +1,11 @@
 import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "./Change";
-import type { Media } from "@common/@types/types";
+import type { Media } from "@common/@types/typesAndEnums";
 
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { FixedSizeList, areEqual } from "react-window";
 import { memo, useRef, useState } from "react";
+import { Type } from "../../contexts/mediaHandler/useCurrentPlaying";
 import Popup from "reactjs-popup";
 
 import { MediaOptionsModal } from "./MediaOptions";
@@ -34,7 +35,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 
 	const playMedia = (media: Media) =>
 		dispatchCurrentPlaying({
-			type: "play this media",
+			type: Type.PLAY_THIS_MEDIA,
 			playlist: mediaList,
 			media,
 		});
@@ -85,6 +86,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				itemKey={(index, data) => data[index].path + Date.now()}
 				itemCount={mediaList.list.length}
 				itemData={mediaList.list}
+				overscanCount={15}
 				className="list"
 				itemSize={60}
 				height={400}

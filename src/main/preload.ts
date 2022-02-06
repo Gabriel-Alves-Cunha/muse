@@ -1,13 +1,9 @@
+import type { MsgObject, WriteTag } from "@common/@types/electron-window.d";
 import type { AllowedMedias } from "@common/utils";
-import type { Media, Path } from "@common/@types/types";
+import type { Media, Path } from "@common/@types/typesAndEnums";
 import type { videoInfo } from "ytdl-core";
 import type { IPicture } from "node-taglib-sharp";
 import type { Stream } from "./utils.js";
-import type {
-	NotificationType,
-	MsgObject,
-	WriteTag,
-} from "@common/@types/electron-window.d";
 
 import { File as MediaFile, Picture, ByteVector } from "node-taglib-sharp";
 import { readdir, readFile, stat, unlink } from "fs/promises";
@@ -15,6 +11,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { StringType, PictureType } from "node-taglib-sharp";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
+import { NotificationType } from "@common/@types/typesAndEnums";
 import { join } from "path";
 import { cpus } from "os";
 import fluent_ffmpeg from "fluent-ffmpeg";
@@ -32,7 +29,6 @@ contextBridge.exposeInMainWorld("electron", {
 	notificationApi: {
 		sendNotificationToElectron,
 		receiveMsgFromElectron,
-		getInfo,
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory: async (dir: Path) =>
@@ -49,10 +45,11 @@ contextBridge.exposeInMainWorld("electron", {
 		transformPathsToMedias,
 		convertToAudio,
 		writeTags,
+		getInfo,
 	},
 });
 
-window.onmessage = event => {
+window.onmessage = async event => {
 	switch (event.data) {
 		case "download media": {
 			const electronPort = event.ports[0];
@@ -121,6 +118,22 @@ window.onmessage = event => {
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
+			break;
+		}
+
+		case "write tag": {
+			const details: { mediaPath: Path; [whatToChange: string]: string } =
+				event.data;
+			const data = {};
+			Object.entries(details).forEach(pair => Object.assign(data, pair));
+
+			console.log({ event });
+			console.log("\n\n\n");
+			console.log({ details });
+			console.log({ data });
+
+			await writeTags(details.mediaPath, data);
+
 			break;
 		}
 

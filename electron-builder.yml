@@ -1,6 +1,19 @@
 appId: com.muse.electron_react
+linux:
+  icon: src/renderer/assets/logo.png
 productName: Muse
+extends: null
+compression: store
+asar: false
+files:
+  [
+    {
+      from: "renderer-build",
+      to: "resources/renderer-build",
+      filter: ["**/*"],
+    },
+    { from: "app", to: "resources/app", filter: ["**/*"] },
+  ]
+icon: src/renderer/assets/logo.png
 directories:
   output: dist
-  buildResources: build
-  app: app

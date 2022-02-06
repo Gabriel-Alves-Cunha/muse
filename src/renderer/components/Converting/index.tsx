@@ -1,6 +1,6 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
 import type { ProgressProps } from "../Progress";
-import type { Path } from "@common/@types/types";
+import type { Path } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer, useRef, useState } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
@@ -15,6 +15,7 @@ import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { icon } from "../Progress";
 import {
+	Type as MsgType,
 	ConvertValues,
 	useInterComm,
 } from "@contexts/communicationBetweenChildren";
@@ -200,7 +201,7 @@ export function Converting() {
 		});
 
 		// This way to prevent infinite updates:
-		if (convertValues[0]) sendMsg({ type: "resetConvertValues" });
+		if (convertValues[0]) sendMsg({ type: MsgType.RESET_CONVERT_VALUES });
 		// We have to do this to reset downloadValues ^
 		// so that it is ready for a new media convertion!
 

@@ -1,10 +1,13 @@
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
-import { GrFormPrevious as Previous } from "react-icons/gr";
-import { BsPauseFill as Pause } from "react-icons/bs";
-import { GrFormNext as Next } from "react-icons/gr";
-import { BsPlayFill as Play } from "react-icons/bs";
+import {
+	TrackPreviousIcon as Previous,
+	TrackNextIcon as Next,
+	PauseIcon as Pause,
+	PlayIcon as Play,
+} from "@radix-ui/react-icons";
 
+import { Type } from "@renderer/contexts/mediaHandler/useCurrentPlaying";
 import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { formatDuration } from "@common/utils";
 
@@ -35,20 +38,20 @@ export function MediaPlayer() {
 		if (!audio) return;
 
 		audio.paused
-			? dispatchCurrentPlaying({ type: "resume" })
-			: dispatchCurrentPlaying({ type: "pause" });
+			? dispatchCurrentPlaying({ type: Type.RESUME })
+			: dispatchCurrentPlaying({ type: Type.PAUSE });
 	};
 
 	const playPreviousMedia = () =>
 		dispatchCurrentPlaying({
 			playlist: currentPlaying.playlist,
-			type: "play previous",
+			type: Type.PLAY_PREVIOUS,
 		});
 
 	const playNextMedia = () =>
 		dispatchCurrentPlaying({
 			playlist: currentPlaying.playlist,
-			type: "play next",
+			type: Type.PLAY_NEXT,
 		});
 
 	useEffect(() => {
@@ -133,15 +136,19 @@ export function MediaPlayer() {
 
 			<Controls>
 				<span className="previous-or-next" onClick={playPreviousMedia}>
-					<Previous size="25" />
+					<Previous />
 				</span>
 
 				<span className="play-pause" onClick={playOrPauseMedia}>
-					{audioRef.current?.paused ? <Play size="28" /> : <Pause size="28" />}
+					{audioRef.current?.paused ? (
+						<Play height={20} width={20} />
+					) : (
+						<Pause height={20} width={20} />
+					)}
 				</span>
 
 				<span className="previous-or-next" onClick={playNextMedia}>
-					<Next size="25" />
+					<Next />
 				</span>
 			</Controls>
 		</Wrapper>

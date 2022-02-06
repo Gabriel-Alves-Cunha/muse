@@ -4,7 +4,8 @@ dist
 dist-ssr
 *.local
 pack
-app/*
+app
+renderer-build
 !app/package.json
 !app/yarn.lock
 !app/package-lock.json

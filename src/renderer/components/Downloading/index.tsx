@@ -8,6 +8,7 @@ import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylists
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
+import { Type as MsgType } from "@contexts/communicationBetweenChildren";
 import { Progress, icon } from "../Progress";
 import { useInterComm } from "@contexts/communicationBetweenChildren";
 
@@ -166,7 +167,7 @@ export function Downloading() {
 
 				// We have to `sendMsg` to reset downloadValues
 				// so that it is ready for a new media download:
-				sendMsg({ type: "resetDownloadValues" });
+				sendMsg({ type: MsgType.RESET_DOWNLOAD_VALUES });
 
 				// Sending port so we can communicate with electron:
 				window.postMessage("download media", "*", [electronPort]);

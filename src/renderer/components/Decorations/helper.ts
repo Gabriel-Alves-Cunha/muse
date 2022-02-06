@@ -1,8 +1,9 @@
+import { NotificationType } from "@common/@types/typesAndEnums";
 const notify = electron.notificationApi.sendNotificationToElectron;
 
-export const toggleMaximize = () => notify({ type: "maximize" });
-export const minimizeWindow = () => notify({ type: "minimize" });
-export const closeWindow = () => notify({ type: "quitApp" });
+export const toggleMaximize = () => notify({ type: NotificationType.MAXIMIZE });
+export const minimizeWindow = () => notify({ type: NotificationType.MINIMIZE });
+export const closeWindow = () => notify({ type: NotificationType.QUIT_APP });
 
 export const handleMaximizeOnDoubleClick = (
 	e: React.MouseEvent<HTMLElement, MouseEvent>,

@@ -1,15 +1,19 @@
 import type { PlaylistsReducer_Action, Playlist } from "./usePlaylists";
 import type { PlayOptions } from "./usePlayOptions";
 import type { Dispatch } from "react";
-import type { Media } from "@common/@types/types";
+import type { Media } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer } from "react";
 
 import { assertUnreachable, getRandomInt } from "@renderer/utils/utils";
-import { defaultPlaylists } from "./usePlaylists";
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@renderer/utils/app";
 import { dbg } from "@common/utils";
+import {
+	Actions as PlaylistActions,
+	Type as PlaylistType,
+	defaultPlaylists,
+} from "./usePlaylists";
 const {
 	fs: { readFile },
 } = electron;
@@ -35,9 +39,8 @@ export function useCurrentPlaying({
 		previousPlaying: CurrentPlaying,
 		action: currentPlayingReducer_Action,
 	): CurrentPlaying {
-		const { type } = action;
-		switch (type) {
-			case "there is no media": {
+		switch (action.type) {
+			case Type.THERE_IS_NO_MEDIA: {
 				dbg("there is no media");
 
 				setCachedCurrentPlaying(defaultCurrentPlaying);
@@ -46,7 +49,7 @@ export function useCurrentPlaying({
 				break;
 			}
 
-			case "new": {
+			case Type.NEW: {
 				dbg("currentPlaying 'new' action =", action);
 
 				if (!action.media) return previousPlaying;
@@ -56,25 +59,25 @@ export function useCurrentPlaying({
 					);
 
 					return currentPlayingReducer(previousPlaying, {
-						type: "there is no media",
+						type: Type.THERE_IS_NO_MEDIA,
 					});
 				}
 
-				// Update history:
+				// We need to update history:
 				if (
 					previousPlaying.media &&
 					previousPlaying.media.title !== action.media.title
 				)
 					dispatchPlaylists({
+						type: PlaylistType.UPDATE_HISTORY,
+						whatToDo: PlaylistActions.ADD,
 						media: previousPlaying.media,
-						type: "update history",
-						whatToDo: "add",
 					});
 
 				const newCurrentPlaying: CurrentPlaying = {
 					playlist: action.playlist,
 					media: action.media,
-					currentTime: 0.0,
+					currentTime: 0,
 				};
 
 				setCachedCurrentPlaying(newCurrentPlaying);
@@ -83,7 +86,7 @@ export function useCurrentPlaying({
 				break;
 			}
 
-			case "play this media": {
+			case Type.PLAY_THIS_MEDIA: {
 				dbg("currentPlaying 'play this media' action =", action);
 				// debugger;
 
@@ -93,23 +96,23 @@ export function useCurrentPlaying({
 						return currentPlayingReducer(previousPlaying, {
 							playlist: action.playlist,
 							media: action.media,
-							type: "new",
+							type: Type.NEW,
 						});
 					else
 						return currentPlayingReducer(previousPlaying, {
-							type: "there is no media",
+							type: Type.THERE_IS_NO_MEDIA,
 						});
 				}
 
 				return currentPlayingReducer(previousPlaying, {
 					playlist: action.playlist,
 					media: action.media,
-					type: "new",
+					type: Type.NEW,
 				});
 				break;
 			}
 
-			case "play previous": {
+			case Type.PLAY_PREVIOUS: {
 				dbg("currentPlaying 'play previous' action =", action);
 
 				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
@@ -118,17 +121,17 @@ export function useCurrentPlaying({
 				if (head)
 					return currentPlayingReducer(previousPlaying, {
 						playlist: action.playlist,
-						type: "play this media",
+						type: Type.PLAY_THIS_MEDIA,
 						media: head,
 					});
 				else
 					return currentPlayingReducer(previousPlaying, {
-						type: "there is no media",
+						type: Type.THERE_IS_NO_MEDIA,
 					});
 				break;
 			}
 
-			case "resume": {
+			case Type.RESUME: {
 				(async () =>
 					await (
 						document.getElementById("audio") as HTMLAudioElement
@@ -138,7 +141,7 @@ export function useCurrentPlaying({
 				break;
 			}
 
-			case "pause": {
+			case Type.PAUSE: {
 				const audio = document.getElementById("audio") as HTMLAudioElement;
 
 				audio.pause();
@@ -155,7 +158,7 @@ export function useCurrentPlaying({
 				break;
 			}
 
-			case "play next": {
+			case Type.PLAY_NEXT: {
 				dbg("currentPlaying 'playNext' action =", action);
 
 				const prevPlaylist = previousPlaying.playlist;
@@ -163,7 +166,7 @@ export function useCurrentPlaying({
 					console.error("Can't play next media from the 'none' playlist!");
 
 					return currentPlayingReducer(previousPlaying, {
-						type: "there is no media",
+						type: Type.THERE_IS_NO_MEDIA,
 					});
 				}
 
@@ -172,13 +175,13 @@ export function useCurrentPlaying({
 				if (playOptions.loopThisMedia) {
 					if (!prevMedia)
 						return currentPlayingReducer(previousPlaying, {
-							type: "there is no media",
+							type: Type.THERE_IS_NO_MEDIA,
 						});
 					else
 						return currentPlayingReducer(previousPlaying, {
+							type: Type.PLAY_THIS_MEDIA,
 							playlist: prevPlaylist,
 							media: prevMedia,
-							type: "play this media",
 						});
 				}
 
@@ -187,7 +190,7 @@ export function useCurrentPlaying({
 					const randomMedia = prevPlaylist.list[randomIndex];
 
 					return currentPlayingReducer(previousPlaying, {
-						type: "play this media",
+						type: Type.PLAY_THIS_MEDIA,
 						playlist: prevPlaylist,
 						media: randomMedia,
 					});
@@ -198,7 +201,7 @@ export function useCurrentPlaying({
 						);
 
 						return currentPlayingReducer(previousPlaying, {
-							type: "there is no media",
+							type: Type.THERE_IS_NO_MEDIA,
 						});
 					}
 
@@ -211,22 +214,22 @@ export function useCurrentPlaying({
 
 						return currentPlayingReducer(previousPlaying, {
 							media: firstMediaFromTheSameList,
+							type: Type.PLAY_THIS_MEDIA,
 							playlist: prevPlaylist,
-							type: "play this media",
 						});
 					}
 
 					return currentPlayingReducer(previousPlaying, {
 						media: nextMediaFromTheSameList,
+						type: Type.PLAY_THIS_MEDIA,
 						playlist: prevPlaylist,
-						type: "play this media",
 					});
 					break;
 				}
 			}
 
 			default:
-				return assertUnreachable(type);
+				return assertUnreachable(action);
 		}
 	}
 
@@ -244,7 +247,14 @@ export function useCurrentPlaying({
 			audio.src = url;
 
 			audio.addEventListener("canplay", () => {
-				console.log("Audio can play");
+				console.log("Audio can play.");
+				dbg({
+					currentTime: audio.currentTime,
+					duration: audio.duration,
+				});
+			});
+			audio.addEventListener("loadedmetadata", () => {
+				console.log("Audio was loadedmetadata. Setting currentTime...");
 				audio.currentTime = currentPlaying.currentTime;
 			});
 			audio.addEventListener("invalid", e => {
@@ -260,6 +270,7 @@ export function useCurrentPlaying({
 			audio.addEventListener("abort", e =>
 				console.log("Audio was aborted:", e),
 			);
+			// debugger;
 		})();
 	}, [currentPlaying]);
 
@@ -274,8 +285,8 @@ useCurrentPlaying.whyDidYouRender = {
 const defaultCurrentPlaying: CurrentPlaying = {
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 	playlist: defaultPlaylists.find(({ name }) => name === "none")!,
-	currentTime: 0.0,
 	media: undefined,
+	currentTime: 0,
 };
 
 export type CurrentPlaying = Readonly<{
@@ -285,13 +296,23 @@ export type CurrentPlaying = Readonly<{
 }>;
 
 export type currentPlayingReducer_Action =
-	| Readonly<{ type: "play this media"; media: Media; playlist: Playlist }>
-	| Readonly<{ type: "new"; media: Media; playlist: Playlist }>
-	| Readonly<{ type: "play previous"; playlist: Playlist }>
-	| Readonly<{ type: "play next"; playlist: Playlist }>
-	| Readonly<{ type: "there is no media" }>
-	| Readonly<{ type: "resume" }>
-	| Readonly<{ type: "pause" }>;
+	| Readonly<{ type: Type.PLAY_THIS_MEDIA; media: Media; playlist: Playlist }>
+	| Readonly<{ type: Type.NEW; media: Media; playlist: Playlist }>
+	| Readonly<{ type: Type.PLAY_PREVIOUS; playlist: Playlist }>
+	| Readonly<{ type: Type.PLAY_NEXT; playlist: Playlist }>
+	| Readonly<{ type: Type.THERE_IS_NO_MEDIA }>
+	| Readonly<{ type: Type.RESUME }>
+	| Readonly<{ type: Type.PAUSE }>;
+
+export enum Type {
+	THERE_IS_NO_MEDIA,
+	PLAY_THIS_MEDIA,
+	PLAY_PREVIOUS,
+	PLAY_NEXT,
+	RESUME,
+	PAUSE,
+	NEW,
+}
 
 type Props = Readonly<{
 	dispatchPlaylists: Dispatch<PlaylistsReducer_Action>;

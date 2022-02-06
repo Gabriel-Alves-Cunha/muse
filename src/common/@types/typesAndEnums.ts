@@ -18,3 +18,20 @@ export type Media = Readonly<{
 	img?: string;
 	path: Path;
 }>;
+
+export enum NotificationType {
+	MAXIMIZE,
+	MINIMIZE,
+	QUIT_APP,
+}
+export enum ListenToNotification {
+	REFRESH_ALL_MEDIA,
+	REFRESH_MEDIA,
+	REMOVE_MEDIA,
+	ADD_MEDIA,
+	DEL_MEDIA,
+}
+
+export enum TypeOfMsgObject {
+	DOWNLOAD_MEDIA,
+}

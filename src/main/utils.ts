@@ -20,8 +20,8 @@ export const logoPath = isDevelopment
 			"icons",
 			"logo.png",
 	  )
-	: join(__dirname, "..", "src", "renderer", "assets", "icons", "logo.png");
-console.log(`logoPath = "${logoPath}"`);
+	: "./logo.png";
+console.log({ logoPath });
 
 export const homeDir = homedir();
 export const dirs = Object.freeze({

@@ -18,7 +18,7 @@ export function ImgWithFallback({
 	if (cache.get(urlAsACachekey)?.stats === Status.SUCCESS)
 		return <img src={imgAsString} />;
 
-	const hasImg = imgAsString.length > 100;
+	const hasImg = Boolean(imgAsString.length);
 	if (!hasImg) {
 		if (!cache.has(urlAsACachekey))
 			cache.set(urlAsACachekey, { stats: Status.FAILURE, img: "" });

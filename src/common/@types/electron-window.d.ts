@@ -1,6 +1,8 @@
 import type { DownloadValues } from "@renderer/contexts/communicationBetweenChildren";
-import type { Media, Path } from "./types";
+import type { Media, Path } from "./typesAndEnums";
 import type { videoInfo } from "ytdl-core";
+
+import { TypeOfMsgObject } from "./typesAndEnums";
 
 declare global {
 	/* eslint-disable no-var */
@@ -17,7 +19,6 @@ type VisibleElectron = Readonly<{
 			}>,
 		): void;
 		receiveMsgFromElectron(handleMsg: (msgObject: MsgObject) => void): void;
-		getInfo(url: string): Promise<void | Readonly<videoInfo>>;
 	};
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory(
@@ -39,11 +40,12 @@ type VisibleElectron = Readonly<{
 		transformPathsToMedias(paths: readonly Path[]): Promise<readonly Media[]>;
 		convertToAudio(mediaPath: Path, extension: ExtensionToBeConvertedTo): void;
 		writeTags(pathOfMedia: Path, data: WriteTag): Promise<Readonly<boolean>>;
+		getInfo(url: string): Promise<void | Readonly<videoInfo>>;
 	};
 }>;
 
 export type MsgObject = Readonly<{
-	type: "download media";
+	type: TypeOfMsgObject.DOWNLOAD_MEDIA;
 	params: DownloadValues;
 }>;
 
@@ -55,11 +57,4 @@ export type WriteTag = Readonly<{
 	title?: string;
 }>;
 
-export type NotificationType = "quitApp" | "maximize" | "minimize";
 export type ExtensionToBeConvertedTo = "mp3";
-export type ListenToNotification =
-	| "refresh-all-media"
-	| "refresh media"
-	| "remove media"
-	| "add media"
-	| "del media";

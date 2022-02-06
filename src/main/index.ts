@@ -1,7 +1,7 @@
 import type { IpcMainInvokeEvent } from "electron";
-import type { NotificationType } from "@common/@types/electron-window";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
+import { NotificationType } from "@common/@types/typesAndEnums";
 import { pathToFileURL } from "url";
 import { getInfo } from "ytdl-core";
 import { join } from "path";
@@ -17,7 +17,7 @@ import {
 	app,
 } from "electron";
 
-import { isDevelopment } from "@common/utils";
+import { capitalizedAppName, isDevelopment } from "@common/utils";
 import { logoPath } from "./utils.js";
 
 let electronWindow: BrowserWindow | undefined;
@@ -25,9 +25,9 @@ let tray: Tray | undefined;
 
 function createWindow() {
 	const window = new BrowserWindow({
+		title: capitalizedAppName,
 		titleBarStyle: "hidden",
 		icon: logoPath,
-		title: "Muse",
 		frame: false,
 		height: 600,
 		show: false,
@@ -80,7 +80,7 @@ function createWindow() {
 
 	const url = isDevelopment
 		? "http://localhost:3000"
-		: pathToFileURL(join(__dirname, "./renderer/index.html")).toString();
+		: pathToFileURL(join(__dirname, "index.html")).toString();
 
 	window.loadURL(url);
 
@@ -175,19 +175,19 @@ ipcMain.on(
 		}>,
 	) => {
 		switch (object.type) {
-			case "quitApp": {
+			case NotificationType.QUIT_APP: {
 				app.quit();
 				break;
 			}
 
-			case "maximize": {
+			case NotificationType.MAXIMIZE: {
 				BrowserWindow.getFocusedWindow()?.isMaximized()
 					? BrowserWindow.getFocusedWindow()?.unmaximize()
 					: BrowserWindow.getFocusedWindow()?.maximize();
 				break;
 			}
 
-			case "minimize": {
+			case NotificationType.MINIMIZE: {
 				BrowserWindow.getFocusedWindow()?.minimize();
 				break;
 			}

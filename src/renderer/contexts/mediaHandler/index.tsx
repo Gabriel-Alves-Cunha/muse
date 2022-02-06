@@ -1,7 +1,7 @@
 import type { Playlist, PlaylistsReducer_Action } from "./usePlaylists";
 import type { PlayOptions, PlayOptions_Action } from "./usePlayOptions";
 import type { ReactNode, Dispatch } from "react";
-import type { Media } from "@common/@types/types";
+import type { Media } from "@common/@types/typesAndEnums";
 import type {
 	currentPlayingReducer_Action,
 	CurrentPlaying,

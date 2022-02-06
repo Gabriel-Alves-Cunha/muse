@@ -1,6 +1,6 @@
 import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "../MediaListKind/Change";
-import type { Media } from "@common/@types/types";
+import type { Media } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer, useRef } from "react";
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
@@ -9,10 +9,15 @@ import { IoReloadSharp as Reload } from "react-icons/io5";
 import { FiTrash as Clean } from "react-icons/fi";
 import { FixedSizeList } from "react-window";
 
+import { Type as CurrentPlayingType } from "@contexts/mediaHandler/useCurrentPlaying";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { dbg } from "@common/utils";
+import {
+	Actions as PlaylistActions,
+	Type as PlaylistType,
+} from "@contexts/mediaHandler/usePlaylists";
 
 import { Img, Info, SubTitle, Title } from "../MediaListKind/styles";
 import { Loading } from "@styles/appStyles";
@@ -27,9 +32,15 @@ import {
 } from "./styles";
 
 type Props = {
-	buttonToTheSide: "reload button" | "clean" | "nothing";
+	buttonToTheSide: ButtonToTheSide;
 	fromList: MediaListKindProps["mediaType"];
 };
+
+export enum ButtonToTheSide {
+	RELOAD_BUTTON,
+	NOTHING,
+	CLEAN,
+}
 
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const {
@@ -48,24 +59,24 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const searcherRef = useRef(null);
 
 	useOnClickOutside(searcherRef, () => {
-		dispatchSearcher({ type: "setSearchTerm", value: "" });
-		dispatchSearcher({ type: "setResults", value: [] });
+		dispatchSearcher({ type: Type.SET_SEARCH_TERM, value: "" });
+		dispatchSearcher({ type: Type.SET_RESULTS, value: [] });
 	});
 
 	const reload = async () => {
-		dispatchSearcher({ type: "setIsLoading", value: true });
+		dispatchSearcher({ type: Type.SET_IS_LOADING, value: true });
 
 		await searchLocalComputerForMedias(true);
 
-		dispatchSearcher({ type: "setIsLoading", value: false });
+		dispatchSearcher({ type: Type.SET_IS_LOADING, value: false });
 	};
 
 	const cleanHistory = () => {
 		dbg("Sending msg to clean history.");
 
 		dispatchPlaylists({
-			type: "update history",
-			whatToDo: "clean",
+			type: PlaylistType.UPDATE_HISTORY,
+			whatToDo: PlaylistActions.CLEAN,
 		});
 	};
 
@@ -76,7 +87,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 			() =>
 				dispatchSearcher({
 					value: searchForMedia(searcher.searchTerm),
-					type: "setResults",
+					type: Type.SET_RESULTS,
 				}),
 			500,
 		);
@@ -93,8 +104,8 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					<input
 						onChange={e =>
 							dispatchSearcher({
+								type: Type.SET_SEARCH_TERM,
 								value: e.target.value,
-								type: "setSearchTerm",
 							})
 						}
 						placeholder="Search for artists, songs..."
@@ -113,7 +124,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 
 			{(() => {
 				switch (buttonToTheSide) {
-					case "reload button": {
+					case ButtonToTheSide.RELOAD_BUTTON: {
 						return (
 							<ReloadContainer
 								isSearching={searcher.isLoading}
@@ -131,7 +142,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 						break;
 					}
 
-					case "clean": {
+					case ButtonToTheSide.CLEAN: {
 						return (
 							<Button>
 								<Clean size={14} onClick={cleanHistory} />
@@ -140,7 +151,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 						break;
 					}
 
-					case "nothing": {
+					case ButtonToTheSide.NOTHING: {
 						return <></>;
 						break;
 					}
@@ -175,7 +186,7 @@ function SearchResults({
 
 	const playMedia = (media: Media) =>
 		dispatchCurrentPlaying({
-			type: "play this media",
+			type: CurrentPlayingType.PLAY_THIS_MEDIA,
 			playlist,
 			media,
 		});
@@ -209,6 +220,7 @@ function SearchResults({
 				itemKey={(index, results) => results[index].path}
 				itemCount={results.length}
 				itemData={results}
+				overscanCount={15}
 				className="list"
 				itemSize={60}
 				height={400}
@@ -221,10 +233,8 @@ function SearchResults({
 }
 
 function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
-	const { type } = action;
-
-	switch (type) {
-		case "setResults": {
+	switch (action.type) {
+		case Type.SET_RESULTS: {
 			const ret: SearcherProps = {
 				searchTerm: prev.searchTerm,
 				isLoading: prev.isLoading,
@@ -234,7 +244,7 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 			return ret;
 		}
 
-		case "setSearchTerm": {
+		case Type.SET_SEARCH_TERM: {
 			const ret: SearcherProps = {
 				isLoading: prev.isLoading,
 				searchTerm: action.value,
@@ -244,7 +254,7 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 			return ret;
 		}
 
-		case "setIsLoading": {
+		case Type.SET_IS_LOADING: {
 			const ret: SearcherProps = {
 				searchTerm: prev.searchTerm,
 				isLoading: action.value,
@@ -255,7 +265,7 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 		}
 
 		default:
-			return assertUnreachable(type);
+			return assertUnreachable(action);
 	}
 }
 
@@ -266,6 +276,12 @@ type SearcherProps = Readonly<{
 }>;
 
 type Action =
-	| Readonly<{ type: "setResults"; value: readonly Media[] }>
-	| Readonly<{ type: "setIsLoading"; value: boolean }>
-	| Readonly<{ type: "setSearchTerm"; value: string }>;
+	| Readonly<{ type: Type.SET_RESULTS; value: readonly Media[] }>
+	| Readonly<{ type: Type.SET_SEARCH_TERM; value: string }>
+	| Readonly<{ type: Type.SET_IS_LOADING; value: boolean }>;
+
+enum Type {
+	SET_SEARCH_TERM,
+	SET_IS_LOADING,
+	SET_RESULTS,
+}

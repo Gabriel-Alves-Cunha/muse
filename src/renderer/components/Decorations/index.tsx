@@ -87,7 +87,7 @@ function Buttons() {
 }
 
 const AppName_Folder = () => {
-	const { page } = usePage();
+	const page = usePage().page;
 
 	return (
 		<AppName_Folder_Wrapper>

@@ -1,10 +1,11 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
 import type { ReactNode } from "react";
-import type { Path } from "@common/@types/types";
+import type { Path } from "@common/@types/typesAndEnums";
 
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { assertUnreachable } from "@utils/utils";
+import { TypeOfMsgObject } from "@common/@types/typesAndEnums";
 import { dbg } from "@common/utils";
 const {
 	notificationApi: { receiveMsgFromElectron },
@@ -17,10 +18,8 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 	const [convertValues, setConvertValues] = useState<ConvertValues[]>([]);
 
 	function sendMsg(action: Action) {
-		const { type } = action;
-
-		switch (type) {
-			case "startDownload": {
+		switch (action.type) {
+			case Type.START_DOWNLOAD: {
 				setDownloadValues({
 					imageURL: action.value.imageURL,
 					title: action.value.title,
@@ -31,19 +30,17 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 				break;
 			}
 
-			case "resetDownloadValues": {
+			case Type.RESET_DOWNLOAD_VALUES: {
 				setDownloadValues(defaultDownloadValues);
-
 				break;
 			}
 
-			case "resetConvertValues": {
+			case Type.RESET_CONVERT_VALUES: {
 				setConvertValues([]);
-
 				break;
 			}
 
-			case "startConvert": {
+			case Type.START_CONVERT: {
 				setConvertValues(
 					action.value.map(values => ({
 						toExtension: values.toExtension,
@@ -51,19 +48,18 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 						path: values.path,
 					})),
 				);
-
 				break;
 			}
 
 			default: {
-				assertUnreachable(type);
+				assertUnreachable(action);
 				break;
 			}
 		}
 	}
 
 	const handleDownloadMedia = (value: DownloadValues) =>
-		sendMsg({ type: "startDownload", value });
+		sendMsg({ type: Type.START_DOWNLOAD, value });
 
 	useEffect(() => {
 		receiveMsgFromElectron(object => {
@@ -73,7 +69,7 @@ function Comm_Provider({ children }: { children: ReactNode }) {
 			);
 
 			switch (object.type) {
-				case "download media": {
+				case TypeOfMsgObject.DOWNLOAD_MEDIA: {
 					handleDownloadMedia(object.params);
 					break;
 				}
@@ -114,12 +110,12 @@ Comm_Provider.whyDidYouRender = {
 	logOnDifferentValues: false,
 };
 
-const defaultDownloadValues: DownloadValues = {
+const defaultDownloadValues: DownloadValues = Object.freeze({
 	canStartDownload: false,
 	imageURL: "",
 	title: "",
 	url: "",
-};
+});
 
 export type ConvertValues = Readonly<{
 	toExtension: ExtensionToBeConvertedTo;
@@ -143,7 +139,14 @@ export type DownloadValues = Readonly<{
 }>;
 
 type Action =
-	| Readonly<{ type: "startConvert"; value: readonly ConvertValues[] }>
-	| Readonly<{ type: "startDownload"; value: DownloadValues }>
-	| Readonly<{ type: "resetDownloadValues" }>
-	| Readonly<{ type: "resetConvertValues" }>;
+	| Readonly<{ type: Type.START_CONVERT; value: readonly ConvertValues[] }>
+	| Readonly<{ type: Type.START_DOWNLOAD; value: DownloadValues }>
+	| Readonly<{ type: Type.RESET_DOWNLOAD_VALUES }>
+	| Readonly<{ type: Type.RESET_CONVERT_VALUES }>;
+
+export enum Type {
+	RESET_DOWNLOAD_VALUES,
+	RESET_CONVERT_VALUES,
+	START_DOWNLOAD,
+	START_CONVERT,
+}

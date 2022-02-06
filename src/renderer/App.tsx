@@ -1,10 +1,10 @@
 import { ToastContainer } from "react-toastify";
 import { Global } from "@emotion/react";
 
-import { Convert, Download, Favorites, History, Home, Settings } from "./pages";
-import { assertUnreachable } from "./utils/utils";
+import { Convert, Download, Favorites, History, Home, Settings } from "@pages";
+import { assertUnreachable } from "@utils/utils";
 import { Contexts } from "@contexts";
-import { usePage } from "./contexts/page";
+import { usePage } from "@contexts/page";
 import {
 	Decorations,
 	MediaPlayer,
@@ -59,7 +59,7 @@ const Main = () => (
 );
 
 const PageToShow = () => {
-	const { page } = usePage();
+	const page = usePage().page;
 
 	switch (page) {
 		case "Convert":

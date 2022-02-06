@@ -6,9 +6,12 @@ import { useEffect, useReducer } from "react";
 
 import { assertUnreachable } from "@utils/utils";
 import { getErrorMessage } from "@utils/error";
-import { useInterComm } from "@contexts/communicationBetweenChildren";
 import { Loading } from "@styles/appStyles";
-const { getInfo } = electron.notificationApi;
+import {
+	Type as MsgType,
+	useInterComm,
+} from "@contexts/communicationBetweenChildren";
+const { getInfo } = electron.media;
 
 import { Wrapper, SearchWrapper, Searcher, Result, Button } from "./styles";
 
@@ -32,39 +35,40 @@ export function Download() {
 				canStartDownload: true,
 				url,
 			},
-			type: "startDownload",
+			type: MsgType.START_DOWNLOAD,
 		});
 	}
 
 	async function search(url: string) {
-		dispatchSearcher({ type: "setLoadingToTrue" });
+		dispatchSearcher({ type: Type.SET_LOADING_TO_TRUE });
+		let metadata: UrlMediaMetadata | undefined = undefined;
 
 		try {
 			const info = (await getInfo(url)) as videoInfo;
 			const title = info.videoDetails.title;
 
-			const metadata: UrlMediaMetadata = {
+			metadata = {
 				imageURL: info.videoDetails.thumbnails.at(-1)?.url ?? "",
 				// ^ Highest quality is last in this array.
 				songTitle: info.videoDetails.media.song ?? title,
 				artist: info.videoDetails.media.artist ?? "",
 				title,
 			};
-
-			dispatchSearcher({ type: "setResult", value: metadata });
 		} catch (error) {
 			if (getErrorMessage(error).includes("No video id found"))
 				dispatchSearcher({
 					value: "No video ID found!",
-					type: "setError",
+					type: Type.SET_ERROR,
 				});
 			else
 				dispatchSearcher({
 					value: "There was an error getting media information!",
-					type: "setError",
+					type: Type.SET_ERROR,
 				});
 
 			throw error;
+		} finally {
+			dispatchSearcher({ type: Type.SET_RESULT, value: metadata });
 		}
 	}
 
@@ -82,7 +86,7 @@ export function Download() {
 	const setSearchTerm = (e: ChangeEvent<HTMLInputElement>) =>
 		dispatchSearcher({
 			value: e.target.value.trim(),
-			type: "setSearchTerm",
+			type: Type.SET_SEARCH_TERM,
 		});
 
 	return (
@@ -138,9 +142,8 @@ function searcherReducer(
 	previous: SearcherProps,
 	action: Action,
 ): SearcherProps {
-	const { type } = action;
-	switch (type) {
-		case "setError": {
+	switch (action.type) {
+		case Type.SET_ERROR: {
 			const ret: SearcherProps = {
 				searchTerm: previous.searchTerm,
 				error: action.value,
@@ -151,7 +154,7 @@ function searcherReducer(
 			return ret;
 		}
 
-		case "setResult": {
+		case Type.SET_RESULT: {
 			const ret: SearcherProps = {
 				searchTerm: previous.searchTerm,
 				result: action.value,
@@ -162,7 +165,7 @@ function searcherReducer(
 			return ret;
 		}
 
-		case "setSearchTerm": {
+		case Type.SET_SEARCH_TERM: {
 			const ret: SearcherProps = {
 				searchTerm: action.value,
 				result: undefined,
@@ -173,7 +176,7 @@ function searcherReducer(
 			return ret;
 		}
 
-		case "setLoadingToTrue": {
+		case Type.SET_LOADING_TO_TRUE: {
 			const ret: SearcherProps = {
 				searchTerm: previous.searchTerm,
 				result: previous.result,
@@ -185,7 +188,7 @@ function searcherReducer(
 		}
 
 		default:
-			return assertUnreachable(type);
+			return assertUnreachable(action);
 	}
 }
 
@@ -204,7 +207,14 @@ type SearcherProps = Readonly<{
 }>;
 
 type Action =
-	| Readonly<{ type: "setResult"; value: UrlMediaMetadata | undefined }>
-	| Readonly<{ type: "setError"; value: NonNullable<string> }>
-	| Readonly<{ type: "setSearchTerm"; value: string }>
-	| Readonly<{ type: "setLoadingToTrue" }>;
+	| Readonly<{ type: Type.SET_RESULT; value: UrlMediaMetadata | undefined }>
+	| Readonly<{ type: Type.SET_ERROR; value: NonNullable<string> }>
+	| Readonly<{ type: Type.SET_SEARCH_TERM; value: string }>
+	| Readonly<{ type: Type.SET_LOADING_TO_TRUE }>;
+
+enum Type {
+	SET_LOADING_TO_TRUE,
+	SET_SEARCH_TERM,
+	SET_RESULT,
+	SET_ERROR,
+}

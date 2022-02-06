@@ -1,11 +1,15 @@
 import styled from "@emotion/styled";
 
 import { MediaListKind, SearchMedia } from "@components";
+import { ButtonToTheSide } from "@renderer/components/SearchMedia";
 
 export function Home() {
 	return (
 		<MainArea>
-			<SearchMedia fromList="mediaList" buttonToTheSide="reload button" />
+			<SearchMedia
+				buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
+				fromList="mediaList"
+			/>
 
 			<MediaListKind mediaType="mediaList" />
 		</MainArea>
@@ -22,8 +26,8 @@ export const MainArea = styled.div`
 
 	@media (max-width: 500px) {
 		header {
-			margin-left: 0;
 			justify-content: center;
+			margin-left: 0;
 		}
 	}
 `;
