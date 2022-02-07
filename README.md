@@ -8,8 +8,6 @@
 
 ## Table of contents
 
-<!--ts-->
-
 - [Layout](#Layout)
 - [Tecnologies](#Tecnologies)
 - [Requirements](#Requirements)
@@ -17,7 +15,6 @@
 - [Contributing](#Contributing)
 - [Author](#Author)
 - [License](#License)
-<!--te-->
 
 <h4 align="center">
 	🚧  React - Electron 🚀 Building...  🚧
@@ -60,11 +57,11 @@ The following tools were used on this project construction:
 - [Node.js](https://nodejs.org/en/)
 - [React](https://pt-br.reactjs.org/)
 - [Electron](https://www.electronjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
 - [Axios](https://github.com/axios/axios)
-- [React Icons](https://react-icons.github.io/react-icons/)
-- [Chokidar](https://github.com/paulmillr/chokidar)
+- [TypeScript](https://www.typescriptlang.org/)
 - [Emotion](https://github.com/emotion-js/emotion)
+- [Chokidar](https://github.com/paulmillr/chokidar)
+- [React Icons](https://react-icons.github.io/react-icons/)
 - [ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 - [Why Did You Render](https://github.com/welldone-software/why-did-you-render)
 
@@ -126,8 +123,6 @@ yarn run clean
 
 The electron project stater using vite for renderer process and esbuild / tsc for main process.
 
-React demo with antd is available here (Automatic style introduction has been configured. Vite supports on-demand loading by default): [antd branch](https://github.com/jctaoo/electron-starter/tree/antd)
-
 Note: CSC_IDENTITY_AUTO_DISCOVERY is set to false by default to avoid the codesign operation in packaging macos (learn more: [codesign](https://www.electron.build/code-signing))
 
 ## 📫 Contributing
@@ -147,9 +142,13 @@ As an alternative, consult the docs from GitHub on [how to create a pull request
 ---
 
 <a href="https://github.com/Gabriel-Alves-Cunha/">
- <img style="border-radius: 50%;" src="https://github.com/Gabriel-Alves-Cunha.png" width="100px;" alt=""/>
- <br />
- <sub><b>Gabriel Alves Cunha</b></sub></a> <a href="https://blog.rocketseat.com.br/author/thiago//" title="Rocketseat">🚀</a>
+  <img style="border-radius: 50%;" src="https://github.com/Gabriel-Alves-Cunha.png" width="100px;" alt=""/>
+  <br />
+  <sub>
+    <b>Gabriel Alves Cunha</b>
+  </sub>
+</a>
+<a href="https://blog.rocketseat.com.br/author/thiago//" title="Rocketseat">🚀</a>
 
 Made with ❤️ by Gabriel Alves Cunha 👋🏽!
 

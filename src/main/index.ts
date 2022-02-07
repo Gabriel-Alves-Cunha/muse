@@ -80,7 +80,9 @@ function createWindow() {
 
 	const url = isDevelopment
 		? "http://localhost:3000"
-		: pathToFileURL(join(__dirname, "index.html")).toString();
+		: pathToFileURL(
+				join(__dirname, "vite-renderer-build", "index.html"),
+		  ).toString();
 
 	window.loadURL(url);
 
