@@ -47,5 +47,5 @@
 			"@hooks": ["renderer/hooks/index"]
 		}
 	},
-	"exclude": ["node_modules", "app", "dist"]
+	"exclude": ["node_modules", "app", "out", "forge.config.js", "jest.config.js"]
 }

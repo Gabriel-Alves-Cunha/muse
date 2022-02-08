@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { useEffect, useRef, useState } from "react";
 
-import { useInterComm, Type } from "@contexts/communicationBetweenChildren";
+import { Type, sendMsg } from "@contexts/communicationBetweenChildren/helpers";
 
 import { Wrapper } from "./styles";
 
@@ -13,7 +13,6 @@ export function Convert() {
 		useState<ExtensionToBeConvertedTo>("mp3");
 	const [selectedMediasPath, setSelectedMediasPath] = useState<Path[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const { sendMsg } = useInterComm();
 
 	function convertTo() {
 		const value = selectedMediasPath.map(path => ({

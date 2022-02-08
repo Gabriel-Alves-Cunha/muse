@@ -102,9 +102,9 @@ app.whenReady().then(async () => {
 
 	try {
 		const extendedClipboard = (await import("./clipboardExtended"))
-			.ExtendedClipboard;
+			.ExtendedClipboard as ClipboardExtended;
 
-		(extendedClipboard as ClipboardExtended)
+		extendedClipboard
 			.on("text-changed", async () => {
 				const txt = extendedClipboard.readText("clipboard");
 

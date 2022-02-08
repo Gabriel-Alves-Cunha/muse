@@ -1,33 +1,41 @@
 import type { ProgressProps } from "../Progress";
 
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
+import create from "zustand";
 
 import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylistsHelper";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
-import { Type as MsgType } from "@contexts/communicationBetweenChildren";
 import { Progress, icon } from "../Progress";
-import { useInterComm } from "@contexts/communicationBetweenChildren";
+import { dbg } from "@common/utils";
+import {
+	useDownloadValues,
+	Type as MsgType,
+	sendMsg,
+} from "@contexts/communicationBetweenChildren/helpers";
 
 import { Circle, Popup, Title } from "./styles";
 
-export function Downloading() {
-	const {
-		values: { downloadValues },
-		sendMsg,
-	} = useInterComm();
+const { getState: getDownloadValues } = useDownloadValues;
 
-	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
-	const [downloadList, setDownloadList] = useState(
-		[] as readonly DownloadingMedia[],
-	);
-	const popupRef = useRef<HTMLDivElement>(null);
+const downloadingStore = create<UseDownloading>(() => ({
+	downloadingList: [],
+}));
+
+const { getState: getDownloadingList, setState: setDownloadingList } =
+	downloadingStore;
+
+function useDownloading() {
+	const downloadingList = getDownloadingList().downloadingList;
+	dbg("downloadingList at Downloading:", downloadingList);
+	const downloadValues = getDownloadValues().downloadValues;
+	dbg("downloadValues at Downloading:", downloadValues);
 
 	function createNewDownload(): MessagePort {
-		const indexIfThereIsOneAlready = downloadList.findIndex(
+		const indexIfThereIsOneAlready = downloadingList.findIndex(
 			({ url }) => url === downloadValues.url,
 		);
 		if (indexIfThereIsOneAlready !== -1) {
@@ -43,7 +51,7 @@ export function Downloading() {
 				draggable: true,
 			});
 
-			console.error(info, downloadList);
+			console.error(info, downloadingList);
 			throw new Error(info);
 		}
 
@@ -52,7 +60,7 @@ export function Downloading() {
 		const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 		const downloadStatus: DownloadingMedia = {
-			index: downloadList.length,
+			index: downloadingList.length,
 			imageURL: downloadValues.imageURL,
 			title: downloadValues.title,
 			url: downloadValues.url,
@@ -62,7 +70,9 @@ export function Downloading() {
 			port: myPort,
 		};
 
-		setDownloadList(prev => [...prev, downloadStatus]);
+		setDownloadingList({
+			downloadingList: [...downloadingList, downloadStatus],
+		});
 
 		myPort.postMessage({
 			imageURL: downloadValues.imageURL,
@@ -72,12 +82,12 @@ export function Downloading() {
 		});
 
 		myPort.onmessage = ({ data }: { data: Partial<DownloadingMedia> }) => {
-			setDownloadList(prev =>
-				replace(prev, downloadStatus.index, {
+			setDownloadingList({
+				downloadingList: replace(downloadingList, downloadStatus.index, {
 					...downloadStatus,
 					...data,
-				}),
-			);
+				}) as Mutable<DownloadingMedia[]>,
+			});
 
 			switch (data.status) {
 				case "fail": {
@@ -143,21 +153,25 @@ export function Downloading() {
 	}
 
 	function cancelDownloadAndOrRemoveItFromList(url_: string) {
-		const index = downloadList.findIndex(({ url }) => url === url_);
+		const index = downloadingList.findIndex(({ url }) => url === url_);
 		if (index === -1) {
 			console.error(
 				`There should be a download with url "${url_}"!\ndownloadList =`,
-				downloadList,
+				downloadingList,
 			);
 			return;
 		}
 
-		const download = downloadList[index];
+		const download = downloadingList[index];
 
 		if (download.isDownloading)
 			download.port.postMessage({ destroy: true, url: download.url });
 
-		setDownloadList(prev => reaplyOrderedIndex(remove(prev, index)));
+		setDownloadingList({
+			downloadingList: reaplyOrderedIndex(
+				remove(downloadingList, index),
+			) as Mutable<DownloadingMedia[]>,
+		});
 	}
 
 	useEffect(() => {
@@ -189,15 +203,24 @@ export function Downloading() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [downloadValues.canStartDownload]);
 
+	return [cancelDownloadAndOrRemoveItFromList] as const;
+}
+
+export function Downloading() {
+	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
+	const [cancelDownloadAndOrRemoveItFromList] = useDownloading();
+	const downloadingList = getDownloadingList().downloadingList;
+	const popupRef = useRef<HTMLDivElement>(null);
+
 	useOnClickOutside(popupRef, () => toggleShowPopup());
 
-	return downloadList.length > 0 ? (
+	return downloadingList.length > 0 ? (
 		<>
 			<Circle onClick={toggleShowPopup}>{icon("active")}</Circle>
 
 			{showPopup && (
 				<Popup ref={popupRef}>
-					{downloadList.map(download => (
+					{downloadingList.map(download => (
 						<div key={download.url}>
 							<Title>
 								<p>{download.title}</p>
@@ -235,3 +258,11 @@ type DownloadingMedia = Readonly<{
 	title: string;
 	url: string;
 }>;
+
+type UseDownloading = {
+	downloadingList: DownloadingMedia[];
+};
+
+type Mutable<T> = {
+	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
+};

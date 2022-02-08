@@ -15,21 +15,20 @@ import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { icon } from "../Progress";
 import {
+	useConvertValues,
 	Type as MsgType,
 	ConvertValues,
-	useInterComm,
-} from "@contexts/communicationBetweenChildren";
+	sendMsg,
+} from "@contexts/communicationBetweenChildren/helpers";
 
 import { Circle, Popup, Progress, Title } from "./styles";
+
+const { getState: getConvertValues } = useConvertValues;
 
 export function Converting() {
 	const {
 		functions: { searchLocalComputerForMedias },
 	} = useMediaHandler();
-	const {
-		values: { convertValues },
-		sendMsg,
-	} = useInterComm();
 
 	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
 	const popupRef = useRef<HTMLDivElement>(null);
@@ -174,6 +173,8 @@ export function Converting() {
 
 		setConvertList(prev => reaplyOrderedIndex(remove(prev, index)));
 	}
+
+	const convertValues = getConvertValues().convertValues;
 
 	useEffect(() => {
 		convertValues.forEach(convertValue => {
