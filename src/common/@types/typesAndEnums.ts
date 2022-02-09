@@ -35,3 +35,7 @@ export enum ListenToNotification {
 export enum TypeOfMsgObject {
 	DOWNLOAD_MEDIA,
 }
+
+export type Mutable<T> = {
+	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
+};

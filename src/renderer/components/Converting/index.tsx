@@ -1,16 +1,17 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
 import type { ProgressProps } from "../Progress";
-import type { Path } from "@common/@types/typesAndEnums";
+import type { Mutable, Path } from "@common/@types/typesAndEnums";
 
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
+import create from "zustand";
 
 import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
-import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { remove, replace } from "@utils/array";
+import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { icon } from "../Progress";
@@ -23,18 +24,18 @@ import {
 
 import { Circle, Popup, Progress, Title } from "./styles";
 
+const useConvertList = create<{ convertList: MediaBeingConverted[] }>(() => ({
+	convertList: [],
+}));
+
 const { getState: getConvertValues } = useConvertValues;
+const { setState: setConvertList } = useConvertList;
+const { getState: getPlaylists } = usePlaylists;
 
-export function Converting() {
-	const {
-		functions: { searchLocalComputerForMedias },
-	} = useMediaHandler();
-
-	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
-	const popupRef = useRef<HTMLDivElement>(null);
-	const [convertList, setConvertList] = useState(
-		[] as readonly MediaBeingConverted[],
-	);
+function useConverting() {
+	const { searchLocalComputerForMedias } = getPlaylists();
+	const { convertList } = useConvertList();
+	const convertValues = getConvertValues().convertValues;
 
 	function createNewConvert(values: ConvertValues): MessagePort {
 		const indexIfThereIsOneAlready = convertList.findIndex(
@@ -72,7 +73,7 @@ export function Converting() {
 			port: myPort,
 		};
 
-		setConvertList(prev => [...prev, convertStatus]);
+		setConvertList({ convertList: [...convertList, convertStatus] });
 
 		myPort.postMessage({
 			toExtension: convertStatus.toExtension,
@@ -83,13 +84,12 @@ export function Converting() {
 
 		myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
 			// dbg("myPort msg received =", data);
-
-			setConvertList(prev =>
-				replace(prev, convertStatus.index, {
+			setConvertList({
+				convertList: replace(convertList, convertStatus.index, {
 					...convertStatus,
 					...data,
-				}),
-			);
+				}) as Mutable<MediaBeingConverted[]>,
+			});
 
 			switch (data.status) {
 				case "fail": {
@@ -105,7 +105,6 @@ export function Converting() {
 						autoClose: 5000,
 						draggable: true,
 					});
-
 					break;
 				}
 
@@ -145,8 +144,10 @@ export function Converting() {
 				case undefined:
 					break;
 
-				default:
+				default: {
 					assertUnreachable(data.status);
+					break;
+				}
 			}
 		};
 
@@ -171,10 +172,10 @@ export function Converting() {
 		if (convert.isConverting)
 			convert.port.postMessage({ destroy: true, path: convert.path });
 
-		setConvertList(prev => reaplyOrderedIndex(remove(prev, index)));
+		setConvertList({
+			convertList: reaplyOrderedIndex(remove(convertList, index)),
+		});
 	}
-
-	const convertValues = getConvertValues().convertValues;
 
 	useEffect(() => {
 		convertValues.forEach(convertValue => {
@@ -208,6 +209,14 @@ export function Converting() {
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [convertValues]);
+
+	return [convertList, cancelDownloadAndOrRemoveItFromList] as const;
+}
+
+export function Converting() {
+	const [convertList, cancelDownloadAndOrRemoveItFromList] = useConverting();
+	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
+	const popupRef = useRef<HTMLDivElement>(null);
 
 	useOnClickOutside(popupRef, () => toggleShowPopup());
 

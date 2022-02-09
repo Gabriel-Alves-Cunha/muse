@@ -120,7 +120,7 @@ export const Controls = styled.div`
 	}
 `;
 
-export const SeekerWrapper = styled.div`
+export const SeekerContainer = styled.div`
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;

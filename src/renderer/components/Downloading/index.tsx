@@ -1,4 +1,5 @@
 import type { ProgressProps } from "../Progress";
+import type { Mutable } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer, useRef } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
@@ -261,8 +262,4 @@ type DownloadingMedia = Readonly<{
 
 type UseDownloading = {
 	downloadingList: DownloadingMedia[];
-};
-
-type Mutable<T> = {
-	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
 };

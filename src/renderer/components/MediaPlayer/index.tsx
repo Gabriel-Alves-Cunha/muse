@@ -1,58 +1,82 @@
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
 	TrackPreviousIcon as Previous,
 	TrackNextIcon as Next,
 	PauseIcon as Pause,
 	PlayIcon as Play,
 } from "@radix-ui/react-icons";
+import create from "zustand";
 
-import { Type } from "@renderer/contexts/mediaHandler/useCurrentPlaying";
-import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { formatDuration } from "@common/utils";
+import {
+	useCurrentPlaying,
+	Type,
+} from "@renderer/contexts/mediaHandler/useCurrentPlaying";
 
 import { theme } from "@styles/theme";
 import {
 	ProgressWrapper,
-	SeekerWrapper,
+	SeekerContainer,
 	Controls,
 	Wrapper,
 	Info,
 	Img,
 } from "./styles";
 
-export function MediaPlayer() {
-	const {
-		functions: { dispatchCurrentPlaying },
-		values: { currentPlaying },
-	} = useMediaHandler();
+const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
+const { setState: setProgress, getState: getProgress } = useProgress;
 
-	const [progress, setProgress] = useState<Progress>({
-		percentage: 0,
-		current: 0,
+const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
+	useCurrentPlaying;
+
+function playNextMedia() {
+	setCurrentPlaying({
+		playlist: getCurrentPlaying().currentPlaying.playlist,
+		type: Type.PLAY_NEXT,
 	});
+}
+
+function useMediaPlayer() {
+	const playlist = useCurrentPlaying().currentPlaying.playlist;
+	const { setCurrentPlaying } = useCurrentPlaying();
 	const audioRef = useRef<HTMLAudioElement>(null);
 
-	const playOrPauseMedia = () => {
+	function playOrPauseMedia() {
 		const audio = audioRef.current;
 		if (!audio) return;
 
 		audio.paused
-			? dispatchCurrentPlaying({ type: Type.RESUME })
-			: dispatchCurrentPlaying({ type: Type.PAUSE });
-	};
+			? setCurrentPlaying({ type: Type.RESUME })
+			: setCurrentPlaying({ type: Type.PAUSE });
+	}
 
-	const playPreviousMedia = () =>
-		dispatchCurrentPlaying({
-			playlist: currentPlaying.playlist,
+	function playPreviousMedia() {
+		setCurrentPlaying({
+			playlist,
 			type: Type.PLAY_PREVIOUS,
 		});
+	}
 
-	const playNextMedia = () =>
-		dispatchCurrentPlaying({
-			playlist: currentPlaying.playlist,
+	function playNextMedia() {
+		setCurrentPlaying({
+			playlist,
 			type: Type.PLAY_NEXT,
 		});
+	}
+
+	function seek(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+		const audio = audioRef.current;
+		const duration = audio?.duration;
+		const div = document.getElementById("goto");
+		if (!audio || !div || !duration) return;
+
+		const width = Number(getComputedStyle(div).width.replace("px", ""));
+		const clickX = e.nativeEvent.offsetX;
+		const gotoTime = (clickX / width) * duration;
+
+		audio.currentTime = gotoTime;
+	}
 
 	useEffect(() => {
 		const audio = audioRef.current;
@@ -70,18 +94,19 @@ export function MediaPlayer() {
 		audio.addEventListener("ended", () => playNextMedia());
 	}, []);
 
-	function seek(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-		const audio = audioRef.current;
-		const duration = audio?.duration;
-		const div = document.getElementById("goto");
-		if (!audio || !div || !duration) return;
+	return {
+		playPreviousMedia,
+		playOrPauseMedia,
+		playNextMedia,
+		audioRef,
+		seek,
+	} as const;
+}
 
-		const width = Number(getComputedStyle(div).width.replace("px", ""));
-		const clickX = e.nativeEvent.offsetX;
-		const gotoTime = (clickX / width) * duration;
-
-		audio.currentTime = gotoTime;
-	}
+export function MediaPlayer() {
+	const { playPreviousMedia, playOrPauseMedia, playNextMedia, audioRef } =
+		useMediaPlayer();
+	const { currentPlaying } = useCurrentPlaying();
 
 	return (
 		<Wrapper>
@@ -100,39 +125,7 @@ export function MediaPlayer() {
 				<span className="subtitle">{currentPlaying?.media?.artist}</span>
 			</Info>
 
-			<SeekerWrapper>
-				<span>{formatDuration(progress.current)}</span>
-
-				<ProgressWrapper onClick={seek} id="goto">
-					<div
-						style={{
-							backgroundColor: theme.colors.accent,
-							width: `${progress.percentage}%`,
-							position: "relative",
-							height: "3px",
-							left: 0,
-							top: 0,
-						}}
-					>
-						<div
-							style={{
-								border: `1px solid ${theme.colors.accent}`,
-								animation: "move 1s ease-in-out infinite",
-								transform: "translate(0, -25%)",
-								position: "absolute",
-								borderRadius: "50%",
-								background: "white",
-								right: "-3px",
-								height: "6px",
-								width: "6px",
-								top: 0,
-							}}
-						/>
-					</div>
-				</ProgressWrapper>
-
-				<span>{currentPlaying.media?.duration ?? "00:00"}</span>
-			</SeekerWrapper>
+			<SeekerWrapper />
 
 			<Controls>
 				<span className="previous-or-next" onClick={playPreviousMedia}>
@@ -152,6 +145,47 @@ export function MediaPlayer() {
 				</span>
 			</Controls>
 		</Wrapper>
+	);
+}
+
+function SeekerWrapper() {
+	const duration = useCurrentPlaying().currentPlaying.media?.duration;
+	const { seek } = useMediaPlayer();
+
+	return (
+		<SeekerContainer>
+			<span>{formatDuration(getProgress().current)}</span>
+
+			<ProgressWrapper onClick={seek} id="goto">
+				<div
+					style={{
+						backgroundColor: theme.colors.accent,
+						width: `${getProgress().percentage}%`,
+						position: "relative",
+						height: "3px",
+						left: 0,
+						top: 0,
+					}}
+				>
+					<div
+						style={{
+							border: `1px solid ${theme.colors.accent}`,
+							animation: "move 1s ease-in-out infinite",
+							transform: "translate(0, -25%)",
+							position: "absolute",
+							borderRadius: "50%",
+							background: "white",
+							right: "-3px",
+							height: "6px",
+							width: "6px",
+							top: 0,
+						}}
+					/>
+				</div>
+			</ProgressWrapper>
+
+			<span>{duration ?? "00:00"}</span>
+		</SeekerContainer>
 	);
 }
 

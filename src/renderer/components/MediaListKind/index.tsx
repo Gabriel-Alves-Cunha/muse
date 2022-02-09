@@ -9,18 +9,17 @@ import { Type } from "../../contexts/mediaHandler/useCurrentPlaying";
 import Popup from "reactjs-popup";
 
 import { MediaOptionsModal } from "./MediaOptions";
+import { useCurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
 import { ImgWithFallback } from "./ImgWithFallback";
-import { useMediaHandler } from "@contexts/mediaHandler";
+import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
 import { Dots } from "../";
 
 import { ListWrapper, SubTitle, Options, Title, Info, Img } from "./styles";
 import { pulse } from "@styles/animations";
 
 export function MediaListKind({ mediaType }: MediaListKindProps) {
-	const {
-		functions: { dispatchCurrentPlaying },
-		values: { currentPlaying, playlists },
-	} = useMediaHandler();
+	const { setCurrentPlaying, currentPlaying } = useCurrentPlaying();
+	const { playlists } = usePlaylists();
 
 	const [showPopup, setShowPopup] = useState<Media>();
 	const listWrapperRef = useRef<HTMLElement>(null);
@@ -34,7 +33,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 		);
 
 	const playMedia = (media: Media) =>
-		dispatchCurrentPlaying({
+		setCurrentPlaying({
 			type: Type.PLAY_THIS_MEDIA,
 			playlist: mediaList,
 			media,
