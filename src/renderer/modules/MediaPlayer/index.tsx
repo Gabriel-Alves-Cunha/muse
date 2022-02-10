@@ -8,11 +8,8 @@ import {
 } from "@radix-ui/react-icons";
 import create from "zustand";
 
+import { useCurrentPlaying, CurrentPlayingType } from "@contexts";
 import { formatDuration } from "@common/utils";
-import {
-	useCurrentPlaying,
-	Type,
-} from "@contexts/mediaHandler/useCurrentPlaying";
 
 import { theme } from "@styles/theme";
 import {
@@ -31,14 +28,14 @@ const { getState: getCurrentPlaying } = useCurrentPlaying;
 function playNextMedia() {
 	getCurrentPlaying().setCurrentPlaying({
 		playlist: getCurrentPlaying().currentPlaying.playlist,
-		type: Type.PLAY_NEXT,
+		type: CurrentPlayingType.PLAY_NEXT,
 	});
 }
 
 function playPreviousMedia() {
 	getCurrentPlaying().setCurrentPlaying({
 		playlist: getCurrentPlaying().currentPlaying.playlist,
-		type: Type.PLAY_PREVIOUS,
+		type: CurrentPlayingType.PLAY_PREVIOUS,
 	});
 }
 
@@ -52,8 +49,8 @@ export function MediaPlayer() {
 		if (!audio) return;
 
 		audio.paused
-			? setCurrentPlaying({ type: Type.RESUME })
-			: setCurrentPlaying({ type: Type.PAUSE });
+			? setCurrentPlaying({ type: CurrentPlayingType.RESUME })
+			: setCurrentPlaying({ type: CurrentPlayingType.PAUSE });
 	}
 
 	function seek(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {

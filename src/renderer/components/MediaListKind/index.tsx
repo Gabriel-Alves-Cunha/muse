@@ -5,14 +5,12 @@ import type { Media } from "@common/@types/typesAndEnums";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { FixedSizeList, areEqual } from "react-window";
 import { memo, useRef, useState } from "react";
-import { Type } from "../../contexts/mediaHandler/useCurrentPlaying";
 import Popup from "reactjs-popup";
 
+import { useCurrentPlaying, CurrentPlayingType, usePlaylists } from "@contexts";
 import { MediaOptionsModal } from "./MediaOptions";
-import { useCurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
 import { ImgWithFallback } from "./ImgWithFallback";
-import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
-import { Dots } from "../";
+import { Dots } from "@components";
 
 import { ListWrapper, SubTitle, Options, Title, Info, Img } from "./styles";
 import { pulse } from "@styles/animations";
@@ -34,7 +32,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 
 	const playMedia = (media: Media) =>
 		setCurrentPlaying({
-			type: Type.PLAY_THIS_MEDIA,
+			type: CurrentPlayingType.PLAY_THIS_MEDIA,
 			playlist: mediaList,
 			media,
 		});

@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction, KeyboardEvent } from "react";
-import type { DefaultLists } from "@renderer/contexts/mediaHandler/usePlaylists";
+import type { DefaultLists } from "@contexts";
 import type { Media, Path } from "@common/@types/typesAndEnums";
 import type { WriteTag } from "@common/@types/electron-window";
 

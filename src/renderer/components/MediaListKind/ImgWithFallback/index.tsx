@@ -1,13 +1,5 @@
 import type { EmotionJSX } from "@emotion/react/types/jsx-namespace";
 
-type Props = {
-	Fallback: EmotionJSX.Element;
-	imgAsString: ImgAsString;
-	urlAsACachekey: string;
-};
-
-type ImgAsString = string;
-
 const cache: Map<string, { stats: Status; img: ImgAsString }> = new Map();
 
 export function ImgWithFallback({
@@ -43,6 +35,14 @@ export function ImgWithFallback({
 		Fallback
 	);
 }
+
+type Props = {
+	Fallback: EmotionJSX.Element;
+	imgAsString: ImgAsString;
+	urlAsACachekey: string;
+};
+
+type ImgAsString = string;
 
 enum Status {
 	FAILURE,

@@ -1,9 +1,10 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
+import type { ChangeEvent } from "react";
 import type { Path } from "@common/@types/typesAndEnums";
 
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { Type, sendMsg } from "@contexts/communicationBetweenChildren/helpers";
+import { MsgType, sendMsg } from "@contexts";
 
 import { Wrapper } from "./styles";
 
@@ -20,7 +21,7 @@ export function Convert() {
 			path,
 		}));
 
-		sendMsg({ type: Type.START_CONVERT, value });
+		sendMsg({ type: MsgType.START_CONVERT, value });
 
 		setSelectedMediasPath([]);
 	}

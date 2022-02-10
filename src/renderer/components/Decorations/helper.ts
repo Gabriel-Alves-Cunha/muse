@@ -1,4 +1,5 @@
 import { NotificationType } from "@common/@types/typesAndEnums";
+
 const notify = electron.notificationApi.sendNotificationToElectron;
 
 export const toggleMaximize = () => notify({ type: NotificationType.MAXIMIZE });

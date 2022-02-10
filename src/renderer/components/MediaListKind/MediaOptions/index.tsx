@@ -6,7 +6,7 @@ import { useState } from "react";
 import Popup from "reactjs-popup";
 
 import { isChangeable, options, Change } from "../Change";
-import { usePlaylists } from "@renderer/contexts/mediaHandler/usePlaylists";
+import { usePlaylists } from "@contexts";
 import { overlayStyle } from "../";
 import { capitalize } from "@utils/utils";
 

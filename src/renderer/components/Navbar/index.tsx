@@ -11,7 +11,7 @@ import {
 } from "@radix-ui/react-icons";
 
 import { folders } from "@utils/app";
-import { usePage } from "@contexts/page";
+import { usePage } from "@contexts";
 
 import { FolderButton, Nav, Text } from "./styles";
 

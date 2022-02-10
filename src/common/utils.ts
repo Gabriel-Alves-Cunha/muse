@@ -1,4 +1,5 @@
 import { debug, enable } from "debug";
+
 const { trunc, floor } = Math;
 
 export const isDevelopment = process.env.NODE_ENV === "development";
@@ -9,7 +10,7 @@ export const lowercaseAppName = "muse" as const;
 
 export const dbg = debug(lowercaseAppName);
 
-isDevelopment && enable(lowercaseAppName);
+if (isDevelopment) enable(lowercaseAppName);
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 export const allowedMedias = [

@@ -1,5 +1,6 @@
 import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "../MediaListKind/Change";
+import type { Playlist } from "@contexts";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer, useRef } from "react";
@@ -9,17 +10,16 @@ import { IoReloadSharp as Reload } from "react-icons/io5";
 import { FiTrash as Clean } from "react-icons/fi";
 import { FixedSizeList } from "react-window";
 
-import { Type as CurrentPlayingType } from "@contexts/mediaHandler/useCurrentPlaying";
-import { useCurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { dbg } from "@common/utils";
 import {
-	Actions as PlaylistActions,
-	Type as PlaylistType,
-	type Playlist,
+	CurrentPlayingType,
+	useCurrentPlaying,
+	PlaylistActions,
+	PlaylistType,
 	usePlaylists,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts";
 
 import { Img, Info, SubTitle, Title } from "../MediaListKind/styles";
 import { Loading } from "@styles/appStyles";
@@ -42,12 +42,12 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		searchTerm: "",
 		results: [],
 	});
-	const searcherRef = useRef(null);
+	// const searcherRef = useRef(null);
 
-	useOnClickOutside(searcherRef, () => {
-		dispatchSearcher({ type: Type.SET_SEARCH_TERM, value: "" });
-		dispatchSearcher({ type: Type.SET_RESULTS, value: [] });
-	});
+	// useOnClickOutside(searcherRef, () => {
+	// 	dispatchSearcher({ type: Type.SET_SEARCH_TERM, value: "" });
+	// 	dispatchSearcher({ type: Type.SET_RESULTS, value: [] });
+	// });
 
 	const reload = async () => {
 		dispatchSearcher({ type: Type.SET_IS_LOADING, value: true });
@@ -84,7 +84,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 
 	return (
 		<Wrapper>
-			<SearchWrapper ref={searcherRef}>
+			<SearchWrapper >
 				<Search>
 					<SearchIcon size="1.2em" />
 					<input

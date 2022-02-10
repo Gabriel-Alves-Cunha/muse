@@ -4,11 +4,10 @@ import { Global } from "@emotion/react";
 
 import { Convert, Download, Favorites, History, Home, Settings } from "@pages";
 import { MediaPlayer, Downloading, Converting } from "@modules";
+import { usePlaylists, usePage } from "@contexts";
 import { Decorations, Navbar } from "@components";
 import { assertUnreachable } from "@utils/utils";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
-import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
-import { usePage } from "@contexts/page";
 import { dbg } from "@common/utils";
 
 import { GlobalCSS } from "@styles/global";

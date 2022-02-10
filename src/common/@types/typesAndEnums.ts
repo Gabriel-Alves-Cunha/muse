@@ -1,4 +1,4 @@
-import { folders } from "@renderer/utils/app";
+import { folders } from "@utils/app";
 
 export type Page = Readonly<typeof folders[number]>;
 export type PrettyBytes = Readonly<string>;
@@ -39,3 +39,18 @@ export enum TypeOfMsgObject {
 export type Mutable<T> = {
 	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
 };
+
+export type DownloadValues = Readonly<{
+	canStartDownload: boolean;
+	imageURL: string;
+	title: string;
+	url: string;
+}>;
+
+export enum ProgressStatus {
+	SUCCESS,
+	CONVERT,
+	ACTIVE,
+	CANCEL,
+	FAIL,
+}

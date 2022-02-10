@@ -6,7 +6,7 @@ import {
 } from "react-icons/vsc";
 
 import { capitalizedAppName } from "@common/utils";
-import { usePage } from "@contexts/page";
+import { usePage } from "@contexts";
 import {
 	handleMaximizeOnDoubleClick,
 	toggleMaximize,
@@ -56,11 +56,6 @@ export function Decorations() {
 	) : null;
 }
 
-Decorations.whyDidYouRender = {
-	logOnDifferentValues: false,
-	customName: "Decorations",
-};
-
 const Buttons = () => (
 	<WindowButtons>
 		<WindowButton
@@ -86,3 +81,8 @@ const AppName_Folder = () => (
 		{usePage().page + " - " + capitalizedAppName}
 	</AppName_Folder_Wrapper>
 );
+
+Decorations.whyDidYouRender = {
+	logOnDifferentValues: false,
+	customName: "Decorations",
+};

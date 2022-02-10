@@ -1,14 +1,11 @@
 import type { ChangeEvent } from "react";
 import type { videoInfo } from "ytdl-core";
 
+import create from "zustand";
+
+import { MsgType, sendMsg } from "@contexts";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
-import {
-	Type as MsgType,
-	sendMsg,
-} from "@contexts/communicationBetweenChildren/helpers";
-
-import create from "zustand";
 
 const { getInfo } = electron.media;
 

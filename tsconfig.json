@@ -37,14 +37,14 @@
 			"@components/*": ["renderer/components/*"],
 			"@contexts": ["renderer/contexts/index"],
 			"@contexts/*": ["renderer/contexts/*"],
+			"@modules": ["renderer/modules/index"],
+			"@modules/*": ["renderer/modules/*"],
 			"@hooks": ["renderer/hooks/index"],
 			"@styles/*": ["renderer/styles/*"],
 			"@pages": ["renderer/pages/index"],
 			"@utils/*": ["renderer/utils/*"],
 			"@pages/*": ["renderer/pages/*"],
-			"@modules": ["@modules/index"],
 			"@renderer/*": ["renderer/*"],
-			"@modules/*": ["@modules/*"],
 			"@common/*": ["common/*"],
 			"@main/*": ["main/*"]
 		}

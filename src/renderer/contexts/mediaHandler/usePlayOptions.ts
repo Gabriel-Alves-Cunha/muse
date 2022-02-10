@@ -1,8 +1,9 @@
 import { persist } from "zustand/middleware";
 import create from "zustand";
+import merge from "deepmerge";
 
-import { assertUnreachable } from "@renderer/utils/utils";
-import { keyPrefix } from "@renderer/utils/app";
+import { assertUnreachable } from "@utils/utils";
+import { keyPrefix } from "@utils/app";
 
 const playOptionsKey = keyPrefix + "play_options";
 
@@ -23,7 +24,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 				const previousPlayOptions = get().playOptions;
 
 				switch (action.type) {
-					case Type.LOOP_THIS_MEDIA: {
+					case PlayOptionsType.LOOP_THIS_MEDIA: {
 						const playOptions: PlayOptions = {
 							...previousPlayOptions,
 							loopThisMedia: action.value,
@@ -36,7 +37,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 						break;
 					}
 
-					case Type.LOOP_ALL_MEDIA: {
+					case PlayOptionsType.LOOP_ALL_MEDIA: {
 						const playOptions: PlayOptions = {
 							...previousPlayOptions,
 							loopAllMedia: action.value,
@@ -46,7 +47,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 						break;
 					}
 
-					case Type.IS_RANDOM: {
+					case PlayOptionsType.IS_RANDOM: {
 						const playOptions: PlayOptions = {
 							...previousPlayOptions,
 							isRandom: action.value,
@@ -65,16 +66,27 @@ export const usePlayOptions = create<PlayOptionsActions>(
 		}),
 		{
 			name: playOptionsKey,
+			serialize: state => JSON.stringify(state.state.playOptions),
+			deserialize: state => JSON.parse(state),
+			partialize: state => ({ playOptions: state.playOptions }),
+			merge: (persistedState, currentState) =>
+				merge(persistedState, currentState),
 		},
 	),
 );
 
 export type PlayOptions_Action =
-	| Readonly<{ type: Type.LOOP_ALL_MEDIA; value: PlayOptions["loopAllMedia"] }>
-	| Readonly<{ type: Type.IS_RANDOM; value: PlayOptions["isRandom"] }>
+	| Readonly<{
+			type: PlayOptionsType.LOOP_ALL_MEDIA;
+			value: PlayOptions["loopAllMedia"];
+	  }>
+	| Readonly<{
+			type: PlayOptionsType.IS_RANDOM;
+			value: PlayOptions["isRandom"];
+	  }>
 	| Readonly<{
 			value: PlayOptions["loopThisMedia"];
-			type: Type.LOOP_THIS_MEDIA;
+			type: PlayOptionsType.LOOP_THIS_MEDIA;
 	  }>;
 
 export type PlayOptions = Readonly<{
@@ -83,7 +95,7 @@ export type PlayOptions = Readonly<{
 	isRandom: boolean;
 }>;
 
-export enum Type {
+export enum PlayOptionsType {
 	LOOP_THIS_MEDIA,
 	LOOP_ALL_MEDIA,
 	IS_RANDOM,

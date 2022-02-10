@@ -1,19 +1,21 @@
-import type { Playlist } from "./usePlaylists";
+import type { Playlist } from "@contexts";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
+import merge from "deepmerge";
 
-import { assertUnreachable, getRandomInt } from "@renderer/utils/utils";
-import { usePlayOptions } from "./usePlayOptions";
-import { keyPrefix } from "@renderer/utils/app";
+import { assertUnreachable, getRandomInt } from "@utils/utils";
+import { usePlayOptions } from "@contexts/mediaHandler/usePlayOptions";
+import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
-	Actions as PlaylistActions,
-	Type as PlaylistType,
 	defaultPlaylists,
+	PlaylistActions,
+	PlaylistType,
 	usePlaylists,
-} from "./usePlaylists";
+} from "@contexts/mediaHandler/usePlaylists";
+
 const {
 	fs: { readFile },
 } = electron;
@@ -40,7 +42,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 				const playlists = getPlaylists().playlists;
 
 				switch (action.type) {
-					case Type.PLAY_THIS_MEDIA: {
+					case CurrentPlayingType.PLAY_THIS_MEDIA: {
 						dbg("setCurrentPlaying 'play this media' action =", action);
 						// debugger;
 
@@ -72,7 +74,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 						break;
 					}
 
-					case Type.PLAY_PREVIOUS: {
+					case CurrentPlayingType.PLAY_PREVIOUS: {
 						dbg("setCurrentPlaying 'play previous' action =", action);
 
 						// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
@@ -91,7 +93,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 						break;
 					}
 
-					case Type.RESUME: {
+					case CurrentPlayingType.RESUME: {
 						(async () =>
 							await (
 								document.getElementById("audio") as HTMLAudioElement
@@ -99,7 +101,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 						break;
 					}
 
-					case Type.PAUSE: {
+					case CurrentPlayingType.PAUSE: {
 						const audio = document.getElementById("audio") as HTMLAudioElement;
 
 						audio.pause();
@@ -114,7 +116,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 						break;
 					}
 
-					case Type.PLAY_NEXT: {
+					case CurrentPlayingType.PLAY_NEXT: {
 						dbg("currentPlaying 'playNext' action =", action);
 
 						const prevPlaylist = previousPlaying.playlist;
@@ -186,7 +188,14 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 				}
 			},
 		}),
-		{ name: currentPlayingKey },
+		{
+			name: currentPlayingKey,
+			serialize: state => JSON.stringify(state.state.currentPlaying),
+			deserialize: state => JSON.parse(state),
+			partialize: state => ({ currentPlaying: state.currentPlaying }),
+			merge: (persistedState, currentState) =>
+				merge(persistedState, currentState),
+		},
 	),
 );
 
@@ -237,13 +246,17 @@ export type CurrentPlaying = Readonly<{
 }>;
 
 export type currentPlayingReducer_Action =
-	| Readonly<{ type: Type.PLAY_THIS_MEDIA; media: Media; playlist: Playlist }>
-	| Readonly<{ type: Type.PLAY_PREVIOUS; playlist: Playlist }>
-	| Readonly<{ type: Type.PLAY_NEXT; playlist: Playlist }>
-	| Readonly<{ type: Type.RESUME }>
-	| Readonly<{ type: Type.PAUSE }>;
+	| Readonly<{
+			type: CurrentPlayingType.PLAY_THIS_MEDIA;
+			media: Media;
+			playlist: Playlist;
+	  }>
+	| Readonly<{ type: CurrentPlayingType.PLAY_PREVIOUS; playlist: Playlist }>
+	| Readonly<{ type: CurrentPlayingType.PLAY_NEXT; playlist: Playlist }>
+	| Readonly<{ type: CurrentPlayingType.RESUME }>
+	| Readonly<{ type: CurrentPlayingType.PAUSE }>;
 
-export enum Type {
+export enum CurrentPlayingType {
 	PLAY_THIS_MEDIA,
 	PLAY_PREVIOUS,
 	PLAY_NEXT,

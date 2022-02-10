@@ -5,15 +5,20 @@ import type { videoInfo } from "ytdl-core";
 import type { IPicture } from "node-taglib-sharp";
 import type { Stream } from "./utils.js";
 
-import { File as MediaFile, Picture, ByteVector } from "node-taglib-sharp";
+import { NotificationType, ProgressStatus } from "@common/@types/typesAndEnums";
 import { readdir, readFile, stat, unlink } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
-import { StringType, PictureType } from "node-taglib-sharp";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
-import { NotificationType } from "@common/@types/typesAndEnums";
 import { join } from "path";
 import { cpus } from "os";
+import {
+	File as MediaFile,
+	PictureType,
+	ByteVector,
+	StringType,
+	Picture,
+} from "node-taglib-sharp";
 import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
 import ytdl from "ytdl-core";
@@ -22,6 +27,9 @@ import { formatDuration, isDevelopment, getBasename } from "@common/utils";
 import { homeDir, dirs, get, has, push, remove } from "./utils.js";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
+
+const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
+fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -127,10 +135,7 @@ window.onmessage = async event => {
 			const data = {};
 			Object.entries(details).forEach(pair => Object.assign(data, pair));
 
-			console.log({ event });
-			console.log("\n\n\n");
-			console.log({ details });
-			console.log({ data });
+			dbg({ event }, "\n\n\n", { details, data });
 
 			await writeTags(details.mediaPath, data);
 
@@ -167,9 +172,6 @@ window.onmessage = async event => {
 	}
 };
 
-const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
-fluent_ffmpeg.setFfmpegPath(ffmpegPath);
-
 const currentDownloads: Stream[] = [];
 const mediasConverting: Stream[] = [];
 
@@ -203,22 +205,17 @@ export async function transformPathsToMedias(
 	paths: readonly string[],
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
-) {
+): Promise<readonly (Media | undefined)[]> {
 	const getMedia = async (
 		path: string,
 		index: number,
 	): Promise<Media | undefined> => {
 		try {
 			console.time(`for (const [${index}, "${path}"])`);
-			// const now = new Date();
-			// const date = `${now.getMinutes()}:${now.getSeconds()}:${now.getMilliseconds()}`;
-			// dbg(`Initialized reading "${path}" at ${date}`);
-			// console.time("Reading metadata");
 			const {
 				tag: { pictures, title, album, genres, albumArtists },
 				properties: { durationMilliseconds },
 			} = MediaFile.createFromPath(path);
-			// console.timeEnd("Reading metadata");
 
 			const duration = durationMilliseconds / 1_000;
 
@@ -269,7 +266,6 @@ export async function transformPathsToMedias(
 			return media;
 		} catch (error) {
 			console.error(error);
-			// console.timeEnd("Reading metadata");
 			return undefined;
 		} finally {
 			console.timeEnd(`for (const [${index}, "${path}"])`);
@@ -297,7 +293,7 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	port.onmessage = event => {
 		const { data } = event;
 
-		console.log(
+		dbg(
 			"Message received on electron side of 2way-comm (currently doing nothing!!):",
 			data,
 		);
@@ -343,9 +339,9 @@ export function makeStream(
 	const titleWithExtension = `${title}.${extension}`;
 	const saveSite = `${dirs.music}/${titleWithExtension}`;
 	const startTime = Date.now();
+
 	let interval: NodeJS.Timer | undefined = undefined;
 	let percentageToSend = "";
-	let prettyTotal = "";
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
@@ -359,8 +355,8 @@ export function makeStream(
 			);
 
 			electronPort.postMessage({
+				status: ProgressStatus.CANCEL,
 				isDownloading: false,
-				status: "cancel",
 			});
 			electronPort.close();
 
@@ -375,10 +371,9 @@ export function makeStream(
 				+minutesDownloading
 			).toFixed(2);
 
-			// to react:
+			// To react:
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
-				prettyTotal = prettyBytes(total);
 
 				interval = setInterval(
 					() => electronPort.postMessage({ percentage: percentageToSend }),
@@ -386,13 +381,13 @@ export function makeStream(
 				);
 			}
 
-			// to node console:
+			// To node console if is in development:
 			if (isDevelopment) {
 				readline.cursorTo(process.stdout, 0);
 				process.stdout.write(
-					`${percentage}% downloaded (${prettyBytes(
-						downloaded,
-					)} of ${prettyTotal}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes.`,
+					`${percentage}% downloaded, (${prettyBytes(downloaded)}/${prettyBytes(
+						total,
+					)}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes.`,
 				);
 			}
 		})
@@ -402,25 +397,29 @@ export function makeStream(
 				"color: green; font-weight: bold;",
 			);
 
-			// to react:
+			// To react:
 			electronPort.postMessage({
+				status: ProgressStatus.SUCCESS,
 				isDownloading: false,
-				status: "success",
 			});
 			electronPort.close();
 
 			interval && clearInterval(interval);
 
-			await writeTags(saveSite, { imageURL });
-			remove(currentDownloads, url);
+			try {
+				await writeTags(saveSite, { imageURL });
+				remove(currentDownloads, url);
+			} catch (error) {
+				console.error(error, { currentDownloads });
+			}
 		})
 		.once("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
 
-			// to react
+			// To react
 			electronPort.postMessage({
+				status: ProgressStatus.FAIL,
 				isDownloading: false,
-				status: "fail",
 				error,
 			});
 
@@ -452,10 +451,9 @@ export function handleCreateOrCancelConvert(
 
 		dbg("readStream 'destroy()' answer =", readAnswer);
 
+		const wasRemoved = remove(mediasConverting, path);
 		dbg(
-			`Was "${path}" deleted from map? `,
-			remove(mediasConverting, path),
-			"\nmediasConverting =",
+			`Was "${path}" deleted from map? ${wasRemoved}\nmediasConverting =`,
 			mediasConverting,
 		);
 	}
@@ -470,8 +468,9 @@ export function convertToAudio(
 	const saveSite = `${dirs.music}/${titleWithExtension}`;
 	const readStream = createReadStream(mediaPath);
 
-	const msgToSend = { timeConverted: "", sizeConverted: 0 };
 	let interval: NodeJS.Timer | undefined = undefined;
+	let timeConverted = "";
+	let sizeConverted: 0;
 
 	fluent_ffmpeg(readStream)
 		.toFormat(toExtension)
@@ -480,14 +479,14 @@ export function convertToAudio(
 		.on("progress", p => {
 			// targetSize: current size of the target file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
-			msgToSend.sizeConverted = p.targetSize;
-			msgToSend.timeConverted = p.timemark;
+			sizeConverted = p.targetSize;
+			timeConverted = p.timemark;
 
 			// To react:
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
-					() => electronPort.postMessage(msgToSend),
+					() => electronPort.postMessage({ sizeConverted, timeConverted }),
 					2_000,
 				);
 			}
@@ -497,8 +496,8 @@ export function convertToAudio(
 
 			// To react:
 			electronPort.postMessage({
+				status: ProgressStatus.FAIL,
 				isConverting: false,
-				status: "fail",
 				error,
 			});
 
@@ -514,9 +513,10 @@ export function convertToAudio(
 
 			// To react:
 			electronPort.postMessage({
+				status: ProgressStatus.SUCCESS,
 				isConverting: false,
-				status: "success",
 			});
+
 			electronPort.close();
 
 			interval && clearInterval(interval);
@@ -525,7 +525,7 @@ export function convertToAudio(
 			console.log(
 				"Deleting from map:",
 				remove(mediasConverting, mediaPath),
-				"\n\nconverting =",
+				"\nconverting =",
 				mediasConverting,
 			);
 		})
@@ -536,8 +536,8 @@ export function convertToAudio(
 			);
 
 			electronPort.postMessage({
+				status: ProgressStatus.CANCEL,
 				isConverting: false,
-				status: "cancel",
 			});
 			electronPort.close();
 
@@ -682,5 +682,8 @@ export async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
 // const logStyle =
 // 	"background-color: green; font-size: 0.8rem; font-weight: bold; color: white;";
 
-// const used = process.memoryUsage().heapUsed / 1024 / 1024;
-// console.log(`The script uses approximately ${used} MB`);
+// dbg(
+// 	`The 'preload.ts' script uses approximately ${
+// 		process.memoryUsage().heapUsed / 1_024 / 1_024
+// 	} MB`,
+// );

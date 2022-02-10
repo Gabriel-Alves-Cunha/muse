@@ -2,12 +2,12 @@ import type { Media, Mutable, Path } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
+import merge from "deepmerge";
 
-import { concatFromIndex, remove, replace, sort } from "@renderer/utils/array";
+import { concatFromIndex, remove, replace, sort } from "@utils/array";
 import { ListenToNotification } from "@common/@types/typesAndEnums";
-import { assertUnreachable } from "@renderer/utils/utils";
-import { keyPrefix } from "@renderer/utils/app";
-import { deepMerge } from "@utils/deepMerge";
+import { assertUnreachable } from "@utils/utils";
+import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
 	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
@@ -65,8 +65,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							get().setPlaylists({
-								type: Type.UPDATE_MEDIA_LIST,
-								whatToDo: Actions.ADD,
+								type: PlaylistType.UPDATE_MEDIA_LIST,
+								whatToDo: PlaylistActions.ADD,
 								media,
 							});
 							break;
@@ -127,8 +127,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							get().setPlaylists({
-								whatToDo: Actions.REFRESH_ONE,
-								type: Type.UPDATE_MEDIA_LIST,
+								whatToDo: PlaylistActions.REFRESH_ONE,
+								type: PlaylistType.UPDATE_MEDIA_LIST,
 								media: refreshedMedia,
 							});
 							break;
@@ -148,8 +148,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							get().setPlaylists({
-								type: Type.UPDATE_MEDIA_LIST,
-								whatToDo: Actions.REMOVE,
+								type: PlaylistType.UPDATE_MEDIA_LIST,
+								whatToDo: PlaylistActions.REMOVE,
 								media,
 							});
 							break;
@@ -168,8 +168,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				await rm(media.path);
 
 				get().setPlaylists({
-					type: Type.UPDATE_MEDIA_LIST,
-					whatToDo: Actions.NEW_LIST,
+					type: PlaylistType.UPDATE_MEDIA_LIST,
+					whatToDo: PlaylistActions.NEW_LIST,
 					media,
 				});
 			},
@@ -194,7 +194,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				const prevPlaylistArray = get().playlists;
 
 				switch (action.type) {
-					case Type.UPDATE_HISTORY: {
+					case PlaylistType.UPDATE_HISTORY: {
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						const prevHistory = prevPlaylistArray.find(
 							({ name }) => name === "history",
@@ -202,7 +202,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						console.assert(prevHistory);
 
 						switch (action.whatToDo) {
-							case Actions.ADD: {
+							case PlaylistActions.ADD: {
 								if (!action.media) {
 									console.error(
 										"There should be a media when calling 'add' on history! action",
@@ -228,7 +228,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.CLEAN: {
+							case PlaylistActions.CLEAN: {
 								dbg(
 									"setPlaylists on 'update history'->'clean'. newHistory = []",
 								);
@@ -245,7 +245,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						break;
 					}
 
-					case Type.UPDATE_FAVORITES: {
+					case PlaylistType.UPDATE_FAVORITES: {
 						// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 						const prevFavorites = prevPlaylistArray.find(
 							({ name }) => name === "favorites",
@@ -253,7 +253,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						console.assert(prevFavorites);
 
 						switch (action.whatToDo) {
-							case Actions.ADD: {
+							case PlaylistActions.ADD: {
 								const newFavorites = [
 									...prevFavorites,
 									{
@@ -271,7 +271,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.REMOVE: {
+							case PlaylistActions.REMOVE: {
 								const newFavorites = reaplyOrderedIndex(
 									remove(prevFavorites, action.media.index),
 								);
@@ -285,7 +285,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.CLEAN: {
+							case PlaylistActions.CLEAN: {
 								dbg(
 									"playlistsReducer on 'update favorites'->'clean'. newFavorites = []",
 								);
@@ -302,7 +302,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						break;
 					}
 
-					case Type.UPDATE_MEDIA_LIST: {
+					case PlaylistType.UPDATE_MEDIA_LIST: {
 						// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 						const prevMediaList = prevPlaylistArray.find(
 							({ name }) => name === "mediaList",
@@ -319,10 +319,11 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								sortByName(newMediaList),
 								"sorted by name",
 							);
+							get().createOrUpdatePlaylists(newMediaList, "mediaList");
 						};
 
 						switch (action.whatToDo) {
-							case Actions.ADD: {
+							case PlaylistActions.ADD: {
 								if (!action.media) {
 									console.error(
 										"There should be a media when calling 'add'! action =",
@@ -348,7 +349,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.REMOVE: {
+							case PlaylistActions.REMOVE: {
 								if (!action.media) {
 									console.error(
 										"There should be a media when calling 'remove'! action =",
@@ -370,7 +371,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.NEW_LIST: {
+							case PlaylistActions.NEW_LIST: {
 								if (!action.list) {
 									console.error(
 										"There should be a list when calling 'new list'!",
@@ -408,7 +409,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.REFRESH_ONE: {
+							case PlaylistActions.REFRESH_ONE: {
 								if (!action.media) {
 									console.error(
 										"There should be a media when CALLING 'refresh one'!",
@@ -450,7 +451,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
-							case Actions.CLEAN: {
+							case PlaylistActions.CLEAN: {
 								dbg(
 									"playlistsReducer on 'update mediaList'->'clean' (yet to be sorted). newMediaList = []",
 								);
@@ -501,8 +502,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						dbg("Finished searching. Medias =", newMediaList);
 
 						get().setPlaylists({
-							type: Type.UPDATE_MEDIA_LIST,
-							whatToDo: Actions.NEW_LIST,
+							type: PlaylistType.UPDATE_MEDIA_LIST,
+							whatToDo: PlaylistActions.NEW_LIST,
 							list: newMediaList,
 						});
 					}
@@ -564,10 +565,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 			deserialize: state => JSON.parse(state),
 			partialize: state => ({ playlists: state.playlists }),
 			merge: (persistedState, currentState) =>
-				deepMerge(persistedState, currentState) as Record<
-					"playlists",
-					UsePlaylistsActions["playlists"]
-				>,
+				merge(persistedState, currentState),
 		},
 	),
 );
@@ -616,23 +614,26 @@ export type Playlist = Readonly<{
 
 export type PlaylistsReducer_Action =
 	| Readonly<{
-			whatToDo: Actions.ADD | Actions.REMOVE | Actions.CLEAN;
-			type: Type.UPDATE_FAVORITES;
+			whatToDo:
+				| PlaylistActions.ADD
+				| PlaylistActions.REMOVE
+				| PlaylistActions.CLEAN;
+			type: PlaylistType.UPDATE_FAVORITES;
 			media: Media;
 	  }>
 	| Readonly<{
-			whatToDo: Actions.ADD | Actions.CLEAN;
-			type: Type.UPDATE_HISTORY;
+			whatToDo: PlaylistActions.ADD | PlaylistActions.CLEAN;
+			type: PlaylistType.UPDATE_HISTORY;
 			media?: Media;
 	  }>
 	| Readonly<{
-			type: Type.UPDATE_MEDIA_LIST;
+			type: PlaylistType.UPDATE_MEDIA_LIST;
 			list?: readonly Media[];
-			whatToDo: Actions;
+			whatToDo: PlaylistActions;
 			media?: Media;
 	  }>;
 
-export enum Actions {
+export enum PlaylistActions {
 	REFRESH_ONE,
 	NEW_LIST,
 	REMOVE,
@@ -640,7 +641,7 @@ export enum Actions {
 	ADD,
 }
 
-export enum Type {
+export enum PlaylistType {
 	UPDATE_MEDIA_LIST,
 	UPDATE_FAVORITES,
 	UPDATE_HISTORY,

@@ -81,7 +81,7 @@ function createWindow() {
 	const url = isDevelopment
 		? "http://localhost:3000"
 		: pathToFileURL(
-				join(__dirname, "vite-renderer-build", "index.html"),
+				join(__dirname, "app", "vite-renderer-build", "index.html"),
 		  ).toString();
 
 	window.loadURL(url);
@@ -212,7 +212,7 @@ ipcMain.handle(
 			get(url, resp => {
 				resp.setEncoding("base64");
 
-				let body = "data:" + resp.headers["content-type"] + ";base64,";
+				let body = `data:${resp.headers["content-type"]};base64,`;
 
 				resp.on("data", chunk => (body += chunk));
 				resp.on("end", () => resolve(body));

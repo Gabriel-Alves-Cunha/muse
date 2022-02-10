@@ -1,4 +1,3 @@
-import type { DownloadValues } from "@renderer/contexts/communicationBetweenChildren";
 import type { Media, Path } from "./typesAndEnums";
 import type { videoInfo } from "ytdl-core";
 

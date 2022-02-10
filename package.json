@@ -62,6 +62,7 @@
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
 		"@radix-ui/react-icons": "^1.0.3",
 		"debug": "^4.3.3",
+		"deepmerge": "^4.2.2",
 		"electron-squirrel-startup": "^1.0.0",
 		"fluent-ffmpeg": "^2.1.2",
 		"immer": "^9.0.12",

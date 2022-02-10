@@ -5,6 +5,8 @@ import { AiOutlineCheck as Success } from "react-icons/ai";
 import { AiOutlineClose as Fail } from "react-icons/ai";
 import { FcCancel as Cancel } from "react-icons/fc";
 
+import { ProgressStatus } from "@common/@types/typesAndEnums";
+
 import { Bar, Component, ProgressBarWrapper } from "./styles";
 
 export function Progress({
@@ -30,27 +32,19 @@ Progress.whyDidYouRender = {
 	customName: "Progress",
 };
 
-const map = new Map<ProgressProps["status"], JSX.Element>();
+const map = new Map<ProgressStatus, JSX.Element>();
 
-export const icon = (status: ProgressProps["status"]) =>
+export const icon = (status: ProgressStatus) =>
 	map.get(status) ?? <QuestionMark size={12} />;
 
-export enum Status {
-	SUCCESS,
-	CONVERT,
-	ACTIVE,
-	CANCEL,
-	FAIL,
-}
-
-map.set(Status.SUCCESS, <Success size={12} color="green" />);
-map.set(Status.CANCEL, <Cancel size={12} color="blue" />);
-map.set(Status.FAIL, <Fail size={12} color="red" />);
-map.set(Status.ACTIVE, <Downloading size={12} />);
-map.set(Status.CONVERT, <Convert size={12} />);
+map.set(ProgressStatus.SUCCESS, <Success size={12} color="green" />);
+map.set(ProgressStatus.CANCEL, <Cancel size={12} color="blue" />);
+map.set(ProgressStatus.FAIL, <Fail size={12} color="red" />);
+map.set(ProgressStatus.ACTIVE, <Downloading size={12} />);
+map.set(ProgressStatus.CONVERT, <Convert size={12} />);
 
 export type ProgressProps = {
 	readonly showStatus: boolean;
 	percent_0_to_100: number;
-	status: Status;
+	status: ProgressStatus;
 };

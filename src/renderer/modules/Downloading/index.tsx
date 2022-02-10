@@ -5,22 +5,14 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
+import { useDownloadValues, MsgType, sendMsg } from "@contexts";
 import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
+import { Progress, icon } from "@components/Progress";
+import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { dbg } from "@common/utils";
-import {
-	type ProgressProps,
-	Progress,
-	Status,
-	icon,
-} from "@components/Progress";
-import {
-	useDownloadValues,
-	Type as MsgType,
-	sendMsg,
-} from "@contexts/communicationBetweenChildren/helpers";
 
 import { Circle, Popup, Title } from "./styles";
 
@@ -71,7 +63,7 @@ function useDownloading() {
 			imageURL: downloadValues.imageURL,
 			title: downloadValues.title,
 			url: downloadValues.url,
-			status: Status.ACTIVE,
+			status: ProgressStatus.ACTIVE,
 			isDownloading: true,
 			percentage: 0,
 			port: myPort,
@@ -97,7 +89,7 @@ function useDownloading() {
 			});
 
 			switch (data.status) {
-				case Status.FAIL: {
+				case ProgressStatus.FAIL: {
 					// ^ In this case, `data` include an `error: Error` key.
 					console.error((data as typeof data & { error: Error }).error);
 
@@ -114,7 +106,7 @@ function useDownloading() {
 					break;
 				}
 
-				case Status.SUCCESS: {
+				case ProgressStatus.SUCCESS: {
 					toast.success(`Download of "${downloadStatus.title}" succeded!`, {
 						hideProgressBar: false,
 						position: "top-right",
@@ -127,7 +119,7 @@ function useDownloading() {
 					break;
 				}
 
-				case Status.CANCEL: {
+				case ProgressStatus.CANCEL: {
 					toast.info(`Download of "${downloadStatus.title}" was cancelled!`, {
 						hideProgressBar: false,
 						position: "top-right",
@@ -142,13 +134,13 @@ function useDownloading() {
 					break;
 				}
 
-				case Status.ACTIVE:
+				case ProgressStatus.ACTIVE:
 					break;
 
 				case undefined:
 					break;
 
-				case Status.CONVERT:
+				case ProgressStatus.CONVERT:
 					break;
 
 				default:
@@ -226,7 +218,7 @@ export function Downloading() {
 
 	return downloadingList.length > 0 ? (
 		<>
-			<Circle onClick={toggleShowPopup}>{icon(Status.ACTIVE)}</Circle>
+			<Circle onClick={toggleShowPopup}>{icon(ProgressStatus.ACTIVE)}</Circle>
 
 			{showPopup && (
 				<Popup ref={popupRef}>
@@ -259,7 +251,7 @@ export function Downloading() {
 }
 
 type DownloadingMedia = Readonly<{
-	status: ProgressProps["status"];
+	status: ProgressStatus;
 	isDownloading: boolean;
 	percentage: number;
 	port: MessagePort;
