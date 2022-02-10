@@ -1,71 +1,107 @@
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useDownloadHelper } from "./helpers";
 
-import { Wrapper, SearchWrapper, Searcher, Result, Button } from "./styles";
 import { Loading } from "@styles/appStyles";
+import {
+	ResultContainer,
+	SearchWrapper,
+	Searcher,
+	Wrapper,
+	Button,
+} from "./styles";
 
 export function Download() {
-	const { searcher, setSearchTerm, download, search } = useDownloadHelper();
-
-	useEffect(() => {
-		if (!searcher.searchTerm || searcher.searchTerm.length < 10) return;
-
-		const searchTimeout = setTimeout(
-			async () => await search(searcher.searchTerm),
-			400,
-		);
-
-		return () => clearTimeout(searchTimeout);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searcher.searchTerm]);
-
 	return (
 		<Wrapper>
-			<SearchWrapper>
-				<Searcher>
-					<SearchIcon size="1.2em" />
-					<input
-						placeholder="Paste Youtube url here!"
-						value={searcher.searchTerm}
-						onChange={setSearchTerm}
-						autoCapitalize="off"
-						spellCheck="false"
-						autoCorrect="off"
-						type="text"
-					/>
-				</Searcher>
+			<SearcherWrapper />
 
-				{searcher.error && <p>{searcher.error}</p>}
+			<IsLoading />
 
-				<div
-					style={{
-						transform: "scale(0.3)",
-						position: "relative",
-						marginLeft: "1rem",
-					}}
-				>
-					{searcher.isLoading && <Loading />}
-				</div>
-			</SearchWrapper>
-
-			{searcher.result && (
-				<Result>
-					<img src={searcher.result.imageURL} alt="thumbnail" />
-
-					<p>{searcher.result.title}</p>
-
-					<Button onClick={() => download(searcher.searchTerm)}>
-						Download
-					</Button>
-				</Result>
-			)}
+			<Result />
 		</Wrapper>
 	);
 }
 
+const SearcherWrapper = () => {
+	const {
+		searcher: { error },
+		setSearchTerm,
+		search,
+	} = useDownloadHelper();
+
+	const searchTermRef = useRef("");
+	const searchTerm = searchTermRef.current;
+
+	useEffect(() => {
+		if (!searchTerm || searchTerm.length < 10) return;
+
+		const searchTimeout = setTimeout(async () => await search(searchTerm), 400);
+
+		return () => clearTimeout(searchTimeout);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchTerm]);
+
+	return (
+		<SearchWrapper>
+			<Searcher>
+				<SearchIcon size="1.2em" />
+				<input
+					placeholder="Paste Youtube url here!"
+					onChange={setSearchTerm}
+					autoCapitalize="off"
+					value={searchTerm}
+					spellCheck="false"
+					autoCorrect="off"
+					type="text"
+				/>
+			</Searcher>
+
+			{error && <p>{error}</p>}
+		</SearchWrapper>
+	);
+};
+
+const IsLoading = () => {
+	const {
+		searcher: { isLoading },
+	} = useDownloadHelper();
+
+	return (
+		<div
+			style={{
+				transform: "scale(0.3)",
+				position: "relative",
+				marginLeft: "1rem",
+			}}
+		>
+			{isLoading && <Loading />}
+		</div>
+	);
+};
+
+const { getState: getDownloadHelper } = useDownloadHelper;
+const makeDownload = () =>
+	getDownloadHelper().download(getDownloadHelper().searcher.searchTerm);
+
+const Result = () => {
+	const {
+		searcher: { result },
+	} = useDownloadHelper();
+
+	return result ? (
+		<ResultContainer>
+			<img src={result.imageURL} alt="thumbnail" />
+
+			<p>{result.title}</p>
+
+			<Button onClick={makeDownload}>Download</Button>
+		</ResultContainer>
+	) : null;
+};
+
 Download.whyDidYouRender = {
-	logOnDifferentValues: false,
+	logOnDifferentValues: true,
 	customName: "Download",
 };

@@ -59,6 +59,10 @@ export default defineConfig({
 				find: "@hooks",
 				replacement: resolve(__dirname, "src/renderer/hooks"),
 			},
+			{
+				find: "@modules",
+				replacement: resolve(__dirname, "src/renderer/modules"),
+			},
 		],
 	},
 });

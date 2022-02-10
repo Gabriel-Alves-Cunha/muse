@@ -12,52 +12,17 @@ const defaultDownloadValues: DownloadValues = Object.freeze({
 	url: "",
 });
 
-export type ConvertValues = Readonly<{
-	toExtension: ExtensionToBeConvertedTo;
-	canStartConvert: boolean;
-	path: Path;
-}>;
-
-export type DownloadValues = Readonly<{
-	canStartDownload: boolean;
-	imageURL: string;
-	title: string;
-	url: string;
-}>;
-
-type DownloadActionsAndValues = {
-	setDownloadValues(value: DownloadValues): void;
+export const useDownloadValues = create<{
 	downloadValues: DownloadValues;
-};
-
-export const useDownloadValues = create<DownloadActionsAndValues>(set => ({
+}>(() => ({
 	downloadValues: defaultDownloadValues,
-	setDownloadValues: (downloadValues: DownloadValues) =>
-		set({ downloadValues }),
 }));
 
-type ConvertValuesActions = {
+export const useConvertValues = create<{
 	convertValues: ConvertValues[];
-	setConvertValues(convertValues: ConvertValues[]): void;
-};
-
-export const useConvertValues = create<ConvertValuesActions>(set => ({
-	setConvertValues: (convertValues: ConvertValues[]) => set({ convertValues }),
+}>(() => ({
 	convertValues: [],
 }));
-
-type Action =
-	| Readonly<{ type: Type.START_CONVERT; value: readonly ConvertValues[] }>
-	| Readonly<{ type: Type.START_DOWNLOAD; value: DownloadValues }>
-	| Readonly<{ type: Type.RESET_DOWNLOAD_VALUES }>
-	| Readonly<{ type: Type.RESET_CONVERT_VALUES }>;
-
-export enum Type {
-	RESET_DOWNLOAD_VALUES,
-	RESET_CONVERT_VALUES,
-	START_DOWNLOAD,
-	START_CONVERT,
-}
 
 const { setState: setDownloadValuesState } = useDownloadValues;
 const { setState: setConvertValuesState } = useConvertValues;
@@ -102,4 +67,30 @@ export function sendMsg(action: Action) {
 			break;
 		}
 	}
+}
+
+export type ConvertValues = Readonly<{
+	toExtension: ExtensionToBeConvertedTo;
+	canStartConvert: boolean;
+	path: Path;
+}>;
+
+export type DownloadValues = Readonly<{
+	canStartDownload: boolean;
+	imageURL: string;
+	title: string;
+	url: string;
+}>;
+
+type Action =
+	| Readonly<{ type: Type.START_CONVERT; value: readonly ConvertValues[] }>
+	| Readonly<{ type: Type.START_DOWNLOAD; value: DownloadValues }>
+	| Readonly<{ type: Type.RESET_DOWNLOAD_VALUES }>
+	| Readonly<{ type: Type.RESET_CONVERT_VALUES }>;
+
+export enum Type {
+	RESET_DOWNLOAD_VALUES,
+	RESET_CONVERT_VALUES,
+	START_DOWNLOAD,
+	START_CONVERT,
 }

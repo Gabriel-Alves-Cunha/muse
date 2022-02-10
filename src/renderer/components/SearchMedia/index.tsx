@@ -10,13 +10,15 @@ import { FiTrash as Clean } from "react-icons/fi";
 import { FixedSizeList } from "react-window";
 
 import { Type as CurrentPlayingType } from "@contexts/mediaHandler/useCurrentPlaying";
+import { useCurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
-import { useMediaHandler } from "@renderer/contexts/mediaHandler";
 import { dbg } from "@common/utils";
 import {
 	Actions as PlaylistActions,
 	Type as PlaylistType,
+	type Playlist,
+	usePlaylists,
 } from "@contexts/mediaHandler/usePlaylists";
 
 import { Img, Info, SubTitle, Title } from "../MediaListKind/styles";
@@ -31,25 +33,9 @@ import {
 	Button,
 } from "./styles";
 
-type Props = {
-	buttonToTheSide: ButtonToTheSide;
-	fromList: MediaListKindProps["mediaType"];
-};
-
-export enum ButtonToTheSide {
-	RELOAD_BUTTON,
-	NOTHING,
-	CLEAN,
-}
-
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
-	const {
-		functions: {
-			searchLocalComputerForMedias,
-			dispatchPlaylists,
-			searchForMedia,
-		},
-	} = useMediaHandler();
+	const { searchLocalComputerForMedias, searchForMedia, setPlaylists } =
+		usePlaylists();
 
 	const [searcher, dispatchSearcher] = useReducer(searcherReducer, {
 		isLoading: false,
@@ -74,7 +60,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const cleanHistory = () => {
 		dbg("Sending msg to clean history.");
 
-		dispatchPlaylists({
+		setPlaylists({
 			type: PlaylistType.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
 		});
@@ -156,12 +142,24 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 						break;
 					}
 
-					default:
+					default: {
 						return assertUnreachable(buttonToTheSide);
+						break;
+					}
 				}
 			})()}
 		</Wrapper>
 	);
+}
+
+const { getState: getCurrentPlaying } = useCurrentPlaying;
+
+function playMedia(media: Media, playlist: Playlist) {
+	getCurrentPlaying().setCurrentPlaying({
+		type: CurrentPlayingType.PLAY_THIS_MEDIA,
+		playlist,
+		media,
+	});
 }
 
 function SearchResults({
@@ -171,25 +169,14 @@ function SearchResults({
 	fromList: MediaListKindProps["mediaType"];
 	results: readonly Media[];
 }) {
-	const {
-		functions: { dispatchCurrentPlaying },
-		values: { playlists },
-	} = useMediaHandler();
-
+	const { playlists } = usePlaylists();
 	const listWrapperReference = useRef<HTMLElement>(null);
-	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-	const playlist = playlists.find(({ name }) => name === fromList)!;
+
+	const playlist = playlists.find(({ name }) => name === fromList);
 	if (!playlist) {
 		console.error(`There should be "${fromList}" to search through!`);
 		return null;
 	}
-
-	const playMedia = (media: Media) =>
-		dispatchCurrentPlaying({
-			type: CurrentPlayingType.PLAY_THIS_MEDIA,
-			playlist,
-			media,
-		});
 
 	const Row = ({
 		index,
@@ -199,7 +186,11 @@ function SearchResults({
 		const media = data[index];
 
 		return media ? (
-			<Result key={media.path} onClick={() => playMedia(media)} style={style}>
+			<Result
+				onClick={() => playMedia(media, playlist)}
+				key={media.path}
+				style={style}
+			>
 				<Img>
 					{media.img ? <img src={media.img} /> : <MusicNote size="1.4em" />}
 				</Img>
@@ -284,4 +275,15 @@ enum Type {
 	SET_SEARCH_TERM,
 	SET_IS_LOADING,
 	SET_RESULTS,
+}
+
+type Props = {
+	fromList: MediaListKindProps["mediaType"];
+	buttonToTheSide: ButtonToTheSide;
+};
+
+export enum ButtonToTheSide {
+	RELOAD_BUTTON,
+	NOTHING,
+	CLEAN,
 }

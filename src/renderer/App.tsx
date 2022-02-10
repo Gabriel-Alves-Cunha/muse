@@ -1,40 +1,36 @@
 import { ToastContainer } from "react-toastify";
+import { useEffect } from "react";
 import { Global } from "@emotion/react";
 
 import { Convert, Download, Favorites, History, Home, Settings } from "@pages";
+import { MediaPlayer, Downloading, Converting } from "@modules";
+import { Decorations, Navbar } from "@components";
 import { assertUnreachable } from "@utils/utils";
-import { getMediaFiles } from "./contexts/mediaHandler/usePlaylistsHelper";
-import { usePlaylists } from "./contexts/mediaHandler/usePlaylists";
-import { useEffect } from "react";
-import { Contexts } from "@contexts";
+import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
 import { usePage } from "@contexts/page";
 import { dbg } from "@common/utils";
-import {
-	Decorations,
-	MediaPlayer,
-	Downloading,
-	Converting,
-	Navbar,
-} from "@components";
 
 import { GlobalCSS } from "@styles/global";
 import { MainView } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
 
-export const App = () => (
-	<Contexts>
-		<Global styles={GlobalCSS} />
+export function App() {
+	return (
+		<>
+			<Global styles={GlobalCSS} />
 
-		<Decorations />
+			<Decorations />
 
-		<Main />
-	</Contexts>
-);
+			<Main />
+		</>
+	);
+}
 
 let renders = 0;
 function Main() {
 	++renders;
-	console.assert(renders === 1);
+	console.log({ renders });
 
 	const { addListeners, searchLocalComputerForMedias } = usePlaylists();
 
@@ -142,10 +138,11 @@ const PageToShow = () => {
 };
 
 App.whyDidYouRender = {
-	logOnDifferentValues: false,
+	logOnDifferentValues: true,
 	customName: "App",
 };
 
 Main.whyDidYouRender = {
+	logOnDifferentValues: true,
 	customName: "Main",
 };

@@ -1,5 +1,4 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
-import type { ProgressProps } from "../Progress";
 import type { Mutable, Path } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer, useRef } from "react";
@@ -7,14 +6,14 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
-import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylistsHelper";
+import { type ProgressProps, Status, icon } from "@components/Progress";
+import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
 import { remove, replace } from "@utils/array";
 import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
-import { icon } from "../Progress";
 import {
 	useConvertValues,
 	Type as MsgType,
@@ -65,11 +64,11 @@ function useConverting() {
 		const convertStatus: MediaBeingConverted = {
 			toExtension: values.toExtension,
 			index: convertList.length,
+			status: Status.ACTIVE,
 			isConverting: true,
 			timeConverted: "",
 			path: values.path,
 			sizeConverted: 0,
-			status: "active",
 			port: myPort,
 		};
 
@@ -92,7 +91,7 @@ function useConverting() {
 			});
 
 			switch (data.status) {
-				case "fail": {
+				case Status.FAIL: {
 					// ^ In this case, `data` include an `error: Error` key.
 					console.error((data as typeof data & { error: Error }).error);
 
@@ -108,7 +107,7 @@ function useConverting() {
 					break;
 				}
 
-				case "success": {
+				case Status.SUCCESS: {
 					toast.success(`Download of "${convertStatus.path}" succeded!`, {
 						hideProgressBar: false,
 						position: "top-right",
@@ -123,7 +122,7 @@ function useConverting() {
 					break;
 				}
 
-				case "cancel": {
+				case Status.CANCEL: {
 					toast.info(`Download of "${convertStatus.path}" was cancelled!`, {
 						hideProgressBar: false,
 						position: "top-right",
@@ -138,10 +137,13 @@ function useConverting() {
 					break;
 				}
 
-				case "active":
+				case Status.ACTIVE:
 					break;
 
 				case undefined:
+					break;
+
+				case Status.CONVERT:
 					break;
 
 				default: {
@@ -222,7 +224,7 @@ export function Converting() {
 
 	return convertList.length > 0 ? (
 		<>
-			<Circle onClick={toggleShowPopup}>{icon("convert")}</Circle>
+			<Circle onClick={toggleShowPopup}>{icon(Status.CONVERT)}</Circle>
 
 			{showPopup && (
 				<Popup ref={popupRef}>

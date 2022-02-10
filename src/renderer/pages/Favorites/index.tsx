@@ -1,16 +1,12 @@
-import { SearchMedia, MediaListKind } from "@components";
-import { ButtonToTheSide } from "@renderer/components/SearchMedia";
-import { MainArea } from "../Home";
+import { SearchMedia, MediaListKind, MainArea } from "@components";
+import { ButtonToTheSide } from "@components/SearchMedia";
 
-export function Favorites() {
-	return (
-		<MainArea>
-			<SearchMedia
-				buttonToTheSide={ButtonToTheSide.NOTHING}
-				fromList="favorites"
-			/>
+const list = "favorites";
 
-			<MediaListKind mediaType="favorites" />
-		</MainArea>
-	);
-}
+export const Favorites = () => (
+	<MainArea>
+		<SearchMedia buttonToTheSide={ButtonToTheSide.NOTHING} fromList={list} />
+
+		<MediaListKind mediaType={list} />
+	</MainArea>
+);

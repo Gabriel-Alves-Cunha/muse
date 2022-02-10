@@ -1,4 +1,3 @@
-import type { ProgressProps } from "../Progress";
 import type { Mutable } from "@common/@types/typesAndEnums";
 
 import { useEffect, useReducer, useRef } from "react";
@@ -6,12 +5,17 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
-import { reaplyOrderedIndex } from "@renderer/contexts/mediaHandler/usePlaylistsHelper";
+import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
-import { Progress, icon } from "../Progress";
 import { dbg } from "@common/utils";
+import {
+	type ProgressProps,
+	Progress,
+	Status,
+	icon,
+} from "@components/Progress";
 import {
 	useDownloadValues,
 	Type as MsgType,
@@ -22,7 +26,9 @@ import { Circle, Popup, Title } from "./styles";
 
 const { getState: getDownloadValues } = useDownloadValues;
 
-const downloadingStore = create<UseDownloading>(() => ({
+const downloadingStore = create<{
+	downloadingList: DownloadingMedia[];
+}>(() => ({
 	downloadingList: [],
 }));
 
@@ -31,9 +37,9 @@ const { getState: getDownloadingList, setState: setDownloadingList } =
 
 function useDownloading() {
 	const downloadingList = getDownloadingList().downloadingList;
-	dbg("downloadingList at Downloading:", downloadingList);
+	dbg("downloadingList at useDownloading:", downloadingList);
 	const downloadValues = getDownloadValues().downloadValues;
-	dbg("downloadValues at Downloading:", downloadValues);
+	dbg("downloadValues at useDownloading:", downloadValues);
 
 	function createNewDownload(): MessagePort {
 		const indexIfThereIsOneAlready = downloadingList.findIndex(
@@ -65,8 +71,8 @@ function useDownloading() {
 			imageURL: downloadValues.imageURL,
 			title: downloadValues.title,
 			url: downloadValues.url,
+			status: Status.ACTIVE,
 			isDownloading: true,
-			status: "active",
 			percentage: 0,
 			port: myPort,
 		};
@@ -91,7 +97,7 @@ function useDownloading() {
 			});
 
 			switch (data.status) {
-				case "fail": {
+				case Status.FAIL: {
 					// ^ In this case, `data` include an `error: Error` key.
 					console.error((data as typeof data & { error: Error }).error);
 
@@ -108,7 +114,7 @@ function useDownloading() {
 					break;
 				}
 
-				case "success": {
+				case Status.SUCCESS: {
 					toast.success(`Download of "${downloadStatus.title}" succeded!`, {
 						hideProgressBar: false,
 						position: "top-right",
@@ -121,7 +127,7 @@ function useDownloading() {
 					break;
 				}
 
-				case "cancel": {
+				case Status.CANCEL: {
 					toast.info(`Download of "${downloadStatus.title}" was cancelled!`, {
 						hideProgressBar: false,
 						position: "top-right",
@@ -136,10 +142,13 @@ function useDownloading() {
 					break;
 				}
 
-				case "active":
+				case Status.ACTIVE:
 					break;
 
 				case undefined:
+					break;
+
+				case Status.CONVERT:
 					break;
 
 				default:
@@ -204,12 +213,12 @@ function useDownloading() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [downloadValues.canStartDownload]);
 
-	return [cancelDownloadAndOrRemoveItFromList] as const;
+	return cancelDownloadAndOrRemoveItFromList;
 }
 
 export function Downloading() {
 	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
-	const [cancelDownloadAndOrRemoveItFromList] = useDownloading();
+	const cancelDownloadAndOrRemoveItFromList = useDownloading();
 	const downloadingList = getDownloadingList().downloadingList;
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -217,7 +226,7 @@ export function Downloading() {
 
 	return downloadingList.length > 0 ? (
 		<>
-			<Circle onClick={toggleShowPopup}>{icon("active")}</Circle>
+			<Circle onClick={toggleShowPopup}>{icon(Status.ACTIVE)}</Circle>
 
 			{showPopup && (
 				<Popup ref={popupRef}>
@@ -259,7 +268,3 @@ type DownloadingMedia = Readonly<{
 	title: string;
 	url: string;
 }>;
-
-type UseDownloading = {
-	downloadingList: DownloadingMedia[];
-};

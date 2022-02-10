@@ -16,7 +16,7 @@ export function Progress({
 		<Component>
 			<ProgressBarWrapper>
 				<Bar percentage={percent_0_to_100}>
-					<div className={status} />
+					<div className={status.toString()} />
 				</Bar>
 			</ProgressBarWrapper>
 
@@ -30,19 +30,27 @@ Progress.whyDidYouRender = {
 	customName: "Progress",
 };
 
-export const icon = (status: ProgressProps["status"] | "convert") =>
+const map = new Map<ProgressProps["status"], JSX.Element>();
+
+export const icon = (status: ProgressProps["status"]) =>
 	map.get(status) ?? <QuestionMark size={12} />;
 
-const map = new Map<ProgressProps["status"] | "convert", JSX.Element>();
+export enum Status {
+	SUCCESS,
+	CONVERT,
+	ACTIVE,
+	CANCEL,
+	FAIL,
+}
 
-map.set("success", <Success size={12} color="green" />);
-map.set("cancel", <Cancel size={12} color="blue" />);
-map.set("fail", <Fail size={12} color="red" />);
-map.set("active", <Downloading size={12} />);
-map.set("convert", <Convert size={12} />);
+map.set(Status.SUCCESS, <Success size={12} color="green" />);
+map.set(Status.CANCEL, <Cancel size={12} color="blue" />);
+map.set(Status.FAIL, <Fail size={12} color="red" />);
+map.set(Status.ACTIVE, <Downloading size={12} />);
+map.set(Status.CONVERT, <Convert size={12} />);
 
 export type ProgressProps = {
-	status: "success" | "fail" | "active" | "cancel";
 	readonly showStatus: boolean;
 	percent_0_to_100: number;
+	status: Status;
 };

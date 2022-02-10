@@ -10,7 +10,7 @@ const handleDownloadMedia = (value: DownloadValues) =>
 	sendMsg({ type: Type.START_DOWNLOAD, value });
 
 receiveMsgFromElectron(object => {
-	dbg("Received 'async-msg' from Electron on React side.\nObject =", object);
+	dbg("Received 'async-msg' from Electron on React side.\nobject =", object);
 
 	switch (object.type) {
 		case TypeOfMsgObject.DOWNLOAD_MEDIA: {

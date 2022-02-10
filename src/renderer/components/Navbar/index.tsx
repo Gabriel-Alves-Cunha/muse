@@ -16,7 +16,8 @@ import { usePage } from "@contexts/page";
 import { FolderButton, Nav, Text } from "./styles";
 
 export function Navbar() {
-	const { page, setPage } = usePage();
+	const { page } = usePage();
+	const setPage = usePage.setState;
 
 	return (
 		<Nav>
@@ -25,7 +26,7 @@ export function Navbar() {
 					className={folder === page ? "active" : ""}
 					onMouseDown={e => e.preventDefault()}
 					// ^ Takes focus off of button so that the `outline` css can be applied
-					onClick={() => setPage(folder)}
+					onClick={() => setPage({ page: folder })}
 					aria-label={"Go to" + folder}
 					key={folder}
 				>

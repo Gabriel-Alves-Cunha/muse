@@ -22,6 +22,15 @@ const currentPlayingKey = keyPrefix + "current_playing";
 const { getState: getPlayOptions } = usePlayOptions;
 const { getState: getPlaylists } = usePlaylists;
 
+// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+const defaultPlaylist = defaultPlaylists.find(({ name }) => name === "none")!;
+console.assert(defaultPlaylist.name === "none");
+const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
+	playlist: defaultPlaylist,
+	media: undefined,
+	currentTime: 0,
+});
+
 export const useCurrentPlaying = create<CurrentPlayingAction>(
 	persist(
 		(set, get) => ({
@@ -219,16 +228,6 @@ useCurrentPlaying.subscribe(async function setAudioToHTMLAudioElement() {
 	audio.addEventListener("error", e => console.error("Audio error:", e));
 	audio.addEventListener("abort", e => console.log("Audio was aborted:", e));
 	// debugger;
-});
-
-// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-const defaultPlaylist = defaultPlaylists.find(({ name }) => name === "none")!;
-console.assert(defaultPlaylist.name === "none");
-
-const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
-	playlist: defaultPlaylist,
-	media: undefined,
-	currentTime: 0,
 });
 
 export type CurrentPlaying = Readonly<{

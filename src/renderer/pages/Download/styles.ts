@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-import { fonts, theme } from "../../styles/theme";
+import { fonts, theme } from "@styles/theme";
 
 export const Wrapper = styled.section`
 	display: flex;
@@ -113,7 +113,7 @@ export const Searcher = styled.button`
 	}
 `;
 
-export const Result = styled.div`
+export const ResultContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

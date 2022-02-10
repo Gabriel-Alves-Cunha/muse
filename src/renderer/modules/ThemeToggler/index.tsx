@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 
 import { useLocalStorage } from "@hooks";
-import { keyPrefix } from "@renderer/utils/app";
+import { keyPrefix } from "@utils/app";
 
 const themeKey = keyPrefix + "theme";
 

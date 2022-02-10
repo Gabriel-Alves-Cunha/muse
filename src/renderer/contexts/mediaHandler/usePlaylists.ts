@@ -7,6 +7,7 @@ import { concatFromIndex, remove, replace, sort } from "@renderer/utils/array";
 import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { assertUnreachable } from "@renderer/utils/utils";
 import { keyPrefix } from "@renderer/utils/app";
+import { deepMerge } from "@utils/deepMerge";
 import { dbg } from "@common/utils";
 import {
 	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
@@ -14,6 +15,7 @@ import {
 	reaplyOrderedIndex,
 	getAllowedMedias,
 } from "./usePlaylistsHelper";
+
 const {
 	media: { transformPathsToMedias },
 	fs: { rm },
@@ -21,15 +23,14 @@ const {
 
 const playlistsKey = keyPrefix + "playlists";
 
-type UsePlaylistsActions = {
-	createOrUpdatePlaylists: (list: readonly Media[], name: string) => void;
-	searchLocalComputerForMedias: (force?: boolean) => Promise<void>;
-	searchForMedia: (searchTerm: string) => readonly Media[];
-	setPlaylists: (action: PlaylistsReducer_Action) => void;
-	addListeners: (port: MessagePort) => MessagePort;
-	deleteMedia: (media: Media) => Promise<void>;
-	playlists: Playlist[];
-};
+export const defaultPlaylists: Playlist[] = [
+	{ name: "sorted by date", list: [] },
+	{ name: "sorted by name", list: [] },
+	{ name: "favorites", list: [] },
+	{ name: "mediaList", list: [] },
+	{ name: "history", list: [] },
+	{ name: "none", list: [] },
+];
 
 export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
@@ -557,7 +558,17 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				isOneAlreadyCreated ? update() : create();
 			},
 		}),
-		{ name: playlistsKey },
+		{
+			name: playlistsKey,
+			serialize: state => JSON.stringify(state.state.playlists),
+			deserialize: state => JSON.parse(state),
+			partialize: state => ({ playlists: state.playlists }),
+			merge: (persistedState, currentState) =>
+				deepMerge(persistedState, currentState) as Record<
+					"playlists",
+					UsePlaylistsActions["playlists"]
+				>,
+		},
 	),
 );
 
@@ -581,14 +592,15 @@ const sortByName = (list: readonly Media[]): readonly Media[] =>
 		}),
 	);
 
-export const defaultPlaylists: Playlist[] = [
-	{ name: "sorted by date", list: [] },
-	{ name: "sorted by name", list: [] },
-	{ name: "favorites", list: [] },
-	{ name: "mediaList", list: [] },
-	{ name: "history", list: [] },
-	{ name: "none", list: [] },
-];
+type UsePlaylistsActions = {
+	createOrUpdatePlaylists: (list: readonly Media[], name: string) => void;
+	searchLocalComputerForMedias: (force?: boolean) => Promise<void>;
+	searchForMedia: (searchTerm: string) => readonly Media[];
+	setPlaylists: (action: PlaylistsReducer_Action) => void;
+	addListeners: (port: MessagePort) => MessagePort;
+	deleteMedia: (media: Media) => Promise<void>;
+	playlists: Playlist[];
+};
 
 export type DefaultLists =
 	| "sorted by date"

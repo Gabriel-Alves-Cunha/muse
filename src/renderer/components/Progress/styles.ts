@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 
+import { Status } from "./index";
 import { theme } from "@styles/theme";
 
 export const Bar = styled.div<{ percentage: number }>`
@@ -9,7 +10,7 @@ export const Bar = styled.div<{ percentage: number }>`
 	background-color: ${theme.colors.accent};
 	transition: width 0.3s linear;
 
-	.active {
+	.${Status.ACTIVE} {
 		position: absolute;
 		height: 100%;
 

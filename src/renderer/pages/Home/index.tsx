@@ -1,33 +1,15 @@
-import styled from "@emotion/styled";
+import { MediaListKind, SearchMedia, MainArea } from "@components";
+import { ButtonToTheSide } from "@components/SearchMedia";
 
-import { MediaListKind, SearchMedia } from "@components";
-import { ButtonToTheSide } from "@renderer/components/SearchMedia";
+const list = "mediaList";
 
-export function Home() {
-	return (
-		<MainArea>
-			<SearchMedia
-				buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
-				fromList="mediaList"
-			/>
+export const Home = () => (
+	<MainArea>
+		<SearchMedia
+			buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
+			fromList={list}
+		/>
 
-			<MediaListKind mediaType="mediaList" />
-		</MainArea>
-	);
-}
-
-export const MainArea = styled.div`
-	flex-direction: column;
-	position: relative;
-	display: flex;
-
-	height: 100%;
-	width: 100%;
-
-	@media (max-width: 500px) {
-		header {
-			justify-content: center;
-			margin-left: 0;
-		}
-	}
-`;
+		<MediaListKind mediaType={list} />
+	</MainArea>
+);

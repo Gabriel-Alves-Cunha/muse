@@ -10,7 +10,8 @@ export const getRandomInt = (min: number, max: number) =>
 export const capitalize = (string: string) =>
 	string.charAt(0).toUpperCase() + string.slice(1);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const assertUnreachable = (_: never): never => {
-	throw new Error("I shouldn't get here!");
+export const assertUnreachable = (received: never): never => {
+	throw new Error(
+		`I shouldn't get here (on 'assertUnreachable')!\nreceived = ${received}`,
+	);
 };

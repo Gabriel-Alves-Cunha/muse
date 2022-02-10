@@ -61,37 +61,28 @@ Decorations.whyDidYouRender = {
 	customName: "Decorations",
 };
 
-function Buttons() {
-	return (
-		<WindowButtons>
-			<WindowButton
-				aria-label="Close window"
-				onClick={closeWindow}
-				isToClose={true}
-			>
-				<Close size="16px" />
-			</WindowButton>
+const Buttons = () => (
+	<WindowButtons>
+		<WindowButton
+			aria-label="Close window"
+			onClick={closeWindow}
+			isToClose={true}
+		>
+			<Close size="16px" />
+		</WindowButton>
 
-			<WindowButton
-				onClick={toggleMaximize}
-				aria-label="Toggle maximize window"
-			>
-				<Maximize size="16px" />
-			</WindowButton>
+		<WindowButton onClick={toggleMaximize} aria-label="Toggle maximize window">
+			<Maximize size="16px" />
+		</WindowButton>
 
-			<WindowButton onClick={minimizeWindow} aria-label="Minize window">
-				<Minimize size="16px" />
-			</WindowButton>
-		</WindowButtons>
-	);
-}
+		<WindowButton onClick={minimizeWindow} aria-label="Minize window">
+			<Minimize size="16px" />
+		</WindowButton>
+	</WindowButtons>
+);
 
-const AppName_Folder = () => {
-	const page = usePage().page;
-
-	return (
-		<AppName_Folder_Wrapper>
-			{page + " - " + capitalizedAppName}
-		</AppName_Folder_Wrapper>
-	);
-};
+const AppName_Folder = () => (
+	<AppName_Folder_Wrapper>
+		{usePage().page + " - " + capitalizedAppName}
+	</AppName_Folder_Wrapper>
+);

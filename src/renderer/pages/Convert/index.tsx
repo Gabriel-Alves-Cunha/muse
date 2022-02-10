@@ -1,8 +1,7 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
-import type { ChangeEvent } from "react";
 import type { Path } from "@common/@types/typesAndEnums";
 
-import { useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { Type, sendMsg } from "@contexts/communicationBetweenChildren/helpers";
 

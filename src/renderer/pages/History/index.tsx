@@ -1,13 +1,12 @@
-import { SearchMedia, MediaListKind } from "@components";
-import { ButtonToTheSide } from "@renderer/components/SearchMedia";
-import { MainArea } from "../Home";
+import { SearchMedia, MediaListKind, MainArea } from "@components";
+import { ButtonToTheSide } from "@components/SearchMedia";
 
-export function History() {
-	return (
-		<MainArea>
-			<SearchMedia fromList="history" buttonToTheSide={ButtonToTheSide.CLEAN} />
+const list = "history";
 
-			<MediaListKind mediaType="history" />
-		</MainArea>
-	);
-}
+export const History = () => (
+	<MainArea>
+		<SearchMedia fromList={list} buttonToTheSide={ButtonToTheSide.CLEAN} />
+
+		<MediaListKind mediaType={list} />
+	</MainArea>
+);

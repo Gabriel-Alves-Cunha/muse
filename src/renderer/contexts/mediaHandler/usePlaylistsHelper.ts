@@ -1,6 +1,7 @@
 import type { Media, Path } from "@common/@types/typesAndEnums";
 
 import { allowedMedias, getBasename } from "@common/utils";
+
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
@@ -73,7 +74,7 @@ export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
 	list.map((item, index) => ({ ...item, index }));
 
 // These are not a bulletproof fns, but for the purpose of
-// getting the allowedMedias, it is ok, faster than NodeJS.
+// getting the allowedMedias, it is ok, faster than NodeJS's.
 export const getBasenameAndExtension = (filename: string) =>
 	[getBasename(filename), getExtension(filename)] as const;
 

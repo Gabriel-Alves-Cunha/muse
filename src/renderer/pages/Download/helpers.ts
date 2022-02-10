@@ -7,9 +7,10 @@ import {
 	Type as MsgType,
 	sendMsg,
 } from "@contexts/communicationBetweenChildren/helpers";
-const { getInfo } = electron.media;
 
 import create from "zustand";
+
+const { getInfo } = electron.media;
 
 export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 	setSearchTerm: (e: ChangeEvent<HTMLInputElement>) =>

@@ -12,7 +12,7 @@ import { formatDuration } from "@common/utils";
 import {
 	useCurrentPlaying,
 	Type,
-} from "@renderer/contexts/mediaHandler/useCurrentPlaying";
+} from "@contexts/mediaHandler/useCurrentPlaying";
 
 import { theme } from "@styles/theme";
 import {
@@ -26,20 +26,25 @@ import {
 
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
 const { setState: setProgress, getState: getProgress } = useProgress;
-
-const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
-	useCurrentPlaying;
+const { getState: getCurrentPlaying } = useCurrentPlaying;
 
 function playNextMedia() {
-	setCurrentPlaying({
+	getCurrentPlaying().setCurrentPlaying({
 		playlist: getCurrentPlaying().currentPlaying.playlist,
 		type: Type.PLAY_NEXT,
 	});
 }
 
-function useMediaPlayer() {
-	const playlist = useCurrentPlaying().currentPlaying.playlist;
+function playPreviousMedia() {
+	getCurrentPlaying().setCurrentPlaying({
+		playlist: getCurrentPlaying().currentPlaying.playlist,
+		type: Type.PLAY_PREVIOUS,
+	});
+}
+
+export function MediaPlayer() {
 	const { setCurrentPlaying } = useCurrentPlaying();
+	const { currentPlaying } = useCurrentPlaying();
 	const audioRef = useRef<HTMLAudioElement>(null);
 
 	function playOrPauseMedia() {
@@ -51,25 +56,12 @@ function useMediaPlayer() {
 			: setCurrentPlaying({ type: Type.PAUSE });
 	}
 
-	function playPreviousMedia() {
-		setCurrentPlaying({
-			playlist,
-			type: Type.PLAY_PREVIOUS,
-		});
-	}
-
-	function playNextMedia() {
-		setCurrentPlaying({
-			playlist,
-			type: Type.PLAY_NEXT,
-		});
-	}
-
 	function seek(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
 		const audio = audioRef.current;
-		const duration = audio?.duration;
+		if (!audio) return;
+		const duration = audio.duration;
 		const div = document.getElementById("goto");
-		if (!audio || !div || !duration) return;
+		if (!div || !duration) return;
 
 		const width = Number(getComputedStyle(div).width.replace("px", ""));
 		const clickX = e.nativeEvent.offsetX;
@@ -80,7 +72,10 @@ function useMediaPlayer() {
 
 	useEffect(() => {
 		const audio = audioRef.current;
-		if (!audio) return;
+		if (!audio) {
+			console.error("useEffect did not find an audio tag!");
+			return;
+		}
 
 		audio.addEventListener("timeupdate", () => {
 			const { duration, currentTime } = audio;
@@ -93,20 +88,6 @@ function useMediaPlayer() {
 
 		audio.addEventListener("ended", () => playNextMedia());
 	}, []);
-
-	return {
-		playPreviousMedia,
-		playOrPauseMedia,
-		playNextMedia,
-		audioRef,
-		seek,
-	} as const;
-}
-
-export function MediaPlayer() {
-	const { playPreviousMedia, playOrPauseMedia, playNextMedia, audioRef } =
-		useMediaPlayer();
-	const { currentPlaying } = useCurrentPlaying();
 
 	return (
 		<Wrapper>
@@ -125,7 +106,7 @@ export function MediaPlayer() {
 				<span className="subtitle">{currentPlaying?.media?.artist}</span>
 			</Info>
 
-			<SeekerWrapper />
+			<SeekerWrapper seek={seek} />
 
 			<Controls>
 				<span className="previous-or-next" onClick={playPreviousMedia}>
@@ -148,9 +129,12 @@ export function MediaPlayer() {
 	);
 }
 
-function SeekerWrapper() {
+function SeekerWrapper({
+	seek,
+}: {
+	seek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+}) {
 	const duration = useCurrentPlaying().currentPlaying.media?.duration;
-	const { seek } = useMediaPlayer();
 
 	return (
 		<SeekerContainer>

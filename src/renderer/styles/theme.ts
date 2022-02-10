@@ -17,9 +17,9 @@ export const theme = {
 } as const;
 
 export const fonts = {
-	all: `font-family: 'Assistant', sans-serif;
-color: ${theme.colors.text};
-letter-spacing: 0.03em;
-font-size: 1rem`,
 	primary: "'Assistant', sans-serif",
+	all: `font-family: 'Assistant', sans-serif;
+				color: ${theme.colors.text};
+				letter-spacing: 0.03em;
+				font-size: 1rem`,
 } as const;
