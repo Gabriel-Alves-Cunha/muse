@@ -8,9 +8,8 @@ import { memo, useRef, useState } from "react";
 import Popup from "reactjs-popup";
 
 import { useCurrentPlaying, CurrentPlayingType, usePlaylists } from "@contexts";
+import { Dots, ImgWithFallback } from "@components";
 import { MediaOptionsModal } from "./MediaOptions";
-import { ImgWithFallback } from "./ImgWithFallback";
-import { Dots } from "@components";
 
 import { ListWrapper, SubTitle, Options, Title, Info, Img } from "./styles";
 import { pulse } from "@styles/animations";
@@ -44,7 +43,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 			return media ? (
 				<div
 					className={`row-wrapper ${
-						media.path === currentPlaying.media?.path ? "active" : ""
+						media.id === currentPlaying.media?.id ? "active" : ""
 					}`}
 					style={style}
 				>
@@ -52,8 +51,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 						<Img>
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4em" />}
-								imgAsString={media.img ?? ""}
-								urlAsACachekey={media.path}
+								media={media}
 							/>
 						</Img>
 
@@ -80,7 +78,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	return (
 		<ListWrapper ref={listWrapperRef}>
 			<FixedSizeList
-				itemKey={(index, data) => data[index].path + Date.now()}
+				itemKey={(index, data) => data[index].id + Date.now()}
 				itemCount={mediaList.list.length}
 				itemData={mediaList.list}
 				overscanCount={15}
@@ -104,7 +102,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				nested
 			>
 				{/* eslint-disable-next-line  @typescript-eslint/no-non-null-assertion */}
-				<MediaOptionsModal media={showPopup!} />
+				<MediaOptionsModal media={showPopup!} setShowPopup={setShowPopup} />
 			</Popup>
 		</ListWrapper>
 	);

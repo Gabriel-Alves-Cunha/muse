@@ -14,7 +14,7 @@ export const Img = styled.div`
 	margin: 0 10px;
 	border: none;
 
-	box-shadow: var(--box-shadow-small);
+	box-shadow: ${theme.boxShadows.small};
 
 	img {
 		object-fit: cover;
@@ -92,12 +92,13 @@ export const Options = styled.button`
 	border: none;
 
 	&:hover {
-		box-shadow: var(--box-shadow-medium);
+		box-shadow: ${theme.boxShadows.medium};
+		transition: box-shadow 0.3s ease-in-out 17ms;
 	}
 `;
 
 export const ListWrapper = styled.section`
-	box-shadow: var(--box-shadow-medium);
+	box-shadow: ${theme.boxShadows.medium};
 	border-radius: 7px;
 	max-width: 500px;
 	margin: 2em 5%;
@@ -142,16 +143,14 @@ export const ListWrapper = styled.section`
 		border-radius: 7px;
 		margin: 7px;
 
-		will-change: box-shadow;
-		transition: box-shadow 0.2s ease;
-
 		&:hover {
-			box-shadow: var(--box-shadow-medium);
+			box-shadow: ${theme.boxShadows.medium};
+			transition: box-shadow 0.2s ease-in-out 17ms;
 		}
 	}
 
 	.active {
-		box-shadow: var(--box-shadow-medium);
+		box-shadow: ${theme.boxShadows.medium};
 
 		background: white;
 
@@ -180,7 +179,7 @@ export const InputWrapper = styled.div`
 	height: 50px;
 	width: 320px;
 
-	box-shadow: var(--box-shadow-medium);
+	box-shadow: ${theme.boxShadows.medium};
 	background: #d3d3d5;
 	border-radius: 7px;
 	padding: 0.5rem;

@@ -70,18 +70,24 @@ export const Searcher = styled.button`
 	border-radius: 15px;
 	cursor: text;
 
-	box-shadow: var(--box-shadow-small);
+	box-shadow: ${theme.boxShadows.small};
 
 	svg {
 		margin-left: 10px;
 	}
 
-	&:hover {
-		box-shadow: var(--inset-box-shadow-small);
+	&::after {
+		box-shadow: ${theme.boxShadows.inset_small};
+		opacity: 0;
+		transition: opacity 0s ease-in-out 17ms;
+	}
 
-		svg {
-			color: rgba(0, 0, 0, 0.5);
-		}
+	&:hover::after {
+		opacity: 1;
+	}
+
+	&:hover svg {
+		color: rgba(0, 0, 0, 0.5);
 	}
 
 	input {
@@ -137,7 +143,7 @@ export const ResultContainer = styled.div`
 			0px 10px 10px rgba(0, 0, 0, 0.1);
 
 		will-change: transform;
-		transition: transform 0.2s ease-in-out;
+		transition: transform 0.2s ease-in-out 17ms;
 
 		&:hover {
 			transform: scale(1.04);
@@ -185,12 +191,10 @@ export const Button = styled.button`
 	border: none;
 	border-radius: 5px;
 
-	box-shadow: var(--box-shadow-small);
-
-	will-change: box-shadow;
-	transition: box-shadow 0.2s ease-in-out;
+	box-shadow: ${theme.boxShadows.small};
 
 	&:hover {
-		box-shadow: var(--inset-box-shadow-small);
+		box-shadow: ${theme.boxShadows.inset_small};
+		transition: opacity 0.3s ease-in-out 17ms;
 	}
 `;

@@ -40,18 +40,19 @@ export const Search = styled.div`
 	cursor: text;
 	color: #ccc;
 
-	box-shadow: var(--box-shadow-small);
+	box-shadow: ${theme.boxShadows.small};
 
 	svg {
 		margin-left: 10px;
 	}
 
 	&:hover {
-		box-shadow: var(--inset-box-shadow-small);
+		box-shadow: ${theme.boxShadows.inset_small};
+		transition: opacity 0s linear 17ms;
 
 		svg {
-			color: rgba(0, 0, 0, 0.5);
 		}
+		color: rgba(0, 0, 0, 0.5);
 	}
 
 	input {
@@ -133,7 +134,7 @@ export const SearchResultsWrapper = styled.section`
 	z-index: 10;
 
 	background-color: ${theme.colors.secondary};
-	box-shadow: var(--box-shadow-medium);
+	box-shadow: ${theme.boxShadows.medium};
 
 	.list {
 		overflow-x: hidden !important;
@@ -175,11 +176,14 @@ export const Result = styled.button`
 	margin: 10px !important;
 	border-radius: 7px;
 
-	will-change: box-shadow;
-	transition: box-shadow 0.2s ease;
+	&::after {
+		box-shadow: ${theme.boxShadows.medium};
+		opacity: 0;
+		transition: opacity 0.2s ease-in-out 17ms;
+	}
 
-	&:hover {
+	&:hover::after {
 		z-index: 20;
-		box-shadow: var(--box-shadow-medium);
+		opacity: 1;
 	}
 `;

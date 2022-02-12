@@ -1,11 +1,11 @@
 import type { Dispatch, SetStateAction, KeyboardEvent } from "react";
 import type { DefaultLists } from "@contexts";
 import type { Media, Path } from "@common/@types/typesAndEnums";
-import type { WriteTag } from "@common/@types/electron-window";
 
 import { useState } from "react";
 
 import { InputWrapper } from "./styles";
+import { dbg } from "@common/utils";
 
 export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 	const [value, setValue] = useState(() => whatToChange.current);
@@ -14,10 +14,15 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 		if (e.key === "Enter" && value) {
 			setWhatToChange(undefined);
 
-			const event = new CustomEvent("write tag", {
-				detail: { mediaPath, [whatToChange.whatToChange]: value.trim() },
-			});
-			window.twoWayComm_React_Electron?.dispatchEvent(event);
+			const msg = {
+				details: [mediaPath, whatToChange.whatToChangeToSend, value.trim()],
+				type: "write tag",
+			};
+
+			if (window.twoWayComm_React_Electron) {
+				dbg("Posting message:", msg);
+				window.twoWayComm_React_Electron.postMessage(msg);
+			} else console.error("There is no 'window.twoWayComm_React_Electron'!");
 		}
 	};
 
@@ -37,29 +42,39 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 	);
 }
 
-export const options = (media: Media) =>
+export const options = ({
+	duration,
+	artist,
+	album,
+	genres,
+	title,
+	size,
+	path,
+}: Media) =>
 	({
-		duration: media.duration,
-		artist: media.artist,
-		genres: media.genres,
-		title: media.title,
-		album: media.album,
-		path: media.path,
-		size: media.size,
+		duration,
+		artist,
+		genres,
+		title,
+		album,
+		path,
+		size,
 	} as const);
 
-const allowedOptionToChange: Readonly<Array<keyof WriteTag>> = [
-	"imageURL",
-	"genres",
-	"artist",
-	"album",
-	"title",
-];
+export const allowedOptionToChange = {
+	artist: "albumArtists",
+	imageURL: "imageURL",
+	genres: "genres",
+	album: "album",
+	title: "title",
+} as const;
 
 export const isChangeable = (option: string): option is ChangeOptions =>
-	allowedOptionToChange.some(opt => opt === option);
+	Object.keys(allowedOptionToChange).some(opt => opt === option);
 
-export type ChangeOptions = typeof allowedOptionToChange[number];
+type Keys = keyof typeof allowedOptionToChange;
+export type ChangeOptionsToSend = typeof allowedOptionToChange[Keys];
+export type ChangeOptions = keyof typeof allowedOptionToChange;
 
 export type MediaListKindProps = Readonly<{
 	mediaType: DefaultLists;
@@ -69,6 +84,7 @@ type Props = {
 	setWhatToChange: Dispatch<
 		SetStateAction<
 			| {
+					whatToChangeToSend: ChangeOptionsToSend;
 					whatToChange: ChangeOptions;
 					current: string;
 			  }
@@ -76,6 +92,7 @@ type Props = {
 		>
 	>;
 	whatToChange: {
+		whatToChangeToSend: ChangeOptionsToSend;
 		whatToChange: ChangeOptions;
 		current: string;
 	};

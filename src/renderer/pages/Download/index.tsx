@@ -40,8 +40,7 @@ const SearcherWrapper = () => {
 		const searchTimeout = setTimeout(async () => await search(searchTerm), 400);
 
 		return () => clearTimeout(searchTimeout);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchTerm]);
+	}, [search, searchTerm]);
 
 	return (
 		<SearchWrapper>

@@ -169,7 +169,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 				get().setPlaylists({
 					type: PlaylistType.UPDATE_MEDIA_LIST,
-					whatToDo: PlaylistActions.NEW_LIST,
+					whatToDo: PlaylistActions.REMOVE,
 					media,
 				});
 			},
@@ -424,7 +424,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 								if (oldMediaIndex === -1) {
 									console.error(
-										"There should be a not-refreshed media when CALLING 'refresh one' but I did not find one!",
+										"I did not find a media when calling 'PlaylistActions.REFRESH_ONE'!",
 									);
 									break;
 								}

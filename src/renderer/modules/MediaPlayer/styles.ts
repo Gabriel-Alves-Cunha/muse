@@ -23,7 +23,7 @@ export const Wrapper = styled.div`
 	border: none;
 	padding: 0.8rem;
 
-	box-shadow: var(--box-shadow-medium);
+	box-shadow: ${theme.boxShadows.medium};
 	backdrop-filter: blur(5px);
 `;
 
@@ -101,8 +101,8 @@ export const Controls = styled.div`
 		width: 30px;
 
 		&:hover {
-			transition: box-shadow 0.1s ease-in-out;
-			box-shadow: var(--box-shadow-small);
+			box-shadow: ${theme.boxShadows.small};
+			transition: opacity 0.1s ease-in-out 17ms;
 		}
 	}
 
@@ -114,8 +114,8 @@ export const Controls = styled.div`
 		color: #27283899;
 
 		&:hover {
-			transition: box-shadow 0.1s ease-in-out;
 			box-shadow: 7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff;
+			transition: opacity 0.1s ease-in-out 17ms;
 		}
 	}
 `;

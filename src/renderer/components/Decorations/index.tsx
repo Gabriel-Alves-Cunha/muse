@@ -56,31 +56,40 @@ export function Decorations() {
 	) : null;
 }
 
-const Buttons = () => (
-	<WindowButtons>
-		<WindowButton
-			aria-label="Close window"
-			onClick={closeWindow}
-			isToClose={true}
-		>
-			<Close size="16px" />
-		</WindowButton>
+function Buttons() {
+	return (
+		<WindowButtons>
+			<WindowButton
+				aria-label="Close window"
+				onClick={closeWindow}
+				isToClose={true}
+			>
+				<Close size="16px" />
+			</WindowButton>
 
-		<WindowButton onClick={toggleMaximize} aria-label="Toggle maximize window">
-			<Maximize size="16px" />
-		</WindowButton>
+			<WindowButton
+				onClick={toggleMaximize}
+				aria-label="Toggle maximize window"
+			>
+				<Maximize size="16px" />
+			</WindowButton>
 
-		<WindowButton onClick={minimizeWindow} aria-label="Minize window">
-			<Minimize size="16px" />
-		</WindowButton>
-	</WindowButtons>
-);
+			<WindowButton onClick={minimizeWindow} aria-label="Minize window">
+				<Minimize size="16px" />
+			</WindowButton>
+		</WindowButtons>
+	);
+}
 
-const AppName_Folder = () => (
-	<AppName_Folder_Wrapper>
-		{usePage().page + " - " + capitalizedAppName}
-	</AppName_Folder_Wrapper>
-);
+function AppName_Folder() {
+	const { page } = usePage();
+
+	return (
+		<AppName_Folder_Wrapper>
+			{`${page} - ${capitalizedAppName}`}
+		</AppName_Folder_Wrapper>
+	);
+}
 
 Decorations.whyDidYouRender = {
 	logOnDifferentValues: false,

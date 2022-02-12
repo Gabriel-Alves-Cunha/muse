@@ -18,10 +18,11 @@ export const Circle = styled.div`
 	width: 40px;
 
 	background-color: ${theme.colors.bgNav};
-	box-shadow: var(--box-shadow-small);
+	box-shadow: ${theme.boxShadows.small};
 
 	&:hover {
-		box-shadow: var(--inset-box-shadow-small);
+		box-shadow: ${theme.boxShadows.inset_small};
+		transition: opacity 0s ease-in-out 17ms;
 	}
 `;
 
@@ -42,7 +43,7 @@ export const Popup = styled.div`
 	z-index: 500;
 
 	background-color: ${theme.colors.bgCentral};
-	box-shadow: var(--box-shadow-small);
+	box-shadow: ${theme.boxShadows.small};
 
 	/* width */
 	::-webkit-scrollbar {

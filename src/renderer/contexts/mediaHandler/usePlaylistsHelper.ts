@@ -13,7 +13,7 @@ export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
 	previousHistory: readonly Media[],
 	media: Readonly<Media>,
 ): readonly Media[] {
-	if (media.path === previousHistory[0]?.path) return previousHistory;
+	if (media.id === previousHistory[0]?.id) return previousHistory;
 
 	const newHistory: Media[] = [media, ...previousHistory];
 

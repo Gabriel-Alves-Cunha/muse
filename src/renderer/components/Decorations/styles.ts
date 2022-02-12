@@ -55,6 +55,7 @@ export const AppName_Folder_Wrapper = styled.button`
 	align-items: center;
 	position: absolute;
 	height: 100%;
+	width: 20%;
 	left: 50%;
 
 	transform: translate(-50%);

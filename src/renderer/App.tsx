@@ -13,6 +13,7 @@ import { dbg } from "@common/utils";
 import { GlobalCSS } from "@styles/global";
 import { MainView } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
+import { Page } from "@common/@types/typesAndEnums";
 
 export function App() {
 	return (
@@ -26,11 +27,7 @@ export function App() {
 	);
 }
 
-let renders = 0;
 function Main() {
-	++renders;
-	console.log({ renders });
-
 	const { addListeners, searchLocalComputerForMedias } = usePlaylists();
 
 	useEffect(() => {
@@ -82,8 +79,7 @@ function Main() {
 			window.removeEventListener("dragover", listenToDragoverEvent);
 			window.removeEventListener("drop", listenToDropEvent);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [addListeners, searchLocalComputerForMedias]);
 
 	return (
 		<MainView>
@@ -115,8 +111,9 @@ function Main() {
 	);
 }
 
-const PageToShow = () => {
-	const page = usePage().page;
+const selector = ({ page }: { page: Page }) => page;
+function PageToShow() {
+	const page = usePage(selector);
 
 	switch (page) {
 		case "Convert":
@@ -134,6 +131,11 @@ const PageToShow = () => {
 		default:
 			return assertUnreachable(page);
 	}
+}
+
+PageToShow.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "PageToShow",
 };
 
 App.whyDidYouRender = {

@@ -7,8 +7,6 @@ import { assertUnreachable } from "@utils/utils";
 import { TypeOfMsgObject } from "@common/@types/typesAndEnums";
 import { dbg } from "@common/utils";
 
-dbg("On communicationBetweenChildren file!");
-
 const defaultDownloadValues: DownloadValues = Object.freeze({
 	canStartDownload: false,
 	imageURL: "",
@@ -76,10 +74,12 @@ export function sendMsg(action: Action) {
 const handleDownloadMedia = (value: DownloadValues) =>
 	sendMsg({ type: MsgType.START_DOWNLOAD, value });
 
-console.log(window);
-
 // TODO: SEE THIS:
 window.electron?.notificationApi.receiveMsgFromElectron(object => {
+	console.warn(
+		"On communicationBetweenChildren file at window.electron?.notificationApi.receiveMsgFromElectron!",
+	);
+
 	dbg("Received 'async-msg' from Electron on React side.\nobject =", object);
 
 	switch (object.type) {

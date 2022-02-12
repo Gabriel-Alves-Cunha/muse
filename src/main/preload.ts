@@ -5,11 +5,11 @@ import type { videoInfo } from "ytdl-core";
 import type { IPicture } from "node-taglib-sharp";
 import type { Stream } from "./utils.js";
 
-import { NotificationType, ProgressStatus } from "@common/@types/typesAndEnums";
 import { readdir, readFile, stat, unlink } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
+import { string2number } from "@main/hash";
 import { join } from "path";
 import { cpus } from "os";
 import {
@@ -19,6 +19,11 @@ import {
 	StringType,
 	Picture,
 } from "node-taglib-sharp";
+import {
+	ListenToNotification,
+	NotificationType,
+	ProgressStatus,
+} from "@common/@types/typesAndEnums";
 import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
 import ytdl from "ytdl-core";
@@ -206,10 +211,10 @@ export async function transformPathsToMedias(
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<readonly (Media | undefined)[]> {
-	const getMedia = async (
+	async function createMedia(
 		path: string,
 		index: number,
-	): Promise<Media | undefined> => {
+	): Promise<Media | undefined> {
 		try {
 			console.time(`for (const [${index}, "${path}"])`);
 			const {
@@ -255,6 +260,7 @@ export async function transformPathsToMedias(
 				size: prettyBytes(sizeInBytes),
 				artist: albumArtists[0] ?? "",
 				dateOfArival: Date.now(),
+				id: string2number(path),
 				genres,
 				album,
 				index,
@@ -262,7 +268,11 @@ export async function transformPathsToMedias(
 				img,
 			};
 
-			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
+			dbg({
+				tag: { pictures, title, album, genres, albumArtists },
+				properties: { durationMilliseconds },
+			});
+			dbg("%cmedia =", "background-color: #f9ca4c80;", media);
 			return media;
 		} catch (error) {
 			console.error(error);
@@ -270,11 +280,11 @@ export async function transformPathsToMedias(
 		} finally {
 			console.timeEnd(`for (const [${index}, "${path}"])`);
 		}
-	};
+	}
 
 	console.time("Creating promises");
 	const promises = paths
-		.map((path, index) => getMedia(path, index))
+		.map((path, index) => createMedia(path, index))
 		.filter(Boolean);
 	console.timeEnd("Creating promises");
 
@@ -290,13 +300,32 @@ export async function transformPathsToMedias(
 }
 
 const addListeners = (port: MessagePort): Readonly<MessagePort> => {
-	port.onmessage = event => {
+	port.onmessage = async event => {
 		const { data } = event;
 
-		dbg(
-			"Message received on electron side of 2way-comm (currently doing nothing!!):",
-			data,
-		);
+		switch (data.type) {
+			case "write tag": {
+				// details: [mediaPath, whatToChange.whatToChange, value.trim()],
+				const [mediaPath, whatToChange, value] = data.details;
+
+				try {
+					console.assert(mediaPath, whatToChange, value);
+
+					await writeTags(mediaPath, { [whatToChange]: value });
+				} catch (error) {
+					console.error(error);
+				}
+				break;
+			}
+
+			default: {
+				dbg(
+					"Message received on electron side of 2way-comm, but there is no function to handle it:",
+					data,
+				);
+				break;
+			}
+		}
 	};
 
 	return port;
@@ -312,20 +341,25 @@ export function handleCreateOrCancelDownload(
 	if (url && !has(currentDownloads, url))
 		makeStream(imageURL, url, title, electronPort);
 	else if (url && destroy) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const { stream } = get(currentDownloads, url)!;
-		stream.emit("destroy");
-		const readAnswer = stream.destroy(
-			new Error("This readStream is being destroyed!"),
-		);
+		const stream = get(currentDownloads, url)?.stream;
 
-		dbg("readStream 'destroy()' answer =", readAnswer);
+		if (stream) {
+			stream.emit("destroy");
+			const readAnswer = stream.destroy(
+				new Error("This readStream is being destroyed!"),
+			);
 
-		dbg(
-			`Was "${url}" deleted from map? `,
-			"\ncurrentDownloads =",
-			remove(currentDownloads, url),
-		);
+			dbg("readStream 'destroy()' answer =", readAnswer);
+
+			remove(currentDownloads, url);
+			dbg(
+				`Was "${url}" deleted from map?\ncurrentDownloads =`,
+				currentDownloads,
+			);
+		} else
+			console.error(
+				`There is no stream on 'currentDownloads' with url: '${url}'`,
+			);
 	}
 }
 
@@ -442,20 +476,25 @@ export function handleCreateOrCancelConvert(
 	if (path && !has(mediasConverting, path))
 		convertToAudio(path, toExtension, electronPort);
 	else if (path && destroy) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const { stream } = get(mediasConverting, path)!;
-		stream.emit("destroy");
-		const readAnswer = stream.destroy(
-			new Error("This readStream is being destroyed!"),
-		);
+		const stream = get(mediasConverting, path)?.stream;
 
-		dbg("readStream 'destroy()' answer =", readAnswer);
+		if (stream) {
+			stream.emit("destroy");
+			const readAnswer = stream.destroy(
+				new Error("This readStream is being destroyed!"),
+			);
 
-		const wasRemoved = remove(mediasConverting, path);
-		dbg(
-			`Was "${path}" deleted from map? ${wasRemoved}\nmediasConverting =`,
-			mediasConverting,
-		);
+			dbg("readStream 'destroy()' answer =", readAnswer);
+
+			remove(mediasConverting, path);
+			dbg(
+				`Was "${path}" deleted from map?\nmediasConverting =`,
+				mediasConverting,
+			);
+		} else
+			console.error(
+				`There is no stream on 'mediasConverting' with path: '${path}'.`,
+			);
 	}
 }
 
@@ -522,12 +561,8 @@ export function convertToAudio(
 			interval && clearInterval(interval);
 
 			////////////////////////////////////////
-			console.log(
-				"Deleting from map:",
-				remove(mediasConverting, mediaPath),
-				"\nconverting =",
-				mediasConverting,
-			);
+			remove(mediasConverting, mediaPath);
+			dbg("Deleting from mediasConverting.\nconverting =", mediasConverting);
 		})
 		.once("destroy", () => {
 			console.log(
@@ -545,145 +580,81 @@ export function convertToAudio(
 		});
 
 	push(mediasConverting, { url: mediaPath, stream: readStream });
-	dbg("Medias converting =", mediasConverting);
+	dbg(`Added '${mediaPath}' to mediasConverting =`, mediasConverting);
 }
 
-export async function writeTags(pathOfMedia: Readonly<Path>, data: WriteTag) {
-	const file = MediaFile.createFromPath(pathOfMedia);
+export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
+	const file = MediaFile.createFromPath(mediaPath);
 	// dbg("File =", file);
 	// dbg("File tags =", file.tag);
 
 	if (data.imageURL) {
-		// Get picture:
-		try {
-			const imgAsString: `data:${string};base64,${string}` =
-				await ipcRenderer.invoke("get-image", data.imageURL);
+		// if imageURL === '0' => erase img so we don't keep
+		// getting an error on the browser.
+		if (data.imageURL === "0") {
+			file.tag.pictures = [];
+			console.log("(SHOULD BE EMPTY) file.tag.pictures =", file.tag.pictures);
+		} else {
+			// Get picture:
+			try {
+				const imgAsString: `data:${string};base64,${string}` =
+					await ipcRenderer.invoke("get-image", data.imageURL);
 
-			const txtForByteVector = imgAsString.slice(
-				imgAsString.indexOf(",") + 1,
-				imgAsString.length,
-			);
-			const mimeType = imgAsString.slice(
-				imgAsString.indexOf(":") + 1,
-				imgAsString.indexOf(";"),
-			);
+				const txtForByteVector = imgAsString.slice(
+					imgAsString.indexOf(",") + 1,
+					imgAsString.length,
+				);
+				const mimeType = imgAsString.slice(
+					imgAsString.indexOf(":") + 1,
+					imgAsString.indexOf(";"),
+				);
 
-			const picture = Picture.fromData(
-				ByteVector.fromString(txtForByteVector, StringType.Latin1),
-			);
+				const picture = Picture.fromData(
+					ByteVector.fromString(txtForByteVector, StringType.Latin1),
+				);
 
-			console.time("Setting image, mimeType and type");
-			picture.type = PictureType.Media;
-			file.tag.pictures = [picture];
-			picture.mimeType = mimeType;
-			console.timeEnd("Setting image, mimeType and type");
-		} catch (error) {
-			console.error("There was an error getting the picture data.", error);
+				picture.type = PictureType.Media;
+				file.tag.pictures = [picture];
+				picture.mimeType = mimeType;
+			} catch (error) {
+				console.error("There was an error getting the picture data.", error);
+			}
 		}
 	}
 
 	Object.entries(data).forEach(([tag, value]) => {
-		if (tag !== "imageURL") {
-			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
-			file.tag[tag] = value;
-			// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
-			console.log(`file.tag[${tag}] = ${file.tag[tag]}`);
+		try {
+			if (tag !== "imageURL") {
+				if (tag === "albumArtists") {
+					dbg("On 'albumArtists' branch.");
+					console.assert(typeof value === "string");
+					const artists = (value as string).split(",");
+					file.tag.albumArtists = artists;
+
+					console.log(
+						`file.tag.albumArtists = ${file.tag.albumArtists}\nartists = ${artists}`,
+					);
+				} else {
+					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
+					file.tag[tag] = value;
+					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
+					console.log(`file.tag[${tag}] =`, file.tag[tag]);
+				}
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	});
 
 	file.save();
+
+	dbg("File tags =", file.tag);
+
 	file.dispose();
+
+	// refresh one
+	window.twoWayComm_React_Electron?.postMessage({
+		msg: ListenToNotification.REFRESH_MEDIA,
+		path: mediaPath,
+	});
 }
-
-// setTimeout(async () => {
-// 	// dbg("Starting");
-
-// 	// const imgAsString: string = await ipcRenderer.invoke(
-// 	// 	"get-image",
-// 	// 	"https://i.ytimg.com/vi/fO_uNc49iNE/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLAOD0x7klMGEfYr5h4z7sLI3iwx5A"
-// 	// );
-// 	// const match = imageTypeRegex.exec(imgAsString);
-
-// 	// const data = ByteVector.fromString(imgAsString, StringType.Latin1);
-// 	// const picture = Picture.fromData(data);
-// 	// picture.mimeType = match?.[1] ?? "";
-// 	// dbg({ picture });
-
-// 	// const file = MediaFile.createFromPath(
-// 	// 	"/home/gabriel/Music/BENEE - Same Effect (Official Audio).mp3"
-// 	// );
-
-// 	// file.tag.pictures = [picture];
-// 	// dbg("File tags =", file.tag.pictures);
-
-// 	const picture_ = (file.tag.pictures[0] as IPicture).data;
-// 	dbg(
-// 		"Picture decoded =\n\n",
-// 		picture_.toString(picture_.length, StringType.Latin1)
-// 	);
-
-// 	file.save();
-// 	file.dispose();
-// }, 5_000);
-
-// export function watchForDirectories(dirs: readonly string[]) {
-// 	const wildcardList = dirs
-// 		.map(dir =>
-// 			allowedMedias.map(extension => normalize(dir + "/*." + extension)),
-// 		)
-// 		.flat();
-
-// 	const watcher = watch(wildcardList, {
-// 		awaitWriteFinish: { stabilityThreshold: 10_000, pollInterval: 10_000 },
-// 		ignorePermissionErrors: true,
-// 		followSymlinks: false,
-// 		ignoreInitial: true,
-// 		usePolling: false,
-// 		alwaysStat: false,
-// 		depth: 0,
-// 	});
-
-// 	const log = console.log.bind(console);
-// 	// ^ Something to use when events are received.
-
-// 	watcher
-// 		.on("error", error =>
-// 			console.error("%c[Chokidar]", logStyle, " Error happened", error),
-// 		)
-// 		.on("ready", () => {
-// 			log(
-// 				"%c[Chokidar]",
-// 				logStyle,
-// 				"Initial scan complete. Listening for changes.",
-// 			);
-
-// 			log(
-// 				"%c[Chokidar]",
-// 				logStyle,
-// 				"Files being watched:",
-// 				watcher.getWatched(),
-// 			);
-// 		})
-// 		.on("unlink", path => {
-// 			log(`%c[Chokidar] File "${path}" has been removed.`, logStyle);
-// 			window.twoWayComm_React_Electron?.postMessage({
-// 				msg: "remove media",
-// 				path,
-// 			});
-// 		})
-// 		.on("add", path => {
-// 			log(`%c[Chokidar] File "${path}" has been added.`, logStyle);
-// 			window.twoWayComm_React_Electron?.postMessage({ msg: "add media", path });
-// 		});
-// }
-
-// watchForDirectories(Object.values(dirs));
-
-// const logStyle =
-// 	"background-color: green; font-size: 0.8rem; font-weight: bold; color: white;";
-
-// dbg(
-// 	`The 'preload.ts' script uses approximately ${
-// 		process.memoryUsage().heapUsed / 1_024 / 1_024
-// 	} MB`,
-// );

@@ -15,18 +15,20 @@ import { usePage } from "@contexts";
 
 import { FolderButton, Nav, Text } from "./styles";
 
+const selector = ({ page }: { page: Page }) => page;
+
 export function Navbar() {
-	const { page } = usePage();
 	const setPage = usePage.setState;
+	const page = usePage(selector);
 
 	return (
 		<Nav>
 			{folders.map(folder => (
 				<FolderButton
 					className={folder === page ? "active" : ""}
+					onClick={() => setPage({ page: folder })}
 					onMouseDown={e => e.preventDefault()}
 					// ^ Takes focus off of button so that the `outline` css can be applied
-					onClick={() => setPage({ page: folder })}
 					aria-label={"Go to" + folder}
 					key={folder}
 				>
@@ -39,7 +41,7 @@ export function Navbar() {
 }
 
 Navbar.whyDidYouRender = {
-	logOnDifferentValues: false,
+	logOnDifferentValues: true,
 	customName: "Navbar",
 };
 

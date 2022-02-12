@@ -14,18 +14,6 @@ export function Convert() {
 	const [selectedMediasPath, setSelectedMediasPath] = useState<Path[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	function convertTo() {
-		const value = selectedMediasPath.map(path => ({
-			toExtension: selectedExtensionToBeConvertedTo,
-			canStartConvert: true,
-			path,
-		}));
-
-		sendMsg({ type: MsgType.START_CONVERT, value });
-
-		setSelectedMediasPath([]);
-	}
-
 	function handleSelectedFiles(e: ChangeEvent<HTMLInputElement>) {
 		const files = e.target.files;
 		if (!files) return;
@@ -37,9 +25,20 @@ export function Convert() {
 	}
 
 	useEffect(() => {
+		function convertTo() {
+			const value = selectedMediasPath.map(path => ({
+				toExtension: selectedExtensionToBeConvertedTo,
+				canStartConvert: true,
+				path,
+			}));
+
+			sendMsg({ type: MsgType.START_CONVERT, value });
+
+			setSelectedMediasPath([]);
+		}
+
 		if (selectedMediasPath[0]) convertTo();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedMediasPath]);
+	}, [selectedExtensionToBeConvertedTo, selectedMediasPath]);
 
 	const handleClick = () => inputRef.current?.click();
 

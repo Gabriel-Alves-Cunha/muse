@@ -1,26 +1,56 @@
-import type { ChangeOptions } from "../Change";
+import type { ChangeOptionsToSend, ChangeOptions } from "../Change";
+import type { Dispatch, SetStateAction } from "react";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { TrashIcon as Remove } from "@radix-ui/react-icons";
 import { useState } from "react";
 import Popup from "reactjs-popup";
 
-import { isChangeable, options, Change } from "../Change";
 import { usePlaylists } from "@contexts";
 import { overlayStyle } from "../";
 import { capitalize } from "@utils/utils";
+import {
+	allowedOptionToChange,
+	isChangeable,
+	options,
+	Change,
+} from "../Change";
 
 import { Confirm, Option, OptionsModalWrapper } from "./styles";
 
-export function MediaOptionsModal({ media }: { media: Media }) {
-	const { deleteMedia } = usePlaylists();
+const { getState: getPlaylistsState } = usePlaylists;
 
+export function MediaOptionsModal({
+	media,
+	setShowPopup,
+}: {
+	media: Media;
+	setShowPopup: Dispatch<SetStateAction<Media | undefined>>;
+}) {
 	const [whatToChange, setWhatToChange] = useState<WhatToChange>();
 	const [showConfirm, setShowConfirm] = useState(false);
 
+	if (!media) return null;
+
 	const changePropsIfAllowed = (option: string, value: unknown) =>
 		isChangeable(option) &&
-		setWhatToChange({ whatToChange: option, current: value as string });
+		setWhatToChange({
+			whatToChangeToSend: allowedOptionToChange[option],
+			current: value as string,
+			whatToChange: option,
+		});
+
+	function deleteMedia() {
+		return async () => {
+			try {
+				await getPlaylistsState().deleteMedia(media);
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setShowPopup(undefined);
+			}
+		};
+	}
 
 	return (
 		<OptionsModalWrapper>
@@ -51,7 +81,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 				<Confirm>
 					<p>Are you sure you want to delete this media from your computer?</p>
 					<Remove />
-					<span onClick={async () => await deleteMedia(media)} className="yes">
+					<span onClick={deleteMedia} className="yes">
 						Yes
 					</span>
 					<span className="no" onClick={() => setShowConfirm(false)}>
@@ -61,7 +91,10 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 			</Popup>
 
 			<Popup
-				onClose={() => setWhatToChange(undefined)}
+				onClose={() => {
+					setWhatToChange(undefined);
+					setShowPopup(undefined);
+				}}
 				open={Boolean(whatToChange)}
 				position="center center"
 				{...{ overlayStyle }}
@@ -81,4 +114,8 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 	);
 }
 
-type WhatToChange = Readonly<{ whatToChange: ChangeOptions; current: string }>;
+type WhatToChange = Readonly<{
+	whatToChangeToSend: ChangeOptionsToSend;
+	whatToChange: ChangeOptions;
+	current: string;
+}>;

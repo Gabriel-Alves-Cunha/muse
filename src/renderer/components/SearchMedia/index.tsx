@@ -12,6 +12,7 @@ import { FixedSizeList } from "react-window";
 
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
+import { ImgWithFallback } from "@components";
 import { dbg } from "@common/utils";
 import {
 	CurrentPlayingType,
@@ -42,12 +43,12 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		searchTerm: "",
 		results: [],
 	});
-	// const searcherRef = useRef(null);
+	const searcherRef = useRef(null);
 
-	// useOnClickOutside(searcherRef, () => {
-	// 	dispatchSearcher({ type: Type.SET_SEARCH_TERM, value: "" });
-	// 	dispatchSearcher({ type: Type.SET_RESULTS, value: [] });
-	// });
+	useOnClickOutside(searcherRef, () => {
+		dispatchSearcher({ type: Type.SET_SEARCH_TERM, value: "" });
+		dispatchSearcher({ type: Type.SET_RESULTS, value: [] });
+	});
 
 	const reload = async () => {
 		dispatchSearcher({ type: Type.SET_IS_LOADING, value: true });
@@ -79,12 +80,11 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		);
 
 		return () => clearTimeout(searchTimeout);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searcher.searchTerm]);
+	}, [searchForMedia, searcher.searchTerm]);
 
 	return (
 		<Wrapper>
-			<SearchWrapper >
+			<SearchWrapper>
 				<Search>
 					<SearchIcon size="1.2em" />
 					<input
@@ -173,10 +173,8 @@ function SearchResults({
 	const listWrapperReference = useRef<HTMLElement>(null);
 
 	const playlist = playlists.find(({ name }) => name === fromList);
-	if (!playlist) {
-		console.error(`There should be "${fromList}" to search through!`);
-		return null;
-	}
+	if (!playlist)
+		throw new Error(`There should be "${fromList}" to search through!`);
 
 	const Row = ({
 		index,
@@ -188,11 +186,14 @@ function SearchResults({
 		return media ? (
 			<Result
 				onClick={() => playMedia(media, playlist)}
-				key={media.path}
+				key={media.id}
 				style={style}
 			>
 				<Img>
-					{media.img ? <img src={media.img} /> : <MusicNote size="1.4em" />}
+					<ImgWithFallback
+						Fallback={<MusicNote size="1.4em" />}
+						media={media}
+					/>
 				</Img>
 
 				<Info>
@@ -208,7 +209,7 @@ function SearchResults({
 	return (
 		<SearchResultsWrapper ref={listWrapperReference}>
 			<FixedSizeList
-				itemKey={(index, results) => results[index].path}
+				itemKey={(index, results) => results[index].id}
 				itemCount={results.length}
 				itemData={results}
 				overscanCount={15}

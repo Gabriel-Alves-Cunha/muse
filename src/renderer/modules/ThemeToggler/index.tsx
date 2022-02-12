@@ -18,8 +18,7 @@ export function ThemeToggler() {
 	useEffect(() => {
 		document.body.dataset.theme = theme;
 		setLocalStoragedTheme(theme);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [theme]);
+	}, [setLocalStoragedTheme, theme]);
 
 	return (
 		<Button onClick={() => setTheme(nextTheme)}>

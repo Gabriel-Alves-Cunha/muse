@@ -9,6 +9,7 @@ import {
 import create from "zustand";
 
 import { useCurrentPlaying, CurrentPlayingType } from "@contexts";
+import { ImgWithFallback } from "@components";
 import { formatDuration } from "@common/utils";
 
 import { theme } from "@styles/theme";
@@ -22,8 +23,8 @@ import {
 } from "./styles";
 
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
-const { setState: setProgress, getState: getProgress } = useProgress;
 const { getState: getCurrentPlaying } = useCurrentPlaying;
+const { setState: setProgress } = useProgress;
 
 function playNextMedia() {
 	getCurrentPlaying().setCurrentPlaying({
@@ -40,7 +41,7 @@ function playPreviousMedia() {
 }
 
 export function MediaPlayer() {
-	const { setCurrentPlaying } = useCurrentPlaying();
+	const duration = useCurrentPlaying().currentPlaying.media?.duration;
 	const { currentPlaying } = useCurrentPlaying();
 	const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -49,8 +50,12 @@ export function MediaPlayer() {
 		if (!audio) return;
 
 		audio.paused
-			? setCurrentPlaying({ type: CurrentPlayingType.RESUME })
-			: setCurrentPlaying({ type: CurrentPlayingType.PAUSE });
+			? getCurrentPlaying().setCurrentPlaying({
+					type: CurrentPlayingType.RESUME,
+			  })
+			: getCurrentPlaying().setCurrentPlaying({
+					type: CurrentPlayingType.PAUSE,
+			  });
 	}
 
 	function seek(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -91,11 +96,10 @@ export function MediaPlayer() {
 			<audio id="audio" preload="none" ref={audioRef} />
 
 			<Img>
-				{currentPlaying?.media?.img ? (
-					<img src={currentPlaying.media.img} />
-				) : (
-					<MusicNote size="1.4em" />
-				)}
+				<ImgWithFallback
+					Fallback={<MusicNote size="1.4em" />}
+					media={currentPlaying?.media}
+				/>
 			</Img>
 
 			<Info>
@@ -103,7 +107,7 @@ export function MediaPlayer() {
 				<span className="subtitle">{currentPlaying?.media?.artist}</span>
 			</Info>
 
-			<SeekerWrapper seek={seek} />
+			<SeekerWrapper seek={seek} duration={duration} />
 
 			<Controls>
 				<span className="previous-or-next" onClick={playPreviousMedia}>
@@ -128,20 +132,22 @@ export function MediaPlayer() {
 
 function SeekerWrapper({
 	seek,
+	duration,
 }: {
 	seek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	duration: string | undefined;
 }) {
-	const duration = useCurrentPlaying().currentPlaying.media?.duration;
+	const { percentage, current } = useProgress();
 
 	return (
 		<SeekerContainer>
-			<span>{formatDuration(getProgress().current)}</span>
+			<span>{formatDuration(current)}</span>
 
 			<ProgressWrapper onClick={seek} id="goto">
 				<div
 					style={{
 						backgroundColor: theme.colors.accent,
-						width: `${getProgress().percentage}%`,
+						width: `${percentage}%`,
 						position: "relative",
 						height: "3px",
 						left: 0,
@@ -171,7 +177,7 @@ function SeekerWrapper({
 }
 
 MediaPlayer.whyDidYouRender = {
-	logOnDifferentValues: false,
+	logOnDifferentValues: true,
 	customName: "MediaPlayer",
 };
 

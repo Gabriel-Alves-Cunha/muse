@@ -23,6 +23,7 @@ module.exports = {
 	plugins: ["react", "@typescript-eslint", "react-hooks"],
 	rules: {
 		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "warn",
 		"@typescript-eslint/ban-ts-comment": [
 			"error",
 			{ "ts-ignore": "allow-with-description" },

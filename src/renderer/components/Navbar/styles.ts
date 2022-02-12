@@ -2,13 +2,15 @@ import styled from "@emotion/styled";
 
 import { fonts, theme } from "@styles/theme";
 
+export const navbarWidth = "170px";
+
 export const Nav = styled.nav`
 	display: flex;
 	flex-direction: column;
 	align-content: center;
 
+	width: ${navbarWidth};
 	height: 100vh;
-	width: 170px;
 
 	background-color: ${theme.colors.bgNav};
 
@@ -18,7 +20,7 @@ export const Nav = styled.nav`
 
 		background: white;
 
-		box-shadow: var(--box-shadow-small);
+		box-shadow: ${theme.boxShadows.small};
 	}
 
 	@media (max-width: 500px) {
@@ -76,9 +78,6 @@ export const FolderButton = styled.button`
 	border-radius: 5px;
 	border: none;
 
-	will-change: box-shadow;
-	transition: box-shadow 0.2s ease;
-
 	span {
 		display: flex;
 		align-items: center;
@@ -88,7 +87,8 @@ export const FolderButton = styled.button`
 
 	&:hover {
 		&:not(.active) {
-			box-shadow: var(--inset-box-shadow-small);
+			transition: box-shadow 0.2s;
+			box-shadow: ${theme.boxShadows.inset_small};
 		}
 	}
 `;

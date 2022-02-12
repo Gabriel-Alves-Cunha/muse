@@ -1,3 +1,12 @@
 * TODO: send to run this elsewhere outside this react component on Change.tsx
 * TODO: play new audio is calling twice!
 * TODO: fix whatToChange (it has to send a msg to electron to send a msg back to react to 'refresh media')
+* TODO: make use of media.id instead of all of media.
+* TODO: transformPathsToMedias => media.id
+
+NOTES:
+
+"
+const { getState: getPage } = usePage;
+getPage().page
+" is not reactive!

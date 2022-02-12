@@ -16,6 +16,7 @@ export type Media = Readonly<{
 	title: string;
 	index: number;
 	img?: string;
+	id: number;
 	path: Path;
 }>;
 

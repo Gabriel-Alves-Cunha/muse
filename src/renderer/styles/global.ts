@@ -9,16 +9,6 @@ export const GlobalCSS = css`
 		margin: 0;
 	}
 
-	:root {
-		--inset-box-shadow-small: inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9),
-			inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07);
-		--box-shadow-medium: -6px -6px 8px rgba(255, 255, 255, 0.9),
-			5px 5px 8px rgba(0, 0, 0, 0.07);
-		--box-shadow-small: -3px -3px 4px rgba(255, 255, 255, 0.9),
-			3px 3px 4px rgba(0, 0, 0, 0.07);
-		--glow: 0px 0px 3px 1px;
-	}
-
 	button {
 		-webkit-app-region: no-drag;
 	}
