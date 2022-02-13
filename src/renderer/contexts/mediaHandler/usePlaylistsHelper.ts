@@ -10,9 +10,9 @@ const {
 // fns
 const maxSizeOfHistory = 100;
 export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
-	previousHistory: readonly Media[],
+	previousHistory: Media[],
 	media: Readonly<Media>,
-): readonly Media[] {
+): Media[] {
 	if (media.id === previousHistory[0]?.id) return previousHistory;
 
 	const newHistory: Media[] = [media, ...previousHistory];

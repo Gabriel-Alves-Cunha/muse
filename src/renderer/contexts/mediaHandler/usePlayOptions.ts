@@ -4,56 +4,40 @@ import merge from "deepmerge";
 
 import { assertUnreachable } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
+import { immer } from "@common/utils";
 
 const playOptionsKey = keyPrefix + "play_options";
 
 type PlayOptionsActions = {
-	setPlayOptions(action: PlayOptions_Action): void;
+	setPlayOptions(action: PlayOptionsAction): void;
 	playOptions: PlayOptions;
 };
 
 export const usePlayOptions = create<PlayOptionsActions>(
 	persist(
-		(set, get) => ({
+		immer(set => ({
 			playOptions: {
 				loopThisMedia: false,
 				loopAllMedia: true,
 				isRandom: false,
 			},
-			setPlayOptions: (action: PlayOptions_Action) => {
-				const previousPlayOptions = get().playOptions;
-
+			setPlayOptions: (action: PlayOptionsAction) => {
 				switch (action.type) {
 					case PlayOptionsType.LOOP_THIS_MEDIA: {
-						const playOptions: PlayOptions = {
-							...previousPlayOptions,
-							loopThisMedia: action.value,
-						};
-
 						(document.getElementById("audio") as HTMLAudioElement).loop =
 							action.value;
 
-						set({ playOptions });
+						set(state => (state.playOptions.loopThisMedia = action.value));
 						break;
 					}
 
 					case PlayOptionsType.LOOP_ALL_MEDIA: {
-						const playOptions: PlayOptions = {
-							...previousPlayOptions,
-							loopAllMedia: action.value,
-						};
-
-						set({ playOptions });
+						set(state => (state.playOptions.loopAllMedia = action.value));
 						break;
 					}
 
 					case PlayOptionsType.IS_RANDOM: {
-						const playOptions: PlayOptions = {
-							...previousPlayOptions,
-							isRandom: action.value,
-						};
-
-						set({ playOptions });
+						set(state => (state.playOptions.isRandom = action.value));
 						break;
 					}
 
@@ -63,7 +47,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 					}
 				}
 			},
-		}),
+		})),
 		{
 			name: playOptionsKey,
 			serialize: state => JSON.stringify(state.state.playOptions),
@@ -75,7 +59,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 	),
 );
 
-export type PlayOptions_Action =
+export type PlayOptionsAction =
 	| Readonly<{
 			type: PlayOptionsType.LOOP_ALL_MEDIA;
 			value: PlayOptions["loopAllMedia"];

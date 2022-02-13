@@ -19,7 +19,7 @@ export type {
 
 export { PlayOptionsType, usePlayOptions } from "./mediaHandler/usePlayOptions";
 export type {
-	PlayOptions_Action,
+	PlayOptionsAction as PlayOptions_Action,
 	PlayOptions,
 } from "./mediaHandler/usePlayOptions";
 
