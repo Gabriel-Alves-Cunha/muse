@@ -268,11 +268,11 @@ export async function transformPathsToMedias(
 				img,
 			};
 
-			dbg({
-				tag: { pictures, title, album, genres, albumArtists },
-				properties: { durationMilliseconds },
-			});
-			dbg("%cmedia =", "background-color: #f9ca4c80;", media);
+			// dbg({
+			// 	tag: { pictures, title, album, genres, albumArtists },
+			// 	properties: { durationMilliseconds },
+			// });
+			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
 			return media;
 		} catch (error) {
 			console.error(error);
@@ -283,9 +283,7 @@ export async function transformPathsToMedias(
 	}
 
 	console.time("Creating promises");
-	const promises = paths
-		.map((path, index) => createMedia(path, index))
-		.filter(Boolean);
+	const promises = paths.map((path, index) => createMedia(path, index));
 	console.timeEnd("Creating promises");
 
 	console.time("Running promises");

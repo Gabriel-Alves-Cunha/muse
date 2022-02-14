@@ -48,8 +48,8 @@ export default defineConfig({
 				replacement: resolve(__dirname, "src/renderer/styles"),
 			},
 			{
-				find: "@pages",
-				replacement: resolve(__dirname, "src/renderer/pages"),
+				find: "@routes",
+				replacement: resolve(__dirname, "src/renderer/routes"),
 			},
 			{
 				find: "@utils",

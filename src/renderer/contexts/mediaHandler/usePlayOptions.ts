@@ -4,7 +4,6 @@ import merge from "deepmerge";
 
 import { assertUnreachable } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
-import { immer } from "@common/utils";
 
 const playOptionsKey = keyPrefix + "play_options";
 
@@ -15,7 +14,8 @@ type PlayOptionsActions = {
 
 export const usePlayOptions = create<PlayOptionsActions>(
 	persist(
-		immer(set => ({
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		(set, _get) => ({
 			playOptions: {
 				loopThisMedia: false,
 				loopAllMedia: true,
@@ -27,17 +27,32 @@ export const usePlayOptions = create<PlayOptionsActions>(
 						(document.getElementById("audio") as HTMLAudioElement).loop =
 							action.value;
 
-						set(state => (state.playOptions.loopThisMedia = action.value));
+						set(state => ({
+							playOptions: {
+								...state.playOptions,
+								loopThisMedia: action.value,
+							},
+						}));
 						break;
 					}
 
 					case PlayOptionsType.LOOP_ALL_MEDIA: {
-						set(state => (state.playOptions.loopAllMedia = action.value));
+						set(state => ({
+							playOptions: {
+								...state.playOptions,
+								loopAllMedia: action.value,
+							},
+						}));
 						break;
 					}
 
 					case PlayOptionsType.IS_RANDOM: {
-						set(state => (state.playOptions.isRandom = action.value));
+						set(state => ({
+							playOptions: {
+								...state.playOptions,
+								isRandom: action.value,
+							},
+						}));
 						break;
 					}
 
@@ -47,7 +62,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 					}
 				}
 			},
-		})),
+		}),
 		{
 			name: playOptionsKey,
 			serialize: state => JSON.stringify(state.state.playOptions),

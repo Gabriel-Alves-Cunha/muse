@@ -1,5 +1,4 @@
-import { add2end } from "./../../utils/arrayMutations";
-import type { Media, Mutable, Path } from "@common/@types/typesAndEnums";
+import type { Media, Path } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
@@ -8,15 +7,14 @@ import merge from "deepmerge";
 import { concatFromIndex, remove, replace, sort } from "@utils/array";
 import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { assertUnreachable } from "@utils/utils";
-import { dbg, immer } from "@common/utils";
 import { keyPrefix } from "@utils/app";
+import { dbg } from "@common/utils";
 import {
 	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
 	searchDirectoryResult,
 	reaplyOrderedIndex,
 	getAllowedMedias,
 } from "./usePlaylistsHelper";
-import { updatedByIndex } from "@utils/arrayMutations";
 
 const {
 	media: { transformPathsToMedias },
@@ -25,18 +23,18 @@ const {
 
 const playlistsKey = keyPrefix + "playlists";
 
-export const defaultPlaylists: Playlist[] = [
+export const defaultPlaylists: readonly Playlist[] = Object.freeze([
 	{ name: "sorted by date", list: [] },
 	{ name: "sorted by name", list: [] },
 	{ name: "favorites", list: [] },
 	{ name: "mediaList", list: [] },
 	{ name: "history", list: [] },
 	{ name: "none", list: [] },
-];
+]);
 
 export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
-		immer((set, get) => ({
+		(set, get) => ({
 			playlists: defaultPlaylists,
 			addListeners: (port: MessagePort) => {
 				port.onmessage = async event => {
@@ -175,7 +173,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					media,
 				});
 			},
-			searchForMedia: (searchTerm: string) => {
+			searchForMedia: (searchTerm: Readonly<string>) => {
 				const playlists = get().playlists;
 
 				console.time("Searching for file");
@@ -226,7 +224,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 								if (newHistory === prevHistory) break;
 
-								get().createOrUpdatePlaylists(newHistory, "history");
+								get().updatePlaylists([{ list: newHistory, name: "history" }]);
 								break;
 							}
 
@@ -235,7 +233,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									"setPlaylists on 'update history'->'clean'. newHistory = []",
 								);
 
-								get().createOrUpdatePlaylists([], "history");
+								get().updatePlaylists([{ list: [], name: "history" }]);
 								break;
 							}
 
@@ -269,7 +267,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									newFavorites,
 								);
 
-								get().createOrUpdatePlaylists(newFavorites, "favorites");
+								get().updatePlaylists([
+									{ list: newFavorites, name: "favorites" },
+								]);
 								break;
 							}
 
@@ -283,7 +283,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									newFavorites,
 								);
 
-								get().createOrUpdatePlaylists(newFavorites, "favorites");
+								get().updatePlaylists([
+									{ list: newFavorites, name: "favorites" },
+								]);
 								break;
 							}
 
@@ -292,7 +294,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									"setPlaylists on 'update favorites'->'clean'. newFavorites = []",
 								);
 
-								get().createOrUpdatePlaylists([], "favorites");
+								get().updatePlaylists([{ list: [], name: "favorites" }]);
 								break;
 							}
 
@@ -309,40 +311,16 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						const prevMediaList = prevPlaylistArray.find(
 							({ name }) => name === "mediaList",
 						)!.list;
+						console.assert(prevMediaList);
 
 						const updateSortedListsAndFinish = (
 							newMediaList: readonly Media[],
 						) => {
-							// get().createOrUpdatePlaylists(
-							// 	sortByDate(newMediaList),
-							// 	"sorted by date",
-							// );
-							// get().createOrUpdatePlaylists(
-							// 	sortByName(newMediaList),
-							// 	"sorted by name",
-							// );
-							// get().createOrUpdatePlaylists(newMediaList, "mediaList");
-
-							set(({ playlists }) => {
-								playlists.forEach((value, index, arr) => {
-									if (value.name === "sorted by date") {
-										updatedByIndex(arr, index, {
-											list: sortByDate(newMediaList) as Mutable<Media[]>,
-											name: "sorted by date",
-										});
-									} else if (value.name === "sorted by name") {
-										updatedByIndex(arr, index, {
-											list: sortByName(newMediaList) as Mutable<Media[]>,
-											name: "sorted by name",
-										});
-									} else if (value.name === "mediaList") {
-										updatedByIndex(arr, index, {
-											list: newMediaList as Mutable<Media[]>,
-											name: "mediaList",
-										});
-									}
-								});
-							});
+							get().updatePlaylists([
+								{ list: sortByDate(newMediaList), name: "sorted by date" },
+								{ list: sortByName(newMediaList), name: "sorted by name" },
+								{ list: newMediaList, name: "mediaList" },
+							]);
 						};
 
 						switch (action.whatToDo) {
@@ -534,45 +512,60 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					console.error(error);
 				}
 			},
-			createOrUpdatePlaylists: (list: Media[], name: string) => {
+			createPlaylists: (playlists: readonly Playlist[]) => {
 				const prevPlaylistArray = get().playlists;
 
-				const update = () => {
-					const index = prevPlaylistArray.findIndex(
-						({ name: name_ }) => name_ === name,
-					);
+				const isOneAlreadyCreated = prevPlaylistArray
+					.map(playlist => playlists.some(({ name }) => name === playlist.name))
+					.some(Boolean);
 
-					const newPlaylistArray = updatedByIndex(prevPlaylistArray, index, {
-						name,
-						list,
-					});
+				if (isOneAlreadyCreated) return get().updatePlaylists(playlists);
 
-					dbg(
-						"setPlaylists on 'create or update playlists'->'update'. New playlist =",
-						newPlaylistArray,
-					);
+				const newPlaylistArray: Playlist[] = [...prevPlaylistArray];
 
-					set(state => (state.playlists = newPlaylistArray));
-				};
+				for (const playlist of playlists) newPlaylistArray.push(playlist);
 
-				const create = () => {
-					const newPlaylistArray = add2end(prevPlaylistArray, { list, name });
-
-					dbg(
-						"setPlaylists on 'create or update playlists'->'create'. New playlist =",
-						newPlaylistArray,
-					);
-
-					set(state => (state.playlists = newPlaylistArray));
-				};
-
-				const isOneAlreadyCreated = prevPlaylistArray.some(
-					({ name: name_ }) => name_ === name,
+				dbg(
+					"setPlaylists on 'create or update playlists'->'create'. New playlist =",
+					newPlaylistArray,
 				);
 
-				isOneAlreadyCreated ? update() : create();
+				set({ playlists: newPlaylistArray });
 			},
-		})),
+			updatePlaylists: (playlists: readonly Playlist[]) => {
+				const prevPlaylistArray = get().playlists;
+
+				{
+					// Assert there isn't a not-created playlist:
+					let foundOneAlreadyCreated = true;
+					for (const playlist of playlists)
+						foundOneAlreadyCreated = prevPlaylistArray.some(
+							({ name }) => name === playlist.name,
+						);
+
+					if (foundOneAlreadyCreated === false)
+						return console.error(
+							"One of the playlists I got was not already created. I'm not made to handle it's creation, only to update.\nplaylists received =",
+							playlists,
+							"\nexisting playlists =",
+							prevPlaylistArray,
+						);
+				}
+
+				const newPlaylistArray = [...prevPlaylistArray];
+				for (const [prevIndex, prevPlaylist] of prevPlaylistArray.entries())
+					for (const playlist of playlists)
+						if (prevPlaylist.name === playlist.name)
+							newPlaylistArray[prevIndex] = playlist;
+
+				dbg(
+					"setPlaylists on 'create or update playlists'->'update'. New playlist =",
+					newPlaylistArray,
+				);
+
+				set({ playlists: newPlaylistArray });
+			},
+		}),
 		{
 			name: playlistsKey,
 			serialize: state => JSON.stringify(state.state.playlists),
@@ -584,12 +577,11 @@ export const usePlaylists = create<UsePlaylistsActions>(
 	),
 );
 
-type T1 = Readonly<{ dateOfArival: number; index: number }>;
-type ListWithDateAndOrder<T extends T1> = ReadonlyArray<T>;
+type ListWithDateAndOrder<T> = ReadonlyArray<
+	Readonly<T> & Readonly<{ dateOfArival: number; index: number }>
+>;
 
-const sortByDate = <T extends T1>(
-	list: ListWithDateAndOrder<T>,
-): ListWithDateAndOrder<T> =>
+const sortByDate = <T>(list: ListWithDateAndOrder<T>) =>
 	reaplyOrderedIndex(
 		sort(list, (a, b) => {
 			if (a.dateOfArival > b.dateOfArival) return 1;
@@ -597,14 +589,13 @@ const sortByDate = <T extends T1>(
 			// a must be equal to b:
 			return 0;
 		}),
-	) as ListWithDateAndOrder<T>;
+	);
 
-type T2 = Readonly<{ title: string; index: number }>;
-type ListWithNameAndOrder<T extends T2> = ReadonlyArray<T>;
+type ListWithNameAndOrder<T> = ReadonlyArray<
+	Readonly<T> & Readonly<{ title: string; index: number }>
+>;
 
-const sortByName = <T extends T2>(
-	list: ListWithNameAndOrder<T>,
-): ListWithNameAndOrder<T> =>
+const sortByName = <T>(list: ListWithNameAndOrder<T>) =>
 	reaplyOrderedIndex(
 		sort(list, (a, b) => {
 			if (a.title > b.title) return 1;
@@ -612,16 +603,17 @@ const sortByName = <T extends T2>(
 			// a must be equal to b:
 			return 0;
 		}),
-	) as unknown as ListWithNameAndOrder<T>;
+	);
 
 type UsePlaylistsActions = {
-	createOrUpdatePlaylists: (list: Media[], name: string) => void;
+	updatePlaylists: (playlists: readonly Playlist[]) => void;
+	createPlaylists: (playlists: readonly Playlist[]) => void;
 	searchLocalComputerForMedias: (force?: boolean) => Promise<void>;
 	searchForMedia: (searchTerm: string) => readonly Media[];
 	setPlaylists: (action: PlaylistsReducer_Action) => void;
 	addListeners: (port: MessagePort) => MessagePort;
 	deleteMedia: (media: Media) => Promise<void>;
-	playlists: Playlist[];
+	playlists: readonly Playlist[];
 };
 
 export type DefaultLists =
@@ -631,10 +623,10 @@ export type DefaultLists =
 	| "mediaList"
 	| "history";
 
-export type Playlist = {
-	list: Media[];
+export type Playlist = Readonly<{
+	list: readonly Media[];
 	name: string;
-};
+}>;
 
 export type PlaylistsReducer_Action =
 	| Readonly<{
@@ -652,8 +644,8 @@ export type PlaylistsReducer_Action =
 	  }>
 	| Readonly<{
 			type: PlaylistType.UPDATE_MEDIA_LIST;
-			list?: readonly Media[];
 			whatToDo: PlaylistActions;
+			list?: readonly Media[];
 			media?: Media;
 	  }>;
 

@@ -16,9 +16,15 @@ import {
 	Tray,
 	app,
 } from "electron";
+import PrettyError from "pretty-error";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
 import { logoPath } from "./utils.js";
+
+// instantiate PrettyError, which can then be used to render error objects
+// eslint-disable-next-line no-var
+var prettyError = new PrettyError();
+prettyError.start();
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;

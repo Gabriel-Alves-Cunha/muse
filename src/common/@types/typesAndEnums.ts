@@ -8,8 +8,8 @@ type DateAsNumber = Readonly<number>;
 
 export type Media = Readonly<{
 	dateOfArival: DateAsNumber;
+	genres?: readonly string[];
 	size: PrettyBytes;
-	genres?: string[];
 	duration: string;
 	artist?: string;
 	album?: string;
