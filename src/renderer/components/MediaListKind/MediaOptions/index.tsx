@@ -24,20 +24,20 @@ export function MediaOptionsModal({
 	media,
 	setShowPopup,
 }: {
-	media: Media;
 	setShowPopup: Dispatch<SetStateAction<Media | undefined>>;
+	media: Media;
 }) {
 	const [whatToChange, setWhatToChange] = useState<WhatToChange>();
 	const [showConfirm, setShowConfirm] = useState(false);
 
 	if (!media) return null;
 
-	const changePropsIfAllowed = (option: string, value: unknown) =>
+	const changePropsIfAllowed = (option: string, value: string) =>
 		isChangeable(option) &&
 		setWhatToChange({
 			whatToChangeToSend: allowedOptionToChange[option],
-			current: value as string,
 			whatToChange: option,
+			current: value,
 		});
 
 	function deleteMedia() {
@@ -56,7 +56,7 @@ export function MediaOptionsModal({
 		<OptionsModalWrapper>
 			{Object.entries(options(media)).map(([option, value]) => (
 				<Option
-					onClick={() => changePropsIfAllowed(option, value)}
+					onClick={() => changePropsIfAllowed(option, value as string)}
 					className={isChangeable(option) ? "hoverable" : ""}
 					key={option}
 				>
@@ -64,7 +64,7 @@ export function MediaOptionsModal({
 				</Option>
 			))}
 
-			<Option onClick={() => setShowConfirm(true)} className="rm" key="rm">
+			<Option onClick={() => setShowConfirm(true)} className="rm">
 				Remove
 				<Remove />
 			</Option>

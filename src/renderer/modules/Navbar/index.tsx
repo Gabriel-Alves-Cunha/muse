@@ -15,11 +15,10 @@ import { usePage } from "@contexts";
 
 import { FolderButton, Nav, Text } from "./styles";
 
-const selector = ({ page }: { page: Page }) => page;
+const { setState: setPage } = usePage;
 
 export function Navbar() {
-	const setPage = usePage.setState;
-	const page = usePage(selector);
+	const page = usePage().page;
 
 	return (
 		<Nav>

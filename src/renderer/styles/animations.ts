@@ -2,7 +2,7 @@ import type { MouseEvent } from "react";
 
 export const pulse = (
 	e: MouseEvent<HTMLButtonElement>,
-	timeOfAnimationInMilliseconds = 600,
+	timeOfAnimationInMilliseconds = 400,
 ) => {
 	e.preventDefault();
 

@@ -5,6 +5,7 @@ import { TypeOfMsgObject } from "./typesAndEnums";
 
 declare global {
 	/* eslint-disable no-var */
+	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[] };
 	var twoWayComm_React_Electron: MessagePort | undefined;
 	var electron: VisibleElectron;
 }

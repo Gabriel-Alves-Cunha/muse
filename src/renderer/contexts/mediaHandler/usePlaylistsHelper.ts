@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/typesAndEnums";
 
-import { allowedMedias, getBasename } from "@common/utils";
+import { allowedMedias, getExtension } from "@common/utils";
 
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
@@ -54,7 +54,11 @@ export async function searchDirectoryResult() {
 	const _2 = await downloadDirectoryPromise;
 	const _3 = await musicDirectoryPromise;
 
-	return [_1, _2, _3].flat() as readonly string[];
+	const result = [_1, _2, _3].flat() as readonly string[];
+
+	console.log(result);
+
+	return result;
 }
 
 export const searchDirectoryForMedias = async (directory: Path) =>
@@ -72,11 +76,3 @@ type ListWithOrder<T> = ReadonlyArray<
 >;
 export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
 	list.map((item, index) => ({ ...item, index }));
-
-// These are not a bulletproof fns, but for the purpose of
-// getting the allowedMedias, it is ok, faster than NodeJS's.
-export const getBasenameAndExtension = (filename: string) =>
-	[getBasename(filename), getExtension(filename)] as const;
-
-export const getExtension = (filename: string) =>
-	filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);

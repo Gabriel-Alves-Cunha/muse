@@ -30,16 +30,6 @@ export const allowedMedias = [
 ] as const;
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
-export const getBasename = (filename: string) =>
-	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
-
-export const getPathWithoutExtension = (filename: string) => {
-	const lastIndex =
-		filename.indexOf(".") === -1 ? filename.length : filename.indexOf(".");
-
-	return filename.slice(0, lastIndex);
-};
-
 export const formatDuration = (time: number | undefined) => {
 	if (time === undefined) return "";
 	time = trunc(time);
@@ -55,3 +45,21 @@ export const formatDuration = (time: number | undefined) => {
 		(minutes + ":" + seconds)
 	);
 };
+
+// These are not a bulletproof fns, but for the purpose of
+// getting the allowedMedias, it is ok, faster than NodeJS's.
+export const getBasename = (filename: string) =>
+	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
+
+export const getPathWithoutExtension = (filename: string) => {
+	const lastIndex =
+		filename.indexOf(".") === -1 ? filename.length : filename.indexOf(".");
+
+	return filename.slice(0, lastIndex);
+};
+
+export const getExtension = (filename: string) =>
+	filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+
+export const getBasenameAndExtension = (filename: string) =>
+	[getBasename(filename), getExtension(filename)] as const;

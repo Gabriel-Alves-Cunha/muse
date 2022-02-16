@@ -7,8 +7,8 @@ export const Img = styled.div`
 	justify-content: center;
 	align-items: center;
 
-	min-width: 40px;
-	height: 40px;
+	min-width: 45px;
+	height: 45px;
 
 	border-radius: 13px;
 	margin: 0 10px;
@@ -18,8 +18,8 @@ export const Img = styled.div`
 
 	img {
 		object-fit: cover;
-		height: 40px;
-		width: 40px;
+		height: 45px;
+		width: 45px;
 
 		border-radius: 13px;
 		border: none;
@@ -97,11 +97,13 @@ export const Options = styled.button`
 	}
 `;
 
-export const ListWrapper = styled.section`
+export const ListWrapper = styled.div`
 	box-shadow: ${theme.boxShadows.medium};
+	box-sizing: border-box;
 	border-radius: 7px;
-	max-width: 500px;
+	max-width: 600px;
 	margin: 2em 5%;
+	height: 65vh;
 	z-index: 1;
 
 	@media (max-width: 500px) {
@@ -131,22 +133,22 @@ export const ListWrapper = styled.section`
 			background: #555;
 		}
 	}
+`;
 
-	.row-wrapper {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
+export const RowWrapper = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 
-		width: 98% !important;
+	width: 98% !important;
 
-		border-radius: 7px;
-		margin: 7px;
+	border-radius: 7px;
+	margin: 7px;
 
-		&:hover {
-			box-shadow: ${theme.boxShadows.medium};
-			transition: box-shadow 0.2s ease-in-out 17ms;
-		}
+	&:hover {
+		box-shadow: ${theme.boxShadows.medium};
+		transition: box-shadow 0.2s ease-in-out 17ms;
 	}
 
 	.active {
@@ -157,19 +159,19 @@ export const ListWrapper = styled.section`
 		outline: 3px solid ${theme.colors.bgCentral};
 		outline-offset: -3px;
 	}
+`;
 
-	.play-button {
-		display: flex;
-		position: relative;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
+export const PlayButton = styled.div`
+	display: flex;
+	position: relative;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 
-		width: 90%;
-		height: 100%;
+	width: 90%;
+	height: 100%;
 
-		cursor: pointer;
-	}
+	cursor: pointer;
 `;
 
 export const InputWrapper = styled.div`

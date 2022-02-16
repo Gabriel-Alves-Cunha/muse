@@ -5,7 +5,6 @@ import type { Media, Path } from "@common/@types/typesAndEnums";
 import { useState } from "react";
 
 import { InputWrapper } from "./styles";
-import { dbg } from "@common/utils";
 
 export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 	const [value, setValue] = useState(() => whatToChange.current);
@@ -19,10 +18,9 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 				type: "write tag",
 			};
 
-			if (window.twoWayComm_React_Electron) {
-				dbg("Posting message:", msg);
+			if (window.twoWayComm_React_Electron)
 				window.twoWayComm_React_Electron.postMessage(msg);
-			} else console.error("There is no 'window.twoWayComm_React_Electron'!");
+			else console.error("There is no 'window.twoWayComm_React_Electron'!");
 		}
 	};
 

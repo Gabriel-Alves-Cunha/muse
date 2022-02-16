@@ -31,19 +31,20 @@
 		"@types/debug": "^4.1.7",
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/jest": "^27.4.0",
-		"@types/node": "^17.0.16",
+		"@types/node": "^17.0.18",
 		"@types/react": "^17.0.39",
 		"@types/react-dom": "^17.0.11",
+		"@types/react-virtualized-auto-sizer": "^1.0.1",
 		"@types/react-window": "^1.8.5",
-		"@typescript-eslint/eslint-plugin": "^5.11.0",
-		"@typescript-eslint/parser": "^5.11.0",
+		"@typescript-eslint/eslint-plugin": "^5.12.0",
+		"@typescript-eslint/parser": "^5.12.0",
 		"@vitejs/plugin-react": "^1.2.0",
 		"@welldone-software/why-did-you-render": "^6.2.3",
 		"cross-env": "^7.0.3",
-		"electron": "^17.0.0",
+		"electron": "^17.0.1",
 		"electron-run": "^2.2.0",
 		"esbuild": "^0.14.21",
-		"eslint": "^8.8.0",
+		"eslint": "^8.9.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-react": "^7.28.0",
 		"eslint-plugin-react-hooks": "^4.3.0",
@@ -54,7 +55,7 @@
 		"ts-node": "^10.5.0",
 		"tslib": "^2.3.1",
 		"typescript": "^4.5.5",
-		"vite": "^2.8.1"
+		"vite": "^2.8.2"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.7.1",
@@ -70,11 +71,12 @@
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
 		"react-icons": "^4.3.1",
-		"react-toastify": "^8.1.1",
+		"react-toastify": "^8.2.0",
+		"react-virtualized-auto-sizer": "^1.0.6",
 		"react-window": "^1.8.6",
 		"reactjs-popup": "^2.0.5",
 		"ytdl-core": "^4.10.1",
-		"zustand": "^3.6.9"
+		"zustand": "^3.7.0"
 	},
 	"config": {
 		"forge": "./forge.config.js"

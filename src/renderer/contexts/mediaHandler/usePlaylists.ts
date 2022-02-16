@@ -57,6 +57,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								break;
 							}
 
+							dbg("At ListenToNotification.ADD_MEDIA:", { path });
+
 							const media: Media = (await transformPathsToMedias([path]))[0];
 
 							if (!media) {
@@ -73,6 +75,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						}
 
 						case ListenToNotification.DEL_MEDIA: {
+							dbg("At ListenToNotification.DEL_MEDIA:", { path });
+
 							if (!path) {
 								console.error(
 									"There should be a path if you want to delete a media!",
@@ -93,11 +97,14 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						}
 
 						case ListenToNotification.REFRESH_ALL_MEDIA: {
+							dbg("At ListenToNotification.REFRESH_ALL_MEDIA:");
 							await get().searchLocalComputerForMedias(true);
 							break;
 						}
 
 						case ListenToNotification.REFRESH_MEDIA: {
+							dbg("At ListenToNotification.REFRESH_MEDIA:", { path });
+
 							if (!path) {
 								console.error(
 									"There should be a path if you want to refresh a media!",
@@ -135,6 +142,8 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						}
 
 						case ListenToNotification.REMOVE_MEDIA: {
+							dbg("At ListenToNotification.REMOVE_MEDIA:", { path });
+
 							// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 							const media = get()
 								.playlists.find(({ name }) => name === "mediaList")!
@@ -142,7 +151,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 							if (!media) {
 								console.error(
-									`I wasn't able to find this path (${path}) to a media to be removed!`,
+									`I wasn't able to find this path "${path}" to a media to be removed!`,
 								);
 								break;
 							}
@@ -156,7 +165,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						}
 
 						default: {
-							console.error(`There is no function to handle this case: ${msg}`);
+							console.error(
+								`There is no function to handle this case: ${event.data}`,
+							);
 							break;
 						}
 					}

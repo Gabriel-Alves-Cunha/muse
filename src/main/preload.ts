@@ -5,12 +5,12 @@ import type { videoInfo } from "ytdl-core";
 import type { IPicture } from "node-taglib-sharp";
 import type { Stream } from "./utils.js";
 
-import { readdir, readFile, stat, unlink } from "fs/promises";
+import { readdir, readFile, stat, unlink, rename } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
 import { string2number } from "@main/hash";
-import { join } from "path";
+import { join, dirname } from "path";
 import { cpus } from "os";
 import {
 	File as MediaFile,
@@ -28,10 +28,15 @@ import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
-import { formatDuration, isDevelopment, getBasename } from "@common/utils";
 import { homeDir, dirs, get, has, push, remove } from "./utils.js";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
+import {
+	formatDuration,
+	isDevelopment,
+	getExtension,
+	getBasename,
+} from "@common/utils";
 
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
@@ -44,8 +49,9 @@ contextBridge.exposeInMainWorld("electron", {
 		receiveMsgFromElectron,
 	},
 	fs: {
-		getFullPathOfFilesForFilesInThisDirectory: async (dir: Path) =>
-			(await readdir(dir)).map(filename => join(dir, filename)),
+		getFullPathOfFilesForFilesInThisDirectory: async function (dir: Path) {
+			return (await readdir(dir)).map(filename => join(dir, filename));
+		},
 		readFile: async (path: Path) => await readFile(path),
 		readdir: async (dir: Path) => await readdir(dir),
 		rm: async (path: Path) => await unlink(path),
@@ -140,7 +146,7 @@ window.onmessage = async event => {
 			const data = {};
 			Object.entries(details).forEach(pair => Object.assign(data, pair));
 
-			dbg({ event }, "\n\n\n", { details, data });
+			console.log({ event }, "\n\n\n", { details, data });
 
 			await writeTags(details.mediaPath, data);
 
@@ -148,7 +154,7 @@ window.onmessage = async event => {
 		}
 
 		case "async two way comm": {
-			dbg("Window received 'async two way comm':", event);
+			console.log("Window received 'async two way comm':", event);
 
 			const electronPort = event.ports[0];
 			if (!electronPort) {
@@ -272,7 +278,7 @@ export async function transformPathsToMedias(
 			// 	tag: { pictures, title, album, genres, albumArtists },
 			// 	properties: { durationMilliseconds },
 			// });
-			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
+			dbg("%cmedia =", "background-color: #f9ca4c80;", media);
 			return media;
 		} catch (error) {
 			console.error(error);
@@ -301,6 +307,8 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	port.onmessage = async event => {
 		const { data } = event;
 
+		console.log("At addListeners on file 'preload.ts', line 309:", data);
+
 		switch (data.type) {
 			case "write tag": {
 				// details: [mediaPath, whatToChange.whatToChange, value.trim()],
@@ -317,7 +325,7 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 			}
 
 			default: {
-				dbg(
+				console.log(
 					"Message received on electron side of 2way-comm, but there is no function to handle it:",
 					data,
 				);
@@ -620,6 +628,7 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 		}
 	}
 
+	let fileNewPath = "";
 	Object.entries(data).forEach(([tag, value]) => {
 		try {
 			if (tag !== "imageURL") {
@@ -632,6 +641,25 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 					console.log(
 						`file.tag.albumArtists = ${file.tag.albumArtists}\nartists = ${artists}`,
 					);
+				} else if (tag === "title") {
+					const oldPath = mediaPath;
+					const newPath = `${dirname(oldPath)}/${value}.${getExtension(
+						oldPath,
+					)}`;
+
+					file.tag.title = value as string;
+
+					console.log({ oldPath, newPath });
+
+					if (getBasename(oldPath) === value) return;
+					fileNewPath = newPath;
+					(async (oldPath: string, newPath: string) => {
+						try {
+							await rename(oldPath, newPath);
+						} catch (error) {
+							console.error(error);
+						}
+					})(oldPath, newPath);
 				} else {
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					file.tag[tag] = value;
@@ -650,9 +678,35 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 
 	file.dispose();
 
-	// refresh one
-	window.twoWayComm_React_Electron?.postMessage({
-		msg: ListenToNotification.REFRESH_MEDIA,
-		path: mediaPath,
-	});
+	if (fileNewPath) {
+		// Since media has a new path, create a new media
+		console.log("Adding new media:", {
+			msg: ListenToNotification.ADD_MEDIA,
+			path: fileNewPath,
+		});
+		window.twoWayComm_React_Electron?.postMessage({
+			msg: ListenToNotification.ADD_MEDIA,
+			path: fileNewPath,
+		});
+
+		// and remove old one
+		console.log("Removing old media:", {
+			msg: ListenToNotification.REMOVE_MEDIA,
+			path: mediaPath,
+		});
+		window.twoWayComm_React_Electron?.postMessage({
+			msg: ListenToNotification.REMOVE_MEDIA,
+			path: mediaPath,
+		});
+	} else {
+		// refresh media
+		console.log("Refreshing media:", {
+			msg: ListenToNotification.REFRESH_MEDIA,
+			path: mediaPath,
+		});
+		window.twoWayComm_React_Electron?.postMessage({
+			msg: ListenToNotification.REFRESH_MEDIA,
+			path: mediaPath,
+		});
+	}
 }

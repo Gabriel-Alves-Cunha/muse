@@ -13,7 +13,6 @@ import { dbg } from "@common/utils";
 import { GlobalCSS } from "@styles/global";
 import { MainView } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
-import { Page } from "@common/@types/typesAndEnums";
 
 export function App() {
 	return (
@@ -111,9 +110,8 @@ function Main() {
 	);
 }
 
-const selector = ({ page }: { page: Page }) => page;
 function PageToShow() {
-	const page = usePage(selector);
+	const page = usePage().page;
 
 	switch (page) {
 		case "Convert":

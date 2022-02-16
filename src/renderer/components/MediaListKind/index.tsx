@@ -2,24 +2,36 @@ import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "./Change";
 import type { Media } from "@common/@types/typesAndEnums";
 
+import { FixedSizeList as List, areEqual } from "react-window";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
-import { FixedSizeList, areEqual } from "react-window";
-import { memo, useRef, useState } from "react";
+import { memo, useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
 import Popup from "reactjs-popup";
 
 import { useCurrentPlaying, CurrentPlayingType, usePlaylists } from "@contexts";
 import { Dots, ImgWithFallback } from "@components";
 import { MediaOptionsModal } from "./MediaOptions";
 
-import { ListWrapper, SubTitle, Options, Title, Info, Img } from "./styles";
 import { pulse } from "@styles/animations";
+import {
+	ListWrapper,
+	PlayButton,
+	RowWrapper,
+	SubTitle,
+	Options,
+	Title,
+	Info,
+	Img,
+} from "./styles";
+
+const PADDING_SIZE = 5;
+const ROW_HEIGHT = 65;
 
 export function MediaListKind({ mediaType }: MediaListKindProps) {
 	const { setCurrentPlaying, currentPlaying } = useCurrentPlaying();
 	const { playlists } = usePlaylists();
 
 	const [showPopup, setShowPopup] = useState<Media>();
-	const listWrapperRef = useRef<HTMLElement>(null);
 
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 	const mediaList = playlists.find(({ name }) => name === mediaType)!;
@@ -41,13 +53,15 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 			const media = data[index];
 
 			return media ? (
-				<div
-					className={`row-wrapper ${
-						media.id === currentPlaying.media?.id ? "active" : ""
-					}`}
-					style={style}
+				<RowWrapper
+					className={media.id === currentPlaying.media?.id ? "active" : ""}
+					style={{
+						...style,
+						width: (parseFloat(String(style.width)) || 0) - PADDING_SIZE,
+						height: (parseFloat(String(style.height)) || 0) - PADDING_SIZE,
+					}}
 				>
-					<div className="play-button" onClick={() => playMedia(media)}>
+					<PlayButton onClick={() => playMedia(media)}>
 						<Img>
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4em" />}
@@ -59,16 +73,12 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 							<Title>{media.title}</Title>
 							<SubTitle>{media.duration}</SubTitle>
 						</Info>
-					</div>
+					</PlayButton>
 
-					<Options
-						onClick={() => setShowPopup(media)}
-						onMouseDown={pulse}
-						id={media.title}
-					>
+					<Options onClick={() => setShowPopup(media)} onMouseDown={pulse}>
 						<Dots />
 					</Options>
-				</div>
+				</RowWrapper>
 			) : null;
 		},
 		areEqual,
@@ -76,19 +86,23 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	Row.displayName = "Row";
 
 	return (
-		<ListWrapper ref={listWrapperRef}>
-			<FixedSizeList
-				itemKey={(index, data) => data[index].id + Date.now()}
-				itemCount={mediaList.list.length}
-				itemData={mediaList.list}
-				overscanCount={15}
-				className="list"
-				itemSize={60}
-				height={400}
-				width="100%"
-			>
-				{Row}
-			</FixedSizeList>
+		<ListWrapper>
+			<AutoSizer>
+				{({ height, width }) => (
+					<List
+						itemKey={(index, data) => data[index].id + Date.now()}
+						itemSize={ROW_HEIGHT + PADDING_SIZE}
+						itemCount={mediaList.list.length}
+						itemData={mediaList.list}
+						overscanCount={15}
+						className="list"
+						height={height}
+						width={width}
+					>
+						{Row}
+					</List>
+				)}
+			</AutoSizer>
 
 			<Popup
 				onClose={() => setShowPopup(undefined)}
