@@ -1,7 +1,6 @@
 import type { IpcMainInvokeEvent } from "electron";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
-import { NotificationType } from "@common/@types/typesAndEnums";
 import { pathToFileURL } from "url";
 import { getInfo } from "ytdl-core";
 import { join } from "path";
@@ -20,6 +19,10 @@ import PrettyError from "pretty-error";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
 import { logoPath } from "./utils.js";
+import {
+	NotificationType,
+	TypeOfMsgObject,
+} from "@common/@types/typesAndEnums";
 
 // instantiate PrettyError, which can then be used to render error objects
 // eslint-disable-next-line no-var
@@ -134,7 +137,7 @@ app.whenReady().then(async () => {
 
 							// Send msg to ipcRenderer:
 							electronWindow?.webContents.send("async-msg", {
-								type: "download media",
+								type: TypeOfMsgObject.DOWNLOAD_MEDIA,
 								params: {
 									imageURL: thumbnails.at(-1)?.url ?? "",
 									type: "download media",

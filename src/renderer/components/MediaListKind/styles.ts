@@ -183,10 +183,21 @@ export const InputWrapper = styled.div`
 
 	box-shadow: ${theme.boxShadows.medium};
 	background: #d3d3d5;
+	overflow-y: hidden;
 	border-radius: 7px;
 	padding: 0.5rem;
 
+	::selection {
+		background: #aa00ff; // ${theme.colors.accent};
+		color: #ffffff;
+	}
+
 	input {
+		::selection {
+			background: #aa00ff; // ${theme.colors.accent};
+			color: #ffffff;
+		}
+
 		font-family: ${fonts.primary};
 		font-weight: 500;
 		letter-spacing: 0.03em;

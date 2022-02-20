@@ -5,13 +5,18 @@ import type { videoInfo } from "ytdl-core";
 import type { IPicture } from "node-taglib-sharp";
 import type { Stream } from "./utils.js";
 
-import { readdir, readFile, stat, unlink, rename } from "fs/promises";
 import { contextBridge, ipcRenderer } from "electron";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
 import { string2number } from "@main/hash";
 import { join, dirname } from "path";
 import { cpus } from "os";
+import {
+	readFile as fsReadFile,
+	readdir as fsReadDir,
+	unlink,
+	rename,
+} from "fs/promises";
 import {
 	File as MediaFile,
 	PictureType,
@@ -34,7 +39,7 @@ import { dbg } from "@common/utils";
 import {
 	formatDuration,
 	isDevelopment,
-	getExtension,
+	getLastExtension,
 	getBasename,
 } from "@common/utils";
 
@@ -49,12 +54,10 @@ contextBridge.exposeInMainWorld("electron", {
 		receiveMsgFromElectron,
 	},
 	fs: {
-		getFullPathOfFilesForFilesInThisDirectory: async function (dir: Path) {
-			return (await readdir(dir)).map(filename => join(dir, filename));
-		},
-		readFile: async (path: Path) => await readFile(path),
-		readdir: async (dir: Path) => await readdir(dir),
-		rm: async (path: Path) => await unlink(path),
+		getFullPathOfFilesForFilesInThisDirectory,
+		readFile,
+		readdir,
+		rm,
 	},
 	os: {
 		homeDir,
@@ -67,6 +70,24 @@ contextBridge.exposeInMainWorld("electron", {
 		getInfo,
 	},
 });
+
+async function getFullPathOfFilesForFilesInThisDirectory(
+	dir: Path,
+): Promise<string[]> {
+	return (await readdir(dir)).map(filename => join(dir, filename));
+}
+
+async function readFile(path: Path): Promise<Buffer> {
+	return await fsReadFile(path);
+}
+
+async function readdir(dir: Path): Promise<string[]> {
+	return await fsReadDir(dir);
+}
+
+async function rm(path: Path): Promise<void> {
+	await unlink(path);
+}
 
 window.onmessage = async event => {
 	switch (event.data) {
@@ -213,17 +234,22 @@ async function getInfo(url: string): Promise<videoInfo | undefined> {
 }
 
 export async function transformPathsToMedias(
-	paths: readonly string[],
+	paths: readonly Path[],
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
-): Promise<readonly (Media | undefined)[]> {
+): Promise<readonly Media[]> {
 	async function createMedia(
-		path: string,
+		path: Path,
 		index: number,
 	): Promise<Media | undefined> {
+		const basename = getBasename(path);
+
 		try {
-			console.time(`for (const [${index}, "${path}"])`);
+			console.time(`Nº ${index}, "${basename}" took`);
 			const {
+				fileAbstraction: {
+					readStream: { length: sizeInBytes },
+				},
 				tag: { pictures, title, album, genres, albumArtists },
 				properties: { durationMilliseconds },
 			} = MediaFile.createFromPath(path);
@@ -237,7 +263,6 @@ export async function transformPathsToMedias(
 				return undefined;
 			}
 
-			const { size: sizeInBytes } = await stat(path);
 			if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
 				console.log(
 					`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
@@ -262,10 +287,10 @@ export async function transformPathsToMedias(
 
 			const media: Media = {
 				duration: formatDuration(duration),
-				title: title ?? getBasename(path),
 				size: prettyBytes(sizeInBytes),
 				artist: albumArtists[0] ?? "",
 				dateOfArival: Date.now(),
+				title: title ?? basename,
 				id: string2number(path),
 				genres,
 				album,
@@ -274,40 +299,35 @@ export async function transformPathsToMedias(
 				img,
 			};
 
-			// dbg({
-			// 	tag: { pictures, title, album, genres, albumArtists },
-			// 	properties: { durationMilliseconds },
-			// });
-			dbg("%cmedia =", "background-color: #f9ca4c80;", media);
+			dbg({
+				tag: { pictures, title, album, genres, albumArtists },
+				properties: { durationMilliseconds },
+			});
+			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
 			return media;
 		} catch (error) {
 			console.error(error);
 			return undefined;
 		} finally {
-			console.timeEnd(`for (const [${index}, "${path}"])`);
+			console.timeEnd(`Nº ${index}, "${basename}" took`);
 		}
 	}
 
-	console.time("Creating promises");
-	const promises = paths.map((path, index) => createMedia(path, index));
-	console.timeEnd("Creating promises");
+	const medias: Array<Media | undefined> = [];
+	console.time("Runnig 'for' on all medias");
+	for (const [index, path] of paths.entries()) {
+		medias.push(await createMedia(path, index));
+	}
+	console.timeEnd("Runnig 'for' on all medias");
 
-	console.time("Running promises");
-	const promisesResolved = await Promise.allSettled(promises);
-	console.timeEnd("Running promises");
-
-	const medias = promisesResolved
-		.map(p => (p.status === "fulfilled" ? p.value : undefined))
-		.filter(Boolean);
-
-	return medias;
+	return medias.filter(Boolean) as Media[];
 }
 
 const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	port.onmessage = async event => {
 		const { data } = event;
 
-		console.log("At addListeners on file 'preload.ts', line 309:", data);
+		console.log("At addListeners on file 'preload.ts', line 330:", data);
 
 		switch (data.type) {
 			case "write tag": {
@@ -594,56 +614,72 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 	// dbg("File =", file);
 	// dbg("File tags =", file.tag);
 
-	if (data.imageURL) {
-		// if imageURL === '0' => erase img so we don't keep
-		// getting an error on the browser.
-		if (data.imageURL === "0") {
-			file.tag.pictures = [];
-			console.log("(SHOULD BE EMPTY) file.tag.pictures =", file.tag.pictures);
-		} else {
-			// Get picture:
-			try {
-				const imgAsString: `data:${string};base64,${string}` =
-					await ipcRenderer.invoke("get-image", data.imageURL);
-
-				const txtForByteVector = imgAsString.slice(
-					imgAsString.indexOf(",") + 1,
-					imgAsString.length,
-				);
-				const mimeType = imgAsString.slice(
-					imgAsString.indexOf(":") + 1,
-					imgAsString.indexOf(";"),
-				);
-
-				const picture = Picture.fromData(
-					ByteVector.fromString(txtForByteVector, StringType.Latin1),
-				);
-
-				picture.type = PictureType.Media;
-				file.tag.pictures = [picture];
-				picture.mimeType = mimeType;
-			} catch (error) {
-				console.error("There was an error getting the picture data.", error);
-			}
-		}
-	}
-
 	let fileNewPath = "";
-	Object.entries(data).forEach(([tag, value]) => {
-		try {
-			if (tag !== "imageURL") {
-				if (tag === "albumArtists") {
+
+	try {
+		Object.entries(data).forEach(async ([tag, value]) => {
+			switch (tag) {
+				case "imageURL": {
+					if (data.imageURL === "erase img") {
+						// if imageURL === 'erase img' => erase img so we don't keep
+						// getting an error on the browser.
+						file.tag.pictures = [];
+						console.log(
+							"(SHOULD BE EMPTY) file.tag.pictures =",
+							file.tag.pictures,
+						);
+					} else {
+						// Get picture:
+						try {
+							const imgAsString: `data:${string};base64,${string}` =
+								await ipcRenderer.invoke("get-image", data.imageURL);
+
+							const txtForByteVector = imgAsString.slice(
+								imgAsString.indexOf(",") + 1,
+								imgAsString.length,
+							);
+							const mimeType = imgAsString.slice(
+								imgAsString.indexOf(":") + 1,
+								imgAsString.indexOf(";"),
+							);
+
+							const picture = Picture.fromData(
+								ByteVector.fromString(txtForByteVector, StringType.Latin1),
+							);
+
+							picture.type = PictureType.Media;
+							file.tag.pictures = [picture];
+							picture.mimeType = mimeType;
+
+							console.log("file.tag.pictures =", file.tag.pictures);
+						} catch (error) {
+							console.error(
+								"There was an error getting the picture data.",
+								error,
+							);
+						}
+					}
+
+					break;
+				}
+
+				case "albumArtists": {
 					dbg("On 'albumArtists' branch.");
 					console.assert(typeof value === "string");
+
 					const artists = (value as string).split(",");
 					file.tag.albumArtists = artists;
 
 					console.log(
 						`file.tag.albumArtists = ${file.tag.albumArtists}\nartists = ${artists}`,
 					);
-				} else if (tag === "title") {
+
+					break;
+				}
+
+				case "title": {
 					const oldPath = mediaPath;
-					const newPath = `${dirname(oldPath)}/${value}.${getExtension(
+					const newPath = `${dirname(oldPath)}/${value}.${getLastExtension(
 						oldPath,
 					)}`;
 
@@ -651,62 +687,69 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 
 					console.log({ oldPath, newPath });
 
-					if (getBasename(oldPath) === value) return;
+					if (getBasename(oldPath) === value) break;
 					fileNewPath = newPath;
-					(async (oldPath: string, newPath: string) => {
-						try {
-							await rename(oldPath, newPath);
-						} catch (error) {
-							console.error(error);
-						}
-					})(oldPath, newPath);
-				} else {
+
+					try {
+						dbg("Renaming...");
+						await rename(oldPath, newPath);
+					} catch (error) {
+						console.error(error);
+					}
+
+					break;
+				}
+
+				default: {
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					file.tag[tag] = value;
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					console.log(`file.tag[${tag}] =`, file.tag[tag]);
+
+					break;
 				}
 			}
-		} catch (error) {
-			console.error(error);
+		});
+	} catch (error) {
+		console.error(error);
+	} finally {
+		file.save();
+
+		dbg("File tags =", file.tag);
+
+		file.dispose();
+
+		if (fileNewPath) {
+			// Since media has a new path, create a new media
+			console.log("Adding new media:", {
+				msg: "ListenToNotification.ADD_MEDIA",
+				path: fileNewPath,
+			});
+			window.twoWayComm_React_Electron?.postMessage({
+				msg: ListenToNotification.ADD_MEDIA,
+				path: fileNewPath,
+			});
+
+			// and remove old one
+			console.log("Removing old media:", {
+				msg: "ListenToNotification.REMOVE_MEDIA",
+				path: mediaPath,
+			});
+			window.twoWayComm_React_Electron?.postMessage({
+				msg: ListenToNotification.REMOVE_MEDIA,
+				path: mediaPath,
+			});
+		} else {
+			// refresh media
+			console.log("Refreshing media:", {
+				msg: "ListenToNotification.REFRESH_MEDIA",
+				path: mediaPath,
+				fileNewPath,
+			});
+			window.twoWayComm_React_Electron?.postMessage({
+				msg: ListenToNotification.REFRESH_MEDIA,
+				path: mediaPath,
+			});
 		}
-	});
-
-	file.save();
-
-	dbg("File tags =", file.tag);
-
-	file.dispose();
-
-	if (fileNewPath) {
-		// Since media has a new path, create a new media
-		console.log("Adding new media:", {
-			msg: ListenToNotification.ADD_MEDIA,
-			path: fileNewPath,
-		});
-		window.twoWayComm_React_Electron?.postMessage({
-			msg: ListenToNotification.ADD_MEDIA,
-			path: fileNewPath,
-		});
-
-		// and remove old one
-		console.log("Removing old media:", {
-			msg: ListenToNotification.REMOVE_MEDIA,
-			path: mediaPath,
-		});
-		window.twoWayComm_React_Electron?.postMessage({
-			msg: ListenToNotification.REMOVE_MEDIA,
-			path: mediaPath,
-		});
-	} else {
-		// refresh media
-		console.log("Refreshing media:", {
-			msg: ListenToNotification.REFRESH_MEDIA,
-			path: mediaPath,
-		});
-		window.twoWayComm_React_Electron?.postMessage({
-			msg: ListenToNotification.REFRESH_MEDIA,
-			path: mediaPath,
-		});
 	}
 }

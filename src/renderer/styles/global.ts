@@ -7,25 +7,20 @@ export const GlobalCSS = css`
 		-webkit-font-smoothing: antialiased;
 		padding: 0;
 		margin: 0;
+
+		:focus {
+			outline: none !important;
+		}
 	}
 
 	button {
 		-webkit-app-region: no-drag;
 	}
 
-	*:focus {
-		outline: none !important;
-	}
-
 	body {
 		/* Make a vertical red line at the middle */
 		/* height: 100vh;
 		background: linear-gradient(red, red) no-repeat center/1px 100%; */
-	}
-
-	::selection {
-		background: ${theme.colors.accent};
-		color: #ffffff;
 	}
 
 	html {
@@ -82,5 +77,10 @@ export const GlobalCSS = css`
 		::-webkit-scrollbar-thumb:hover {
 			background: #555;
 		}
+	}
+
+	::selection {
+		background: ${theme.colors.accent};
+		color: #ffffff;
 	}
 `;

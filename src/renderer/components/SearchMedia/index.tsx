@@ -83,7 +83,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	}, [searchForMedia, searcher.searchTerm]);
 
 	return (
-		<Wrapper>
+		<Wrapper ref={searcherRef}>
 			<SearchWrapper>
 				<Search>
 					<SearchIcon size="1.2em" />

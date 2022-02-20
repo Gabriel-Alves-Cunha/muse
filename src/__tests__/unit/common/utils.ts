@@ -2,6 +2,7 @@
 
 import {
 	getPathWithoutExtension,
+	getLastExtension,
 	formatDuration,
 	getBasename,
 } from "../../../common/utils";
@@ -59,4 +60,22 @@ it("should get the basename of a path", () => {
 	const basenames = paths.map(path => getBasename(path));
 
 	expect(basenames).toStrictEqual(["hello", "how", "are", "you", "bye", ""]);
+});
+
+it("should get the extension of a file", () => {
+	const paths = [
+		"/home/music/hello.mp3",
+		"\\home\\docs\\how",
+		"are.test.js",
+		"you.webp",
+		"bye.",
+		".gitignore",
+		"",
+	];
+
+	const extensions = paths.map(path => getLastExtension(path));
+
+	console.log({ extensions });
+
+	expect(extensions).toStrictEqual(["mp3", "", "js", "webp", "", "", ""]);
 });

@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/typesAndEnums";
 
-import { allowedMedias, getExtension } from "@common/utils";
+import { allowedMedias, getLastExtension } from "@common/utils";
 
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
@@ -39,17 +39,16 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 	return supportedFiles;
 }
 
-const documentsDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-	dirs.documents,
-);
-const downloadDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-	dirs.downloads,
-);
-const musicDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-	dirs.music,
-);
-
 export async function searchDirectoryResult() {
+	const documentsDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
+		dirs.documents,
+	);
+	const downloadDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
+		dirs.downloads,
+	);
+	const musicDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
+		dirs.music,
+	);
 	const _1 = await documentsDirectoryPromise;
 	const _2 = await downloadDirectoryPromise;
 	const _3 = await musicDirectoryPromise;
@@ -68,7 +67,7 @@ export const getAllowedMedias = (
 	filenames: readonly string[],
 ): readonly string[] =>
 	filenames.filter(filename =>
-		allowedMedias.some(extension => extension === getExtension(filename)),
+		allowedMedias.some(extension => extension === getLastExtension(filename)),
 	);
 
 type ListWithOrder<T> = ReadonlyArray<

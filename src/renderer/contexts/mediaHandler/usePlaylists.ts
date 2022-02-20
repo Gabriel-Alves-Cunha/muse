@@ -118,9 +118,11 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								.list.findIndex(({ path: path_ }) => path_ === path);
 
 							if (mediaIndex === -1) {
-								console.error(
-									`There should be a media with path = "${path}" to be refreshed, but there isn't!`,
+								console.warn(
+									`There should be a media with path = "${path}" to be refreshed, but there isn't!\nRefreshing all media.`,
 								);
+
+								await get().searchLocalComputerForMedias(true);
 								break;
 							}
 

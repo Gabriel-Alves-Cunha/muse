@@ -16,11 +16,15 @@ export function ImgWithFallback({
 	let img: HTMLImageElement | null = new Image();
 	img.onload = () => {
 		cache[media.id] = Status.SUCCESS;
+		console.log("SUCCESS IMG");
+
 		img = null;
 	};
-	img.onerror = async () => {
-		await writeTags(media.path, { imageURL: "0" });
-		// ^ Erase picture.
+	img.onerror = async ev => {
+		console.error("Erasing img", ev);
+		console.log("FAILED IMG");
+
+		// await writeTags(media.path, { imageURL: "erase img" });
 		cache[media.id] = Status.FAILURE;
 		img = null;
 	};

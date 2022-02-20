@@ -17,7 +17,11 @@ export function Progress({
 	return (
 		<Component>
 			<ProgressBarWrapper>
-				<Bar percentage={percent_0_to_100}>
+				<Bar
+					percentage={
+						status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100
+					}
+				>
 					<div className={status.toString()} />
 				</Bar>
 			</ProgressBarWrapper>

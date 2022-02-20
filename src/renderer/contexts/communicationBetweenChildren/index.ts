@@ -76,10 +76,6 @@ const handleDownloadMedia = (value: DownloadValues) =>
 
 // TODO: SEE THIS:
 window.electron?.notificationApi.receiveMsgFromElectron(object => {
-	console.warn(
-		"On communicationBetweenChildren file at window.electron?.notificationApi.receiveMsgFromElectron!",
-	);
-
 	dbg("Received 'async-msg' from Electron on React side.\nobject =", object);
 
 	switch (object.type) {

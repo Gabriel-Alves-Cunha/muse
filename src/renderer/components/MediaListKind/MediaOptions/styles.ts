@@ -40,6 +40,7 @@ export const Option = styled.button`
 	flex-direction: row;
 	justify-content: flex-start;
 	align-items: center;
+
 	font-family: ${fonts.primary};
 	letter-spacing: 0.03em;
 	font-size: 1rem;
@@ -51,13 +52,14 @@ export const Option = styled.button`
 
 	border: none;
 	border-bottom: 1px solid #ccc;
+	overflow-y: visible;
 	padding: 0.7rem;
 
 	user-select: text;
 	cursor: text;
 
 	::selection {
-		background: #aa00ff;
+		background: #aa00ff; // theme.colors.accent
 		color: #fff;
 	}
 
@@ -76,6 +78,11 @@ export const Option = styled.button`
 		text-align: left;
 		font-size: 1rem;
 		color: #8e8e8e;
+
+		::selection {
+			background: #aa00ff; // theme.colors.accent
+			color: #fff;
+		}
 	}
 
 	&.rm {
@@ -123,8 +130,8 @@ export const Confirm = styled.div`
 
 		font-family: ${fonts.primary};
 		letter-spacing: 0.03em;
-		font-weight: 500;
 		font-size: 1.05rem;
+		font-weight: 500;
 		color: white;
 
 		&.yes {
@@ -132,15 +139,13 @@ export const Confirm = styled.div`
 			background: #bb2b2e;
 		}
 		&.no {
-			background: #219a00;
-
 			border-bottom-right-radius: 10px;
 			border-bottom-left-radius: 10px;
+			background: #219a00;
 		}
 
 		&:hover {
 			transition: background-color 0.1s ease;
-			/* background-color: #d3d3d5; */
 			filter: brightness(1.1);
 			cursor: pointer;
 			color: black;

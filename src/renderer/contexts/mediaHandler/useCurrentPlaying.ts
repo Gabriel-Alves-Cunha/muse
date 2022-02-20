@@ -215,16 +215,16 @@ useCurrentPlaying.subscribe(
 		} = getCurrentPlaying();
 		if (!window || !media) return;
 
-		console.time("Reading <audio> file");
+		console.time("Reading <audio> file took");
 		const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
-		console.timeEnd("Reading <audio> file");
+		console.timeEnd("Reading <audio> file took");
 
 		const audio = document.getElementById("audio") as HTMLAudioElement;
 		audio.src = url;
 
 		audio.addEventListener("loadedmetadata", () => {
-			console.log("Audio was loadedmetadata. Setting currentTime...");
-			audio.currentTime = currentTime;
+			console.log("Audio has loaded metadata. Setting currentTime...");
+			if (currentTime > 10) audio.currentTime = currentTime;
 		});
 		audio.addEventListener("canplay", () => {
 			console.log("Audio can play.");
@@ -238,8 +238,8 @@ useCurrentPlaying.subscribe(
 		audio.addEventListener("securitypolicyviolation", e =>
 			console.error("Audio has a security policy violation:", e),
 		);
-		audio.addEventListener("error", e => console.error("Audio error:", e));
-		audio.addEventListener("abort", e => console.log("Audio was aborted:", e));
+		audio.addEventListener("error", () => console.error("Audio error."));
+		audio.addEventListener("abort", () => console.log("Audio was aborted."));
 	},
 );
 
