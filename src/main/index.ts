@@ -15,7 +15,6 @@ import {
 	Tray,
 	app,
 } from "electron";
-import PrettyError from "pretty-error";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
 import { logoPath } from "./utils.js";
@@ -23,11 +22,6 @@ import {
 	NotificationType,
 	TypeOfMsgObject,
 } from "@common/@types/typesAndEnums";
-
-// instantiate PrettyError, which can then be used to render error objects
-// eslint-disable-next-line no-var
-var prettyError = new PrettyError();
-prettyError.start();
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -90,7 +84,7 @@ function createWindow() {
 	const url = isDevelopment
 		? "http://localhost:3000"
 		: pathToFileURL(
-				join(__dirname, "app", "vite-renderer-build", "index.html"),
+				join(__dirname, "vite-renderer-build", "index.html"),
 		  ).toString();
 
 	window.loadURL(url);
