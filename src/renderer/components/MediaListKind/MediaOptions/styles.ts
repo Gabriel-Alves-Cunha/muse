@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme, fonts } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const OptionsModalWrapper = styled("div", {
 	display: "flex",
@@ -41,7 +41,7 @@ export const Option = styled("button", {
 	justifyContent: "flex-start",
 	alignItems: "center",
 
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	letterSpacing: "0.03em",
 	fontSize: "1rem",
 
@@ -73,7 +73,7 @@ export const Option = styled("button", {
 	},
 
 	span: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		letterSpacing: "0.03em",
 		textAlign: "left",
 		fontSize: "1rem",
@@ -108,7 +108,7 @@ export const Confirm = styled("div", {
 	maxHeight: 350,
 	width: 320,
 
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	letterSpacing: "0.03em",
 	background: "#edecf8",
 	textAlign: "center",
@@ -128,7 +128,7 @@ export const Confirm = styled("div", {
 		width: "100%",
 		height: 40,
 
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		letterSpacing: "0.03em",
 		fontSize: "1.05rem",
 		fontWeight: "500",

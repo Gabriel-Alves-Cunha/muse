@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Nav = styled("nav", {
 	display: "flex",
@@ -18,7 +18,7 @@ export const Nav = styled("nav", {
 
 		background: "white",
 
-		boxShadow: theme.boxShadows.small,
+		boxShadow: "$theme.shadows.small.value",
 	},
 
 	media: {
@@ -88,13 +88,13 @@ export const FolderButton = styled("button", {
 	"&:hover": {
 		"&:not(&.active)": {
 			transition: "box-shadow 0.2s",
-			boxShadow: theme.boxShadows.inset_small,
+			boxShadow: "$theme.shadows.insetSmall.value",
 		},
 	},
 });
 
 export const Text = styled("div", {
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	color: theme.colors.text,
 	letterSpacing: "0.03em",
 	fontSize: "1.05rem",

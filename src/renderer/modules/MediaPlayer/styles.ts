@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Wrapper = styled("div", {
 	display: "flex",
@@ -23,7 +23,7 @@ export const Wrapper = styled("div", {
 	padding: "0.8rem",
 	border: "none",
 
-	boxShadow: theme.boxShadows.medium,
+	boxShadow: "$theme.shadows.medium.value",
 	backdropFilter: "blur(5px)",
 });
 
@@ -59,7 +59,7 @@ export const Info = styled("div", {
 	width: "100%",
 
 	".title": {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		color: theme.colors.text,
 		letterSpacing: "0.03em",
 		fontSize: "1.1rem",
@@ -70,8 +70,8 @@ export const Info = styled("div", {
 	},
 
 	".subtitle": {
+		fontFamily: "$theme.fonts.fontFamily.value",
 		color: theme.colors.grayText,
-		fontFamily: fonts.primary,
 		letterSpacing: "0.03em",
 		fontSize: "0.9rem",
 		fontWeight: 400,
@@ -102,7 +102,7 @@ export const Controls = styled("div", {
 
 		"&:hover": {
 			transition: "opacity 0.1s ease-in-out 17ms",
-			boxShadow: theme.boxShadows.small,
+			boxShadow: "$theme.shadows.small.value",
 		},
 	},
 
@@ -129,9 +129,9 @@ export const SeekerContainer = styled("div", {
 	width: 275,
 
 	span: {
+		fontFamily: "$theme.fonts.fontFamily.value",
 		backgroundColor: "transparent",
 		color: theme.colors.grayText,
-		fontFamily: fonts.primary,
 		letterSpacing: "0.03em",
 		textAlign: "center",
 		fontSize: "1rem",

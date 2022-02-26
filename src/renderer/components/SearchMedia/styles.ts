@@ -1,6 +1,6 @@
-import { styled } from "@styles/global";
+import { styled, keyframes } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Wrapper = styled("header", {
 	display: "flex",
@@ -39,14 +39,14 @@ export const Search = styled("div", {
 	cursor: "text",
 	color: "#ccc",
 
-	boxShadow: theme.boxShadows.small,
+	boxShadow: "$theme.shadows.small.value",
 
 	svg: {
 		marginLeft: 10,
 	},
 
 	"&:hover": {
-		boxShadow: theme.boxShadows.inset_small,
+		boxShadow: "$theme.shadows.insetSmall.value",
 		transition: "opacity 0s linear 17ms",
 
 		svg: {
@@ -55,7 +55,7 @@ export const Search = styled("div", {
 	},
 
 	input: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontSize: "0.9rem",
@@ -83,10 +83,19 @@ export const Search = styled("div", {
 	},
 });
 
+const spin = keyframes({
+	from: {
+		transform: "rotate(0deg)",
+	},
+	to: {
+		transform: "rotate(360deg)",
+	},
+});
+
 export const ReloadContainer = styled("button", {
 	variants: {
 		animation: {
-			false: { animation: "spin 0.5s linear" },
+			false: { animation: `${spin} 0.5s linear` },
 			true: { animation: "" },
 		},
 	},
@@ -103,15 +112,6 @@ export const ReloadContainer = styled("button", {
 	"&:hover": {
 		willChange: "transform",
 		animation: "$animation",
-
-		"@keyframes spin": {
-			from: {
-				transform: "rotate(0deg)",
-			},
-			to: {
-				transform: "rotate(360deg)",
-			},
-		},
 	},
 });
 
@@ -140,7 +140,7 @@ export const SearchResultsWrapper = styled("section", {
 	zIndex: 10,
 
 	backgroundColor: theme.colors.secondary,
-	boxShadow: theme.boxShadows.medium,
+	boxShadow: "$theme.shadows.medium.value",
 
 	"&.list": {
 		overflowX: "hidden !important",
@@ -184,7 +184,7 @@ export const Result = styled("button", {
 
 	"&::after": {
 		transition: "opacity 0.2s ease-in-out 17ms",
-		boxShadow: theme.boxShadows.medium,
+		boxShadow: "$theme.shadows.medium.value",
 		opacity: 0,
 	},
 

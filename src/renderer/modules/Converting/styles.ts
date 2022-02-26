@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Circle = styled("div", {
 	display: "flex",
@@ -18,11 +18,11 @@ export const Circle = styled("div", {
 	width: 40,
 
 	backgroundColor: theme.colors.bgNav,
-	boxShadow: theme.boxShadows.small,
+	boxShadow: "$theme.shadows.small.value",
 
 	"&:hover": {
 		transition: "opacity 0s ease-in-out 17ms",
-		boxShadow: theme.boxShadows.inset_small,
+		boxShadow: "$theme.shadows.insetSmall.value",
 	},
 });
 
@@ -43,7 +43,7 @@ export const Popup = styled("div", {
 	zIndex: 500,
 
 	backgroundColor: theme.colors.bgCentral,
-	boxShadow: theme.boxShadows.small,
+	boxShadow: "$theme.shadows.small.value",
 
 	/* width */
 	"&::-webkit-scrollbar": {
@@ -67,7 +67,7 @@ export const Popup = styled("div", {
 });
 
 export const Progress = styled("div", {
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	color: theme.colors.text,
 	whiteSpace: "nowrap",
 	overflow: "hidden",
@@ -97,7 +97,7 @@ export const Title = styled("div", {
 	width: "100%",
 
 	p: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		whiteSpace: "nowrap",
 		overflow: "hidden",
 		fontSize: "0.9rem",

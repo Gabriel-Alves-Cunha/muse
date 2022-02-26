@@ -1,4 +1,4 @@
-import { styled } from "@styles/global";
+import { styled, keyframes } from "@styles/global";
 
 import { theme } from "./theme";
 
@@ -8,6 +8,23 @@ export const MainView = styled("div", {
 	flexDirection: "row",
 
 	backgroundColor: theme.colors.bgCentral,
+});
+
+const ripple = keyframes({
+	"0%": {
+		top: "36px",
+		left: "36px",
+		width: 0,
+		height: 0,
+		opacity: 1,
+	},
+	"100%": {
+		top: 0,
+		left: 0,
+		width: "72px",
+		height: "72px",
+		opacity: 0,
+	},
 });
 
 const AnimStyle = styled("div", {
@@ -25,31 +42,14 @@ const AnimStyle = styled("div", {
 	"&.lds-ripple div": {
 		position: "absolute",
 		border: `3px solid ${theme.colors.accent}`,
-		opacity: "1",
 		borderRadius: "50%",
-		animation: "ripple 1.3s cubic-bezier(0, 0.2, 0.8, 1) infinite",
+		opacity: "1",
+
+		animation: `${ripple} 1.3s cubic-bezier(0, 0.2, 0.8, 1) infinite`,
 	},
 
 	"&.lds-ripple div:nth-of-type(2)": {
 		animationDelay: "-0.5s",
-	},
-
-	"@keyframes ripple": {
-		"0%": {
-			top: "36px",
-			left: "36px",
-			width: 0,
-			height: 0,
-			opacity: 1,
-		},
-
-		"100%": {
-			top: 0,
-			left: 0,
-			width: "72px",
-			height: "72px",
-			opacity: 0,
-		},
 	},
 });
 

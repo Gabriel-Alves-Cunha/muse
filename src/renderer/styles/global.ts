@@ -1,13 +1,36 @@
-import { createStitches, globalCss } from "@stitches/react";
+import { createStitches } from "@stitches/react";
 
 import { theme } from "./theme";
 
-// Set up reusable breakpoints.
-export const { styled } = createStitches({
+// You can use the returned theme objects to read the tokens, like so:
+// default theme:
+//  theme.colors.foreground.value; // black
+//  theme.colors.foreground.token; // foreground
+//  theme.colors.foreground.scale; // colors
+//  theme.colors.foreground.variable; // --colors-foreground
+//  theme.colors.foreground.computedValue; // var(--colors-foreground)
+export const { styled, globalCss, keyframes } = createStitches({
 	media: {
 		medium: "(min-width: 768px)",
 		large: "(min-width: 1024px)",
 		small: "(min-width: 640px)", // Maybe change to max- ?
+	},
+	theme: {
+		shadows: {
+			insetSmall:
+				"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
+			medium:
+				"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
+			small:
+				"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
+			glow: "0px 0px 3px 1px",
+		},
+		fonts: {
+			fontFamily: "'Assistant', sans-serif",
+			color: theme.colors.text,
+			letterSpacing: "0.03em",
+			fontSize: "1rem",
+		},
 	},
 });
 
@@ -26,6 +49,11 @@ export const GlobalCSS = globalCss({
 		"-webkit-app-region": "no-drag",
 	},
 
+	"&::selection": {
+		background: theme.colors.accent,
+		color: "white",
+	},
+
 	body: {
 		/* Make a vertical red line at the middle */
 		/* height: 100vh,
@@ -33,6 +61,8 @@ export const GlobalCSS = globalCss({
 	},
 
 	html: {
+		overflow: "hidden",
+
 		"[data-theme='light']": {
 			"--nav-button-hovered-color": "#25306c",
 			"--nav-button-active-color": "white",
@@ -65,8 +95,6 @@ export const GlobalCSS = globalCss({
 			"--text": "",
 		},
 
-		overflow: "hidden",
-
 		/* width */
 		"&::-webkit-scrollbar": {
 			width: 5,
@@ -86,10 +114,5 @@ export const GlobalCSS = globalCss({
 		"&::-webkit-scrollbar-thumb:hover": {
 			background: "#555",
 		},
-	},
-
-	"&::selection": {
-		background: theme.colors.accent,
-		color: "white",
 	},
 });

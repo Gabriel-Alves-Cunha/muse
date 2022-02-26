@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 const HEADER_HEIGHT = 27;
 
@@ -72,7 +72,7 @@ export const AppName_Folder_Wrapper = styled("button", {
 
 	transform: "translate(-50%)",
 
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	color: theme.colors.text,
 	letterSpacing: "0.03em",
 	fontSize: "0.9em",

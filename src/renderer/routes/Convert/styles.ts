@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Wrapper = styled("div", {
 	display: "flex",
@@ -17,9 +17,11 @@ export const Wrapper = styled("div", {
 		width: 200,
 		height: 30,
 
-		...fonts.all,
-		fontWeight: 500,
+		letterSpacing: "$theme.fonts.letterSpacing.value",
+		fontFamily: "$theme.fonts.fontFamily.value",
+		color: theme.colors.text,
 		fontSize: "1.1rem",
+		fontWeight: 500,
 
 		border: `1px solid ${theme.colors.navButtonHoveredColor}`,
 

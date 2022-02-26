@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Wrapper = styled("section", {
 	display: "flex",
@@ -45,7 +45,7 @@ export const SearchWrapper = styled("div", {
 	height: 60,
 
 	p: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		letterSpacing: "0.02rem",
 		position: "absolute",
 		fontSize: "0.8rem",
@@ -70,7 +70,7 @@ export const Searcher = styled("button", {
 	border: "none",
 	cursor: "text",
 
-	boxShadow: theme.boxShadows.small,
+	boxShadow: "$theme.shadows.small.value",
 
 	svg: {
 		marginLeft: "10px",
@@ -78,7 +78,7 @@ export const Searcher = styled("button", {
 
 	"&::after": {
 		transition: "opacity 0s ease-in-out 17ms",
-		boxShadow: theme.boxShadows.inset_small,
+		boxShadow: "$theme.shadows.insetSmall.value",
 		opacity: 0,
 	},
 
@@ -91,7 +91,7 @@ export const Searcher = styled("button", {
 	},
 
 	input: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontSize: "0.9rem",
@@ -155,7 +155,7 @@ export const ResultContainer = styled("div", {
 	},
 
 	p: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		textAlign: "center",
 		margin: "2rem 1rem",
 		fontSize: "1.1rem",
@@ -165,7 +165,7 @@ export const ResultContainer = styled("div", {
 	},
 
 	span: {
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		textAlign: "center",
 		margin: "1rem auto",
 		fontSize: "1rem",
@@ -182,13 +182,13 @@ export const Button = styled("button", {
 	width: 160,
 	height: 42,
 
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	textAlign: "center",
 	fontSize: "1rem",
 	padding: "10px",
 
 	backgroundColor: theme.colors.bgNav,
-	boxShadow: theme.boxShadows.small,
+	boxShadow: "$theme.shadows.small.value",
 	cursor: "pointer",
 	color: "black",
 
@@ -197,6 +197,6 @@ export const Button = styled("button", {
 
 	"&:hover": {
 		transition: "opacity 0.3s ease-in-out 17ms",
-		boxShadow: theme.boxShadows.inset_small,
+		boxShadow: "$theme.shadows.insetSmall.value",
 	},
 });

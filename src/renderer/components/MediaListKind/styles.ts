@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { fonts, theme } from "@styles/theme";
+import { theme } from "@styles/theme";
 
 export const Img = styled("div", {
 	display: "flex",
@@ -14,7 +14,7 @@ export const Img = styled("div", {
 	margin: "0 10px",
 	border: "none",
 
-	boxShadow: theme.boxShadows.small,
+	boxShadow: "$theme.shadows.small.value",
 
 	img: {
 		objectFit: "cover",
@@ -43,7 +43,7 @@ export const Info = styled("div", {
 });
 
 export const Title = styled("p", {
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	color: theme.colors.text,
 	letterSpacing: "0.03em",
 	fontSize: "1rem",
@@ -68,7 +68,7 @@ export const Title = styled("p", {
 });
 
 export const SubTitle = styled("p", {
-	fontFamily: fonts.primary,
+	fontFamily: "$theme.fonts.fontFamily.value",
 	color: theme.colors.grayText,
 	letterSpacing: "0.03em",
 	fontSize: "0.8em",
@@ -93,12 +93,12 @@ export const Options = styled("button", {
 
 	"&:hover": {
 		transition: "boxShadow 0.3s ease-in-out 17ms",
-		boxShadow: theme.boxShadows.medium,
+		boxShadow: "$theme.shadows.medium.value",
 	},
 });
 
 export const ListWrapper = styled("div", {
-	boxShadow: theme.boxShadows.medium,
+	boxShadow: "$theme.shadows.medium.value",
 	boxSizing: "border-box",
 	margin: "2em 5%",
 	borderRadius: 7,
@@ -150,11 +150,11 @@ export const RowWrapper = styled("div", {
 
 	"&:hover": {
 		transition: "boxShadow 0.2s ease-in-out 17ms",
-		boxShadow: theme.boxShadows.medium,
+		boxShadow: "$theme.shadows.medium.value",
 	},
 
 	"&.active": {
-		boxShadow: theme.boxShadows.medium,
+		boxShadow: "$theme.shadows.medium.value",
 
 		background: "white",
 
@@ -183,7 +183,7 @@ export const InputWrapper = styled("div", {
 	height: 50,
 	width: 320,
 
-	boxShadow: theme.boxShadows.medium,
+	boxShadow: "$theme.shadows.medium.value",
 	background: "#d3d3d5",
 	overflowY: "hidden",
 	padding: "0.5rem",
@@ -200,7 +200,7 @@ export const InputWrapper = styled("div", {
 			color: "#ffffff",
 		},
 
-		fontFamily: fonts.primary,
+		fontFamily: "$theme.fonts.fontFamily.value",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontSize: "1.05rem",

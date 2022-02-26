@@ -14,23 +14,4 @@ export const theme = {
 		bgNav: "var(--bg-nav)",
 		text: "var(--text)",
 	},
-	boxShadows: {
-		inset_small:
-			"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
-		medium:
-			"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
-		small:
-			"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
-		glow: "0px 0px 3px 1px",
-	},
-} as const;
-
-export const fonts = {
-	primary: "'Assistant', sans-serif",
-	all: {
-		fontFamily: "'Assistant', sans-serif",
-		color: theme.colors.text,
-		letterSpacing: "0.03em",
-		fontSize: "1rem",
-	},
 } as const;
