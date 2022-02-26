@@ -59,7 +59,7 @@ The following tools were used on this project construction:
 - [Electron](https://www.electronjs.org/)
 - [Axios](https://github.com/axios/axios)
 - [TypeScript](https://www.typescriptlang.org/)
-- [Emotion](https://github.com/emotion-js/emotion)
+- [Stitches](https://stitches.dev/)
 - [Chokidar](https://github.com/paulmillr/chokidar)
 - [React Icons](https://react-icons.github.io/react-icons/)
 - [ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)

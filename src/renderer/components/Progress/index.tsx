@@ -18,9 +18,10 @@ export function Progress({
 		<Component>
 			<ProgressBarWrapper>
 				<Bar
-					percentage={
-						status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100
-					}
+					css={{
+						$$percentage:
+							status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100,
+					}}
 				>
 					<div className={status.toString()} />
 				</Bar>
@@ -36,16 +37,16 @@ Progress.whyDidYouRender = {
 	customName: "Progress",
 };
 
-const map = new Map<ProgressStatus, JSX.Element>();
+const iconObj: Record<ProgressStatus, JSX.Element> = Object.freeze({
+	[ProgressStatus.SUCCESS]: <Success size={12} color="green" />,
+	[ProgressStatus.CANCEL]: <Cancel size={12} color="blue" />,
+	[ProgressStatus.FAIL]: <Fail size={12} color="red" />,
+	[ProgressStatus.ACTIVE]: <Downloading size={12} />,
+	[ProgressStatus.CONVERT]: <Convert size={12} />,
+});
 
 export const icon = (status: ProgressStatus) =>
-	map.get(status) ?? <QuestionMark size={12} />;
-
-map.set(ProgressStatus.SUCCESS, <Success size={12} color="green" />);
-map.set(ProgressStatus.CANCEL, <Cancel size={12} color="blue" />);
-map.set(ProgressStatus.FAIL, <Fail size={12} color="red" />);
-map.set(ProgressStatus.ACTIVE, <Downloading size={12} />);
-map.set(ProgressStatus.CONVERT, <Convert size={12} />);
+	iconObj[status] ?? <QuestionMark size={12} />;
 
 export type ProgressProps = {
 	readonly showStatus: boolean;

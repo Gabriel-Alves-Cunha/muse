@@ -1,6 +1,6 @@
 export const keyPrefix = "@muse:";
 
-export const folders = [
+export const pages = [
 	"Home",
 	"Favorites",
 	"History",

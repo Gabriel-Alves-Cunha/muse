@@ -8,7 +8,6 @@ import {
 import { capitalizedAppName } from "@common/utils";
 import { usePage } from "@contexts";
 import {
-	handleMaximizeOnDoubleClick,
 	toggleMaximize,
 	minimizeWindow,
 	closeWindow,
@@ -43,7 +42,7 @@ export function Decorations() {
 	}, []);
 
 	return showDecorations ? (
-		<Wrapper onClick={handleMaximizeOnDoubleClick}>
+		<Wrapper>
 			{/* ^ window-draggable-region */}
 			<AppIcon>
 				<img src={imageUrl.href} width="24px" height="24px" alt="Muse's logo" />

@@ -1,56 +1,56 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { fonts, theme } from "@styles/theme";
 
-export const Img = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
+export const Img = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
 
-	min-width: 45px;
-	height: 45px;
+	minWidth: 45,
+	height: 45,
 
-	border-radius: 13px;
-	margin: 0 10px;
-	border: none;
+	borderRadius: 13,
+	margin: "0 10px",
+	border: "none",
 
-	box-shadow: ${theme.boxShadows.small};
+	boxShadow: theme.boxShadows.small,
 
-	img {
-		object-fit: cover;
-		height: 45px;
-		width: 45px;
+	img: {
+		objectFit: "cover",
+		height: 45,
+		width: 45,
 
-		border-radius: 13px;
-		border: none;
-	}
+		borderRadius: 13,
+		border: "none",
 
-	img:before {
-		display: none;
-	}
-`;
+		"&:before": {
+			display: "none",
+		},
+	},
+});
 
-export const Info = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: flex-start;
+export const Info = styled("div", {
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "center",
+	alignItems: "flex-start",
 
-	height: calc(100% - 5px);
-	width: calc(100% - 5px);
+	height: "calc(100% - 5px)",
+	width: "calc(100% - 5px)",
 
-	overflow: hidden;
-`;
+	overflow: "hidden",
+});
 
-export const Title = styled.p`
-	font-family: ${fonts.primary};
-	color: ${theme.colors.text};
-	letter-spacing: 0.03em;
-	font-weight: 500;
-	font-size: 1rem;
+export const Title = styled("p", {
+	fontFamily: fonts.primary,
+	color: theme.colors.text,
+	letterSpacing: "0.03em",
+	fontSize: "1rem",
+	fontWeight: 500,
 
-	word-wrap: normal;
-	overflow: hidden;
+	wordWrap: "normal",
+	overflow: "hidden",
 	/* white-space: nowrap; // make it one-line. */
 
 	/* animation: 6s linear 0s infinite move;
@@ -65,161 +65,162 @@ export const Title = styled.p`
 			left: 110%;
 		}
 	} */
-`;
+});
 
-export const SubTitle = styled.p`
-	font-family: ${fonts.primary};
-	color: ${theme.colors.grayText};
-	letter-spacing: 0.03em;
-	font-size: 0.8em;
-	font-weight: 500;
-`;
+export const SubTitle = styled("p", {
+	fontFamily: fonts.primary,
+	color: theme.colors.grayText,
+	letterSpacing: "0.03em",
+	fontSize: "0.8em",
+	fontWeight: 500,
+});
 
-export const Options = styled.button`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+export const Options = styled("button", {
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "center",
+	alignItems: "center",
 
-	background: transparent;
-	border-radius: 7px;
-	margin: 5px;
+	background: "transparent",
+	borderRadius: 7,
+	margin: 5,
 
-	width: 25px;
-	height: 80%;
+	height: "80%",
+	width: 25,
 
-	cursor: pointer;
-	border: none;
+	cursor: "pointer",
+	border: "none",
 
-	&:hover {
-		box-shadow: ${theme.boxShadows.medium};
-		transition: box-shadow 0.3s ease-in-out 17ms;
-	}
-`;
+	"&:hover": {
+		transition: "boxShadow 0.3s ease-in-out 17ms",
+		boxShadow: theme.boxShadows.medium,
+	},
+});
 
-export const ListWrapper = styled.div`
-	box-shadow: ${theme.boxShadows.medium};
-	box-sizing: border-box;
-	border-radius: 7px;
-	max-width: 600px;
-	margin: 2em 5%;
-	height: 65vh;
-	z-index: 1;
+export const ListWrapper = styled("div", {
+	boxShadow: theme.boxShadows.medium,
+	boxSizing: "border-box",
+	margin: "2em 5%",
+	borderRadius: 7,
+	height: "65vh",
+	maxWidth: 600,
+	zIndex: 1,
 
-	@media (max-width: 500px) {
-		margin: 0.5em 5%;
-	}
+	media: {
+		small: {
+			margin: "0.5em 5%",
+		},
+	},
 
-	.list {
-		overflow-x: hidden !important;
+	"&.list": {
+		overflowX: "hidden !important",
 
 		/* width */
-		::-webkit-scrollbar {
-			width: 5px;
-		}
+		"&::-webkit-scrollbar": {
+			width: 5,
+		},
 
 		/* Track */
-		::-webkit-scrollbar-track {
-			background: #f1f1f1;
-		}
+		"&::-webkit-scrollbar-track": {
+			background: "#f1f1f1",
+		},
 
 		/* Handle */
-		::-webkit-scrollbar-thumb {
-			background: #888;
-		}
+		"&::-webkit-scrollbar-thumb": {
+			background: "#888",
+		},
 
 		/* Handle on hover */
-		::-webkit-scrollbar-thumb:hover {
-			background: #555;
-		}
-	}
-`;
+		"&::-webkit-scrollbar-thumb:hover": {
+			background: "#555",
+		},
+	},
+});
 
-export const RowWrapper = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
+export const RowWrapper = styled("div", {
+	display: "flex",
+	flexDirection: "row",
+	justifyContent: "center",
+	alignItems: "center",
 
-	width: 98% !important;
+	width: "98% !important",
 
-	border-radius: 7px;
-	margin: 7px;
+	borderRadius: 7,
+	margin: 7,
 
-	&:hover {
-		box-shadow: ${theme.boxShadows.medium};
-		transition: box-shadow 0.2s ease-in-out 17ms;
-	}
+	"&:hover": {
+		transition: "boxShadow 0.2s ease-in-out 17ms",
+		boxShadow: theme.boxShadows.medium,
+	},
 
-	.active {
-		box-shadow: ${theme.boxShadows.medium};
+	"&.active": {
+		boxShadow: theme.boxShadows.medium,
 
-		background: white;
+		background: "white",
 
-		outline: 3px solid ${theme.colors.bgCentral};
-		outline-offset: -3px;
-	}
-`;
+		outline: `3px solid ${theme.colors.bgCentral}`,
+		outlineOffset: -3,
+	},
+});
 
-export const PlayButton = styled.div`
-	display: flex;
-	position: relative;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
+export const PlayButton = styled("div", {
+	display: "flex",
+	position: "relative",
+	flexDirection: "row",
+	justifyContent: "center",
+	alignItems: "center",
 
-	width: 90%;
-	height: 100%;
+	height: "100%",
+	width: "90%",
 
-	cursor: pointer;
-`;
+	cursor: "pointer",
+});
 
-export const InputWrapper = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 50px;
-	width: 320px;
+export const InputWrapper = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
+	height: 50,
+	width: 320,
 
-	box-shadow: ${theme.boxShadows.medium};
-	background: #d3d3d5;
-	overflow-y: hidden;
-	border-radius: 7px;
-	padding: 0.5rem;
+	boxShadow: theme.boxShadows.medium,
+	background: "#d3d3d5",
+	overflowY: "hidden",
+	padding: "0.5rem",
+	borderRadius: 7,
 
-	::selection {
-		background: #aa00ff; // ${theme.colors.accent};
-		color: #ffffff;
-	}
+	"&::selection": {
+		background: "#aa00ff; // ${theme.colors.accent}",
+		color: "#ffffff",
+	},
 
-	input {
-		::selection {
-			background: #aa00ff; // ${theme.colors.accent};
-			color: #ffffff;
-		}
+	input: {
+		"&::selection": {
+			background: "#aa00ff; // ${theme.colors.accent}",
+			color: "#ffffff",
+		},
 
-		font-family: ${fonts.primary};
-		font-weight: 500;
-		letter-spacing: 0.03em;
-		box-sizing: border-box;
-		font-size: 1.05rem;
-		color: #00525e;
+		fontFamily: fonts.primary,
+		letterSpacing: "0.03em",
+		boxSizing: "border-box",
+		fontSize: "1.05rem",
+		color: "#00525e",
+		fontWeight: 500,
 
-		height: 26px;
-		width: 100%;
+		width: "100%",
+		height: 26,
 
-		border: none;
+		background: "transparent",
+		paddingLeft: 10,
+		border: "none",
 
-		background: transparent;
-		padding-left: 10px;
+		"&::-webkit-input-placeholder": {
+			display: "flex",
+			justifyContent: "flex-start",
+			alignItems: "center",
 
-		::-webkit-input-placeholder {
-			display: flex;
-			justify-content: flex-start;
-			align-items: center;
-
-			color: rgba(0, 0, 0, 0.5);
-			font-style: italic;
-		}
-	}
-`;
+			color: "rgba(0, 0, 0, 0.5)",
+			fontStyle: "italic",
+		},
+	},
+});

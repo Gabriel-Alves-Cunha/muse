@@ -19,7 +19,7 @@ import {
 	useConvertValues,
 	ConvertValues,
 	usePlaylists,
-	MsgType,
+	MsgEnum,
 	sendMsg,
 } from "@contexts";
 
@@ -88,8 +88,8 @@ function useConverting() {
 
 			const convertStatus: MediaBeingConverted = {
 				toExtension: values.toExtension,
-				index: convertList.length,
 				status: ProgressStatus.ACTIVE,
+				index: convertList.length,
 				isConverting: true,
 				timeConverted: "",
 				path: values.path,
@@ -209,7 +209,7 @@ function useConverting() {
 		});
 
 		// This way to prevent infinite updates:
-		if (convertValues[0]) sendMsg({ type: MsgType.RESET_CONVERT_VALUES });
+		if (convertValues[0]) sendMsg({ type: MsgEnum.RESET_CONVERT_VALUES });
 		// We have to do this to reset downloadValues ^
 		// so that it is ready for a new media convertion!
 	}, [

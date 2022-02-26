@@ -1,80 +1,94 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { fonts, theme } from "@styles/theme";
 
-export const HEADER_HEIGHT = "27px" as const;
+const HEADER_HEIGHT = 27;
 
-export const Wrapper = styled.header`
-	height: ${HEADER_HEIGHT};
-	position: relative;
-	display: flex;
+export const Wrapper = styled("header", {
+	height: HEADER_HEIGHT,
+	position: "relative",
+	display: "flex",
 
-	background-color: ${theme.colors.secondary};
+	backgroundColor: theme.colors.secondary,
 
-	-webkit-user-select: none;
-	-webkit-app-region: drag;
+	"-webkit-user-select": "none",
+	"-webkit-app-region": "drag",
 	// ^ window-draggable-region
-	user-select: none;
-`;
+	"user-select": "none",
+});
 
-export const WindowButton = styled.button<{ isToClose?: boolean }>`
-	justify-content: center;
-	align-content: center;
-	align-items: center;
-	display: flex;
+//<{ isToClose?: boolean }>
+export const WindowButton = styled("button", {
+	justifyContent: "center",
+	alignContent: "center",
+	alignItems: "center",
+	display: "flex",
 
-	border: none;
-	color: black;
+	border: "none",
+	color: "black",
 
-	height: ${HEADER_HEIGHT};
-	width: 48px;
+	height: HEADER_HEIGHT,
+	width: 48,
 
-	background-color: ${theme.colors.secondary};
+	backgroundColor: theme.colors.secondary,
 
-	&:hover {
-		background-color: ${({ isToClose }) => (isToClose ? "#e70000" : "#dbdadc")};
-		${({ isToClose }) => (isToClose ? "color: white;" : "")};
-	}
-`;
+	variants: {
+		color: {
+			true: { color: "white" },
+			false: { color: "" },
+		},
+		backgroundColor: {
+			false: { backgroundColor: "#dbdadc" },
+			true: { backgroundColor: "#e70000" },
+		},
+	},
 
-export const WindowButtons = styled.div`
-	display: flex;
-	flex-direction: row-reverse;
-	margin-left: auto;
-	height: 100%;
+	"&:hover": {
+		backgroundColor: "$backgroundColor",
+		color: "$color",
+	},
+});
 
-	background-color: ${theme.colors.secondary};
-`;
+export const WindowButtons = styled("div", {
+	display: "flex",
+	flexDirection: "row-reverse",
+	marginLeft: "auto",
+	height: "100%",
 
-export const AppName_Folder_Wrapper = styled.button`
-	background-color: ${theme.colors.secondary};
-	border: none;
+	backgroundColor: theme.colors.secondary,
+});
 
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: absolute;
-	height: 100%;
-	width: 20%;
-	left: 50%;
+export const AppName_Folder_Wrapper = styled("button", {
+	backgroundColor: theme.colors.secondary,
+	border: "none",
 
-	transform: translate(-50%);
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
+	position: "absolute",
+	height: "100%",
+	width: "20%",
+	left: "50%",
 
-	font-family: ${fonts.primary};
-	color: ${theme.colors.text};
-	letter-spacing: 0.03em;
-	font-weight: 300;
-	font-size: 0.9em;
+	transform: "translate(-50%)",
 
-	@media (max-width: 500px) {
-		display: none;
-	}
-`;
+	fontFamily: fonts.primary,
+	color: theme.colors.text,
+	letterSpacing: "0.03em",
+	fontSize: "0.9em",
+	fontWeight: 300,
 
-export const AppIcon = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	media: {
+		small: {
+			display: "none",
+		},
+	},
+});
 
-	margin-left: 7px;
-`;
+export const AppIcon = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
+
+	marginLeft: 7,
+});

@@ -1,30 +1,30 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
-export const Dots = styled.div`
-	position: relative;
-	background: gray;
-	height: 3px;
-	width: 3px;
+export const Dots = styled("div", {
+	position: "relative",
+	background: "gray",
+	height: 3,
+	width: 3,
 
-	&::before {
-		content: "";
-		position: absolute;
-		height: 3px;
-		width: 3px;
-		top: -6px;
-		left: 0px;
+	"&::before": {
+		content: "",
+		position: "absolute",
+		height: 3,
+		width: 3,
+		top: -6,
+		left: 0,
 
-		background: gray;
-	}
+		background: "gray",
+	},
 
-	&::after {
-		content: "";
-		position: absolute;
-		height: 3px;
-		width: 3px;
-		left: 0px;
-		top: 6px;
+	"&::after": {
+		content: "",
+		position: "absolute",
+		height: 3,
+		width: 3,
+		left: 0,
+		top: 6,
 
-		background: gray;
-	}
-`;
+		background: "gray",
+	},
+});

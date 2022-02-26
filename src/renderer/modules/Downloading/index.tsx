@@ -5,14 +5,13 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
-import { useDownloadValues, MsgType, sendMsg } from "@contexts";
+import { useDownloadValues, MsgEnum, sendMsg } from "@contexts";
 import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
 import { Progress, icon } from "@components/Progress";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
-import { dbg } from "@common/utils";
 
 import { Circle, Popup, Title } from "./styles";
 
@@ -27,13 +26,6 @@ const { setState: setDownloadingList } = useDownloadingList;
 function useDownloading() {
 	const { downloadingList } = useDownloadingList();
 	const { downloadValues } = useDownloadValues();
-
-	dbg(
-		"downloadingList at useDownloading:",
-		downloadingList,
-		"\ndownloadValues at useDownloading:",
-		downloadValues,
-	);
 
 	const cancelDownloadAndOrRemoveItFromList = useCallback(
 		(url_: string) => {
@@ -188,7 +180,7 @@ function useDownloading() {
 
 				// We have to `sendMsg` to reset downloadValues
 				// so that it is ready for a new media download:
-				sendMsg({ type: MsgType.RESET_DOWNLOAD_VALUES });
+				sendMsg({ type: MsgEnum.RESET_DOWNLOAD_VALUES });
 
 				// Sending port so we can communicate with electron:
 				window.postMessage("download media", "*", [electronPort]);

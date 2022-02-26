@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { useEffect, useRef, useState } from "react";
 
-import { MsgType, sendMsg } from "@contexts";
+import { MsgEnum, sendMsg } from "@contexts";
 
 import { Wrapper } from "./styles";
 
@@ -32,7 +32,7 @@ export function Convert() {
 				path,
 			}));
 
-			sendMsg({ type: MsgType.START_CONVERT, value });
+			sendMsg({ type: MsgEnum.START_CONVERT, value });
 
 			setSelectedMediasPath([]);
 		}

@@ -15,10 +15,10 @@ import { assertUnreachable } from "@utils/utils";
 import { ImgWithFallback } from "@components";
 import { dbg } from "@common/utils";
 import {
-	CurrentPlayingType,
+	CurrentPlayingEnum,
 	useCurrentPlaying,
 	PlaylistActions,
-	PlaylistType,
+	PlaylistEnum,
 	usePlaylists,
 } from "@contexts";
 
@@ -46,37 +46,37 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const searcherRef = useRef(null);
 
 	useOnClickOutside(searcherRef, () => {
-		dispatchSearcher({ type: Type.SET_SEARCH_TERM, value: "" });
-		dispatchSearcher({ type: Type.SET_RESULTS, value: [] });
+		dispatchSearcher({ type: SearcherAction.SET_SEARCH_TERM, value: "" });
+		dispatchSearcher({ type: SearcherAction.SET_RESULTS, value: [] });
 	});
 
 	const reload = async () => {
-		dispatchSearcher({ type: Type.SET_IS_LOADING, value: true });
+		dispatchSearcher({ type: SearcherAction.SET_IS_LOADING, value: true });
 
 		await searchLocalComputerForMedias(true);
 
-		dispatchSearcher({ type: Type.SET_IS_LOADING, value: false });
+		dispatchSearcher({ type: SearcherAction.SET_IS_LOADING, value: false });
 	};
 
 	const cleanHistory = () => {
 		dbg("Sending msg to clean history.");
 
 		setPlaylists({
-			type: PlaylistType.UPDATE_HISTORY,
+			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
 		});
 	};
 
 	useEffect(() => {
-		if (searcher.searchTerm.length < 3) return;
+		if (searcher.searchTerm.length < 2) return;
 
 		const searchTimeout = setTimeout(
 			() =>
 				dispatchSearcher({
 					value: searchForMedia(searcher.searchTerm),
-					type: Type.SET_RESULTS,
+					type: SearcherAction.SET_RESULTS,
 				}),
-			500,
+			400,
 		);
 
 		return () => clearTimeout(searchTimeout);
@@ -90,11 +90,11 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					<input
 						onChange={e =>
 							dispatchSearcher({
-								type: Type.SET_SEARCH_TERM,
+								type: SearcherAction.SET_SEARCH_TERM,
 								value: e.target.value,
 							})
 						}
-						placeholder="Search for artists, songs..."
+						placeholder="Search for songs"
 						value={searcher.searchTerm}
 						autoCapitalize="on"
 						spellCheck="false"
@@ -113,7 +113,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					case ButtonToTheSide.RELOAD_BUTTON: {
 						return (
 							<ReloadContainer
-								isSearching={searcher.isLoading}
+								animation={String(searcher.isLoading) as "true" | "false"}
 								onClick={reload}
 							>
 								{searcher.isLoading ? (
@@ -156,7 +156,7 @@ const { getState: getCurrentPlaying } = useCurrentPlaying;
 
 function playMedia(media: Media, playlist: Playlist) {
 	getCurrentPlaying().setCurrentPlaying({
-		type: CurrentPlayingType.PLAY_THIS_MEDIA,
+		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlist,
 		media,
 	});
@@ -197,10 +197,10 @@ function SearchResults({
 				</Img>
 
 				<Info>
-					<Title style={{ marginLeft: "5px", textAlign: "left" }}>
+					<Title style={{ marginLeft: 5, textAlign: "left" }}>
 						{media.title}
 					</Title>
-					<SubTitle style={{ marginLeft: "5px" }}>{media.duration}</SubTitle>
+					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
 				</Info>
 			</Result>
 		) : null;
@@ -226,7 +226,7 @@ function SearchResults({
 
 function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 	switch (action.type) {
-		case Type.SET_RESULTS: {
+		case SearcherAction.SET_RESULTS: {
 			const ret: SearcherProps = {
 				searchTerm: prev.searchTerm,
 				isLoading: prev.isLoading,
@@ -236,7 +236,7 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 			return ret;
 		}
 
-		case Type.SET_SEARCH_TERM: {
+		case SearcherAction.SET_SEARCH_TERM: {
 			const ret: SearcherProps = {
 				isLoading: prev.isLoading,
 				searchTerm: action.value,
@@ -246,7 +246,7 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 			return ret;
 		}
 
-		case Type.SET_IS_LOADING: {
+		case SearcherAction.SET_IS_LOADING: {
 			const ret: SearcherProps = {
 				searchTerm: prev.searchTerm,
 				isLoading: action.value,
@@ -268,11 +268,11 @@ type SearcherProps = Readonly<{
 }>;
 
 type Action =
-	| Readonly<{ type: Type.SET_RESULTS; value: readonly Media[] }>
-	| Readonly<{ type: Type.SET_SEARCH_TERM; value: string }>
-	| Readonly<{ type: Type.SET_IS_LOADING; value: boolean }>;
+	| Readonly<{ type: SearcherAction.SET_RESULTS; value: readonly Media[] }>
+	| Readonly<{ type: SearcherAction.SET_SEARCH_TERM; value: string }>
+	| Readonly<{ type: SearcherAction.SET_IS_LOADING; value: boolean }>;
 
-enum Type {
+enum SearcherAction {
 	SET_SEARCH_TERM,
 	SET_IS_LOADING,
 	SET_RESULTS,

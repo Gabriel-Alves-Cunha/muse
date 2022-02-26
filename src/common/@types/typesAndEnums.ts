@@ -1,6 +1,6 @@
-import { folders } from "@utils/app";
+import { pages } from "@utils/app";
 
-export type Page = Readonly<typeof folders[number]>;
+export type Page = Readonly<typeof pages[number]>;
 export type PrettyBytes = Readonly<string>;
 export type Path = Readonly<string>;
 
@@ -20,7 +20,7 @@ export type Media = Readonly<{
 	path: Path;
 }>;
 
-export enum NotificationType {
+export enum NotificationEnum {
 	MAXIMIZE,
 	MINIMIZE,
 	QUIT_APP,

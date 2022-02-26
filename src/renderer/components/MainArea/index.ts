@@ -1,17 +1,19 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
-export const MainArea = styled.div`
-	flex-direction: column;
-	position: relative;
-	display: flex;
+export const MainArea = styled("div", {
+	flexDirection: "column",
+	position: "relative",
+	display: "flex",
 
-	height: 100%;
-	width: 100%;
+	height: "100%",
+	width: "100%",
 
-	@media (max-width: 500px) {
-		header {
-			justify-content: center;
-			margin-left: 0;
-		}
-	}
-`;
+	media: {
+		small: {
+			header: {
+				justifyContent: "center",
+				marginLeft: 0,
+			},
+		},
+	},
+});

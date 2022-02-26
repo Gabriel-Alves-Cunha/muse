@@ -1,103 +1,103 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { fonts, theme } from "@styles/theme";
 
-export const navbarWidth = "170px";
+export const Nav = styled("nav", {
+	display: "flex",
+	flexDirection: "column",
+	alignContent: "center",
 
-export const Nav = styled.nav`
-	display: flex;
-	flex-direction: column;
-	align-content: center;
+	height: "100vh",
+	width: 170,
 
-	width: ${navbarWidth};
-	height: 100vh;
+	backgroundColor: theme.colors.bgNav,
 
-	background-color: ${theme.colors.bgNav};
+	"&.active": {
+		outline: `3px solid ${theme.colors.bgCentral}`,
+		outlineOffset: -3,
 
-	.active {
-		outline: 3px solid ${theme.colors.bgCentral};
-		outline-offset: -3px;
+		background: "white",
 
-		background: white;
+		boxShadow: theme.boxShadows.small,
+	},
 
-		box-shadow: ${theme.boxShadows.small};
-	}
+	media: {
+		small: {
+			width: 30,
 
-	@media (max-width: 500px) {
-		width: 30px;
+			"&.active": {
+				boxShadow: "none",
+				outline: "none",
 
-		.active {
-			box-shadow: none;
-			outline: none;
+				backgroundColor: theme.colors.accentAlpha,
+			},
 
-			background-color: ${theme.colors.accentAlpha};
-		}
+			button: {
+				justifyContent: "center",
 
-		button {
-			justify-content: center;
+				height: 42,
+				width: 30,
 
-			height: 42px;
-			width: 30px;
+				padding: 0,
+				margin: 0,
 
-			padding: 0;
-			margin: 0;
+				boxShadow: "none",
+				borderRadius: 0,
 
-			box-shadow: none;
-			border-radius: 0;
+				"&:hover": {
+					boxShadow: "none",
+				},
 
-			&:hover {
-				box-shadow: none;
-			}
+				div: {
+					// Text
+					display: "none",
+				},
 
-			div {
-				// Text
-				display: none;
-			}
+				span: {
+					// svg
+					color: "black",
+					margin: 0,
+				},
+			},
+		},
+	},
+});
 
-			span {
-				// svg
-				color: black;
-				margin: 0;
-			}
-		}
-	}
-`;
+export const FolderButton = styled("button", {
+	display: "flex", // row,
+	alignItems: "center",
+	width: 160,
+	height: 42,
 
-export const FolderButton = styled.button`
-	display: flex; // row
-	align-items: center;
-	width: 160px;
-	height: 42px;
+	backgroundColor: "transparent",
+	cursor: "pointer",
+	fontSize: "1rem",
+	padding: 10,
+	margin: 5,
 
-	background-color: transparent;
-	font-size: 1rem;
-	cursor: pointer;
-	padding: 10px;
-	margin: 5px;
+	borderRadius: 5,
+	border: "none",
 
-	border-radius: 5px;
-	border: none;
+	span: {
+		display: "flex",
+		alignItems: "center",
 
-	span {
-		display: flex;
-		align-items: center;
+		marginRight: 10,
+	},
 
-		margin-right: 10px;
-	}
+	"&:hover": {
+		"&:not(&.active)": {
+			transition: "box-shadow 0.2s",
+			boxShadow: theme.boxShadows.inset_small,
+		},
+	},
+});
 
-	&:hover {
-		&:not(.active) {
-			transition: box-shadow 0.2s;
-			box-shadow: ${theme.boxShadows.inset_small};
-		}
-	}
-`;
-
-export const Text = styled.div`
-	font-family: ${fonts.primary};
-	color: ${theme.colors.text};
-	letter-spacing: 0.03em;
-	font-size: 1.05rem;
-	font-weight: 500;
-	text-align: left;
-`;
+export const Text = styled("div", {
+	fontFamily: fonts.primary,
+	color: theme.colors.text,
+	letterSpacing: "0.03em",
+	fontSize: "1.05rem",
+	textAlign: "left",
+	fontWeight: 500,
+});

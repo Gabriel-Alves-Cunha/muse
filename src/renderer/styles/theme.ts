@@ -27,8 +27,10 @@ export const theme = {
 
 export const fonts = {
 	primary: "'Assistant', sans-serif",
-	all: `font-family: 'Assistant', sans-serif;
-				color: ${theme.colors.text};
-				letter-spacing: 0.03em;
-				font-size: 1rem`,
+	all: {
+		fontFamily: "'Assistant', sans-serif",
+		color: theme.colors.text,
+		letterSpacing: "0.03em",
+		fontSize: "1rem",
+	},
 } as const;

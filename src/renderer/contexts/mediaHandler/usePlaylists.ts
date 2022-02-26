@@ -67,7 +67,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							get().setPlaylists({
-								type: PlaylistType.UPDATE_MEDIA_LIST,
+								type: PlaylistEnum.UPDATE_MEDIA_LIST,
 								whatToDo: PlaylistActions.ADD,
 								media,
 							});
@@ -137,7 +137,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 							get().setPlaylists({
 								whatToDo: PlaylistActions.REFRESH_ONE,
-								type: PlaylistType.UPDATE_MEDIA_LIST,
+								type: PlaylistEnum.UPDATE_MEDIA_LIST,
 								media: refreshedMedia,
 							});
 							break;
@@ -159,7 +159,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							get().setPlaylists({
-								type: PlaylistType.UPDATE_MEDIA_LIST,
+								type: PlaylistEnum.UPDATE_MEDIA_LIST,
 								whatToDo: PlaylistActions.REMOVE,
 								media,
 							});
@@ -181,7 +181,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				await rm(media.path);
 
 				get().setPlaylists({
-					type: PlaylistType.UPDATE_MEDIA_LIST,
+					type: PlaylistEnum.UPDATE_MEDIA_LIST,
 					whatToDo: PlaylistActions.REMOVE,
 					media,
 				});
@@ -207,7 +207,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				const prevPlaylistArray = get().playlists;
 
 				switch (action.type) {
-					case PlaylistType.UPDATE_HISTORY: {
+					case PlaylistEnum.UPDATE_HISTORY: {
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						const prevHistory = prevPlaylistArray.find(
 							({ name }) => name === "history",
@@ -258,7 +258,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						break;
 					}
 
-					case PlaylistType.UPDATE_FAVORITES: {
+					case PlaylistEnum.UPDATE_FAVORITES: {
 						// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 						const prevFavorites = prevPlaylistArray.find(
 							({ name }) => name === "favorites",
@@ -319,7 +319,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						break;
 					}
 
-					case PlaylistType.UPDATE_MEDIA_LIST: {
+					case PlaylistEnum.UPDATE_MEDIA_LIST: {
 						// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 						const prevMediaList = prevPlaylistArray.find(
 							({ name }) => name === "mediaList",
@@ -516,7 +516,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						dbg("Finished searching. Medias =", newMediaList);
 
 						get().setPlaylists({
-							type: PlaylistType.UPDATE_MEDIA_LIST,
+							type: PlaylistEnum.UPDATE_MEDIA_LIST,
 							whatToDo: PlaylistActions.NEW_LIST,
 							list: newMediaList,
 						});
@@ -647,16 +647,16 @@ export type PlaylistsReducer_Action =
 				| PlaylistActions.ADD
 				| PlaylistActions.REMOVE
 				| PlaylistActions.CLEAN;
-			type: PlaylistType.UPDATE_FAVORITES;
+			type: PlaylistEnum.UPDATE_FAVORITES;
 			media: Media;
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.ADD | PlaylistActions.CLEAN;
-			type: PlaylistType.UPDATE_HISTORY;
+			type: PlaylistEnum.UPDATE_HISTORY;
 			media?: Media;
 	  }>
 	| Readonly<{
-			type: PlaylistType.UPDATE_MEDIA_LIST;
+			type: PlaylistEnum.UPDATE_MEDIA_LIST;
 			whatToDo: PlaylistActions;
 			list?: readonly Media[];
 			media?: Media;
@@ -670,7 +670,7 @@ export enum PlaylistActions {
 	ADD,
 }
 
-export enum PlaylistType {
+export enum PlaylistEnum {
 	UPDATE_MEDIA_LIST,
 	UPDATE_FAVORITES,
 	UPDATE_HISTORY,

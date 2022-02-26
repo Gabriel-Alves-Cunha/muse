@@ -1,6 +1,5 @@
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
-import { Global } from "@emotion/react";
 
 import { Convert, Download, Favorites, History, Home, Settings } from "@routes";
 import { MediaPlayer, Downloading, Converting, Navbar } from "@modules";
@@ -15,10 +14,10 @@ import { MainView } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
 
 export function App() {
+	GlobalCSS();
+
 	return (
 		<>
-			<Global styles={GlobalCSS} />
-
 			<Decorations />
 
 			<Main />

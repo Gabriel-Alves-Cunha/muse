@@ -19,7 +19,7 @@ import {
 import { capitalizedAppName, isDevelopment } from "@common/utils";
 import { logoPath } from "./utils.js";
 import {
-	NotificationType,
+	NotificationEnum,
 	TypeOfMsgObject,
 } from "@common/@types/typesAndEnums";
 
@@ -175,24 +175,24 @@ ipcMain.on(
 	(
 		event,
 		object: Readonly<{
-			type: NotificationType;
+			type: NotificationEnum;
 			msg?: string;
 		}>,
 	) => {
 		switch (object.type) {
-			case NotificationType.QUIT_APP: {
+			case NotificationEnum.QUIT_APP: {
 				app.quit();
 				break;
 			}
 
-			case NotificationType.MAXIMIZE: {
+			case NotificationEnum.MAXIMIZE: {
 				BrowserWindow.getFocusedWindow()?.isMaximized()
 					? BrowserWindow.getFocusedWindow()?.unmaximize()
 					: BrowserWindow.getFocusedWindow()?.maximize();
 				break;
 			}
 
-			case NotificationType.MINIMIZE: {
+			case NotificationEnum.MINIMIZE: {
 				BrowserWindow.getFocusedWindow()?.minimize();
 				break;
 			}

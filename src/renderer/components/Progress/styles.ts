@@ -1,62 +1,62 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 
 import { theme } from "@styles/theme";
 
-export const Bar = styled.div<{ percentage: number }>`
-	width: ${({ percentage }) => percentage}%;
-	height: 100%;
+export const Bar = styled("div", {
+	width: "$$percentage",
+	height: "100%",
 
-	background-color: ${theme.colors.accent};
-	transition: width 0.3s linear;
+	backgroundColor: theme.colors.accent,
+	transition: "width 0.3s linear",
 
-	.${ProgressStatus.ACTIVE} {
-		position: absolute;
-		height: 100%;
+	[`&.${ProgressStatus.ACTIVE}`]: {
+		position: "absolute",
+		height: "100%",
 
-		animation: progress-active 2s cubic-bezier(0.23, 1, 0.32, 1) infinite;
-		background-color: white;
+		animation: "progress-active 2s cubic-bezier(0.23, 1, 0.32, 1) infinite",
+		backgroundColor: "white",
 
-		@keyframes progress-active {
-			0% {
-				opacity: 0.3;
-				width: 0;
-			}
+		"@keyframes progress-active": {
+			"0%": {
+				opacity: 0.3,
+				width: 0,
+			},
 
-			40% {
-				opacity: 0.7;
-				width: 0;
-			}
+			"40%": {
+				opacity: 0.7,
+				width: 0,
+			},
 
-			80% {
-				opacity: 0.3;
-			}
+			"80%": {
+				opacity: 0.3,
+			},
 
-			100% {
-				opacity: 0;
-				width: ${({ percentage }) => percentage}%;
-			}
-		}
-	}
-`;
+			"100%": {
+				width: "$$percentage",
+				opacity: 0,
+			},
+		},
+	},
+});
 
-export const ProgressBarWrapper = styled.div`
-	position: relative;
-	height: 3px;
-	width: 90%;
+export const ProgressBarWrapper = styled("div", {
+	position: "relative",
+	width: "90%",
+	height: 3,
 
-	background-color: ${theme.colors.bgNav};
-`;
+	backgroundColor: theme.colors.bgNav,
+});
 
-export const Component = styled.div`
-	display: flex;
-	height: 15px;
-	width: 100%;
+export const Component = styled("div", {
+	display: "flex",
+	width: "100%",
+	height: 15,
 
-	align-items: center;
+	alignItems: "center",
 
-	svg {
-		margin: auto;
-	}
-`;
+	svg: {
+		margin: "auto",
+	},
+});

@@ -26,7 +26,7 @@ import {
 } from "node-taglib-sharp";
 import {
 	ListenToNotification,
-	NotificationType,
+	NotificationEnum,
 	ProgressStatus,
 } from "@common/@types/typesAndEnums";
 import fluent_ffmpeg from "fluent-ffmpeg";
@@ -209,7 +209,7 @@ const mediasConverting: Stream[] = [];
 
 function sendNotificationToElectron(
 	object: Readonly<{
-		type: NotificationType;
+		type: NotificationEnum;
 		msg?: string;
 	}>,
 ): void {

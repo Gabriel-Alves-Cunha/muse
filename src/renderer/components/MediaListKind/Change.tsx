@@ -78,7 +78,7 @@ export type MediaListKindProps = Readonly<{
 	mediaType: DefaultLists;
 }>;
 
-type Props = {
+type Props = Readonly<{
 	setWhatToChange: Dispatch<
 		SetStateAction<
 			| {
@@ -95,4 +95,4 @@ type Props = {
 		current: string;
 	};
 	mediaPath: Path;
-};
+}>;

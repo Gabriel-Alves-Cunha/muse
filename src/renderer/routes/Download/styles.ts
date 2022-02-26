@@ -1,200 +1,202 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { fonts, theme } from "@styles/theme";
 
-export const Wrapper = styled.section`
-	display: flex;
-	position: relative;
-	flex-direction: column;
-	justify-content: flex-start;
+export const Wrapper = styled("section", {
+	display: "flex",
+	position: "relative",
+	flexDirection: "column",
+	justifyContent: "flex-start",
 
-	width: 100%;
-	height: calc(100vh - 20vh);
+	width: "100%",
+	height: "calc(100vh - 20vh)",
 
-	overflow-y: hidden;
+	overflowY: "hidden",
 
 	/* width */
-	::-webkit-scrollbar {
-		width: 5px;
-	}
+	"&::-webkit-scrollbar": {
+		width: 5,
+	},
 
 	/* Track */
-	::-webkit-scrollbar-track {
-		background: #f1f1f1;
-	}
+	"&::-webkit-scrollbar-track": {
+		background: "#f1f1f1",
+	},
 
 	/* Handle */
-	::-webkit-scrollbar-thumb {
-		background: #888;
-	}
+	"&::-webkit-scrollbar-thumb": {
+		background: "#888",
+	},
 
 	/* Handle on hover */
-	::-webkit-scrollbar-thumb:hover {
-		background: #555;
-	}
-`;
+	"&::-webkit-scrollbar-thumb:hover": {
+		background: "#555",
+	},
+});
 
-export const SearchWrapper = styled.div`
-	display: flex;
-	position: relative;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
+export const SearchWrapper = styled("div", {
+	display: "flex",
+	position: "relative",
+	flexDirection: "row",
+	alignItems: "center",
+	justifyContent: "center",
 
-	height: 60px;
-	padding: 0 5%;
+	padding: "0 5%",
+	height: 60,
 
-	p {
-		position: absolute;
-		margin-top: 4rem;
-		font-size: 0.8rem;
-		letter-spacing: 0.02rem;
-		font-family: ${fonts.primary};
-		color: red;
-	}
-`;
+	p: {
+		fontFamily: fonts.primary,
+		letterSpacing: "0.02rem",
+		position: "absolute",
+		fontSize: "0.8rem",
+		marginTop: "4rem",
+		color: "red",
+	},
+});
 
-export const Searcher = styled.button`
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: center;
+export const Searcher = styled("button", {
+	position: "relative",
+	display: "flex",
+	flexDirection: "row",
+	justifyContent: "flex-start",
+	alignItems: "center",
 
-	height: 30px;
-	background: transparent;
-	color: #ccc;
-	width: 80%;
+	background: "transparent",
+	color: "#ccc",
+	width: "80%",
+	height: 30,
 
-	border: none;
-	border-radius: 15px;
-	cursor: text;
+	borderRadius: 15,
+	border: "none",
+	cursor: "text",
 
-	box-shadow: ${theme.boxShadows.small};
+	boxShadow: theme.boxShadows.small,
 
-	svg {
-		margin-left: 10px;
-	}
+	svg: {
+		marginLeft: "10px",
+	},
 
-	&::after {
-		box-shadow: ${theme.boxShadows.inset_small};
-		opacity: 0;
-		transition: opacity 0s ease-in-out 17ms;
-	}
+	"&::after": {
+		transition: "opacity 0s ease-in-out 17ms",
+		boxShadow: theme.boxShadows.inset_small,
+		opacity: 0,
+	},
 
-	&:hover::after {
-		opacity: 1;
-	}
+	"&:hover::after": {
+		opacity: 1,
+	},
 
-	&:hover svg {
-		color: rgba(0, 0, 0, 0.5);
-	}
+	"&:hover svg": {
+		color: "rgba(0, 0, 0, 0.5)",
+	},
 
-	input {
-		box-sizing: border-box;
-		font-size: 0.9rem;
-		font-family: ${fonts.primary};
-		letter-spacing: 0.03em;
+	input: {
+		fontFamily: fonts.primary,
+		letterSpacing: "0.03em",
+		boxSizing: "border-box",
+		fontSize: "0.9rem",
 
-		height: 100%;
-		width: 100%;
+		height: "100%",
+		width: "100%",
 
-		border: none;
-		border-radius: 15px;
-		background: transparent;
+		background: "transparent",
+		borderRadius: 15,
+		border: "none",
 
-		padding-left: 10px;
-		padding-right: 10px;
-		color: rgba(0, 0, 0, 0.5);
+		color: "rgba(0, 0, 0, 0.5)",
+		paddingRight: 10,
+		paddingLeft: 10,
 
-		::placeholder {
-			color: #ccc;
-		}
+		"&::placeholder": {
+			color: "#ccc",
+		},
 
-		&:hover {
-			::placeholder {
-				color: rgba(0, 0, 0, 0.5);
-			}
-		}
-	}
-`;
+		"&:hover": {
+			"&::placeholder": {
+				color: "rgba(0, 0, 0, 0.5)",
+			},
+		},
+	},
+});
 
-export const ResultContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	margin-bottom: 1.3rem;
+export const ResultContainer = styled("div", {
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "center",
+	marginBottom: "1.3rem",
+	alignItems: "center",
 
-	img {
-		object-fit: cover;
-		display: flex;
+	img: {
+		objectFit: "cover",
+		display: "flex",
 
-		width: 90%;
-		height: 90%;
+		height: "90%",
+		width: "90%",
 
-		max-width: 250px;
-		max-height: 250px;
+		maxHeight: 250,
+		maxWidth: 250,
 
-		-webkit-box-reflect: below 0px -webkit-gradient(linear, right top, right
-					bottom, from(transparent), color-stop(40%, transparent), to(rgba(255, 255, 255, 0.1)));
+		"-webkit-box-reflect": `below 0px
+			-webkit-gradient(linear, right top, right	bottom,
+				from(transparent),
+				color-stop(40%, transparent),
+				to(rgba(255, 255, 255, 0.1))
+			)`,
 
-		box-shadow: 0px 50px 70px rgba(0, 0, 0, 0.3),
-			0px 10px 10px rgba(0, 0, 0, 0.1);
+		boxShadow: `0px 50px 70px rgba(0, 0, 0, 0.3),
+			0px 10px 10px rgba(0, 0, 0, 0.1)`,
 
-		will-change: transform;
-		transition: transform 0.2s ease-in-out 17ms;
+		willChange: "transform",
+		transition: "transform 0.2s ease-in-out 17ms",
 
-		&:hover {
-			transform: scale(1.04);
-		}
-	}
+		"&:hover": {
+			transform: "scale(1.04)",
+		},
+	},
 
-	p {
-		text-align: center;
-		margin: 2rem 1rem;
-		font-size: 1.1rem;
-		font-family: ${fonts.primary};
+	p: {
+		fontFamily: fonts.primary,
+		textAlign: "center",
+		margin: "2rem 1rem",
+		fontSize: "1.1rem",
 
-		color: black;
-		word-wrap: normal;
-	}
+		wordWrap: "normal",
+		color: "black",
+	},
 
-	span {
-		text-align: center;
-		margin: 1rem auto;
-		font-size: 1rem;
-		font-family: ${fonts.primary};
+	span: {
+		fontFamily: fonts.primary,
+		textAlign: "center",
+		margin: "1rem auto",
+		fontSize: "1rem",
 
-		color: black;
-		word-wrap: normal;
-	}
-`;
+		wordWrap: "normal",
+		color: "black",
+	},
+});
 
-export const Button = styled.button`
-	display: flex; // row
-	justify-content: center;
-	align-items: center;
-	width: 160px;
-	height: 42px;
+export const Button = styled("button", {
+	display: "flex", // row,
+	justifyContent: "center",
+	alignItems: "center",
+	width: 160,
+	height: 42,
 
-	background-color: transparent;
-	font-size: 1rem;
-	font-family: ${fonts.primary};
-	text-align: center;
-	padding: 10px;
-	cursor: pointer;
+	fontFamily: fonts.primary,
+	textAlign: "center",
+	fontSize: "1rem",
+	padding: "10px",
 
-	background-color: ${theme.colors.bgNav};
-	color: black;
+	backgroundColor: theme.colors.bgNav,
+	boxShadow: theme.boxShadows.small,
+	cursor: "pointer",
+	color: "black",
 
-	border: none;
-	border-radius: 5px;
+	borderRadius: "5px",
+	border: "none",
 
-	box-shadow: ${theme.boxShadows.small};
-
-	&:hover {
-		box-shadow: ${theme.boxShadows.inset_small};
-		transition: opacity 0.3s ease-in-out 17ms;
-	}
-`;
+	"&:hover": {
+		transition: "opacity 0.3s ease-in-out 17ms",
+		boxShadow: theme.boxShadows.inset_small,
+	},
+});

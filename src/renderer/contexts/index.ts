@@ -3,13 +3,13 @@ export { usePage } from "./page";
 export {
 	useDownloadValues,
 	useConvertValues,
-	MsgType,
+	MsgEnum,
 	sendMsg,
 } from "./communicationBetweenChildren";
 export type { ConvertValues } from "./communicationBetweenChildren";
 
 export {
-	CurrentPlayingType,
+	CurrentPlayingEnum,
 	useCurrentPlaying,
 } from "./mediaHandler/useCurrentPlaying";
 export type {
@@ -26,7 +26,7 @@ export type {
 export {
 	defaultPlaylists,
 	PlaylistActions,
-	PlaylistType,
+	PlaylistEnum,
 	usePlaylists,
 } from "./mediaHandler/usePlaylists";
 export type {

@@ -1,109 +1,108 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { fonts, theme } from "@styles/theme";
 
-export const Circle = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: absolute;
+export const Circle = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
+	position: "absolute",
 
-	bottom: 20vh;
-	left: 10px;
-	z-index: 50;
-	cursor: pointer;
+	cursor: "pointer",
+	bottom: "20vh",
+	zIndex: 50,
+	left: 10,
 
-	border-radius: 20px;
-	height: 40px;
-	width: 40px;
+	borderRadius: 20,
+	height: 40,
+	width: 40,
 
-	background-color: ${theme.colors.bgNav};
-	box-shadow: ${theme.boxShadows.small};
+	backgroundColor: theme.colors.bgNav,
+	boxShadow: theme.boxShadows.small,
 
-	&:hover {
-		box-shadow: ${theme.boxShadows.inset_small};
-		transition: opacity 0s ease-in-out 17ms;
-	}
-`;
+	"&:hover": {
+		transition: "opacity 0s ease-in-out 17ms",
+		boxShadow: theme.boxShadows.inset_small,
+	},
+});
 
-export const Popup = styled.div`
-	position: absolute;
-	display: flex;
-	flex-direction: column;
-	height: 100px;
-	width: 250px;
-	bottom: 20vh;
-	left: 10px;
-	gap: 1rem;
+export const Popup = styled("div", {
+	position: "absolute",
+	display: "flex",
+	flexDirection: "column",
+	bottom: "20vh",
+	gap: "1rem",
+	height: 100,
+	width: 250,
+	left: 10,
 
-	border-radius: 20px;
-	overflow-x: hidden;
-	overflow-y: auto;
-	padding: 1rem;
-	z-index: 500;
+	overflowX: "hidden",
+	overflowY: "auto",
+	borderRadius: 20,
+	padding: "1rem",
+	zIndex: 500,
 
-	background-color: ${theme.colors.bgCentral};
-	box-shadow: ${theme.boxShadows.small};
+	backgroundColor: theme.colors.bgCentral,
+	boxShadow: theme.boxShadows.small,
 
 	/* width */
-	::-webkit-scrollbar {
-		width: 5px;
-	}
+	"&::-webkit-scrollbar": {
+		width: 5,
+	},
 
 	/* Track */
-	::-webkit-scrollbar-track {
-		background: #f1f1f1;
-	}
+	"&::-webkit-scrollbar-track": {
+		background: "#f1f1f1",
+	},
 
 	/* Handle */
-	::-webkit-scrollbar-thumb {
-		background: #888;
-	}
+	"&::-webkit-scrollbar-thumb": {
+		background: "#888",
+	},
 
 	/* Handle on hover */
-	::-webkit-scrollbar-thumb:hover {
-		background: #555;
-	}
-`;
+	"&::-webkit-scrollbar-thumb:hover": {
+		background: "#555",
+	},
+});
 
-export const Title = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 1rem;
-	margin-bottom: 10px;
+export const Title = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
+	marginBottom: 10,
+	height: "1rem",
+	width: "100%",
 
-	p {
-		font-family: ${fonts.primary};
-		white-space: nowrap;
-		overflow: hidden;
-		font-size: 0.8rem;
-		text-align: left;
-		color: #777;
+	p: {
+		fontFamily: fonts.primary,
+		whiteSpace: "nowrap",
+		fontSize: "0.8rem",
+		textAlign: "left",
+		color: "#777",
 
-		width: 90%;
-	}
+		overflow: "hidden",
+		width: "90%",
+	},
 
-	span {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 20px;
-		width: 20px;
+	span: {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		height: 20,
+		width: 20,
 
-		border-radius: 50%;
-		margin-left: 10px;
+		backgroundColor: "transparent",
+		borderRadius: "50%",
+		marginLeft: 10,
 
-		background-color: transparent;
+		"&:hover": {
+			backgroundColor: "rgba(125, 125, 125, 0.3)",
+			color: "red",
 
-		&:hover {
-			background-color: rgba(125, 125, 125, 0.3);
-			color: red;
-
-			svg {
-				fill: red;
-			}
-		}
-	}
-`;
+			svg: {
+				fill: "red",
+			},
+		},
+	},
+});

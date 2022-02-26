@@ -3,7 +3,7 @@ import type { videoInfo } from "ytdl-core";
 
 import create from "zustand";
 
-import { MsgType, sendMsg } from "@contexts";
+import { MsgEnum, sendMsg } from "@contexts";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
 
@@ -21,19 +21,19 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		}),
 
 	download: (url: string) => {
-		const searcher = get().searcher;
+		const result = get().searcher.result;
 
-		if (!searcher.result) return;
+		if (!result) return;
 		dbg("Sending msg to download", url);
 
 		sendMsg({
+			type: MsgEnum.START_DOWNLOAD,
 			value: {
-				imageURL: searcher.result.imageURL,
-				title: searcher.result.title,
+				imageURL: result.imageURL,
 				canStartDownload: true,
+				title: result.title,
 				url,
 			},
-			type: MsgType.START_DOWNLOAD,
 		});
 	},
 
@@ -48,36 +48,28 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		const searcher = get().searcher;
 
 		set({ searcher: { ...searcher, isLoading: true, error: "" } });
-		let metadata: UrlMediaMetadata | undefined = undefined;
+		let result: UrlMediaMetadata | undefined = undefined;
 
 		try {
-			const info = (await getInfo(url)) as videoInfo;
-			const title = info.videoDetails.title;
+			const videoInfo = (await getInfo(url)) as videoInfo;
 
-			metadata = {
-				imageURL: info.videoDetails.thumbnails.at(-1)?.url ?? "",
+			result = {
+				imageURL: videoInfo.videoDetails.thumbnails.at(-1)?.url ?? "",
 				// ^ Highest quality is last in this array.
-				songTitle: info.videoDetails.media.song ?? title,
-				artist: info.videoDetails.media.artist ?? "",
-				title,
+				artist: videoInfo.videoDetails.media.artist ?? "",
+				title: videoInfo.videoDetails.title,
 			};
 		} catch (error) {
-			if (getErrorMessage(error).includes("No video id found"))
-				set({
-					searcher: {
-						...searcher,
-						isLoading: false,
-						error: "No video ID found!",
-					},
-				});
-			else
-				set({
-					searcher: {
-						...searcher,
-						isLoading: false,
-						error: "There was an error getting media information!",
-					},
-				});
+			set({
+				searcher: {
+					isLoading: false,
+					result: undefined,
+					searchTerm: searcher.searchTerm,
+					error: getErrorMessage(error).includes("No video id found")
+						? "No video ID found!"
+						: "There was an error getting media information!",
+				},
+			});
 
 			throw error;
 		} finally {
@@ -85,23 +77,22 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 				searcher: {
 					...searcher,
 					isLoading: false,
-					result: metadata,
 					error: "",
+					result,
 				},
 			});
 		}
 	},
 }));
 
-type DownloadHelper = {
+type DownloadHelper = Readonly<{
 	setSearchTerm(e: ChangeEvent<HTMLInputElement>): void;
 	search(url: string): Promise<void>;
 	download(url: string): void;
 	searcher: SearcherProps;
-};
+}>;
 
 type UrlMediaMetadata = Readonly<{
-	songTitle: string;
 	imageURL: string;
 	artist: string;
 	title: string;

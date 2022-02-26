@@ -31,26 +31,26 @@ const SearcherWrapper = () => {
 		search,
 	} = useDownloadHelper();
 
-	const searchTermRef = useRef("");
-	const searchTerm = searchTermRef.current;
+	const Ref2Url2Search = useRef("");
+	const url2Search = Ref2Url2Search.current;
 
 	useEffect(() => {
-		if (!searchTerm || searchTerm.length < 10) return;
+		if (!url2Search || url2Search.length < 10) return;
 
-		const searchTimeout = setTimeout(async () => await search(searchTerm), 400);
+		const searchTimeout = setTimeout(async () => await search(url2Search), 400);
 
 		return () => clearTimeout(searchTimeout);
-	}, [search, searchTerm]);
+	}, [search, url2Search]);
 
 	return (
 		<SearchWrapper>
 			<Searcher>
 				<SearchIcon size="1.2em" />
 				<input
-					placeholder="Paste Youtube url here!"
+					placeholder="Paste Youtube url here"
 					onChange={setSearchTerm}
 					autoCapitalize="off"
-					value={searchTerm}
+					value={url2Search}
 					spellCheck="false"
 					autoCorrect="off"
 					type="text"
@@ -81,7 +81,7 @@ const IsLoading = () => {
 };
 
 const { getState: getDownloadHelper } = useDownloadHelper;
-const makeDownload = () =>
+const startDownload = () =>
 	getDownloadHelper().download(getDownloadHelper().searcher.searchTerm);
 
 const Result = () => {
@@ -95,7 +95,7 @@ const Result = () => {
 
 			<p>{result.title}</p>
 
-			<Button onClick={makeDownload}>Download</Button>
+			<Button onClick={startDownload}>Download</Button>
 		</ResultContainer>
 	) : null;
 };

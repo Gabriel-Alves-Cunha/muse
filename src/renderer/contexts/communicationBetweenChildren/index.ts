@@ -31,7 +31,7 @@ const { setState: setConvertValuesState } = useConvertValues;
 
 export function sendMsg(action: Action) {
 	switch (action.type) {
-		case MsgType.START_DOWNLOAD: {
+		case MsgEnum.START_DOWNLOAD: {
 			setDownloadValuesState({
 				downloadValues: {
 					imageURL: action.value.imageURL,
@@ -43,17 +43,17 @@ export function sendMsg(action: Action) {
 			break;
 		}
 
-		case MsgType.RESET_DOWNLOAD_VALUES: {
+		case MsgEnum.RESET_DOWNLOAD_VALUES: {
 			setDownloadValuesState({ downloadValues: defaultDownloadValues });
 			break;
 		}
 
-		case MsgType.RESET_CONVERT_VALUES: {
+		case MsgEnum.RESET_CONVERT_VALUES: {
 			setConvertValuesState({ convertValues: [] });
 			break;
 		}
 
-		case MsgType.START_CONVERT: {
+		case MsgEnum.START_CONVERT: {
 			setConvertValuesState({
 				convertValues: action.value.map(values => ({
 					toExtension: values.toExtension,
@@ -72,7 +72,7 @@ export function sendMsg(action: Action) {
 }
 
 const handleDownloadMedia = (value: DownloadValues) =>
-	sendMsg({ type: MsgType.START_DOWNLOAD, value });
+	sendMsg({ type: MsgEnum.START_DOWNLOAD, value });
 
 // TODO: SEE THIS:
 window.electron?.notificationApi.receiveMsgFromElectron(object => {
@@ -101,12 +101,12 @@ export type ConvertValues = Readonly<{
 }>;
 
 type Action =
-	| Readonly<{ type: MsgType.START_CONVERT; value: readonly ConvertValues[] }>
-	| Readonly<{ type: MsgType.START_DOWNLOAD; value: DownloadValues }>
-	| Readonly<{ type: MsgType.RESET_DOWNLOAD_VALUES }>
-	| Readonly<{ type: MsgType.RESET_CONVERT_VALUES }>;
+	| Readonly<{ type: MsgEnum.START_CONVERT; value: readonly ConvertValues[] }>
+	| Readonly<{ type: MsgEnum.START_DOWNLOAD; value: DownloadValues }>
+	| Readonly<{ type: MsgEnum.RESET_DOWNLOAD_VALUES }>
+	| Readonly<{ type: MsgEnum.RESET_CONVERT_VALUES }>;
 
-export enum MsgType {
+export enum MsgEnum {
 	RESET_DOWNLOAD_VALUES,
 	RESET_CONVERT_VALUES,
 	START_DOWNLOAD,

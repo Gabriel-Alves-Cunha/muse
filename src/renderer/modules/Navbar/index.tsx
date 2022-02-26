@@ -10,7 +10,7 @@ import {
 	HomeIcon as Home,
 } from "@radix-ui/react-icons";
 
-import { folders } from "@utils/app";
+import { pages } from "@utils/app";
 import { usePage } from "@contexts";
 
 import { FolderButton, Nav, Text } from "./styles";
@@ -18,21 +18,21 @@ import { FolderButton, Nav, Text } from "./styles";
 const { setState: setPage } = usePage;
 
 export function Navbar() {
-	const page = usePage().page;
+	const currPage = usePage().page;
 
 	return (
 		<Nav>
-			{folders.map(folder => (
+			{pages.map(page => (
 				<FolderButton
-					className={folder === page ? "active" : ""}
-					onClick={() => setPage({ page: folder })}
+					className={page === currPage ? "active" : ""}
+					onClick={() => setPage({ page: page })}
 					onMouseDown={e => e.preventDefault()}
 					// ^ Takes focus off of button so that the `outline` css can be applied
-					aria-label={"Go to" + folder}
-					key={folder}
+					aria-label={"Go to" + page}
+					key={page}
 				>
-					<span>{icon(folder)}</span>
-					<Text>{folder}</Text>
+					<span>{icon(page)}</span>
+					<Text>{page}</Text>
 				</FolderButton>
 			))}
 		</Nav>
@@ -44,12 +44,13 @@ Navbar.whyDidYouRender = {
 	customName: "Navbar",
 };
 
-const icon = (folder: Page) => iconMap.get(folder) ?? <Question />;
-const iconMap = new Map<Page, JSX.Element>();
+const icon = (folder: Page) => iconObj[folder] ?? <Question />;
 
-iconMap.set("Favorites", <Favorites />);
-iconMap.set("Download", <Download />);
-iconMap.set("Settings", <Settings />);
-iconMap.set("History", <History />);
-iconMap.set("Convert", <Convert />);
-iconMap.set("Home", <Home />);
+const iconObj: Record<Page, JSX.Element> = {
+	Favorites: <Favorites />,
+	Download: <Download />,
+	Settings: <Settings />,
+	History: <History />,
+	Convert: <Convert />,
+	Home: <Home />,
+};

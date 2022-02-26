@@ -8,7 +8,7 @@ import {
 } from "@radix-ui/react-icons";
 import create from "zustand";
 
-import { useCurrentPlaying, CurrentPlayingType } from "@contexts";
+import { useCurrentPlaying, CurrentPlayingEnum } from "@contexts";
 import { ImgWithFallback } from "@components";
 import { formatDuration } from "@common/utils";
 
@@ -29,14 +29,14 @@ const { setState: setProgress } = useProgress;
 function playNextMedia() {
 	getCurrentPlaying().setCurrentPlaying({
 		playlist: getCurrentPlaying().currentPlaying.playlist,
-		type: CurrentPlayingType.PLAY_NEXT,
+		type: CurrentPlayingEnum.PLAY_NEXT,
 	});
 }
 
 function playPreviousMedia() {
 	getCurrentPlaying().setCurrentPlaying({
 		playlist: getCurrentPlaying().currentPlaying.playlist,
-		type: CurrentPlayingType.PLAY_PREVIOUS,
+		type: CurrentPlayingEnum.PLAY_PREVIOUS,
 	});
 }
 
@@ -51,10 +51,10 @@ export function MediaPlayer() {
 
 		audio.paused
 			? getCurrentPlaying().setCurrentPlaying({
-					type: CurrentPlayingType.RESUME,
+					type: CurrentPlayingEnum.RESUME,
 			  })
 			: getCurrentPlaying().setCurrentPlaying({
-					type: CurrentPlayingType.PAUSE,
+					type: CurrentPlayingEnum.PAUSE,
 			  });
 	}
 
@@ -67,9 +67,9 @@ export function MediaPlayer() {
 
 		const width = Number(getComputedStyle(div).width.replace("px", ""));
 		const clickX = e.nativeEvent.offsetX;
-		const gotoTime = (clickX / width) * duration;
+		const go2Time = (clickX / width) * duration;
 
-		audio.currentTime = gotoTime;
+		audio.currentTime = go2Time;
 	}
 
 	useEffect(() => {
@@ -149,7 +149,7 @@ function SeekerWrapper({
 						backgroundColor: theme.colors.accent,
 						width: `${percentage}%`,
 						position: "relative",
-						height: "3px",
+						height: 3,
 						left: 0,
 						top: 0,
 					}}
@@ -162,9 +162,9 @@ function SeekerWrapper({
 							position: "absolute",
 							borderRadius: "50%",
 							background: "white",
-							right: "-3px",
-							height: "6px",
-							width: "6px",
+							right: -3,
+							height: 6,
+							width: 6,
 							top: 0,
 						}}
 					/>

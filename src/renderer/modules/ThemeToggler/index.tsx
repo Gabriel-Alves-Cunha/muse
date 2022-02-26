@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@utils/app";
@@ -27,4 +27,4 @@ export function ThemeToggler() {
 	);
 }
 
-const Button = styled.button``;
+const Button = styled("button", {});

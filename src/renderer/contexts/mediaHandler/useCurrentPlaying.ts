@@ -12,7 +12,7 @@ import { dbg } from "@common/utils";
 import {
 	defaultPlaylists,
 	PlaylistActions,
-	PlaylistType,
+	PlaylistEnum,
 	usePlaylists,
 } from "@contexts/mediaHandler/usePlaylists";
 
@@ -43,7 +43,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 					const playlists = getPlaylists().playlists;
 
 					switch (action.type) {
-						case CurrentPlayingType.PLAY_THIS_MEDIA: {
+						case CurrentPlayingEnum.PLAY_THIS_MEDIA: {
 							dbg("setCurrentPlaying 'play this media' action =", action);
 							// debugger;
 
@@ -60,7 +60,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 								previousPlaying.media.id !== action.media.id
 							)
 								getPlaylists().setPlaylists({
-									type: PlaylistType.UPDATE_HISTORY,
+									type: PlaylistEnum.UPDATE_HISTORY,
 									whatToDo: PlaylistActions.ADD,
 									media: previousPlaying.media,
 								});
@@ -75,7 +75,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							break;
 						}
 
-						case CurrentPlayingType.PLAY_PREVIOUS: {
+						case CurrentPlayingEnum.PLAY_PREVIOUS: {
 							dbg("setCurrentPlaying 'play previous' action =", action);
 
 							// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
@@ -94,7 +94,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							break;
 						}
 
-						case CurrentPlayingType.RESUME: {
+						case CurrentPlayingEnum.RESUME: {
 							(async () =>
 								await (
 									document.getElementById("audio") as HTMLAudioElement
@@ -102,7 +102,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							break;
 						}
 
-						case CurrentPlayingType.PAUSE: {
+						case CurrentPlayingEnum.PAUSE: {
 							const audio = document.getElementById(
 								"audio",
 							) as HTMLAudioElement;
@@ -119,7 +119,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							break;
 						}
 
-						case CurrentPlayingType.PLAY_NEXT: {
+						case CurrentPlayingEnum.PLAY_NEXT: {
 							dbg("currentPlaying 'playNext' action =", action);
 
 							const prevPlaylist = previousPlaying.playlist;
@@ -251,16 +251,16 @@ export type CurrentPlaying = Readonly<{
 
 export type currentPlayingReducer_Action =
 	| Readonly<{
-			type: CurrentPlayingType.PLAY_THIS_MEDIA;
+			type: CurrentPlayingEnum.PLAY_THIS_MEDIA;
 			media: Media;
 			playlist: Playlist;
 	  }>
-	| Readonly<{ type: CurrentPlayingType.PLAY_PREVIOUS; playlist: Playlist }>
-	| Readonly<{ type: CurrentPlayingType.PLAY_NEXT; playlist: Playlist }>
-	| Readonly<{ type: CurrentPlayingType.RESUME }>
-	| Readonly<{ type: CurrentPlayingType.PAUSE }>;
+	| Readonly<{ type: CurrentPlayingEnum.PLAY_PREVIOUS; playlist: Playlist }>
+	| Readonly<{ type: CurrentPlayingEnum.PLAY_NEXT; playlist: Playlist }>
+	| Readonly<{ type: CurrentPlayingEnum.RESUME }>
+	| Readonly<{ type: CurrentPlayingEnum.PAUSE }>;
 
-export enum CurrentPlayingType {
+export enum CurrentPlayingEnum {
 	PLAY_THIS_MEDIA,
 	PLAY_PREVIOUS,
 	PLAY_NEXT,

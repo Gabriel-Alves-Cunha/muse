@@ -2,13 +2,13 @@ import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "./Change";
 import type { Media } from "@common/@types/typesAndEnums";
 
-import { FixedSizeList as List, areEqual } from "react-window";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
+import { FixedSizeList as List } from "react-window";
 import { memo, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import Popup from "reactjs-popup";
 
-import { useCurrentPlaying, CurrentPlayingType, usePlaylists } from "@contexts";
+import { useCurrentPlaying, CurrentPlayingEnum, usePlaylists } from "@contexts";
 import { Dots, ImgWithFallback } from "@components";
 import { MediaOptionsModal } from "./MediaOptions";
 
@@ -43,7 +43,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 
 	const playMedia = (media: Media) =>
 		setCurrentPlaying({
-			type: CurrentPlayingType.PLAY_THIS_MEDIA,
+			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 			playlist: mediaList,
 			media,
 		});
@@ -57,8 +57,9 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 					className={media.id === currentPlaying.media?.id ? "active" : ""}
 					style={{
 						...style,
-						width: (parseFloat(String(style.width)) || 0) - PADDING_SIZE,
 						height: (parseFloat(String(style.height)) || 0) - PADDING_SIZE,
+						width: (parseFloat(String(style.width)) || 0) - PADDING_SIZE,
+						//			^ This way to safely turn style.width to a number.
 					}}
 				>
 					<PlayButton onClick={() => playMedia(media)}>
@@ -81,7 +82,8 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 				</RowWrapper>
 			) : null;
 		},
-		areEqual,
+		(prevProps, nextProps) =>
+			prevProps.data[prevProps.index].id === nextProps.data[nextProps.index].id,
 	);
 	Row.displayName = "Row";
 
@@ -122,7 +124,7 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 	);
 }
 
-export const overlayStyle = {
+export const overlayStyle = Object.freeze({
 	background: "rgba(0,0,0,0.15)",
 	backdropFilter: "blur(2px)",
-} as const;
+});

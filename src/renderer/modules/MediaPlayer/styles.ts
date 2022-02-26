@@ -1,150 +1,150 @@
-import styled from "@emotion/styled";
+import { styled } from "@styles/global";
 
 import { fonts, theme } from "@styles/theme";
 
-export const Wrapper = styled.div`
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	position: absolute;
+export const Wrapper = styled("div", {
+	display: "flex",
+	flexDirection: "row",
+	alignItems: "center",
+	position: "absolute",
 
 	// center itself:
-	left: 50%;
-	transform: translate(-50%);
+	left: "50%",
+	transform: "translate(-50%)",
 
-	bottom: 25px; // <-- This is being needed to push it up a little :( something with the absolute positioning...
-	height: 11vh;
-	width: 95vw;
-	z-index: 30;
+	bottom: 25, // <-- This is being needed to push it up a little :( something with the absolute positioning...
+	height: "11vh",
+	width: "95vw",
+	zIndex: 30,
 
-	border-top-right-radius: 40px;
-	border-top-left-radius: 40px;
-	background-color: #e0e0e095;
-	border: none;
-	padding: 0.8rem;
+	backgroundColor: "#e0e0e095",
+	borderTopRightRadius: 40,
+	borderTopLeftRadius: 40,
+	padding: "0.8rem",
+	border: "none",
 
-	box-shadow: ${theme.boxShadows.medium};
-	backdrop-filter: blur(5px);
-`;
+	boxShadow: theme.boxShadows.medium,
+	backdropFilter: "blur(5px)",
+});
 
-export const Img = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
+export const Img = styled("div", {
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
 
-	height: 70px;
-	min-width: 70px;
+	marginLeft: "1%",
+	minWidth: 70,
+	height: 70,
 
-	margin-left: 1%;
+	borderRadius: 17,
+	border: "none",
 
-	border: none;
-	border-radius: 17px;
+	boxShadow: "7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff",
 
-	box-shadow: 7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff;
+	img: {
+		objectFit: "cover",
+		height: 70,
+		width: 70,
 
-	img {
-		object-fit: cover;
-		width: 70px;
-		height: 70px;
+		borderRadius: 17,
+		border: "none",
+	},
+});
 
-		border: none;
-		border-radius: 17px;
-	}
-`;
+export const Info = styled("div", {
+	display: "flex",
+	flexDirection: "column",
+	maxHeight: "100%",
+	marginLeft: "3%",
+	width: "100%",
 
-export const Info = styled.div`
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	max-height: 100%;
-	margin-left: 3%;
+	".title": {
+		fontFamily: fonts.primary,
+		color: theme.colors.text,
+		letterSpacing: "0.03em",
+		fontSize: "1.1rem",
+		fontWeight: 500,
 
-	.title {
-		font-size: 1.1rem;
-		font-family: ${fonts.primary};
-		font-weight: 500;
-		letter-spacing: 0.03em;
-		color: ${theme.colors.text};
-		overflow-y: hidden;
+		overflowY: "hidden",
+		maxHeight: 70,
+	},
 
-		max-height: 70px;
-	}
+	".subtitle": {
+		color: theme.colors.grayText,
+		fontFamily: fonts.primary,
+		letterSpacing: "0.03em",
+		fontSize: "0.9rem",
+		fontWeight: 400,
 
-	.subtitle {
-		font-size: 0.9rem;
-		font-family: ${fonts.primary};
-		font-weight: 400;
-		letter-spacing: 0.03em;
-		color: ${theme.colors.grayText};
-		overflow-y: hidden;
-	}
-`;
+		overflowY: "hidden",
+	},
+});
 
-export const Controls = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	margin-left: 10%;
-	gap: 10px;
+export const Controls = styled("div", {
+	display: "flex",
+	flexDirection: "row",
+	justifyContent: "center",
+	alignItems: "center",
+	marginLeft: "10%",
+	gap: 10,
 
-	span {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+	span: {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+	},
 
-	.previous-or-next {
-		border-radius: 50%;
-		cursor: pointer;
-		height: 30px;
-		width: 30px;
+	".previous-or-next": {
+		borderRadius: "50%",
+		cursor: "pointer",
+		height: 30,
+		width: 30,
 
-		&:hover {
-			box-shadow: ${theme.boxShadows.small};
-			transition: opacity 0.1s ease-in-out 17ms;
-		}
-	}
+		"&:hover": {
+			transition: "opacity 0.1s ease-in-out 17ms",
+			boxShadow: theme.boxShadows.small,
+		},
+	},
 
-	.play-pause {
-		border-radius: 50%;
-		cursor: pointer;
-		height: 40px;
-		width: 40px;
-		color: #27283899;
+	".play-pause": {
+		borderRadius: "50%",
+		color: "#27283899",
+		cursor: "pointer",
+		height: 40,
+		width: 40,
 
-		&:hover {
-			box-shadow: 7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff;
-			transition: opacity 0.1s ease-in-out 17ms;
-		}
-	}
-`;
+		"&:hover": {
+			boxShadow: "7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff",
+			transition: "opacity 0.1s ease-in-out 17ms",
+		},
+	},
+});
 
-export const SeekerContainer = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 1rem;
-	width: 275px;
+export const SeekerContainer = styled("div", {
+	display: "flex",
+	flexDirection: "row",
+	justifyContent: "space-between",
+	alignItems: "center",
+	height: "1rem",
+	width: 275,
 
-	span {
-		font-family: ${fonts.primary};
-		color: ${theme.colors.grayText};
-		background-color: transparent;
-		letter-spacing: 0.03em;
-		text-align: center;
-		font-size: 1rem;
-		border: none;
-	}
-`;
+	span: {
+		backgroundColor: "transparent",
+		color: theme.colors.grayText,
+		fontFamily: fonts.primary,
+		letterSpacing: "0.03em",
+		textAlign: "center",
+		fontSize: "1rem",
+		border: "none",
+	},
+});
 
-export const ProgressWrapper = styled.div`
-	display: block;
-	width: 200px;
-	height: 3px;
+export const ProgressWrapper = styled("div", {
+	display: "block",
+	width: 200,
+	height: 3,
 
-	background-color: rgba(125, 125, 125, 0.6);
-	cursor: pointer;
-	margin: 0 7px;
-`;
+	backgroundColor: "rgba(125, 125, 125, 0.6)",
+	cursor: "pointer",
+	margin: "0 7px",
+});
