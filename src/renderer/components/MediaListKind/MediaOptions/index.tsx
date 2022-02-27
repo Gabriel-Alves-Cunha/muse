@@ -9,12 +9,7 @@ import Popup from "reactjs-popup";
 import { usePlaylists } from "@contexts";
 import { overlayStyle } from "../";
 import { capitalize } from "@utils/utils";
-import {
-	allowedOptionToChange,
-	isChangeable,
-	options,
-	Change,
-} from "./Change";
+import { allowedOptionToChange, isChangeable, options, Change } from "./Change";
 
 import { Confirm, Option, OptionsModalWrapper } from "./styles";
 

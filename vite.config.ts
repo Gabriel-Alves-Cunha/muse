@@ -21,6 +21,13 @@ export default defineConfig({
 			},
 		},
 	},
+	test: {
+		coverage: {
+			all: true,
+			// reporter: ["html", "text"],
+			reporter: ["text"],
+		},
+	},
 	resolve: {
 		alias: [
 			{

@@ -1,9 +1,11 @@
-.cache
-content
-public
 node_modules
-static
+coverage
+content
 scripts
+public
+static
 build
 app
 out
+
+.cache

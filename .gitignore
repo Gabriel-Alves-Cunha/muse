@@ -1,13 +1,14 @@
 node_modules
-.DS_Store
+coverage
+content
+scripts
+public
+static
+build
 dist
-dist-ssr
-*.local
 pack
 app
-renderer-build
-!app/package.json
-!app/yarn.lock
-!app/package-lock.json
+out
 
-out/
+.DS_Store
+*.local

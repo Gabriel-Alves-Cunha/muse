@@ -60,7 +60,7 @@ export const getPathWithoutExtension = (filename: string) => {
 
 /**
  * This doesn't handle files with only extensions,
- * like: ".gitignore" will result in "".
+ * like: '.gitignore' will result in ''.
  */
 export const getLastExtension = (filename: string) =>
 	filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);

@@ -1,11 +1,11 @@
-/* eslint-disable */
+import { expect, it } from "vitest";
 
 import {
 	getPathWithoutExtension,
 	getLastExtension,
 	formatDuration,
 	getBasename,
-} from "../../../common/utils";
+} from "@common/utils";
 
 it("should get path without extension", () => {
 	const paths = [
@@ -74,8 +74,6 @@ it("should get the extension of a file", () => {
 	];
 
 	const extensions = paths.map(path => getLastExtension(path));
-
-	console.log({ extensions });
 
 	expect(extensions).toStrictEqual(["mp3", "", "js", "webp", "", "", ""]);
 });

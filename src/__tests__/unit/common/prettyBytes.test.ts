@@ -1,6 +1,6 @@
-/* eslint-disable */
+import { expect, it } from "vitest";
 
-import { prettyBytes } from "../../../common/prettyBytes";
+import { prettyBytes } from "@common/prettyBytes";
 
 it("should return prettyfied bytes", () => {
 	const bytes_1 = [0, 1, 435, 246545, 24564567473];

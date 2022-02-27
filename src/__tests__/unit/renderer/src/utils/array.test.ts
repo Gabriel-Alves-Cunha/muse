@@ -1,4 +1,4 @@
-/* eslint-disable */
+import { expect, it } from "vitest";
 
 import {
 	concatFromIndex,
@@ -9,7 +9,7 @@ import {
 	push,
 	sort,
 	pop,
-} from "../../../../../renderer/utils/array";
+} from "@utils/array";
 
 it("should return a new joined array. The first array will be fully copied, the second will be fully copied from a given index", () => {
 	const fstArray = Object.freeze(["hello", ",", " ", "mother", "."]);
