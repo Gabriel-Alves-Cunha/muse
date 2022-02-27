@@ -1,4 +1,4 @@
-import type { ChangeOptionsToSend, ChangeOptions } from "../Change";
+import type { ChangeOptionsToSend, ChangeOptions } from "./Change";
 import type { Dispatch, SetStateAction } from "react";
 import type { Media } from "@common/@types/typesAndEnums";
 
@@ -14,7 +14,7 @@ import {
 	isChangeable,
 	options,
 	Change,
-} from "../Change";
+} from "./Change";
 
 import { Confirm, Option, OptionsModalWrapper } from "./styles";
 

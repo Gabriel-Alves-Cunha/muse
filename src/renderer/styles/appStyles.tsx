@@ -12,8 +12,8 @@ export const MainView = styled("div", {
 
 const ripple = keyframes({
 	"0%": {
-		top: "36px",
-		left: "36px",
+		top: 36,
+		left: 36,
 		width: 0,
 		height: 0,
 		opacity: 1,
@@ -21,8 +21,8 @@ const ripple = keyframes({
 	"100%": {
 		top: 0,
 		left: 0,
-		width: "72px",
-		height: "72px",
+		width: 72,
+		height: 72,
 		opacity: 0,
 	},
 });
@@ -35,15 +35,15 @@ const AnimStyle = styled("div", {
 	"&.lds-ripple": {
 		display: "inline-block",
 		position: "relative",
-		width: "80px",
-		height: "80px",
+		height: 80,
+		width: 80,
 	},
 
 	"&.lds-ripple div": {
 		position: "absolute",
 		border: `3px solid ${theme.colors.accent}`,
 		borderRadius: "50%",
-		opacity: "1",
+		opacity: 1,
 
 		animation: `${ripple} 1.3s cubic-bezier(0, 0.2, 0.8, 1) infinite`,
 	},

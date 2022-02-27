@@ -1,5 +1,5 @@
 import type { ListChildComponentProps } from "react-window";
-import type { MediaListKindProps } from "./Change";
+import type { MediaListKindProps } from "./MediaOptions/Change";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";

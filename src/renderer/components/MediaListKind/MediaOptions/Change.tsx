@@ -4,7 +4,7 @@ import type { Media, Path } from "@common/@types/typesAndEnums";
 
 import { useState } from "react";
 
-import { InputWrapper } from "./styles";
+import { InputWrapper } from "../styles";
 
 export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 	const [value, setValue] = useState(() => whatToChange.current);

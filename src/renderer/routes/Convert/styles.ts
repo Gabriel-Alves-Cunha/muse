@@ -17,8 +17,8 @@ export const Wrapper = styled("div", {
 		width: 200,
 		height: 30,
 
-		letterSpacing: "$theme.fonts.letterSpacing.value",
-		fontFamily: "$theme.fonts.fontFamily.value",
+		letterSpacing: "$letterSpacing",
+		fontFamily: "$fontFamily",
 		color: theme.colors.text,
 		fontSize: "1.1rem",
 		fontWeight: 500,

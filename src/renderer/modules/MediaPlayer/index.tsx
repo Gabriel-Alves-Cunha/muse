@@ -116,9 +116,9 @@ export function MediaPlayer() {
 
 				<span className="play-pause" onClick={playOrPauseMedia}>
 					{audioRef.current?.paused ? (
-						<Play height={20} width={20} />
+						<Play height={25} width={25} />
 					) : (
-						<Pause height={20} width={20} />
+						<Pause height={25} width={25} />
 					)}
 				</span>
 

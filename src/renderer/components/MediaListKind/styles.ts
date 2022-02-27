@@ -14,7 +14,7 @@ export const Img = styled("div", {
 	margin: "0 10px",
 	border: "none",
 
-	boxShadow: "$theme.shadows.small.value",
+	boxShadow: "$small",
 
 	img: {
 		objectFit: "cover",
@@ -43,7 +43,7 @@ export const Info = styled("div", {
 });
 
 export const Title = styled("p", {
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	color: theme.colors.text,
 	letterSpacing: "0.03em",
 	fontSize: "1rem",
@@ -68,7 +68,7 @@ export const Title = styled("p", {
 });
 
 export const SubTitle = styled("p", {
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	color: theme.colors.grayText,
 	letterSpacing: "0.03em",
 	fontSize: "0.8em",
@@ -93,12 +93,12 @@ export const Options = styled("button", {
 
 	"&:hover": {
 		transition: "boxShadow 0.3s ease-in-out 17ms",
-		boxShadow: "$theme.shadows.medium.value",
+		boxShadow: "$medium",
 	},
 });
 
 export const ListWrapper = styled("div", {
-	boxShadow: "$theme.shadows.medium.value",
+	boxShadow: "$medium",
 	boxSizing: "border-box",
 	margin: "2em 5%",
 	borderRadius: 7,
@@ -106,32 +106,31 @@ export const ListWrapper = styled("div", {
 	maxWidth: 600,
 	zIndex: 1,
 
-	media: {
-		small: {
-			margin: "0.5em 5%",
-		},
+	"@sm": {
+		margin: "0.5em 5%",
 	},
 
 	"&.list": {
 		overflowX: "hidden !important",
 
 		/* width */
-		"&::-webkit-scrollbar": {
+		"::-webkit-scrollbar": {
+			height: 5,
 			width: 5,
 		},
 
 		/* Track */
-		"&::-webkit-scrollbar-track": {
+		"::-webkit-scrollbar-track": {
 			background: "#f1f1f1",
 		},
 
 		/* Handle */
-		"&::-webkit-scrollbar-thumb": {
+		"::-webkit-scrollbar-thumb": {
 			background: "#888",
 		},
 
 		/* Handle on hover */
-		"&::-webkit-scrollbar-thumb:hover": {
+		"::-webkit-scrollbar-thumb:hover": {
 			background: "#555",
 		},
 	},
@@ -150,11 +149,11 @@ export const RowWrapper = styled("div", {
 
 	"&:hover": {
 		transition: "boxShadow 0.2s ease-in-out 17ms",
-		boxShadow: "$theme.shadows.medium.value",
+		boxShadow: "$medium",
 	},
 
 	"&.active": {
-		boxShadow: "$theme.shadows.medium.value",
+		boxShadow: "$medium",
 
 		background: "white",
 
@@ -183,7 +182,7 @@ export const InputWrapper = styled("div", {
 	height: 50,
 	width: 320,
 
-	boxShadow: "$theme.shadows.medium.value",
+	boxShadow: "$medium",
 	background: "#d3d3d5",
 	overflowY: "hidden",
 	padding: "0.5rem",
@@ -200,7 +199,7 @@ export const InputWrapper = styled("div", {
 			color: "#ffffff",
 		},
 
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontSize: "1.05rem",
@@ -214,7 +213,7 @@ export const InputWrapper = styled("div", {
 		paddingLeft: 10,
 		border: "none",
 
-		"&::-webkit-input-placeholder": {
+		"::-webkit-input-placeholder": {
 			display: "flex",
 			justifyContent: "flex-start",
 			alignItems: "center",

@@ -7,59 +7,12 @@ export const Nav = styled("nav", {
 	flexDirection: "column",
 	alignContent: "center",
 
+	backgroundColor: theme.colors.bgNav,
 	height: "100vh",
 	width: 170,
 
-	backgroundColor: theme.colors.bgNav,
-
-	"&.active": {
-		outline: `3px solid ${theme.colors.bgCentral}`,
-		outlineOffset: -3,
-
-		background: "white",
-
-		boxShadow: "$theme.shadows.small.value",
-	},
-
-	media: {
-		small: {
-			width: 30,
-
-			"&.active": {
-				boxShadow: "none",
-				outline: "none",
-
-				backgroundColor: theme.colors.accentAlpha,
-			},
-
-			button: {
-				justifyContent: "center",
-
-				height: 42,
-				width: 30,
-
-				padding: 0,
-				margin: 0,
-
-				boxShadow: "none",
-				borderRadius: 0,
-
-				"&:hover": {
-					boxShadow: "none",
-				},
-
-				div: {
-					// Text
-					display: "none",
-				},
-
-				span: {
-					// svg
-					color: "black",
-					margin: 0,
-				},
-			},
-		},
+	"@sm": {
+		width: 30,
 	},
 });
 
@@ -87,14 +40,57 @@ export const FolderButton = styled("button", {
 
 	"&:hover": {
 		"&:not(&.active)": {
-			transition: "box-shadow 0.2s",
-			boxShadow: "$theme.shadows.insetSmall.value",
+			transition: "box-shadow 60ms",
+			boxShadow: "$insetSmall",
+		},
+	},
+
+	"&.active": {
+		outline: `3px solid ${theme.colors.bgCentral}`,
+		outlineOffset: -3,
+
+		background: "white",
+		boxShadow: "$small",
+	},
+
+	"@sm": {
+		justifyContent: "center",
+
+		height: 42,
+		width: 30,
+
+		padding: 0,
+		margin: 0,
+
+		boxShadow: "none",
+		borderRadius: 0,
+
+		"&:hover": {
+			boxShadow: "none",
+		},
+
+		"&.active": {
+			boxShadow: "none",
+			outline: "none",
+
+			backgroundColor: theme.colors.accentAlpha,
+		},
+
+		div: {
+			// Don't show text:
+			display: "none",
+		},
+
+		span: {
+			// For svg:
+			color: "black",
+			margin: 0,
 		},
 	},
 });
 
 export const Text = styled("div", {
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	color: theme.colors.text,
 	letterSpacing: "0.03em",
 	fontSize: "1.05rem",

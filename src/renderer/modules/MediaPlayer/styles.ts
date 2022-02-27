@@ -9,13 +9,13 @@ export const Wrapper = styled("div", {
 	position: "absolute",
 
 	// center itself:
-	left: "50%",
 	transform: "translate(-50%)",
+	left: "50%",
 
-	bottom: 25, // <-- This is being needed to push it up a little :( something with the absolute positioning...
 	height: "11vh",
 	width: "95vw",
 	zIndex: 30,
+	bottom: 25, // This is being needed to push it up a little :( something with the absolute positioning...
 
 	backgroundColor: "#e0e0e095",
 	borderTopRightRadius: 40,
@@ -23,8 +23,8 @@ export const Wrapper = styled("div", {
 	padding: "0.8rem",
 	border: "none",
 
-	boxShadow: "$theme.shadows.medium.value",
 	backdropFilter: "blur(5px)",
+	boxShadow: "$medium",
 });
 
 export const Img = styled("div", {
@@ -36,15 +36,13 @@ export const Img = styled("div", {
 	minWidth: 70,
 	height: 70,
 
+	boxShadow: "$whiteGlowAroundComponent",
 	borderRadius: 17,
 	border: "none",
 
-	boxShadow: "7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff",
-
 	img: {
 		objectFit: "cover",
-		height: 70,
-		width: 70,
+		size: "100%",
 
 		borderRadius: 17,
 		border: "none",
@@ -58,25 +56,27 @@ export const Info = styled("div", {
 	marginLeft: "3%",
 	width: "100%",
 
-	".title": {
-		fontFamily: "$theme.fonts.fontFamily.value",
-		color: theme.colors.text,
-		letterSpacing: "0.03em",
-		fontSize: "1.1rem",
-		fontWeight: 500,
+	span: {
+		"&.title": {
+			fontFamily: "$fontFamily",
+			color: theme.colors.text,
+			letterSpacing: "0.03em",
+			fontSize: "1.1rem",
+			fontWeight: 500,
 
-		overflowY: "hidden",
-		maxHeight: 70,
-	},
+			overflowY: "hidden",
+			maxHeight: 70,
+		},
 
-	".subtitle": {
-		fontFamily: "$theme.fonts.fontFamily.value",
-		color: theme.colors.grayText,
-		letterSpacing: "0.03em",
-		fontSize: "0.9rem",
-		fontWeight: 400,
+		"&.subtitle": {
+			color: theme.colors.grayText,
+			fontFamily: "$fontFamily",
+			letterSpacing: "0.03em",
+			fontSize: "0.9rem",
+			fontWeight: 400,
 
-		overflowY: "hidden",
+			overflowY: "hidden",
+		},
 	},
 });
 
@@ -92,30 +92,30 @@ export const Controls = styled("div", {
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
-	},
 
-	".previous-or-next": {
-		borderRadius: "50%",
-		cursor: "pointer",
-		height: 30,
-		width: 30,
+		"&.previous-or-next": {
+			borderRadius: "50%",
+			cursor: "pointer",
+			height: 40,
+			width: 40,
 
-		"&:hover": {
-			transition: "opacity 0.1s ease-in-out 17ms",
-			boxShadow: "$theme.shadows.small.value",
+			"&:hover": {
+				transition: "opacity 0.1s ease-in-out 17ms",
+				boxShadow: "$small",
+			},
 		},
-	},
 
-	".play-pause": {
-		borderRadius: "50%",
-		color: "#27283899",
-		cursor: "pointer",
-		height: 40,
-		width: 40,
+		"&.play-pause": {
+			borderRadius: "50%",
+			color: "#27283899",
+			cursor: "pointer",
+			height: 50,
+			width: 50,
 
-		"&:hover": {
-			boxShadow: "7px 7px 14px #b1b1b1, -7px -7px 14px #ffffff",
-			transition: "opacity 0.1s ease-in-out 17ms",
+			"&:hover": {
+				transition: "opacity 0.1s ease-in-out 17ms",
+				boxShadow: "$whiteGlowAroundComponent",
+			},
 		},
 	},
 });
@@ -129,12 +129,13 @@ export const SeekerContainer = styled("div", {
 	width: 275,
 
 	span: {
-		fontFamily: "$theme.fonts.fontFamily.value",
-		backgroundColor: "transparent",
 		color: theme.colors.grayText,
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		textAlign: "center",
 		fontSize: "1rem",
+
+		backgroundColor: "transparent",
 		border: "none",
 	},
 });

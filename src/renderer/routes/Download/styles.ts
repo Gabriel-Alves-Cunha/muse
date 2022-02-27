@@ -8,28 +8,29 @@ export const Wrapper = styled("section", {
 	flexDirection: "column",
 	justifyContent: "flex-start",
 
-	width: "100%",
 	height: "calc(100vh - 20vh)",
+	width: "100%",
 
 	overflowY: "hidden",
 
 	/* width */
-	"&::-webkit-scrollbar": {
+	"::-webkit-scrollbar": {
+		height: 5,
 		width: 5,
 	},
 
 	/* Track */
-	"&::-webkit-scrollbar-track": {
+	"::-webkit-scrollbar-track": {
 		background: "#f1f1f1",
 	},
 
 	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
+	"::-webkit-scrollbar-thumb": {
 		background: "#888",
 	},
 
 	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
+	"::-webkit-scrollbar-thumb:hover": {
 		background: "#555",
 	},
 });
@@ -38,14 +39,14 @@ export const SearchWrapper = styled("div", {
 	display: "flex",
 	position: "relative",
 	flexDirection: "row",
-	alignItems: "center",
 	justifyContent: "center",
+	alignItems: "center",
 
 	padding: "0 5%",
 	height: 60,
 
 	p: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.02rem",
 		position: "absolute",
 		fontSize: "0.8rem",
@@ -70,15 +71,15 @@ export const Searcher = styled("button", {
 	border: "none",
 	cursor: "text",
 
-	boxShadow: "$theme.shadows.small.value",
+	boxShadow: "$small",
 
-	svg: {
+	"& svg": {
 		marginLeft: "10px",
 	},
 
 	"&::after": {
 		transition: "opacity 0s ease-in-out 17ms",
-		boxShadow: "$theme.shadows.insetSmall.value",
+		boxShadow: "$insetSmall",
 		opacity: 0,
 	},
 
@@ -91,7 +92,7 @@ export const Searcher = styled("button", {
 	},
 
 	input: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontSize: "0.9rem",
@@ -133,8 +134,8 @@ export const ResultContainer = styled("div", {
 		height: "90%",
 		width: "90%",
 
-		maxHeight: 250,
-		maxWidth: 250,
+		maxHeight: 300,
+		maxWidth: 300,
 
 		"-webkit-box-reflect": `below 0px
 			-webkit-gradient(linear, right top, right	bottom,
@@ -155,7 +156,7 @@ export const ResultContainer = styled("div", {
 	},
 
 	p: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		textAlign: "center",
 		margin: "2rem 1rem",
 		fontSize: "1.1rem",
@@ -165,7 +166,7 @@ export const ResultContainer = styled("div", {
 	},
 
 	span: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		textAlign: "center",
 		margin: "1rem auto",
 		fontSize: "1rem",
@@ -176,27 +177,27 @@ export const ResultContainer = styled("div", {
 });
 
 export const Button = styled("button", {
-	display: "flex", // row,
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 	width: 160,
 	height: 42,
 
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	textAlign: "center",
 	fontSize: "1rem",
-	padding: "10px",
+	padding: 10,
 
 	backgroundColor: theme.colors.bgNav,
-	boxShadow: "$theme.shadows.small.value",
+	boxShadow: "$small",
 	cursor: "pointer",
 	color: "black",
 
-	borderRadius: "5px",
+	borderRadius: 5,
 	border: "none",
 
 	"&:hover": {
 		transition: "opacity 0.3s ease-in-out 17ms",
-		boxShadow: "$theme.shadows.insetSmall.value",
+		boxShadow: "$insetSmall",
 	},
 });

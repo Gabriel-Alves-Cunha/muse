@@ -8,12 +8,10 @@ export const MainArea = styled("div", {
 	height: "100%",
 	width: "100%",
 
-	media: {
-		small: {
-			header: {
-				justifyContent: "center",
-				marginLeft: 0,
-			},
+	"@sm": {
+		header: {
+			justifyContent: "center",
+			marginLeft: 0,
 		},
 	},
 });

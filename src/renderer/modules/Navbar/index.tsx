@@ -10,8 +10,8 @@ import {
 	HomeIcon as Home,
 } from "@radix-ui/react-icons";
 
-import { pages } from "@utils/app";
 import { usePage } from "@contexts";
+import { pages } from "@utils/app";
 
 import { FolderButton, Nav, Text } from "./styles";
 
@@ -25,10 +25,10 @@ export function Navbar() {
 			{pages.map(page => (
 				<FolderButton
 					className={page === currPage ? "active" : ""}
-					onClick={() => setPage({ page: page })}
 					onMouseDown={e => e.preventDefault()}
 					// ^ Takes focus off of button so that the `outline` css can be applied
-					aria-label={"Go to" + page}
+					onClick={() => setPage({ page })}
+					aria-label={"Go to " + page}
 					key={page}
 				>
 					<span>{icon(page)}</span>
@@ -46,11 +46,11 @@ Navbar.whyDidYouRender = {
 
 const icon = (folder: Page) => iconObj[folder] ?? <Question />;
 
-const iconObj: Record<Page, JSX.Element> = {
+const iconObj: Record<Page, JSX.Element> = Object.freeze({
 	Favorites: <Favorites />,
 	Download: <Download />,
 	Settings: <Settings />,
 	History: <History />,
 	Convert: <Convert />,
 	Home: <Home />,
-};
+});

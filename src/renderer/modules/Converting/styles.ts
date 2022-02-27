@@ -18,11 +18,11 @@ export const Circle = styled("div", {
 	width: 40,
 
 	backgroundColor: theme.colors.bgNav,
-	boxShadow: "$theme.shadows.small.value",
+	boxShadow: "$small",
 
 	"&:hover": {
 		transition: "opacity 0s ease-in-out 17ms",
-		boxShadow: "$theme.shadows.insetSmall.value",
+		boxShadow: "$insetSmall",
 	},
 });
 
@@ -43,31 +43,32 @@ export const Popup = styled("div", {
 	zIndex: 500,
 
 	backgroundColor: theme.colors.bgCentral,
-	boxShadow: "$theme.shadows.small.value",
+	boxShadow: "$small",
 
 	/* width */
-	"&::-webkit-scrollbar": {
+	"::-webkit-scrollbar": {
+		height: 5,
 		width: 5,
 	},
 
 	/* Track */
-	"&::-webkit-scrollbar-track": {
+	"::-webkit-scrollbar-track": {
 		background: "#f1f1f1",
 	},
 
 	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
+	"::-webkit-scrollbar-thumb": {
 		background: "#888",
 	},
 
 	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
+	"::-webkit-scrollbar-thumb:hover": {
 		background: "#555",
 	},
 });
 
 export const Progress = styled("div", {
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	color: theme.colors.text,
 	whiteSpace: "nowrap",
 	overflow: "hidden",
@@ -97,7 +98,7 @@ export const Title = styled("div", {
 	width: "100%",
 
 	p: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		whiteSpace: "nowrap",
 		overflow: "hidden",
 		fontSize: "0.9rem",
@@ -122,7 +123,7 @@ export const Title = styled("div", {
 			backgroundColor: "rgba(125, 125, 125, 0.3)",
 			color: "red",
 
-			svg: {
+			"& svg": {
 				fill: "red",
 			},
 		},

@@ -39,23 +39,23 @@ export const Search = styled("div", {
 	cursor: "text",
 	color: "#ccc",
 
-	boxShadow: "$theme.shadows.small.value",
+	boxShadow: "$small",
 
-	svg: {
+	"& svg": {
 		marginLeft: 10,
 	},
 
 	"&:hover": {
-		boxShadow: "$theme.shadows.insetSmall.value",
+		boxShadow: "$insetSmall",
 		transition: "opacity 0s linear 17ms",
 
-		svg: {
+		"& svg": {
 			color: "rgba(0, 0, 0, 0.5)",
 		},
 	},
 
 	input: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontSize: "0.9rem",
@@ -94,24 +94,32 @@ const spin = keyframes({
 
 export const ReloadContainer = styled("button", {
 	variants: {
-		animation: {
-			false: { animation: `${spin} 0.5s linear` },
-			true: { animation: "" },
+		withAnimation: {
+			true: {
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+
+				backgroundColor: "transparent",
+				marginLeft: "1rem",
+				cursor: "pointer",
+				border: "none",
+
+				"&:hover": {
+					animation: `${spin} 0.5s linear`,
+				},
+			},
+			false: {
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+
+				backgroundColor: "transparent",
+				marginLeft: "1rem",
+				cursor: "pointer",
+				border: "none",
+			},
 		},
-	},
-
-	display: "flex",
-	justifyContent: "center",
-	alignItems: "center",
-
-	backgroundColor: "transparent",
-	marginLeft: "1rem",
-	cursor: "pointer",
-	border: "none",
-
-	"&:hover": {
-		willChange: "transform",
-		animation: "$animation",
 	},
 });
 
@@ -121,7 +129,6 @@ export const Button = styled("button", {
 	alignItems: "center",
 
 	backgroundColor: "transparent",
-	/* marginLeft: 1rem; */
 	cursor: "pointer",
 	border: "none",
 });
@@ -140,28 +147,29 @@ export const SearchResultsWrapper = styled("section", {
 	zIndex: 10,
 
 	backgroundColor: theme.colors.secondary,
-	boxShadow: "$theme.shadows.medium.value",
+	boxShadow: "$medium",
 
 	"&.list": {
 		overflowX: "hidden !important",
 
 		/* width */
-		"&::-webkit-scrollbar": {
+		"::-webkit-scrollbar": {
+			height: 5,
 			width: 5,
 		},
 
 		/* Track */
-		"&::-webkit-scrollbar-track": {
+		"::-webkit-scrollbar-track": {
 			background: "#f1f1f1",
 		},
 
 		/* Handle */
-		"&::-webkit-scrollbar-thumb": {
+		"::-webkit-scrollbar-thumb": {
 			background: "#888",
 		},
 
 		/* Handle on hover */
-		"&::-webkit-scrollbar-thumb:hover": {
+		"::-webkit-scrollbar-thumb:hover": {
 			background: "#555",
 		},
 	},
@@ -184,7 +192,7 @@ export const Result = styled("button", {
 
 	"&::after": {
 		transition: "opacity 0.2s ease-in-out 17ms",
-		boxShadow: "$theme.shadows.medium.value",
+		boxShadow: "$medium",
 		opacity: 0,
 	},
 

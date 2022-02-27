@@ -17,7 +17,6 @@ export const Wrapper = styled("header", {
 	"user-select": "none",
 });
 
-//<{ isToClose?: boolean }>
 export const WindowButton = styled("button", {
 	justifyContent: "center",
 	alignContent: "center",
@@ -32,20 +31,13 @@ export const WindowButton = styled("button", {
 
 	backgroundColor: theme.colors.secondary,
 
-	variants: {
-		color: {
-			true: { color: "white" },
-			false: { color: "" },
-		},
-		backgroundColor: {
-			false: { backgroundColor: "#dbdadc" },
-			true: { backgroundColor: "#e70000" },
-		},
+	"&.close:hover": {
+		backgroundColor: "#e70000",
+		color: "white",
 	},
 
 	"&:hover": {
-		backgroundColor: "$backgroundColor",
-		color: "$color",
+		backgroundColor: "#dbdadc",
 	},
 });
 
@@ -72,16 +64,14 @@ export const AppName_Folder_Wrapper = styled("button", {
 
 	transform: "translate(-50%)",
 
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	color: theme.colors.text,
 	letterSpacing: "0.03em",
 	fontSize: "0.9em",
 	fontWeight: 300,
 
-	media: {
-		small: {
-			display: "none",
-		},
+	"@sm": {
+		display: "none",
 	},
 });
 

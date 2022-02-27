@@ -2,18 +2,11 @@ import { createStitches } from "@stitches/react";
 
 import { theme } from "./theme";
 
-// You can use the returned theme objects to read the tokens, like so:
-// default theme:
-//  theme.colors.foreground.value; // black
-//  theme.colors.foreground.token; // foreground
-//  theme.colors.foreground.scale; // colors
-//  theme.colors.foreground.variable; // --colors-foreground
-//  theme.colors.foreground.computedValue; // var(--colors-foreground)
 export const { styled, globalCss, keyframes } = createStitches({
 	media: {
-		medium: "(min-width: 768px)",
-		large: "(min-width: 1024px)",
-		small: "(min-width: 640px)", // Maybe change to max- ?
+		sm: "(max-width: 500px)", // Maybe change to max- ?
+		md: "(max-width: 768px)",
+		lg: "(max-width: 1024px)",
 	},
 	theme: {
 		shadows: {
@@ -24,6 +17,7 @@ export const { styled, globalCss, keyframes } = createStitches({
 			small:
 				"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
 			glow: "0px 0px 3px 1px",
+			whiteGlowAroundComponent: "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 		},
 		fonts: {
 			fontFamily: "'Assistant', sans-serif",
@@ -31,6 +25,12 @@ export const { styled, globalCss, keyframes } = createStitches({
 			letterSpacing: "0.03em",
 			fontSize: "1rem",
 		},
+	},
+	utils: {
+		size: (value: number | string) => ({
+			height: value,
+			width: value,
+		}),
 	},
 });
 
@@ -47,11 +47,6 @@ export const GlobalCSS = globalCss({
 
 	button: {
 		"-webkit-app-region": "no-drag",
-	},
-
-	"&::selection": {
-		background: theme.colors.accent,
-		color: "white",
 	},
 
 	body: {
@@ -95,23 +90,29 @@ export const GlobalCSS = globalCss({
 			"--text": "",
 		},
 
+		"::selection": {
+			background: theme.colors.accent,
+			color: "white",
+		},
+
 		/* width */
-		"&::-webkit-scrollbar": {
+		"::-webkit-scrollbar": {
+			height: 5,
 			width: 5,
 		},
 
 		/* Track */
-		"&::-webkit-scrollbar-track": {
+		"::-webkit-scrollbar-track": {
 			background: "#f1f1f1",
 		},
 
 		/* Handle */
-		"&::-webkit-scrollbar-thumb": {
+		"::-webkit-scrollbar-thumb": {
 			background: "#888",
 		},
 
 		/* Handle on hover */
-		"&::-webkit-scrollbar-thumb:hover": {
+		"::-webkit-scrollbar-thumb:hover": {
 			background: "#555",
 		},
 	},

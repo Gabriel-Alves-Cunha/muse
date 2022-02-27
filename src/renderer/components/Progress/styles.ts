@@ -54,7 +54,7 @@ export const Component = styled("div", {
 
 	alignItems: "center",
 
-	svg: {
+	"& svg": {
 		margin: "auto",
 	},
 });

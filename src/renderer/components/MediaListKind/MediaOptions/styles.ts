@@ -15,22 +15,23 @@ export const OptionsModalWrapper = styled("div", {
 	overflowY: "auto",
 
 	/* width */
-	"&::-webkit-scrollbar": {
+	"::-webkit-scrollbar": {
+		height: 5,
 		width: 5,
 	},
 
 	/* Track */
-	"&::-webkit-scrollbar-track": {
+	"::-webkit-scrollbar-track": {
 		background: "#f1f1f1",
 	},
 
 	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
+	"::-webkit-scrollbar-thumb": {
 		background: "#888",
 	},
 
 	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
+	"::-webkit-scrollbar-thumb:hover": {
 		background: "#555",
 	},
 });
@@ -41,7 +42,7 @@ export const Option = styled("button", {
 	justifyContent: "flex-start",
 	alignItems: "center",
 
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	letterSpacing: "0.03em",
 	fontSize: "1rem",
 
@@ -59,7 +60,7 @@ export const Option = styled("button", {
 	cursor: "text",
 
 	"&::selection": {
-		background: "#aa00ff; // theme.colors.accen",
+		background: "#aa00ff", // theme.colors.accent,
 		color: "#fff",
 	},
 
@@ -73,7 +74,7 @@ export const Option = styled("button", {
 	},
 
 	span: {
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		textAlign: "left",
 		fontSize: "1rem",
@@ -108,7 +109,7 @@ export const Confirm = styled("div", {
 	maxHeight: 350,
 	width: 320,
 
-	fontFamily: "$theme.fonts.fontFamily.value",
+	fontFamily: "$fontFamily",
 	letterSpacing: "0.03em",
 	background: "#edecf8",
 	textAlign: "center",
@@ -128,7 +129,7 @@ export const Confirm = styled("div", {
 		width: "100%",
 		height: 40,
 
-		fontFamily: "$theme.fonts.fontFamily.value",
+		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		fontSize: "1.05rem",
 		fontWeight: "500",

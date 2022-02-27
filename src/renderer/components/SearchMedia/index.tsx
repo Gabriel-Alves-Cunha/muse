@@ -1,5 +1,5 @@
 import type { ListChildComponentProps } from "react-window";
-import type { MediaListKindProps } from "../MediaListKind/Change";
+import type { MediaListKindProps } from "../MediaListKind/MediaOptions/Change";
 import type { Playlist } from "@contexts";
 import type { Media } from "@common/@types/typesAndEnums";
 
@@ -113,7 +113,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					case ButtonToTheSide.RELOAD_BUTTON: {
 						return (
 							<ReloadContainer
-								animation={String(searcher.isLoading) as "true" | "false"}
+								withAnimation={!searcher.isLoading}
 								onClick={reload}
 							>
 								{searcher.isLoading ? (

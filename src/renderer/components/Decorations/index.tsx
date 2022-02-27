@@ -61,14 +61,14 @@ function Buttons() {
 			<WindowButton
 				aria-label="Close window"
 				onClick={closeWindow}
-				isToClose={true}
+				className="close"
 			>
 				<Close size="16px" />
 			</WindowButton>
 
 			<WindowButton
-				onClick={toggleMaximize}
 				aria-label="Toggle maximize window"
+				onClick={toggleMaximize}
 			>
 				<Maximize size="16px" />
 			</WindowButton>
