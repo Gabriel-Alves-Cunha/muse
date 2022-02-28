@@ -9,17 +9,25 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 		!media ||
 		!media.img ||
 		!media.img.length ||
-		cache[media.id] === Status.FAILURE
+		cache[media.id] === Status.FAILURE ||
+		cache[media.id] === Status.PENDING
 	)
 		return Fallback;
 	if (cache[media.id] === Status.SUCCESS) return <img src={media.img} />;
 
-	let img: HTMLImageElement | null = new Image();
-	img.onload = () => {
-		cache[media.id] = Status.SUCCESS;
+	cache[media.id] = Status.PENDING;
 
+	let img: HTMLImageElement | null = new Image();
+
+	img.onload = () => {
 		img = null;
+		cache[media.id] = Status.SUCCESS;
+		console.log(
+			`%c"${media.path}" img loaded with success`,
+			"font-weight: bold; color: blue;",
+		);
 	};
+
 	img.onerror = async ev => {
 		console.error("Failed img, erasing it", ev);
 
@@ -27,6 +35,7 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 		cache[media.id] = Status.FAILURE;
 		img = null;
 	};
+
 	img.src = media.img;
 
 	return cache[media.id] === Status.SUCCESS ? (
@@ -43,5 +52,6 @@ type Props = {
 
 enum Status {
 	FAILURE,
+	PENDING,
 	SUCCESS,
 }

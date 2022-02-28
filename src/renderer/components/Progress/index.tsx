@@ -14,6 +14,8 @@ export function Progress({
 	showStatus,
 	status,
 }: ProgressProps) {
+	console.log({ percent_0_to_100 });
+
 	return (
 		<Component>
 			<ProgressBarWrapper>

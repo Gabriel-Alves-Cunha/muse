@@ -82,6 +82,44 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		return () => clearTimeout(searchTimeout);
 	}, [searchForMedia, searcher.searchTerm]);
 
+	const ButtonToTheSideJSX = () => {
+		switch (buttonToTheSide) {
+			case ButtonToTheSide.RELOAD_BUTTON: {
+				return (
+					<ReloadContainer withAnimation={!searcher.isLoading} onClick={reload}>
+						{searcher.isLoading ? (
+							<div style={{ transform: "scale(0.3)", animation: "" }}>
+								<Loading />
+							</div>
+						) : (
+							<Reload size={17} color="#ccc" />
+						)}
+					</ReloadContainer>
+				);
+				break;
+			}
+
+			case ButtonToTheSide.CLEAN: {
+				return (
+					<Button>
+						<Clean size={14} onClick={cleanHistory} />
+					</Button>
+				);
+				break;
+			}
+
+			case ButtonToTheSide.NOTHING: {
+				return <></>;
+				break;
+			}
+
+			default: {
+				return assertUnreachable(buttonToTheSide);
+				break;
+			}
+		}
+	};
+
 	return (
 		<Wrapper ref={searcherRef}>
 			<SearchWrapper>
@@ -103,51 +141,10 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					/>
 				</Search>
 
-				{searcher.results.length > 0 && (
-					<SearchResults results={searcher.results} fromList={fromList} />
-				)}
+				<SearchResults results={searcher.results} fromList={fromList} />
 			</SearchWrapper>
 
-			{(() => {
-				switch (buttonToTheSide) {
-					case ButtonToTheSide.RELOAD_BUTTON: {
-						return (
-							<ReloadContainer
-								withAnimation={!searcher.isLoading}
-								onClick={reload}
-							>
-								{searcher.isLoading ? (
-									<div style={{ transform: "scale(0.3)", animation: "" }}>
-										<Loading />
-									</div>
-								) : (
-									<Reload size={17} color="#ccc" />
-								)}
-							</ReloadContainer>
-						);
-						break;
-					}
-
-					case ButtonToTheSide.CLEAN: {
-						return (
-							<Button>
-								<Clean size={14} onClick={cleanHistory} />
-							</Button>
-						);
-						break;
-					}
-
-					case ButtonToTheSide.NOTHING: {
-						return <></>;
-						break;
-					}
-
-					default: {
-						return assertUnreachable(buttonToTheSide);
-						break;
-					}
-				}
-			})()}
+			<ButtonToTheSideJSX />
 		</Wrapper>
 	);
 }
@@ -172,9 +169,10 @@ function SearchResults({
 	const { playlists } = usePlaylists();
 	const listWrapperReference = useRef<HTMLElement>(null);
 
-	const playlist = playlists.find(({ name }) => name === fromList);
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const playlist = playlists.find(({ name }) => name === fromList)!;
 	if (!playlist)
-		throw new Error(`There should be "${fromList}" to search through!`);
+		console.error(`There should be "${fromList}" to search through!`);
 
 	const Row = ({
 		index,
@@ -183,7 +181,7 @@ function SearchResults({
 	}: ListChildComponentProps<readonly Media[]>) => {
 		const media = data[index];
 
-		return media ? (
+		return (
 			<Result
 				onClick={() => playMedia(media, playlist)}
 				key={media.id}
@@ -203,7 +201,7 @@ function SearchResults({
 					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
 				</Info>
 			</Result>
-		) : null;
+		);
 	};
 
 	return (
@@ -278,10 +276,10 @@ enum SearcherAction {
 	SET_RESULTS,
 }
 
-type Props = {
+type Props = Readonly<{
 	fromList: MediaListKindProps["mediaType"];
 	buttonToTheSide: ButtonToTheSide;
-};
+}>;
 
 export enum ButtonToTheSide {
 	RELOAD_BUTTON,

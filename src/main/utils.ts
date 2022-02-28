@@ -29,15 +29,19 @@ export type Stream = Readonly<{ url: string; stream: Readable }>;
 
 export const has = (
 	array: readonly Stream[],
-	url_: Readonly<string>,
-): boolean =>
-	array.findIndex(({ url }) => url === url_) === -1 ? false : true;
+	url: Readonly<string>,
+): boolean => {
+	for (let i = 0; i < array.length; ++i) if (array[i].url === url) return true;
+	return false;
+};
 
 export const get = (array: readonly Stream[], url_: Readonly<string>) =>
 	array.find(({ url }) => url === url_);
 
-export const remove = (array: Stream[], url_: Readonly<string>) =>
-	(array = array.filter(({ url }) => url !== url_));
+export const remove = (array: Stream[], url_: Readonly<string>) => {
+	const index = array.findIndex(({ url }) => url === url_);
+	if (index !== -1) array.splice(index, 1);
+};
 
 export const push = (array: Stream[], stream: Stream) => {
 	array.push(stream);

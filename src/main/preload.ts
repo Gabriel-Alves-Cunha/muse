@@ -8,9 +8,7 @@ import type { Stream } from "./utils.js";
 import { contextBridge, ipcRenderer } from "electron";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream } from "fs";
-import { string2number } from "@main/hash";
 import { join, dirname } from "path";
-import { cpus } from "os";
 import {
 	readFile as fsReadFile,
 	readdir as fsReadDir,
@@ -34,6 +32,7 @@ import readline from "readline";
 import ytdl from "ytdl-core";
 
 import { homeDir, dirs, get, has, push, remove } from "./utils.js";
+import { string2number } from "@main/hash";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
 import {
@@ -175,7 +174,7 @@ window.onmessage = async event => {
 		}
 
 		case "async two way comm": {
-			console.log("Window received 'async two way comm':", event);
+			console.log("Electron received 'async two way comm':", event);
 
 			const electronPort = event.ports[0];
 			if (!electronPort) {
@@ -467,7 +466,7 @@ export function makeStream(
 			interval && clearInterval(interval);
 
 			try {
-				await writeTags(saveSite, { imageURL });
+				await writeTags(saveSite, { imageURL, isNewMedia: true });
 				remove(currentDownloads, url);
 			} catch (error) {
 				console.error(error, { currentDownloads });
@@ -540,7 +539,6 @@ export function convertToAudio(
 	fluent_ffmpeg(readStream)
 		.toFormat(toExtension)
 		.save(saveSite)
-		.addOptions(["-threads", String(cpus().length)])
 		.on("progress", p => {
 			// targetSize: current size of the target file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
@@ -609,7 +607,10 @@ export function convertToAudio(
 	dbg(`Added '${mediaPath}' to mediasConverting =`, mediasConverting);
 }
 
-export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
+export async function writeTags(
+	mediaPath: Readonly<Path>,
+	data: WriteTag & { isNewMedia?: boolean },
+) {
 	const file = MediaFile.createFromPath(mediaPath);
 	// dbg("File =", file);
 	// dbg("File tags =", file.tag);
@@ -624,12 +625,12 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 						// if imageURL === 'erase img' => erase img so we don't keep
 						// getting an error on the browser.
 						file.tag.pictures = [];
-						console.log(
+						console.warn(
 							"(SHOULD BE EMPTY) file.tag.pictures =",
 							file.tag.pictures,
 						);
 					} else {
-						// Get picture:
+						dbg("Getting picture");
 						try {
 							const imgAsString: `data:${string};base64,${string}` =
 								await ipcRenderer.invoke("get-image", data.imageURL);
@@ -646,12 +647,15 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 							const picture = Picture.fromData(
 								ByteVector.fromString(txtForByteVector, StringType.Latin1),
 							);
-
+							picture.description =
+								"This image was download when this media downloaded.";
+							picture.filename = `${getBasename(mediaPath)}`;
 							picture.type = PictureType.Media;
-							file.tag.pictures = [picture];
 							picture.mimeType = mimeType;
 
-							console.log("file.tag.pictures =", file.tag.pictures);
+							file.tag.pictures = [picture];
+
+							console.log({ fileTagPictures: file.tag.pictures, picture });
 						} catch (error) {
 							console.error(
 								"There was an error getting the picture data.",
@@ -700,6 +704,9 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 					break;
 				}
 
+				case "isNewMedia":
+					break;
+
 				default: {
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					file.tag[tag] = value;
@@ -710,15 +717,14 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 				}
 			}
 		});
-	} catch (error) {
-		console.error(error);
-	} finally {
-		file.save();
 
 		dbg("File tags =", file.tag);
 
+		file.save();
 		file.dispose();
-
+	} catch (error) {
+		console.error(error);
+	} finally {
 		if (fileNewPath) {
 			// Since media has a new path, create a new media
 			console.log("Adding new media:", {
@@ -737,6 +743,12 @@ export async function writeTags(mediaPath: Readonly<Path>, data: WriteTag) {
 			});
 			window.twoWayComm_React_Electron?.postMessage({
 				msg: ListenToNotification.REMOVE_MEDIA,
+				path: mediaPath,
+			});
+		} else if (data.isNewMedia) {
+			// Add media
+			window.twoWayComm_React_Electron?.postMessage({
+				msg: ListenToNotification.ADD_MEDIA,
 				path: mediaPath,
 			});
 		} else {

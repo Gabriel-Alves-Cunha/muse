@@ -1,5 +1,3 @@
-import type { Mutable } from "@common/@types/typesAndEnums";
-
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
@@ -15,10 +13,22 @@ import { ProgressStatus } from "@common/@types/typesAndEnums";
 
 import { Circle, Popup, Title } from "./styles";
 
+const { port1: testPort } = new MessageChannel();
+const testDownloadingMedia: DownloadingMedia = Object.freeze({
+	status: ProgressStatus.ACTIVE,
+	url: "http://test.com",
+	isDownloading: true,
+	percentage: 50,
+	port: testPort,
+	title: "test",
+	imageURL: "",
+	index: 0,
+});
+
 const useDownloadingList = create<{
-	downloadingList: DownloadingMedia[];
+	downloadingList: readonly DownloadingMedia[];
 }>(() => ({
-	downloadingList: [],
+	downloadingList: [testDownloadingMedia],
 }));
 
 const { setState: setDownloadingList } = useDownloadingList;
@@ -29,31 +39,35 @@ function useDownloading() {
 
 	const cancelDownloadAndOrRemoveItFromList = useCallback(
 		(url_: string) => {
+			// Find the DownloadingMedia:
 			const index = downloadingList.findIndex(({ url }) => url === url_);
-			if (index === -1) {
-				console.error(
+			if (index === -1)
+				return console.error(
 					`There should be a download with url "${url_}"!\ndownloadList =`,
 					downloadingList,
 				);
-				return;
-			}
 
 			const download = downloadingList[index];
 
+			// Cancel download:
 			if (download.isDownloading)
 				download.port.postMessage({ destroy: true, url: download.url });
 
+			// Update downloading list:
 			setDownloadingList({
-				downloadingList: reaplyOrderedIndex(
-					remove(downloadingList, index),
-				) as Mutable<DownloadingMedia[]>,
+				downloadingList: reaplyOrderedIndex(remove(downloadingList, index)),
 			});
 		},
 		[downloadingList],
 	);
 
 	useEffect(() => {
+		// This fn returns a MessagePort that will be send to
+		// Electron to enable 2 way communication between it
+		// and React.
 		function createNewDownload(): MessagePort {
+			// First, see if there is another one that has the same url
+			// and stop if true:
 			const indexIfThereIsOneAlready = downloadingList.findIndex(
 				({ url }) => url === downloadValues.url,
 			);
@@ -74,10 +88,13 @@ function useDownloading() {
 				throw new Error(info);
 			}
 
+			// Since this a brand new download, let's create a new one.
 			// MessageChannels are lightweight, it's cheap to create
-			// a new one for each request.
+			// a new one for each DownloadingMedia to communicate the
+			// download progress between React and Electron:
 			const { port1: myPort, port2: electronPort } = new MessageChannel();
 
+			// Creating a new DownloadingMedia:
 			const downloadStatus: DownloadingMedia = {
 				imageURL: downloadValues.imageURL,
 				status: ProgressStatus.ACTIVE,
@@ -89,25 +106,32 @@ function useDownloading() {
 				port: myPort,
 			};
 
+			// Adding newly created DownloadingMedia:
 			setDownloadingList({
 				downloadingList: [...downloadingList, downloadStatus],
 			});
 
+			// Send a msg with the necessary info to Electron
+			// to start a new download:
 			myPort.postMessage({
 				imageURL: downloadValues.imageURL,
 				title: downloadStatus.title,
 				url: downloadValues.url,
-				// ^ On every `postMessage` you have to send the url (as an ID)!
+				// ^ On every `postMessage` you have to send the url as an ID!
 			});
 
+			// Adding event listeners to React's MessagePort to receive and
+			// handle download progress info:
 			myPort.onmessage = ({ data }: { data: Partial<DownloadingMedia> }) => {
+				// Update React's information about this DownloadingMedia:
 				setDownloadingList({
 					downloadingList: replace(downloadingList, downloadStatus.index, {
 						...downloadStatus,
 						...data,
-					}) as Mutable<DownloadingMedia[]>,
+					}),
 				});
 
+				// Handle ProgressStatus's cases:
 				switch (data.status) {
 					case ProgressStatus.FAIL: {
 						// ^ In this case, `data` include an `error: Error` key.
@@ -122,7 +146,6 @@ function useDownloading() {
 							autoClose: 5000,
 							draggable: true,
 						});
-
 						break;
 					}
 
@@ -174,6 +197,7 @@ function useDownloading() {
 			return electronPort;
 		}
 
+		// For each new DownloadingValues, start a new download:
 		if (downloadValues.canStartDownload) {
 			try {
 				const electronPort = createNewDownload();
@@ -182,7 +206,7 @@ function useDownloading() {
 				// so that it is ready for a new media download:
 				sendMsg({ type: MsgEnum.RESET_DOWNLOAD_VALUES });
 
-				// Sending port so we can communicate with electron:
+				// Sending port so we can communicate with Electron:
 				window.postMessage("download media", "*", [electronPort]);
 			} catch (error) {
 				toast.error(
@@ -219,7 +243,7 @@ export function Downloading() {
 
 	useOnClickOutside(popupRef, () => toggleShowPopup());
 
-	return downloadingList.length > 0 ? (
+	return (
 		<>
 			<Circle onClick={toggleShowPopup}>{icon(ProgressStatus.ACTIVE)}</Circle>
 
@@ -250,7 +274,7 @@ export function Downloading() {
 				</Popup>
 			)}
 		</>
-	) : null;
+	);
 }
 
 type DownloadingMedia = Readonly<{

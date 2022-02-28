@@ -21,7 +21,7 @@ export const useDownloadValues = create<{
 }));
 
 export const useConvertValues = create<{
-	convertValues: ConvertValues[];
+	convertValues: readonly ConvertValues[];
 }>(() => ({
 	convertValues: [],
 }));
