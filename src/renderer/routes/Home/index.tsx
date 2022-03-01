@@ -1,15 +1,20 @@
 import { MediaListKind, SearchMedia, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia";
+import { dbg } from "@common/utils";
 
 const list = "mediaList";
 
-export const Home = () => (
-	<MainArea>
-		<SearchMedia
-			buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
-			fromList={list}
-		/>
+export function Home() {
+	dbg("Here at routes/Home");
 
-		<MediaListKind mediaType={list} />
-	</MainArea>
-);
+	return (
+		<MainArea>
+			<SearchMedia
+				buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
+				fromList={list}
+			/>
+
+			<MediaListKind mediaType={list} />
+		</MainArea>
+	);
+}

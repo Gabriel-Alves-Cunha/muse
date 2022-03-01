@@ -1,12 +1,17 @@
 import { SearchMedia, MediaListKind, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia";
+import { dbg } from "@common/utils";
 
 const list = "favorites";
 
-export const Favorites = () => (
-	<MainArea>
-		<SearchMedia buttonToTheSide={ButtonToTheSide.NOTHING} fromList={list} />
+export function Favorites() {
+	dbg("Here at routes/Favorites");
 
-		<MediaListKind mediaType={list} />
-	</MainArea>
-);
+	return (
+		<MainArea>
+			<SearchMedia buttonToTheSide={ButtonToTheSide.NOTHING} fromList={list} />
+
+			<MediaListKind mediaType={list} />
+		</MainArea>
+	);
+}

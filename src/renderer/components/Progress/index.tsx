@@ -7,32 +7,22 @@ import { FcCancel as Cancel } from "react-icons/fc";
 
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 
-import { Bar, Component, ProgressBarWrapper } from "./styles";
+import { Bar, Component } from "./styles";
 
-export function Progress({
+export const Progress = ({
 	percent_0_to_100,
 	showStatus,
 	status,
-}: ProgressProps) {
-	console.log({ percent_0_to_100 });
+}: ProgressProps) => (
+	<Component>
+		<Bar
+			value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}
+			max={100}
+		/>
 
-	return (
-		<Component>
-			<ProgressBarWrapper>
-				<Bar
-					css={{
-						$$percentage:
-							status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100,
-					}}
-				>
-					<div className={status.toString()} />
-				</Bar>
-			</ProgressBarWrapper>
-
-			{showStatus && icon(status)}
-		</Component>
-	);
-}
+		{showStatus && icon(status)}
+	</Component>
+);
 
 Progress.whyDidYouRender = {
 	logOnDifferentValues: false,

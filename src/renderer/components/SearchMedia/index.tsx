@@ -28,6 +28,7 @@ import {
 	SearchResultsWrapper,
 	ReloadContainer,
 	SearchWrapper,
+	NothingFound,
 	Wrapper,
 	Search,
 	Result,
@@ -37,9 +38,8 @@ import {
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const { searchLocalComputerForMedias, searchForMedia, setPlaylists } =
 		usePlaylists();
-
 	const [searcher, dispatchSearcher] = useReducer(searcherReducer, {
-		isLoading: false,
+		searchStatus: SearchStatus.DOING_NOTHING,
 		searchTerm: "",
 		results: [],
 	});
@@ -51,21 +51,24 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	});
 
 	const reload = async () => {
-		dispatchSearcher({ type: SearcherAction.SET_IS_LOADING, value: true });
+		dispatchSearcher({
+			type: SearcherAction.SET_SEARCH_STATUS,
+			value: SearchStatus.RELOADING_ALL_MEDIAS,
+		});
 
 		await searchLocalComputerForMedias(true);
 
-		dispatchSearcher({ type: SearcherAction.SET_IS_LOADING, value: false });
+		dispatchSearcher({
+			type: SearcherAction.SET_SEARCH_STATUS,
+			value: SearchStatus.DOING_NOTHING,
+		});
 	};
 
-	const cleanHistory = () => {
-		dbg("Sending msg to clean history.");
-
+	const cleanHistory = () =>
 		setPlaylists({
 			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
 		});
-	};
 
 	useEffect(() => {
 		if (searcher.searchTerm.length < 2) return;
@@ -76,48 +79,44 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					value: searchForMedia(searcher.searchTerm),
 					type: SearcherAction.SET_RESULTS,
 				}),
-			400,
+			300,
 		);
 
 		return () => clearTimeout(searchTimeout);
 	}, [searchForMedia, searcher.searchTerm]);
 
-	const ButtonToTheSideJSX = () => {
-		switch (buttonToTheSide) {
-			case ButtonToTheSide.RELOAD_BUTTON: {
-				return (
-					<ReloadContainer withAnimation={!searcher.isLoading} onClick={reload}>
-						{searcher.isLoading ? (
-							<div style={{ transform: "scale(0.3)", animation: "" }}>
-								<Loading />
-							</div>
-						) : (
-							<Reload size={17} color="#ccc" />
-						)}
-					</ReloadContainer>
-				);
-				break;
-			}
+	const buttonToTheSideJSX: Record<ButtonToTheSide, JSX.Element> = {
+		[ButtonToTheSide.RELOAD_BUTTON]: (
+			<ReloadContainer onClick={reload}>
+				{searcher.searchStatus === SearchStatus.RELOADING_ALL_MEDIAS ? (
+					<div style={{ transform: "scale(0.3)", animation: "" }}>
+						<Loading />
+					</div>
+				) : (
+					<Reload size={17} color="#ccc" />
+				)}
+			</ReloadContainer>
+		),
+		[ButtonToTheSide.CLEAN]: (
+			<Button>
+				<Clean size={14} onClick={cleanHistory} />
+			</Button>
+		),
+		[ButtonToTheSide.NOTHING]: <></>,
+	};
 
-			case ButtonToTheSide.CLEAN: {
-				return (
-					<Button>
-						<Clean size={14} onClick={cleanHistory} />
-					</Button>
-				);
-				break;
-			}
-
-			case ButtonToTheSide.NOTHING: {
-				return <></>;
-				break;
-			}
-
-			default: {
-				return assertUnreachable(buttonToTheSide);
-				break;
-			}
-		}
+	const showSearchResultJSX: Record<SearchStatus, JSX.Element> = {
+		[SearchStatus.NOTHING_FOUND]: (
+			<NothingFound>
+				Nothing was found for &quot{searcher.searchTerm}&quot
+			</NothingFound>
+		),
+		[SearchStatus.FOUND_SOMETHING]: (
+			<SearchResults results={searcher.results} fromList={fromList} />
+		),
+		[SearchStatus.RELOADING_ALL_MEDIAS]: <></>,
+		[SearchStatus.DOING_NOTHING]: <></>,
+		[SearchStatus.SEARCHING]: <></>,
 	};
 
 	return (
@@ -141,10 +140,10 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 					/>
 				</Search>
 
-				<SearchResults results={searcher.results} fromList={fromList} />
+				{showSearchResultJSX[searcher.searchStatus]}
 			</SearchWrapper>
 
-			<ButtonToTheSideJSX />
+			{buttonToTheSideJSX[buttonToTheSide]}
 		</Wrapper>
 	);
 }
@@ -166,6 +165,8 @@ function SearchResults({
 	fromList: MediaListKindProps["mediaType"];
 	results: readonly Media[];
 }) {
+	dbg("Here at SearchResults");
+
 	const { playlists } = usePlaylists();
 	const listWrapperReference = useRef<HTMLElement>(null);
 
@@ -226,8 +227,8 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 	switch (action.type) {
 		case SearcherAction.SET_RESULTS: {
 			const ret: SearcherProps = {
+				searchStatus: prev.searchStatus,
 				searchTerm: prev.searchTerm,
-				isLoading: prev.isLoading,
 				results: action.value,
 			};
 
@@ -236,7 +237,7 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 
 		case SearcherAction.SET_SEARCH_TERM: {
 			const ret: SearcherProps = {
-				isLoading: prev.isLoading,
+				searchStatus: prev.searchStatus,
 				searchTerm: action.value,
 				results: prev.results,
 			};
@@ -244,10 +245,10 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 			return ret;
 		}
 
-		case SearcherAction.SET_IS_LOADING: {
+		case SearcherAction.SET_SEARCH_STATUS: {
 			const ret: SearcherProps = {
 				searchTerm: prev.searchTerm,
-				isLoading: action.value,
+				searchStatus: action.value,
 				results: prev.results,
 			};
 
@@ -260,26 +261,34 @@ function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 }
 
 type SearcherProps = Readonly<{
+	searchStatus: SearchStatus;
 	results: readonly Media[];
 	searchTerm: string;
-	isLoading: boolean;
 }>;
 
 type Action =
+	| Readonly<{ type: SearcherAction.SET_SEARCH_STATUS; value: SearchStatus }>
 	| Readonly<{ type: SearcherAction.SET_RESULTS; value: readonly Media[] }>
-	| Readonly<{ type: SearcherAction.SET_SEARCH_TERM; value: string }>
-	| Readonly<{ type: SearcherAction.SET_IS_LOADING; value: boolean }>;
-
-enum SearcherAction {
-	SET_SEARCH_TERM,
-	SET_IS_LOADING,
-	SET_RESULTS,
-}
+	| Readonly<{ type: SearcherAction.SET_SEARCH_TERM; value: string }>;
 
 type Props = Readonly<{
 	fromList: MediaListKindProps["mediaType"];
 	buttonToTheSide: ButtonToTheSide;
 }>;
+
+enum SearcherAction {
+	SET_SEARCH_STATUS,
+	SET_SEARCH_TERM,
+	SET_RESULTS,
+}
+
+enum SearchStatus {
+	RELOADING_ALL_MEDIAS,
+	FOUND_SOMETHING,
+	DOING_NOTHING,
+	NOTHING_FOUND,
+	SEARCHING,
+}
 
 export enum ButtonToTheSide {
 	RELOAD_BUTTON,

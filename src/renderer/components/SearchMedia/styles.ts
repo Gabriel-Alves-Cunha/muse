@@ -93,33 +93,17 @@ const spin = keyframes({
 });
 
 export const ReloadContainer = styled("button", {
-	variants: {
-		withAnimation: {
-			true: {
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
 
-				backgroundColor: "transparent",
-				marginLeft: "1rem",
-				cursor: "pointer",
-				border: "none",
+	backgroundColor: "transparent",
+	marginLeft: "1rem",
+	cursor: "pointer",
+	border: "none",
 
-				"&:hover": {
-					animation: `${spin} 0.5s linear`,
-				},
-			},
-			false: {
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-
-				backgroundColor: "transparent",
-				marginLeft: "1rem",
-				cursor: "pointer",
-				border: "none",
-			},
-		},
+	"&:hover": {
+		animation: `${spin} 0.5s linear`,
 	},
 });
 
@@ -190,14 +174,24 @@ export const Result = styled("button", {
 	margin: "10px !important",
 	borderRadius: 7,
 
-	"&::after": {
+	"&:hover": {
 		transition: "opacity 0.2s ease-in-out 17ms",
 		boxShadow: "$medium",
-		opacity: 0,
 	},
+});
 
-	"&:hover::after": {
-		zIndex: 20,
-		opacity: 1,
-	},
+export const NothingFound = styled("div", {
+	cursor: "pointer",
+	border: "none",
+
+	display: "flex",
+	flexDirection: "row",
+	justifyContent: "flex-start",
+	alignItems: "center",
+
+	width: "95% !important",
+
+	backgroundColor: theme.colors.secondary,
+	margin: "10px !important",
+	borderRadius: 7,
 });

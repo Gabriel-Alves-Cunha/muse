@@ -7,8 +7,11 @@ import { useEffect, useRef, useState } from "react";
 import { MsgEnum, sendMsg } from "@contexts";
 
 import { Wrapper } from "./styles";
+import { dbg } from "@common/utils";
 
 export function Convert() {
+	dbg("Here at routes/Convert");
+
 	const [selectedExtensionToBeConvertedTo] =
 		useState<ExtensionToBeConvertedTo>("mp3");
 	const [selectedMediasPath, setSelectedMediasPath] = useState<Path[]>([]);
