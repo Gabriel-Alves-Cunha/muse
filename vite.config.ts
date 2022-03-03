@@ -9,6 +9,13 @@ export default defineConfig({
 	plugins: [react()],
 	base: "./",
 	root: rendererPath,
+	test: {
+		coverage: {
+			all: true,
+			// reporter: ["html", "text"],
+			reporter: ["text"],
+		},
+	},
 	build: {
 		outDir: outDirRenderer,
 		emptyOutDir: true,
@@ -19,13 +26,6 @@ export default defineConfig({
 				chunkFileNames: "[name].js",
 				assetFileNames: "assets/[name].[ext]",
 			},
-		},
-	},
-	test: {
-		coverage: {
-			all: true,
-			// reporter: ["html", "text"],
-			reporter: ["text"],
 		},
 	},
 	resolve: {

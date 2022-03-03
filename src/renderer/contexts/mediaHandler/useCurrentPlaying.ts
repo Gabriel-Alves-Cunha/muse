@@ -1,5 +1,5 @@
 import type { Playlist } from "@contexts";
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media, Mutable } from "@common/@types/typesAndEnums";
 
 import { persist, subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
@@ -18,7 +18,7 @@ import {
 
 const {
 	fs: { readFile },
-} = electron;
+} = global.electron;
 
 const currentPlayingKey = keyPrefix + "current_playing";
 const { getState: getPlayOptions } = usePlayOptions;
@@ -26,7 +26,6 @@ const { getState: getPlaylists } = usePlaylists;
 
 // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 const defaultPlaylist = defaultPlaylists.find(({ name }) => name === "none")!;
-console.assert(defaultPlaylist.name === "none");
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	playlist: defaultPlaylist,
 	media: undefined,
@@ -52,18 +51,19 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 								if (action.playlist.name === "none")
 									console.error("Received 'none' playlist to play from!");
 								dbg("There is no media!");
+								break;
 							}
 
 							// We need to update history:
-							if (
-								previousPlaying.media &&
-								previousPlaying.media.id !== action.media.id
-							)
+							if (previousPlaying.media?.id !== action.media.id) {
+								dbg("Adding media to history");
+
 								getPlaylists().setPlaylists({
 									type: PlaylistEnum.UPDATE_HISTORY,
-									whatToDo: PlaylistActions.ADD,
-									media: previousPlaying.media,
+									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+									media: action.media,
 								});
+							}
 
 							set({
 								currentPlaying: {
@@ -85,12 +85,75 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							head
 								? set({
 										currentPlaying: {
-											currentTime: 0,
 											playlist: action.playlist,
+											currentTime: 0,
 											media: head,
 										},
 								  })
 								: dbg("There is no media!");
+							/////////
+
+							const prevPlaylist = previousPlaying.playlist;
+							if (previousPlaying.playlist.name === "none") {
+								console.error(
+									"Can't play previous media from the 'none' playlist!",
+								);
+								break;
+							}
+
+							const playOptions = getPlayOptions().playOptions;
+
+							if (playOptions.loopThisMedia) {
+								set({
+									currentPlaying: { ...previousPlaying, currentTime: 0 },
+								});
+							} else if (playOptions.isRandom) {
+								const randomIndex = getRandomInt(0, prevPlaylist.list.length);
+								const randomMedia = prevPlaylist.list[randomIndex];
+
+								set({
+									currentPlaying: {
+										playlist: prevPlaylist,
+										media: randomMedia,
+										currentTime: 0,
+									},
+								});
+							} else {
+								const prevMedia = previousPlaying.media;
+								if (!prevMedia) {
+									console.error(
+										"Can't play previous media if there isn't one selected already.",
+									);
+									break;
+								}
+
+								const mutList = prevPlaylist.list as Mutable<Media[]>;
+								const prevMediaFromTheSameList = mutList.at(
+									prevMedia.index - 1,
+								);
+
+								if (!prevMediaFromTheSameList) {
+									// ^ In case it goes beyond the bounds of the list (it would receive undefined):
+									const firstMediaFromTheSameList = prevPlaylist.list[0];
+
+									set({
+										currentPlaying: {
+											media: firstMediaFromTheSameList,
+											playlist: prevPlaylist,
+											currentTime: 0,
+										},
+									});
+									break;
+								}
+
+								set({
+									currentPlaying: {
+										media: prevMediaFromTheSameList,
+										playlist: prevPlaylist,
+										currentTime: 0,
+									},
+								});
+							}
 							break;
 						}
 
@@ -127,17 +190,12 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 								console.error(
 									"Can't play next media from the 'none' playlist!",
 								);
-								dbg("There is no media!");
 								break;
 							}
 
 							const playOptions = getPlayOptions().playOptions;
 
-							if (playOptions.loopThisMedia) {
-								set({
-									currentPlaying: { ...previousPlaying, currentTime: 0 },
-								});
-							} else if (playOptions.isRandom) {
+							if (playOptions.isRandom) {
 								const randomIndex = getRandomInt(0, prevPlaylist.list.length);
 								const randomMedia = prevPlaylist.list[randomIndex];
 
@@ -154,7 +212,6 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 									console.error(
 										"Can't play next media if there isn't one selected already.",
 									);
-									dbg("There is no media!");
 									break;
 								}
 
@@ -195,9 +252,9 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 			}),
 			{
 				name: currentPlayingKey,
+				partialize: state => ({ currentPlaying: state.currentPlaying }),
 				serialize: state => JSON.stringify(state.state.currentPlaying),
 				deserialize: state => JSON.parse(state),
-				partialize: state => ({ currentPlaying: state.currentPlaying }),
 				merge: (persistedState, currentState) =>
 					merge(persistedState, currentState),
 			},
@@ -213,7 +270,7 @@ useCurrentPlaying.subscribe(
 		const {
 			currentPlaying: { media, currentTime },
 		} = getCurrentPlaying();
-		if (!window || !media) return;
+		if (!global.window || !media) return;
 
 		console.time("Reading <audio> file took");
 		const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
@@ -252,8 +309,8 @@ export type CurrentPlaying = Readonly<{
 export type currentPlayingReducer_Action =
 	| Readonly<{
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA;
-			media: Media;
 			playlist: Playlist;
+			media: Media;
 	  }>
 	| Readonly<{ type: CurrentPlayingEnum.PLAY_PREVIOUS; playlist: Playlist }>
 	| Readonly<{ type: CurrentPlayingEnum.PLAY_NEXT; playlist: Playlist }>

@@ -13,7 +13,7 @@ const rootDirectory = isDevelopment
 // Typescript -> Javascript output dir is different for 'main'
 // compared to 'electron' (confirm with the log):
 export const logoPath = isDevelopment
-	? join(rootDirectory, "..", "src", "renderer", "assets", "icons", "logo.png")
+	? join(rootDirectory, "src", "renderer", "assets", "icons", "logo.png")
 	: join(rootDirectory, "assets", "logo.png");
 
 console.log({ rootDirectory, logoPath });
@@ -41,9 +41,4 @@ export const get = (array: readonly Stream[], url_: Readonly<string>) =>
 export const remove = (array: Stream[], url_: Readonly<string>) => {
 	const index = array.findIndex(({ url }) => url === url_);
 	if (index !== -1) array.splice(index, 1);
-};
-
-export const push = (array: Stream[], stream: Stream) => {
-	array.push(stream);
-	if (array.length > 10) array.length = 10;
 };

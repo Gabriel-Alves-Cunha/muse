@@ -5,7 +5,7 @@ import { allowedMedias, getLastExtension } from "@common/utils";
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
-} = electron;
+} = global.electron;
 
 // fns
 const maxSizeOfHistory = 100;
@@ -53,11 +53,7 @@ export async function searchDirectoryResult() {
 	const _2 = await downloadDirectoryPromise;
 	const _3 = await musicDirectoryPromise;
 
-	const result = [_1, _2, _3].flat() as readonly string[];
-
-	console.log(result);
-
-	return result;
+	return [_1, _2, _3].flat() as readonly string[];
 }
 
 export const searchDirectoryForMedias = async (directory: Path) =>

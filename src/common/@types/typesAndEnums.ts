@@ -28,8 +28,8 @@ export enum NotificationEnum {
 export enum ListenToNotification {
 	REFRESH_ALL_MEDIA,
 	REFRESH_MEDIA,
+	ADD_ONE_MEDIA,
 	REMOVE_MEDIA,
-	ADD_MEDIA,
 	DEL_MEDIA,
 }
 

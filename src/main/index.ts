@@ -1,4 +1,5 @@
 import type { IpcMainInvokeEvent } from "electron";
+import type { ImgString } from "@common/@types/electron-window.js";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
 import { pathToFileURL } from "url";
@@ -109,13 +110,13 @@ app.whenReady().then(async () => {
 
 		extendedClipboard
 			.on("text-changed", async () => {
-				const txt = extendedClipboard.readText("clipboard");
+				const url = extendedClipboard.readText("clipboard");
 
-				if (validateURL(txt)) {
+				if (validateURL(url)) {
 					try {
 						const {
 							videoDetails: { title, thumbnails },
-						} = await getBasicInfo(txt);
+						} = await getBasicInfo(url);
 
 						const notification = new Notification({
 							title: "Click to download this video as 'mp3'",
@@ -136,8 +137,8 @@ app.whenReady().then(async () => {
 									imageURL: thumbnails.at(-1)?.url ?? "",
 									type: "download media",
 									canStartDownload: true,
-									url: txt,
 									title,
+									url,
 								},
 							});
 						});
@@ -210,15 +211,18 @@ ipcMain.on(
 
 ipcMain.handle(
 	"get-image",
-	async (_event: IpcMainInvokeEvent, url: string): Promise<string | Error> => {
+	async (
+		_event: IpcMainInvokeEvent,
+		url: string,
+	): Promise<ImgString | Error> => {
 		return new Promise((resolve, reject) => {
-			get(url, resp => {
-				resp.setEncoding("base64");
+			get(url, res => {
+				res.setEncoding("base64");
 
-				let body = `data:${resp.headers["content-type"]};base64,`;
+				let body = `data:${res.headers["content-type"]};base64,`;
 
-				resp.on("data", chunk => (body += chunk));
-				resp.on("end", () => resolve(body));
+				res.on("data", chunk => (body += chunk));
+				res.on("end", () => resolve(body as ImgString));
 			}).on("error", e => {
 				console.error(`Got error getting image on Electron side: ${e.message}`);
 				reject(e);

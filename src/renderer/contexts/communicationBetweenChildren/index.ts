@@ -74,8 +74,7 @@ export function sendMsg(action: Action) {
 const handleDownloadMedia = (value: DownloadValues) =>
 	sendMsg({ type: MsgEnum.START_DOWNLOAD, value });
 
-// TODO: SEE THIS:
-window.electron?.notificationApi.receiveMsgFromElectron(object => {
+globalThis.electron?.notificationApi.receiveMsgFromElectron(object => {
 	dbg("Received 'async-msg' from Electron on React side.\nobject =", object);
 
 	switch (object.type) {

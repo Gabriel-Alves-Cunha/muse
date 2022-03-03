@@ -29,16 +29,17 @@ import {
 } from "@common/@types/typesAndEnums";
 import fluent_ffmpeg from "fluent-ffmpeg";
 import readline from "readline";
+import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { homeDir, dirs, get, has, push, remove } from "./utils.js";
+import { homeDir, dirs, get, has, remove } from "./utils.js";
 import { string2number } from "@main/hash";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
 import {
+	getLastExtension,
 	formatDuration,
 	isDevelopment,
-	getLastExtension,
 	getBasename,
 } from "@common/utils";
 
@@ -71,20 +72,20 @@ contextBridge.exposeInMainWorld("electron", {
 });
 
 async function getFullPathOfFilesForFilesInThisDirectory(
-	dir: Path,
-): Promise<string[]> {
+	dir: Readonly<Path>,
+): Promise<readonly string[]> {
 	return (await readdir(dir)).map(filename => join(dir, filename));
 }
 
-async function readFile(path: Path): Promise<Buffer> {
+async function readFile(path: Readonly<Path>): Promise<Readonly<Buffer>> {
 	return await fsReadFile(path);
 }
 
-async function readdir(dir: Path): Promise<string[]> {
+async function readdir(dir: Readonly<Path>): Promise<readonly string[]> {
 	return await fsReadDir(dir);
 }
 
-async function rm(path: Path): Promise<void> {
+async function rm(path: Readonly<Path>): Promise<void> {
 	await unlink(path);
 }
 
@@ -237,10 +238,10 @@ export async function transformPathsToMedias(
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<readonly Media[]> {
-	async function createMedia(
+	const createMedia = async (
 		path: Path,
 		index: number,
-	): Promise<Media | undefined> {
+	): Promise<Media | undefined> => {
 		const basename = getBasename(path);
 
 		try {
@@ -257,14 +258,14 @@ export async function transformPathsToMedias(
 
 			if (ignoreMediaWithLessThan60Seconds && duration < 60) {
 				console.log(
-					`Jumping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
+					`Skipping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
 				);
 				return undefined;
 			}
 
 			if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
 				console.log(
-					`Jumping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
+					`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
 				);
 				return undefined;
 			}
@@ -298,8 +299,8 @@ export async function transformPathsToMedias(
 				img,
 			};
 
-			dbg({
-				tag: { pictures, title, album, genres, albumArtists },
+			dbg(title, {
+				tag: { pictures, album, genres, albumArtists },
 				properties: { durationMilliseconds },
 			});
 			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
@@ -310,7 +311,7 @@ export async function transformPathsToMedias(
 		} finally {
 			console.timeEnd(`Nº ${index}, "${basename}" took`);
 		}
-	}
+	};
 
 	const medias: Array<Media | undefined> = [];
 	console.time("Runnig 'for' on all medias");
@@ -368,20 +369,8 @@ export function handleCreateOrCancelDownload(
 	else if (url && destroy) {
 		const stream = get(currentDownloads, url)?.stream;
 
-		if (stream) {
-			stream.emit("destroy");
-			const readAnswer = stream.destroy(
-				new Error("This readStream is being destroyed!"),
-			);
-
-			dbg("readStream 'destroy()' answer =", readAnswer);
-
-			remove(currentDownloads, url);
-			dbg(
-				`Was "${url}" deleted from map?\ncurrentDownloads =`,
-				currentDownloads,
-			);
-		} else
+		if (stream) stream.emit("destroy");
+		else
 			console.error(
 				`There is no stream on 'currentDownloads' with url: '${url}'`,
 			);
@@ -396,7 +385,7 @@ export function makeStream(
 ) {
 	const extension: AllowedMedias = "mp3";
 	const titleWithExtension = `${title}.${extension}`;
-	const saveSite = `${dirs.music}/${titleWithExtension}`;
+	const saveSite = `${dirs.music}/${sanitize(titleWithExtension)}`;
 	const startTime = Date.now();
 
 	let interval: NodeJS.Timer | undefined = undefined;
@@ -420,6 +409,17 @@ export function makeStream(
 			electronPort.close();
 
 			interval && clearInterval(interval);
+
+			const readAnswer = readStream.destroy(
+				new Error("This readStream is being destroyed!"),
+			);
+			dbg("readStream 'destroy()' answer =", readAnswer);
+
+			remove(currentDownloads, url);
+			dbg(
+				`Was "${url}" deleted from map?\ncurrentDownloads =`,
+				currentDownloads,
+			);
 		})
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
@@ -466,6 +466,7 @@ export function makeStream(
 			interval && clearInterval(interval);
 
 			try {
+				console.log("Going to writeTags");
 				await writeTags(saveSite, { imageURL, isNewMedia: true });
 				remove(currentDownloads, url);
 			} catch (error) {
@@ -487,9 +488,10 @@ export function makeStream(
 			interval && clearInterval(interval);
 		});
 
-	fluent_ffmpeg(readStream).toFormat(extension).save(saveSite);
+	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
 
-	push(currentDownloads, { url, stream: readStream });
+	currentDownloads.push({ url, stream: readStream });
+	dbg(`Added "${url}" to currentDownloads =`, currentDownloads);
 }
 
 export function handleCreateOrCancelConvert(
@@ -503,20 +505,8 @@ export function handleCreateOrCancelConvert(
 	else if (path && destroy) {
 		const stream = get(mediasConverting, path)?.stream;
 
-		if (stream) {
-			stream.emit("destroy");
-			const readAnswer = stream.destroy(
-				new Error("This readStream is being destroyed!"),
-			);
-
-			dbg("readStream 'destroy()' answer =", readAnswer);
-
-			remove(mediasConverting, path);
-			dbg(
-				`Was "${path}" deleted from map?\nmediasConverting =`,
-				mediasConverting,
-			);
-		} else
+		if (stream) stream.emit("destroy");
+		else
 			console.error(
 				`There is no stream on 'mediasConverting' with path: '${path}'.`,
 			);
@@ -529,7 +519,7 @@ export function convertToAudio(
 	electronPort: Readonly<MessagePort>,
 ) {
 	const titleWithExtension = `${getBasename(mediaPath)}.${toExtension}`;
-	const saveSite = `${dirs.music}/${titleWithExtension}`;
+	const saveSite = `${dirs.music}/${sanitize(titleWithExtension)}`;
 	const readStream = createReadStream(mediaPath);
 
 	let interval: NodeJS.Timer | undefined = undefined;
@@ -601,19 +591,32 @@ export function convertToAudio(
 			electronPort.close();
 
 			interval && clearInterval(interval);
+
+			const readAnswer = readStream.destroy(
+				new Error("This readStream is being destroyed!"),
+			);
+
+			dbg("readStream 'destroy()' answer =", readAnswer);
+
+			remove(mediasConverting, mediaPath);
+			dbg(
+				`Was "${mediaPath}" deleted from map?\nmediasConverting =`,
+				mediasConverting,
+			);
 		});
 
-	push(mediasConverting, { url: mediaPath, stream: readStream });
+	mediasConverting.push({ url: mediaPath, stream: readStream });
 	dbg(`Added '${mediaPath}' to mediasConverting =`, mediasConverting);
 }
 
 export async function writeTags(
 	mediaPath: Readonly<Path>,
-	data: WriteTag & { isNewMedia?: boolean },
+	data: Readonly<WriteTag & { isNewMedia?: boolean }>,
 ) {
 	const file = MediaFile.createFromPath(mediaPath);
 	// dbg("File =", file);
 	// dbg("File tags =", file.tag);
+	dbg({ data });
 
 	let fileNewPath = "";
 
@@ -630,7 +633,7 @@ export async function writeTags(
 							file.tag.pictures,
 						);
 					} else {
-						dbg("Getting picture");
+						dbg("Downloading picture");
 						try {
 							const imgAsString: `data:${string};base64,${string}` =
 								await ipcRenderer.invoke("get-image", data.imageURL);
@@ -683,8 +686,8 @@ export async function writeTags(
 
 				case "title": {
 					const oldPath = mediaPath;
-					const newPath = `${dirname(oldPath)}/${value}.${getLastExtension(
-						oldPath,
+					const newPath = `${dirname(oldPath)}/${sanitize(
+						`${value}.${getLastExtension(oldPath)}`,
 					)}`;
 
 					file.tag.title = value as string;
@@ -732,7 +735,7 @@ export async function writeTags(
 				path: fileNewPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.ADD_MEDIA,
+				msg: ListenToNotification.ADD_ONE_MEDIA,
 				path: fileNewPath,
 			});
 
@@ -748,7 +751,7 @@ export async function writeTags(
 		} else if (data.isNewMedia) {
 			// Add media
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.ADD_MEDIA,
+				msg: ListenToNotification.ADD_ONE_MEDIA,
 				path: mediaPath,
 			});
 		} else {

@@ -58,3 +58,5 @@ export type WriteTag = Readonly<{
 }>;
 
 export type ExtensionToBeConvertedTo = "mp3";
+
+export type ImgString = `data:${string};base64,${string}`;
