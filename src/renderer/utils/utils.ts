@@ -1,7 +1,7 @@
 const { random, floor } = Math;
 
 /** [min, max) */
-export const getRandomInt = (min: number, max: number) => {
+export const getRandomInt = (min: number, max: number): number => {
 	if (!Number.isFinite(min)) {
 		console.error(
 			`Function \`getRandomInt\` received \`min = ${min}\` wich is not a finite number!`,

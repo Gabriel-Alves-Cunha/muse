@@ -745,7 +745,7 @@ export async function writeTags(
 				path: mediaPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.REMOVE_MEDIA,
+				msg: ListenToNotification.REMOVE_ONE_MEDIA,
 				path: mediaPath,
 			});
 		} else if (data.isNewMedia) {
@@ -762,7 +762,7 @@ export async function writeTags(
 				fileNewPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.REFRESH_MEDIA,
+				msg: ListenToNotification.REFRESH_ONE_MEDIA,
 				path: mediaPath,
 			});
 		}

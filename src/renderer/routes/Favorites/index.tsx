@@ -1,17 +1,19 @@
 import { SearchMedia, MediaListKind, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia";
+import { FAVORITES } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { dbg } from "@common/utils";
-
-const list = "favorites";
 
 export function Favorites() {
 	dbg("Here at routes/Favorites");
 
 	return (
 		<MainArea>
-			<SearchMedia buttonToTheSide={ButtonToTheSide.NOTHING} fromList={list} />
+			<SearchMedia
+				buttonToTheSide={ButtonToTheSide.NOTHING}
+				fromList={FAVORITES}
+			/>
 
-			<MediaListKind mediaType={list} />
+			<MediaListKind mediaType={FAVORITES} />
 		</MainArea>
 	);
 }

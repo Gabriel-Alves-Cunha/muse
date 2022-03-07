@@ -1,11 +1,12 @@
-import type { Media, Path } from "@common/@types/typesAndEnums";
+import type { Media, Mutable, Path } from "@common/@types/typesAndEnums";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
+import { push } from "@utils/array";
 
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
-} = global.electron;
+} = electron;
 
 // fns
 const maxSizeOfHistory = 100;
@@ -13,9 +14,9 @@ export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
 	previousHistory: readonly Media[],
 	media: Media,
 ): readonly Media[] {
-	if (media.id === previousHistory[0]?.id) return previousHistory;
+	if (media.id === previousHistory.slice(-1)[0]?.id) return previousHistory;
 
-	const newHistory: Media[] = [media, ...previousHistory];
+	const newHistory: Media[] = push(previousHistory, media) as Mutable<Media[]>;
 
 	if (newHistory.length > maxSizeOfHistory)
 		newHistory.length = maxSizeOfHistory;
@@ -71,3 +72,9 @@ type ListWithOrder<T> = ReadonlyArray<
 >;
 export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
 	list.map((item, index) => ({ ...item, index }));
+
+export const SORTED_BY_DATE = "sorted by date";
+export const SORTED_BY_NAME = "sorted by name";
+export const FAVORITES = "favorites";
+export const MEDIA_LIST = "mediaList";
+export const HISTORY = "history";

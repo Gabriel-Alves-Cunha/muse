@@ -1,8 +1,7 @@
 import { MediaListKind, SearchMedia, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia";
+import { MEDIA_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { dbg } from "@common/utils";
-
-const list = "mediaList";
 
 export function Home() {
 	dbg("Here at routes/Home");
@@ -11,10 +10,10 @@ export function Home() {
 		<MainArea>
 			<SearchMedia
 				buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
-				fromList={list}
+				fromList={MEDIA_LIST}
 			/>
 
-			<MediaListKind mediaType={list} />
+			<MediaListKind mediaType={MEDIA_LIST} />
 		</MainArea>
 	);
 }

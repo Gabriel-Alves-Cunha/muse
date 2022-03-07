@@ -26,11 +26,11 @@ export enum NotificationEnum {
 	QUIT_APP,
 }
 export enum ListenToNotification {
+	DELETE_ONE_MEDIA_FROM_COMPUTER,
 	REFRESH_ALL_MEDIA,
-	REFRESH_MEDIA,
+	REFRESH_ONE_MEDIA,
+	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
-	REMOVE_MEDIA,
-	DEL_MEDIA,
 }
 
 export enum TypeOfMsgObject {

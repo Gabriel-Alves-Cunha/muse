@@ -1,11 +1,12 @@
 import type { Playlist } from "@contexts";
-import type { Media, Mutable } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/typesAndEnums";
 
 import { persist, subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 import merge from "deepmerge";
 
 import { assertUnreachable, getRandomInt } from "@utils/utils";
+import { HISTORY, MEDIA_LIST } from "./usePlaylistsHelper";
 import { usePlayOptions } from "@contexts/mediaHandler/usePlayOptions";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
@@ -18,14 +19,14 @@ import {
 
 const {
 	fs: { readFile },
-} = global.electron;
+} = electron;
 
 const currentPlayingKey = keyPrefix + "current_playing";
 const { getState: getPlayOptions } = usePlayOptions;
 const { getState: getPlaylists } = usePlaylists;
 
 // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-const defaultPlaylist = defaultPlaylists.find(({ name }) => name === "none")!;
+const defaultPlaylist = defaultPlaylists.find(p => p.name === MEDIA_LIST)!;
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	playlist: defaultPlaylist,
 	media: undefined,
@@ -48,22 +49,17 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 
 							if (!action.media) {
 								// ^ In case it received the [0] item from a Media[] that is empty.
-								if (action.playlist.name === "none")
-									console.error("Received 'none' playlist to play from!");
-								dbg("There is no media!");
+								console.error("There is no media to play!");
 								break;
 							}
 
 							// We need to update history:
-							if (previousPlaying.media?.id !== action.media.id) {
-								dbg("Adding media to history");
-
-								getPlaylists().setPlaylists({
-									type: PlaylistEnum.UPDATE_HISTORY,
-									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-									media: action.media,
-								});
-							}
+							dbg("Adding media to history");
+							getPlaylists().setPlaylists({
+								whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+								type: PlaylistEnum.UPDATE_HISTORY,
+								media: action.media,
+							});
 
 							set({
 								currentPlaying: {
@@ -79,81 +75,26 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							dbg("setCurrentPlaying 'play previous' action =", action);
 
 							// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-							const head = playlists.find(({ name }) => name === "history")!
+							const head = playlists.find(({ name }) => name === HISTORY)!
 								.list[0];
 
-							head
-								? set({
-										currentPlaying: {
-											playlist: action.playlist,
-											currentTime: 0,
-											media: head,
-										},
-								  })
-								: dbg("There is no media!");
-							/////////
-
-							const prevPlaylist = previousPlaying.playlist;
-							if (previousPlaying.playlist.name === "none") {
-								console.error(
-									"Can't play previous media from the 'none' playlist!",
-								);
-								break;
-							}
-
-							const playOptions = getPlayOptions().playOptions;
-
-							if (playOptions.loopThisMedia) {
-								set({
-									currentPlaying: { ...previousPlaying, currentTime: 0 },
+							if (head) {
+								// We need to update history:
+								dbg("Adding media to history");
+								getPlaylists().setPlaylists({
+									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+									type: PlaylistEnum.UPDATE_HISTORY,
+									media: head,
 								});
-							} else if (playOptions.isRandom) {
-								const randomIndex = getRandomInt(0, prevPlaylist.list.length);
-								const randomMedia = prevPlaylist.list[randomIndex];
 
 								set({
 									currentPlaying: {
-										playlist: prevPlaylist,
-										media: randomMedia,
+										playlist: action.playlist,
 										currentTime: 0,
+										media: head,
 									},
 								});
-							} else {
-								const prevMedia = previousPlaying.media;
-								if (!prevMedia) {
-									console.error(
-										"Can't play previous media if there isn't one selected already.",
-									);
-									break;
-								}
-
-								const mutList = prevPlaylist.list as Mutable<Media[]>;
-								const prevMediaFromTheSameList = mutList.at(
-									prevMedia.index - 1,
-								);
-
-								if (!prevMediaFromTheSameList) {
-									// ^ In case it goes beyond the bounds of the list (it would receive undefined):
-									const firstMediaFromTheSameList = prevPlaylist.list[0];
-
-									set({
-										currentPlaying: {
-											media: firstMediaFromTheSameList,
-											playlist: prevPlaylist,
-											currentTime: 0,
-										},
-									});
-									break;
-								}
-
-								set({
-									currentPlaying: {
-										media: prevMediaFromTheSameList,
-										playlist: prevPlaylist,
-										currentTime: 0,
-									},
-								});
-							}
+							} else console.error("There is no previous media!");
 							break;
 						}
 
@@ -185,19 +126,25 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 						case CurrentPlayingEnum.PLAY_NEXT: {
 							dbg("currentPlaying 'playNext' action =", action);
 
-							const prevPlaylist = previousPlaying.playlist;
-							if (previousPlaying.playlist.name === "none") {
-								console.error(
-									"Can't play next media from the 'none' playlist!",
-								);
+							const prevList = previousPlaying.playlist.list;
+
+							if (prevList.length === 0) {
+								console.error("Media list size is 0! Can't play next media.");
 								break;
 							}
 
-							const playOptions = getPlayOptions().playOptions;
+							const prevPlaylist = previousPlaying.playlist;
 
-							if (playOptions.isRandom) {
-								const randomIndex = getRandomInt(0, prevPlaylist.list.length);
-								const randomMedia = prevPlaylist.list[randomIndex];
+							if (getPlayOptions().playOptions.isRandom) {
+								const randomMedia = prevList[getRandomInt(0, prevList.length)];
+
+								// We need to update history:
+								dbg("Adding media to history");
+								getPlaylists().setPlaylists({
+									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+									type: PlaylistEnum.UPDATE_HISTORY,
+									media: randomMedia,
+								});
 
 								set({
 									currentPlaying: {
@@ -222,6 +169,14 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 									// ^ In case it is in the final of the list (it would receive undefined):
 									const firstMediaFromTheSameList = prevPlaylist.list[0];
 
+									// We need to update history:
+									dbg("Adding media to history");
+									getPlaylists().setPlaylists({
+										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+										type: PlaylistEnum.UPDATE_HISTORY,
+										media: firstMediaFromTheSameList,
+									});
+
 									set({
 										currentPlaying: {
 											media: firstMediaFromTheSameList,
@@ -231,6 +186,14 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 									});
 									break;
 								}
+
+								// We need to update history:
+								dbg("Adding media to history");
+								getPlaylists().setPlaylists({
+									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+									type: PlaylistEnum.UPDATE_HISTORY,
+									media: nextMediaFromTheSameList,
+								});
 
 								set({
 									currentPlaying: {
@@ -301,9 +264,9 @@ useCurrentPlaying.subscribe(
 );
 
 export type CurrentPlaying = Readonly<{
+	media: Media | undefined;
 	currentTime: number;
 	playlist: Playlist;
-	media?: Media;
 }>;
 
 export type currentPlayingReducer_Action =

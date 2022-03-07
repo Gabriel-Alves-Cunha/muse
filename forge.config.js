@@ -53,7 +53,7 @@ module.exports = {
 			// The Zip target builds basic .zip files containing your packaged application.
 			// There are no platform specific dependencies for using this maker and it will run on any platform.
 			name: "@electron-forge/maker-zip",
-			platform: ["linux"]
+			platform: ["linux"],
 		},
 		// {
 		// Squirrel.Windows is a no-prompt, no-hassle, no-admin method of installing
