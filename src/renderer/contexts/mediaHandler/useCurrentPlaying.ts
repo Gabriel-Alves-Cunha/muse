@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import type { Playlist } from "@contexts";
 import type { Media } from "@common/@types/typesAndEnums";
 
@@ -11,6 +13,7 @@ import { usePlayOptions } from "@contexts/mediaHandler/usePlayOptions";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
+	type DefaultLists,
 	defaultPlaylists,
 	PlaylistActions,
 	PlaylistEnum,
@@ -25,7 +28,6 @@ const currentPlayingKey = keyPrefix + "current_playing";
 const { getState: getPlayOptions } = usePlayOptions;
 const { getState: getPlaylists } = usePlaylists;
 
-// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 const defaultPlaylist = defaultPlaylists.find(p => p.name === MEDIA_LIST)!;
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	playlist: defaultPlaylist,
@@ -40,12 +42,12 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 				currentPlaying: defaultCurrentPlaying,
 				setCurrentPlaying: (action: currentPlayingReducer_Action) => {
 					const previousPlaying = get().currentPlaying;
-					const playlists = getPlaylists().playlists;
+					const getPlaylist = (listName: DefaultLists) =>
+						getPlaylists().playlists.find(p => p.name === listName)!;
 
 					switch (action.type) {
 						case CurrentPlayingEnum.PLAY_THIS_MEDIA: {
 							dbg("setCurrentPlaying 'play this media' action =", action);
-							// debugger;
 
 							if (!action.media) {
 								// ^ In case it received the [0] item from a Media[] that is empty.
@@ -71,30 +73,59 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							break;
 						}
 
-						case CurrentPlayingEnum.PLAY_PREVIOUS: {
-							dbg("setCurrentPlaying 'play previous' action =", action);
+						case CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST: {
+							dbg(
+								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST\naction =",
+								action,
+							);
 
-							// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-							const head = playlists.find(({ name }) => name === HISTORY)!
-								.list[0];
+							const mediaList = getPlaylist(MEDIA_LIST).list;
+							const currMedia = get().currentPlaying.media;
 
-							if (head) {
+							if (!currMedia) {
+								console.error(
+									"A media needs to be currently selected to play a previous media!",
+								);
+								break;
+							}
+
+							const prevMedia = mediaList.at(currMedia.index - 1)!;
+
+							set({
+								currentPlaying: {
+									playlist: action.playlist,
+									media: prevMedia,
+									currentTime: 0,
+								},
+							});
+							break;
+						}
+
+						case CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY: {
+							dbg(
+								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY\naction =",
+								action,
+							);
+
+							const headOfHistory = getPlaylist(HISTORY).list[0];
+
+							if (headOfHistory) {
 								// We need to update history:
 								dbg("Adding media to history");
 								getPlaylists().setPlaylists({
 									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 									type: PlaylistEnum.UPDATE_HISTORY,
-									media: head,
+									media: headOfHistory,
 								});
 
 								set({
 									currentPlaying: {
 										playlist: action.playlist,
 										currentTime: 0,
-										media: head,
+										media: headOfHistory,
 									},
 								});
-							} else console.error("There is no previous media!");
+							} else console.error("There is no previous media in history!");
 							break;
 						}
 
@@ -123,20 +154,24 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 							break;
 						}
 
-						case CurrentPlayingEnum.PLAY_NEXT: {
-							dbg("currentPlaying 'playNext' action =", action);
+						case CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST: {
+							dbg(
+								"CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST\naction =",
+								action,
+							);
+							const playlist = action.playlist;
 
-							const prevList = previousPlaying.playlist.list;
-
-							if (prevList.length === 0) {
-								console.error("Media list size is 0! Can't play next media.");
+							if (playlist.list.length === 0) {
+								console.error(
+									"Media list size is 0! Can't play next media.\naction.playlist =",
+									{ playlist },
+								);
 								break;
 							}
 
-							const prevPlaylist = previousPlaying.playlist;
-
 							if (getPlayOptions().playOptions.isRandom) {
-								const randomMedia = prevList[getRandomInt(0, prevList.length)];
+								const randomMedia =
+									playlist.list[getRandomInt(0, playlist.list.length)];
 
 								// We need to update history:
 								dbg("Adding media to history");
@@ -148,9 +183,9 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 
 								set({
 									currentPlaying: {
-										playlist: prevPlaylist,
 										media: randomMedia,
 										currentTime: 0,
+										playlist,
 									},
 								});
 							} else {
@@ -163,11 +198,11 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 								}
 
 								const nextMediaFromTheSameList =
-									prevPlaylist.list[prevMedia.index + 1];
+									playlist.list[prevMedia.index + 1];
 
 								if (!nextMediaFromTheSameList) {
 									// ^ In case it is in the final of the list (it would receive undefined):
-									const firstMediaFromTheSameList = prevPlaylist.list[0];
+									const firstMediaFromTheSameList = playlist.list[0];
 
 									// We need to update history:
 									dbg("Adding media to history");
@@ -180,7 +215,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 									set({
 										currentPlaying: {
 											media: firstMediaFromTheSameList,
-											playlist: prevPlaylist,
+											playlist: playlist,
 											currentTime: 0,
 										},
 									});
@@ -198,8 +233,8 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 								set({
 									currentPlaying: {
 										media: nextMediaFromTheSameList,
-										playlist: prevPlaylist,
 										currentTime: 0,
+										playlist,
 									},
 								});
 							}
@@ -215,9 +250,11 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 			}),
 			{
 				name: currentPlayingKey,
-				partialize: state => ({ currentPlaying: state.currentPlaying }),
-				serialize: state => JSON.stringify(state.state.currentPlaying),
-				deserialize: state => JSON.parse(state),
+				partialize: ({ currentPlaying }) => ({
+					currentPlaying,
+				}),
+				serialize: ({ state }) => JSON.stringify(state.currentPlaying),
+				deserialize: currentPlaying => JSON.parse(currentPlaying),
 				merge: (persistedState, currentState) =>
 					merge(persistedState, currentState),
 			},
@@ -227,41 +264,47 @@ export const useCurrentPlaying = create<CurrentPlayingAction>(
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 
-useCurrentPlaying.subscribe(
-	state => state.currentPlaying.media,
-	async function setAudioToHTMLAudioElement() {
-		const {
-			currentPlaying: { media, currentTime },
-		} = getCurrentPlaying();
-		if (!global.window || !media) return;
+if (global.window) {
+	console.log(
+		"There is global.window => setting a listener to useCurrentPlaying",
+	);
 
-		console.time("Reading <audio> file took");
-		const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
-		console.timeEnd("Reading <audio> file took");
+	useCurrentPlaying.subscribe(
+		state => state.currentPlaying.media,
+		async function setAudioToHTMLAudioElement() {
+			const {
+				currentPlaying: { media, currentTime },
+			} = getCurrentPlaying();
+			if (!global.window || !media) return;
 
-		const audio = document.getElementById("audio") as HTMLAudioElement;
-		audio.src = url;
+			console.time("Reading <audio> file took");
+			const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
+			console.timeEnd("Reading <audio> file took");
 
-		audio.addEventListener("loadedmetadata", () => {
-			console.log("Audio has loaded metadata. Setting currentTime...");
-			if (currentTime > 10) audio.currentTime = currentTime;
-		});
-		audio.addEventListener("canplay", () => {
-			console.log("Audio can play.");
-		});
-		audio.addEventListener("invalid", e => {
-			console.error("Audio is invalid:", e);
-		});
-		audio.addEventListener("stalled", e => {
-			console.log("Audio is stalled:", e);
-		});
-		audio.addEventListener("securitypolicyviolation", e =>
-			console.error("Audio has a security policy violation:", e),
-		);
-		audio.addEventListener("error", () => console.error("Audio error."));
-		audio.addEventListener("abort", () => console.log("Audio was aborted."));
-	},
-);
+			const audio = document.getElementById("audio") as HTMLAudioElement;
+			audio.src = url;
+
+			audio.addEventListener("loadedmetadata", () => {
+				console.log("Audio has loaded metadata. Setting currentTime...");
+				if (currentTime > 10) audio.currentTime = currentTime;
+			});
+			audio.addEventListener("canplay", () => {
+				console.log("Audio can play.");
+			});
+			audio.addEventListener("invalid", e => {
+				console.error("Audio is invalid:", e);
+			});
+			audio.addEventListener("stalled", e => {
+				console.log("Audio is stalled:", e);
+			});
+			audio.addEventListener("securitypolicyviolation", e =>
+				console.error("Audio has a security policy violation:", e),
+			);
+			audio.addEventListener("error", () => console.error("Audio error."));
+			audio.addEventListener("abort", () => console.log("Audio was aborted."));
+		},
+	);
+}
 
 export type CurrentPlaying = Readonly<{
 	media: Media | undefined;
@@ -275,20 +318,31 @@ export type currentPlayingReducer_Action =
 			playlist: Playlist;
 			media: Media;
 	  }>
-	| Readonly<{ type: CurrentPlayingEnum.PLAY_PREVIOUS; playlist: Playlist }>
-	| Readonly<{ type: CurrentPlayingEnum.PLAY_NEXT; playlist: Playlist }>
+	| Readonly<{
+			type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST;
+			playlist: Playlist;
+	  }>
+	| Readonly<{
+			type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY;
+			playlist: Playlist;
+	  }>
+	| Readonly<{
+			type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST;
+			playlist: Playlist;
+	  }>
 	| Readonly<{ type: CurrentPlayingEnum.RESUME }>
 	| Readonly<{ type: CurrentPlayingEnum.PAUSE }>;
 
 export enum CurrentPlayingEnum {
+	PLAY_PREVIOUS_FROM_HISTORY,
+	PLAY_PREVIOUS_FROM_LIST,
+	PLAY_NEXT_FROM_PLAYLIST,
 	PLAY_THIS_MEDIA,
-	PLAY_PREVIOUS,
-	PLAY_NEXT,
 	RESUME,
 	PAUSE,
 }
 
-type CurrentPlayingAction = {
+type CurrentPlayingAction = Readonly<{
 	setCurrentPlaying(action: currentPlayingReducer_Action): void;
 	currentPlaying: CurrentPlaying;
-};
+}>;

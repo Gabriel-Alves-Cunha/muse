@@ -1,4 +1,7 @@
-import { defineConfig } from "vite";
+import { type UserConfig as UserConfigFromVitest } from "vitest";
+
+import { type UserConfig as UserConfigFromVite, defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 
@@ -15,6 +18,18 @@ export default defineConfig({
 			// reporter: ["html", "text"],
 			reporter: ["text"],
 		},
+		exclude: [
+			...(configDefaults.exclude as string[]),
+			"**/seeLeakedVariables.ts",
+			"**/.eslintrc.{js,cjs}",
+			"**/forge.config.js",
+			"**/animation.ts",
+			"**/styles.ts",
+			"**/global.ts",
+			"**/theme.ts",
+			"coverage/**",
+			"**/*.d.ts",
+		],
 	},
 	build: {
 		outDir: outDirRenderer,
@@ -72,4 +87,4 @@ export default defineConfig({
 			},
 		],
 	},
-});
+} as UserConfigFromVitest & UserConfigFromVite);

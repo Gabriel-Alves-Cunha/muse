@@ -1,6 +1,6 @@
 import { assert, expect, it } from "vitest";
 
-import { string2number } from "@main/hash";
+import { string2number } from "@common/hash";
 
 it("should produce (fast) a hash (integer) from a string", () => {
 	const testStrings = [

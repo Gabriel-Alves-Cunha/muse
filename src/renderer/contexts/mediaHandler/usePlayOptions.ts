@@ -7,10 +7,10 @@ import { keyPrefix } from "@utils/app";
 
 const playOptionsKey = keyPrefix + "play_options";
 
-type PlayOptionsActions = {
+type PlayOptionsActions = Readonly<{
 	setPlayOptions(action: PlayOptionsAction): void;
 	playOptions: PlayOptions;
-};
+}>;
 
 export const usePlayOptions = create<PlayOptionsActions>(
 	persist(
@@ -65,9 +65,9 @@ export const usePlayOptions = create<PlayOptionsActions>(
 		}),
 		{
 			name: playOptionsKey,
-			serialize: state => JSON.stringify(state.state.playOptions),
-			deserialize: state => JSON.parse(state),
-			partialize: state => ({ playOptions: state.playOptions }),
+			serialize: ({ state }) => JSON.stringify(state.playOptions),
+			deserialize: playOptions => JSON.parse(playOptions),
+			partialize: ({ playOptions }) => ({ playOptions }),
 			merge: (persistedState, currentState) =>
 				merge(persistedState, currentState),
 		},

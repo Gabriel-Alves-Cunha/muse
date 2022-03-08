@@ -33,7 +33,7 @@ import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { homeDir, dirs, get, has, remove } from "./utils.js";
-import { string2number } from "@main/hash";
+import { string2number } from "@common/hash";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
 import {
