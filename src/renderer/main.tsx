@@ -1,5 +1,3 @@
-// import "./wdyr"; // <-- Has to be the first import.
-
 import { StrictMode } from "react";
 import { render } from "react-dom";
 

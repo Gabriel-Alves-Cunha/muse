@@ -35,6 +35,7 @@ export enum ListenToNotification {
 
 export enum TypeOfMsgObject {
 	DOWNLOAD_MEDIA,
+	WRITE_TAG,
 }
 
 export type Mutable<T> = {

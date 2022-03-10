@@ -164,7 +164,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		const firstMedia = mediaPlaylistList!.list[0];
 		getCurrentPlaying().setCurrentPlaying({
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-			playlist: mediaPlaylistList,
+			playlistName: MEDIA_LIST,
 			media: firstMedia,
 		});
 
@@ -180,7 +180,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		for (let i = 0; i < numberOfMedias; ++i) {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
-				playlist: mediaListPlaylist,
+				playlistName: MEDIA_LIST,
 			});
 
 			// If is the last media, it is going to go back
@@ -204,8 +204,8 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 		for (let i = numberOfMedias; i === 0; --i) {
 			getCurrentPlaying().setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST,
-				playlist: mediaListPlaylist,
+				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
+				playlistName: MEDIA_LIST,
 			});
 
 			const expectedMedia = mediaListPlaylist.list.at(i - 1);
@@ -228,7 +228,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				media: mediaListPlaylist.list[index],
-				playlist: mediaListPlaylist,
+				playlistName: MEDIA_LIST,
 			});
 
 			const currMedia = getCurrentPlaying().currentPlaying.media;
@@ -264,6 +264,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			// at `playNextMediaFn()` above:
 			expect(newHistory.length).toBe(1 + 1);
 
+			// last from array: `.slice(-1)[0]`
 			expect(newHistory.slice(-1)[0]).toEqual(mediaList[1]);
 		});
 	});

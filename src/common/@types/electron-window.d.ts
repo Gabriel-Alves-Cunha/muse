@@ -1,7 +1,8 @@
-import type { Media, Path } from "./typesAndEnums";
+import type { DownloadValues, Media, Path } from "./typesAndEnums";
 import type { videoInfo } from "ytdl-core";
 
 import { TypeOfMsgObject } from "./typesAndEnums";
+import { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions/Change";
 
 declare global {
 	/* eslint-disable no-var */
@@ -14,7 +15,7 @@ type VisibleElectron = Readonly<{
 	notificationApi: {
 		sendNotificationToElectron(
 			object: Readonly<{
-				type: NotificationType;
+				type: MsgObject;
 				msg?: string;
 			}>,
 		): void;
@@ -25,6 +26,7 @@ type VisibleElectron = Readonly<{
 			dir: Path,
 		): Promise<readonly Path[]>;
 		readdir(dir: Path): Promise<readonly Path[]>;
+		// eslint-disable-next-line no-undef
 		readFile(path: Path): Promise<Readonly<Buffer>>;
 		rm(path: Path): Promise<void>;
 	};
@@ -44,10 +46,19 @@ type VisibleElectron = Readonly<{
 	};
 }>;
 
-export type MsgObject = Readonly<{
-	type: TypeOfMsgObject.DOWNLOAD_MEDIA;
-	params: DownloadValues;
-}>;
+export type MsgObject =
+	| Readonly<{
+			type: TypeOfMsgObject.DOWNLOAD_MEDIA;
+			params: DownloadValues;
+	  }>
+	| Readonly<{
+			type: TypeOfMsgObject.WRITE_TAG;
+			details: {
+				whatToSend: ChangeOptionsToSend;
+				mediaPath: Path;
+				value: string;
+			};
+	  }>;
 
 export type WriteTag = Readonly<{
 	genres?: readonly string[];

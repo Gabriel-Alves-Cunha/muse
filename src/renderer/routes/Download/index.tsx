@@ -40,7 +40,7 @@ const SearcherWrapper = () => {
 	useEffect(() => {
 		if (!url2Search || url2Search.length < 10) return;
 
-		const searchTimeout = setTimeout(async () => await search(url2Search), 400);
+		const searchTimeout = setTimeout(async () => await search(url2Search), 300);
 
 		return () => clearTimeout(searchTimeout);
 	}, [search, url2Search]);
@@ -88,9 +88,7 @@ const startDownload = () =>
 	getDownloadHelper().download(getDownloadHelper().searcher.searchTerm);
 
 const Result = () => {
-	const {
-		searcher: { result },
-	} = useDownloadHelper();
+	const result = useDownloadHelper().searcher.result;
 
 	return result ? (
 		<ResultContainer>
@@ -101,9 +99,4 @@ const Result = () => {
 			<Button onClick={startDownload}>Download</Button>
 		</ResultContainer>
 	) : null;
-};
-
-Download.whyDidYouRender = {
-	logOnDifferentValues: true,
-	customName: "Download",
 };

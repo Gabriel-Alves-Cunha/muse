@@ -10,7 +10,7 @@ export function History() {
 		<MainArea>
 			<SearchMedia fromList={HISTORY} buttonToTheSide={ButtonToTheSide.CLEAN} />
 
-			<MediaListKind mediaType={HISTORY} />
+			<MediaListKind playlistName={HISTORY} />
 		</MainArea>
 	);
 }

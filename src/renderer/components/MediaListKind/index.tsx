@@ -1,10 +1,12 @@
-import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "./MediaOptions/Change";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
-import { FixedSizeList as List } from "react-window";
 import { memo, useState } from "react";
+import {
+	type ListChildComponentProps,
+	FixedSizeList as List,
+} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import Popup from "reactjs-popup";
 
@@ -27,24 +29,24 @@ import {
 const PADDING_SIZE = 5;
 const ROW_HEIGHT = 65;
 
-export function MediaListKind({ mediaType }: MediaListKindProps) {
+export function MediaListKind({ playlistName }: MediaListKindProps) {
 	const { setCurrentPlaying, currentPlaying } = useCurrentPlaying();
 	const { playlists } = usePlaylists();
 
 	const [showPopup, setShowPopup] = useState<Media>();
 
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-	const mediaList = playlists.find(({ name }) => name === mediaType)!;
-	if (!mediaList)
+	const list = playlists.find(({ name }) => name === playlistName)!;
+	if (!list)
 		console.error(
-			`There should/must be a "${mediaType}"!\nplaylists =`,
+			`There should/must be a list with name = "${playlistName}"!\nplaylists =`,
 			playlists,
 		);
 
 	const playMedia = (media: Media) =>
 		setCurrentPlaying({
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-			playlist: mediaList,
+			playlistName,
 			media,
 		});
 
@@ -94,8 +96,8 @@ export function MediaListKind({ mediaType }: MediaListKindProps) {
 					<List
 						itemKey={(index, data) => data[index].id + Date.now()}
 						itemSize={ROW_HEIGHT + PADDING_SIZE}
-						itemCount={mediaList.list.length}
-						itemData={mediaList.list}
+						itemCount={list.list.length}
+						itemData={list.list}
 						overscanCount={15}
 						className="list"
 						height={height}

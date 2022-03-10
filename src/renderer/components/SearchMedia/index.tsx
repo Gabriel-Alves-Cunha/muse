@@ -1,20 +1,19 @@
-import type { ListChildComponentProps } from "react-window";
 import type { MediaListKindProps } from "../MediaListKind/MediaOptions/Change";
-import type { Playlist } from "@contexts";
 import type { Media } from "@common/@types/typesAndEnums";
 
+import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import { useEffect, useReducer, useRef } from "react";
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { IoReloadSharp as Reload } from "react-icons/io5";
 import { FiTrash as Clean } from "react-icons/fi";
-import { FixedSizeList } from "react-window";
 
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { ImgWithFallback } from "@components";
 import { dbg } from "@common/utils";
 import {
+	type Playlist,
 	CurrentPlayingEnum,
 	useCurrentPlaying,
 	PlaylistActions,
@@ -150,10 +149,10 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 
-function playMedia(media: Media, playlist: Playlist) {
+function playMedia(media: Media, playlistName: Playlist["name"]) {
 	getCurrentPlaying().setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		playlist,
+		playlistName,
 		media,
 	});
 }
@@ -184,7 +183,7 @@ function SearchResults({
 
 		return (
 			<Result
-				onClick={() => playMedia(media, playlist)}
+				onClick={() => playMedia(media, fromList)}
 				key={media.id}
 				style={style}
 			>
@@ -226,33 +225,33 @@ function SearchResults({
 function searcherReducer(prev: SearcherProps, action: Action): SearcherProps {
 	switch (action.type) {
 		case SearcherAction.SET_RESULTS: {
-			const ret: SearcherProps = {
-				searchStatus: prev.searchStatus,
-				searchTerm: prev.searchTerm,
-				results: action.value,
-			};
+			const { searchTerm, searchStatus } = prev;
 
-			return ret;
+			return {
+				results: action.value,
+				searchStatus,
+				searchTerm,
+			};
 		}
 
 		case SearcherAction.SET_SEARCH_TERM: {
-			const ret: SearcherProps = {
-				searchStatus: prev.searchStatus,
-				searchTerm: action.value,
-				results: prev.results,
-			};
+			const { results, searchStatus } = prev;
 
-			return ret;
+			return {
+				searchTerm: action.value,
+				searchStatus,
+				results,
+			};
 		}
 
 		case SearcherAction.SET_SEARCH_STATUS: {
-			const ret: SearcherProps = {
-				searchTerm: prev.searchTerm,
-				searchStatus: action.value,
-				results: prev.results,
-			};
+			const { results, searchTerm } = prev;
 
-			return ret;
+			return {
+				searchStatus: action.value,
+				searchTerm,
+				results,
+			};
 		}
 
 		default:

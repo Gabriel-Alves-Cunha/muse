@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { CurrentPlaying } from "@contexts";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -127,21 +128,19 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_THIS_MEDIA) should set the currentPlaying media", () => {
-		const playlist = getPlaylist(MEDIA_LIST);
-
 		for (let i = 0; i < numberOfMedias; ++i) {
 			const media = testList[i];
 
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlist,
+				playlistName: MEDIA_LIST,
 				media,
 			});
 
 			const currentPlaying = getCurrentPlaying().currentPlaying;
-			const expected = {
+			const expected: CurrentPlaying = {
+				playlistName: MEDIA_LIST,
 				currentTime: 0,
-				playlist,
 				media,
 			};
 
@@ -150,30 +149,30 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY) should play the previous media from history", () => {
-		const playlist = getPlaylist(MEDIA_LIST);
-
 		for (let i = 0; i < numberOfMedias - 1; ++i) {
+			const media = testList[i];
+
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				media: testList[20],
-				playlist,
+				playlistName: MEDIA_LIST,
+				media,
 			});
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				media: testList[20 + 1],
-				playlist,
+				playlistName: MEDIA_LIST,
+				media: testList[i + 1],
 			});
 
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY,
-				playlist,
+				playlistName: MEDIA_LIST,
 			});
 
 			const currentPlaying = getCurrentPlaying().currentPlaying;
-			const expected = {
-				media: testList[20],
+			const expected: CurrentPlaying = {
+				playlistName: MEDIA_LIST,
 				currentTime: 0,
-				playlist,
+				media,
 			};
 
 			expect(expected).toEqual(currentPlaying);
@@ -181,25 +180,23 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST) should play the previous media from mediaList", () => {
-		const playlist = getPlaylist(MEDIA_LIST);
-
 		for (let i = 0; i < numberOfMedias - 1; ++i) {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
+				playlistName: MEDIA_LIST,
 				media: testList[i],
-				playlist,
 			});
 
 			getCurrentPlaying().setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST,
-				playlist,
+				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
+				playlistName: MEDIA_LIST,
 			});
 
 			const currentPlaying = getCurrentPlaying().currentPlaying;
-			const expected = {
+			const expected: CurrentPlaying = {
 				media: testList.at(i - 1),
+				playlistName: MEDIA_LIST,
 				currentTime: 0,
-				playlist,
 			};
 
 			expect(expected).toEqual(currentPlaying);
@@ -207,18 +204,16 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST) should play the next media from a given playlist", () => {
-		const playlist = getPlaylist(MEDIA_LIST);
-
 		for (let i = 0; i < numberOfMedias - 1; ++i) {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
+				playlistName: MEDIA_LIST,
 				media: testList[i],
-				playlist,
 			});
 
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
-				playlist,
+				playlistName: MEDIA_LIST,
 			});
 
 			const currMedia = getCurrentPlaying().currentPlaying.media;

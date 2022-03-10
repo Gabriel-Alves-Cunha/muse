@@ -5,11 +5,11 @@ module.exports = {
 		es2021: true,
 	},
 	extends: [
-		"eslint:recommended",
-		"plugin:react/recommended",
 		"plugin:@typescript-eslint/recommended",
 		"plugin:react-hooks/recommended",
+		"plugin:react/recommended",
 		"plugin:react/jsx-runtime",
+		"eslint:recommended",
 		"prettier",
 	],
 	parser: "@typescript-eslint/parser",
@@ -17,8 +17,8 @@ module.exports = {
 		ecmaFeatures: {
 			jsx: true,
 		},
-		ecmaVersion: 13,
 		sourceType: "module",
+		ecmaVersion: 13,
 	},
 	plugins: ["react", "@typescript-eslint", "react-hooks"],
 	rules: {
@@ -28,8 +28,10 @@ module.exports = {
 			"error",
 			{ "ts-ignore": "allow-with-description" },
 		],
-		semi: ["error", "always"],
 		quotes: ["error", "double"],
+		semi: ["error", "always"],
+		"no-unused-vars": "off",
+		"no-undef": "off",
 	},
 	settings: {
 		react: {

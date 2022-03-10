@@ -1,13 +1,12 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
-import type { ChangeEvent } from "react";
 import type { Path } from "@common/@types/typesAndEnums";
 
-import { useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { MsgEnum, sendMsg } from "@contexts";
+import { dbg } from "@common/utils";
 
 import { Wrapper } from "./styles";
-import { dbg } from "@common/utils";
 
 export function Convert() {
 	dbg("Here at routes/Convert");

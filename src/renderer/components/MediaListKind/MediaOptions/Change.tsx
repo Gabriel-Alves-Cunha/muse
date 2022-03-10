@@ -1,8 +1,15 @@
-import type { Dispatch, SetStateAction, KeyboardEvent } from "react";
 import type { DefaultLists } from "@contexts";
-import type { Media, Path } from "@common/@types/typesAndEnums";
+import type { WhatToChange } from ".";
+import type { MsgObject } from "@common/@types/electron-window";
 
-import { useState } from "react";
+import {
+	type SetStateAction,
+	type KeyboardEvent,
+	type Dispatch,
+	useState,
+} from "react";
+
+import { type Path, TypeOfMsgObject } from "@common/@types/typesAndEnums";
 
 import { InputWrapper } from "../styles";
 
@@ -13,9 +20,13 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 		if (e.key === "Enter" && value) {
 			setWhatToChange(undefined);
 
-			const msg = {
-				details: [mediaPath, whatToChange.whatToChangeToSend, value.trim()],
-				type: "write tag",
+			const msg: MsgObject = {
+				type: TypeOfMsgObject.WRITE_TAG,
+				details: {
+					whatToSend: whatToChange.whatToSend,
+					value: value.trim(),
+					mediaPath,
+				},
 			};
 
 			if (window.twoWayComm_React_Electron)
@@ -40,25 +51,6 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 	);
 }
 
-export const options = ({
-	duration,
-	artist,
-	album,
-	genres,
-	title,
-	size,
-	path,
-}: Media) =>
-	({
-		duration,
-		artist,
-		genres,
-		title,
-		album,
-		path,
-		size,
-	} as const);
-
 export const allowedOptionToChange = {
 	artist: "albumArtists",
 	imageURL: "imageURL",
@@ -75,24 +67,11 @@ export type ChangeOptionsToSend = typeof allowedOptionToChange[Keys];
 export type ChangeOptions = keyof typeof allowedOptionToChange;
 
 export type MediaListKindProps = Readonly<{
-	mediaType: DefaultLists;
+	playlistName: DefaultLists;
 }>;
 
 type Props = Readonly<{
-	setWhatToChange: Dispatch<
-		SetStateAction<
-			| {
-					whatToChangeToSend: ChangeOptionsToSend;
-					whatToChange: ChangeOptions;
-					current: string;
-			  }
-			| undefined
-		>
-	>;
-	whatToChange: {
-		whatToChangeToSend: ChangeOptionsToSend;
-		whatToChange: ChangeOptions;
-		current: string;
-	};
+	setWhatToChange: Dispatch<SetStateAction<WhatToChange | undefined>>;
+	whatToChange: WhatToChange;
 	mediaPath: Path;
 }>;

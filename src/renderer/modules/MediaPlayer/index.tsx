@@ -28,15 +28,15 @@ const { setState: setProgress } = useProgress;
 
 function playNextMedia() {
 	getCurrentPlaying().setCurrentPlaying({
-		playlist: getCurrentPlaying().currentPlaying.playlist,
+		playlistName: getCurrentPlaying().currentPlaying.playlistName,
 		type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
 	});
 }
 
 function playPreviousMedia() {
 	getCurrentPlaying().setCurrentPlaying({
-		playlist: getCurrentPlaying().currentPlaying.playlist,
-		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST,
+		playlistName: getCurrentPlaying().currentPlaying.playlistName,
+		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
 	});
 }
 

@@ -1,12 +1,12 @@
 export { usePage } from "./page";
 
+export type { ConvertValues } from "./communicationBetweenChildren";
 export {
 	useDownloadValues,
 	useConvertValues,
 	MsgEnum,
 	sendMsg,
 } from "./communicationBetweenChildren";
-export type { ConvertValues } from "./communicationBetweenChildren";
 
 export {
 	CurrentPlayingEnum,
@@ -19,12 +19,11 @@ export type {
 
 export { PlayOptionsType, usePlayOptions } from "./mediaHandler/usePlayOptions";
 export type {
-	PlayOptionsAction as PlayOptions_Action,
+	PlayOptionsAction,
 	PlayOptions,
 } from "./mediaHandler/usePlayOptions";
 
 export {
-	defaultPlaylists,
 	PlaylistActions,
 	PlaylistEnum,
 	usePlaylists,

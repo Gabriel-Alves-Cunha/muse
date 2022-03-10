@@ -1,17 +1,22 @@
-import type { ChangeOptionsToSend, ChangeOptions } from "./Change";
-import type { Dispatch, SetStateAction } from "react";
 import type { Media } from "@common/@types/typesAndEnums";
 
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { TrashIcon as Remove } from "@radix-ui/react-icons";
-import { useState } from "react";
 import Popup from "reactjs-popup";
 
 import { usePlaylists } from "@contexts";
 import { overlayStyle } from "../";
 import { capitalize } from "@utils/utils";
-import { allowedOptionToChange, isChangeable, options, Change } from "./Change";
+import {
+	type ChangeOptionsToSend,
+	type ChangeOptions,
+	allowedOptionToChange,
+	isChangeable,
+	Change,
+} from "./Change";
 
 import { Confirm, Option, OptionsModalWrapper } from "./styles";
+import { dbg } from "@common/utils";
 
 const { getState: getPlaylistsState } = usePlaylists;
 
@@ -30,22 +35,21 @@ export function MediaOptionsModal({
 	const changePropsIfAllowed = (option: string, value: string) =>
 		isChangeable(option) &&
 		setWhatToChange({
-			whatToChangeToSend: allowedOptionToChange[option],
+			whatToSend: allowedOptionToChange[option],
 			whatToChange: option,
 			current: value,
 		});
 
-	function deleteMedia() {
-		return async () => {
-			try {
-				await getPlaylistsState().deleteMedia(media);
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setShowPopup(undefined);
-			}
-		};
-	}
+	const deleteMedia = () => async () => {
+		try {
+			dbg("Deleting media", media);
+			await getPlaylistsState().deleteMedia(media);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setShowPopup(undefined);
+		}
+	};
 
 	return (
 		<OptionsModalWrapper>
@@ -109,8 +113,27 @@ export function MediaOptionsModal({
 	);
 }
 
-type WhatToChange = Readonly<{
-	whatToChangeToSend: ChangeOptionsToSend;
+const options = ({
+	duration,
+	artist,
+	album,
+	genres,
+	title,
+	size,
+	path,
+}: Media) =>
+	({
+		duration,
+		artist,
+		genres,
+		title,
+		album,
+		path,
+		size,
+	} as const);
+
+export type WhatToChange = Readonly<{
+	whatToSend: ChangeOptionsToSend;
 	whatToChange: ChangeOptions;
 	current: string;
 }>;

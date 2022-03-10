@@ -74,7 +74,7 @@ it("should return a new array without the first item", () => {
 	expect(shiftedArray).toStrictEqual([2, 3, 4]);
 });
 
-it("should return a new array with a new item", () => {
+it("should return a new array with a new item at the beginning", () => {
 	const arr = Object.freeze([1, 2, 3]);
 
 	const newArray = push(arr, 4);

@@ -129,18 +129,3 @@ function PageToShow() {
 			return assertUnreachable(page);
 	}
 }
-
-PageToShow.whyDidYouRender = {
-	logOnDifferentValues: true,
-	customName: "PageToShow",
-};
-
-App.whyDidYouRender = {
-	logOnDifferentValues: true,
-	customName: "App",
-};
-
-Main.whyDidYouRender = {
-	logOnDifferentValues: true,
-	customName: "Main",
-};

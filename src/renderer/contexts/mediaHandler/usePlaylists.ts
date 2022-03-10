@@ -31,7 +31,7 @@ const {
 
 const playlistsKey = keyPrefix + "playlists";
 
-export const defaultPlaylists: readonly Playlist[] = Object.freeze([
+const defaultPlaylists: readonly Playlist[] = Object.freeze([
 	{ name: SORTED_BY_DATE, list: [] },
 	{ name: SORTED_BY_NAME, list: [] },
 	{ name: MEDIA_LIST, list: [] },

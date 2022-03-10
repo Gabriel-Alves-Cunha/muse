@@ -13,7 +13,7 @@ export function Home() {
 				fromList={MEDIA_LIST}
 			/>
 
-			<MediaListKind mediaType={MEDIA_LIST} />
+			<MediaListKind playlistName={MEDIA_LIST} />
 		</MainArea>
 	);
 }

@@ -13,7 +13,7 @@ export function Favorites() {
 				fromList={FAVORITES}
 			/>
 
-			<MediaListKind mediaType={FAVORITES} />
+			<MediaListKind playlistName={FAVORITES} />
 		</MainArea>
 	);
 }

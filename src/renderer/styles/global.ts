@@ -4,7 +4,7 @@ import { theme } from "./theme";
 
 export const { styled, globalCss, keyframes } = createStitches({
 	media: {
-		sm: "(max-width: 500px)", // Maybe change to max- ?
+		sm: "(max-width: 500px)",
 		md: "(max-width: 768px)",
 		lg: "(max-width: 1024px)",
 	},

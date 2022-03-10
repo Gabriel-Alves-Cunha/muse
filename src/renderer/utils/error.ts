@@ -7,7 +7,7 @@ const toErrorWithMessage = (maybeError: unknown): ErrorWithMessage => {
 	if (isErrorWithMessage(maybeError)) return maybeError;
 
 	try {
-		return new Error(JSON.stringify(maybeError));
+		return new Error(JSON.stringify(maybeError, null, 2));
 	} catch (error) {
 		// Fallback in case there's an error stringifying
 		return new Error(String(maybeError));

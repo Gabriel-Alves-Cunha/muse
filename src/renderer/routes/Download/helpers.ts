@@ -48,7 +48,7 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		const searcher = get().searcher;
 
 		set({ searcher: { ...searcher, isLoading: true, error: "" } });
-		let result: UrlMediaMetadata | undefined = undefined;
+		let result: UrlMediaMetadata | undefined;
 
 		try {
 			const videoInfo = (await getInfo(url)) as videoInfo;
