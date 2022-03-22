@@ -1,4 +1,4 @@
-import type { Page } from "@common/@types/typesAndEnums";
+import type { Page } from "@utils/app";
 
 import create from "zustand";
 

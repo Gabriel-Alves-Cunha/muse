@@ -24,7 +24,7 @@ const {
 	fs: { readFile },
 } = electron;
 
-const currentPlayingKey = keyPrefix + "current_playing";
+const currentPlayingKey = `${keyPrefix}current_playing` as const;
 const { getState: getPlayOptions } = usePlayOptions;
 const { getState: getPlaylists } = usePlaylists;
 

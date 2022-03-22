@@ -1,10 +1,10 @@
 import { EventEmitter } from "events";
-import { clipboard } from "electron";
+import { clipboard } from "@tauri-apps/api";
 
 const clipboardEmitter = new EventEmitter();
 
 let watcherId: NodeJS.Timer | undefined = undefined;
-let previousText = clipboard.readText();
+let previousText = (await clipboard.readText()) ?? "";
 
 (clipboard as ClipboardExtended).on = <T>(
 	event: string,
@@ -36,8 +36,8 @@ let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).startWatching = () => {
 	if (!watcherId)
-		watcherId = setInterval(() => {
-			if (isTextDiff(previousText, (previousText = clipboard.readText())))
+		watcherId = setInterval(async () => {
+			if (previousText !== (previousText = (await clipboard.readText()) ?? ""))
 				clipboardEmitter.emit("text-changed");
 		}, 500);
 
@@ -46,17 +46,14 @@ let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).stopWatching = () => {
 	if (watcherId) clearInterval(watcherId);
-	watcherId = undefined;
 
 	return clipboard;
 };
 
-const isTextDiff = (str1: string, str2: string) => str2 && str1 !== str2;
-
 export { clipboard as ExtendedClipboard };
 
 // Doing this Partial<{}> so typescript doesn't complain...
-type ClipboardExtended = Electron.Clipboard &
+type ClipboardExtended = typeof clipboard &
 	Partial<{
 		startWatching: () => ClipboardExtended;
 		stopWatching: () => ClipboardExtended;

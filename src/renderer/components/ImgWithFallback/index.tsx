@@ -1,7 +1,5 @@
 import type { Media } from "@common/@types/typesAndEnums";
 
-const { writeTags } = electron.media;
-
 const cache: Record<number, Status> = {};
 
 export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {

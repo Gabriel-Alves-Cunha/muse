@@ -10,19 +10,22 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 
 export default defineConfig({
 	plugins: [react()],
-	base: "./",
 	root: rendererPath,
+	base: "./",
+	define: {
+		"process.env.FLUENTFFMPEG_COV": false,
+		// ^ This because, when transitioning to Tauri, this is an error that appeared...
+	},
 	test: {
 		coverage: {
-			all: true,
 			// reporter: ["html", "text"],
 			reporter: ["text"],
+			all: true,
 		},
 		exclude: [
 			...(configDefaults.exclude as string[]),
 			"**/seeLeakedVariables.ts",
 			"**/.eslintrc.{js,cjs}",
-			"**/forge.config.js",
 			"**/animation.ts",
 			"**/styles.ts",
 			"**/global.ts",
@@ -37,33 +40,25 @@ export default defineConfig({
 		sourcemap: false,
 		rollupOptions: {
 			output: {
+				assetFileNames: "assets/[name].[ext]",
 				entryFileNames: "[name].js",
 				chunkFileNames: "[name].js",
-				assetFileNames: "assets/[name].[ext]",
 			},
 		},
 	},
 	resolve: {
 		alias: [
 			{
-				find: "@renderer",
-				replacement: resolve(__dirname, "src/renderer"),
-			},
-			{
-				find: "@common",
-				replacement: resolve(__dirname, "src/common"),
-			},
-			{
-				find: "@main",
-				replacement: resolve(__dirname, "src/main"),
+				find: "@components",
+				replacement: resolve(__dirname, "src/renderer/components"),
 			},
 			{
 				find: "@contexts",
 				replacement: resolve(__dirname, "src/renderer/contexts"),
 			},
 			{
-				find: "@components",
-				replacement: resolve(__dirname, "src/renderer/components"),
+				find: "@modules",
+				replacement: resolve(__dirname, "src/renderer/modules"),
 			},
 			{
 				find: "@styles",
@@ -82,8 +77,16 @@ export default defineConfig({
 				replacement: resolve(__dirname, "src/renderer/hooks"),
 			},
 			{
-				find: "@modules",
-				replacement: resolve(__dirname, "src/renderer/modules"),
+				find: "@renderer",
+				replacement: resolve(__dirname, "src/renderer"),
+			},
+			{
+				find: "@common",
+				replacement: resolve(__dirname, "src/common"),
+			},
+			{
+				find: "@main",
+				replacement: resolve(__dirname, "src/main"),
 			},
 		],
 	},

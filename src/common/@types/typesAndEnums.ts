@@ -1,10 +1,7 @@
-import { pages } from "@utils/app";
-
-export type Page = Readonly<typeof pages[number]>;
-export type PrettyBytes = Readonly<string>;
-export type Path = Readonly<string>;
+import { type PrettyBytes } from "@common/prettyBytes";
 
 type DateAsNumber = Readonly<number>;
+export type Path = Readonly<string>;
 
 export type Media = Readonly<{
 	dateOfArival: DateAsNumber;
@@ -38,6 +35,14 @@ export enum TypeOfMsgObject {
 	WRITE_TAG,
 }
 
+export enum ProgressStatus {
+	SUCCESS,
+	CONVERT,
+	ACTIVE,
+	CANCEL,
+	FAIL,
+}
+
 export type Mutable<T> = {
 	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
 };
@@ -48,11 +53,3 @@ export type DownloadValues = Readonly<{
 	title: string;
 	url: string;
 }>;
-
-export enum ProgressStatus {
-	SUCCESS,
-	CONVERT,
-	ACTIVE,
-	CANCEL,
-	FAIL,
-}

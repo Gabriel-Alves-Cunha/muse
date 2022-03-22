@@ -48,5 +48,5 @@
 			"@main/*": ["main/*"]
 		}
 	},
-	"exclude": ["node_modules", "app", "out", "forge.config.js", "jest.config.js"]
+	"exclude": ["node_modules", "app", "src-tauri"]
 }

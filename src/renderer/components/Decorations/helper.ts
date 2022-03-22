@@ -1,10 +1,14 @@
-import { NotificationEnum } from "@common/@types/typesAndEnums";
+import { getCurrent } from "@tauri-apps/api/window";
 
-const notify = electron.notificationApi.sendNotificationToElectron;
+export const toggleMaximize = async () => {
+	const currWindow = getCurrent();
 
-export const toggleMaximize = () => notify({ type: NotificationEnum.MAXIMIZE });
-export const minimizeWindow = () => notify({ type: NotificationEnum.MINIMIZE });
-export const closeWindow = () => notify({ type: NotificationEnum.QUIT_APP });
+	(await currWindow.isMaximized())
+		? await currWindow.unmaximize()
+		: await currWindow.maximize();
+};
+export const minimizeWindow = async () => await getCurrent().minimize();
+export const closeWindow = async () => await getCurrent().close();
 
 export const imageUrl = new URL(
 	"../../assets/icons/logo.svg?width=16",

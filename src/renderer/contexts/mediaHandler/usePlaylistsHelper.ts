@@ -2,11 +2,11 @@ import type { Media, Mutable, Path } from "@common/@types/typesAndEnums";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
 import { push } from "@utils/array";
-
-const {
-	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
-	os: { dirs },
-} = electron;
+import { dirs } from "@main/utils";
+import {
+	getFullPathOfFilesForFilesInThisDirectory,
+	readdir,
+} from "@main/preload";
 
 // fns
 const maxSizeOfHistory = 100;
@@ -41,24 +41,23 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 }
 
 export async function searchDirectoryResult() {
-	const documentsDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-		dirs.documents,
-	);
-	const downloadDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-		dirs.downloads,
-	);
-	const musicDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
+	const documentsDirectoryPromise =
+		await getFullPathOfFilesForFilesInThisDirectory(dirs.documents);
+	const downloadDirectoryPromise =
+		await getFullPathOfFilesForFilesInThisDirectory(dirs.downloads);
+	const musicDirectoryPromise = await getFullPathOfFilesForFilesInThisDirectory(
 		dirs.music,
 	);
-	const _1 = await documentsDirectoryPromise;
-	const _2 = await downloadDirectoryPromise;
-	const _3 = await musicDirectoryPromise;
 
-	return [_1, _2, _3].flat() as readonly string[];
+	return [
+		documentsDirectoryPromise,
+		downloadDirectoryPromise,
+		musicDirectoryPromise,
+	].flat() as readonly string[];
 }
 
 export const searchDirectoryForMedias = async (directory: Path) =>
-	getAllowedMedias(await readdir(directory));
+	getAllowedMedias((await readdir(directory)).map(fileEntry => fileEntry.path));
 
 export const getAllowedMedias = (
 	filenames: readonly string[],
@@ -75,6 +74,6 @@ export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
 
 export const SORTED_BY_DATE = "sorted by date";
 export const SORTED_BY_NAME = "sorted by name";
-export const FAVORITES = "favorites";
 export const MEDIA_LIST = "mediaList";
+export const FAVORITES = "favorites";
 export const HISTORY = "history";

@@ -1,19 +1,21 @@
 import { debug, enable } from "debug";
 
+export const { log } = console;
 const { trunc, floor } = Math;
-
-export const isDevelopment = process.env.NODE_ENV === "development";
-console.log("Electron isDevelopment =", isDevelopment);
 
 export const capitalizedAppName = "Muse" as const;
 export const lowercaseAppName = "muse" as const;
 
+export const isDevelopment = process.env.NODE_ENV === "development";
 export const dbg = debug(lowercaseAppName);
 
+log({ isDevelopment });
+
 if (isDevelopment) enable(lowercaseAppName);
+
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
-export const allowedMedias = [
+export const allowedMedias = Object.freeze(<const>[
 	"vorbis",
 	"webm",
 	"flac",
@@ -27,7 +29,7 @@ export const allowedMedias = [
 	"m4b",
 	"m4r",
 	"m4v",
-] as const;
+]);
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
 export const formatDuration = (time: number | undefined) => {

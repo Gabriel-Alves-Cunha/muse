@@ -1,44 +1,37 @@
-import type { Readable } from "stream";
-
-import { homedir } from "os";
-import { join } from "path";
+import {
+	documentDir,
+	downloadDir,
+	audioDir,
+	dirname,
+	join,
+} from "@tauri-apps/api/path";
 
 import { isDevelopment } from "@common/utils";
 
+const dirName = await dirname(import.meta.url);
 const rootDirectory = isDevelopment
-	? join(__dirname, "..", "..", "..")
-	: __dirname;
+	? await join(dirName, "..", "..", "..")
+	: dirName;
 
 // This path has to be like this cause of the transpiling of
 // Typescript -> Javascript output dir is different for 'main'
 // compared to 'electron' (confirm with the log):
 export const logoPath = isDevelopment
-	? join(rootDirectory, "src", "renderer", "assets", "icons", "logo.png")
-	: join(rootDirectory, "assets", "logo.png");
+	? await join(rootDirectory, "src", "renderer", "assets", "icons", "logo.png")
+	: await join(rootDirectory, "assets", "logo.png");
 
-console.log({ rootDirectory, logoPath });
+console.log({ rootDirectory, logoPath, dirName });
 
-export const homeDir = homedir();
 export const dirs = Object.freeze({
-	documents: join(homeDir, "Documents"),
-	downloads: join(homeDir, "Downloads"),
-	music: join(homeDir, "Music"),
+	documents: await documentDir(),
+	downloads: await downloadDir(),
+	music: await audioDir(),
 });
 
-export type Stream = Readonly<{ url: string; stream: Readable }>;
+export const get = (array: readonly string[], url_: Readonly<string>) =>
+	array.find(url => url === url_);
 
-export const has = (
-	array: readonly Stream[],
-	url: Readonly<string>,
-): boolean => {
-	for (let i = 0; i < array.length; ++i) if (array[i].url === url) return true;
-	return false;
-};
-
-export const get = (array: readonly Stream[], url_: Readonly<string>) =>
-	array.find(({ url }) => url === url_);
-
-export const remove = (array: Stream[], url_: Readonly<string>) => {
-	const index = array.findIndex(({ url }) => url === url_);
+export const remove = (array: string[], url_: Readonly<string>) => {
+	const index = array.findIndex(url => url === url_);
 	if (index !== -1) array.splice(index, 1);
 };

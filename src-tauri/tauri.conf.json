@@ -1,0 +1,68 @@
+{
+	"package": {
+		"productName": "muse",
+		"version": "0.1.0"
+	},
+	"build": {
+		"beforeDevCommand": "yarn front-end",
+		"beforeBuildCommand": "yarn build",
+		"devPath": "http://localhost:3000",
+		"distDir": "../app"
+	},
+	"tauri": {
+		"bundle": {
+			"identifier": "com.tauri.dev",
+			"targets": "all",
+			"active": true,
+			"icon": [
+				"icons/128x128@2x.png",
+				"icons/128x128.png",
+				"icons/32x32.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			],
+			"shortDescription": "Just an Youtube music downloader and player.",
+			"category": "DeveloperTool",
+			"longDescription": "",
+			"copyright": "MIT",
+			"externalBin": [],
+			"resources": [],
+			"deb": {
+				"useBootstrapper": false,
+				"depends": []
+			},
+			"macOS": {
+				"minimumSystemVersion": "",
+				"providerShortName": null,
+				"useBootstrapper": false,
+				"signingIdentity": null,
+				"exceptionDomain": "",
+				"entitlements": null,
+				"frameworks": []
+			},
+			"windows": {
+				"certificateThumbprint": null,
+				"digestAlgorithm": "sha256",
+				"timestampUrl": ""
+			}
+		},
+		"updater": {
+			"active": false
+		},
+		"allowlist": {
+			"all": true
+		},
+		"windows": [
+			{
+				"fullscreen": false,
+				"resizable": true,
+				"title": "Muse",
+				"height": 600,
+				"width": 800
+			}
+		],
+		"security": {
+			"csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
+		}
+	}
+}

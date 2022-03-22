@@ -1,0 +1,100 @@
+// import type { ImgString } from "@common/@types/electron-window.js";
+
+// import { validateURL, getBasicInfo } from "ytdl-core";
+// import { pathToFileURL } from "url";
+// import { appWindow } from "@tauri-apps/api/window";
+// import { getInfo } from "ytdl-core";
+// import { join } from "path";
+// import { get } from "https";
+
+// import { capitalizedAppName, isDevelopment } from "@common/utils";
+// import { logoPath } from "./utils.js";
+// import {
+// 	NotificationEnum,
+// 	TypeOfMsgObject,
+// } from "@common/@types/typesAndEnums";
+
+// const url = isDevelopment
+// 	? "http://localhost:3000"
+// 	: pathToFileURL(
+// 			join(__dirname, "vite-renderer-build", "index.html"),
+// 	  ).toString();
+
+// window.loadURL(url);
+
+// if (isDevelopment) window.webContents.openDevTools();
+
+// try {
+// 	const extendedClipboard = (await import("./clipboardExtended"))
+// 		.ExtendedClipboard as ClipboardExtended;
+
+// 	extendedClipboard
+// 		.on("text-changed", async () => {
+// 			const url = extendedClipboard.readText("clipboard");
+
+// 			if (validateURL(url)) {
+// 				try {
+// 					const {
+// 						videoDetails: { title, thumbnails },
+// 					} = await getBasicInfo(url);
+
+// 					const notification = new Notification({
+// 						title: "Click to download this video as 'mp3'",
+// 						timeoutType: "never",
+// 						urgency: "normal",
+// 						icon: logoPath,
+// 						silent: true,
+// 						body: title,
+// 					});
+
+// 					notification.on("click", () => {
+// 						console.log("Clicked notification!");
+
+// 						// Send msg to ipcRenderer:
+// 						electronWindow?.webContents.send("async-msg", {
+// 							type: TypeOfMsgObject.DOWNLOAD_MEDIA,
+// 							params: {
+// 								imageURL: thumbnails.at(-1)?.url ?? "",
+// 								type: "download media",
+// 								canStartDownload: true,
+// 								title,
+// 								url,
+// 							},
+// 						});
+// 					});
+
+// 					notification.show();
+// 				} catch (error) {
+// 					console.error(error);
+// 				}
+// 			}
+// 		})
+// 		.startWatching();
+// } catch (error) {
+// 	console.error(error);
+// }
+
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
+
+// ipcMain.handle(
+// 	"get-image",
+// 	async (
+// 		_event: IpcMainInvokeEvent,
+// 		url: string,
+// 	): Promise<ImgString | Error> => {
+// 		return new Promise((resolve, reject) => {
+// 			get(url, res => {
+// 				res.setEncoding("base64");
+
+// 				let body = `data:${res.headers["content-type"]};base64,`;
+
+// 				res.on("data", chunk => (body += chunk));
+// 				res.on("end", () => resolve(body as ImgString));
+// 			}).on("error", e => {
+// 				console.error(`Got error getting image on Electron side: ${e.message}`);
+// 				reject(e);
+// 			});
+// 		});
+// 	},
+// );

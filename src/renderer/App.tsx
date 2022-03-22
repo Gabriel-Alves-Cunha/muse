@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { Convert, Download, Favorites, History, Home, Settings } from "@routes";
 import { MediaPlayer, Downloading, Converting, Navbar } from "@modules";
 import { usePlaylists, usePage } from "@contexts";
-import { assertUnreachable } from "@utils/utils";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
@@ -110,22 +109,16 @@ function Main() {
 }
 
 function PageToShow() {
-	const page = usePage().page;
+	const { page } = usePage();
 
-	switch (page) {
-		case "Convert":
-			return <Convert />;
-		case "Download":
-			return <Download />;
-		case "Favorites":
-			return <Favorites />;
-		case "History":
-			return <History />;
-		case "Home":
-			return <Home />;
-		case "Settings":
-			return <Settings />;
-		default:
-			return assertUnreachable(page);
-	}
+	return pages[page];
 }
+
+const pages = Object.freeze({
+	Favorites: <Favorites />,
+	Settings: <Settings />,
+	Download: <Download />,
+	Convert: <Convert />,
+	History: <History />,
+	Home: <Home />,
+});
