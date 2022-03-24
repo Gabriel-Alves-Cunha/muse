@@ -29,7 +29,7 @@ const {
 	fs: { rm },
 } = electron;
 
-const playlistsKey = keyPrefix + "playlists";
+const playlistsKey = `${keyPrefix}playlists` as const;
 
 const defaultPlaylists: readonly Playlist[] = Object.freeze([
 	{ name: SORTED_BY_DATE, list: [] },

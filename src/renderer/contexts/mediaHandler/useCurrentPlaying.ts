@@ -9,13 +9,13 @@ import merge from "deepmerge";
 
 import { assertUnreachable, getRandomInt } from "@utils/utils";
 import { HISTORY, MEDIA_LIST } from "./usePlaylistsHelper";
-import { usePlayOptions } from "@contexts/mediaHandler/usePlayOptions";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
 	type DefaultLists,
 	type Playlist,
 	PlaylistActions,
+	usePlayOptions,
 	PlaylistEnum,
 	usePlaylists,
 } from "@contexts";
@@ -24,7 +24,7 @@ const {
 	fs: { readFile },
 } = electron;
 
-const currentPlayingKey = keyPrefix + "current_playing";
+const currentPlayingKey = `${keyPrefix}current_playing` as const;
 const { getState: getPlayOptions } = usePlayOptions;
 const { getState: getPlaylists } = usePlaylists;
 

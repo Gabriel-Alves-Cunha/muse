@@ -14,9 +14,9 @@ export default defineConfig({
 	root: rendererPath,
 	test: {
 		coverage: {
-			all: true,
 			// reporter: ["html", "text"],
 			reporter: ["text"],
+			all: true,
 		},
 		exclude: [
 			...(configDefaults.exclude as string[]),
