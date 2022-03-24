@@ -1,21 +1,13 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import type { ImgString, WriteTag } from "@common/@types/electron-window.d";
-import type { Media, Path } from "@common/@types/typesAndEnums";
-
-import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
-import ytdl, { type videoInfo } from "ytdl-core";
-import { join, dirname } from "@tauri-apps/api/path";
-import { fetch } from "@tauri-apps/api/http";
+import { Readable, Writable, Stream, Duplex } from "readable-stream";
+import { type IFileAbstraction } from "node-taglib-sharp/dist/fileAbstraction";
+import { fetch, ResponseType } from "@tauri-apps/api/http";
+import ytdl, { getBasicInfo } from "ytdl-core";
+import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
+import { dirname, join } from "@tauri-apps/api/path";
+import { renameFile } from "@tauri-apps/api/fs";
 import {
-	type FileEntry,
-	removeFile,
-	renameFile,
-	readDir,
-} from "@tauri-apps/api/fs";
-import {
-	type IPicture,
 	File as MediaFile,
+	type IPicture,
 	PictureType,
 	ByteVector,
 	StringType,
@@ -24,200 +16,37 @@ import {
 import fluent_ffmpeg from "fluent-ffmpeg";
 import sanitize from "sanitize-filename";
 
+import { ImgString, WriteTag } from "@common/@types/electron-window";
 import { string2number } from "@common/hash";
-import { dirs, remove } from "./utils.js";
 import { prettyBytes } from "@common/prettyBytes";
-import { dbg } from "@common/utils";
+import { dirs } from "./utils";
+import {
+	ListenToNotification,
+	ProgressStatus,
+	type Media,
+	type Path,
+} from "@common/@types/typesAndEnums";
 import {
 	type AllowedMedias,
 	getLastExtension,
 	formatDuration,
 	getBasename,
+	dbg,
 } from "@common/utils";
-import {
-	ListenToNotification,
-	ProgressStatus,
-} from "@common/@types/typesAndEnums";
 
-const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
-fluent_ffmpeg.setFfmpegPath(ffmpegPath);
-
-// Expose protected methods that allow the renderer process to use
-// notificationApi: {
-// 	sendNotificationToElectron,
-// 	receiveMsgFromElectron,
-// },
-// fs: {
-// 	getFullPathOfFilesForFilesInThisDirectory,
-// 	readFile,
-// 	readdir,
-// 	rm,
-// },
-// os: {
-// 	homeDir,
-// 	dirs,
-// },
 // media: {
 // 	transformPathsToMedias,
 // 	convertToAudio,
+// 	getVideoInfo,
 // 	writeTags,
-// 	getInfo,
 // }
 
-export async function getFullPathOfFilesForFilesInThisDirectory(
-	dir: Readonly<Path>,
-): Promise<readonly string[]> {
-	console.time("getFullPathOfFilesForFilesInThisDirectory");
-	const dirs = await readdir(dir);
-	const promises = dirs.map(async ({ path }) => await join(dir, path));
-	const fullPaths = await Promise.all(promises);
-	console.timeEnd("getFullPathOfFilesForFilesInThisDirectory");
+fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
-	console.log({ fullPaths });
+type URL = string;
 
-	return fullPaths;
-}
-
-export async function readFile(
-	path: Readonly<Path>,
-): Promise<Readonly<Buffer>> {
-	return await readFile(path);
-}
-
-export async function readdir(dir: Readonly<Path>): Promise<FileEntry[]> {
-	return await readDir(dir);
-}
-
-export async function rm(path: Readonly<Path>): Promise<void> {
-	await removeFile(path);
-}
-
-export async function getVideoInfo(url: string): Promise<videoInfo> {
-	return (await fetch<videoInfo>(url)).data;
-}
-
-window.onmessage = async event => {
-	switch (event.data) {
-		case "download media": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There is no message port to handle 'download media' event!",
-				);
-				return;
-			}
-
-			electronPort.onmessage = ({
-				data,
-			}: {
-				data: DownloadProps & { destroy: boolean };
-			}) => handleCreateOrCancelDownload({ ...data, electronPort });
-
-			electronPort.addEventListener("close", () =>
-				dbg("Closing ports (electronPort)."),
-			);
-
-			// MessagePortMain queues messages until the .start() method has been called.
-			electronPort.start();
-			break;
-		}
-
-		case "convert media": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There is no MessagePort to handle 'convert media' event!",
-				);
-				return;
-			}
-
-			electronPort.onmessage = ({
-				data,
-			}: {
-				data: Readonly<{
-					toExtension: AllowedMedias;
-					destroy: boolean;
-					path: Path;
-				}>;
-			}) =>
-				handleCreateOrCancelConvert(
-					data.destroy,
-					data.toExtension,
-					data.path,
-					electronPort,
-				);
-
-			electronPort.addEventListener("close", () =>
-				dbg("Closing ports (electronPort)."),
-			);
-
-			// MessagePortMain queues messages until the .start() method has been called.
-			electronPort.start();
-			break;
-		}
-
-		case "write tag": {
-			const details: { mediaPath: Path; [whatToChange: string]: string } =
-				event.data;
-			const data = {};
-			Object.entries(details).forEach(pair => Object.assign(data, pair));
-
-			console.log({ event }, "\n\n\n", { details, data });
-
-			await writeTags(details.mediaPath, data);
-
-			break;
-		}
-
-		case "async two way comm": {
-			console.log("Electron received 'async two way comm':", event);
-
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There should be an electronPort for 2-way communication with React!",
-				);
-				return;
-			}
-
-			window.twoWayComm_React_Electron = addListeners(electronPort);
-
-			// MessagePortMain queues messages until the .start() method has been called.
-			electronPort.start();
-			break;
-		}
-
-		default: {
-			console.error(
-				`There is no method to handle this event: (${typeof event.data}) "${
-					event.data
-				}";\nEvent =`,
-				event,
-			);
-			break;
-		}
-	}
-};
-
-const currentDownloads: string[] = [];
-const mediasConverting: string[] = [];
-
-// function sendNotificationToElectron(
-// 	object: Readonly<{
-// 		type: NotificationEnum;
-// 		msg?: string;
-// 	}>,
-// ): void {
-// 	ipcRenderer.send("notify", object);
-// }
-
-// export function receiveMsgFromElectron(
-// 	handleMsg: (msgObject: MsgObject) => void,
-// ): void {
-// 	ipcRenderer.on("async-msg", (_, msgObject: MsgObject) =>
-// 		handleMsg(msgObject),
-// 	);
-// }
+const mediasConverting: Map<Path, Readable> = new Map();
+const currentDownloads: Map<URL, Readable> = new Map();
 
 export async function transformPathsToMedias(
 	paths: readonly Path[],
@@ -263,7 +92,7 @@ export async function transformPathsToMedias(
 				const str =
 					// If the picture wasn't made by us. (That's the only way I found to
 					// make this work, cause, when we didn't make the picture in
-					// `writeTag`, we can't decode it!):
+					// `writeTag`, we can't decode it! :(
 					picture.type === PictureType.NotAPicture ||
 					picture.type === PictureType.Other
 						? Buffer.from(picture.data.data).toString("base64")
@@ -303,57 +132,22 @@ export async function transformPathsToMedias(
 	console.time("Runnig 'for' on all medias");
 	for (const [index, path] of paths.entries())
 		medias.push(await createMedia(path, index));
-
 	console.timeEnd("Runnig 'for' on all medias");
 
 	return medias.filter(Boolean) as Media[];
 }
 
-const addListeners = (port: MessagePort): Readonly<MessagePort> => {
-	port.onmessage = async event => {
-		const { data } = event;
-
-		console.log("At addListeners on file 'preload.ts', line 330:", data);
-
-		switch (data.type) {
-			case "write tag": {
-				// details: [mediaPath, whatToChange.whatToChange, value.trim()],
-				const [mediaPath, whatToChange, value] = data.details;
-
-				try {
-					console.assert(mediaPath, whatToChange, value);
-
-					await writeTags(mediaPath, { [whatToChange]: value });
-				} catch (error) {
-					console.error(error);
-				}
-				break;
-			}
-
-			default: {
-				console.log(
-					"Message received on electron side of 2way-comm, but there is no function to handle it:",
-					data,
-				);
-				break;
-			}
-		}
-	};
-
-	return port;
-};
-
-type DownloadProps = Readonly<{
-	electronPort: Readonly<MessagePort>;
-	imageURL: Readonly<string>;
-	title: Readonly<string>;
-	url: Readonly<string>;
+export type DownloadProps = Readonly<{
+	electronPort: MessagePort;
+	imageURL: string;
+	title: string;
+	url: string;
 }>;
 
 export function handleCreateOrCancelDownload(
 	downloadProps: DownloadProps & { destroy: boolean },
 ) {
-	if (downloadProps.url && !currentDownloads.includes(downloadProps.url))
+	if (downloadProps.url && !currentDownloads.has(downloadProps.url))
 		makeStream(downloadProps);
 	else if (downloadProps.url && downloadProps.destroy) {
 		// const stream = get(currentDownloads, downloadProps.url);
@@ -361,26 +155,25 @@ export function handleCreateOrCancelDownload(
 	}
 }
 
-export function makeStream({
+export async function makeStream({
 	electronPort,
 	imageURL,
 	title,
 	url,
 }: DownloadProps) {
 	const extension: AllowedMedias = "mp3";
-	const titleWithExtension = `${title}.${extension}`;
-	const saveSite = `${dirs.music}/${sanitize(titleWithExtension)}`;
-	// const startTime = Date.now();
+	const titleWithExtension = `${sanitize(title)}.${extension}`;
+	const saveSite = await join(dirs.music, titleWithExtension);
 
 	let interval: NodeJS.Timer | undefined = undefined;
-	let percentageToSend = "";
+	let percentage = "";
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.once("destroy", () => {
+		.on("destroy", () => {
 			console.log(
 				"%cDestroy was called on readStream!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
@@ -399,42 +192,30 @@ export function makeStream({
 			);
 			dbg("readStream 'destroy()' answer =", readAnswer);
 
-			remove(currentDownloads, url);
-			dbg(
-				`Was "${url}" deleted from map?\ncurrentDownloads =`,
-				currentDownloads,
-			);
+			currentDownloads.delete(url);
+			dbg({ currentDownloads });
 		})
-		.on("progress", (_, downloaded, total) => {
-			// const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
-			const percentage = ((downloaded / total) * 100).toFixed(2);
-			percentageToSend = percentage;
-			// const estimatedDownloadTime = (
-			// 	+minutesDownloading / (+percentage / 100) -
-			// 	+minutesDownloading
-			// ).toFixed(2);
+		.on(
+			"progress",
+			(
+				_chunkLengthInBytes: number,
+				bytesDownloaded: number,
+				totalBytes: number,
+			) => {
+				percentage = ((bytesDownloaded / totalBytes) * 100).toFixed(2);
 
-			// To react:
-			if (!interval) {
-				// ^ Only in the firt time this 'on progress' fn is called!
+				// To react:
+				if (!interval) {
+					// ^ Only in the firt time this 'on progress' fn is called!
 
-				interval = setInterval(
-					() => electronPort.postMessage({ percentage: percentageToSend }),
-					2_000,
-				);
-			}
-
-			// // To node console if is in development:
-			// if (isDevelopment) {
-			// 	readline.cursorTo(process.stdout, 0);
-			// 	process.stdout.write(
-			// 		`${percentage}% downloaded, (${prettyBytes(downloaded)}/${prettyBytes(
-			// 			total,
-			// 		)}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes.`,
-			// 	);
-			// }
-		})
-		.once("end", async () => {
+					interval = setInterval(
+						() => electronPort.postMessage({ percentage }),
+						1_500,
+					);
+				}
+			},
+		)
+		.on("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
@@ -450,14 +231,15 @@ export function makeStream({
 			interval && clearInterval(interval);
 
 			try {
-				console.log("Going to writeTags");
+				console.log("Going to writeTags to write the img to the media...");
 				await writeTags(saveSite, { imageURL, isNewMedia: true });
-				remove(currentDownloads, url);
 			} catch (error) {
-				console.error(error, { currentDownloads });
+				console.error(error);
+			} finally {
+				currentDownloads.delete(url);
 			}
 		})
-		.once("error", error => {
+		.on("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
 
 			// To react
@@ -466,46 +248,65 @@ export function makeStream({
 				isDownloading: false,
 				error,
 			});
-
 			electronPort.close();
 
 			interval && clearInterval(interval);
+
+			currentDownloads.delete(url);
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
 
-	currentDownloads.push(url);
+	// @ts-ignore Let's see if it works...
+	currentDownloads.set(url, readStream);
 	dbg(`Added "${url}" to currentDownloads =`, currentDownloads);
 }
 
-export function handleCreateOrCancelConvert(
-	destroy: Readonly<boolean>,
-	toExtension: AllowedMedias,
-	path: Readonly<Path>,
-	electronPort: Readonly<MessagePort>,
-) {
-	if (path && !mediasConverting.includes(path))
-		convertToAudio(path, toExtension, electronPort);
-	else if (path && destroy) {
-		// const stream = get(mediasConverting, path);
-		// TODO
+type ConvertProps = {
+	toExtension: AllowedMedias;
+	electronPort: MessagePort;
+	mediaPath: Path;
+};
+
+export function handleCreateOrCancelConvert({
+	electronPort,
+	toExtension,
+	mediaPath,
+	destroy,
+}: ConvertProps & {
+	destroy: Readonly<boolean>;
+}) {
+	if (mediaPath && !mediasConverting.has(mediaPath))
+		convertToAudio({ mediaPath, toExtension, electronPort });
+	else if (mediaPath && destroy) {
+		const convertStream = mediasConverting.get(mediaPath);
+
+		if (convertStream) {
+			convertStream.destroy(
+				new Error("This convertStream is being destroyed!"),
+			);
+			mediasConverting.delete(mediaPath);
+			dbg({ mediasConverting });
+		}
 	}
 }
 
-export function convertToAudio(
-	mediaPath: Readonly<Path>,
-	toExtension: AllowedMedias,
-	electronPort: Readonly<MessagePort>,
-) {
-	const titleWithExtension = `${getBasename(mediaPath)}.${toExtension}`;
-	const saveSite = `${dirs.music}/${sanitize(titleWithExtension)}`;
-	// const readStream = ;
+export async function convertToAudio({
+	electronPort,
+	toExtension,
+	mediaPath,
+}: ConvertProps) {
+	const titleWithExtension = `${sanitize(
+		getBasename(mediaPath),
+	)}.${toExtension}`;
+	const saveSite = await join(dirs.music, "titleWithExtension");
+	const readStreamToConvert = new Readable();
 
 	let interval: NodeJS.Timer | undefined = undefined;
 	let timeConverted = "";
 	let sizeConverted: 0;
 
-	fluent_ffmpeg()
+	fluent_ffmpeg(readStreamToConvert)
 		.toFormat(toExtension)
 		.save(saveSite)
 		.on("progress", p => {
@@ -519,12 +320,12 @@ export function convertToAudio(
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort.postMessage({ sizeConverted, timeConverted }),
-					2_000,
+					1_500,
 				);
 			}
 		})
-		.once("error", error => {
-			console.error(`Error Converting file: "${titleWithExtension}"!`, error);
+		.on("error", error => {
+			console.error(`Error converting file: "${titleWithExtension}"!`, error);
 
 			// To react:
 			electronPort.postMessage({
@@ -532,12 +333,13 @@ export function convertToAudio(
 				isConverting: false,
 				error,
 			});
-
 			electronPort.close();
 
 			interval && clearInterval(interval);
+
+			mediasConverting.delete(mediaPath);
 		})
-		.once("end", async () => {
+		.on("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
@@ -548,16 +350,13 @@ export function convertToAudio(
 				status: ProgressStatus.SUCCESS,
 				isConverting: false,
 			});
-
 			electronPort.close();
 
 			interval && clearInterval(interval);
 
-			////////////////////////////////////////
-			remove(mediasConverting, mediaPath);
-			dbg("Deleting from mediasConverting.\nconverting =", mediasConverting);
+			mediasConverting.delete(mediaPath);
 		})
-		.once("destroy", () => {
+		.on("destroy", () => {
 			console.log(
 				"%cDestroy was called on readStream for converter!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
@@ -571,31 +370,77 @@ export function convertToAudio(
 
 			interval && clearInterval(interval);
 
-			// const readAnswer = readStream.destroy(
-			// 	new Error("This readStream is being destroyed!"),
-			// );
-
-			// dbg("readStream 'destroy()' answer =", readAnswer);
-
-			remove(mediasConverting, mediaPath);
-			dbg(
-				`Was "${mediaPath}" deleted from map?\nmediasConverting =`,
-				mediasConverting,
+			const readAnswer = readStreamToConvert.destroy(
+				new Error("This readStreamToConvert is being destroyed!"),
 			);
+
+			dbg("'readStream.destroy()' answer =", readAnswer);
+
+			mediasConverting.delete(mediaPath);
 		})
 		.saveToFile(mediaPath);
 
-	mediasConverting.push(mediaPath);
+	mediasConverting.set(mediaPath, readStreamToConvert);
 	dbg(`Added '${mediaPath}' to mediasConverting =`, mediasConverting);
 }
+
+// function createMyFileAbstraction(filename: string): IFileAbstraction {
+// 	const readStream = new Readable();
+// 	const writeStream = new Writable();
+// 	const stream = new Stream();
+// 	const readAndWriteStream = new Duplex();
+
+// 	// readStream.canWrite = () => readStream.
+
+// 	const fileAbstraction: IFileAbstraction = {
+// 		/**
+// 		 * Name or identifier used by the implementation
+// 		 * @remarks This value would typically represent a path or URL to be used when identifying
+// 		 *   the file system, but it could be any valid as appropriate for the implementation.
+// 		 */
+// 		name: filename,
+// 		/**
+// 		 * Readable, seekable stream for the file referenced by the current instance.
+// 		 * @remarks This property is typically used when constructing an instance of {@link File}.
+// 		 *   Upon completion of the constructor {@link closeStream} will be called to close the stream.
+// 		 *   If the stream is to be reused after this point, {@link closeStream} should be implemented
+// 		 *   in a way to keep it open.
+// 		 */
+// 		readStream: readAndWriteStream.,
+// 		/**
+// 		 * Writable, seekable stream fo the file referenced by the current instance.
+// 		 * @remarks This property is typically used when saving a file with {@link File.save}. Upon
+// 		 *   completion of the method, {@link closeStream} will be called to close the stream. If the
+// 		 *   stream is to be reused after this point, {@link closeStream} should be implemented in a way
+// 		 *   to keep it open
+// 		 */
+// 		writeStream,
+// 		/**
+// 		 * Closes a stream created by the current instance.
+// 		 * @param stream Stream created by the current instance.
+// 		 */
+// 		closeStream(stream: IStream): void;,
+// 	};
+
+// 	return fileAbstraction;
+// }
 
 export async function writeTags(
 	mediaPath: Readonly<Path>,
 	data: Readonly<WriteTag & { isNewMedia?: boolean }>,
 ) {
+	// TODO: need to change this to readable-stream
 	const file = MediaFile.createFromPath(mediaPath);
-	// dbg("File =", file);
-	// dbg("File tags =", file.tag);
+	// const s = new Duplex();
+
+	// const fileAbstraction = Object.assign(s, {
+	// 	name: mediaPath,
+	// 	closeStream: s.destroy,
+	// 	readStream: s,
+	// 	writeStream: s,
+	// });
+
+	// const file_ = MediaFile.createFromAbstraction(fileAbstraction);
 	dbg({ data });
 
 	let fileNewPath = "";
@@ -606,16 +451,23 @@ export async function writeTags(
 				case "imageURL": {
 					if (data.imageURL === "erase img") {
 						// if imageURL === 'erase img' => erase img so we don't keep
-						// getting an error on the browser.
+						// getting an error on the browser side.
 						file.tag.pictures = [];
 						console.warn(
 							"(SHOULD BE EMPTY) file.tag.pictures =",
 							file.tag.pictures,
 						);
 					} else {
-						dbg("Downloading picture");
+						dbg("Downloading picture...");
 						try {
-							const imgAsString = (await fetch<ImgString>(data.imageURL!)).data;
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+							const req = await fetch<ImgString>(data.imageURL!, {
+								responseType: ResponseType.Text,
+								method: "GET",
+							});
+
+							dbg({ req });
+							const imgAsString = req.data;
 
 							const txtForByteVector = imgAsString.slice(
 								imgAsString.indexOf(",") + 1,
@@ -630,8 +482,9 @@ export async function writeTags(
 								ByteVector.fromString(txtForByteVector, StringType.Latin1),
 							);
 							picture.description =
-								"This image was download when this media downloaded.";
+								"This image was download when this media was downloaded.";
 							picture.filename = `${getBasename(mediaPath)}`;
+							// Should be sanitized. ^
 							picture.type = PictureType.Media;
 							picture.mimeType = mimeType;
 
@@ -651,8 +504,6 @@ export async function writeTags(
 
 				case "albumArtists": {
 					dbg("On 'albumArtists' branch.");
-					console.assert(typeof value === "string");
-
 					const artists = (value as string).split(",");
 					file.tag.albumArtists = artists;
 
@@ -669,7 +520,7 @@ export async function writeTags(
 						`${value}.${getLastExtension(oldPath)}`,
 					)}`;
 
-					file.tag.title = value as string;
+					file.tag.title = sanitize(value as string);
 
 					console.log({ oldPath, newPath });
 
@@ -747,3 +598,5 @@ export async function writeTags(
 		}
 	}
 }
+
+export const getVideoInfo = async (url: string) => await getBasicInfo(url);

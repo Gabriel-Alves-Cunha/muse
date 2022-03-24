@@ -8,6 +8,8 @@ import react from "@vitejs/plugin-react";
 const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
 
+console.log({ outDirRenderer });
+
 export default defineConfig({
 	plugins: [react()],
 	root: rendererPath,
@@ -48,6 +50,10 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: [
+			{
+				find: "stream",
+				replacement: "readable-stream",
+			},
 			{
 				find: "@components",
 				replacement: resolve(__dirname, "src/renderer/components"),

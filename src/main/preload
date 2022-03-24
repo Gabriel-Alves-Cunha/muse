@@ -1,0 +1,159 @@
+import type { AllowedMedias } from "@common/utils";
+import type { Path } from "@common/@types/typesAndEnums";
+
+import { dbg } from "@common/utils";
+import { DownloadProps } from "./media";
+
+// Expose protected methods that allow the renderer process to use
+// notificationApi: {
+// 	sendNotificationToElectron,
+// 	receiveMsgFromElectron,
+// },
+
+window.onmessage = async event => {
+	switch (event.data) {
+		case "download media": {
+			const electronPort = event.ports[0];
+			if (!electronPort) {
+				console.error(
+					"There is no 'messagePort' to handle 'download media' event!",
+				);
+				return;
+			}
+
+			electronPort.onmessage = ({
+				data,
+			}: {
+				data: DownloadProps & { destroy: boolean };
+			}) => handleCreateOrCancelDownload({ ...data, electronPort });
+
+			electronPort.addEventListener("close", () =>
+				dbg("Closing ports (electronPort)."),
+			);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		case "convert media": {
+			const electronPort = event.ports[0];
+			if (!electronPort) {
+				console.error(
+					"There is no MessagePort to handle 'convert media' event!",
+				);
+				return;
+			}
+
+			electronPort.onmessage = ({
+				data,
+			}: {
+				data: Readonly<{
+					toExtension: AllowedMedias;
+					destroy: boolean;
+					mediaPath: Path;
+				}>;
+			}) => handleCreateOrCancelConvert({ ...data, electronPort });
+
+			electronPort.addEventListener("close", () =>
+				dbg("Closing ports (electronPort)."),
+			);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		case "write tag": {
+			const details: { mediaPath: Path; [whatToChange: string]: string } =
+				event.data;
+			const data = {};
+			Object.entries(details).forEach(pair => Object.assign(data, pair));
+
+			console.log({ event }, "\n\n\n", { details, data });
+
+			await writeTags(details.mediaPath, data);
+
+			break;
+		}
+
+		case "async two way comm": {
+			console.log("Electron received 'async two way comm':", event);
+
+			const electronPort = event.ports[0];
+			if (!electronPort) {
+				console.error(
+					"There should be an electronPort for 2-way communication with React!",
+				);
+				return;
+			}
+
+			window.twoWayComm_React_Electron = addListeners(electronPort);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		default: {
+			console.error(
+				`There is no method to handle this event: (${typeof event.data}) "${
+					event.data
+				}";\nEvent =`,
+				event,
+			);
+			break;
+		}
+	}
+};
+
+// function sendNotificationToElectron(
+// 	object: Readonly<{
+// 		type: NotificationEnum;
+// 		msg?: string;
+// 	}>,
+// ): void {
+// 	ipcRenderer.send("notify", object);
+// }
+
+// export function receiveMsgFromElectron(
+// 	handleMsg: (msgObject: MsgObject) => void,
+// ): void {
+// 	ipcRenderer.on("async-msg", (_, msgObject: MsgObject) =>
+// 		handleMsg(msgObject),
+// 	);
+// }
+
+const addListeners = (port: MessagePort): Readonly<MessagePort> => {
+	port.onmessage = async event => {
+		const { data } = event;
+
+		console.log("At addListeners on file 'preload.ts', line 330:", data);
+
+		switch (data.type) {
+			case "write tag": {
+				// details: [mediaPath, whatToChange.whatToChange, value.trim()],
+				const [mediaPath, whatToChange, value] = data.details;
+
+				try {
+					console.assert(mediaPath, whatToChange, value);
+
+					await writeTags(mediaPath, { [whatToChange]: value });
+				} catch (error) {
+					console.error(error);
+				}
+				break;
+			}
+
+			default: {
+				console.log(
+					"Message received on electron side of 2way-comm, but there is no function to handle it:",
+					data,
+				);
+				break;
+			}
+		}
+	};
+
+	return port;
+};
