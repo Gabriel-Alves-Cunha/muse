@@ -18,11 +18,8 @@ import {
 } from "electron";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
+import { NotificationEnum } from "@common/@types/typesAndEnums";
 import { logoPath } from "./utils.js";
-import {
-	NotificationEnum,
-	TypeOfMsgObject,
-} from "@common/@types/typesAndEnums";
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -132,7 +129,7 @@ app.whenReady().then(async () => {
 
 							// Send msg to ipcRenderer:
 							electronWindow?.webContents.send("async-msg", {
-								type: TypeOfMsgObject.DOWNLOAD_MEDIA,
+								type: NotificationEnum.DOWNLOAD_MEDIA,
 								params: {
 									imageURL: thumbnails.at(-1)?.url ?? "",
 									type: "download media",

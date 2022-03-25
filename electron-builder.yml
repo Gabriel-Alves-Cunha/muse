@@ -1,0 +1,14 @@
+appId: "com.electron.muse"
+productName: Muse
+copyright: Copyright MIT 2022 Gabriel Alves Cunha
+
+files: "app/"
+
+icon: "./src/renderer/assets/icons/256x256.png"
+
+linux:
+  target: AppImage
+  category: AudioVideo
+
+publish:
+  - provider: github

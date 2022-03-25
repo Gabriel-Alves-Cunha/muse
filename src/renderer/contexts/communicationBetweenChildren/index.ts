@@ -4,7 +4,7 @@ import type { DownloadValues, Path } from "@common/@types/typesAndEnums";
 import create from "zustand";
 
 import { assertUnreachable } from "@utils/utils";
-import { TypeOfMsgObject } from "@common/@types/typesAndEnums";
+import { NotificationEnum } from "@common/@types/typesAndEnums";
 import { dbg } from "@common/utils";
 
 const defaultDownloadValues: DownloadValues = Object.freeze({
@@ -78,7 +78,8 @@ globalThis.electron?.notificationApi.receiveMsgFromElectron(object => {
 	dbg("Received 'async-msg' from Electron on React side.\nobject =", object);
 
 	switch (object.type) {
-		case TypeOfMsgObject.DOWNLOAD_MEDIA: {
+		case NotificationEnum.DOWNLOAD_MEDIA: {
+			// @ts-ignore - This is a valid value.
 			handleDownloadMedia(object.params);
 			break;
 		}

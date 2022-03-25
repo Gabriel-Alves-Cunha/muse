@@ -10,6 +10,3 @@ export const imageUrl = new URL(
 	"../../assets/icons/logo.svg?width=16",
 	import.meta.url,
 );
-
-// Putting this here so Vite can bundle it:
-export const logoUrl = new URL("../../assets/icons/logo.png", import.meta.url);

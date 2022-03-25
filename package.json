@@ -2,7 +2,7 @@
 	"name": "muse",
 	"version": "0.9.1",
 	"description": "Just an Youtube music downloader and player.",
-	"author": "Gabriel Alves Cunha",
+	"author": "Gabriel Alves Cunha <gabriel925486@outlook.com>",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -18,17 +18,13 @@
 		"fmt": "prettier --use-tabs -w .",
 		"lint": "eslint ./ --ext .ts --ext .tsx --ext .ts",
 		"test": "vitest",
+		"dist:test": "yarn build && electron-builder --dir --x64 ",
+		"dist": "yarn build && electron-builder --x64 ",
+		"postinstall": "electron-builder install-app-deps",
 		"coverage": "vitest run --coverage",
-		"forge": "yarn build && electron-forge --arch=x64 make",
-		"forge:start": "yarn build && cross-env DEBUG=electron-forge:* electron-forge --enable-logging --inspect-electron start -- --trace-warnings",
-		"forge:lint": "electron-forge lint",
-		"electron:lint": "electronegativity"
+		"release": "electron-builder"
 	},
 	"devDependencies": {
-		"@electron-forge/cli": "^6.0.0-beta.63",
-		"@electron-forge/maker-squirrel": "^6.0.0-beta.63",
-		"@electron-forge/maker-zip": "^6.0.0-beta.63",
-		"@electron-forge/plugin-electronegativity": "^6.0.0-beta.63",
 		"@faker-js/faker": "6.0.0-beta.0",
 		"@types/debug": "^4.1.7",
 		"@types/fluent-ffmpeg": "^2.1.20",
@@ -44,6 +40,7 @@
 		"c8": "^7.11.0",
 		"cross-env": "^7.0.3",
 		"electron": "^17.2.0",
+		"electron-builder": "^22.14.13",
 		"electron-run": "^2.2.0",
 		"esbuild": "^0.14.27",
 		"eslint": "^8.11.0",
@@ -77,9 +74,6 @@
 		"sanitize-filename": "^1.6.3",
 		"ytdl-core": "^4.11.0",
 		"zustand": "^3.7.1"
-	},
-	"config": {
-		"forge": "./forge.config.js"
 	},
 	"prettier": {
 		"trailingComma": "all",

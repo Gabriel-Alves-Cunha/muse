@@ -22,6 +22,8 @@ export type Media = Readonly<{
 }>;
 
 export enum NotificationEnum {
+	DOWNLOAD_MEDIA,
+	WRITE_TAG,
 	MAXIMIZE,
 	MINIMIZE,
 	QUIT_APP,
@@ -32,11 +34,6 @@ export enum ListenToNotification {
 	REFRESH_ONE_MEDIA,
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
-}
-
-export enum TypeOfMsgObject {
-	DOWNLOAD_MEDIA,
-	WRITE_TAG,
 }
 
 export type Mutable<T> = {

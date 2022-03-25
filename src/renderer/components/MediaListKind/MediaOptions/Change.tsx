@@ -9,19 +9,19 @@ import {
 	useState,
 } from "react";
 
-import { type Path, TypeOfMsgObject } from "@common/@types/typesAndEnums";
+import { type Path, NotificationEnum } from "@common/@types/typesAndEnums";
 
 import { InputWrapper } from "../styles";
 
 export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
-	const [value, setValue] = useState(() => whatToChange.current);
+	const [value, setValue] = useState(whatToChange.current);
 
 	const writeChange = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" && value) {
 			setWhatToChange(undefined);
 
 			const msg: MsgObject = {
-				type: TypeOfMsgObject.WRITE_TAG,
+				type: NotificationEnum.WRITE_TAG,
 				details: {
 					whatToSend: whatToChange.whatToSend,
 					value: value.trim(),
@@ -51,13 +51,13 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 	);
 }
 
-export const allowedOptionToChange = {
+export const allowedOptionToChange = Object.freeze({
 	artist: "albumArtists",
 	imageURL: "imageURL",
 	genres: "genres",
 	album: "album",
 	title: "title",
-} as const;
+});
 
 export const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).some(opt => opt === option);

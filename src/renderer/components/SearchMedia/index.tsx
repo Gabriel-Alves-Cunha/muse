@@ -33,14 +33,27 @@ import {
 	Button,
 } from "./styles";
 
+enum SearchStatus {
+	RELOADING_ALL_MEDIAS,
+	FOUND_SOMETHING,
+	DOING_NOTHING,
+	NOTHING_FOUND,
+	SEARCHING,
+}
+
+const defaultSearcher = Object.freeze({
+	searchStatus: SearchStatus.DOING_NOTHING,
+	searchTerm: "",
+	results: [],
+});
+
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const { searchLocalComputerForMedias, searchForMedia, setPlaylists } =
 		usePlaylists();
-	const [searcher, dispatchSearcher] = useReducer(searcherReducer, {
-		searchStatus: SearchStatus.DOING_NOTHING,
-		searchTerm: "",
-		results: [],
-	});
+	const [searcher, dispatchSearcher] = useReducer(
+		searcherReducer,
+		defaultSearcher,
+	);
 	const searcherRef = useRef(null);
 
 	useOnClickOutside(searcherRef, () => {
@@ -276,14 +289,6 @@ enum SearcherAction {
 	SET_SEARCH_STATUS,
 	SET_SEARCH_TERM,
 	SET_RESULTS,
-}
-
-enum SearchStatus {
-	RELOADING_ALL_MEDIAS,
-	FOUND_SOMETHING,
-	DOING_NOTHING,
-	NOTHING_FOUND,
-	SEARCHING,
 }
 
 export enum ButtonToTheSide {
