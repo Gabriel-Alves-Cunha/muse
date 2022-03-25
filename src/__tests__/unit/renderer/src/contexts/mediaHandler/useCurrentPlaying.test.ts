@@ -19,7 +19,7 @@ global.electron = {
 		getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
 		readdir: vi.fn(),
 		readFile: vi.fn(),
-		rm: vi.fn(),
+		deleteFile: vi.fn(),
 	},
 	os: {
 		homeDir: "test/homeDir",
@@ -76,7 +76,7 @@ class LocalStorageMock {
 
 global.localStorage = new LocalStorageMock();
 
-import { MEDIA_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MEDIA_LIST, HISTORY } from "@contexts/mediaHandler/usePlaylistsHelper";
 import {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
@@ -116,15 +116,19 @@ describe("Testing useCurrentPlaying", () => {
 			type: PlaylistEnum.UPDATE_MEDIA_LIST,
 			list: testList,
 		});
+		{
+			const mediaList = getPlaylist(MEDIA_LIST)!.list;
+			expect(mediaList).toEqual(testList);
+		}
 
 		getPlaylistsFuncs().setPlaylists({
 			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
 		});
-
-		const currMediaList = getPlaylist(MEDIA_LIST).list;
-
-		expect(currMediaList).toEqual(testList);
+		{
+			const history = getPlaylist(HISTORY)!.list;
+			expect(history.length).toBe(0);
+		}
 	});
 
 	it("(CurrentPlayingEnum.PLAY_THIS_MEDIA) should set the currentPlaying media", () => {
@@ -151,18 +155,29 @@ describe("Testing useCurrentPlaying", () => {
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY) should play the previous media from history", () => {
 		for (let i = 0; i < numberOfMedias - 1; ++i) {
 			const media = testList[i];
+			const nextMedia = testList[i + 1];
 
+			// Play a media to make sure history is not empty:
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MEDIA_LIST,
 				media,
 			});
+
+			const updatedHistory_1 = getPlaylist(HISTORY)!.list;
+			expect(updatedHistory_1[0]).toEqual(media);
+
+			// Play the next media:
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MEDIA_LIST,
-				media: testList[i + 1],
+				media: nextMedia,
 			});
 
+			const updatedHistory_2 = getPlaylist(HISTORY)!.list;
+			expect(updatedHistory_2[0]).toEqual(nextMedia);
+
+			// Play previous media:
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY,
 				playlistName: MEDIA_LIST,

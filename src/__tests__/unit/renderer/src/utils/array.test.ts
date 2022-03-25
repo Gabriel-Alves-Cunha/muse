@@ -4,6 +4,7 @@ import {
 	concatFromIndex,
 	replace,
 	reverse,
+	unshift,
 	remove,
 	shift,
 	push,
@@ -74,7 +75,15 @@ it("should return a new array without the first item", () => {
 	expect(shiftedArray).toStrictEqual([2, 3, 4]);
 });
 
-it("should return a new array with a new item at the beginning", () => {
+it("should return a new array with new item(s) at the start of the array", () => {
+	const array = Object.freeze([1, 2, 3, 4]);
+
+	const unshiftedArray = unshift(array, -1, 0);
+
+	expect(unshiftedArray).toStrictEqual([-1, 0, 1, 2, 3, 4]);
+});
+
+it("should return a new array with a new item at the end of the array", () => {
 	const arr = Object.freeze([1, 2, 3]);
 
 	const newArray = push(arr, 4);

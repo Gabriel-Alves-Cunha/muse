@@ -2,7 +2,6 @@ import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect, useRef } from "react";
 
 import { useDownloadHelper } from "./helpers";
-import { dbg } from "@common/utils";
 
 import { Loading } from "@styles/appStyles";
 import {
@@ -14,8 +13,6 @@ import {
 } from "./styles";
 
 export function Download() {
-	dbg("Here at routes/Download");
-
 	return (
 		<Wrapper>
 			<SearcherWrapper />

@@ -19,7 +19,7 @@ global.electron = {
 		getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
 		readdir: vi.fn(),
 		readFile: vi.fn(),
-		rm: vi.fn(),
+		deleteFile: vi.fn(),
 	},
 	os: {
 		homeDir: "test/homeDir",
@@ -264,8 +264,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			// at `playNextMediaFn()` above:
 			expect(newHistory.length).toBe(1 + 1);
 
-			// last from array: `.slice(-1)[0]`
-			expect(newHistory.slice(-1)[0]).toEqual(mediaList[1]);
+			expect(newHistory[0]).toEqual(mediaList[1]);
 		});
 	});
 

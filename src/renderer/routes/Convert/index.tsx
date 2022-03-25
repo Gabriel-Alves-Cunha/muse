@@ -4,13 +4,10 @@ import type { Path } from "@common/@types/typesAndEnums";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { MsgEnum, sendMsg } from "@contexts";
-import { dbg } from "@common/utils";
 
 import { Wrapper } from "./styles";
 
 export function Convert() {
-	dbg("Here at routes/Convert");
-
 	const [selectedExtensionToBeConvertedTo] =
 		useState<ExtensionToBeConvertedTo>("mp3");
 	const [selectedMediasPath, setSelectedMediasPath] = useState<Path[]>([]);

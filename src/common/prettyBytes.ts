@@ -1,6 +1,6 @@
 const { log10, floor, abs, min } = Math;
 
-const UNITS = Object.freeze([
+const UNITS = Object.freeze(<const>[
 	"B",
 	"KB",
 	"MB",
@@ -12,8 +12,10 @@ const UNITS = Object.freeze([
 	"YB",
 ]);
 
-export const prettyBytes = (num: number, precision = 3, addSpace = true) => {
-	if (abs(num) < 1) return num + (addSpace ? " " : "") + "B";
+export type PrettyBytes = `${"" | "-"}${number} ${typeof UNITS[number]}`;
+
+export const prettyBytes = (num: number, precision = 3): PrettyBytes => {
+	if (abs(num) < 1) return `${num} B`;
 
 	const exponent = min(
 		floor(log10(num < 0 ? -num : num) / 3),
@@ -24,5 +26,5 @@ export const prettyBytes = (num: number, precision = 3, addSpace = true) => {
 		((num < 0 ? -num : num) / 1_000 ** exponent).toPrecision(precision),
 	);
 
-	return (num < 0 ? "-" : "") + n + (addSpace ? " " : "") + UNITS[exponent];
+	return `${num < 0 ? "-" : ""}${n} ${UNITS[exponent]}`;
 };

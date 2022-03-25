@@ -1,7 +1,8 @@
+import type { PrettyBytes } from "@common/prettyBytes";
+
 import { pages } from "@utils/app";
 
 export type Page = Readonly<typeof pages[number]>;
-export type PrettyBytes = Readonly<string>;
 export type Path = Readonly<string>;
 
 type DateAsNumber = Readonly<number>;

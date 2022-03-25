@@ -10,7 +10,7 @@ global.electron = {
 		getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
 		readdir: vi.fn(),
 		readFile: vi.fn(),
-		rm: vi.fn(),
+		deleteFile: vi.fn(),
 	},
 	os: {
 		homeDir: "test/homeDir",

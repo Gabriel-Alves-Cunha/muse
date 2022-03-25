@@ -46,3 +46,9 @@ export const shift = <T>(array: readonly T[]): readonly T[] => array.slice(1);
 /** Get a new reversed array. */
 export const reverse = <T>(array: readonly T[]): readonly T[] =>
 	[...array].reverse();
+
+/** Add one or more items to the start of the array. */
+export const unshift = <T>(
+	array: readonly T[],
+	...items: T[]
+): readonly T[] => [...items, ...array];

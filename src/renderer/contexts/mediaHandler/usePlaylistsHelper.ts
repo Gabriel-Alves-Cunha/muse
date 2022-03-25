@@ -1,7 +1,7 @@
 import type { Media, Mutable, Path } from "@common/@types/typesAndEnums";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
-import { push } from "@utils/array";
+import { sort, unshift } from "@utils/array";
 
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
@@ -9,15 +9,20 @@ const {
 } = electron;
 
 // fns
-const maxSizeOfHistory = 100;
+export const maxSizeOfHistory = 100;
 export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
 	previousHistory: readonly Media[],
-	media: Media,
+	newMedia: Media,
 ): readonly Media[] {
-	if (media.id === previousHistory.slice(-1)[0]?.id) return previousHistory;
+	// if the newMedia is the same as the first media in the list, don't add it again:
+	if (newMedia.id === previousHistory[0]?.id) return previousHistory;
 
-	const newHistory: Media[] = push(previousHistory, media) as Mutable<Media[]>;
+	// add newMedia to the start of array:
+	const newHistory: Media[] = unshift(previousHistory, newMedia) as Mutable<
+		Media[]
+	>;
 
+	// history has a max size of maxSizeOfHistory:
 	if (newHistory.length > maxSizeOfHistory)
 		newHistory.length = maxSizeOfHistory;
 
@@ -72,6 +77,34 @@ type ListWithOrder<T> = ReadonlyArray<
 >;
 export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
 	list.map((item, index) => ({ ...item, index }));
+
+type ListWithDateAndOrder<T> = ReadonlyArray<
+	Readonly<T> & Readonly<{ dateOfArival: number; index: number }>
+>;
+
+export const sortByDate = <T>(list: ListWithDateAndOrder<T>) =>
+	reaplyOrderedIndex(
+		sort(list, (a, b) => {
+			if (a.dateOfArival > b.dateOfArival) return 1;
+			if (a.dateOfArival < b.dateOfArival) return -1;
+			// a must be equal to b:
+			return 0;
+		}),
+	);
+
+type ListWithNameAndOrder<T> = ReadonlyArray<
+	Readonly<T> & Readonly<{ title: string; index: number }>
+>;
+
+export const sortByName = <T>(list: ListWithNameAndOrder<T>) =>
+	reaplyOrderedIndex(
+		sort(list, (a, b) => {
+			if (a.title > b.title) return 1;
+			if (a.title < b.title) return -1;
+			// a must be equal to b:
+			return 0;
+		}),
+	);
 
 export const SORTED_BY_DATE = "sorted by date";
 export const SORTED_BY_NAME = "sorted by name";

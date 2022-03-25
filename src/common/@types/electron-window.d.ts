@@ -28,7 +28,7 @@ type VisibleElectron = Readonly<{
 		readdir(dir: Path): Promise<readonly Path[]>;
 		// eslint-disable-next-line no-undef
 		readFile(path: Path): Promise<Readonly<Buffer>>;
-		rm(path: Path): Promise<void>;
+		deleteFile(path: Path): Promise<void>;
 	};
 	os: {
 		homeDir: Path;

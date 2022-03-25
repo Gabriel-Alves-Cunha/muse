@@ -13,7 +13,7 @@ export const dbg = debug(lowercaseAppName);
 if (isDevelopment) enable(lowercaseAppName);
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
-export const allowedMedias = [
+export const allowedMedias = Object.freeze(<const>[
 	"vorbis",
 	"webm",
 	"flac",
@@ -27,7 +27,7 @@ export const allowedMedias = [
 	"m4b",
 	"m4r",
 	"m4v",
-] as const;
+]);
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
 export const formatDuration = (time: number | undefined) => {

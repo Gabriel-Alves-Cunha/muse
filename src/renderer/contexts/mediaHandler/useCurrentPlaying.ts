@@ -9,16 +9,16 @@ import merge from "deepmerge";
 
 import { assertUnreachable, getRandomInt } from "@utils/utils";
 import { HISTORY, MEDIA_LIST } from "./usePlaylistsHelper";
+import { usePlayOptions } from "./usePlayOptions";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
 	type DefaultLists,
 	type Playlist,
 	PlaylistActions,
-	usePlayOptions,
-	PlaylistEnum,
 	usePlaylists,
-} from "@contexts";
+	PlaylistEnum,
+} from "./usePlaylists";
 
 const {
 	fs: { readFile },
@@ -33,6 +33,12 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	media: undefined,
 	currentTime: 0,
 });
+
+export type CurrentPlaying = Readonly<{
+	playlistName: Playlist["name"];
+	media: Media | undefined;
+	currentTime: number;
+}>;
 
 export const useCurrentPlaying = create(
 	subscribeWithSelector(
@@ -64,7 +70,7 @@ export const useCurrentPlaying = create(
 							}
 
 							// We need to update history:
-							dbg("Adding media to history");
+							dbg("Adding media to history...");
 							getPlaylists().setPlaylists({
 								whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 								type: PlaylistEnum.UPDATE_HISTORY,
@@ -116,7 +122,7 @@ export const useCurrentPlaying = create(
 								action,
 							);
 
-							const headOfHistory = getPlaylist(HISTORY).list[0];
+							const headOfHistory = getPlaylist(HISTORY).list[1];
 
 							if (headOfHistory) {
 								// We need to update history:
@@ -281,7 +287,7 @@ if (globalThis.window) {
 			const {
 				currentPlaying: { media, currentTime },
 			} = getCurrentPlaying();
-			if (!global.window || !media) return;
+			if (!globalThis.window || !media) return;
 
 			console.time("Reading <audio> file took");
 			const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
@@ -311,12 +317,6 @@ if (globalThis.window) {
 		},
 	);
 }
-
-export type CurrentPlaying = Readonly<{
-	playlistName: Playlist["name"];
-	media: Media | undefined;
-	currentTime: number;
-}>;
 
 export type currentPlayingReducer_Action =
 	| Readonly<{

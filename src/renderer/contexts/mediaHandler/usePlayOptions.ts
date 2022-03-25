@@ -5,7 +5,7 @@ import merge from "deepmerge";
 import { assertUnreachable } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
 
-const playOptionsKey = keyPrefix + "play_options";
+const playOptionsKey = `${keyPrefix}play_options` as const;
 
 type PlayOptionsActions = Readonly<{
 	setPlayOptions(action: PlayOptionsAction): void;

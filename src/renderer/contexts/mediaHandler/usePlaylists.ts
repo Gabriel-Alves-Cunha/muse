@@ -6,7 +6,7 @@ import { persist } from "zustand/middleware";
 import create from "zustand";
 import merge from "deepmerge";
 
-import { push, remove, replace, sort } from "@utils/array";
+import { push, remove, replace } from "@utils/array";
 import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { assertUnreachable } from "@utils/utils";
 import { string2number } from "@common/hash";
@@ -20,13 +20,15 @@ import {
 	SORTED_BY_DATE,
 	SORTED_BY_NAME,
 	MEDIA_LIST,
+	sortByDate,
+	sortByName,
 	FAVORITES,
 	HISTORY,
 } from "./usePlaylistsHelper";
 
 const {
 	media: { transformPathsToMedias },
-	fs: { rm },
+	fs: { deleteFile: rm },
 } = electron;
 
 const playlistsKey = `${keyPrefix}playlists` as const;
@@ -38,6 +40,17 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 	{ name: FAVORITES, list: [] },
 	{ name: HISTORY, list: [] },
 ]);
+
+type UsePlaylistsActions = Readonly<{
+	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
+	searchForMedia: (searchTerm_: Readonly<string>) => readonly Media[];
+	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
+	updatePlaylists: (playlists: readonly Playlist[]) => void;
+	createPlaylist: (playlists: readonly Playlist[]) => void;
+	deleteMedia: (media: Readonly<Media>) => Promise<void>;
+	addListeners: (port: MessagePort) => MessagePort;
+	playlists: readonly Playlist[];
+}>;
 
 export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
@@ -516,45 +529,6 @@ export const usePlaylists = create<UsePlaylistsActions>(
 		},
 	),
 );
-
-type ListWithDateAndOrder<T> = ReadonlyArray<
-	Readonly<T> & Readonly<{ dateOfArival: number; index: number }>
->;
-
-const sortByDate = <T>(list: ListWithDateAndOrder<T>) =>
-	reaplyOrderedIndex(
-		sort(list, (a, b) => {
-			if (a.dateOfArival > b.dateOfArival) return 1;
-			if (a.dateOfArival < b.dateOfArival) return -1;
-			// a must be equal to b:
-			return 0;
-		}),
-	);
-
-type ListWithNameAndOrder<T> = ReadonlyArray<
-	Readonly<T> & Readonly<{ title: string; index: number }>
->;
-
-const sortByName = <T>(list: ListWithNameAndOrder<T>) =>
-	reaplyOrderedIndex(
-		sort(list, (a, b) => {
-			if (a.title > b.title) return 1;
-			if (a.title < b.title) return -1;
-			// a must be equal to b:
-			return 0;
-		}),
-	);
-
-type UsePlaylistsActions = Readonly<{
-	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
-	searchForMedia: (searchTerm_: Readonly<string>) => readonly Media[];
-	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
-	updatePlaylists: (playlists: readonly Playlist[]) => void;
-	createPlaylist: (playlists: readonly Playlist[]) => void;
-	deleteMedia: (media: Readonly<Media>) => Promise<void>;
-	addListeners: (port: MessagePort) => MessagePort;
-	playlists: readonly Playlist[];
-}>;
 
 type Msg = { msg: ListenToNotification; path?: Path };
 

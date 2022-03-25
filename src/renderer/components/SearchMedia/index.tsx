@@ -11,7 +11,6 @@ import { FiTrash as Clean } from "react-icons/fi";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { ImgWithFallback } from "@components";
-import { dbg } from "@common/utils";
 import {
 	type Playlist,
 	CurrentPlayingEnum,
@@ -161,11 +160,9 @@ function SearchResults({
 	results,
 	fromList,
 }: {
-	fromList: MediaListKindProps["mediaType"];
+	fromList: MediaListKindProps["playlistName"];
 	results: readonly Media[];
 }) {
-	dbg("Here at SearchResults");
-
 	const { playlists } = usePlaylists();
 	const listWrapperReference = useRef<HTMLElement>(null);
 
@@ -271,7 +268,7 @@ type Action =
 	| Readonly<{ type: SearcherAction.SET_SEARCH_TERM; value: string }>;
 
 type Props = Readonly<{
-	fromList: MediaListKindProps["mediaType"];
+	fromList: MediaListKindProps["playlistName"];
 	buttonToTheSide: ButtonToTheSide;
 }>;
 

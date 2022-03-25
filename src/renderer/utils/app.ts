@@ -1,10 +1,10 @@
 export const keyPrefix = "@muse:";
 
-export const pages = [
+export const pages = Object.freeze(<const>[
 	"Home",
 	"Favorites",
 	"History",
 	"Download",
 	"Convert",
 	"Settings",
-] as const;
+]);
