@@ -3,18 +3,19 @@ module.exports = {
 	packagerConfig: {
 		ignore: [
 			// ignore everything but "app/", "LICENSE" and "package.json":
-			"^(/src$)",
-			"^(/images$)",
-			"package-lock.json",
-			"^(/README.md$)",
-			"Stork.SPA.njsproj",
 			"Stork.SPA.njsproj.user",
+			"package-lock.json",
+			"Stork.SPA.njsproj",
 			"vite.config.json",
-			"tsconfig.json",
-			"tslint.json",
-			"jest.config.js",
 			"forge.config.js",
+			"^(/README.md$)",
+			"jest.config.js",
 			"vite.config.ts",
+			"tsconfig.json",
+			// "node_modules",
+			"tslint.json",
+			"^(/images$)",
+			"^(/src$)",
 			"TODO.txt",
 			/^\/?(?:\w+\/)*(\.\w+)/gm, // dot files
 		],
