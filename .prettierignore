@@ -5,6 +5,7 @@ scripts
 public
 static
 build
+dist
 app
 out
 
