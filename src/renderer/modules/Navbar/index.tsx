@@ -13,7 +13,7 @@ import {
 import { usePage } from "@contexts";
 import { pages } from "@utils/app";
 
-import { FolderButton, Nav, Text } from "./styles";
+import { FolderButton, Nav } from "./styles";
 
 const { setState: setPage } = usePage;
 
@@ -31,18 +31,12 @@ export function Navbar() {
 					aria-label={"Go to " + page}
 					key={page}
 				>
-					<span>{icon(page)}</span>
-					<Text>{page}</Text>
+					{icon(page)}
 				</FolderButton>
 			))}
 		</Nav>
 	);
 }
-
-Navbar.whyDidYouRender = {
-	logOnDifferentValues: true,
-	customName: "Navbar",
-};
 
 const icon = (folder: Page) => iconObj[folder] ?? <Question />;
 

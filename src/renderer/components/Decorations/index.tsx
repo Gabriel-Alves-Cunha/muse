@@ -89,8 +89,3 @@ function AppName_Folder() {
 		</AppName_Folder_Wrapper>
 	);
 }
-
-Decorations.whyDidYouRender = {
-	logOnDifferentValues: false,
-	customName: "Decorations",
-};

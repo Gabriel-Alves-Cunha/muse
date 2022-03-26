@@ -10,10 +10,10 @@ import { dbg } from "@common/utils";
 const { getInfo } = electron.media;
 
 export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
-	setSearchTerm: (e: ChangeEvent<HTMLInputElement>) =>
+	setSearchTerm: ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
 		set({
 			searcher: {
-				searchTerm: e.target.value,
+				searchTerm: value,
 				result: undefined,
 				isLoading: false,
 				error: "",
@@ -21,7 +21,7 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		}),
 
 	download: (url: string) => {
-		const result = get().searcher.result;
+		const { result } = get().searcher;
 
 		if (!result) return;
 		dbg("Sending msg to download", url);
@@ -48,17 +48,25 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		const searcher = get().searcher;
 
 		set({ searcher: { ...searcher, isLoading: true, error: "" } });
-		let result: UrlMediaMetadata | undefined;
 
 		try {
 			const videoInfo = (await getInfo(url)) as videoInfo;
 
-			result = {
+			const result: UrlMediaMetadata = {
 				imageURL: videoInfo.videoDetails.thumbnails.at(-1)?.url ?? "",
 				// ^ Highest quality is last in this array.
 				artist: videoInfo.videoDetails.media.artist ?? "",
 				title: videoInfo.videoDetails.title,
 			};
+
+			set({
+				searcher: {
+					...searcher,
+					isLoading: false,
+					error: "",
+					result,
+				},
+			});
 		} catch (error) {
 			set({
 				searcher: {
@@ -72,15 +80,6 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 			});
 
 			throw error;
-		} finally {
-			set({
-				searcher: {
-					...searcher,
-					isLoading: false,
-					error: "",
-					result,
-				},
-			});
 		}
 	},
 }));

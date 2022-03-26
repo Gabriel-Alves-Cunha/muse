@@ -1,10 +1,10 @@
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
+import { BsFillPauseFill as Pause } from "react-icons/bs";
 import { useEffect, useRef } from "react";
+import { FaPlay as Play } from "react-icons/fa";
 import {
 	TrackPreviousIcon as Previous,
 	TrackNextIcon as Next,
-	PauseIcon as Pause,
-	PlayIcon as Play,
 } from "@radix-ui/react-icons";
 import create from "zustand";
 
@@ -42,8 +42,8 @@ function playPreviousMedia() {
 
 export function MediaPlayer() {
 	const duration = useCurrentPlaying().currentPlaying.media?.duration;
-	const { currentPlaying } = useCurrentPlaying();
 	const audioRef = useRef<HTMLAudioElement>(null);
+	const { currentPlaying } = useCurrentPlaying();
 
 	function playOrPauseMedia() {
 		const audio = audioRef.current;
@@ -94,6 +94,8 @@ export function MediaPlayer() {
 	return (
 		<Wrapper>
 			<audio id="audio" preload="none" ref={audioRef} />
+
+			<></>
 
 			<Img>
 				<ImgWithFallback
@@ -175,11 +177,6 @@ function SeekerWrapper({
 		</SeekerContainer>
 	);
 }
-
-MediaPlayer.whyDidYouRender = {
-	logOnDifferentValues: true,
-	customName: "MediaPlayer",
-};
 
 type Progress = Readonly<{
 	percentage: number;

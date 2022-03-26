@@ -5,6 +5,7 @@ export const theme = {
 		navButtonHoveredBg: "var(--nav-button-hovered-bg)",
 		navButtonActiveBg: "var(--nav-button-active-bg)",
 		accentAlpha: "var(--accent-alpha)",
+		accentLight: "var(--accent-light)",
 		bgCentral: "var(--bg-central)",
 		blackText: "var(--black-text)",
 		secondary: "var(--secondary)",

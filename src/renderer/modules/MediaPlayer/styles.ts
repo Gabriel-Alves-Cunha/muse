@@ -1,30 +1,25 @@
 import { styled } from "@styles/global";
 
+import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { theme } from "@styles/theme";
 
 export const Wrapper = styled("div", {
 	display: "flex",
-	flexDirection: "row",
+	flexDirection: "column",
+	justifyContent: "space-between",
 	alignItems: "center",
 	position: "absolute",
 
-	// center itself:
-	transform: "translate(-50%)",
-	left: "50%",
-
-	height: "11vh",
-	width: "95vw",
+	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
+	width: "25vw",
 	zIndex: 30,
-	bottom: 25, // This is being needed to push it up a little :( something with the absolute positioning...
+	right: 0,
 
-	backgroundColor: "#e0e0e095",
-	borderTopRightRadius: 40,
-	borderTopLeftRadius: 40,
+	backgroundColor: theme.colors.accentLight,
 	padding: "0.8rem",
 	border: "none",
 
 	backdropFilter: "blur(5px)",
-	boxShadow: "$medium",
 });
 
 export const Img = styled("div", {

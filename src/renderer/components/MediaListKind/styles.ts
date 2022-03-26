@@ -110,29 +110,28 @@ export const ListWrapper = styled("div", {
 		margin: "0.5em 5%",
 	},
 
-	"&.list": {
-		overflowX: "hidden !important",
+	overflowX: "hidden !important",
 
-		/* width */
-		"::-webkit-scrollbar": {
-			height: 5,
-			width: 5,
-		},
+	/* width */
+	".list::-webkit-scrollbar": {
+		display: "block",
+		height: 5,
+		width: 5,
+	},
 
-		/* Track */
-		"::-webkit-scrollbar-track": {
-			background: "#f1f1f1",
-		},
+	/* Track */
+	".list::-webkit-scrollbar-track": {
+		background: "#f1f1f1",
+	},
 
-		/* Handle */
-		"::-webkit-scrollbar-thumb": {
-			background: "#888",
-		},
+	/* Handle */
+	".list::-webkit-scrollbar-thumb": {
+		background: "#888",
+	},
 
-		/* Handle on hover */
-		"::-webkit-scrollbar-thumb:hover": {
-			background: "#555",
-		},
+	/* Handle on hover */
+	".list::-webkit-scrollbar-thumb:hover": {
+		background: "#555",
 	},
 });
 

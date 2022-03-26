@@ -10,7 +10,7 @@ import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 
 import { GlobalCSS } from "@styles/global";
-import { MainView } from "@styles/appStyles";
+import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
 
 export function App() {
@@ -80,7 +80,7 @@ function Main() {
 	}, [addListeners, searchLocalComputerForMedias]);
 
 	return (
-		<MainView>
+		<Content>
 			<ToastContainer
 				hideProgressBar={false}
 				position="top-right"
@@ -105,7 +105,7 @@ function Main() {
 			</>
 
 			<MediaPlayer />
-		</MainView>
+		</Content>
 	);
 }
 

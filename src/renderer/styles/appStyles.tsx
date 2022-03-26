@@ -1,13 +1,15 @@
 import { styled, keyframes } from "@styles/global";
 
+import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { theme } from "./theme";
 
-export const MainView = styled("div", {
+export const Content = styled("div", {
 	display: "flex",
 	position: "relative",
 	flexDirection: "row",
 
 	backgroundColor: theme.colors.bgCentral,
+	marginTop: DECORATIONS_HEADER_HEIGHT,
 });
 
 const ripple = keyframes({

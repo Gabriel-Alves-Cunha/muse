@@ -50,6 +50,9 @@ export const GlobalCSS = globalCss({
 	},
 
 	body: {
+		height: "100%",
+		overflow: "hidden",
+
 		/* Make a vertical red line at the middle */
 		/* height: 100vh,
 		background: linear-gradient(red, red) no-repeat center/1px 100%, */
@@ -64,22 +67,24 @@ export const GlobalCSS = globalCss({
 			"--nav-button-hovered-bg": "#c9c2f9",
 			"--nav-button-active-bg": "#c1bbec",
 			"--accent-alpha": "#aa00ff26",
+			"--accent-light": "#f1d4ff",
 			"--bg-central": "#f2f3f7",
-			"--black-text": "black",
 			"--secondary": "#edecf8",
 			"--gray-text": "#8e8e8e",
-			"--primary": "",
+			"--black-text": "black",
 			"--accent": "#aa00ff",
 			"--bg-nav": "#edecf8",
 			"--text": "#00525e",
+			"--primary": "",
 		},
 
 		"[data-theme='dark']": {
 			"--nav-button-hovered-color": "",
 			"--nav-button-active-color": "",
 			"--nav-button-hovered-bg": "",
-			"--nav-button-active-bg": "",
 			"--accent-alpha": "#aa00ff99",
+			"--nav-button-active-bg": "",
+			"--accent-light": "#dd99ff",
 			"--bg-central": "",
 			"--black-text": "",
 			"--secondary": "",
@@ -95,25 +100,8 @@ export const GlobalCSS = globalCss({
 			color: "white",
 		},
 
-		/* width */
 		"::-webkit-scrollbar": {
-			height: 5,
-			width: 5,
-		},
-
-		/* Track */
-		"::-webkit-scrollbar-track": {
-			background: "#f1f1f1",
-		},
-
-		/* Handle */
-		"::-webkit-scrollbar-thumb": {
-			background: "#888",
-		},
-
-		/* Handle on hover */
-		"::-webkit-scrollbar-thumb:hover": {
-			background: "#555",
+			display: "none",
 		},
 	},
 });

@@ -85,7 +85,7 @@ const startDownload = () =>
 	getDownloadHelper().download(getDownloadHelper().searcher.searchTerm);
 
 const Result = () => {
-	const result = useDownloadHelper().searcher.result;
+	const { result } = useDownloadHelper().searcher;
 
 	return result ? (
 		<ResultContainer>

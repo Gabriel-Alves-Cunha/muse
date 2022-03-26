@@ -2,16 +2,18 @@ import { styled } from "@styles/global";
 
 import { theme } from "@styles/theme";
 
-const HEADER_HEIGHT = 27;
+export const DECORATIONS_HEADER_HEIGHT = "27px";
 
 export const Wrapper = styled("header", {
-	height: HEADER_HEIGHT,
-	position: "relative",
+	position: "absolute",
 	display: "flex",
+
+	marginTop: `-${DECORATIONS_HEADER_HEIGHT}`,
+	minHeight: DECORATIONS_HEADER_HEIGHT,
+	width: "100%",
 
 	backgroundColor: theme.colors.secondary,
 
-	"-webkit-user-select": "none",
 	"-webkit-app-region": "drag",
 	// ^ window-draggable-region
 	"user-select": "none",
@@ -26,7 +28,7 @@ export const WindowButton = styled("button", {
 	border: "none",
 	color: "black",
 
-	height: HEADER_HEIGHT,
+	height: DECORATIONS_HEADER_HEIGHT,
 	width: 48,
 
 	backgroundColor: theme.colors.secondary,
