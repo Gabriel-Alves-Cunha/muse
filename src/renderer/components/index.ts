@@ -4,4 +4,4 @@ export { Decorations } from "./Decorations";
 export { SearchMedia } from "./SearchMedia";
 export { MainArea } from "./MainArea";
 export { Progress } from "./Progress";
-export { Dots } from "./Dots";
+export { Button } from "./Button";

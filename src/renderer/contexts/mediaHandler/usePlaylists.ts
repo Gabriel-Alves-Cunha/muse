@@ -33,7 +33,7 @@ const {
 
 const playlistsKey = `${keyPrefix}playlists` as const;
 
-const defaultPlaylists: readonly Playlist[] = Object.freeze([
+const defaultPlaylists: readonly Playlist[] = Object.freeze(<const>[
 	{ name: SORTED_BY_DATE, list: [] },
 	{ name: SORTED_BY_NAME, list: [] },
 	{ name: MEDIA_LIST, list: [] },
@@ -42,6 +42,7 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 ]);
 
 type UsePlaylistsActions = Readonly<{
+	isFavorite: (mediaId: Readonly<Media["id"]> | undefined) => Readonly<boolean>;
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
 	searchForMedia: (searchTerm_: Readonly<string>) => readonly Media[];
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
@@ -216,6 +217,12 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 				return results;
 			},
+			isFavorite: (mediaId: Media["id"] | undefined) =>
+				mediaId
+					? get()
+							.playlists.find(p => p.name === FAVORITES)!
+							.list.some(m => m.id === mediaId)
+					: false,
 			setPlaylists: (action: PlaylistsReducer_Action) => {
 				const prevPlaylistArray = get().playlists;
 				const getPlaylist = (listName: DefaultLists) =>

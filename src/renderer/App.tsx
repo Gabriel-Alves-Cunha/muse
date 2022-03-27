@@ -2,10 +2,11 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
 import { Convert, Download, Favorites, History, Home, Settings } from "@routes";
-import { MediaPlayer, Downloading, Converting, Navbar } from "@modules";
 import { usePlaylists, usePage } from "@contexts";
+import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { ThemeToggler } from "@modules/ThemeToggler";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 
@@ -18,9 +19,21 @@ export function App() {
 
 	return (
 		<>
-			<Decorations />
+			<ThemeToggler />
+			<span id="wave"></span>
 
-			<Main />
+			<div
+				style={{
+					height: "100vh",
+					width: "100vw",
+
+					transition: "all 1s cubic-bezier(0.4, 0.0, 0.2, 1)",
+				}}
+			>
+				<Decorations />
+
+				<Main />
+			</div>
 		</>
 	);
 }
@@ -94,11 +107,6 @@ function Main() {
 			/>
 
 			<Navbar />
-
-			<>
-				<Downloading />
-				<Converting />
-			</>
 
 			<>
 				<PageToShow />

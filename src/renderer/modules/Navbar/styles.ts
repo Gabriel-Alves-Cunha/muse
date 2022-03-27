@@ -5,14 +5,15 @@ import { theme } from "@styles/theme";
 export const Nav = styled("nav", {
 	display: "flex",
 	flexDirection: "column",
-	alignContent: "center",
+	alignItems: "center",
 
 	backgroundColor: theme.colors.bgNav,
 	height: "100vh",
+	paddingTop: 100,
 	width: 65,
 });
 
-export const FolderButton = styled("button", {
+export const ScaleUpIconButton = styled("button", {
 	display: "flex", // row,
 	alignItems: "center",
 	justifyContent: "center",
@@ -22,21 +23,20 @@ export const FolderButton = styled("button", {
 	backgroundColor: "transparent",
 	cursor: "pointer",
 	fontSize: "1rem",
-	margin: 5,
 
-	transition: "all .2s ease-in-out",
-	color: "#a8a8a8",
+	transition: "transform .2s ease-in-out",
+	color: theme.colors.deactivatedIcon,
 	border: "none",
 
 	"&:hover": {
 		"&:not(&.active)": {
-			transition: "all .2s ease-in-out",
+			transition: "transform .2s ease-in-out",
 			transform: "scale(1.5)",
-			color: "black",
+			color: theme.colors.activeIcon,
 		},
 	},
 
 	"&.active": {
-		color: "black",
+		color: theme.colors.activeIcon,
 	},
 });

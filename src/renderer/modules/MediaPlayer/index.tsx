@@ -1,49 +1,54 @@
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { BsFillPauseFill as Pause } from "react-icons/bs";
-import { useEffect, useRef } from "react";
 import { FaPlay as Play } from "react-icons/fa";
 import {
-	TrackPreviousIcon as Previous,
-	TrackNextIcon as Next,
-} from "@radix-ui/react-icons";
+	MdFavoriteBorder as AddFavorite,
+	MdSkipPrevious as Previous,
+	MdRepeatOne as RepeatOne,
+	MdShuffleOn as RandomOn,
+	MdFavorite as Favorite,
+	MdShuffle as RandomOff,
+	MdSkipNext as Next,
+	MdRepeat as Repeat,
+} from "react-icons/md";
+
+import { useEffect, useRef } from "react";
 import create from "zustand";
 
-import { useCurrentPlaying, CurrentPlayingEnum } from "@contexts";
 import { ImgWithFallback } from "@components";
 import { formatDuration } from "@common/utils";
-
 import { theme } from "@styles/theme";
 import {
+	CurrentPlayingEnum,
+	useCurrentPlaying,
+	usePlayOptions,
+	usePlaylists,
+} from "@contexts";
+
+import { ScaleUpIconButton } from "@modules/Navbar/styles";
+import {
+	OptionsAndAlbum,
 	ProgressWrapper,
 	SeekerContainer,
+	ImgContainer,
 	Controls,
 	Wrapper,
 	Info,
-	Img,
 } from "./styles";
 
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 const { setState: setProgress } = useProgress;
 
-function playNextMedia() {
-	getCurrentPlaying().setCurrentPlaying({
-		playlistName: getCurrentPlaying().currentPlaying.playlistName,
-		type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
-	});
-}
-
-function playPreviousMedia() {
-	getCurrentPlaying().setCurrentPlaying({
-		playlistName: getCurrentPlaying().currentPlaying.playlistName,
-		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
-	});
-}
-
 export function MediaPlayer() {
-	const duration = useCurrentPlaying().currentPlaying.media?.duration;
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const { currentPlaying } = useCurrentPlaying();
+	const { isFavorite } = usePlaylists();
+	const {
+		playOptions: { isRandom, loopThisMedia },
+	} = usePlayOptions();
+
+	const duration = currentPlaying.media?.duration;
 
 	function playOrPauseMedia() {
 		const audio = audioRef.current;
@@ -95,14 +100,28 @@ export function MediaPlayer() {
 		<Wrapper>
 			<audio id="audio" preload="none" ref={audioRef} />
 
-			<></>
+			<OptionsAndAlbum>
+				<ScaleUpIconButton style={{ width: 40, height: 40 }}>
+					<Previous size="20px" />
+				</ScaleUpIconButton>
 
-			<Img>
+				<span>{currentPlaying.media?.album}</span>
+
+				<ScaleUpIconButton style={{ width: 40, height: 40 }}>
+					{isFavorite(currentPlaying.media?.id) ? (
+						<Favorite size="20px" />
+					) : (
+						<AddFavorite size="20px" />
+					)}
+				</ScaleUpIconButton>
+			</OptionsAndAlbum>
+
+			<ImgContainer>
 				<ImgWithFallback
 					Fallback={<MusicNote size="1.4em" />}
 					media={currentPlaying?.media}
 				/>
-			</Img>
+			</ImgContainer>
 
 			<Info>
 				<span className="title">{currentPlaying?.media?.title}</span>
@@ -112,21 +131,27 @@ export function MediaPlayer() {
 			<SeekerWrapper seek={seek} duration={duration} />
 
 			<Controls>
-				<span className="previous-or-next" onClick={playPreviousMedia}>
-					<Previous />
-				</span>
+				<span id="loop">{loopThisMedia ? <Repeat /> : <RepeatOne />}</span>
 
-				<span className="play-pause" onClick={playOrPauseMedia}>
-					{audioRef.current?.paused ? (
-						<Play height={25} width={25} />
-					) : (
-						<Pause height={25} width={25} />
-					)}
-				</span>
+				<div>
+					<span className="previous-or-next" onClick={playPreviousMedia}>
+						<Previous />
+					</span>
 
-				<span className="previous-or-next" onClick={playNextMedia}>
-					<Next />
-				</span>
+					<span className="play-pause" onClick={playOrPauseMedia}>
+						{audioRef.current?.paused ? (
+							<Play height={25} width={25} />
+						) : (
+							<Pause height={25} width={25} />
+						)}
+					</span>
+
+					<span className="previous-or-next" onClick={playNextMedia}>
+						<Next />
+					</span>
+				</div>
+
+				<span id="random">{isRandom ? <RandomOn /> : <RandomOff />}</span>
 			</Controls>
 		</Wrapper>
 	);
@@ -159,7 +184,7 @@ function SeekerWrapper({
 					<div
 						style={{
 							border: `1px solid ${theme.colors.accent}`,
-							animation: "move 1s ease-in-out infinite",
+							animation: "move 1s linear infinite",
 							transform: "translate(0, -25%)",
 							position: "absolute",
 							borderRadius: "50%",
@@ -176,6 +201,20 @@ function SeekerWrapper({
 			<span>{duration ?? "00:00"}</span>
 		</SeekerContainer>
 	);
+}
+
+function playNextMedia() {
+	getCurrentPlaying().setCurrentPlaying({
+		playlistName: getCurrentPlaying().currentPlaying.playlistName,
+		type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
+	});
+}
+
+function playPreviousMedia() {
+	getCurrentPlaying().setCurrentPlaying({
+		playlistName: getCurrentPlaying().currentPlaying.playlistName,
+		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
+	});
 }
 
 type Progress = Readonly<{

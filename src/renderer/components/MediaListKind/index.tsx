@@ -1,7 +1,9 @@
 import type { MediaListKindProps } from "./MediaOptions/Change";
 import type { Media } from "@common/@types/typesAndEnums";
 
-import { IoMdMusicalNote as MusicNote } from "react-icons/io";
+import { BsThreeDotsVertical as Dots } from "react-icons/bs";
+import { MdAudiotrack as MusicNote } from "react-icons/md";
+
 import { memo, useState } from "react";
 import {
 	type ListChildComponentProps,
@@ -11,7 +13,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import Popup from "reactjs-popup";
 
 import { useCurrentPlaying, CurrentPlayingEnum, usePlaylists } from "@contexts";
-import { Dots, ImgWithFallback } from "@components";
+import { ImgWithFallback } from "@components";
 import { MediaOptionsModal } from "./MediaOptions";
 
 import { pulse } from "@styles/animations";

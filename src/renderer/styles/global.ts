@@ -50,8 +50,26 @@ export const GlobalCSS = globalCss({
 	},
 
 	body: {
-		height: "100%",
 		overflow: "hidden",
+		height: "100%",
+
+		"#wave": {
+			position: "absolute",
+			display: "block",
+			left: 30,
+			top: 75,
+			size: 2,
+
+			boxShadow: "0 0 0 0 #212121",
+			borderRadius: "100%",
+			zIndex: 1,
+
+			transition: "box-shadow 1s cubic-bezier(0.4, 0, 0.2, 1)",
+
+			"&.active": {
+				boxShadow: "0 0 0 9999px #212121",
+			},
+		},
 
 		/* Make a vertical red line at the middle */
 		/* height: 100vh,
@@ -66,12 +84,17 @@ export const GlobalCSS = globalCss({
 			"--nav-button-active-color": "white",
 			"--nav-button-hovered-bg": "#c9c2f9",
 			"--nav-button-active-bg": "#c1bbec",
+			"--deactivated-icon": "#a8a8a8",
+			"--button-hovered": "#E5E5E5",
 			"--accent-alpha": "#aa00ff26",
 			"--accent-light": "#f1d4ff",
+			"--button-border": "black",
 			"--bg-central": "#f2f3f7",
+			"--active-icon": "black",
 			"--secondary": "#edecf8",
 			"--gray-text": "#8e8e8e",
 			"--black-text": "black",
+			"--box-shadow": "#ccc",
 			"--accent": "#aa00ff",
 			"--bg-nav": "#edecf8",
 			"--text": "#00525e",
@@ -79,20 +102,25 @@ export const GlobalCSS = globalCss({
 		},
 
 		"[data-theme='dark']": {
-			"--nav-button-hovered-color": "",
-			"--nav-button-active-color": "",
-			"--nav-button-hovered-bg": "",
+			"--nav-button-hovered-color": "black",
+			"--nav-button-active-color": "black",
+			"--nav-button-hovered-bg": "black",
+			"--nav-button-active-bg": "black",
+			"--deactivated-icon": "#a8a8a8",
 			"--accent-alpha": "#aa00ff99",
-			"--nav-button-active-bg": "",
+			"--button-hovered": "#E5E5E5",
 			"--accent-light": "#dd99ff",
-			"--bg-central": "",
-			"--black-text": "",
-			"--secondary": "",
-			"--gray-text": "",
-			"--primary": "",
-			"--accent": "",
-			"--bg-nav": "",
-			"--text": "",
+			"--button-border": "white",
+			"--active-icon": "white",
+			"--bg-central": "black",
+			"--black-text": "black",
+			"--secondary": "black",
+			"--gray-text": "black",
+			"--box-shadow": "#000",
+			"--primary": "black",
+			"--accent": "black",
+			"--bg-nav": "black",
+			"--text": "black",
 		},
 
 		"::selection": {

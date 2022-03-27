@@ -1,19 +1,20 @@
 import type { Page } from "@common/@types/typesAndEnums";
 
+import { QuestionMarkIcon as Question } from "@radix-ui/react-icons";
 import {
-	CounterClockwiseClockIcon as History,
-	QuestionMarkIcon as Question,
-	DownloadIcon as Download,
-	StarIcon as Favorites,
-	WidthIcon as Convert,
-	GearIcon as Settings,
-	HomeIcon as Home,
-} from "@radix-ui/react-icons";
+	MdOutlineSettings as Settings,
+	MdFavoriteBorder as Favorites,
+	MdCloudDownload as Download,
+	MdSwapHoriz as Convert,
+	MdHistory as History,
+	MdHomeMax as Home,
+} from "react-icons/md";
 
+import { Downloading, Converting } from "@modules";
 import { usePage } from "@contexts";
 import { pages } from "@utils/app";
 
-import { FolderButton, Nav } from "./styles";
+import { ScaleUpIconButton, Nav } from "./styles";
 
 const { setState: setPage } = usePage;
 
@@ -23,7 +24,7 @@ export function Navbar() {
 	return (
 		<Nav>
 			{pages.map(page => (
-				<FolderButton
+				<ScaleUpIconButton
 					className={page === currPage ? "active" : ""}
 					onMouseDown={e => e.preventDefault()}
 					// ^ Takes focus off of button so that the `outline` css can be applied
@@ -32,8 +33,11 @@ export function Navbar() {
 					key={page}
 				>
 					{icon(page)}
-				</FolderButton>
+				</ScaleUpIconButton>
 			))}
+
+			<Downloading />
+			<Converting />
 		</Nav>
 	);
 }

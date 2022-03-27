@@ -4,11 +4,11 @@ import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { theme } from "@styles/theme";
 
 export const Wrapper = styled("div", {
-	display: "flex",
-	flexDirection: "column",
-	justifyContent: "space-between",
-	alignItems: "center",
 	position: "absolute",
+	display: "flex",
+	justifyContent: "flex-start",
+	flexDirection: "column",
+	alignContent: "center",
 
 	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
 	width: "25vw",
@@ -16,20 +16,19 @@ export const Wrapper = styled("div", {
 	right: 0,
 
 	backgroundColor: theme.colors.accentLight,
-	padding: "0.8rem",
+	padding: "1rem",
 	border: "none",
-
-	backdropFilter: "blur(5px)",
 });
 
-export const Img = styled("div", {
+export const ImgContainer = styled("div", {
 	display: "flex",
 	justifyContent: "center",
 	alignItems: "center",
+	alignSelf: "center",
 
-	marginLeft: "1%",
-	minWidth: 70,
-	height: 70,
+	marginTop: "15%",
+	height: "25vh",
+	width: "25vh",
 
 	boxShadow: "$whiteGlowAroundComponent",
 	borderRadius: 17,
@@ -47,11 +46,19 @@ export const Img = styled("div", {
 export const Info = styled("div", {
 	display: "flex",
 	flexDirection: "column",
-	maxHeight: "100%",
-	marginLeft: "3%",
+	justifyContent: "center",
+	alignItems: "center",
+	height: "10vh",
 	width: "100%",
 
+	marginTop: "3vh",
+
 	span: {
+		justifyContent: "center",
+		alignItems: "center",
+		display: "flex",
+		width: "100%",
+
 		"&.title": {
 			fontFamily: "$fontFamily",
 			color: theme.colors.text,
@@ -60,7 +67,6 @@ export const Info = styled("div", {
 			fontWeight: 500,
 
 			overflowY: "hidden",
-			maxHeight: 70,
 		},
 
 		"&.subtitle": {
@@ -75,13 +81,43 @@ export const Info = styled("div", {
 	},
 });
 
-export const Controls = styled("div", {
+export const SeekerContainer = styled("div", {
 	display: "flex",
 	flexDirection: "row",
-	justifyContent: "center",
+	justifyContent: "space-between",
 	alignItems: "center",
-	marginLeft: "10%",
+	height: "1rem",
+	width: "100%",
+
+	marginTop: "5vh",
+
+	span: {
+		color: theme.colors.grayText,
+		fontFamily: "$fontFamily",
+		letterSpacing: "0.03em",
+		textAlign: "center",
+		fontSize: "1rem",
+
+		backgroundColor: "transparent",
+		border: "none",
+	},
+});
+
+export const Controls = styled("div", {
+	display: "flex", // row
+	justifyContent: "space-between",
+	alignItems: "center",
 	gap: 10,
+
+	"> div": {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+
+	"#loop": {},
+
+	"#random": {},
 
 	span: {
 		display: "flex",
@@ -115,26 +151,6 @@ export const Controls = styled("div", {
 	},
 });
 
-export const SeekerContainer = styled("div", {
-	display: "flex",
-	flexDirection: "row",
-	justifyContent: "space-between",
-	alignItems: "center",
-	height: "1rem",
-	width: 275,
-
-	span: {
-		color: theme.colors.grayText,
-		fontFamily: "$fontFamily",
-		letterSpacing: "0.03em",
-		textAlign: "center",
-		fontSize: "1rem",
-
-		backgroundColor: "transparent",
-		border: "none",
-	},
-});
-
 export const ProgressWrapper = styled("div", {
 	display: "block",
 	width: 200,
@@ -143,4 +159,10 @@ export const ProgressWrapper = styled("div", {
 	backgroundColor: "rgba(125, 125, 125, 0.6)",
 	cursor: "pointer",
 	margin: "0 7px",
+});
+
+export const OptionsAndAlbum = styled("div", {
+	display: "flex", // row
+	justifyContent: "space-between",
+	alignItems: "center",
 });
