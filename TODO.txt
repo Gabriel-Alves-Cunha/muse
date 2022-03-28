@@ -1,10 +1,10 @@
 * TODO: play new audio is calling twice!
 * FIX: history list is not storing medias with new indexes!
-* HANDLE: window.twoWayComm_React_Electron.postMessage(msg);!
 
 NOTES:
 
 1. `const { getState: getPage } = usePage;
+		// and then:
 		getPage().page
 	 ` is not reactive!
 

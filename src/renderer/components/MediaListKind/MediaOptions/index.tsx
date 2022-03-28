@@ -1,7 +1,7 @@
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { type Dispatch, type SetStateAction, useState } from "react";
-import { TrashIcon as Remove } from "@radix-ui/react-icons";
+import { MdOutlineDelete as Remove } from "react-icons/md";
 import Popup from "reactjs-popup";
 
 import { usePlaylists } from "@contexts";

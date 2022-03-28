@@ -23,11 +23,11 @@
 ## Screenshots
 
 <h1 align="center">
-  <img src="images/Screenshot from 2021-12-18 18-38-42.png" />
+  <img src="screenshots/home.png" />
 </h1>
 
 <h1 align="center">
-  <img src="images/Screenshot from 2021-12-18 18-39-21.png" />
+  <img src="screenshots/download.png" />
 </h1>
 
 <!-- ## Features
@@ -54,22 +54,23 @@
 The following tools were used on this project construction:
 
 - [Vite](https://vitejs.dev/)
+- [Vitest](https://vitest.dev/)
+- [Stitches](https://stitches.dev/)
 - [Node.js](https://nodejs.org/en/)
 - [React](https://pt-br.reactjs.org/)
 - [Electron](https://www.electronjs.org/)
-- [Axios](https://github.com/axios/axios)
+- [Zustand](https://github.com/pmndrs/zustand)
 - [TypeScript](https://www.typescriptlang.org/)
-- [Stitches](https://stitches.dev/)
-- [Chokidar](https://github.com/paulmillr/chokidar)
+- [Ytdl Core](https://github.com/fent/node-ytdl-core)
 - [React Icons](https://react-icons.github.io/react-icons/)
-- [ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
-- [Why Did You Render](https://github.com/welldone-software/why-did-you-render)
+- [Node TagLib Sharp](https://github.com/benrr101/node-taglib-sharp)
+- [Fluent Ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 
 ## 💻 Requirements
 
 Before everything, verify that:
 
-- You have the most recent (LTS) version of `git`, `Node.JS` and `yarn || npm`
+- You have the most recent (LTS) version of `git`, `Node.JS` and `yarn`
 
 ## 🚀 Installing
 
@@ -77,53 +78,24 @@ To install and run Muse, follow these steps:
 
 ```bash
 git clone https://github.com/Gabriel-Alves-Cunha/muse
+```
+
+```bash
 yarn
 ```
 
 ```bash
+yarn dist
+```
+
+Then the binary will be inside the `dist/` folder.
+
+To start local development:
+
+```shell
+# We use esbuild to compile the main process Typescript, which is faster
 yarn dev
 ```
-
-Start local development
-
-```shell
-# Use esbuild to compile the main process Typescript, which is faster
-yarn run dev
-
-# Use tsc to compile the main process Typescript
-yarn run dev:tsc
-```
-
-You can also use `dev:main`, `dev:main:tsc`, and `dev:renderer` separately to debug the main process and the rendering process separately.
-
-Compile/Pack
-
-```shell
-# Only build the target code and resources of the main process and the rendering process, without packaging (exe, dmg, etc.)
-yarn run build
-
-# Preview your application in production mode without pack.
-yarn run preview
-
-# Build and pack as a runnable program or installer
-yarn run pack:win
-yarn run pack:mac
-yarn run pack:linux
-
-# Pack for all platforms
-yarn run pack # Exclude mac platform, applicable to linux & win
-yarn run pack:all
-```
-
-Clean up the build directory
-
-```shell
-yarn run clean
-```
-
-The electron project stater using vite for renderer process and esbuild / tsc for main process.
-
-Note: CSC_IDENTITY_AUTO_DISCOVERY is set to false by default to avoid the codesign operation in packaging macos (learn more: [codesign](https://www.electron.build/code-signing))
 
 ## 📫 Contributing
 

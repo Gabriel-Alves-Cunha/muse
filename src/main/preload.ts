@@ -1,8 +1,10 @@
-import type { AllowedMedias } from "@common/utils";
+import type { HandleConversion, HandleDownload } from "./preload/media";
 import type { Path } from "@common/@types/typesAndEnums";
 
 import { contextBridge } from "electron";
+import { getBasicInfo } from "ytdl-core";
 
+import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { homeDir, dirs } from "./utils";
 import { dbg } from "@common/utils";
 import {
@@ -11,7 +13,6 @@ import {
 	transformPathsToMedias,
 	convertToAudio,
 	writeTags,
-	getInfo,
 } from "./preload/media";
 import {
 	getFullPathOfFilesForFilesInThisDirectory,
@@ -43,17 +44,18 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 	media: {
 		transformPathsToMedias,
+		getInfo: getBasicInfo,
 		convertToAudio,
 		writeTags,
-		getInfo,
 	},
 });
 
+// For window.twoWayComm_React_Electron:
 const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 	port.onmessage = async event => {
 		const { data } = event;
 
-		console.log("At addListeners on file 'preload.ts', line 330:", data);
+		console.log("At addListeners on file 'preload.ts', line 57:", data);
 
 		switch (data.type) {
 			case "write tag": {
@@ -67,6 +69,11 @@ const addListeners = (port: MessagePort): Readonly<MessagePort> => {
 				} catch (error) {
 					console.error(error);
 				}
+				break;
+			}
+
+			// TODO: handle this and other cases from writeTag!
+			case ListenToNotification.ADD_ONE_MEDIA: {
 				break;
 			}
 
@@ -91,26 +98,14 @@ window.onmessage = async event => {
 				console.error(
 					"There is no message port to handle 'download media' event!",
 				);
-				return;
+				break;
 			}
 
 			electronPort.onmessage = ({
 				data,
 			}: {
-				data: Readonly<{
-					imageURL: string;
-					destroy: boolean;
-					title: string;
-					url: string;
-				}>;
-			}) =>
-				handleCreateOrCancelDownload(
-					data.imageURL,
-					data.destroy,
-					data.url,
-					data.title,
-					electronPort,
-				);
+				data: HandleDownload & { destroy: boolean };
+			}) => handleCreateOrCancelDownload({ ...data, electronPort });
 
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
@@ -127,24 +122,14 @@ window.onmessage = async event => {
 				console.error(
 					"There is no MessagePort to handle 'convert media' event!",
 				);
-				return;
+				break;
 			}
 
 			electronPort.onmessage = ({
 				data,
 			}: {
-				data: Readonly<{
-					toExtension: AllowedMedias;
-					destroy: boolean;
-					path: Path;
-				}>;
-			}) =>
-				handleCreateOrCancelConvert(
-					data.destroy,
-					data.toExtension,
-					data.path,
-					electronPort,
-				);
+				data: HandleConversion & { destroy: boolean };
+			}) => handleCreateOrCancelConvert({ ...data, electronPort });
 
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
@@ -161,7 +146,10 @@ window.onmessage = async event => {
 			const data = {};
 			Object.entries(details).forEach(pair => Object.assign(data, pair));
 
-			console.log({ event }, "\n\n\n", { details, data });
+			console.log("On 'preload.ts' at window.onmessage:", { event }, "\n\n\n", {
+				details,
+				data,
+			});
 
 			await writeTags(details.mediaPath, data);
 
@@ -169,17 +157,17 @@ window.onmessage = async event => {
 		}
 
 		case "async two way comm": {
-			console.log("Electron received 'async two way comm':", event);
-
 			const electronPort = event.ports[0];
 			if (!electronPort) {
 				console.error(
 					"There should be an electronPort for 2-way communication with React!",
 				);
-				return;
+				break;
 			}
 
 			window.twoWayComm_React_Electron = addListeners(electronPort);
+
+			dbg({ twoWayComm_React_Electron: window.twoWayComm_React_Electron });
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
@@ -188,7 +176,7 @@ window.onmessage = async event => {
 
 		default: {
 			console.error(
-				`There is no method to handle this event: (${typeof event.data}) "${
+				`There is no method to handle this event.data: (${typeof event.data}) "${
 					event.data
 				}";\nEvent =`,
 				event,

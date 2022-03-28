@@ -1,5 +1,3 @@
-import type { Readable } from "stream";
-
 import { homedir } from "os";
 import { join } from "path";
 
@@ -24,21 +22,3 @@ export const dirs = Object.freeze({
 	downloads: join(homeDir, "Downloads"),
 	music: join(homeDir, "Music"),
 });
-
-export type Stream = Readonly<{ url: string; stream: Readable }>;
-
-export const has = (
-	array: readonly Stream[],
-	url: Readonly<string>,
-): boolean => {
-	for (let i = 0; i < array.length; ++i) if (array[i].url === url) return true;
-	return false;
-};
-
-export const get = (array: readonly Stream[], url_: Readonly<string>) =>
-	array.find(({ url }) => url === url_);
-
-export const remove = (array: Stream[], url_: Readonly<string>) => {
-	const index = array.findIndex(({ url }) => url === url_);
-	if (index !== -1) array.splice(index, 1);
-};

@@ -1,13 +1,13 @@
 import type { Page } from "@common/@types/typesAndEnums";
 
-import { QuestionMarkIcon as Question } from "@radix-ui/react-icons";
+import { RiQuestionMark as Question } from "react-icons/ri";
 import {
+	MdOutlineVideoLibrary as Home,
 	MdOutlineSettings as Settings,
 	MdFavoriteBorder as Favorites,
 	MdCloudDownload as Download,
 	MdSwapHoriz as Convert,
 	MdHistory as History,
-	MdHomeMax as Home,
 } from "react-icons/md";
 
 import { Downloading, Converting } from "@modules";

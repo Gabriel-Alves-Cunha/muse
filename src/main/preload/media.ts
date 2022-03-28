@@ -1,15 +1,14 @@
+import type { ImgString, WriteTag } from "@common/@types/electron-window";
 import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/typesAndEnums";
-import type { videoInfo } from "ytdl-core";
-import type { WriteTag } from "@common/@types/electron-window";
 import type { IPicture } from "node-taglib-sharp";
-import type { Stream } from "../utils";
+import type { Readable } from "stream";
 
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { rename as renameFile } from "fs/promises";
 import { createReadStream } from "fs";
-import { ipcRenderer } from "electron";
-import { dirname } from "path";
+import { dirname, join } from "path";
+import { get } from "https";
 import {
 	File as MediaFile,
 	PictureType,
@@ -18,13 +17,13 @@ import {
 	Picture,
 } from "node-taglib-sharp";
 import fluent_ffmpeg from "fluent-ffmpeg";
-import readline from "readline";
 import sanitize from "sanitize-filename";
+import readline from "readline";
 import ytdl from "ytdl-core";
 
-import { dirs, get, has, remove } from "../utils";
 import { string2number } from "@common/hash";
 import { prettyBytes } from "@common/prettyBytes";
+import { dirs } from "../utils";
 import { dbg } from "@common/utils";
 import {
 	getLastExtension,
@@ -40,128 +39,142 @@ import {
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
-const currentDownloads: Stream[] = [];
-const mediasConverting: Stream[] = [];
+const currentDownloads: Map<string, Readable> = new Map();
+const mediasConverting: Map<Path, Readable> = new Map();
+
+const createMedia = async (
+	path: Path,
+	index: number,
+	assureMediaSizeIsGreaterThan60KB: boolean,
+	ignoreMediaWithLessThan60Seconds: boolean,
+): Promise<Media> =>
+	new Promise(resolve => {
+		const basename = getBasename(path);
+		console.time(`Nº ${index}, "${basename}" took`);
+
+		const {
+			fileAbstraction: {
+				readStream: { length: sizeInBytes },
+			},
+			tag: { pictures, title, album, genres, albumArtists },
+			properties: { durationMilliseconds },
+		} = MediaFile.createFromPath(path);
+
+		const duration = durationMilliseconds / 1_000;
+
+		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
+			console.log(
+				`Skipping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
+			);
+			return undefined;
+		}
+
+		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
+			console.log(
+				`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
+			);
+			return undefined;
+		}
+
+		const picture: IPicture | undefined = pictures[0];
+		const mimeType = picture?.mimeType;
+		let img = "";
+		if (picture && mimeType) {
+			const str =
+				// If the picture wasn't made by us. (That's the only way I found to
+				// make this work, cause, when we didn't make the picture in
+				// `writeTag`, we can't decode it!):
+				picture.type === PictureType.NotAPicture ||
+				picture.type === PictureType.Other
+					? Buffer.from(picture.data.data).toString("base64")
+					: picture?.data.toString();
+			img = `data:${mimeType};base64,${str}`;
+		}
+
+		const media: Media = {
+			duration: formatDuration(duration),
+			size: prettyBytes(sizeInBytes),
+			artist: albumArtists[0] ?? "",
+			dateOfArival: Date.now(),
+			title: title ?? basename,
+			id: string2number(path),
+			genres,
+			album,
+			index,
+			path,
+			img,
+		};
+
+		dbg(basename, {
+			tag: { pictures, album, genres, albumArtists },
+			properties: { durationMilliseconds },
+		});
+		console.timeEnd(`Nº ${index}, "${basename}" took`);
+
+		return resolve(media);
+	});
 
 export async function transformPathsToMedias(
 	paths: readonly Path[],
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<readonly Media[]> {
-	const createMedia = async (
-		path: Path,
-		index: number,
-	): Promise<Media | undefined> => {
-		const basename = getBasename(path);
-
-		try {
-			console.time(`Nº ${index}, "${basename}" took`);
-			const {
-				fileAbstraction: {
-					readStream: { length: sizeInBytes },
-				},
-				tag: { pictures, title, album, genres, albumArtists },
-				properties: { durationMilliseconds },
-			} = MediaFile.createFromPath(path);
-
-			const duration = durationMilliseconds / 1_000;
-
-			if (ignoreMediaWithLessThan60Seconds && duration < 60) {
-				console.log(
-					`Skipping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
-				);
-				return undefined;
-			}
-
-			if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
-				console.log(
-					`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
-				);
-				return undefined;
-			}
-
-			const picture: IPicture | undefined = pictures[0];
-			const mimeType = picture?.mimeType;
-			let img = "";
-			if (picture && mimeType) {
-				const str =
-					// If the picture wasn't made by us. (That's the only way I found to
-					// make this work, cause, when we didn't make the picture in
-					// `writeTag`, we can't decode it!):
-					picture.type === PictureType.NotAPicture ||
-					picture.type === PictureType.Other
-						? Buffer.from(picture.data.data).toString("base64")
-						: picture?.data.toString();
-				img = `data:${mimeType};base64,${str}`;
-			}
-
-			const media: Media = {
-				duration: formatDuration(duration),
-				size: prettyBytes(sizeInBytes),
-				artist: albumArtists[0] ?? "",
-				dateOfArival: Date.now(),
-				title: title ?? basename,
-				id: string2number(path),
-				genres,
-				album,
-				index,
-				path,
-				img,
-			};
-
-			dbg(basename, {
-				tag: { pictures, album, genres, albumArtists },
-				properties: { durationMilliseconds },
-			});
-			// dbg("%cmedia =", "background-color: #f9ca4c80;", media);
-			return media;
-		} catch (error) {
-			console.error(error);
-			return undefined;
-		} finally {
-			console.timeEnd(`Nº ${index}, "${basename}" took`);
-		}
-	};
-
-	const medias: Array<Media | undefined> = [];
+	const medias: Media[] = [];
 	console.time("Runnig 'for' on all medias");
-	for (const [index, path] of paths.entries()) {
-		medias.push(await createMedia(path, index));
-	}
+	const promises = paths.map((path, index) =>
+		createMedia(
+			path,
+			index,
+			assureMediaSizeIsGreaterThan60KB,
+			ignoreMediaWithLessThan60Seconds,
+		),
+	);
+	(await Promise.allSettled(promises)).forEach(p => {
+		if (p.status === "fulfilled" && p.value) medias.push(p.value);
+	});
 	console.timeEnd("Runnig 'for' on all medias");
 
-	return medias.filter(Boolean) as Media[];
+	return medias;
 }
 
-export function handleCreateOrCancelDownload(
-	imageURL: Readonly<string>,
-	destroy: Readonly<boolean>,
-	url: Readonly<string>,
-	title: Readonly<string>,
-	electronPort: Readonly<MessagePort>,
-) {
-	if (url && !has(currentDownloads, url))
-		makeStream(imageURL, url, title, electronPort);
-	else if (url && destroy) {
-		const stream = get(currentDownloads, url)?.stream;
+export type HandleDownload = {
+	electronPort: Readonly<MessagePort>;
+	imageURL: Readonly<string>;
+	title: Readonly<string>;
+	url: Readonly<string>;
+};
 
-		if (stream) stream.emit("destroy");
-		else
-			console.error(
-				`There is no stream on 'currentDownloads' with url: '${url}'`,
-			);
+export function handleCreateOrCancelDownload({
+	electronPort,
+	imageURL,
+	destroy,
+	title,
+	url,
+}: HandleDownload & {
+	destroy: Readonly<boolean>;
+}) {
+	if (url && !currentDownloads.has(url))
+		makeStream({ imageURL, url, title, electronPort });
+	else if (url && destroy) {
+		const stream = currentDownloads.get(url);
+
+		stream
+			? stream.emit("destroy")
+			: console.error(
+					`There is no stream on "currentDownloads" with url: "${url}"`,
+			  );
 	}
 }
 
-export function makeStream(
-	imageURL: Readonly<string>,
-	url: Readonly<string>,
-	title: Readonly<string>,
-	electronPort: Readonly<MessagePort>,
-) {
+export function makeStream({
+	electronPort,
+	imageURL,
+	title,
+	url,
+}: HandleDownload) {
 	const extension: AllowedMedias = "mp3";
-	const titleWithExtension = `${title}.${extension}`;
-	const saveSite = `${dirs.music}/${sanitize(titleWithExtension)}`;
+	const titleWithExtension = sanitize(`${title}.${extension}`);
+	const saveSite = join(dirs.music, titleWithExtension);
 	const startTime = Date.now();
 
 	let interval: NodeJS.Timer | undefined = undefined;
@@ -172,7 +185,7 @@ export function makeStream(
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.once("destroy", () => {
+		.on("destroy", () => {
 			console.log(
 				"%cDestroy was called on readStream!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
@@ -183,7 +196,6 @@ export function makeStream(
 				isDownloading: false,
 			});
 			electronPort.close();
-
 			interval && clearInterval(interval);
 
 			const readAnswer = readStream.destroy(
@@ -191,11 +203,8 @@ export function makeStream(
 			);
 			dbg("readStream 'destroy()' answer =", readAnswer);
 
-			remove(currentDownloads, url);
-			dbg(
-				`Was "${url}" deleted from map?\ncurrentDownloads =`,
-				currentDownloads,
-			);
+			currentDownloads.delete(url);
+			dbg({ currentDownloads });
 		})
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
@@ -209,7 +218,6 @@ export function makeStream(
 			// To react:
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
-
 				interval = setInterval(
 					() => electronPort.postMessage({ percentage: percentageToSend }),
 					2_000,
@@ -219,6 +227,7 @@ export function makeStream(
 			// To node console if is in development:
 			if (isDevelopment) {
 				readline.cursorTo(process.stdout, 0);
+				readline.clearLine(process.stdout, 0);
 				process.stdout.write(
 					`${percentage}% downloaded, (${prettyBytes(downloaded)}/${prettyBytes(
 						total,
@@ -226,7 +235,7 @@ export function makeStream(
 				);
 			}
 		})
-		.once("end", async () => {
+		.on("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
@@ -238,18 +247,18 @@ export function makeStream(
 				isDownloading: false,
 			});
 			electronPort.close();
-
 			interval && clearInterval(interval);
 
 			try {
-				console.log("Going to writeTags");
+				console.log("Going to writeTags...");
 				await writeTags(saveSite, { imageURL, isNewMedia: true });
-				remove(currentDownloads, url);
 			} catch (error) {
-				console.error(error, { currentDownloads });
+				console.error(error);
+			} finally {
+				currentDownloads.delete(url);
 			}
 		})
-		.once("error", error => {
+		.on("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
 
 			// To react
@@ -258,49 +267,57 @@ export function makeStream(
 				isDownloading: false,
 				error,
 			});
-
 			electronPort.close();
-
 			interval && clearInterval(interval);
+
+			currentDownloads.delete(url);
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
 
-	currentDownloads.push({ url, stream: readStream });
+	currentDownloads.set(url, readStream);
 	dbg(`Added "${url}" to currentDownloads =`, currentDownloads);
 }
 
-export function handleCreateOrCancelConvert(
-	destroy: Readonly<boolean>,
-	toExtension: AllowedMedias,
-	path: Readonly<Path>,
-	electronPort: Readonly<MessagePort>,
-) {
-	if (path && !has(mediasConverting, path))
-		convertToAudio(path, toExtension, electronPort);
-	else if (path && destroy) {
-		const stream = get(mediasConverting, path)?.stream;
+export type HandleConversion = Readonly<{
+	electronPort: Readonly<MessagePort>;
+	toExtension: AllowedMedias;
+	mediaPath: Readonly<Path>;
+}>;
 
-		if (stream) stream.emit("destroy");
-		else
-			console.error(
-				`There is no stream on 'mediasConverting' with path: '${path}'.`,
-			);
+export function handleCreateOrCancelConvert({
+	electronPort,
+	toExtension,
+	mediaPath,
+	destroy,
+}: HandleConversion & { destroy: boolean }) {
+	if (mediaPath && !mediasConverting.has(mediaPath))
+		convertToAudio({ mediaPath, toExtension, electronPort });
+	else if (mediaPath && destroy) {
+		const stream = mediasConverting.get(mediaPath);
+
+		stream
+			? stream.emit("destroy")
+			: console.error(
+					`There is no stream on "mediasConverting" with path: "${mediaPath}".`,
+			  );
 	}
 }
 
-export function convertToAudio(
-	mediaPath: Readonly<Path>,
-	toExtension: AllowedMedias,
-	electronPort: Readonly<MessagePort>,
-) {
-	const titleWithExtension = `${getBasename(mediaPath)}.${toExtension}`;
-	const saveSite = `${dirs.music}/${sanitize(titleWithExtension)}`;
+export function convertToAudio({
+	electronPort,
+	toExtension,
+	mediaPath,
+}: HandleConversion) {
+	const titleWithExtension = sanitize(
+		`${getBasename(mediaPath)}.${toExtension}`,
+	);
+	const saveSite = join(dirs.music, titleWithExtension);
 	const readStream = createReadStream(mediaPath);
 
 	let interval: NodeJS.Timer | undefined = undefined;
 	let timeConverted = "";
-	let sizeConverted: 0;
+	let sizeConverted = 0;
 
 	fluent_ffmpeg(readStream)
 		.toFormat(toExtension)
@@ -313,15 +330,18 @@ export function convertToAudio(
 
 			// To react:
 			if (!interval) {
-				// ^ Only in the firt time this 'on progress' fn is called!
+				// ^ Only in the firt time this setInterval is called!
 				interval = setInterval(
 					() => electronPort.postMessage({ sizeConverted, timeConverted }),
 					2_000,
 				);
 			}
 		})
-		.once("error", error => {
-			console.error(`Error Converting file: "${titleWithExtension}"!`, error);
+		.on("error", error => {
+			console.error(
+				`Error converting file: "${titleWithExtension}"!\n\n`,
+				error,
+			);
 
 			// To react:
 			electronPort.postMessage({
@@ -329,12 +349,12 @@ export function convertToAudio(
 				isConverting: false,
 				error,
 			});
-
 			electronPort.close();
-
 			interval && clearInterval(interval);
+
+			mediasConverting.delete(mediaPath);
 		})
-		.once("end", async () => {
+		.on("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
@@ -345,16 +365,12 @@ export function convertToAudio(
 				status: ProgressStatus.SUCCESS,
 				isConverting: false,
 			});
-
 			electronPort.close();
-
 			interval && clearInterval(interval);
 
-			////////////////////////////////////////
-			remove(mediasConverting, mediaPath);
-			dbg("Deleting from mediasConverting.\nconverting =", mediasConverting);
+			mediasConverting.delete(mediaPath);
 		})
-		.once("destroy", () => {
+		.on("destroy", () => {
 			console.log(
 				"%cDestroy was called on readStream for converter!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
@@ -365,23 +381,18 @@ export function convertToAudio(
 				isConverting: false,
 			});
 			electronPort.close();
-
 			interval && clearInterval(interval);
 
 			const readAnswer = readStream.destroy(
 				new Error("This readStream is being destroyed!"),
 			);
-
 			dbg("readStream 'destroy()' answer =", readAnswer);
 
-			remove(mediasConverting, mediaPath);
-			dbg(
-				`Was "${mediaPath}" deleted from map?\nmediasConverting =`,
-				mediasConverting,
-			);
+			mediasConverting.delete(mediaPath);
+			dbg({ mediasConverting });
 		});
 
-	mediasConverting.push({ url: mediaPath, stream: readStream });
+	mediasConverting.set(mediaPath, readStream);
 	dbg(`Added '${mediaPath}' to mediasConverting =`, mediasConverting);
 }
 
@@ -390,8 +401,6 @@ export async function writeTags(
 	data: Readonly<WriteTag & { isNewMedia?: boolean }>,
 ) {
 	const file = MediaFile.createFromPath(mediaPath);
-	// dbg("File =", file);
-	// dbg("File tags =", file.tag);
 	dbg({ data });
 
 	let fileNewPath = "";
@@ -404,15 +413,10 @@ export async function writeTags(
 						// if imageURL === 'erase img' => erase img so we don't keep
 						// getting an error on the browser.
 						file.tag.pictures = [];
-						console.warn(
-							"(SHOULD BE EMPTY) file.tag.pictures =",
-							file.tag.pictures,
-						);
-					} else {
-						dbg("Downloading picture");
+					} else if (data.imageURL) {
+						dbg("Downloading picture...");
 						try {
-							const imgAsString: `data:${string};base64,${string}` =
-								await ipcRenderer.invoke("get-image", data.imageURL);
+							const imgAsString: ImgString = await getThumbnail(data.imageURL);
 
 							const txtForByteVector = imgAsString.slice(
 								imgAsString.indexOf(",") + 1,
@@ -447,24 +451,26 @@ export async function writeTags(
 				}
 
 				case "albumArtists": {
-					dbg("On 'albumArtists' branch.");
-					console.assert(typeof value === "string");
+					dbg("On 'albumArtists' branch.", { value });
 
 					const artists = (value as string).split(",");
 					file.tag.albumArtists = artists;
 
 					console.log(
-						`file.tag.albumArtists = ${file.tag.albumArtists}\nartists = ${artists}`,
+						`file.tag.albumArtists = ${file.tag.albumArtists}\n${{ artists }}`,
 					);
 
 					break;
 				}
 
 				case "title": {
+					dbg("On 'title' branch.", { value });
+
 					const oldPath = mediaPath;
-					const newPath = `${dirname(oldPath)}/${sanitize(
-						`${value}.${getLastExtension(oldPath)}`,
-					)}`;
+					const newPath = join(
+						dirname(oldPath),
+						sanitize(value + "." + getLastExtension(oldPath)),
+					);
 
 					file.tag.title = value as string;
 
@@ -474,7 +480,7 @@ export async function writeTags(
 					fileNewPath = newPath;
 
 					try {
-						dbg("Renaming...");
+						dbg("Renaming file...");
 						await renameFile(oldPath, newPath);
 					} catch (error) {
 						console.error(error);
@@ -507,49 +513,61 @@ export async function writeTags(
 		if (fileNewPath) {
 			// Since media has a new path, create a new media
 			console.log("Adding new media:", {
-				msg: "ListenToNotification.ADD_MEDIA",
+				msg: "Since media has a new path, create a new media.",
+				type: "ListenToNotification.ADD_MEDIA",
 				path: fileNewPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.ADD_ONE_MEDIA,
+				type: ListenToNotification.ADD_ONE_MEDIA,
 				path: fileNewPath,
 			});
 
 			// and remove old one
 			console.log("Removing old media:", {
-				msg: "ListenToNotification.REMOVE_MEDIA",
+				type: "ListenToNotification.REMOVE_MEDIA",
+				msg: "and remove old one.",
 				path: mediaPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.REMOVE_ONE_MEDIA,
+				type: ListenToNotification.REMOVE_ONE_MEDIA,
 				path: mediaPath,
 			});
 		} else if (data.isNewMedia) {
 			// Add media
+			console.log({
+				type: "ListenToNotification.ADD_ONE_MEDIA",
+				path: mediaPath,
+			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.ADD_ONE_MEDIA,
+				type: ListenToNotification.ADD_ONE_MEDIA,
 				path: mediaPath,
 			});
 		} else {
 			// refresh media
-			console.log("Refreshing media:", {
-				msg: "ListenToNotification.REFRESH_MEDIA",
+			console.log({
+				type: "ListenToNotification.REFRESH_MEDIA",
 				path: mediaPath,
 				fileNewPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
-				msg: ListenToNotification.REFRESH_ONE_MEDIA,
+				type: ListenToNotification.REFRESH_ONE_MEDIA,
 				path: mediaPath,
 			});
 		}
 	}
 }
 
-export async function getInfo(url: string): Promise<videoInfo | undefined> {
-	try {
-		return await ipcRenderer.invoke("get-info-ytdl", url);
-	} catch (error) {
-		console.error(error);
-		return;
-	}
-}
+const getThumbnail = async (url: string): Promise<ImgString> =>
+	new Promise((resolve, reject) => {
+		get(url, res => {
+			res.setEncoding("base64");
+
+			let body = `data:${res.headers["content-type"]};base64,` as const;
+
+			res.on("data", chunk => (body += chunk));
+			res.on("end", () => resolve(body as ImgString));
+		}).on("error", e => {
+			console.error(`Got error getting image on Electron side: ${e.message}`);
+			reject(e);
+		});
+	});

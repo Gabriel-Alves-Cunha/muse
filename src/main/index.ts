@@ -1,11 +1,6 @@
-import type { IpcMainInvokeEvent } from "electron";
-import type { ImgString } from "@common/@types/electron-window.js";
-
 import { validateURL, getBasicInfo } from "ytdl-core";
 import { pathToFileURL } from "url";
-import { getInfo } from "ytdl-core";
 import { join } from "path";
-import { get } from "https";
 import {
 	BrowserWindow,
 	Notification,
@@ -24,7 +19,7 @@ import { logoPath } from "./utils.js";
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
 
-function createWindow() {
+async function createWindow() {
 	const window = new BrowserWindow({
 		title: capitalizedAppName,
 		titleBarStyle: "hidden",
@@ -52,11 +47,9 @@ function createWindow() {
 			label: "Refresh Page",
 			submenu: [
 				{
+					click: () => window.reload(),
 					accelerator: "f5",
 					role: "reload",
-					click() {
-						window.reload();
-					},
 				},
 			],
 		}),
@@ -66,13 +59,9 @@ function createWindow() {
 			label: "Open/close Dev Tools",
 			submenu: [
 				{
+					click: () => window.webContents.toggleDevTools(),
 					accelerator: "CommandOrControl+shift+i",
 					role: "toggleDevTools",
-					click() {
-						window.webContents.isDevToolsOpened()
-							? window.webContents.openDevTools()
-							: window.webContents.closeDevTools();
-					},
 				},
 			],
 		}),
@@ -85,85 +74,81 @@ function createWindow() {
 				join(__dirname, "vite-renderer-build", "index.html"),
 		  ).toString();
 
-	window.loadURL(url);
-
-	if (isDevelopment) window.webContents.openDevTools();
+	await window.loadURL(url);
 
 	return window;
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
-	electronWindow = createWindow();
-	tray = new Tray(nativeImage.createFromPath(logoPath));
-	tray.setToolTip("Music player and downloader");
-	tray.setTitle("Muse");
-
-	try {
-		const extendedClipboard = (await import("./clipboardExtended"))
-			.ExtendedClipboard as ClipboardExtended;
-
-		extendedClipboard
-			.on("text-changed", async () => {
-				const url = extendedClipboard.readText("clipboard");
-
-				if (validateURL(url)) {
-					try {
-						const {
-							videoDetails: { title, thumbnails },
-						} = await getBasicInfo(url);
-
-						const notification = new Notification({
-							title: "Click to download this video as 'mp3'",
-							timeoutType: "never",
-							urgency: "normal",
-							icon: logoPath,
-							silent: true,
-							body: title,
-						});
-
-						notification.on("click", () => {
-							console.log("Clicked notification!");
-
-							// Send msg to ipcRenderer:
-							electronWindow?.webContents.send("async-msg", {
-								type: NotificationEnum.DOWNLOAD_MEDIA,
-								params: {
-									imageURL: thumbnails.at(-1)?.url ?? "",
-									type: "download media",
-									canStartDownload: true,
-									title,
-									url,
-								},
-							});
-						});
-
-						notification.show();
-					} catch (error) {
-						console.error(error);
-					}
-				}
-			})
-			.startWatching();
-	} catch (error) {
-		console.error(error);
-	}
-
-	app.on("activate", () => {
+app
+	.on("window-all-closed", () => {
+		// Quit when all windows are closed, except on macOS. There, it's common
+		// for applications and their menu bar to stay active until the user quits
+		// explicitly with Cmd + Q.
+		if (process.platform !== "darwin") app.quit();
+	})
+	.on("activate", () => {
 		// On macOS it's common to re-create a window in the app when the
 		// dock icon is clicked and there are no other windows open.
 		if (BrowserWindow.getAllWindows().length === 0) createWindow();
-	});
+	})
+	.whenReady()
+	.then(async () => {
+		// This method will be called when Electron has finished
+		// initialization and is ready to create browser windows.
+		// Some APIs can only be used after this event occurs.
+		electronWindow = await createWindow();
+		tray = new Tray(nativeImage.createFromPath(logoPath));
+		tray.setToolTip("Music player and downloader");
+		tray.setTitle("Muse");
 
-	// Quit when all windows are closed, except on macOS. There, it's common
-	// for applications and their menu bar to stay active until the user quits
-	// explicitly with Cmd + Q.
-	app.on("window-all-closed", () => {
-		if (process.platform !== "darwin") app.quit();
+		try {
+			const extendedClipboard = (await import("./clipboardExtended"))
+				.ExtendedClipboard as ClipboardExtended;
+
+			extendedClipboard
+				.on("text-changed", async () => {
+					const url = extendedClipboard.readText("clipboard");
+
+					if (validateURL(url)) {
+						try {
+							const {
+								videoDetails: { title, thumbnails },
+							} = await getBasicInfo(url);
+
+							new Notification({
+								title: "Click to download this video as 'mp3'",
+								timeoutType: "never",
+								urgency: "normal",
+								icon: logoPath,
+								silent: true,
+								body: title,
+							})
+								.on("click", () => {
+									console.log("Clicked notification!");
+
+									// Send msg to ipcRenderer:
+									electronWindow?.webContents.send("async-msg", {
+										type: NotificationEnum.DOWNLOAD_MEDIA,
+										params: {
+											imageURL: thumbnails.at(-1)?.url ?? "",
+											type: "download media",
+											canStartDownload: true,
+											title,
+											url,
+										},
+									});
+								})
+								.show();
+						} catch (error) {
+							console.error(error);
+						}
+					}
+				})
+				.startWatching();
+		} catch (error) {
+			console.error(error);
+		}
 	});
-});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
@@ -174,7 +159,6 @@ ipcMain.on(
 		event,
 		object: Readonly<{
 			type: NotificationEnum;
-			msg?: string;
 		}>,
 	) => {
 		switch (object.type) {
@@ -184,9 +168,12 @@ ipcMain.on(
 			}
 
 			case NotificationEnum.MAXIMIZE: {
-				BrowserWindow.getFocusedWindow()?.isMaximized()
-					? BrowserWindow.getFocusedWindow()?.unmaximize()
-					: BrowserWindow.getFocusedWindow()?.maximize();
+				const focusedWindow = BrowserWindow.getFocusedWindow();
+				if (!focusedWindow) break;
+
+				focusedWindow.isMaximized()
+					? focusedWindow.unmaximize()
+					: focusedWindow.maximize();
 				break;
 			}
 
@@ -204,33 +191,6 @@ ipcMain.on(
 			}
 		}
 	},
-);
-
-ipcMain.handle(
-	"get-image",
-	async (
-		_event: IpcMainInvokeEvent,
-		url: string,
-	): Promise<ImgString | Error> => {
-		return new Promise((resolve, reject) => {
-			get(url, res => {
-				res.setEncoding("base64");
-
-				let body = `data:${res.headers["content-type"]};base64,`;
-
-				res.on("data", chunk => (body += chunk));
-				res.on("end", () => resolve(body as ImgString));
-			}).on("error", e => {
-				console.error(`Got error getting image on Electron side: ${e.message}`);
-				reject(e);
-			});
-		});
-	},
-);
-
-ipcMain.handle(
-	"get-info-ytdl",
-	async (_event: IpcMainInvokeEvent, url: string) => await getInfo(url),
 );
 
 // Also defining it here with all types required so typescript doesn't complain...
