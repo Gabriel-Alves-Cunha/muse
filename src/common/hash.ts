@@ -1,6 +1,6 @@
 const { imul } = Math;
 
-export function string2number(str: string, seed = 0): number {
+export function hash(str: string, seed = 0): number {
 	let h1 = 0xdeadbeef ^ seed;
 	let h2 = 0x41c6ce57 ^ seed;
 

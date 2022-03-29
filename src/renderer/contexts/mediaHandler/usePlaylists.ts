@@ -9,7 +9,7 @@ import merge from "deepmerge";
 import { push, remove, replace } from "@utils/array";
 import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { assertUnreachable } from "@utils/utils";
-import { string2number } from "@common/hash";
+import { hash } from "@common/hash";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
@@ -397,7 +397,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 								const newMediaWithCorrectIndex: Media = {
 									...action.media,
-									id: string2number(action.media.title),
+									id: hash(action.media.title),
 									index: oldMediaIndex,
 								};
 

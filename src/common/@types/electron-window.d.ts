@@ -62,8 +62,8 @@ export type MsgObject =
 	  }>;
 
 export type WriteTag = Readonly<{
+	albumArtists?: readonly string[];
 	genres?: readonly string[];
-	albumArtists?: string;
 	imageURL?: string;
 	album?: string;
 	title?: string;

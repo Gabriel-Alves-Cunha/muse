@@ -4,7 +4,6 @@ import type { Path } from "@common/@types/typesAndEnums";
 import { contextBridge } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
-import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { homeDir, dirs } from "./utils";
 import { dbg } from "@common/utils";
 import {
@@ -23,6 +22,7 @@ import {
 import {
 	sendNotificationToElectron,
 	receiveMsgFromElectron,
+	addListeners,
 } from "./preload/notificationApi";
 
 // Expose protected methods that allow the renderer process to use
@@ -50,57 +50,11 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 });
 
-// For window.twoWayComm_React_Electron:
-const addListeners = (port: MessagePort): Readonly<MessagePort> => {
-	port.onmessage = async event => {
-		const { data } = event;
-
-		console.log("At addListeners on file 'preload.ts', line 57:", data);
-
-		switch (data.type) {
-			case "write tag": {
-				// details: [mediaPath, whatToChange.whatToChange, value.trim()],
-				const [mediaPath, whatToChange, value] = data.details;
-
-				try {
-					console.assert(mediaPath, whatToChange, value);
-
-					await writeTags(mediaPath, { [whatToChange]: value });
-				} catch (error) {
-					console.error(error);
-				}
-				break;
-			}
-
-			// TODO: handle this and other cases from writeTag!
-			case ListenToNotification.ADD_ONE_MEDIA: {
-				break;
-			}
-
-			default: {
-				console.log(
-					"Message received on electron side of 2way-comm, but there is no function to handle it:",
-					data,
-				);
-				break;
-			}
-		}
-	};
-
-	return port;
-};
-
 window.onmessage = async event => {
+	const electronPort = event.ports[0];
+
 	switch (event.data) {
 		case "download media": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There is no message port to handle 'download media' event!",
-				);
-				break;
-			}
-
 			electronPort.onmessage = ({
 				data,
 			}: {
@@ -117,14 +71,6 @@ window.onmessage = async event => {
 		}
 
 		case "convert media": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There is no MessagePort to handle 'convert media' event!",
-				);
-				break;
-			}
-
 			electronPort.onmessage = ({
 				data,
 			}: {
@@ -152,19 +98,10 @@ window.onmessage = async event => {
 			});
 
 			await writeTags(details.mediaPath, data);
-
 			break;
 		}
 
 		case "async two way comm": {
-			const electronPort = event.ports[0];
-			if (!electronPort) {
-				console.error(
-					"There should be an electronPort for 2-way communication with React!",
-				);
-				break;
-			}
-
 			window.twoWayComm_React_Electron = addListeners(electronPort);
 
 			dbg({ twoWayComm_React_Electron: window.twoWayComm_React_Electron });

@@ -1,6 +1,6 @@
 import { assert, expect, it } from "vitest";
 
-import { string2number } from "@common/hash";
+import { hash } from "@common/hash";
 
 it("should produce (fast) a hash (integer) from a string", () => {
 	const testStrings = [
@@ -12,8 +12,8 @@ it("should produce (fast) a hash (integer) from a string", () => {
 	];
 
 	console.time("hashing");
-	const result1 = testStrings.map(str => string2number(str, 12913042));
-	const result2 = testStrings.map(str => string2number(str, 12913042));
+	const result1 = testStrings.map(str => hash(str, 12913042));
+	const result2 = testStrings.map(str => hash(str, 12913042));
 	console.timeEnd("hashing");
 
 	result1.forEach(res => assert(Number.isInteger(res)));

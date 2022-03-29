@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { faker } from "@faker-js/faker";
 
 import { formatDuration } from "@common/utils";
-import { string2number } from "@common/hash";
+import { hash } from "@common/hash";
 import { getRandomInt } from "@utils/utils";
 
 // Mocking `global.electron` before importing code that calls it:
@@ -98,15 +98,17 @@ const testList: Media[] = [];
 for (let index = 0; index < numberOfMedias; ++index) {
 	const title = faker.unique(faker.name.title);
 
-	testList.push({
+	const fakeMedia: Media = {
 		dateOfArival: faker.date.past().getTime(),
 		duration: formatDuration(index + 10),
 		path: `home/Music/test/${title}.mp3`,
-		id: string2number(title),
+		id: hash(title),
 		size: "3.0 MB",
 		title,
 		index,
-	});
+	};
+
+	testList.push(fakeMedia);
 }
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
@@ -327,7 +329,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 				dateOfArival: faker.date.past().getTime(),
 				path: `home/Music/test/${title}.mp3`,
 				duration: formatDuration(100 + 10),
-				id: string2number(title),
+				id: hash(title),
 				size: "3.0 MB",
 				index: 100,
 				title,
@@ -379,9 +381,9 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		it("(PlaylistActions.REFRESH_ONE_MEDIA_BY_ID) should refresh one media (the caller should not update the media id, it will be updated, if needed, when calling PlaylistActions.REFRESH_ONE_MEDIA_BY_ID).", () => {
 			const prevMediaList = getPlaylist(MEDIA_LIST)!.list;
 			const title = "I'm an updated title";
-			const size = "1.0 MB";
+			const size = "1.0 MB" as const;
 			const index = 15;
-			const mediaToBeRefreshed = {
+			const mediaToBeRefreshed: Media = {
 				...prevMediaList[index],
 				index: 3290,
 				title,

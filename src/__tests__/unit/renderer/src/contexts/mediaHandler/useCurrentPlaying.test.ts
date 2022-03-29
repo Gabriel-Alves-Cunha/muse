@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { faker } from "@faker-js/faker";
 
 import { formatDuration } from "@common/utils";
-import { string2number } from "@common/hash";
+import { hash } from "@common/hash";
 
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
@@ -102,7 +102,7 @@ for (let index = 0; index < numberOfMedias; ++index) {
 		dateOfArival: faker.date.past().getTime(),
 		duration: formatDuration(index + 10),
 		path: `home/Music/test/${title}.mp3`,
-		id: string2number(title),
+		id: hash(title),
 		size: "3.0 MB",
 		title,
 		index,

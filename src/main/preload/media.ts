@@ -21,8 +21,8 @@ import sanitize from "sanitize-filename";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
-import { string2number } from "@common/hash";
 import { prettyBytes } from "@common/prettyBytes";
+import { hash } from "@common/hash";
 import { dirs } from "../utils";
 import { dbg } from "@common/utils";
 import {
@@ -97,7 +97,7 @@ const createMedia = async (
 			artist: albumArtists[0] ?? "",
 			dateOfArival: Date.now(),
 			title: title ?? basename,
-			id: string2number(path),
+			id: hash(path),
 			genres,
 			album,
 			index,
@@ -137,12 +137,12 @@ export async function transformPathsToMedias(
 	return medias;
 }
 
-export type HandleDownload = {
+export type HandleDownload = Readonly<{
 	electronPort: Readonly<MessagePort>;
 	imageURL: Readonly<string>;
 	title: Readonly<string>;
 	url: Readonly<string>;
-};
+}>;
 
 export function handleCreateOrCancelDownload({
 	electronPort,
@@ -398,8 +398,8 @@ export function convertToAudio({
 
 export async function writeTags(
 	mediaPath: Readonly<Path>,
-	data: Readonly<WriteTag & { isNewMedia?: boolean }>,
-) {
+	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean }>,
+): Promise<void> {
 	const file = MediaFile.createFromPath(mediaPath);
 	dbg({ data });
 
@@ -413,10 +413,12 @@ export async function writeTags(
 						// if imageURL === 'erase img' => erase img so we don't keep
 						// getting an error on the browser.
 						file.tag.pictures = [];
-					} else if (data.imageURL) {
+					} else if (data.downloadImg) {
 						dbg("Downloading picture...");
 						try {
-							const imgAsString: ImgString = await getThumbnail(data.imageURL);
+							const imgAsString: ImgString = await getThumbnail(
+								data.imageURL as string,
+							);
 
 							const txtForByteVector = imgAsString.slice(
 								imgAsString.indexOf(",") + 1,
@@ -445,6 +447,35 @@ export async function writeTags(
 								error,
 							);
 						}
+					} else {
+						// Assume we received an img as a base64 string like: `data:${string};base64,${string}`.
+						if (
+							data.imageURL?.includes("data:image/") &&
+							data.imageURL?.includes("base64,")
+						) {
+							const imgAsString = data.imageURL as string;
+							const txtForByteVector = imgAsString.slice(
+								imgAsString.indexOf(",") + 1,
+								imgAsString.length,
+							);
+							const mimeType = imgAsString.slice(
+								imgAsString.indexOf(":") + 1,
+								imgAsString.indexOf(";"),
+							);
+
+							const picture = Picture.fromData(
+								ByteVector.fromString(txtForByteVector, StringType.Latin1),
+							);
+							picture.description =
+								"This image was download when this media downloaded.";
+							picture.filename = `${getBasename(mediaPath)}`;
+							picture.type = PictureType.Media;
+							picture.mimeType = mimeType;
+
+							file.tag.pictures = [picture];
+
+							console.log({ fileTagPictures: file.tag.pictures, picture });
+						} else console.error("Invalid imageURL! imageURL =", data.imageURL);
 					}
 
 					break;
@@ -453,39 +484,36 @@ export async function writeTags(
 				case "albumArtists": {
 					dbg("On 'albumArtists' branch.", { value });
 
-					const artists = (value as string).split(",");
+					const artists = value as string[];
 					file.tag.albumArtists = artists;
 
-					console.log(
-						`file.tag.albumArtists = ${file.tag.albumArtists}\n${{ artists }}`,
-					);
+					console.log(`file.tag.albumArtists = "${file.tag.albumArtists}"`, {
+						artists,
+					});
 
 					break;
 				}
 
 				case "title": {
-					dbg("On 'title' branch.", { value });
+					const sanitizedTitle = sanitize(value as string);
+					dbg("On 'title' branch.", { value: sanitizedTitle });
 
 					const oldPath = mediaPath;
 					const newPath = join(
 						dirname(oldPath),
-						sanitize(value + "." + getLastExtension(oldPath)),
+						sanitizedTitle + "." + getLastExtension(oldPath),
 					);
 
-					file.tag.title = value as string;
+					file.tag.title = sanitizedTitle;
 
 					console.log({ oldPath, newPath });
 
-					if (getBasename(oldPath) === value) break;
+					if (getBasename(oldPath) === sanitizedTitle) break;
+
 					fileNewPath = newPath;
 
-					try {
-						dbg("Renaming file...");
-						await renameFile(oldPath, newPath);
-					} catch (error) {
-						console.error(error);
-					}
-
+					dbg("Renaming file...");
+					await renameFile(oldPath, newPath);
 					break;
 				}
 
@@ -513,7 +541,7 @@ export async function writeTags(
 		if (fileNewPath) {
 			// Since media has a new path, create a new media
 			console.log("Adding new media:", {
-				msg: "Since media has a new path, create a new media.",
+				msg: "Since media has a new path, create a new media...",
 				type: "ListenToNotification.ADD_MEDIA",
 				path: fileNewPath,
 			});
@@ -524,8 +552,8 @@ export async function writeTags(
 
 			// and remove old one
 			console.log("Removing old media:", {
-				type: "ListenToNotification.REMOVE_MEDIA",
 				msg: "and remove old one.",
+				type: "ListenToNotification.REMOVE_MEDIA",
 				path: mediaPath,
 			});
 			window.twoWayComm_React_Electron?.postMessage({
