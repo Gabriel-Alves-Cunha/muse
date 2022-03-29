@@ -5,8 +5,8 @@ import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "stream";
 
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
+import { createReadStream, existsSync } from "fs";
 import { rename as renameFile } from "fs/promises";
-import { createReadStream } from "fs";
 import { dirname, join } from "path";
 import { get } from "https";
 import {
@@ -487,7 +487,7 @@ export async function writeTags(
 					const artists = value as string[];
 					file.tag.albumArtists = artists;
 
-					console.log(`file.tag.albumArtists = "${file.tag.albumArtists}"`, {
+					console.log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
 						artists,
 					});
 
@@ -496,7 +496,6 @@ export async function writeTags(
 
 				case "title": {
 					const sanitizedTitle = sanitize(value as string);
-					dbg("On 'title' branch.", { value: sanitizedTitle });
 
 					const oldPath = mediaPath;
 					const newPath = join(
@@ -506,14 +505,13 @@ export async function writeTags(
 
 					file.tag.title = sanitizedTitle;
 
-					console.log({ oldPath, newPath });
+					console.log({ value });
 
 					if (getBasename(oldPath) === sanitizedTitle) break;
 
-					fileNewPath = newPath;
+					console.log({ oldPath, newPath });
 
-					dbg("Renaming file...");
-					await renameFile(oldPath, newPath);
+					fileNewPath = newPath;
 					break;
 				}
 
@@ -539,29 +537,49 @@ export async function writeTags(
 		console.error(error);
 	} finally {
 		if (fileNewPath) {
-			// Since media has a new path, create a new media
-			console.log("Adding new media:", {
-				msg: "Since media has a new path, create a new media...",
-				type: "ListenToNotification.ADD_MEDIA",
-				path: fileNewPath,
-			});
-			window.twoWayComm_React_Electron?.postMessage({
-				type: ListenToNotification.ADD_ONE_MEDIA,
-				path: fileNewPath,
-			});
+			try {
+				await renameFile(mediaPath, fileNewPath);
 
-			// and remove old one
-			console.log("Removing old media:", {
-				msg: "and remove old one.",
-				type: "ListenToNotification.REMOVE_MEDIA",
-				path: mediaPath,
-			});
-			window.twoWayComm_React_Electron?.postMessage({
-				type: ListenToNotification.REMOVE_ONE_MEDIA,
-				path: mediaPath,
-			});
+				// Since media has a new path, create a new media...
+				console.log("Adding new media:", {
+					msg: "Since media has a new path, create a new media...",
+					type: "ListenToNotification.ADD_MEDIA",
+					path: fileNewPath,
+				});
+				window.twoWayComm_React_Electron?.postMessage({
+					type: ListenToNotification.ADD_ONE_MEDIA,
+					path: fileNewPath,
+				});
+
+				// and remove old one
+				console.log("Removing old media:", {
+					msg: "and remove old one.",
+					type: "ListenToNotification.REMOVE_MEDIA",
+					path: mediaPath,
+				});
+				window.twoWayComm_React_Electron?.postMessage({
+					type: ListenToNotification.REMOVE_ONE_MEDIA,
+					path: mediaPath,
+				});
+			} catch (error) {
+				console.error(error);
+
+				// Just refresh media:
+				console.log({
+					type: "ListenToNotification.REFRESH_MEDIA",
+					path: mediaPath,
+					fileNewPath,
+				});
+				window.twoWayComm_React_Electron?.postMessage({
+					type: ListenToNotification.REFRESH_ONE_MEDIA,
+					path: mediaPath,
+				});
+			} finally {
+				console.log("Was file renamed?", existsSync(fileNewPath));
+				console.log("Does old file remains?", existsSync(mediaPath));
+			}
 		} else if (data.isNewMedia) {
-			// Add media
+			// Add media:
 			console.log({
 				type: "ListenToNotification.ADD_ONE_MEDIA",
 				path: mediaPath,
@@ -571,7 +589,7 @@ export async function writeTags(
 				path: mediaPath,
 			});
 		} else {
-			// refresh media
+			// Refresh media:
 			console.log({
 				type: "ListenToNotification.REFRESH_MEDIA",
 				path: mediaPath,
@@ -585,7 +603,7 @@ export async function writeTags(
 	}
 }
 
-const getThumbnail = async (url: string): Promise<ImgString> =>
+export const getThumbnail = async (url: string): Promise<ImgString> =>
 	new Promise((resolve, reject) => {
 		get(url, res => {
 			res.setEncoding("base64");

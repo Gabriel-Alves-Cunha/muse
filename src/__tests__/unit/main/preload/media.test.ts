@@ -1,15 +1,12 @@
+import type { ImgString } from "@common/@types/electron-window";
+
 import { readFile, rename as renameFile } from "fs/promises";
 import { describe, expect, it, vi } from "vitest";
+import { File as MediaFile } from "node-taglib-sharp";
 import { resolve } from "path";
-import {
-	File as MediaFile,
-	// PictureType,
-	// ByteVector,
-	// StringType,
-	// Picture,
-} from "node-taglib-sharp";
 
-// Getting everything ready for the tests
+// Getting everything ready for the tests...
+
 import { addListeners } from "@main/preload/notificationApi";
 
 // Mocking `global.electron` before importing code that calls it:
@@ -54,8 +51,7 @@ global.window = {
 	twoWayComm_React_Electron: addListenersForReactSide(reactPort),
 };
 
-import { writeTags } from "@main/preload/media";
-import { ImgString } from "@common/@types/electron-window";
+import { getThumbnail, writeTags } from "@main/preload/media";
 
 const originalTitle = "audio for tests" as const;
 const mediaPath = resolve(
@@ -67,7 +63,7 @@ const mediaPath = resolve(
 	`${originalTitle}.mp3`,
 );
 
-console.log({ mediaPath });
+// console.log({ mediaPath });
 
 // data: Readonly<Readonly<{
 //     albumArtists?: readonly string[];
@@ -80,7 +76,39 @@ console.log({ mediaPath });
 //     isNewMedia?: boolean;
 // }>
 
-describe("It should account for the switch possibilities and the message sending. #writeTags()", async () => {
+/////////////////////////////////////////////////////////
+// Testing #writeTags()
+/////////////////////////////////////////////////////////
+
+describe("It should account for the switch possibilities and the message sending. #writeTags()", () => {
+	it("Should be able to write the tag 'title' to a file and change it's basename.", async () => {
+		// This test will change the basename of the file, that's why, at the end, we change it back.
+
+		const changedData = Object.freeze({ title: "test title" as const });
+		const changedPath = resolve(
+			__dirname,
+			"..",
+			"..",
+			"..",
+			"test_assets",
+			`${changedData.title}.mp3`,
+		);
+
+		// Changing the title and basename of the file:
+		await writeTags(mediaPath, changedData);
+
+		// Here, the file is renamed and the title is changed.
+		const {
+			tag: { title: changedTitle },
+		} = MediaFile.createFromPath(changedPath);
+
+		// Assuring that the title and basename are changed:
+		expect(changedTitle).toBe(changedData.title);
+
+		// Changing the title and basename of the file back:
+		await renameFile(changedPath, mediaPath);
+	});
+
 	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
 		const data = Object.freeze({ albumArtists: ["Test Artist"] as const });
 
@@ -93,36 +121,6 @@ describe("It should account for the switch possibilities and the message sending
 		expect(albumArtists).toEqual(data.albumArtists);
 	});
 
-	it("Should be able to write the tag 'title' to a file.", async () => {
-		// This test will change the basename of the file, that's why, at the end, we change it back.
-
-		const changedData = Object.freeze({ title: "Test Title" as const });
-		const changedPath = resolve(
-			__dirname,
-			"..",
-			"..",
-			"..",
-			"test_assets",
-			`${changedData.title}.mp3`,
-		);
-
-		try {
-			// Changing the title and basename of the file:
-			await writeTags(mediaPath, changedData);
-
-			// Here, the file is renamed and the title is changed.
-			const {
-				tag: { title: changedTitle },
-			} = MediaFile.createFromPath(changedPath);
-
-			// Assuring that the title and basename are changed:
-			expect(changedTitle).toEqual(changedData.title);
-		} finally {
-			// Let's get back to original title/basename:
-			await renameFile(changedPath, mediaPath);
-		}
-	});
-
 	it("Should be able to write the tag 'album' to a file.", async () => {
 		const data = Object.freeze({ album: "Test Album" as const });
 
@@ -133,6 +131,18 @@ describe("It should account for the switch possibilities and the message sending
 		} = MediaFile.createFromPath(mediaPath);
 
 		expect(album).toBe(data.album);
+	});
+
+	it("Should be able erase the tag 'pictures' of file.", async () => {
+		const data = Object.freeze({ imageURL: "erase img" as const });
+
+		await writeTags(mediaPath, data);
+
+		const {
+			tag: { pictures },
+		} = MediaFile.createFromPath(mediaPath);
+
+		expect(pictures.length).toBe(0);
 	});
 
 	it("Should be able to write the tag 'imageURL' to a file.", async () => {
@@ -160,3 +170,16 @@ describe("It should account for the switch possibilities and the message sending
 		expect(pictures[0].data.toString()).toBe(imgContents);
 	});
 });
+
+/////////////////////////////////////////////////////////
+// Testing #getThumbnail()
+/////////////////////////////////////////////////////////
+
+// describe("Testing #getThumbnail()", () => {
+// 	it("should get a response like: 'data:${res.headers['content-type']};base64,'", async () => {
+// 		// const imgAsString = await getThumbnail();
+
+// 		expect(imgAsString).includes("data:image/png");
+// 		expect(imgAsString).includes(";base64,");
+// 	});
+// });
