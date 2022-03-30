@@ -48,7 +48,7 @@ const createMedia = async (
 	assureMediaSizeIsGreaterThan60KB: boolean,
 	ignoreMediaWithLessThan60Seconds: boolean,
 ): Promise<Media> =>
-	new Promise(resolve => {
+	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 		console.time(`Nº ${index}, "${basename}" took`);
 
@@ -63,17 +63,17 @@ const createMedia = async (
 		const duration = durationMilliseconds / 1_000;
 
 		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
-			console.log(
-				`Skipping "${path}" because time is ${duration} seconds (< 60 seconds)!`,
+			console.info(
+				`Skipping "${path}" because the duration is ${duration} seconds (< 60 seconds)!`,
 			);
-			return undefined;
+			reject(undefined);
 		}
 
 		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
-			console.log(
+			console.info(
 				`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
 			);
-			return undefined;
+			reject(undefined);
 		}
 
 		const picture: IPicture | undefined = pictures[0];
