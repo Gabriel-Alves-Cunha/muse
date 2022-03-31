@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const OptionsModalWrapper = styled("div", {
 	display: "flex",
@@ -8,7 +8,7 @@ export const OptionsModalWrapper = styled("div", {
 	maxHeight: 400,
 	maxWidth: 320,
 
-	backgroundColor: theme.colors.bgNav,
+	backgroundColor: color("bgNav"),
 	borderRadius: 10,
 
 	overflowX: "hidden",
@@ -60,7 +60,7 @@ export const Option = styled("button", {
 	cursor: "text",
 
 	"&::selection": {
-		background: "#aa00ff", // theme.colors.accent,
+		background: "#aa00ff", // color("accent"),
 		color: "#fff",
 	},
 
@@ -81,7 +81,7 @@ export const Option = styled("button", {
 		color: "#8e8e8e",
 
 		"&::selection": {
-			background: "#aa00ff; // theme.colors.accen",
+			background: "#aa00ff; // color("accen")",
 			color: "#fff",
 		},
 	},

@@ -9,7 +9,7 @@ import {
 
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@utils/app";
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 const themeKey = `${keyPrefix}theme` as const;
 
@@ -46,7 +46,7 @@ const Button = styled("button", {
 	justifyContent: "center",
 
 	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
-	backgroundColor: theme.colors.accent,
+	backgroundColor: color("accent"),
 	border: "none",
 	color: "white",
 	zIndex: 10,

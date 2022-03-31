@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Wrapper = styled("section", {
 	display: "flex",
@@ -188,7 +188,7 @@ export const Button = styled("button", {
 	fontSize: "1rem",
 	padding: 10,
 
-	backgroundColor: theme.colors.bgNav,
+	backgroundColor: color("bgNav"),
 	boxShadow: "$small",
 	cursor: "pointer",
 	color: "black",

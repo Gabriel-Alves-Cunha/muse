@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Img = styled("div", {
 	display: "flex",
@@ -44,7 +44,7 @@ export const Info = styled("div", {
 
 export const Title = styled("p", {
 	fontFamily: "$fontFamily",
-	color: theme.colors.text,
+	color: color("text"),
 	letterSpacing: "0.03em",
 	fontSize: "1rem",
 	fontWeight: 500,
@@ -69,7 +69,7 @@ export const Title = styled("p", {
 
 export const SubTitle = styled("p", {
 	fontFamily: "$fontFamily",
-	color: theme.colors.grayText,
+	color: color("grayText"),
 	letterSpacing: "0.03em",
 	fontSize: "0.8em",
 	fontWeight: 500,
@@ -156,7 +156,7 @@ export const RowWrapper = styled("div", {
 
 		background: "white",
 
-		outline: `3px solid ${theme.colors.bgCentral}`,
+		outline: `3px solid ${color("bgCentral")}`,
 		outlineOffset: -3,
 	},
 });
@@ -188,13 +188,13 @@ export const InputWrapper = styled("div", {
 	borderRadius: 7,
 
 	"&::selection": {
-		background: "#aa00ff; // ${theme.colors.accent}",
+		background: "#aa00ff; // ${color("accent")}",
 		color: "#ffffff",
 	},
 
 	input: {
 		"&::selection": {
-			background: "#aa00ff; // ${theme.colors.accent}",
+			background: "#aa00ff; // ${color("accent")}",
 			color: "#ffffff",
 		},
 

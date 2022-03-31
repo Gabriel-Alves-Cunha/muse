@@ -27,7 +27,10 @@ export function App() {
 					height: "100vh",
 					width: "100vw",
 
-					transition: "all 1s cubic-bezier(0.4, 0.0, 0.2, 1)",
+					transitionTimingFunction: "cubic-bezier(0.4, 0.0, 0.2, 1)",
+					transitionDuration: "1s",
+					transitionProperty:
+						"box-shadow, caret-color, color, outline-color, accent-color, background-color, border-color, text-color, scrollbar-color",
 				}}
 			>
 				<Decorations />

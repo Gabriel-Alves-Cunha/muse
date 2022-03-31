@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Wrapper = styled("div", {
 	display: "flex",
@@ -19,14 +19,14 @@ export const Wrapper = styled("div", {
 
 		letterSpacing: "$letterSpacing",
 		fontFamily: "$fontFamily",
-		color: theme.colors.text,
+		color: color("text"),
 		fontSize: "1.1rem",
 		fontWeight: 500,
 
-		border: `1px solid ${theme.colors.navButtonHoveredColor}`,
+		border: `1px solid ${color("navButtonHoveredColor")}`,
 
 		"&:hover": {
-			backgroundColor: theme.colors.navButtonHoveredColor,
+			backgroundColor: color("navButtonHoveredColor"),
 			transition: "background-color 0.15s ease-in-out",
 			cursor: "pointer",
 			color: "white",

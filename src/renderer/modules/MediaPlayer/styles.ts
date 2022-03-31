@@ -1,7 +1,7 @@
 import { styled } from "@styles/global";
 
 import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Wrapper = styled("div", {
 	position: "absolute",
@@ -15,7 +15,7 @@ export const Wrapper = styled("div", {
 	zIndex: 30,
 	right: 0,
 
-	backgroundColor: theme.colors.accentLight,
+	backgroundColor: color("accentLight"),
 	padding: "1rem",
 	border: "none",
 });
@@ -61,7 +61,7 @@ export const Info = styled("div", {
 
 		"&.title": {
 			fontFamily: "$fontFamily",
-			color: theme.colors.text,
+			color: color("text"),
 			letterSpacing: "0.03em",
 			fontSize: "1.1rem",
 			fontWeight: 500,
@@ -70,7 +70,7 @@ export const Info = styled("div", {
 		},
 
 		"&.subtitle": {
-			color: theme.colors.grayText,
+			color: color("grayText"),
 			fontFamily: "$fontFamily",
 			letterSpacing: "0.03em",
 			fontSize: "0.9rem",
@@ -92,7 +92,7 @@ export const SeekerContainer = styled("div", {
 	marginTop: "5vh",
 
 	span: {
-		color: theme.colors.grayText,
+		color: color("grayText"),
 		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		textAlign: "center",

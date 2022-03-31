@@ -1,6 +1,10 @@
 import { createStitches } from "@stitches/react";
 
-import { theme } from "./theme";
+import {
+	darkColorsAsCSSVariables,
+	lightColorsAsCSSVariables,
+	color,
+} from "./theme";
 
 export const { styled, globalCss, keyframes } = createStitches({
 	media: {
@@ -21,8 +25,8 @@ export const { styled, globalCss, keyframes } = createStitches({
 		},
 		fonts: {
 			fontFamily: "'Assistant', sans-serif",
-			color: theme.colors.text,
 			letterSpacing: "0.03em",
+			color: color("text"),
 			fontSize: "1rem",
 		},
 	},
@@ -70,61 +74,59 @@ export const GlobalCSS = globalCss({
 				boxShadow: "0 0 0 9999px #212121",
 			},
 		},
-
-		/* Make a vertical red line at the middle */
-		/* height: 100vh,
-		background: linear-gradient(red, red) no-repeat center/1px 100%, */
 	},
 
 	html: {
 		overflow: "hidden",
 
-		"[data-theme='light']": {
-			"--nav-button-hovered-color": "#25306c",
-			"--nav-button-active-color": "white",
-			"--nav-button-hovered-bg": "#c9c2f9",
-			"--nav-button-active-bg": "#c1bbec",
-			"--deactivated-icon": "#a8a8a8",
-			"--button-hovered": "#E5E5E5",
-			"--accent-alpha": "#aa00ff26",
-			"--accent-light": "#f1d4ff",
-			"--button-border": "black",
-			"--bg-central": "#f2f3f7",
-			"--active-icon": "black",
-			"--secondary": "#edecf8",
-			"--gray-text": "#8e8e8e",
-			"--black-text": "black",
-			"--box-shadow": "#ccc",
-			"--accent": "#aa00ff",
-			"--bg-nav": "#edecf8",
-			"--text": "#00525e",
-			"--primary": "",
-		},
+		"[data-theme='light']": lightColorsAsCSSVariables,
+		// "[data-theme='light']": {
+		// 	"--nav-button-hovered-color": "#25306c",
+		// 	"--nav-button-active-color": "white",
+		// 	"--nav-button-hovered-bg": "#c9c2f9",
+		// 	"--nav-button-active-bg": "#c1bbec",
+		// 	"--deactivated-icon": "#a8a8a8",
+		// 	"--button-hovered": "#E5E5E5",
+		// 	"--accent-alpha": "#aa00ff26",
+		// 	"--accent-light": "#f1d4ff",
+		// 	"--button-border": "black",
+		// 	"--bg-central": "#f2f3f7",
+		// 	"--active-icon": "black",
+		// 	"--secondary": "#edecf8",
+		// 	"--gray-text": "#8e8e8e",
+		// 	"--black-text": "black",
+		// 	"--box-shadow": "#ccc",
+		// 	"--accent": "#aa00ff",
+		// 	"--bg-nav": "#edecf8",
+		// 	"--text": "#00525e",
+		// 	"--primary": "",
+		// },
 
-		"[data-theme='dark']": {
-			"--nav-button-hovered-color": "black",
-			"--nav-button-active-color": "black",
-			"--nav-button-hovered-bg": "black",
-			"--nav-button-active-bg": "black",
-			"--deactivated-icon": "#a8a8a8",
-			"--accent-alpha": "#aa00ff99",
-			"--button-hovered": "#E5E5E5",
-			"--accent-light": "#dd99ff",
-			"--button-border": "white",
-			"--active-icon": "white",
-			"--bg-central": "black",
-			"--black-text": "black",
-			"--secondary": "black",
-			"--gray-text": "black",
-			"--box-shadow": "#000",
-			"--primary": "black",
-			"--accent": "black",
-			"--bg-nav": "black",
-			"--text": "black",
-		},
+		"[data-theme='dark']": darkColorsAsCSSVariables,
+		// "[data-theme='dark']": {
+		// 	"--nav-button-hovered-color": "black",
+		// 	"--nav-button-active-color": "black",
+		// 	"--nav-button-hovered-bg": "black",
+		// 	"--nav-button-active-bg": "black",
+		// 	"--deactivated-icon": "#a8a8a8",
+		// 	"--accent-alpha": "#aa00ff99",
+		// 	"--button-hovered": "#E5E5E5",
+		// 	"--accent-light": "#dd99ff",
+		// 	"--button-border": "white",
+		// 	"--active-icon": "white",
+		// 	"--bg-central": "black",
+		// 	"--black-text": "black",
+		// 	"--secondary": "black",
+		// 	"--gray-text": "black",
+		// 	"--box-shadow": "#000",
+		// 	"--primary": "black",
+		// 	"--accent": "black",
+		// 	"--bg-nav": "black",
+		// 	"--text": "black",
+		// },
 
 		"::selection": {
-			background: theme.colors.accent,
+			background: color("accent"),
 			color: "white",
 		},
 

@@ -1,7 +1,8 @@
 import type { ReactNode, ComponentProps } from "react";
 
 import { styled } from "@styles/global";
-import { theme } from "@styles/theme";
+
+import { color } from "@styles/theme";
 
 type Props = ComponentProps<typeof ButtonStyled> & {
 	children?: ReactNode;
@@ -17,13 +18,13 @@ const ButtonStyled = styled("button", {
 	justifyContent: "center",
 	size: 22,
 
-	border: `1px solid ${theme.colors.buttonBorder}`,
+	border: `1px solid ${color("buttonBorder")}`,
 	backgroundColor: "transparent",
 	borderRadius: 10,
 	padding: 2,
 
 	"&:hover": {
-		backgroundColor: theme.colors.buttonHovered,
+		backgroundColor: color("buttonHovered"),
 	},
 });
 

@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Bar = styled("progress", {
 	appearance: "none",
@@ -11,7 +11,7 @@ export const Bar = styled("progress", {
 	height: 3,
 
 	"&[value]::-webkit-progress-value": {
-		backgroundColor: theme.colors.accent,
+		backgroundColor: color("accent"),
 	},
 
 	"&[value]::-webkit-progress-bar": {

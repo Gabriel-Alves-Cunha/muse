@@ -1,14 +1,14 @@
 import { styled, keyframes } from "@styles/global";
 
 import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
-import { theme } from "./theme";
+import { color } from "./theme";
 
 export const Content = styled("div", {
 	display: "flex",
 	position: "relative",
 	flexDirection: "row",
 
-	backgroundColor: theme.colors.bgCentral,
+	backgroundColor: color("bgCentral"),
 	marginTop: DECORATIONS_HEADER_HEIGHT,
 });
 
@@ -43,7 +43,7 @@ const AnimStyle = styled("div", {
 
 	"&.lds-ripple div": {
 		position: "absolute",
-		border: `3px solid ${theme.colors.accent}`,
+		border: `3px solid ${color("accent")}`,
 		borderRadius: "50%",
 		opacity: 1,
 

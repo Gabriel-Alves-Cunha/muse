@@ -1,6 +1,6 @@
 import { styled, keyframes } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Wrapper = styled("header", {
 	display: "flex",
@@ -130,7 +130,7 @@ export const SearchResultsWrapper = styled("section", {
 	marginTop: 30,
 	zIndex: 10,
 
-	backgroundColor: theme.colors.secondary,
+	backgroundColor: color("secondary"),
 	boxShadow: "$medium",
 
 	"&.list": {
@@ -170,7 +170,7 @@ export const Result = styled("button", {
 
 	width: "95% !important",
 
-	backgroundColor: theme.colors.secondary,
+	backgroundColor: color("secondary"),
 	margin: "10px !important",
 	borderRadius: 7,
 
@@ -191,7 +191,7 @@ export const NothingFound = styled("div", {
 
 	width: "95% !important",
 
-	backgroundColor: theme.colors.secondary,
+	backgroundColor: color("secondary"),
 	margin: "10px !important",
 	borderRadius: 7,
 });

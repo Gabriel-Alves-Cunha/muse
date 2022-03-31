@@ -17,7 +17,7 @@ import create from "zustand";
 
 import { ImgWithFallback } from "@components";
 import { formatDuration } from "@common/utils";
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 import {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
@@ -173,7 +173,7 @@ function SeekerWrapper({
 			<ProgressWrapper onClick={seek} id="goto">
 				<div
 					style={{
-						backgroundColor: theme.colors.accent,
+						backgroundColor: color("accent"),
 						width: `${percentage}%`,
 						position: "relative",
 						height: 3,
@@ -183,7 +183,7 @@ function SeekerWrapper({
 				>
 					<div
 						style={{
-							border: `1px solid ${theme.colors.accent}`,
+							border: `1px solid ${color("accent")}`,
 							animation: "move 1s linear infinite",
 							transform: "translate(0, -25%)",
 							position: "absolute",

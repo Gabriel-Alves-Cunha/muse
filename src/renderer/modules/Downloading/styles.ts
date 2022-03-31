@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-import { theme } from "@styles/theme";
+import { color } from "@styles/theme";
 
 export const Circle = styled("div", {
 	display: "flex",
@@ -17,7 +17,7 @@ export const Circle = styled("div", {
 	height: 40,
 	width: 40,
 
-	backgroundColor: theme.colors.bgNav,
+	backgroundColor: color("bgNav"),
 	boxShadow: "$small",
 
 	"&:hover": {
@@ -42,7 +42,7 @@ export const Popup = styled("div", {
 	padding: "1rem",
 	zIndex: 500,
 
-	backgroundColor: theme.colors.bgCentral,
+	backgroundColor: color("bgCentral"),
 	boxShadow: "$small",
 
 	/* width */
