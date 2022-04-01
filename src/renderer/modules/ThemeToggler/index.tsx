@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import { useEffect } from "react";
-import { styled } from "@styles/global";
 import {
 	MdLightbulbOutline as Light,
 	MdLightbulb as Dark,
@@ -9,7 +5,9 @@ import {
 
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@utils/app";
+import { styled } from "@styles/global";
 import { color } from "@styles/theme";
+import { useEffect } from "react";
 
 const themeKey = `${keyPrefix}theme` as const;
 
@@ -21,13 +19,14 @@ export function ThemeToggler() {
 	const nextTheme = theme === "light" ? "dark" : "light";
 
 	useEffect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		document.getElementById("root")!.dataset.theme = theme;
-
-		setTheme(theme);
-	}, [setTheme, theme]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handleClick = () => {
-		document.getElementById("wave")!.classList.toggle("active");
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		document.getElementById("root")!.dataset.theme = nextTheme;
 
 		setTheme(nextTheme);
 	};
@@ -40,26 +39,21 @@ export function ThemeToggler() {
 }
 
 const Button = styled("button", {
-	position: "absolute",
-	display: "flex",
-	alignItems: "center",
+	display: "flex", // row
 	justifyContent: "center",
+	alignItems: "center",
 
 	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
 	backgroundColor: color("accent"),
+	cursor: "pointer",
 	border: "none",
 	color: "white",
-	zIndex: 10,
 	size: 40,
 
-	marginBottom: "2.5rem",
-	marginTop: "2rem",
-	marginLeft: 12,
-
-	transition: "transform .2s ease-in-out",
+	transition: "$scale",
 
 	"&:hover": {
-		transition: "transform .2s ease-in-out",
+		transition: "$scale",
 		transform: "scale(1.2)",
 	},
 });

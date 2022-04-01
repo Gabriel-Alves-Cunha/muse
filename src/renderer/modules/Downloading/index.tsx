@@ -1,5 +1,10 @@
+import {
+	MdDownloading as DownloadingIcon,
+	MdClose as Close,
+} from "react-icons/md";
 import { useCallback, useEffect, useReducer, useRef } from "react";
-import { AiOutlineClose as Cancel } from "react-icons/ai";
+import { Popover } from "@radix-ui/react-popover";
+import { FcCancel as Cancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import create from "zustand";
 
@@ -8,27 +13,35 @@ import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
-import { Progress, icon } from "@components/Progress";
+import { Progress } from "@components/Progress";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 
-import { Circle, Popup, Title } from "./styles";
+import {
+	Circle,
+	Popup,
+	Title,
+	StyledPopoverTrigger,
+	StyledContent,
+	StyledArrow,
+	StyledClose,
+} from "./styles";
 
-const { port1: testPort } = new MessageChannel();
-const testDownloadingMedia: DownloadingMedia = Object.freeze({
-	status: ProgressStatus.ACTIVE,
-	url: "http://test.com",
-	isDownloading: true,
-	percentage: 50,
-	port: testPort,
-	title: "test",
-	imageURL: "",
-	index: 0,
-});
+// const { port1: testPort } = new MessageChannel();
+// const testDownloadingMedia: DownloadingMedia = Object.freeze({
+// 	status: ProgressStatus.ACTIVE,
+// 	url: "http://test.com",
+// 	isDownloading: true,
+// 	percentage: 50,
+// 	port: testPort,
+// 	title: "test",
+// 	imageURL: "",
+// 	index: 0,
+// } as const);
 
 const useDownloadingList = create<{
 	downloadingList: readonly DownloadingMedia[];
 }>(() => ({
-	downloadingList: [testDownloadingMedia],
+	downloadingList: [], // [testDownloadingMedia],
 }));
 
 const { setState: setDownloadingList } = useDownloadingList;
@@ -38,12 +51,12 @@ function useDownloading() {
 	const { downloadValues } = useDownloadValues();
 
 	const cancelDownloadAndOrRemoveItFromList = useCallback(
-		(url_: string) => {
+		(url: string) => {
 			// Find the DownloadingMedia:
-			const index = downloadingList.findIndex(({ url }) => url === url_);
+			const index = downloadingList.findIndex(d => d.url === url);
 			if (index === -1)
 				return console.error(
-					`There should be a download with url "${url_}"!\ndownloadList =`,
+					`There should be a download with url "${url}"!\ndownloadList =`,
 					downloadingList,
 				);
 
@@ -69,7 +82,7 @@ function useDownloading() {
 			// First, see if there is another one that has the same url
 			// and stop if true:
 			const indexIfThereIsOneAlready = downloadingList.findIndex(
-				({ url }) => url === downloadValues.url,
+				d => d.url === downloadValues.url,
 			);
 			if (indexIfThereIsOneAlready !== -1) {
 				const info = `There is already one download of "${downloadValues.title}"`;
@@ -235,45 +248,90 @@ function useDownloading() {
 	return cancelDownloadAndOrRemoveItFromList;
 }
 
+// export function Downloading() {
+// 	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
+// 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
+// 	const { downloadingList } = useDownloadingList();
+// 	const popupRef = useRef<HTMLDivElement>(null);
+
+// 	useOnClickOutside(popupRef, () => toggleShowPopup());
+
+// 	return (
+// 		<>
+// 			<Circle onClick={toggleShowPopup}>
+// 				<DownloadingIcon size="20" />
+// 			</Circle>
+
+// 			{showPopup && (
+// 				<Popup ref={popupRef}>
+// 					{downloadingList.map(download => (
+// 						<div key={download.url}>
+// 							<Title>
+// 								<p>{download.title}</p>
+// 								<span>
+// 									<Cancel
+// 										size={13}
+// 										color="#777"
+// 										onClick={() =>
+// 											cancelDownloadAndOrRemoveItFromList(download.url)
+// 										}
+// 									/>
+// 								</span>
+// 							</Title>
+
+// 							<Progress
+// 								percent_0_to_100={download.percentage}
+// 								status={download.status}
+// 								showStatus={true}
+// 							/>
+// 						</div>
+// 					))}
+// 				</Popup>
+// 			)}
+// 		</>
+// 	);
+// }
 export function Downloading() {
-	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
 	const { downloadingList } = useDownloadingList();
-	const popupRef = useRef<HTMLDivElement>(null);
-
-	useOnClickOutside(popupRef, () => toggleShowPopup());
 
 	return (
-		<>
-			<Circle onClick={toggleShowPopup}>{icon(ProgressStatus.ACTIVE)}</Circle>
+		<Popover>
+			<StyledPopoverTrigger>
+				<DownloadingIcon size="20" aria-label="See downloads" />
+			</StyledPopoverTrigger>
 
-			{showPopup && (
-				<Popup ref={popupRef}>
-					{downloadingList.map(download => (
-						<div key={download.url}>
-							<Title>
-								<p>{download.title}</p>
-								<span>
-									<Cancel
-										size={13}
-										color="#777"
-										onClick={() =>
-											cancelDownloadAndOrRemoveItFromList(download.url)
-										}
-									/>
-								</span>
-							</Title>
+			<StyledContent sideOffset={5}>
+				{downloadingList.map(download => (
+					<div key={download.url}>
+						<Title>
+							<p>{download.title}</p>
+							<span>
+								<Cancel
+									size={13}
+									color="#777"
+									onClick={() =>
+										cancelDownloadAndOrRemoveItFromList(download.url)
+									}
+								/>
+							</span>
+						</Title>
 
-							<Progress
-								percent_0_to_100={download.percentage}
-								status={download.status}
-								showStatus={true}
-							/>
-						</div>
-					))}
-				</Popup>
-			)}
-		</>
+						<Progress
+							percent_0_to_100={download.percentage}
+							status={download.status}
+							showStatus
+						/>
+					</div>
+				))}
+
+				<StyledArrow />
+
+				<StyledClose aria-label="Close">
+					<Close size="15" />
+				</StyledClose>
+			</StyledContent>
+		</Popover>
 	);
 }
 

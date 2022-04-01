@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const Bar = styled("progress", {
@@ -20,7 +19,7 @@ export const Bar = styled("progress", {
 });
 
 export const Component = styled("div", {
-	display: "flex",
+	display: "flex", // row,
 	width: "100%",
 	height: 15,
 

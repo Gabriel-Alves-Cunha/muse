@@ -1,6 +1,5 @@
-import { styled } from "@styles/global";
-
 import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
+import { styled } from "@styles/global";
 import { color } from "@styles/theme";
 
 export const Wrapper = styled("div", {
@@ -15,11 +14,12 @@ export const Wrapper = styled("div", {
 	zIndex: 30,
 	right: 0,
 
-	backgroundColor: color("accentLight"),
+	backgroundColor: color("bgMediaPlayer"),
 	padding: "1rem",
 	border: "none",
 });
 
+// TODO: make it a square
 export const ImgContainer = styled("div", {
 	display: "flex",
 	justifyContent: "center",
@@ -27,8 +27,8 @@ export const ImgContainer = styled("div", {
 	alignSelf: "center",
 
 	marginTop: "15%",
-	height: "25vh",
-	width: "25vh",
+	height: "25vw",
+	width: "25vw",
 
 	boxShadow: "$whiteGlowAroundComponent",
 	borderRadius: 17,
@@ -61,8 +61,8 @@ export const Info = styled("div", {
 
 		"&.title": {
 			fontFamily: "$fontFamily",
-			color: color("text"),
 			letterSpacing: "0.03em",
+			color: color("text"),
 			fontSize: "1.1rem",
 			fontWeight: 500,
 
@@ -70,8 +70,8 @@ export const Info = styled("div", {
 		},
 
 		"&.subtitle": {
-			color: color("grayText"),
 			fontFamily: "$fontFamily",
+			color: color("grayText"),
 			letterSpacing: "0.03em",
 			fontSize: "0.9rem",
 			fontWeight: 400,
@@ -92,8 +92,8 @@ export const SeekerContainer = styled("div", {
 	marginTop: "5vh",
 
 	span: {
-		color: color("grayText"),
 		fontFamily: "$fontFamily",
+		color: color("grayText"),
 		letterSpacing: "0.03em",
 		textAlign: "center",
 		fontSize: "1rem",
@@ -110,7 +110,7 @@ export const Controls = styled("div", {
 	gap: 10,
 
 	"> div": {
-		display: "flex",
+		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
 	},
@@ -120,32 +120,29 @@ export const Controls = styled("div", {
 	"#random": {},
 
 	span: {
-		display: "flex",
+		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
 
 		"&.previous-or-next": {
+			color: color("text"),
 			borderRadius: "50%",
 			cursor: "pointer",
-			height: 40,
-			width: 40,
+			size: 40,
 
-			"&:hover": {
-				transition: "opacity 0.1s ease-in-out 17ms",
-				boxShadow: "$small",
-			},
+			// TODO: see if this works
+			"&:hover": "$scaleTransition",
 		},
 
 		"&.play-pause": {
+			color: color("text"),
 			borderRadius: "50%",
-			color: "#27283899",
 			cursor: "pointer",
-			height: 50,
-			width: 50,
+			size: 50,
 
 			"&:hover": {
-				transition: "opacity 0.1s ease-in-out 17ms",
-				boxShadow: "$whiteGlowAroundComponent",
+				transition: "$scale",
+				transform: "scale(1.1)",
 			},
 		},
 	},

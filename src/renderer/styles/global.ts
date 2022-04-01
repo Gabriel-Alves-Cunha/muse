@@ -21,13 +21,17 @@ export const { styled, globalCss, keyframes } = createStitches({
 			small:
 				"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
 			glow: "0px 0px 3px 1px",
+			reflect:
+				"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 			whiteGlowAroundComponent: "7px 7px 14px #b1b1b1, -7px -7px 14px white",
+		},
+		transitions: {
+			scale: "transform .2s ease-in-out 20ms",
+			opacity: "opacity .1s ease-in-out 20ms",
+			boxShadow: "box-shadow .2s ease-in-out 20ms",
 		},
 		fonts: {
 			fontFamily: "'Assistant', sans-serif",
-			letterSpacing: "0.03em",
-			color: color("text"),
-			fontSize: "1rem",
 		},
 	},
 	utils: {
@@ -55,25 +59,7 @@ export const GlobalCSS = globalCss({
 
 	body: {
 		overflow: "hidden",
-		height: "100%",
-
-		"#wave": {
-			position: "absolute",
-			display: "block",
-			left: 30,
-			top: 75,
-			size: 2,
-
-			boxShadow: "0 0 0 0 #212121",
-			borderRadius: "100%",
-			zIndex: 1,
-
-			transition: "box-shadow 1s cubic-bezier(0.4, 0, 0.2, 1)",
-
-			"&.active": {
-				boxShadow: "0 0 0 9999px #212121",
-			},
-		},
+		size: "100%",
 	},
 
 	html: {

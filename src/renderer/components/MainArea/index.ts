@@ -1,12 +1,11 @@
 import { styled } from "@styles/global";
 
 export const MainArea = styled("div", {
-	flexDirection: "column",
 	position: "relative",
 	display: "flex",
+	flexDirection: "column",
 
-	height: "100%",
-	width: "100%",
+	size: "100%",
 
 	"@sm": {
 		header: {

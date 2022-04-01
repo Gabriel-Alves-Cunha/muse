@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const Wrapper = styled("div", {
@@ -23,11 +22,11 @@ export const Wrapper = styled("div", {
 		fontSize: "1.1rem",
 		fontWeight: 500,
 
-		border: `1px solid ${color("navButtonHoveredColor")}`,
+		border: `1px solid ${color("accent")}`,
 
 		"&:hover": {
-			backgroundColor: color("navButtonHoveredColor"),
 			transition: "background-color 0.15s ease-in-out",
+			backgroundColor: color("accent"),
 			cursor: "pointer",
 			color: "white",
 		},

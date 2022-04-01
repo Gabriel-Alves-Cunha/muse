@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const OptionsModalWrapper = styled("div", {
@@ -8,7 +7,7 @@ export const OptionsModalWrapper = styled("div", {
 	maxHeight: 400,
 	maxWidth: 320,
 
-	backgroundColor: color("bgNav"),
+	backgroundColor: color("bgMain"),
 	borderRadius: 10,
 
 	overflowX: "hidden",
@@ -16,29 +15,27 @@ export const OptionsModalWrapper = styled("div", {
 
 	/* width */
 	"::-webkit-scrollbar": {
-		height: 5,
-		width: 5,
+		size: 5,
 	},
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: "#f1f1f1",
+		background: color("scrollbar"),
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: "#888",
+		background: color("scrollbarThumb"),
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: "#555",
+		background: color("scrollbarThumbHover"),
 	},
 });
 
 export const Option = styled("button", {
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
 
@@ -60,7 +57,7 @@ export const Option = styled("button", {
 	cursor: "text",
 
 	"&::selection": {
-		background: "#aa00ff", // color("accent"),
+		background: color("accent"),
 		color: "#fff",
 	},
 
@@ -81,14 +78,13 @@ export const Option = styled("button", {
 		color: "#8e8e8e",
 
 		"&::selection": {
-			background: "#aa00ff; // color("accen")",
+			background: color("accent"),
 			color: "#fff",
 		},
 	},
 
 	"&.rm": {
-		display: "flex",
-		flexDirection: "row",
+		display: "flex", // row
 		justifyContent: "space-between",
 
 		background: "#bb2b2e",
@@ -123,9 +119,9 @@ export const Confirm = styled("div", {
 	},
 
 	span: {
-		display: "flex",
-		alignItems: "center",
+		display: "flex", // row
 		justifyContent: "center",
+		alignItems: "center",
 		width: "100%",
 		height: 40,
 
@@ -140,13 +136,12 @@ export const Confirm = styled("div", {
 			marginTop: "0.8rem",
 		},
 		"&.no": {
-			borderBottomRightRadius: 10,
-			borderBottomLeftRadius: 10,
+			borderRadius: "0 0 10px 10px",
 			background: "#219a00",
 		},
 
 		"&:hover": {
-			transition: "backgroundColor 0.1s ease",
+			transition: "filter 0.1s ease",
 			filter: "brightness(1.1)",
 			cursor: "pointer",
 			color: "black",

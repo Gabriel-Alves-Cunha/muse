@@ -1,28 +1,119 @@
-import { styled } from "@styles/global";
+import { Content, Arrow, Close, PopoverTrigger } from "@radix-ui/react-popover";
 
+import { styled, keyframes } from "@styles/global";
 import { color } from "@styles/theme";
+
+export const StyledPopoverTrigger = styled(PopoverTrigger, {
+	display: "flex", // row,
+	justifyContent: "center",
+	alignItems: "center",
+	width: "80%",
+	height: 45,
+
+	backgroundColor: "transparent",
+	cursor: "pointer",
+	fontSize: "1rem",
+
+	color: color("activeIcon"),
+	transition: "$opacity",
+	border: "none",
+	opacity: 0.5,
+
+	"&:hover": {
+		transition: "$opacity",
+		opacity: 1,
+	},
+});
+
+const slideUpAndFade = keyframes({
+	"0%": { opacity: 0, transform: "translateY(2px)" },
+	"100%": { opacity: 1, transform: "translateY(0)" },
+});
+
+const slideRightAndFade = keyframes({
+	"0%": { opacity: 0, transform: "translateX(-2px)" },
+	"100%": { opacity: 1, transform: "translateX(0)" },
+});
+
+const slideDownAndFade = keyframes({
+	"0%": { opacity: 0, transform: "translateY(-2px)" },
+	"100%": { opacity: 1, transform: "translateY(0)" },
+});
+
+const slideLeftAndFade = keyframes({
+	"0%": { opacity: 0, transform: "translateX(2px)" },
+	"100%": { opacity: 1, transform: "translateX(0)" },
+});
+
+export const StyledContent = styled(Content, {
+	backgroundColor: "white",
+	borderRadius: 4,
+	padding: 20,
+	width: 260,
+
+	boxShadow: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px`,
+
+	animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+	animationFillMode: "forwards",
+	animationDuration: ".4s",
+
+	willChange: "transform, opacity",
+
+	"&[data-state='open']": {
+		"&[data-side='right']": { animationName: slideLeftAndFade },
+		"&[data-side='left']": { animationName: slideRightAndFade },
+		"&[data-side='bottom']": { animationName: slideUpAndFade },
+		"&[data-side='top']": { animationName: slideDownAndFade },
+	},
+
+	"&:focus": {
+		boxShadow: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px,
+		0 0 0 2px ${color("accent")}`,
+	},
+});
+
+export const StyledArrow = styled(Arrow, {
+	fill: color("bgMain"),
+});
+
+export const StyledClose = styled(Close, {
+	all: "unset",
+
+	position: "absolute",
+	display: "inline-flex",
+	justifyContent: "center",
+	alignItems: "center",
+
+	size: 25,
+	top: 5,
+	right: 5,
+
+	fontFamily: "inherit",
+	color: color("accent"),
+
+	borderRadius: "100%",
+
+	"&:hover": { backgroundColor: color("buttonHovered") },
+	"&:focus": { boxShadow: `0 0 0 2px ${color("buttonHovered")}` },
+});
 
 export const Circle = styled("div", {
 	display: "flex",
 	justifyContent: "center",
 	alignItems: "center",
-	position: "absolute",
 
 	cursor: "pointer",
 	bottom: "20vh",
-	zIndex: 50,
-	left: 10,
 
+	backgroundColor: "transparent",
 	borderRadius: 20,
-	height: 40,
-	width: 40,
-
-	backgroundColor: color("bgNav"),
-	boxShadow: "$small",
+	size: 40,
 
 	"&:hover": {
-		transition: "opacity 0s ease-in-out 17ms",
-		boxShadow: "$insetSmall",
+		transition: "$scale",
+		transform: "scale(1.4)",
 	},
 });
 
@@ -42,33 +133,32 @@ export const Popup = styled("div", {
 	padding: "1rem",
 	zIndex: 500,
 
-	backgroundColor: color("bgCentral"),
+	backgroundColor: color("bgMain"),
 	boxShadow: "$small",
 
 	/* width */
 	"::-webkit-scrollbar": {
-		height: 5,
-		width: 5,
+		size: 5,
 	},
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: "#f1f1f1",
+		background: color("scrollbar"),
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: "#888",
+		background: color("scrollbarThumb"),
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: "#555",
+		background: color("scrollbarThumbHover"),
 	},
 });
 
 export const Title = styled("div", {
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 	marginBottom: 10,
@@ -78,16 +168,16 @@ export const Title = styled("div", {
 	p: {
 		fontFamily: "$fontFamily",
 		whiteSpace: "nowrap",
+		color: color("text"),
 		fontSize: "0.8rem",
 		textAlign: "left",
-		color: "#777",
 
 		overflow: "hidden",
 		width: "90%",
 	},
 
 	span: {
-		display: "flex",
+		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
 		height: 20,

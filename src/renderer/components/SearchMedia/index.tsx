@@ -3,10 +3,12 @@ import type { Media } from "@common/@types/typesAndEnums";
 
 import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import { useEffect, useReducer, useRef } from "react";
-import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
-import { IoMdMusicalNote as MusicNote } from "react-icons/io";
-import { IoReloadSharp as Reload } from "react-icons/io5";
-import { FiTrash as Clean } from "react-icons/fi";
+import {
+	MdOutlineSearch as SearchIcon,
+	MdMusicNote as MusicNote,
+	MdAutorenew as Reload,
+	MdDelete as Clean,
+} from "react-icons/md";
 
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
@@ -45,7 +47,7 @@ const defaultSearcher = Object.freeze({
 	searchStatus: SearchStatus.DOING_NOTHING,
 	searchTerm: "",
 	results: [],
-});
+} as const);
 
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const { searchLocalComputerForMedias, searchForMedia, setPlaylists } =
@@ -180,7 +182,7 @@ function SearchResults({
 	const listWrapperReference = useRef<HTMLElement>(null);
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const playlist = playlists.find(({ name }) => name === fromList)!;
+	const playlist = playlists.find(p => p.name === fromList)!;
 	if (!playlist)
 		console.error(`There should be "${fromList}" to search through!`);
 

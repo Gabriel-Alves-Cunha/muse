@@ -1,5 +1,7 @@
 * TODO: play new audio is calling twice!
 * FIX: history list is not storing medias with new indexes!
+* TODO: useDebounce/useTransition
+* TODO: use radix components
 
 NOTES:
 

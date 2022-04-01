@@ -1,10 +1,8 @@
 import { styled, keyframes } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const Wrapper = styled("header", {
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row,
 	justifyContent: "space-between !important",
 	alignItems: "center",
 
@@ -24,8 +22,7 @@ export const SearchWrapper = styled("div", {
 
 export const Search = styled("div", {
 	position: "relative",
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row,
 	justifyContent: "flex-start",
 	alignItems: "center",
 
@@ -34,12 +31,11 @@ export const Search = styled("div", {
 	height: 30,
 
 	background: "transparent",
+	color: color("text"),
+	boxShadow: "$small",
 	borderRadius: 15,
 	border: "none",
 	cursor: "text",
-	color: "#ccc",
-
-	boxShadow: "$small",
 
 	"& svg": {
 		marginLeft: 10,
@@ -47,7 +43,7 @@ export const Search = styled("div", {
 
 	"&:hover": {
 		boxShadow: "$insetSmall",
-		transition: "opacity 0s linear 17ms",
+		transition: "$opacity",
 
 		"& svg": {
 			color: "rgba(0, 0, 0, 0.5)",
@@ -60,25 +56,28 @@ export const Search = styled("div", {
 		boxSizing: "border-box",
 		fontSize: "0.9rem",
 
-		height: "100%",
-		width: "100%",
+		size: "100%",
 
 		background: "transparent",
 		borderRadius: 15,
 		border: "none",
 
-		color: "rgba(0, 0, 0, 0.5)",
-		paddingRight: 10,
-		paddingLeft: 10,
+		color: color("text"),
+		padding: "0 10px",
 
-		"&::placeholder": {
-			color: "#ccc",
-		},
+		transition: "$opacity",
+		opacity: 0.5,
 
 		"&:hover": {
+			opacity: 1,
+
 			"&::placeholder": {
-				color: "rgba(0, 0, 0, 0.5)",
+				color: color("text"),
 			},
+		},
+
+		"&::placeholder": {
+			color: color("text"),
 		},
 	},
 });
@@ -93,7 +92,7 @@ const spin = keyframes({
 });
 
 export const ReloadContainer = styled("button", {
-	display: "flex",
+	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -108,7 +107,7 @@ export const ReloadContainer = styled("button", {
 });
 
 export const Button = styled("button", {
-	display: "flex",
+	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -130,7 +129,7 @@ export const SearchResultsWrapper = styled("section", {
 	marginTop: 30,
 	zIndex: 10,
 
-	backgroundColor: color("secondary"),
+	backgroundColor: color("bgMain"),
 	boxShadow: "$medium",
 
 	"&.list": {
@@ -138,42 +137,40 @@ export const SearchResultsWrapper = styled("section", {
 
 		/* width */
 		"::-webkit-scrollbar": {
-			height: 5,
-			width: 5,
+			size: 5,
 		},
 
 		/* Track */
 		"::-webkit-scrollbar-track": {
-			background: "#f1f1f1",
+			background: color("scrollbar"),
 		},
 
 		/* Handle */
 		"::-webkit-scrollbar-thumb": {
-			background: "#888",
+			background: color("scrollbarThumb"),
 		},
 
 		/* Handle on hover */
 		"::-webkit-scrollbar-thumb:hover": {
-			background: "#555",
+			background: color("scrollbarThumbHover"),
 		},
 	},
 });
 
 export const Result = styled("button", {
-	cursor: "pointer",
-	border: "none",
-
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row,
 	justifyContent: "flex-start",
 	alignItems: "center",
 
 	width: "95% !important",
 
-	backgroundColor: color("secondary"),
+	backgroundColor: color("bgMain"),
 	margin: "10px !important",
+	cursor: "pointer",
 	borderRadius: 7,
+	border: "none",
 
+	// TODO: fix this
 	"&:hover": {
 		transition: "opacity 0.2s ease-in-out 17ms",
 		boxShadow: "$medium",
@@ -181,17 +178,15 @@ export const Result = styled("button", {
 });
 
 export const NothingFound = styled("div", {
-	cursor: "pointer",
-	border: "none",
-
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row,
 	justifyContent: "flex-start",
 	alignItems: "center",
 
 	width: "95% !important",
 
-	backgroundColor: color("secondary"),
+	backgroundColor: color("bgMain"),
 	margin: "10px !important",
+	cursor: "pointer",
 	borderRadius: 7,
+	border: "none",
 });

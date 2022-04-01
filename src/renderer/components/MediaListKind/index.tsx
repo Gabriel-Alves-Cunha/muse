@@ -13,8 +13,8 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import Popup from "reactjs-popup";
 
 import { useCurrentPlaying, CurrentPlayingEnum, usePlaylists } from "@contexts";
-import { ImgWithFallback } from "@components";
 import { MediaOptionsModal } from "./MediaOptions";
+import { ImgWithFallback } from "@components";
 
 import { pulse } from "@styles/animations";
 import {
@@ -37,8 +37,9 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 
 	const [showPopup, setShowPopup] = useState<Media>();
 
+	// TODO: ErrorBoundary
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-	const list = playlists.find(({ name }) => name === playlistName)!;
+	const list = playlists.find(p => p.name === playlistName)!;
 	if (!list)
 		console.error(
 			`There should/must be a list with name = "${playlistName}"!\nplaylists =`,

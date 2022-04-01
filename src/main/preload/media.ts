@@ -4,8 +4,8 @@ import type { Media, Path } from "@common/@types/typesAndEnums";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "stream";
 
-import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { createReadStream, existsSync } from "fs";
+import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { rename as renameFile } from "fs/promises";
 import { dirname, join } from "path";
 import { get } from "https";
@@ -66,14 +66,16 @@ const createMedia = async (
 			console.info(
 				`Skipping "${path}" because the duration is ${duration} seconds (< 60 seconds)!`,
 			);
-			reject(undefined);
+			console.timeEnd(`Nº ${index}, "${basename}" took`);
+			return reject();
 		}
 
 		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
 			console.info(
 				`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
 			);
-			reject(undefined);
+			console.timeEnd(`Nº ${index}, "${basename}" took`);
+			return reject();
 		}
 
 		const picture: IPicture | undefined = pictures[0];
@@ -87,7 +89,7 @@ const createMedia = async (
 				picture.type === PictureType.NotAPicture ||
 				picture.type === PictureType.Other
 					? Buffer.from(picture.data.data).toString("base64")
-					: picture?.data.toString();
+					: picture.data.toString();
 			img = `data:${mimeType};base64,${str}`;
 		}
 

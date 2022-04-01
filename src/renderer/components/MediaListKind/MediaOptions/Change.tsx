@@ -29,9 +29,9 @@ export function Change({ setWhatToChange, whatToChange, mediaPath }: Props) {
 				},
 			};
 
-			if (window.twoWayComm_React_Electron)
-				window.twoWayComm_React_Electron.postMessage(msg);
-			else console.error("There is no 'window.twoWayComm_React_Electron'!");
+			window.twoWayComm_React_Electron
+				? window.twoWayComm_React_Electron.postMessage(msg)
+				: console.error("There is no 'window.twoWayComm_React_Electron'!");
 		}
 	};
 
@@ -57,7 +57,7 @@ export const allowedOptionToChange = Object.freeze({
 	genres: "genres",
 	album: "album",
 	title: "title",
-});
+} as const);
 
 export const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).some(opt => opt === option);

@@ -1,18 +1,17 @@
 import { styled } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const DECORATIONS_HEADER_HEIGHT = "27px";
 
 export const Wrapper = styled("header", {
 	position: "absolute",
-	display: "flex",
+	display: "flex", // row
 
 	marginTop: `-${DECORATIONS_HEADER_HEIGHT}`,
 	minHeight: DECORATIONS_HEADER_HEIGHT,
 	width: "100%",
 
-	backgroundColor: color("secondary"),
+	backgroundColor: color("bgMain"),
 
 	"-webkit-app-region": "drag",
 	// ^ window-draggable-region
@@ -20,10 +19,10 @@ export const Wrapper = styled("header", {
 });
 
 export const WindowButton = styled("button", {
+	display: "flex", // row
 	justifyContent: "center",
 	alignContent: "center",
 	alignItems: "center",
-	display: "flex",
 
 	border: "none",
 	color: "black",
@@ -31,7 +30,7 @@ export const WindowButton = styled("button", {
 	height: DECORATIONS_HEADER_HEIGHT,
 	width: 48,
 
-	backgroundColor: color("secondary"),
+	backgroundColor: "transparent",
 
 	"&.close:hover": {
 		backgroundColor: "#e70000",
@@ -39,7 +38,7 @@ export const WindowButton = styled("button", {
 	},
 
 	"&:hover": {
-		backgroundColor: "#dbdadc",
+		backgroundColor: color("buttonHovered"),
 	},
 });
 
@@ -49,26 +48,26 @@ export const WindowButtons = styled("div", {
 	marginLeft: "auto",
 	height: "100%",
 
-	backgroundColor: color("secondary"),
+	backgroundColor: "transparent",
 });
 
 export const AppName_Folder_Wrapper = styled("button", {
-	backgroundColor: color("secondary"),
-	border: "none",
-
-	display: "flex",
+	position: "absolute",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-	position: "absolute",
 	height: "100%",
 	width: "20%",
 	left: "50%",
 
+	backgroundColor: "transparent",
+	border: "none",
+
 	transform: "translate(-50%)",
 
 	fontFamily: "$fontFamily",
-	color: color("text"),
 	letterSpacing: "0.03em",
+	color: color("text"),
 	fontSize: "0.9em",
 	fontWeight: 300,
 
@@ -78,7 +77,7 @@ export const AppName_Folder_Wrapper = styled("button", {
 });
 
 export const AppIcon = styled("div", {
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 

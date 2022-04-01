@@ -1,20 +1,18 @@
 import { styled } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const Img = styled("div", {
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
 	minWidth: 45,
 	height: 45,
 
+	boxShadow: "$small",
 	borderRadius: 13,
 	margin: "0 10px",
 	border: "none",
-
-	boxShadow: "$small",
 
 	img: {
 		objectFit: "cover",
@@ -36,16 +34,14 @@ export const Info = styled("div", {
 	justifyContent: "center",
 	alignItems: "flex-start",
 
-	height: "calc(100% - 5px)",
-	width: "calc(100% - 5px)",
-
+	size: "calc(100% - 5px)",
 	overflow: "hidden",
 });
 
 export const Title = styled("p", {
 	fontFamily: "$fontFamily",
-	color: color("text"),
 	letterSpacing: "0.03em",
+	color: color("text"),
 	fontSize: "1rem",
 	fontWeight: 500,
 
@@ -92,14 +88,14 @@ export const Options = styled("button", {
 	border: "none",
 
 	"&:hover": {
-		transition: "boxShadow 0.3s ease-in-out 17ms",
+		transition: "$boxShadow",
 		boxShadow: "$medium",
 	},
 });
 
 export const ListWrapper = styled("div", {
-	boxShadow: "$medium",
 	boxSizing: "border-box",
+	boxShadow: "$medium",
 	margin: "2em 5%",
 	borderRadius: 7,
 	height: "65vh",
@@ -115,29 +111,27 @@ export const ListWrapper = styled("div", {
 	/* width */
 	".list::-webkit-scrollbar": {
 		display: "block",
-		height: 5,
-		width: 5,
+		size: 5,
 	},
 
 	/* Track */
 	".list::-webkit-scrollbar-track": {
-		background: "#f1f1f1",
+		background: color("scrollbar"),
 	},
 
 	/* Handle */
 	".list::-webkit-scrollbar-thumb": {
-		background: "#888",
+		background: color("scrollbarThumb"),
 	},
 
 	/* Handle on hover */
 	".list::-webkit-scrollbar-thumb:hover": {
-		background: "#555",
+		background: color("scrollbarThumbHover"),
 	},
 });
 
 export const RowWrapper = styled("div", {
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -147,24 +141,22 @@ export const RowWrapper = styled("div", {
 	margin: 7,
 
 	"&:hover": {
-		transition: "boxShadow 0.2s ease-in-out 17ms",
+		transition: "$boxShadow",
 		boxShadow: "$medium",
 	},
 
 	"&.active": {
 		boxShadow: "$medium",
-
 		background: "white",
 
-		outline: `3px solid ${color("bgCentral")}`,
+		outline: `3px solid ${color("bgMain")}`,
 		outlineOffset: -3,
 	},
 });
 
 export const PlayButton = styled("div", {
-	display: "flex",
 	position: "relative",
-	flexDirection: "row",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -175,34 +167,30 @@ export const PlayButton = styled("div", {
 });
 
 export const InputWrapper = styled("div", {
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 	height: 50,
 	width: 320,
 
+	background: color("bgMain"),
 	boxShadow: "$medium",
-	background: "#d3d3d5",
 	overflowY: "hidden",
 	padding: "0.5rem",
 	borderRadius: 7,
 
 	"&::selection": {
-		background: "#aa00ff; // ${color("accent")}",
+		background: color("accent"),
+		// TODO: see this:
 		color: "#ffffff",
 	},
 
 	input: {
-		"&::selection": {
-			background: "#aa00ff; // ${color("accent")}",
-			color: "#ffffff",
-		},
-
 		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
+		color: color("text"),
 		fontSize: "1.05rem",
-		color: "#00525e",
 		fontWeight: 500,
 
 		width: "100%",
@@ -212,11 +200,18 @@ export const InputWrapper = styled("div", {
 		paddingLeft: 10,
 		border: "none",
 
+		"&::selection": {
+			background: color("accent"),
+			// TODO: see this:
+			color: "#ffffff",
+		},
+
 		"::-webkit-input-placeholder": {
-			display: "flex",
+			display: "flex", // row
 			justifyContent: "flex-start",
 			alignItems: "center",
 
+			// TODO: see this:
 			color: "rgba(0, 0, 0, 0.5)",
 			fontStyle: "italic",
 		},

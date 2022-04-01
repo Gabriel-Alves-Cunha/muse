@@ -1,6 +1,5 @@
 import type { Page } from "@common/@types/typesAndEnums";
 
-import { RiQuestionMark as Question } from "react-icons/ri";
 import {
 	MdOutlineVideoLibrary as Home,
 	MdOutlineSettings as Settings,
@@ -11,18 +10,30 @@ import {
 } from "react-icons/md";
 
 import { Downloading, Converting } from "@modules";
+import { ThemeToggler } from "@modules/ThemeToggler";
 import { usePage } from "@contexts";
 import { pages } from "@utils/app";
 
-import { ScaleUpIconButton, Nav } from "./styles";
+import { ScaleUpIconButton, Nav, Buttons } from "./styles";
 
 const { setState: setPage } = usePage;
 
-export function Navbar() {
+export const Navbar = () => (
+	<Nav>
+		<ThemeToggler />
+
+		<ButtonsForPages />
+
+		<Downloading />
+		<Converting />
+	</Nav>
+);
+
+const ButtonsForPages = () => {
 	const currPage = usePage().page;
 
 	return (
-		<Nav>
+		<Buttons>
 			{pages.map(page => (
 				<ScaleUpIconButton
 					className={page === currPage ? "active" : ""}
@@ -35,14 +46,11 @@ export function Navbar() {
 					{icon(page)}
 				</ScaleUpIconButton>
 			))}
-
-			<Downloading />
-			<Converting />
-		</Nav>
+		</Buttons>
 	);
-}
+};
 
-const icon = (folder: Page) => iconObj[folder] ?? <Question />;
+const icon = (folder: Page) => iconObj[folder];
 
 const iconObj: Record<Page, JSX.Element> = Object.freeze({
 	Favorites: <Favorites />,

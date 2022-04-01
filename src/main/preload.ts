@@ -51,6 +51,8 @@ contextBridge.exposeInMainWorld("electron", {
 });
 
 window.onmessage = async event => {
+	if (event.data?.source?.includes("react-devtools")) return;
+
 	const electronPort = event.ports[0];
 
 	switch (event.data) {
@@ -113,9 +115,9 @@ window.onmessage = async event => {
 
 		default: {
 			console.error(
-				`There is no method to handle this event.data: (${typeof event.data}) "${
-					event.data
-				}";\nEvent =`,
+				`There is no method to handle this event.data: (${typeof event.data}) '`,
+				event.data,
+				"'\nEvent =",
 				event,
 			);
 			break;

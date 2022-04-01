@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-
 import { color } from "@styles/theme";
 
 export const Wrapper = styled("section", {
@@ -21,17 +20,17 @@ export const Wrapper = styled("section", {
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: "#f1f1f1",
+		background: color("scrollbar"),
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: "#888",
+		background: color("scrollbarThumb"),
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: "#555",
+		background: color("scrollbarThumbHover"),
 	},
 });
 
@@ -63,32 +62,31 @@ export const Searcher = styled("button", {
 	alignItems: "center",
 
 	background: "transparent",
-	color: "#ccc",
 	width: "80%",
-	height: 30,
+	height: 40,
 
-	borderRadius: 15,
-	border: "none",
+	borderRadius: 10,
+	border: `1px solid ${color("text")}`,
 	cursor: "text",
 
-	boxShadow: "$small",
-
 	"& svg": {
+		transition: "opacity .2s ease-in-out 20ms",
+		color: color("text"),
 		marginLeft: "10px",
+		opacity: 0.5,
+	},
+
+	"&:hover svg": {
+		opacity: 1,
 	},
 
 	"&::after": {
-		transition: "opacity 0s ease-in-out 17ms",
-		boxShadow: "$insetSmall",
-		opacity: 0,
+		transition: "opacity .2s ease-in-out 20ms",
+		opacity: 0.5,
 	},
 
 	"&:hover::after": {
 		opacity: 1,
-	},
-
-	"&:hover svg": {
-		color: "rgba(0, 0, 0, 0.5)",
 	},
 
 	input: {
@@ -97,14 +95,13 @@ export const Searcher = styled("button", {
 		boxSizing: "border-box",
 		fontSize: "0.9rem",
 
-		height: "100%",
-		width: "100%",
+		size: "100%",
 
 		background: "transparent",
 		borderRadius: 15,
 		border: "none",
 
-		color: "rgba(0, 0, 0, 0.5)",
+		color: color("text"),
 		paddingRight: 10,
 		paddingLeft: 10,
 
@@ -112,9 +109,16 @@ export const Searcher = styled("button", {
 			color: "#ccc",
 		},
 
+		"&::after": {
+			transition: "opacity .2s ease-in-out 20ms",
+			opacity: 0.5,
+		},
+
 		"&:hover": {
+			opacity: 1,
+
 			"&::placeholder": {
-				color: "rgba(0, 0, 0, 0.5)",
+				color: color("text"),
 			},
 		},
 	},
@@ -131,8 +135,7 @@ export const ResultContainer = styled("div", {
 		objectFit: "cover",
 		display: "flex",
 
-		height: "90%",
-		width: "90%",
+		size: "90%",
 
 		maxHeight: 300,
 		maxWidth: 300,
@@ -144,10 +147,8 @@ export const ResultContainer = styled("div", {
 				to(rgba(255, 255, 255, 0.1))
 			)`,
 
-		boxShadow: `0px 50px 70px rgba(0, 0, 0, 0.3),
-			0px 10px 10px rgba(0, 0, 0, 0.1)`,
+		boxShadow: "$reflect",
 
-		willChange: "transform",
 		transition: "transform 0.2s ease-in-out 17ms",
 
 		"&:hover": {
@@ -162,7 +163,7 @@ export const ResultContainer = styled("div", {
 		fontSize: "1.1rem",
 
 		wordWrap: "normal",
-		color: "black",
+		color: color("text"),
 	},
 
 	span: {
@@ -172,7 +173,7 @@ export const ResultContainer = styled("div", {
 		fontSize: "1rem",
 
 		wordWrap: "normal",
-		color: "black",
+		color: color("text"),
 	},
 });
 
@@ -188,7 +189,7 @@ export const Button = styled("button", {
 	fontSize: "1rem",
 	padding: 10,
 
-	backgroundColor: color("bgNav"),
+	backgroundColor: color("bgMain"),
 	boxShadow: "$small",
 	cursor: "pointer",
 	color: "black",

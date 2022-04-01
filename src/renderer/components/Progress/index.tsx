@@ -1,9 +1,10 @@
-import { BsQuestionLg as QuestionMark } from "react-icons/bs";
-import { BsArrowLeftRight as Convert } from "react-icons/bs";
-import { HiDownload as Downloading } from "react-icons/hi";
-import { AiOutlineCheck as Success } from "react-icons/ai";
-import { AiOutlineClose as Fail } from "react-icons/ai";
-import { FcCancel as Cancel } from "react-icons/fc";
+import {
+	MdOutlineFileDownloadDone as Success,
+	MdDownloading as Downloading,
+	MdCompareArrows as Convert,
+	MdOutlineClose as Cancel,
+	MdOutlineClose as Fail,
+} from "react-icons/md";
 
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 
@@ -37,8 +38,7 @@ const iconObj: Record<ProgressStatus, JSX.Element> = Object.freeze({
 	[ProgressStatus.CONVERT]: <Convert size={12} />,
 });
 
-export const icon = (status: ProgressStatus) =>
-	iconObj[status] ?? <QuestionMark size={12} />;
+export const icon = (status: ProgressStatus) => iconObj[status];
 
 export type ProgressProps = {
 	readonly showStatus: boolean;

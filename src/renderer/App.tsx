@@ -6,7 +6,6 @@ import { usePlaylists, usePage } from "@contexts";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
-import { ThemeToggler } from "@modules/ThemeToggler";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 
@@ -19,24 +18,9 @@ export function App() {
 
 	return (
 		<>
-			<ThemeToggler />
-			<span id="wave"></span>
+			<Decorations />
 
-			<div
-				style={{
-					height: "100vh",
-					width: "100vw",
-
-					transitionTimingFunction: "cubic-bezier(0.4, 0.0, 0.2, 1)",
-					transitionDuration: "1s",
-					transitionProperty:
-						"box-shadow, caret-color, color, outline-color, accent-color, background-color, border-color, text-color, scrollbar-color",
-				}}
-			>
-				<Decorations />
-
-				<Main />
-			</div>
+			<Main />
 		</>
 	);
 }

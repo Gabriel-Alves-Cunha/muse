@@ -38,11 +38,11 @@ function useConverting() {
 	const { convertList } = useConvertList();
 
 	const cancelDownloadAndOrRemoveItFromList = useCallback(
-		(path_: string) => {
-			const index = convertList.findIndex(({ path }) => path === path_);
+		(path: string) => {
+			const index = convertList.findIndex(c => c.path === path);
 			if (index === -1) {
 				console.error(
-					`There should be a download with path "${path_}"!\nconvertList =`,
+					`There should be a download with path "${path}"!\nconvertList =`,
 					convertList,
 				);
 				return;
@@ -63,7 +63,7 @@ function useConverting() {
 	useEffect(() => {
 		function createNewConvert(values: ConvertValues): MessagePort {
 			const indexIfThereIsOneAlready = convertList.findIndex(
-				({ path }) => path === values.path,
+				c => c.path === values.path,
 			);
 			if (indexIfThereIsOneAlready !== -1) {
 				const info = `There is already one convert of "${values.path}"!`;
