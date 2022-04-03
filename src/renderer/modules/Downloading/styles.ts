@@ -1,22 +1,19 @@
 import { Content, Arrow, Close, PopoverTrigger } from "@radix-ui/react-popover";
 
 import { styled, keyframes } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const StyledPopoverTrigger = styled(PopoverTrigger, {
 	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
-	width: "80%",
 	height: 45,
 
 	backgroundColor: "transparent",
+	color: "$active-icon",
 	cursor: "pointer",
-	fontSize: "1rem",
-
-	color: color("activeIcon"),
-	transition: "$opacity",
 	border: "none",
+
+	transition: "$opacity",
 	opacity: 0.5,
 
 	"&:hover": {
@@ -48,17 +45,17 @@ const slideLeftAndFade = keyframes({
 export const StyledContent = styled(Content, {
 	backgroundColor: "white",
 	borderRadius: 4,
-	padding: 20,
+	minHeight: 40,
+	padding: 5,
 	width: 260,
 
 	boxShadow: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
 		hsl(206 22% 7% / 20%) 0px 10px 20px -15px`,
 
+	willChange: "transform, opacity",
 	animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
 	animationFillMode: "forwards",
 	animationDuration: ".4s",
-
-	willChange: "transform, opacity",
 
 	"&[data-state='open']": {
 		"&[data-side='right']": { animationName: slideLeftAndFade },
@@ -70,12 +67,12 @@ export const StyledContent = styled(Content, {
 	"&:focus": {
 		boxShadow: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
 		hsl(206 22% 7% / 20%) 0px 10px 20px -15px,
-		0 0 0 2px ${color("accent")}`,
+		0 0 0 2px $accent}`,
 	},
 });
 
 export const StyledArrow = styled(Arrow, {
-	fill: color("bgMain"),
+	fill: "$bg-main",
 });
 
 export const StyledClose = styled(Close, {
@@ -87,20 +84,18 @@ export const StyledClose = styled(Close, {
 	alignItems: "center",
 
 	size: 25,
-	top: 5,
 	right: 5,
+	top: 5,
 
-	fontFamily: "inherit",
-	color: color("accent"),
+	borderRadius: "50%",
+	color: "$accent",
 
-	borderRadius: "100%",
-
-	"&:hover": { backgroundColor: color("buttonHovered") },
-	"&:focus": { boxShadow: `0 0 0 2px ${color("buttonHovered")}` },
+	"&:focus": { boxShadow: "0 0 0 2px $button-hovered" },
+	"&:hover": { backgroundColor: "$button-hovered" },
 });
 
 export const Circle = styled("div", {
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -121,19 +116,19 @@ export const Popup = styled("div", {
 	position: "absolute",
 	display: "flex",
 	flexDirection: "column",
+
 	bottom: "20vh",
 	gap: "1rem",
 	height: 100,
 	width: 250,
 	left: 10,
 
-	overflowX: "hidden",
 	overflowY: "auto",
 	borderRadius: 20,
 	padding: "1rem",
 	zIndex: 500,
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	boxShadow: "$small",
 
 	/* width */
@@ -143,17 +138,17 @@ export const Popup = styled("div", {
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: color("scrollbar"),
+		background: "$scrollbar",
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: color("scrollbarThumb"),
+		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: color("scrollbarThumbHover"),
+		background: "$scrollbar-thumb-hover",
 	},
 });
 
@@ -166,11 +161,11 @@ export const Title = styled("div", {
 	width: "100%",
 
 	p: {
-		fontFamily: "$fontFamily",
+		fontFamily: "$primary",
 		whiteSpace: "nowrap",
-		color: color("text"),
 		fontSize: "0.8rem",
 		textAlign: "left",
+		color: "$text",
 
 		overflow: "hidden",
 		width: "90%",
@@ -180,8 +175,7 @@ export const Title = styled("div", {
 		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
-		height: 20,
-		width: 20,
+		size: 20,
 
 		backgroundColor: "transparent",
 		borderRadius: "50%",

@@ -1,29 +1,26 @@
+import { useCallback, useEffect } from "react";
+import { FcCancel as Cancel } from "react-icons/fc";
+import { Popover } from "@radix-ui/react-popover";
+import { toast } from "react-toastify";
 import {
 	MdDownloading as DownloadingIcon,
 	MdClose as Close,
 } from "react-icons/md";
-import { useCallback, useEffect, useReducer, useRef } from "react";
-import { Popover } from "@radix-ui/react-popover";
-import { FcCancel as Cancel } from "react-icons/fc";
-import { toast } from "react-toastify";
 import create from "zustand";
 
 import { useDownloadValues, MsgEnum, sendMsg } from "@contexts";
 import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
-import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
-import { Progress } from "@components/Progress";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
+import { Progress } from "@components/Progress";
 
 import {
-	Circle,
-	Popup,
-	Title,
 	StyledPopoverTrigger,
 	StyledContent,
 	StyledArrow,
 	StyledClose,
+	Title,
 } from "./styles";
 
 // const { port1: testPort } = new MessageChannel();
@@ -296,12 +293,17 @@ export function Downloading() {
 	const { downloadingList } = useDownloadingList();
 
 	return (
-		<Popover>
+		<Popover modal>
 			<StyledPopoverTrigger>
 				<DownloadingIcon size="20" aria-label="See downloads" />
 			</StyledPopoverTrigger>
 
-			<StyledContent sideOffset={5}>
+			<StyledContent
+				collisionTolerance={30}
+				sideOffset={5}
+				align="center"
+				side="right"
+			>
 				{downloadingList.map(download => (
 					<div key={download.url}>
 						<Title>

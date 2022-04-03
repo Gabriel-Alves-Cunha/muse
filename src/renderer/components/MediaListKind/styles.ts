@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const Img = styled("div", {
 	display: "flex", // row
@@ -16,8 +15,7 @@ export const Img = styled("div", {
 
 	img: {
 		objectFit: "cover",
-		height: 45,
-		width: 45,
+		size: 45,
 
 		borderRadius: 13,
 		border: "none",
@@ -39,11 +37,11 @@ export const Info = styled("div", {
 });
 
 export const Title = styled("p", {
-	fontFamily: "$fontFamily",
 	letterSpacing: "0.03em",
-	color: color("text"),
+	fontFamily: "$primary",
 	fontSize: "1rem",
 	fontWeight: 500,
+	color: "$text",
 
 	wordWrap: "normal",
 	overflow: "hidden",
@@ -64,9 +62,9 @@ export const Title = styled("p", {
 });
 
 export const SubTitle = styled("p", {
-	fontFamily: "$fontFamily",
-	color: color("grayText"),
 	letterSpacing: "0.03em",
+	fontFamily: "$primary",
+	color: "$gray-text",
 	fontSize: "0.8em",
 	fontWeight: 500,
 });
@@ -96,8 +94,9 @@ export const Options = styled("button", {
 export const ListWrapper = styled("div", {
 	boxSizing: "border-box",
 	boxShadow: "$medium",
-	margin: "2em 5%",
 	borderRadius: 7,
+
+	margin: "2em 5%",
 	height: "65vh",
 	maxWidth: 600,
 	zIndex: 1,
@@ -116,17 +115,17 @@ export const ListWrapper = styled("div", {
 
 	/* Track */
 	".list::-webkit-scrollbar-track": {
-		background: color("scrollbar"),
+		background: "$scrollbar",
 	},
 
 	/* Handle */
 	".list::-webkit-scrollbar-thumb": {
-		background: color("scrollbarThumb"),
+		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	".list::-webkit-scrollbar-thumb:hover": {
-		background: color("scrollbarThumbHover"),
+		background: "$scrollbar-thumb-hover",
 	},
 });
 
@@ -149,7 +148,7 @@ export const RowWrapper = styled("div", {
 		boxShadow: "$medium",
 		background: "white",
 
-		outline: `3px solid ${color("bgMain")}`,
+		outline: "3px solid $bgMain",
 		outlineOffset: -3,
 	},
 });
@@ -173,25 +172,25 @@ export const InputWrapper = styled("div", {
 	height: 50,
 	width: 320,
 
-	background: color("bgMain"),
+	background: "$bg-main",
 	boxShadow: "$medium",
 	overflowY: "hidden",
 	padding: "0.5rem",
 	borderRadius: 7,
 
 	"&::selection": {
-		background: color("accent"),
+		background: "$accent",
 		// TODO: see this:
 		color: "#ffffff",
 	},
 
 	input: {
-		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
-		color: color("text"),
+		fontFamily: "$primary",
 		fontSize: "1.05rem",
 		fontWeight: 500,
+		color: "$text",
 
 		width: "100%",
 		height: 26,
@@ -201,7 +200,7 @@ export const InputWrapper = styled("div", {
 		border: "none",
 
 		"&::selection": {
-			background: color("accent"),
+			background: "$accent",
 			// TODO: see this:
 			color: "#ffffff",
 		},

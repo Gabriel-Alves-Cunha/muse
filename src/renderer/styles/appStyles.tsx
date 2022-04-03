@@ -1,6 +1,5 @@
 import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { styled, keyframes } from "@styles/global";
-import { color } from "./theme";
 
 export const Content = styled("div", {
 	display: "flex",
@@ -8,7 +7,7 @@ export const Content = styled("div", {
 	flexDirection: "row",
 
 	marginTop: DECORATIONS_HEADER_HEIGHT,
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 });
 
 const ripple = keyframes({
@@ -42,7 +41,8 @@ const AnimStyle = styled("div", {
 
 	"&.lds-ripple div": {
 		position: "absolute",
-		border: `3px solid ${color("accent")}`,
+
+		border: "3px solid $accent",
 		borderRadius: "50%",
 		opacity: 1,
 
@@ -62,8 +62,3 @@ export const Loading = () => (
 		</div>
 	</AnimStyle>
 );
-
-// --dark-button-shadow:
-// 			-2px -2px 4px rgba(255, 255, 255, 0.05),
-// 			0 0 10px 10px rgba(255, 255, 255, 0.005),
-// 			2px 2px 8px rgba(60, 60, 60, 0.1);

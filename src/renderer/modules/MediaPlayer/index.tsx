@@ -17,7 +17,6 @@ import create from "zustand";
 
 import { ImgWithFallback } from "@components";
 import { formatDuration } from "@common/utils";
-import { color } from "@styles/theme";
 import {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
@@ -34,6 +33,7 @@ import {
 	Controls,
 	Wrapper,
 	Info,
+	ProgressThumb,
 } from "./styles";
 
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
@@ -171,31 +171,11 @@ function SeekerWrapper({
 			<span>{formatDuration(current)}</span>
 
 			<ProgressWrapper onClick={seek} id="goto">
-				<div
+				<ProgressThumb
 					style={{
-						backgroundColor: color("accent"),
 						width: `${percentage}%`,
-						position: "relative",
-						height: 3,
-						left: 0,
-						top: 0,
 					}}
-				>
-					<div
-						style={{
-							border: `1px solid ${color("accent")}`,
-							animation: "move 1s linear infinite",
-							transform: "translate(0, -25%)",
-							position: "absolute",
-							borderRadius: "50%",
-							background: "white",
-							right: -3,
-							height: 6,
-							width: 6,
-							top: 0,
-						}}
-					/>
-				</div>
+				></ProgressThumb>
 			</ProgressWrapper>
 
 			<span>{duration ?? "00:00"}</span>

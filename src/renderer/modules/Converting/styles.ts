@@ -1,9 +1,8 @@
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const Circle = styled("div", {
 	// position: "absolute",
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -12,7 +11,7 @@ export const Circle = styled("div", {
 	zIndex: 50,
 	left: 10,
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	borderRadius: 20,
 	size: 40,
 
@@ -38,7 +37,7 @@ export const Popup = styled("div", {
 	padding: "1rem",
 	zIndex: 500,
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	boxShadow: "$small",
 
 	/* width */
@@ -48,27 +47,28 @@ export const Popup = styled("div", {
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: color("scrollbar"),
+		background: "$scrollbar",
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: color("scrollbarThumb"),
+		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: color("scrollbarThumbHover"),
+		background: "$scrollbar-thumb-hover",
 	},
 });
 
 export const Progress = styled("div", {
-	fontFamily: "$fontFamily",
-	color: color("text"),
+	fontFamily: "$primary",
 	whiteSpace: "nowrap",
 	overflow: "hidden",
 	fontSize: "0.9rem",
 	textAlign: "left",
+	color: "$text",
+
 	gap: "0.5rem",
 
 	table: {
@@ -78,14 +78,14 @@ export const Progress = styled("div", {
 	},
 
 	"td:nth-of-type(2)": {
-		borderRight: `1px solid ${color("text")}`,
+		borderRight: "1px solid $text",
 		paddingRight: 5,
 		width: "100%",
 	},
 });
 
 export const Title = styled("div", {
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 	marginBottom: 10,
@@ -93,12 +93,12 @@ export const Title = styled("div", {
 	width: "100%",
 
 	p: {
-		fontFamily: "$fontFamily",
+		fontFamily: "$primary",
 		whiteSpace: "nowrap",
-		color: color("text"),
 		overflow: "hidden",
 		fontSize: "0.9rem",
 		textAlign: "left",
+		color: "$text",
 
 		width: "90%",
 	},

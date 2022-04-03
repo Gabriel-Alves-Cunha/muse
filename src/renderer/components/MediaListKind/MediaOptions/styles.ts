@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const OptionsModalWrapper = styled("div", {
 	display: "flex",
@@ -7,7 +6,7 @@ export const OptionsModalWrapper = styled("div", {
 	maxHeight: 400,
 	maxWidth: 320,
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	borderRadius: 10,
 
 	overflowX: "hidden",
@@ -20,17 +19,17 @@ export const OptionsModalWrapper = styled("div", {
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: color("scrollbar"),
+		background: "$scrollbar",
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: color("scrollbarThumb"),
+		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: color("scrollbarThumbHover"),
+		background: "$scrollbar-thumb-hover",
 	},
 });
 
@@ -39,17 +38,17 @@ export const Option = styled("button", {
 	justifyContent: "flex-start",
 	alignItems: "center",
 
-	fontFamily: "$fontFamily",
 	letterSpacing: "0.03em",
+	fontFamily: "$primary",
 	fontSize: "1rem",
 
-	background: "#edecf8",
-	color: "#00525e",
+	background: "$bg-main",
+	color: "$text",
 	width: "100%",
 	height: 50,
 
+	borderBottom: "1px solid $text",
 	border: "none",
-	borderBottom: "1px solid #ccc",
 
 	overflowY: "visible",
 	userSelect: "text",
@@ -57,7 +56,7 @@ export const Option = styled("button", {
 	cursor: "text",
 
 	"&::selection": {
-		background: color("accent"),
+		background: "$accent",
 		color: "#fff",
 	},
 
@@ -65,20 +64,20 @@ export const Option = styled("button", {
 		cursor: "pointer",
 
 		"&:hover": {
-			transition: "backgroundColor 0.1s ease-in-out",
-			backgroundColor: "#d3d3d5",
+			transition: "$bgc",
+			backgroundColor: "$button-hovered",
 		},
 	},
 
 	span: {
-		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
+		fontFamily: "$primary",
 		textAlign: "left",
 		fontSize: "1rem",
-		color: "#8e8e8e",
+		color: "$text",
 
 		"&::selection": {
-			background: color("accent"),
+			background: "$accent",
 			color: "#fff",
 		},
 	},
@@ -105,13 +104,14 @@ export const Confirm = styled("div", {
 	maxHeight: 350,
 	width: 320,
 
-	fontFamily: "$fontFamily",
 	letterSpacing: "0.03em",
-	background: "#edecf8",
+	fontFamily: "$primary",
 	textAlign: "center",
 	fontSize: "1.05rem",
 	flexWrap: "wrap",
-	color: "#00525e",
+	color: "$text",
+
+	background: "$bg-main",
 	borderRadius: 10,
 
 	p: {
@@ -125,8 +125,8 @@ export const Confirm = styled("div", {
 		width: "100%",
 		height: 40,
 
-		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
+		fontFamily: "$primary",
 		fontSize: "1.05rem",
 		fontWeight: "500",
 		color: "white",
@@ -141,8 +141,9 @@ export const Confirm = styled("div", {
 		},
 
 		"&:hover": {
-			transition: "filter 0.1s ease",
+			transition: "$filter",
 			filter: "brightness(1.1)",
+
 			cursor: "pointer",
 			color: "black",
 		},

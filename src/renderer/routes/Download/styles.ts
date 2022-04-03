@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const Wrapper = styled("section", {
 	display: "flex",
@@ -20,24 +19,23 @@ export const Wrapper = styled("section", {
 
 	/* Track */
 	"::-webkit-scrollbar-track": {
-		background: color("scrollbar"),
+		background: "$scrollbar",
 	},
 
 	/* Handle */
 	"::-webkit-scrollbar-thumb": {
-		background: color("scrollbarThumb"),
+		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	"::-webkit-scrollbar-thumb:hover": {
-		background: color("scrollbarThumbHover"),
+		background: "$scrollbar-thumb-hover",
 	},
 });
 
 export const SearchWrapper = styled("div", {
-	display: "flex",
 	position: "relative",
-	flexDirection: "row",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -45,8 +43,8 @@ export const SearchWrapper = styled("div", {
 	height: 60,
 
 	p: {
-		fontFamily: "$fontFamily",
 		letterSpacing: "0.02rem",
+		fontFamily: "$primary",
 		position: "absolute",
 		fontSize: "0.8rem",
 		marginTop: "4rem",
@@ -56,8 +54,7 @@ export const SearchWrapper = styled("div", {
 
 export const Searcher = styled("button", {
 	position: "relative",
-	display: "flex",
-	flexDirection: "row",
+	display: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
 
@@ -65,15 +62,16 @@ export const Searcher = styled("button", {
 	width: "80%",
 	height: 40,
 
+	border: "1px solid $text",
 	borderRadius: 10,
-	border: `1px solid ${color("text")}`,
 	cursor: "text",
 
 	"& svg": {
-		transition: "opacity .2s ease-in-out 20ms",
-		color: color("text"),
-		marginLeft: "10px",
+		transition: "$opacity",
 		opacity: 0.5,
+
+		marginLeft: "10px",
+		color: "$text",
 	},
 
 	"&:hover svg": {
@@ -81,7 +79,7 @@ export const Searcher = styled("button", {
 	},
 
 	"&::after": {
-		transition: "opacity .2s ease-in-out 20ms",
+		transition: "$opacity",
 		opacity: 0.5,
 	},
 
@@ -90,36 +88,28 @@ export const Searcher = styled("button", {
 	},
 
 	input: {
-		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
-		boxSizing: "border-box",
+		fontFamily: "$primary",
 		fontSize: "0.9rem",
 
+		boxSizing: "border-box",
 		size: "100%",
 
 		background: "transparent",
 		borderRadius: 15,
 		border: "none",
 
-		color: color("text"),
-		paddingRight: 10,
-		paddingLeft: 10,
+		color: "$text",
+		opacity: 0.5,
+		px: 10,
 
 		"&::placeholder": {
-			color: "#ccc",
-		},
-
-		"&::after": {
-			transition: "opacity .2s ease-in-out 20ms",
-			opacity: 0.5,
+			color: "$text",
 		},
 
 		"&:hover": {
+			transition: "$opacity",
 			opacity: 1,
-
-			"&::placeholder": {
-				color: color("text"),
-			},
 		},
 	},
 });
@@ -128,8 +118,8 @@ export const ResultContainer = styled("div", {
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "center",
-	marginBottom: "1.3rem",
 	alignItems: "center",
+	mb: "1.3rem",
 
 	img: {
 		objectFit: "cover",
@@ -149,7 +139,7 @@ export const ResultContainer = styled("div", {
 
 		boxShadow: "$reflect",
 
-		transition: "transform 0.2s ease-in-out 17ms",
+		transition: "$transform",
 
 		"&:hover": {
 			transform: "scale(1.04)",
@@ -157,23 +147,23 @@ export const ResultContainer = styled("div", {
 	},
 
 	p: {
-		fontFamily: "$fontFamily",
+		fontFamily: "$primary",
 		textAlign: "center",
 		margin: "2rem 1rem",
 		fontSize: "1.1rem",
 
 		wordWrap: "normal",
-		color: color("text"),
+		color: "$text",
 	},
 
 	span: {
-		fontFamily: "$fontFamily",
+		fontFamily: "$primary",
 		textAlign: "center",
 		margin: "1rem auto",
 		fontSize: "1rem",
 
 		wordWrap: "normal",
-		color: color("text"),
+		color: "$text",
 	},
 });
 
@@ -184,21 +174,22 @@ export const Button = styled("button", {
 	width: 160,
 	height: 42,
 
-	fontFamily: "$fontFamily",
+	fontFamily: "$primary",
 	textAlign: "center",
 	fontSize: "1rem",
 	padding: 10,
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	boxShadow: "$small",
 	cursor: "pointer",
 	color: "black",
 
 	borderRadius: 5,
 	border: "none",
+	opacity: 0.65,
 
 	"&:hover": {
-		transition: "opacity 0.3s ease-in-out 17ms",
-		boxShadow: "$insetSmall",
+		transition: "$opacity",
+		opacity: 1,
 	},
 });

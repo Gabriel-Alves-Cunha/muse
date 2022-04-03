@@ -1,5 +1,4 @@
 import { styled, keyframes } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const Wrapper = styled("header", {
 	display: "flex", // row,
@@ -31,11 +30,15 @@ export const Search = styled("div", {
 	height: 30,
 
 	background: "transparent",
-	color: color("text"),
 	boxShadow: "$small",
 	borderRadius: 15,
 	border: "none",
 	cursor: "text",
+
+	color: "$text",
+
+	transition: "$opacity",
+	opacity: 0.6,
 
 	"& svg": {
 		marginLeft: 10,
@@ -43,41 +46,31 @@ export const Search = styled("div", {
 
 	"&:hover": {
 		boxShadow: "$insetSmall",
-		transition: "$opacity",
 
-		"& svg": {
-			color: "rgba(0, 0, 0, 0.5)",
-		},
+		transition: "$opacity",
+		opacity: 1,
 	},
 
 	input: {
-		fontFamily: "$fontFamily",
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
+		fontFamily: "$primary",
 		fontSize: "0.9rem",
+		color: "$text",
 
+		padding: "0 10px",
 		size: "100%",
 
 		background: "transparent",
 		borderRadius: 15,
 		border: "none",
 
-		color: color("text"),
-		padding: "0 10px",
-
 		transition: "$opacity",
 		opacity: 0.5,
 
 		"&:hover": {
+			transition: "$opacity",
 			opacity: 1,
-
-			"&::placeholder": {
-				color: color("text"),
-			},
-		},
-
-		"&::placeholder": {
-			color: color("text"),
 		},
 	},
 });
@@ -129,7 +122,7 @@ export const SearchResultsWrapper = styled("section", {
 	marginTop: 30,
 	zIndex: 10,
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	boxShadow: "$medium",
 
 	"&.list": {
@@ -142,17 +135,17 @@ export const SearchResultsWrapper = styled("section", {
 
 		/* Track */
 		"::-webkit-scrollbar-track": {
-			background: color("scrollbar"),
+			background: "$scrollbar",
 		},
 
 		/* Handle */
 		"::-webkit-scrollbar-thumb": {
-			background: color("scrollbarThumb"),
+			background: "$scrollbar-thumb",
 		},
 
 		/* Handle on hover */
 		"::-webkit-scrollbar-thumb:hover": {
-			background: color("scrollbarThumbHover"),
+			background: "$scrollbar-thumb-hover",
 		},
 	},
 });
@@ -164,15 +157,17 @@ export const Result = styled("button", {
 
 	width: "95% !important",
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	margin: "10px !important",
 	cursor: "pointer",
 	borderRadius: 7,
 	border: "none",
 
-	// TODO: fix this
+	transition: "$boxShadow",
+	boxShadow: "",
+
 	"&:hover": {
-		transition: "opacity 0.2s ease-in-out 17ms",
+		transition: "$boxShadow",
 		boxShadow: "$medium",
 	},
 });
@@ -184,7 +179,7 @@ export const NothingFound = styled("div", {
 
 	width: "95% !important",
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 	margin: "10px !important",
 	cursor: "pointer",
 	borderRadius: 7,

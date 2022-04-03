@@ -1,5 +1,5 @@
+import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const Nav = styled("nav", {
 	display: "flex", // row
@@ -7,9 +7,8 @@ export const Nav = styled("nav", {
 	justifyContent: "space-between",
 	alignItems: "center",
 
-	backgroundColor: color("bgMain"),
-	height: "100vh",
-	padding: "20px 0",
+	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
+	backgroundColor: "$bg-main",
 	width: 65,
 });
 
@@ -31,21 +30,21 @@ export const ScaleUpIconButton = styled("button", {
 
 	backgroundColor: "transparent",
 	cursor: "pointer",
+
+	color: "$deactivated-icon",
 	fontSize: "1rem",
 
-	color: color("deactivatedIcon"),
+	willChange: "transform",
 	transition: "$scale",
 	border: "none",
 
 	"&:hover": {
-		"&:not(&.active)": {
-			transition: "$scale",
-			transform: "scale(1.5)",
-			color: color("activeIcon"),
-		},
+		transition: "$scale",
+		transform: "scale(1.4)",
+		color: "$active-icon",
 	},
 
 	"&.active": {
-		color: color("activeIcon"),
+		color: "$active-icon",
 	},
 });

@@ -26,7 +26,6 @@ export default defineConfig({
 			"**/animation.ts",
 			"**/styles.ts",
 			"**/global.ts",
-			"**/theme.ts",
 			"coverage/**",
 			"**/*.d.ts",
 		],

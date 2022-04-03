@@ -3,30 +3,34 @@ import {
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
+import { styled, darkTheme, lightTheme } from "@styles/global";
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@utils/app";
-import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 import { useEffect } from "react";
 
 const themeKey = `${keyPrefix}theme` as const;
 
-export function ThemeToggler() {
-	const [theme, setTheme] = useLocalStorage<"light" | "dark">(
-		themeKey,
-		"light",
-	);
-	const nextTheme = theme === "light" ? "dark" : "light";
+type Themes = "light" | "dark";
 
+const availableThemes: Record<Themes, string> = Object.freeze({
+	light: lightTheme.className,
+	dark: darkTheme.className,
+} as const);
+
+export function ThemeToggler() {
+	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, "light");
+	const nextTheme: Themes = theme === "light" ? "dark" : "light";
+	const html = document.documentElement;
+
+	// Only run on firt render
 	useEffect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		document.getElementById("root")!.dataset.theme = theme;
+		html.classList.add(availableThemes[theme]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleClick = () => {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		document.getElementById("root")!.dataset.theme = nextTheme;
+		html.classList.remove(availableThemes[theme]);
+		html.classList.add(availableThemes[nextTheme]);
 
 		setTheme(nextTheme);
 	};
@@ -44,7 +48,7 @@ const Button = styled("button", {
 	alignItems: "center",
 
 	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
-	backgroundColor: color("accent"),
+	backgroundColor: "$accent",
 	cursor: "pointer",
 	border: "none",
 	color: "white",

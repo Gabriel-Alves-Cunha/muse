@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const Bar = styled("progress", {
 	appearance: "none",
@@ -10,7 +9,7 @@ export const Bar = styled("progress", {
 	height: 3,
 
 	"&[value]::-webkit-progress-value": {
-		backgroundColor: color("accent"),
+		backgroundColor: "$accent",
 	},
 
 	"&[value]::-webkit-progress-bar": {

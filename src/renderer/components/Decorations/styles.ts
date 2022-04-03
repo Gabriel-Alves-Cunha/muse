@@ -1,5 +1,4 @@
 import { styled } from "@styles/global";
-import { color } from "@styles/theme";
 
 export const DECORATIONS_HEADER_HEIGHT = "27px";
 
@@ -11,7 +10,7 @@ export const Wrapper = styled("header", {
 	minHeight: DECORATIONS_HEADER_HEIGHT,
 	width: "100%",
 
-	backgroundColor: color("bgMain"),
+	backgroundColor: "$bg-main",
 
 	"-webkit-app-region": "drag",
 	// ^ window-draggable-region
@@ -38,7 +37,7 @@ export const WindowButton = styled("button", {
 	},
 
 	"&:hover": {
-		backgroundColor: color("buttonHovered"),
+		backgroundColor: "$button-hovered",
 	},
 });
 
@@ -65,11 +64,11 @@ export const AppName_Folder_Wrapper = styled("button", {
 
 	transform: "translate(-50%)",
 
-	fontFamily: "$fontFamily",
 	letterSpacing: "0.03em",
-	color: color("text"),
+	fontFamily: "$primary",
 	fontSize: "0.9em",
 	fontWeight: 300,
+	color: "$text",
 
 	"@sm": {
 		display: "none",
