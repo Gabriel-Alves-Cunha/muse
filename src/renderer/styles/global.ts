@@ -7,19 +7,6 @@ export const { styled, globalCss, keyframes, createTheme } = createStitches({
 		lg: "(max-width: 1024px)",
 	},
 	theme: {
-		shadows: {
-			insetSmall:
-				"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
-			medium:
-				"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
-			small:
-				"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
-			glow: "0px 0px 3px 1px",
-			reflect:
-				"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
-			"white-glow-around-component":
-				"7px 7px 14px #b1b1b1, -7px -7px 14px white",
-		},
 		transitions: {
 			boxShadow: "box-shadow .2s ease-in-out 20ms",
 			bgc: "background-color .2s ease-in-out 20ms",
@@ -99,7 +86,22 @@ export const darkTheme = createTheme({
 
 		"button-hovered": "#dbdadc",
 
+		"bg-popover": "white",
+
 		accent: "#550c18",
+	},
+	shadows: {
+		insetSmall:
+			"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
+		medium:
+			"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
+		small:
+			"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
+		"small-black": "0 0 4px 25px rgba(0, 0, 0, 0.07)",
+		glow: "0 0 3px 1px",
+		reflect:
+			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
+		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 	},
 });
 
@@ -121,7 +123,22 @@ export const lightTheme = createTheme({
 
 		"button-hovered": "#dbdadc",
 
+		"bg-popover": "white",
+
 		accent: "#af1b3f",
+	},
+	shadows: {
+		insetSmall:
+			"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
+		medium:
+			"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
+		small:
+			"-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
+		"small-black": "3px 3px 4px rgba(0, 0, 0, 0.07)",
+		glow: "0px 0px 3px 1px",
+		reflect:
+			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
+		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 	},
 });
 
@@ -141,7 +158,8 @@ export const GlobalCSS = globalCss({
 	},
 
 	body: {
-		overflow: "hidden",
+		position: "fixed",
+		overflow: "hidden !important",
 		size: "100%",
 	},
 

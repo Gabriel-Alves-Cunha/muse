@@ -2,7 +2,7 @@ import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
 import type { Mutable, Path } from "@common/@types/typesAndEnums";
 import type { ProgressProps } from "@components/Progress";
 
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
@@ -23,7 +23,8 @@ import {
 	sendMsg,
 } from "@contexts";
 
-import { Circle, Popup, Progress, Title } from "./styles";
+import { Trigger, Wrapper, Popup, Title } from "../Downloading/styles";
+import { ConvertionProgress } from "./styles";
 
 const useConvertList = create<{ convertList: MediaBeingConverted[] }>(() => ({
 	convertList: [],
@@ -224,17 +225,29 @@ function useConverting() {
 
 export function Converting() {
 	const [convertList, cancelDownloadAndOrRemoveItFromList] = useConverting();
-	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
+	const [showPopup, setShowPopup] = useState(false);
 	const popupRef = useRef<HTMLDivElement>(null);
 
-	useOnClickOutside(popupRef, () => toggleShowPopup());
+	useOnClickOutside(popupRef, () => setShowPopup(false));
+
+	useEffect(() => {
+		function handleEscKey(event: KeyboardEvent) {
+			if (event.key === "Escape") setShowPopup(false);
+		}
+
+		window.addEventListener("keydown", handleEscKey);
+
+		return () => window.removeEventListener("keydown", handleEscKey);
+	}, []);
 
 	return convertList.length > 0 ? (
-		<>
-			<Circle onClick={toggleShowPopup}>{icon(ProgressStatus.CONVERT)}</Circle>
+		<Wrapper ref={popupRef}>
+			<Trigger onClick={() => setShowPopup(prev => !prev)}>
+				{icon(ProgressStatus.CONVERT)}
+			</Trigger>
 
 			{showPopup && (
-				<Popup ref={popupRef}>
+				<Popup>
 					{convertList.map(convert => (
 						<div key={convert.path}>
 							<Title>
@@ -251,7 +264,7 @@ export function Converting() {
 								</span>
 							</Title>
 
-							<Progress>
+							<ConvertionProgress>
 								<table>
 									<tbody>
 										<tr>
@@ -261,12 +274,12 @@ export function Converting() {
 										</tr>
 									</tbody>
 								</table>
-							</Progress>
+							</ConvertionProgress>
 						</div>
 					))}
 				</Popup>
 			)}
-		</>
+		</Wrapper>
 	) : null;
 }
 

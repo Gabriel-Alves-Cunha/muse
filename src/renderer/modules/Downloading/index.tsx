@@ -1,11 +1,7 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { FcCancel as Cancel } from "react-icons/fc";
-import { Popover } from "@radix-ui/react-popover";
 import { toast } from "react-toastify";
-import {
-	MdDownloading as DownloadingIcon,
-	MdClose as Close,
-} from "react-icons/md";
 import create from "zustand";
 
 import { useDownloadValues, MsgEnum, sendMsg } from "@contexts";
@@ -15,13 +11,8 @@ import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { Progress } from "@components/Progress";
 
-import {
-	StyledPopoverTrigger,
-	StyledContent,
-	StyledArrow,
-	StyledClose,
-	Title,
-} from "./styles";
+import { Title, Trigger, Popup, Wrapper } from "./styles";
+import { useOnClickOutside } from "@hooks";
 
 // const { port1: testPort } = new MessageChannel();
 // const testDownloadingMedia: DownloadingMedia = Object.freeze({
@@ -245,97 +236,115 @@ function useDownloading() {
 	return cancelDownloadAndOrRemoveItFromList;
 }
 
-// export function Downloading() {
-// 	const [showPopup, toggleShowPopup] = useReducer(prev => !prev, false);
-// 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
-// 	const { downloadingList } = useDownloadingList();
-// 	const popupRef = useRef<HTMLDivElement>(null);
-
-// 	useOnClickOutside(popupRef, () => toggleShowPopup());
-
-// 	return (
-// 		<>
-// 			<Circle onClick={toggleShowPopup}>
-// 				<DownloadingIcon size="20" />
-// 			</Circle>
-
-// 			{showPopup && (
-// 				<Popup ref={popupRef}>
-// 					{downloadingList.map(download => (
-// 						<div key={download.url}>
-// 							<Title>
-// 								<p>{download.title}</p>
-// 								<span>
-// 									<Cancel
-// 										size={13}
-// 										color="#777"
-// 										onClick={() =>
-// 											cancelDownloadAndOrRemoveItFromList(download.url)
-// 										}
-// 									/>
-// 								</span>
-// 							</Title>
-
-// 							<Progress
-// 								percent_0_to_100={download.percentage}
-// 								status={download.status}
-// 								showStatus={true}
-// 							/>
-// 						</div>
-// 					))}
-// 				</Popup>
-// 			)}
-// 		</>
-// 	);
-// }
 export function Downloading() {
 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
+	const [showPopup, setShowPopup] = useState(false);
 	const { downloadingList } = useDownloadingList();
+	const popupRef = useRef<HTMLDivElement>(null);
+
+	useOnClickOutside(popupRef, () => setShowPopup(false));
+
+	useEffect(() => {
+		function handleEscKey(event: KeyboardEvent) {
+			if (event.key === "Escape") setShowPopup(false);
+		}
+
+		window.addEventListener("keydown", handleEscKey);
+
+		return () => window.removeEventListener("keydown", handleEscKey);
+	}, []);
 
 	return (
-		<Popover modal>
-			<StyledPopoverTrigger>
-				<DownloadingIcon size="20" aria-label="See downloads" />
-			</StyledPopoverTrigger>
-
-			<StyledContent
-				collisionTolerance={30}
-				sideOffset={5}
-				align="center"
-				side="right"
+		<Wrapper ref={popupRef}>
+			<Trigger
+				onClick={() => setShowPopup(prev => !prev)}
+				className={`${showPopup ? "active" : ""}`}
 			>
-				{downloadingList.map(download => (
-					<div key={download.url}>
-						<Title>
-							<p>{download.title}</p>
-							<span>
-								<Cancel
-									size={13}
-									color="#777"
-									onClick={() =>
-										cancelDownloadAndOrRemoveItFromList(download.url)
-									}
-								/>
-							</span>
-						</Title>
+				<DownloadingIcon size="20" />
+			</Trigger>
 
-						<Progress
-							percent_0_to_100={download.percentage}
-							status={download.status}
-							showStatus
-						/>
-					</div>
-				))}
+			{showPopup && (
+				<Popup>
+					{downloadingList.map(download => (
+						<div key={download.url}>
+							<Title>
+								<p>{download.title}</p>
 
-				<StyledArrow />
+								<span>
+									<Cancel
+										size={13}
+										color="#777"
+										onClick={() =>
+											cancelDownloadAndOrRemoveItFromList(download.url)
+										}
+									/>
+								</span>
+							</Title>
 
-				<StyledClose aria-label="Close">
-					<Close size="15" />
-				</StyledClose>
-			</StyledContent>
-		</Popover>
+							<Progress
+								percent_0_to_100={download.percentage}
+								status={download.status}
+								showStatus={true}
+							/>
+						</div>
+					))}
+				</Popup>
+			)}
+		</Wrapper>
 	);
 }
+// export function Downloading() {
+// 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
+// 	const { downloadingList } = useDownloadingList();
+
+// 	return (
+// 		<StyledRoot modal>
+// 			<StyledAnchor>
+// 				<StyledPopoverTrigger asChild>
+// 					<DownloadingIcon size="20" aria-label="See downloads" />
+// 				</StyledPopoverTrigger>
+// 			</StyledAnchor>
+
+// 			<StyledContent
+// 				collisionTolerance={30}
+// 				sideOffset={5*2}
+// 				side="right"
+// 			>
+// 				<Text>Downloading</Text>
+
+// 				{downloadingList.map(download => (
+// 					<div key={download.url}>
+// 						<Title>
+// 							<p>{download.title}</p>
+
+// 							<span>
+// 								<Cancel
+// 									size={13}
+// 									color="#777"
+// 									onClick={() =>
+// 										cancelDownloadAndOrRemoveItFromList(download.url)
+// 									}
+// 								/>
+// 							</span>
+// 						</Title>
+
+// 						<Progress
+// 							percent_0_to_100={download.percentage}
+// 							status={download.status}
+// 							showStatus
+// 						/>
+// 					</div>
+// 				))}
+
+// 				{/* <StyledArrow /> */}
+
+// 				<StyledClose aria-label="Close">
+// 					<Close size="15" />
+// 				</StyledClose>
+// 			</StyledContent>
+// 		</StyledRoot>
+// 	);
+// }
 
 type DownloadingMedia = Readonly<{
 	status: ProgressStatus;
