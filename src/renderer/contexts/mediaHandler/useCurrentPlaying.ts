@@ -327,7 +327,7 @@ if (globalThis.window) {
 			});
 
 			// Adding event listeners:
-			audio.addEventListener("loadedmetadata", () => {
+			audio.addEventListener("loadeddata", () => {
 				if (currentTime > 10) {
 					console.log(
 						`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
@@ -343,7 +343,10 @@ if (globalThis.window) {
 				URL.revokeObjectURL(url);
 			});
 			audio.addEventListener("stalled", e => {
-				console.log("Audio is stalled:", e);
+				console.log(
+					"Audio is stalled (Fires when the browser is trying to get media data, but data is not available):",
+					e,
+				);
 			});
 			audio.addEventListener("securitypolicyviolation", e => {
 				console.error("Audio has a security policy violation:", e);
@@ -359,6 +362,10 @@ if (globalThis.window) {
 			});
 			audio.addEventListener("close", () => {
 				console.log("Audio was closed.");
+				URL.revokeObjectURL(url);
+			});
+			audio.addEventListener("ended", () => {
+				console.log("Audio has ended.");
 				URL.revokeObjectURL(url);
 			});
 		},

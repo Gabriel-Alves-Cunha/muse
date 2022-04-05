@@ -1,8 +1,12 @@
 * TODO: play new audio is calling twice!
 * FIX: history list is not storing medias with new indexes!
 * TODO: useDebounce/useTransition
-* TODO: use radix components
 * TODO: use tooltip for seeking
+* TODO: use Label from radix-ui on album change
+* TODO: use dialog from radix-ui on media details
+* TODO: use toast from radix-ui
+* TODO: use alert dialog from radix-ui to delete media
+* TODO: make visualizer
 
 NOTES:
 

@@ -15,7 +15,6 @@ import { useCurrentPlaying, CurrentPlayingEnum, usePlaylists } from "@contexts";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
 
-import { pulse } from "@styles/animations";
 import {
 	ListWrapper,
 	PlayButton,
@@ -80,7 +79,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 						</Info>
 					</PlayButton>
 
-					<Options onClick={() => setShowPopup(media)} onMouseDown={pulse}>
+					<Options onClick={() => setShowPopup(media)}>
 						<Dots />
 					</Options>
 				</RowWrapper>

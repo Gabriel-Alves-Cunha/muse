@@ -102,7 +102,7 @@ export function MediaPlayer() {
 
 	useEffect(() => {
 		if (!audio) return;
-		dbg("Setting progress listener");
+		dbg("Setting progress listener.");
 
 		audio.addEventListener("timeupdate", () => {
 			const { duration, currentTime } = audio;
