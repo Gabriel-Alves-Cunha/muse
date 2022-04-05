@@ -8,30 +8,85 @@ export const Wrapper = styled("div", {
 	justifyContent: "flex-start",
 	alignContent: "center",
 
-	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
+	height: `calc(100vh - 2 * ${DECORATIONS_HEADER_HEIGHT})`,
+	minWidth: 176,
 	width: "25vw",
+
 	zIndex: 30,
 	right: 0,
 
-	backgroundColor: "$bg-media-player",
+	background:
+		"linear-gradient(0deg, rgba(195,101,34,1) 0%, rgba(253,187,45,1) 100%)",
 	padding: "1rem",
-	border: "none",
+
+	"@media-player": {
+		flexDirection: "row",
+		justifyContent: "center",
+		alignContent: "center",
+		width: "100vw",
+		height: 70,
+		bottom: 0,
+	},
 });
 
-// TODO: make it a square
-export const ImgContainer = styled("div", {
+export const OptionsAndAlbum = styled("div", {
 	display: "flex", // row
+	justifyContent: "space-between",
+	alignItems: "center",
+});
+
+export const Album = styled("span", {
+	letterSpacing: "0.04rem",
+	fontFamily: "$primary",
+	fontSize: "1rem",
+	fontWeight: 500,
+	color: "$alternative-text",
+});
+
+export const OptionsButton = styled("button", {
+	display: "block",
 	justifyContent: "center",
 	alignItems: "center",
+	size: 25,
+
+	backgroundColor: "transparent",
+	cursor: "pointer",
+	border: "none",
+
+	transition: "$color",
+	color: "$deactivated-icon",
+
+	"&:hover": {
+		transition: "$color",
+		color: "$active-icon",
+	},
+});
+
+export const SquareImage = styled("div", {
+	position: "relative",
 	alignSelf: "center",
 
-	marginTop: "15%",
-	height: "25vw",
-	width: "25vw",
+	marginTop: "25%",
+	width: "90%",
 
-	boxShadow: "$white-glow-around-component",
+	backgroundColor: "transparent",
+	boxShadow: "$medium-black",
 	borderRadius: 17,
 	border: "none",
+
+	"&:after": {
+		content: "",
+		display: "block",
+		pb: "100%",
+	},
+
+	div: {
+		position: "absolute",
+		display: "flex", // row
+		justifyContent: "center",
+		alignItems: "center",
+		size: "100%",
+	},
 
 	img: {
 		objectFit: "cover",
@@ -58,26 +113,34 @@ export const Info = styled("div", {
 		alignItems: "center",
 		width: "100%",
 
+		letterSpacing: "0.04em",
+		fontFamily: "$primary",
+		textAlign: "center",
+		flexWrap: "wrap",
+
+		overflowY: "hidden",
+
 		"&.title": {
-			letterSpacing: "0.03em",
-			fontFamily: "$primary",
-			fontSize: "1.1rem",
+			fontSize: "1.15rem",
 			fontWeight: 500,
 			color: "$text",
-
-			overflowY: "hidden",
 		},
 
 		"&.subtitle": {
-			letterSpacing: "0.03em",
-			fontFamily: "$primary",
 			color: "$gray-text",
 			fontSize: "0.9rem",
 			fontWeight: 400,
-
-			overflowY: "hidden",
 		},
 	},
+});
+
+export const ControlsAndSeekerContainer = styled("div", {
+	position: "absolute",
+	display: "flex",
+	flexDirection: "column",
+	bottom: 40,
+
+	width: "87%",
 });
 
 export const SeekerContainer = styled("div", {
@@ -93,7 +156,7 @@ export const SeekerContainer = styled("div", {
 		letterSpacing: "0.03em",
 		fontFamily: "$primary",
 		textAlign: "center",
-		color: "$gray-text",
+		color: "$bg-main",
 		fontSize: "1rem",
 
 		backgroundColor: "transparent",
@@ -105,46 +168,66 @@ export const Controls = styled("div", {
 	display: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",
+	mt: "10%",
 	gap: 10,
 
 	"> div": {
 		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
-	},
 
-	"#loop": {},
+		span: {
+			display: "flex", // row
+			justifyContent: "center",
+			alignItems: "center",
 
-	"#random": {},
+			"&.previous-or-next": {
+				borderRadius: "50%",
+				cursor: "pointer",
+				size: 40,
 
-	span: {
-		display: "flex", // row
-		justifyContent: "center",
-		alignItems: "center",
+				transition: "$color",
+				color: "$deactivated-icon",
 
-		"&.previous-or-next": {
-			borderRadius: "50%",
-			cursor: "pointer",
-			color: "$text",
-			size: 40,
+				"&:hover": {
+					transition: "$color",
+					color: "$active-icon",
+				},
+			},
 
-			// TODO: see if this works
-			"&:hover": "$scaleTransition",
-		},
+			"&.play-pause": {
+				borderRadius: "50%",
+				cursor: "pointer",
+				size: 50,
 
-		"&.play-pause": {
-			borderRadius: "50%",
-			cursor: "pointer",
-			color: "$text",
-			size: 50,
+				transition: "$color",
+				color: "$deactivated-icon",
 
-			transition: "$scale",
-
-			"&:hover": {
-				transition: "$scale",
-				transform: "scale(1.1)",
+				"&:hover": {
+					transition: "$color",
+					color: "$active-icon",
+				},
 			},
 		},
+	},
+});
+
+export const ButtonForRandomAndLoop = styled("button", {
+	display: "flex", // row
+	justifyContent: "center",
+	alignItems: "center",
+	size: 25,
+
+	backgroundColor: "transparent",
+	cursor: "pointer",
+	border: "none",
+
+	willChange: "transform",
+	transition: "$scale",
+
+	"&:hover": {
+		transition: "$scale",
+		transform: "scale(1.5)",
 	},
 });
 
@@ -153,7 +236,7 @@ export const ProgressWrapper = styled("div", {
 	width: 200,
 	height: 3,
 
-	backgroundColor: "rgba(125, 125, 125, 0.6)",
+	backgroundColor: "$bg-main",
 	cursor: "pointer",
 	margin: "0 7px",
 });
@@ -181,9 +264,3 @@ export const ProgressThumb = styled("div", {
 // 	animation: "move 1s linear infinite",
 // 	transform: "translate(0, -25%)",
 // });
-
-export const OptionsAndAlbum = styled("div", {
-	display: "flex", // row
-	justifyContent: "space-between",
-	alignItems: "center",
-});

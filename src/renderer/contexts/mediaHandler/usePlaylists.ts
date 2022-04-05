@@ -77,7 +77,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 							dbg("At ListenToNotification.ADD_MEDIA:", { path });
 
-							const media: Media = (await transformPathsToMedias([path]))[0];
+							const media = (await transformPathsToMedias([path]))[0];
 
 							if (!media) {
 								console.error(`Could not transform "${path}" to media.`);
@@ -408,7 +408,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								);
 
 								dbg(
-									"playlistsReducer on 'update mediaList'->'refresh one'. newMediaWithRightIndex =",
+									"playlistsReducer on 'update mediaList'->'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
 									newMediaWithCorrectIndex,
 									"\nnewMediaList =",
 									newMediaList,

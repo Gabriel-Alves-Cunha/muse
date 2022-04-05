@@ -1,10 +1,12 @@
 {
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"noPropertyAccessFromIndexSignature": true,
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
 		"strictPropertyInitialization": true,
 		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
 		"experimentalDecorators": false,
 		"strictFunctionTypes": true,
 		"strictBindCallApply": true,

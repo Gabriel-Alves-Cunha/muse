@@ -14,7 +14,7 @@ import { ThemeToggler } from "@modules/ThemeToggler";
 import { usePage } from "@contexts";
 import { pages } from "@utils/app";
 
-import { ScaleUpIconButton, Nav, Buttons } from "./styles";
+import { ScaleUpIconButton, Nav, Buttons, Popups } from "./styles";
 
 const { setState: setPage } = usePage;
 
@@ -24,8 +24,11 @@ export const Navbar = () => (
 
 		<ButtonsForPages />
 
-		<Downloading />
-		<Converting />
+		<Popups>
+			<Converting />
+
+			<Downloading />
+		</Popups>
 	</Nav>
 );
 

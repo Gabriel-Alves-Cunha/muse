@@ -3,6 +3,7 @@ import type { Mutable, Path } from "@common/@types/typesAndEnums";
 import type { ProgressProps } from "@components/Progress";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MdCompareArrows as Convert } from "react-icons/md";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
@@ -14,7 +15,6 @@ import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
-import { icon } from "@components/Progress";
 import {
 	useConvertValues,
 	ConvertValues,
@@ -240,10 +240,10 @@ export function Converting() {
 		return () => window.removeEventListener("keydown", handleEscKey);
 	}, []);
 
-	return convertList.length > 0 ? (
+	return (
 		<Wrapper ref={popupRef}>
 			<Trigger onClick={() => setShowPopup(prev => !prev)}>
-				{icon(ProgressStatus.CONVERT)}
+				<Convert size="20" />
 			</Trigger>
 
 			{showPopup && (
@@ -280,7 +280,7 @@ export function Converting() {
 				</Popup>
 			)}
 		</Wrapper>
-	) : null;
+	);
 }
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));

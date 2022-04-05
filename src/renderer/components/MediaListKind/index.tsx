@@ -3,7 +3,6 @@ import type { Media } from "@common/@types/typesAndEnums";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-
 import { memo, useState } from "react";
 import {
 	type ListChildComponentProps,
@@ -88,7 +87,8 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 			) : null;
 		},
 		(prevProps, nextProps) =>
-			prevProps.data[prevProps.index].id === nextProps.data[nextProps.index].id,
+			prevProps.data[prevProps.index]?.id ===
+			nextProps.data[nextProps.index]?.id,
 	);
 	Row.displayName = "Row";
 
@@ -97,7 +97,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 			<AutoSizer>
 				{({ height, width }) => (
 					<List
-						itemKey={(index, data) => data[index].id + Date.now()}
+						itemKey={(index, data) => data[index]?.id ?? 0 + Date.now()}
 						itemSize={ROW_HEIGHT + PADDING_SIZE}
 						itemCount={list.list.length}
 						itemData={list.list}
@@ -132,4 +132,4 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 export const overlayStyle = Object.freeze({
 	background: "rgba(0,0,0,0.15)",
 	backdropFilter: "blur(2px)",
-});
+} as const);

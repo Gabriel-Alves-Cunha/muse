@@ -41,7 +41,7 @@ export const Title = styled("p", {
 	fontFamily: "$primary",
 	fontSize: "1rem",
 	fontWeight: 500,
-	color: "$text",
+	color: "$alternative-text",
 
 	wordWrap: "normal",
 	overflow: "hidden",
@@ -87,14 +87,12 @@ export const Options = styled("button", {
 
 	"&:hover": {
 		transition: "$boxShadow",
-		boxShadow: "$medium",
+		boxShadow: "$medium-black",
 	},
 });
 
 export const ListWrapper = styled("div", {
 	boxSizing: "border-box",
-	boxShadow: "$medium",
-	borderRadius: 7,
 
 	margin: "2em 5%",
 	height: "65vh",
@@ -178,19 +176,13 @@ export const InputWrapper = styled("div", {
 	padding: "0.5rem",
 	borderRadius: 7,
 
-	"&::selection": {
-		background: "$accent",
-		// TODO: see this:
-		color: "#ffffff",
-	},
-
 	input: {
 		letterSpacing: "0.03em",
 		boxSizing: "border-box",
 		fontFamily: "$primary",
 		fontSize: "1.05rem",
 		fontWeight: 500,
-		color: "$text",
+		color: "$alternative-text",
 
 		width: "100%",
 		height: 26,
@@ -199,18 +191,11 @@ export const InputWrapper = styled("div", {
 		paddingLeft: 10,
 		border: "none",
 
-		"&::selection": {
-			background: "$accent",
-			// TODO: see this:
-			color: "#ffffff",
-		},
-
 		"::-webkit-input-placeholder": {
 			display: "flex", // row
 			justifyContent: "flex-start",
 			alignItems: "center",
 
-			// TODO: see this:
 			color: "rgba(0, 0, 0, 0.5)",
 			fontStyle: "italic",
 		},

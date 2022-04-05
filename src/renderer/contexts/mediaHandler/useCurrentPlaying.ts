@@ -9,6 +9,7 @@ import merge from "deepmerge";
 
 import { assertUnreachable, getRandomInt } from "@utils/utils";
 import { HISTORY, MEDIA_LIST } from "./usePlaylistsHelper";
+import { formatDuration } from "@common/utils";
 import { usePlayOptions } from "./usePlayOptions";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
@@ -191,14 +192,22 @@ export const useCurrentPlaying = create(
 								const randomMedia =
 									playlist.list[getRandomInt(0, playlist.list.length)];
 
+								if (!randomMedia) {
+									console.error(
+										"There should be a random media selected, but there isn't!\nrandomMedia =",
+										randomMedia,
+									);
+									break;
+								}
+
 								// We need to update history:
-								dbg("Adding media to history");
 								getPlaylists().setPlaylists({
 									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 									type: PlaylistEnum.UPDATE_HISTORY,
 									media: randomMedia,
 								});
 
+								// Setting the current playing media:
 								set({
 									currentPlaying: {
 										media: randomMedia,
@@ -221,6 +230,14 @@ export const useCurrentPlaying = create(
 								if (!nextMediaFromTheSameList) {
 									// ^ In case it is in the final of the list (it would receive undefined):
 									const firstMediaFromTheSameList = playlist.list[0];
+
+									if (!firstMediaFromTheSameList) {
+										console.error(
+											"There should be a media at the index '0', but there isn't!\nfirstMediaFromTheSameList =",
+											firstMediaFromTheSameList,
+										);
+										break;
+									}
 
 									// We need to update history:
 									dbg("Adding media to history");
@@ -279,6 +296,8 @@ export const useCurrentPlaying = create(
 );
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
+const timeKey = "Reading <audio> file took" as const;
+let prevURL = "";
 
 if (globalThis.window) {
 	useCurrentPlaying.subscribe(
@@ -287,33 +306,61 @@ if (globalThis.window) {
 			const {
 				currentPlaying: { media, currentTime },
 			} = getCurrentPlaying();
-			if (!globalThis.window || !media) return;
+			if (!media) return;
 
-			console.time("Reading <audio> file took");
+			console.time(timeKey);
 			const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
-			console.timeEnd("Reading <audio> file took");
+			prevURL = url;
+			console.timeEnd(timeKey);
+
+			// If there is previous audio, we need to revoke it's url:
+			URL.revokeObjectURL(prevURL);
 
 			const audio = document.getElementById("audio") as HTMLAudioElement;
 			audio.src = url;
 
+			// Updating the duration of media:
+			getPlaylists().setPlaylists({
+				media: { ...media, duration: formatDuration(audio.duration) },
+				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+			});
+
+			// Adding event listeners:
 			audio.addEventListener("loadedmetadata", () => {
-				console.log("Audio has loaded metadata. Setting currentTime...");
-				if (currentTime > 10) audio.currentTime = currentTime;
+				if (currentTime > 10) {
+					console.log(
+						`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
+					);
+					audio.currentTime = currentTime;
+				}
 			});
 			audio.addEventListener("canplay", () => {
 				console.log("Audio can play.");
 			});
 			audio.addEventListener("invalid", e => {
 				console.error("Audio is invalid:", e);
+				URL.revokeObjectURL(url);
 			});
 			audio.addEventListener("stalled", e => {
 				console.log("Audio is stalled:", e);
 			});
-			audio.addEventListener("securitypolicyviolation", e =>
-				console.error("Audio has a security policy violation:", e),
-			);
-			audio.addEventListener("error", () => console.error("Audio error."));
-			audio.addEventListener("abort", () => console.log("Audio was aborted."));
+			audio.addEventListener("securitypolicyviolation", e => {
+				console.error("Audio has a security policy violation:", e);
+				URL.revokeObjectURL(url);
+			});
+			audio.addEventListener("error", () => {
+				console.error("Audio error.");
+				URL.revokeObjectURL(url);
+			});
+			audio.addEventListener("abort", () => {
+				console.log("Audio was aborted.");
+				URL.revokeObjectURL(url);
+			});
+			audio.addEventListener("close", () => {
+				console.log("Audio was closed.");
+				URL.revokeObjectURL(url);
+			});
 		},
 	);
 }
@@ -340,8 +387,8 @@ export type currentPlayingReducer_Action =
 	| Readonly<{ type: CurrentPlayingEnum.PAUSE }>;
 
 export enum CurrentPlayingEnum {
-	PLAY_PREVIOUS_FROM_HISTORY,
 	PLAY_PREVIOUS_FROM_PLAYLIST,
+	PLAY_PREVIOUS_FROM_HISTORY,
 	PLAY_NEXT_FROM_PLAYLIST,
 	PLAY_THIS_MEDIA,
 	RESUME,

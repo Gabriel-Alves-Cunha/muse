@@ -50,7 +50,7 @@ export const WindowButtons = styled("div", {
 	backgroundColor: "transparent",
 });
 
-export const AppName_Folder_Wrapper = styled("button", {
+export const AppName_Folder_Wrapper = styled("div", {
 	position: "absolute",
 	display: "flex", // row
 	justifyContent: "center",
@@ -66,7 +66,7 @@ export const AppName_Folder_Wrapper = styled("button", {
 
 	letterSpacing: "0.03em",
 	fontFamily: "$primary",
-	fontSize: "0.9em",
+	fontSize: "0.93em",
 	fontWeight: 300,
 	color: "$text",
 

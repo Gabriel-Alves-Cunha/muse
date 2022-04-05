@@ -10,6 +10,13 @@ export const Nav = styled("nav", {
 	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
 	backgroundColor: "$bg-main",
 	width: 65,
+
+	"& > :first-child": {
+		mt: 40,
+	},
+	"& > :last-child": {
+		mb: 40,
+	},
 });
 
 export const Buttons = styled("div", {
@@ -47,4 +54,13 @@ export const ScaleUpIconButton = styled("button", {
 	"&.active": {
 		color: "$active-icon",
 	},
+});
+
+export const Popups = styled("div", {
+	display: "flex", // row
+	flexDirection: "column",
+	justifyContent: "center",
+	alignItems: "center",
+
+	width: "100%",
 });

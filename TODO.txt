@@ -2,6 +2,7 @@
 * FIX: history list is not storing medias with new indexes!
 * TODO: useDebounce/useTransition
 * TODO: use radix components
+* TODO: use tooltip for seeking
 
 NOTES:
 

@@ -1,12 +1,13 @@
+import { useEffect } from "react";
 import {
 	MdLightbulbOutline as Light,
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
-import { styled, darkTheme, lightTheme } from "@styles/global";
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@utils/app";
-import { useEffect } from "react";
+
+import { styled, darkTheme, lightTheme } from "@styles/global";
 
 const themeKey = `${keyPrefix}theme` as const;
 
@@ -37,7 +38,7 @@ export function ThemeToggler() {
 
 	return (
 		<Button onClick={handleClick}>
-			{theme === "light" ? <Light size="20px" /> : <Dark size="20px" />}
+			{theme === "light" ? <Dark size="20px" /> : <Light size="20px" />}
 		</Button>
 	);
 }
@@ -46,6 +47,8 @@ const Button = styled("button", {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
+
+	filter: "drop-shadow(0 0px 0.5rem #af1b3f40)",
 
 	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
 	backgroundColor: "$accent",

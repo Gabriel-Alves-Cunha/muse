@@ -27,10 +27,15 @@ async function createWindow() {
 		title: capitalizedAppName,
 		titleBarStyle: "hidden",
 		icon: logoPath,
+
 		frame: false,
-		height: 600,
 		show: false,
+
+		minHeight: 500,
+		minWidth: 315,
+		height: 600,
 		width: 800,
+
 		webPreferences: {
 			preload: join(__dirname, "preload.js"),
 			allowRunningInsecureContent: false,
