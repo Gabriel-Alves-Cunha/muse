@@ -2,7 +2,7 @@ import { debug, enable } from "debug";
 
 const { trunc, floor } = Math;
 
-export const isDevelopment = process.env.NODE_ENV === "development";
+export const isDevelopment = process.env["NODE_ENV"] === "development";
 console.log("Electron isDevelopment =", isDevelopment);
 
 export const capitalizedAppName = "Muse" as const;
@@ -31,7 +31,7 @@ export const allowedMedias = Object.freeze(<const>[
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
 export const formatDuration = (time: number | undefined) => {
-	if (time === undefined) return "";
+	if (time === undefined) return "00:00";
 	time = trunc(time);
 
 	const days = floor(time / 86_400),

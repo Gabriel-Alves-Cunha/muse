@@ -232,6 +232,7 @@ export const ButtonForRandomAndLoop = styled("button", {
 });
 
 export const ProgressWrapper = styled("div", {
+	position: "relative",
 	display: "block",
 	width: 200,
 	height: 3,
@@ -239,6 +240,24 @@ export const ProgressWrapper = styled("div", {
 	backgroundColor: "$bg-main",
 	cursor: "pointer",
 	margin: "0 7px",
+});
+
+export const Tooltip = styled("div", {
+	position: "absolute",
+	display: "none", // row
+	justifyContent: "center",
+	alignItems: "center",
+	bottom: -5,
+	height: 20,
+	width: 30,
+
+	backgroundColor: "$bg-main",
+	borderRadius: 2,
+
+	fontFamily: "$primary",
+	fontSize: "0.8rem",
+	fontWeight: 500,
+	color: "$text",
 });
 
 export const ProgressThumb = styled("div", {

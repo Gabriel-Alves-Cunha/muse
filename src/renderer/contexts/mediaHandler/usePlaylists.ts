@@ -9,8 +9,8 @@ import merge from "deepmerge";
 import { push, remove, replace } from "@utils/array";
 import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { assertUnreachable } from "@utils/utils";
-import { hash } from "@common/hash";
 import { keyPrefix } from "@utils/app";
+import { hash } from "@common/hash";
 import { dbg } from "@common/utils";
 import {
 	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
@@ -241,7 +241,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									);
 
 								dbg(
-									"setPlaylists on 'update history'->'add'. newHistory =",
+									"setPlaylists on 'UPDATE_HISTORY'->'ADD_ONE_MEDIA'. newHistory =",
 									newHistory,
 								);
 
@@ -253,7 +253,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 							case PlaylistActions.CLEAN: {
 								dbg(
-									"setPlaylists on 'update history'->'clean'. newHistory = []",
+									"setPlaylists on 'UPDATE_HISTORY'->'CLEAN'. newHistory = []",
 								);
 
 								get().updatePlaylists([{ list: [], name: HISTORY }]);
@@ -279,7 +279,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								});
 
 								dbg(
-									"setPlaylists on 'update FAVORITES'->'add'. newFavorites =",
+									"setPlaylists on 'UPDATE_FAVORITES'->'ADD_ONE_MEDIA'. newFavorites =",
 									newFavorites,
 								);
 
@@ -295,7 +295,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								);
 
 								dbg(
-									"setPlaylists on 'update favorites'->'REMOVE_ONE_MEDIA'. newFavorites =",
+									"setPlaylists on 'UPDATE_FAVORITES'->'REMOVE_ONE_MEDIA'. newFavorites =",
 									newFavorites,
 								);
 
@@ -307,7 +307,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 							case PlaylistActions.CLEAN: {
 								dbg(
-									"setPlaylists on 'update favorites'->'clean'. newfavorites = []",
+									"setPlaylists on 'UPDATE_FAVORITES'->'CLEAN'. newfavorites = []",
 								);
 
 								get().updatePlaylists([{ list: [], name: FAVORITES }]);
@@ -349,7 +349,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								});
 
 								dbg(
-									"setPlaylists on 'update mediaList'->'add' (yet to be sorted). newMediaList =",
+									"setPlaylists on 'UPDATE_MEDIA_LIST'->'ADD_ONE_MEDIA' (yet to be sorted). newMediaList =",
 									newMediaList,
 								);
 
@@ -363,7 +363,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								);
 
 								dbg(
-									"setPlaylists on 'update mediaList'->'remove' (yet to be sorted). newMediaList =",
+									"setPlaylists on 'UPDATE_MEDIA_LIST'->'REMOVE_ONE_MEDIA' (yet to be sorted). newMediaList =",
 									newMediaList,
 								);
 
@@ -375,7 +375,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								const newMediaList = reaplyOrderedIndex(action.list);
 
 								dbg(
-									"setPlaylists on 'update mediaList'->'new list' (yet to be sorted). newMediaList =",
+									"setPlaylists on 'UPDATE_MEDIA_LIST'->'REPLACE_ENTIRE_LIST' (yet to be sorted). newMediaList =",
 									newMediaList,
 								);
 
@@ -390,7 +390,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 								if (oldMediaIndex === -1) {
 									console.error(
-										"I did not find a media when calling 'PlaylistActions.REFRESH_ONE_MEDIA_BY_ID'!",
+										`I did not find a media with id = "${action.media.id}" when calling 'REFRESH_ONE_MEDIA_BY_ID'!`,
 									);
 									break;
 								}
@@ -408,7 +408,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								);
 
 								dbg(
-									"playlistsReducer on 'update mediaList'->'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
+									"playlistsReducer on 'UPDATE_MEDIA_LIST'->'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
 									newMediaWithCorrectIndex,
 									"\nnewMediaList =",
 									newMediaList,
@@ -420,7 +420,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 							case PlaylistActions.CLEAN: {
 								dbg(
-									"playlistsReducer on 'update mediaList'->'clean' (yet to be sorted). newMediaList = []",
+									"playlistsReducer on 'UPDATE_MEDIA_LIST'->'CLEAN' (yet to be sorted). newMediaList = []",
 								);
 
 								updateSortedListsAndFinish([]);

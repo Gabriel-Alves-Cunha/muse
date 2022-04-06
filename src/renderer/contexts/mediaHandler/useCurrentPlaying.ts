@@ -33,7 +33,7 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	playlistName: MEDIA_LIST,
 	media: undefined,
 	currentTime: 0,
-});
+} as const);
 
 export type CurrentPlaying = Readonly<{
 	playlistName: Playlist["name"];
@@ -258,7 +258,6 @@ export const useCurrentPlaying = create(
 								}
 
 								// We need to update history:
-								dbg("Adding media to history");
 								getPlaylists().setPlaylists({
 									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 									type: PlaylistEnum.UPDATE_HISTORY,
@@ -297,77 +296,84 @@ export const useCurrentPlaying = create(
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 const timeKey = "Reading <audio> file took" as const;
+let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
 let prevURL = "";
 
 if (globalThis.window) {
 	useCurrentPlaying.subscribe(
 		state => state.currentPlaying.media,
-		async function setAudioToHTMLAudioElement() {
+		function setAudioToHTMLAudioElement() {
 			const {
 				currentPlaying: { media, currentTime },
 			} = getCurrentPlaying();
 			if (!media) return;
 
-			console.time(timeKey);
-			const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
-			prevURL = url;
-			console.timeEnd(timeKey);
+			if (prevMediaTimer) clearTimeout(prevMediaTimer);
 
-			// If there is previous audio, we need to revoke it's url:
-			URL.revokeObjectURL(prevURL);
+			const mediaTimer = setTimeout(async () => {
+				console.time(timeKey);
+				const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
+				console.timeEnd(timeKey);
+				prevURL = url;
 
-			const audio = document.getElementById("audio") as HTMLAudioElement;
-			audio.src = url;
+				// If there is previous audio, we need to revoke it's url:
+				URL.revokeObjectURL(prevURL);
 
-			// Updating the duration of media:
-			getPlaylists().setPlaylists({
-				media: { ...media, duration: formatDuration(audio.duration) },
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
-			});
+				const audio = document.getElementById("audio") as HTMLAudioElement;
+				audio.src = url;
 
-			// Adding event listeners:
-			audio.addEventListener("loadeddata", () => {
-				if (currentTime > 10) {
+				// Updating the duration of media:
+				getPlaylists().setPlaylists({
+					media: { ...media, duration: formatDuration(audio.duration) },
+					whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+					type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				});
+
+				// Adding event listeners:
+				audio.addEventListener("loadeddata", () => {
+					if (currentTime > 10) {
+						console.log(
+							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
+						);
+						audio.currentTime = currentTime;
+					}
+				});
+				audio.addEventListener("canplay", () => {
+					console.log("Audio can play.");
+				});
+				audio.addEventListener("invalid", e => {
+					console.error("Audio is invalid:", e);
+					URL.revokeObjectURL(url);
+				});
+				audio.addEventListener("stalled", e => {
 					console.log(
-						`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
+						"Audio is stalled (Fires when the browser is trying to get media data, but data is not available):",
+						e,
 					);
-					audio.currentTime = currentTime;
-				}
-			});
-			audio.addEventListener("canplay", () => {
-				console.log("Audio can play.");
-			});
-			audio.addEventListener("invalid", e => {
-				console.error("Audio is invalid:", e);
-				URL.revokeObjectURL(url);
-			});
-			audio.addEventListener("stalled", e => {
-				console.log(
-					"Audio is stalled (Fires when the browser is trying to get media data, but data is not available):",
-					e,
-				);
-			});
-			audio.addEventListener("securitypolicyviolation", e => {
-				console.error("Audio has a security policy violation:", e);
-				URL.revokeObjectURL(url);
-			});
-			audio.addEventListener("error", () => {
-				console.error("Audio error.");
-				URL.revokeObjectURL(url);
-			});
-			audio.addEventListener("abort", () => {
-				console.log("Audio was aborted.");
-				URL.revokeObjectURL(url);
-			});
-			audio.addEventListener("close", () => {
-				console.log("Audio was closed.");
-				URL.revokeObjectURL(url);
-			});
-			audio.addEventListener("ended", () => {
-				console.log("Audio has ended.");
-				URL.revokeObjectURL(url);
-			});
+				});
+				audio.addEventListener("securitypolicyviolation", e => {
+					console.error("Audio has a security policy violation:", e);
+					URL.revokeObjectURL(url);
+				});
+				audio.addEventListener("error", () => {
+					console.error("Audio error.");
+					URL.revokeObjectURL(url);
+				});
+				audio.addEventListener("abort", () => {
+					console.log("Audio was aborted.");
+					URL.revokeObjectURL(url);
+				});
+				audio.addEventListener("close", () => {
+					console.log("Audio was closed.");
+					URL.revokeObjectURL(url);
+				});
+				audio.addEventListener("ended", () => {
+					console.log("Audio has ended.");
+					URL.revokeObjectURL(url);
+				});
+			}, 150);
+
+			prevMediaTimer = mediaTimer;
 		},
 	);
 }

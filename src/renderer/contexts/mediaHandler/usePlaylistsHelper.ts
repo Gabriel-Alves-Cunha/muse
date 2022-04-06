@@ -18,9 +18,9 @@ export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
 	if (newMedia.id === previousHistory[0]?.id) return previousHistory;
 
 	// add newMedia to the start of array:
-	const newHistory: Media[] = unshift(previousHistory, newMedia) as Mutable<
-		Media[]
-	>;
+	const newHistory: Media[] = reaplyOrderedIndex(
+		unshift(previousHistory, newMedia) as Mutable<Media[]>,
+	);
 
 	// history has a max size of maxSizeOfHistory:
 	if (newHistory.length > maxSizeOfHistory)

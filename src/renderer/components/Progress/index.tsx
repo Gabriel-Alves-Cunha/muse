@@ -18,17 +18,11 @@ export const Progress = ({
 	<Component>
 		<Bar
 			value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}
-			max={100}
+			max="100"
 		/>
-
 		{showStatus && icon(status)}
 	</Component>
 );
-
-Progress.whyDidYouRender = {
-	logOnDifferentValues: false,
-	customName: "Progress",
-};
 
 const iconObj: Record<ProgressStatus, JSX.Element> = Object.freeze({
 	[ProgressStatus.SUCCESS]: <Success size={12} color="green" />,

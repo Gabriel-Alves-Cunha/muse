@@ -40,6 +40,7 @@ import {
 	Album,
 	Info,
 	ControlsAndSeekerContainer,
+	Tooltip,
 } from "./styles";
 
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
@@ -84,7 +85,6 @@ export function MediaPlayer() {
 		playOptions: { isRandom, loopThisMedia },
 	} = usePlayOptions();
 
-	const duration = currentPlaying.media?.duration;
 	const audio = audioRef.current;
 
 	const seek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -152,7 +152,7 @@ export function MediaPlayer() {
 			</Info>
 
 			<ControlsAndSeekerContainer>
-				<SeekerWrapper seek={seek} duration={duration} />
+				<SeekerWrapper seek={seek} duration={audio?.duration} />
 
 				<Controls>
 					<ButtonForRandomAndLoop onClick={toggleRepeatThisMedia}>
@@ -185,12 +185,36 @@ export function MediaPlayer() {
 	);
 }
 
+const handleTooltip = (
+	e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+	duration = 0,
+) => {
+	/*
+		- event.offsetX, event.offsetY
+			The X and Y coordinates of the mouse relative to the event source
+			element (srcElement).
+	*/
+
+	const tooltip = document.getElementById("tooltip");
+	const div = document.getElementById("goto");
+	if (!div || !tooltip) return;
+
+	// maybe mouseX is clientX
+	const { width: progressBarWidth, left: startX } = div.getBoundingClientRect();
+	const { offsetX: mouseX } = e.nativeEvent;
+
+	const mouseAtTime = ((mouseX - startX) / progressBarWidth) * duration;
+
+	tooltip.innerText = `${formatDuration(mouseAtTime)}`;
+	tooltip.style.left = `${mouseX}px`;
+};
+
 function SeekerWrapper({
 	seek,
 	duration,
 }: {
 	seek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-	duration: string | undefined;
+	duration: number | undefined;
 }) {
 	const { percentage, current } = useProgress();
 
@@ -198,7 +222,13 @@ function SeekerWrapper({
 		<SeekerContainer>
 			<span>{formatDuration(current)}</span>
 
-			<ProgressWrapper onClick={seek} id="goto">
+			<ProgressWrapper
+				onMouseMove={e => handleTooltip(e, duration)}
+				onClick={seek}
+				id="goto"
+			>
+				<Tooltip id="tooltip" />
+
 				<ProgressThumb
 					style={{
 						width: `${percentage}%`,
@@ -206,7 +236,7 @@ function SeekerWrapper({
 				></ProgressThumb>
 			</ProgressWrapper>
 
-			<span>{duration ?? "00:00"}</span>
+			<span>{formatDuration(duration) ?? "00:00"}</span>
 		</SeekerContainer>
 	);
 }

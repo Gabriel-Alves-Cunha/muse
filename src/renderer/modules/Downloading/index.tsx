@@ -51,7 +51,7 @@ function useDownloading() {
 			const download = downloadingList[index];
 
 			// Cancel download:
-			if (download.isDownloading)
+			if (download?.isDownloading)
 				download.port.postMessage({ destroy: true, url: download.url });
 
 			// Update downloading list:
