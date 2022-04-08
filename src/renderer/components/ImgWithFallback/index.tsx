@@ -19,7 +19,8 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 		cache[media.id] === PENDING
 	)
 		return Fallback;
-	if (cache[media.id] === SUCCESS) return <img src={media.img} />;
+	if (cache[media.id] === SUCCESS)
+		return <img src={media.img} loading="lazy" decoding="async" />;
 
 	cache[media.id] = PENDING;
 
@@ -44,7 +45,11 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 
 	img.src = media.img;
 
-	return cache[media.id] === SUCCESS ? <img src={media.img} /> : Fallback;
+	return cache[media.id] === SUCCESS ? (
+		<img src={media.img} loading="lazy" decoding="async" />
+	) : (
+		Fallback
+	);
 }
 
 type Props = {

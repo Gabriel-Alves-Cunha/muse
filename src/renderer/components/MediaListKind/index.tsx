@@ -3,24 +3,25 @@ import type { Media } from "@common/@types/typesAndEnums";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { memo, useState } from "react";
+import { Dialog, Portal } from "@radix-ui/react-dialog";
+import { memo } from "react";
 import {
 	type ListChildComponentProps,
 	FixedSizeList as List,
 } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
-import Popup from "reactjs-popup";
 
 import { useCurrentPlaying, CurrentPlayingEnum, usePlaylists } from "@contexts";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
 
+import { StyledOverlay } from "./MediaOptions/styles";
 import {
+	TriggerOptions,
 	ListWrapper,
 	PlayButton,
 	RowWrapper,
 	SubTitle,
-	Options,
 	Title,
 	Info,
 	Img,
@@ -32,8 +33,6 @@ const ROW_HEIGHT = 65;
 export function MediaListKind({ playlistName }: MediaListKindProps) {
 	const { setCurrentPlaying, currentPlaying } = useCurrentPlaying();
 	const { playlists } = usePlaylists();
-
-	const [showPopup, setShowPopup] = useState<Media>();
 
 	// TODO: ErrorBoundary
 	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
@@ -79,9 +78,17 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 						</Info>
 					</PlayButton>
 
-					<Options onClick={() => setShowPopup(media)}>
-						<Dots />
-					</Options>
+					<Dialog modal>
+						<TriggerOptions>
+							<Dots />
+						</TriggerOptions>
+
+						<Portal>
+							<StyledOverlay>
+								<MediaOptionsModal media={media} />
+							</StyledOverlay>
+						</Portal>
+					</Dialog>
 				</RowWrapper>
 			) : null;
 		},
@@ -109,26 +116,6 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 					</List>
 				)}
 			</AutoSizer>
-
-			<Popup
-				onClose={() => setShowPopup(undefined)}
-				open={Boolean(showPopup)}
-				position="center center"
-				{...{ overlayStyle }}
-				defaultOpen={false}
-				repositionOnResize
-				closeOnEscape
-				lockScroll
-				nested
-			>
-				{/* eslint-disable-next-line  @typescript-eslint/no-non-null-assertion */}
-				<MediaOptionsModal media={showPopup!} setShowPopup={setShowPopup} />
-			</Popup>
 		</ListWrapper>
 	);
 }
-
-export const overlayStyle = Object.freeze({
-	background: "rgba(0,0,0,0.15)",
-	backdropFilter: "blur(2px)",
-} as const);

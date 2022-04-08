@@ -202,7 +202,8 @@ function SeekerWrapper({
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 	const { percentage, current } = useProgress();
 
-	const isDurationValid = duration && !Number.isNaN(duration);
+	const isDurationValid =
+		typeof duration === "number" && !Number.isNaN(duration);
 
 	const handleTooltip = useCallback(
 		({

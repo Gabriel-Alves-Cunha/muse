@@ -1,3 +1,5 @@
+import { Trigger } from "@radix-ui/react-dialog";
+
 import { styled } from "@styles/global";
 
 export const Img = styled("div", {
@@ -69,7 +71,7 @@ export const SubTitle = styled("p", {
 	fontWeight: 500,
 });
 
-export const Options = styled("button", {
+export const TriggerOptions = styled(Trigger, {
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "center",
@@ -87,7 +89,7 @@ export const Options = styled("button", {
 
 	"&:hover": {
 		transition: "$boxShadow",
-		boxShadow: "$medium-black",
+		boxShadow: "5px 5px 15px 5px #000000",
 	},
 });
 

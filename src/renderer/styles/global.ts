@@ -19,6 +19,7 @@ export const { styled, globalCss, keyframes, createTheme } = createStitches({
 		},
 		fonts: {
 			primary: "'Assistant', sans-serif",
+			secondary: "Source Sans Pro",
 		},
 	},
 	utils: {
@@ -98,7 +99,7 @@ export const darkTheme = createTheme({
 			"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
 		medium:
 			"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
-		small:`
+		small: `
 			0.1px 0.1px 0.3px rgba(0, 0, 0, 0.02),
 			0.3px 0.3px 0.7px rgba(0, 0, 0, 0.028),
 			0.5px 0.5px 1.4px rgba(0, 0, 0, 0.035),
@@ -112,7 +113,7 @@ export const darkTheme = createTheme({
 			-0.9px -0.9px 2.5px rgba(255, 255, 255, 0.042),
 			-1.7px -1.7px 4.6px rgba(255, 255, 255, 0.05),
 			-4px -4px 11px rgba(255, 255, 255, 0.07)`,
-			// "-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
+		// "-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
 		"small-black": "0 0 4px 25px rgba(0, 0, 0, 0.07)",
 		"medium-black": `
 			0.7px 0.7px 2.4px -28px rgba(255, 255, 255, 0.059),
@@ -160,7 +161,7 @@ export const lightTheme = createTheme({
 			"inset -3px -3px 4px 0 rgba(255, 255, 255, 0.9), inset 3px 3px 4px 0 rgba(0, 0, 0, 0.07)",
 		medium:
 			"-6px -6px 8px rgba(255, 255, 255, 0.9), 5px 5px 8px rgba(0, 0, 0, 0.07)",
-		small:`
+		small: `
 			0.1px 0.1px 0.3px rgba(0, 0, 0, 0.02),
 			0.3px 0.3px 0.7px rgba(0, 0, 0, 0.028),
 			0.5px 0.5px 1.4px rgba(0, 0, 0, 0.035),
@@ -174,7 +175,7 @@ export const lightTheme = createTheme({
 			-0.9px -0.9px 2.5px rgba(255, 255, 255, 0.042),
 			-1.7px -1.7px 4.6px rgba(255, 255, 255, 0.05),
 			-4px -4px 11px rgba(255, 255, 255, 0.07)`,
-			// "-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
+		// "-3px -3px 4px rgba(255, 255, 255, 0.9), 3px 3px 4px rgba(0, 0, 0, 0.07)",
 		"small-black": "3px 3px 4px rgba(0, 0, 0, 0.07)",
 		"medium-black": `
 			0.7px 0.7px 2.4px -28px rgba(0, 0, 0, 0.059),
