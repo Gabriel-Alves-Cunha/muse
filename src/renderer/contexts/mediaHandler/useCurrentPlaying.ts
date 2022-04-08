@@ -297,7 +297,6 @@ export const useCurrentPlaying = create(
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 const timeKey = "Reading <audio> file took" as const;
 let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
-let prevURL = "";
 
 if (globalThis.window) {
 	useCurrentPlaying.subscribe(
@@ -314,23 +313,19 @@ if (globalThis.window) {
 				console.time(timeKey);
 				const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
 				console.timeEnd(timeKey);
-				prevURL = url;
-
-				// If there is previous audio, we need to revoke it's url:
-				URL.revokeObjectURL(prevURL);
 
 				const audio = document.getElementById("audio") as HTMLAudioElement;
 				audio.src = url;
 
-				// Updating the duration of media:
-				getPlaylists().setPlaylists({
-					media: { ...media, duration: formatDuration(audio.duration) },
-					whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-					type: PlaylistEnum.UPDATE_MEDIA_LIST,
-				});
-
 				// Adding event listeners:
 				audio.addEventListener("loadeddata", () => {
+					// Updating the duration of media:
+					getPlaylists().setPlaylists({
+						media: { ...media, duration: formatDuration(audio.duration) },
+						whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+						type: PlaylistEnum.UPDATE_MEDIA_LIST,
+					});
+
 					if (currentTime > 10) {
 						console.log(
 							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
@@ -343,7 +338,6 @@ if (globalThis.window) {
 				});
 				audio.addEventListener("invalid", e => {
 					console.error("Audio is invalid:", e);
-					URL.revokeObjectURL(url);
 				});
 				audio.addEventListener("stalled", e => {
 					console.log(
@@ -353,23 +347,18 @@ if (globalThis.window) {
 				});
 				audio.addEventListener("securitypolicyviolation", e => {
 					console.error("Audio has a security policy violation:", e);
-					URL.revokeObjectURL(url);
 				});
-				audio.addEventListener("error", () => {
-					console.error("Audio error.");
-					URL.revokeObjectURL(url);
+				audio.addEventListener("error", e => {
+					console.error("Audio error.", e);
 				});
 				audio.addEventListener("abort", () => {
 					console.log("Audio was aborted.");
-					URL.revokeObjectURL(url);
 				});
 				audio.addEventListener("close", () => {
 					console.log("Audio was closed.");
-					URL.revokeObjectURL(url);
 				});
 				audio.addEventListener("ended", () => {
 					console.log("Audio has ended.");
-					URL.revokeObjectURL(url);
 				});
 			}, 150);
 

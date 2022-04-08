@@ -13,7 +13,7 @@ import {
 	MdRepeat as Repeat,
 } from "react-icons/md";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import create from "zustand";
 
 import { dbg, formatDuration } from "@common/utils";
@@ -28,6 +28,7 @@ import {
 
 import { ScaleUpIconButton } from "@modules/Navbar/styles";
 import {
+	ControlsAndSeekerContainer,
 	ButtonForRandomAndLoop,
 	OptionsAndAlbum,
 	ProgressWrapper,
@@ -39,9 +40,9 @@ import {
 	Wrapper,
 	Album,
 	Info,
-	ControlsAndSeekerContainer,
-	Tooltip,
 } from "./styles";
+
+const { ceil } = Math;
 
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
 const { getState: getCurrentPlaying } = useCurrentPlaying;
@@ -104,18 +105,23 @@ export function MediaPlayer() {
 		if (!audio) return;
 		dbg("Setting progress listener.");
 
-		audio.addEventListener("timeupdate", () => {
+		const handleProgress = () => {
 			const { duration, currentTime } = audio;
 
 			setProgress({
 				percentage: (currentTime / duration) * 100,
 				current: currentTime,
 			});
-		});
+		};
 
-		audio.addEventListener("ended", () => playNextMedia());
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+		audio.addEventListener("timeupdate", handleProgress);
+		audio.addEventListener("ended", playNextMedia);
+
+		return () => {
+			audio.removeEventListener("timeupdate", handleProgress);
+			audio.removeEventListener("ended", playNextMedia);
+		};
+	}, [audio]);
 
 	return (
 		<Wrapper>
@@ -185,49 +191,58 @@ export function MediaPlayer() {
 	);
 }
 
-const handleTooltip = (
-	e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-	duration = 0,
-) => {
-	/*
-		- event.offsetX, event.offsetY
-			The X and Y coordinates of the mouse relative to the event source
-			element (srcElement).
-	*/
-
-	const tooltip = document.getElementById("tooltip");
-	const div = document.getElementById("goto");
-	if (!div || !tooltip) return;
-
-	// maybe mouseX is clientX
-	const { width: progressBarWidth, left: startX } = div.getBoundingClientRect();
-	const { offsetX: mouseX } = e.nativeEvent;
-
-	const mouseAtTime = ((mouseX - startX) / progressBarWidth) * duration;
-
-	tooltip.innerText = `${formatDuration(mouseAtTime)}`;
-	tooltip.style.left = `${mouseX}px`;
-};
-
 function SeekerWrapper({
 	seek,
 	duration,
 }: {
 	seek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-	duration: number | undefined;
+	duration?: number;
 }) {
+	const progressWrapperRef = useRef<HTMLDivElement>(null);
+	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 	const { percentage, current } = useProgress();
+
+	const isDurationValid = duration && !Number.isNaN(duration);
+
+	const handleTooltip = useCallback(
+		({
+			nativeEvent: { offsetX: mouseX },
+		}: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+			/*
+				- event.offsetX, event.offsetY
+					The X and Y coordinates of the mouse relative
+					to the event source element (srcElement).
+			*/
+			if (!isDurationValid) return;
+			const tooltip = timeTooltipRef.current;
+			const div = progressWrapperRef.current;
+			if (!div || !tooltip) return;
+
+			const { width } = div.getBoundingClientRect();
+			const progressBarWidth = ceil(width);
+
+			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
+			const time = (mouseXPercentage / 100) * duration;
+
+			const left = mouseX - (35 >> 1); // 35 is the width of the tooltip. Also, (35 >> 1) is the half of the width.
+			tooltip.innerText = formatDuration(time);
+			tooltip.style.left = `${left}px`;
+		},
+		[duration, isDurationValid],
+	);
 
 	return (
 		<SeekerContainer>
 			<span>{formatDuration(current)}</span>
 
 			<ProgressWrapper
-				onMouseMove={e => handleTooltip(e, duration)}
+				style={{ cursor: isDurationValid ? "pointer" : "default" }}
+				onMouseMove={handleTooltip}
+				ref={progressWrapperRef}
 				onClick={seek}
 				id="goto"
 			>
-				<Tooltip id="tooltip" />
+				{isDurationValid && <span id="time-tooltip" ref={timeTooltipRef} />}
 
 				<ProgressThumb
 					style={{
@@ -236,7 +251,7 @@ function SeekerWrapper({
 				></ProgressThumb>
 			</ProgressWrapper>
 
-			<span>{formatDuration(duration) ?? "00:00"}</span>
+			<span>{formatDuration(duration)}</span>
 		</SeekerContainer>
 	);
 }

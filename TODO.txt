@@ -1,4 +1,3 @@
-* TODO: use tooltip for seeking
 * TODO: use Label from radix-ui on album change
 * TODO: use dialog from radix-ui on media details
 * TODO: use toast from radix-ui
