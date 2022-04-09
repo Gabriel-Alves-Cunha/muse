@@ -3,21 +3,23 @@ import { Trigger } from "@radix-ui/react-dialog";
 import { styled } from "@styles/global";
 
 export const Img = styled("div", {
+	$$size: "45px",
+
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
-	minWidth: 45,
-	height: 45,
+	minWidth: "$$size",
+	height: "$$size",
 
 	boxShadow: "$small",
 	borderRadius: 13,
 	margin: "0 10px",
 	border: "none",
 
-	img: {
+	"& img": {
 		objectFit: "cover",
-		size: 45,
+		size: "$$size",
 
 		borderRadius: 13,
 		border: "none",

@@ -92,6 +92,7 @@ export const darkTheme = createTheme({
 
 		"bg-popover": "white",
 
+		"accent-light": "#574f82",
 		accent: "#550c18",
 	},
 	shadows: {
@@ -154,6 +155,7 @@ export const lightTheme = createTheme({
 
 		"bg-popover": "white",
 
+		"accent-light": "#574f82",
 		accent: "#af1b3f",
 	},
 	shadows: {

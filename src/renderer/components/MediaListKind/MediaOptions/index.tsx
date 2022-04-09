@@ -1,7 +1,9 @@
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { MdOutlineDelete as Remove } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MdClose as Close } from "react-icons/md";
+import { Dialog } from "@radix-ui/react-dialog";
 
 import { usePlaylists } from "@contexts";
 import { capitalize } from "@utils/utils";
@@ -14,12 +16,17 @@ import {
 } from "./Change";
 
 import {
+	TriggerToRemoveMedia,
 	StyledDescription,
 	StyledContent,
-	StyledClose,
+	StyledOverlay,
+	ButtonToClose,
 	StyledTitle,
-	Confirm,
-	Option,
+	CloseIcon,
+	Fieldset,
+	Input,
+	Label,
+	Flex,
 } from "./styles";
 
 const { getState: getPlaylistsState } = usePlaylists;
@@ -27,106 +34,89 @@ const { getState: getPlaylistsState } = usePlaylists;
 export function MediaOptionsModal({ media }: { media: Media }) {
 	const [whatToChange, setWhatToChange] = useState<WhatToChange>();
 
-	const changePropsIfAllowed = (option: string, value: string) =>
-		isChangeable(option) &&
-		setWhatToChange({
-			whatToSend: allowedOptionToChange[option],
-			whatToChange: option,
-			current: value,
-		});
+	const changePropsIfAllowed = () => {
+		// isChangeable(option) &&
+		// 	setWhatToChange({
+		// 		whatToSend: allowedOptionToChange[option],
+		// 		whatToChange: option,
+		// 		current: value,
+		// 	});
+	};
 
 	const deleteMedia = () => async () => {
 		dbg("Deleting media", media);
 		await getPlaylistsState().deleteMedia(media);
+
+		// TODO: handle close all.
 	};
+
+	useEffect(() => {
+		const handleKeyUp = ({ key }: KeyboardEvent) =>
+			key === "Enter" && changePropsIfAllowed();
+
+		window.addEventListener("keyup", handleKeyUp);
+
+		return () => window.removeEventListener("keyup", handleKeyUp);
+	}, []);
 
 	return (
 		<StyledContent>
 			<StyledTitle>Edit/See media information</StyledTitle>
 
 			<StyledDescription>
-				Make changes to your media here. Click save when you&apos;re done.
+				Make changes to your media&apos;s metadata here. Click save when
+				you&apos;re done.
 			</StyledDescription>
 
-			<StyledClose />
+			<CloseIcon>
+				<Close />
+			</CloseIcon>
 
 			{Object.entries(options(media)).map(([option, value]) => (
-				<Option
-					onClick={() => changePropsIfAllowed(option, value as string)}
-					className={isChangeable(option) ? "hoverable" : ""}
-					key={option}
-				>
-					{capitalize(option)}:&nbsp;&nbsp;<span>{value}</span>
-				</Option>
+				<Fieldset key={option}>
+					<Label htmlFor={option}>{capitalize(option)}</Label>
+					<Input
+						disabled={!isChangeable(option)}
+						defaultValue={value}
+						id={option}
+					/>
+				</Fieldset>
 			))}
 
-			<Option className="rm">
-				Remove
-				<Remove />
-			</Option>
+			<Flex>
+				<Dialog modal>
+					<TriggerToRemoveMedia>
+						Delete media
+						<Remove />
+					</TriggerToRemoveMedia>
+
+					<StyledOverlay />
+
+					<StyledContent>
+						<StyledTitle>
+							Are you sure you want to delete this media from your computer?
+						</StyledTitle>
+
+						<ButtonToClose onClick={deleteMedia} id="delete-media">
+							Confirm
+						</ButtonToClose>
+
+						<ButtonToClose id="cancel">Cancel</ButtonToClose>
+					</StyledContent>
+				</Dialog>
+
+				<ButtonToClose onClick={changePropsIfAllowed} id="save-changes">
+					Save changes
+				</ButtonToClose>
+			</Flex>
 		</StyledContent>
 	);
 
-	// return (
-	// 	<OptionsModalWrapper>
-	// 		{Object.entries(options(media)).map(([option, value]) => (
-	// 			<Option
-	// 				onClick={() => changePropsIfAllowed(option, value as string)}
-	// 				className={isChangeable(option) ? "hoverable" : ""}
-	// 				key={option}
-	// 			>
-	// 				{capitalize(option)}:&nbsp;&nbsp;<span>{value}</span>
-	// 			</Option>
-	// 		))}
-
-	// 		<Option onClick={() => setShowConfirm(true)} className="rm">
-	// 			Remove
-	// 			<Remove />
-	// 		</Option>
-
-	// 		<Popup
-	// 			onClose={() => setShowConfirm(false)}
-	// 			{...{ overlayStyle }}
-	// 			defaultOpen={false}
-	// 			open={showConfirm}
-	// 			closeOnEscape
-	// 			lockScroll
-	// 			nested
-	// 		>
-	// 			<Confirm>
-	// 				<p>Are you sure you want to delete this media from your computer?</p>
-	// 				<Remove />
-	// 				<span onClick={deleteMedia} className="yes">
-	// 					Yes
-	// 				</span>
-	// 				<span className="no" onClick={() => setShowConfirm(false)}>
-	// 					No
-	// 				</span>
-	// 			</Confirm>
-	// 		</Popup>
-
-	// 		<Popup
-	// 			onClose={() => {
-	// 				setWhatToChange(undefined);
-	// 				setShowPopup(undefined);
-	// 			}}
-	// 			open={Boolean(whatToChange)}
-	// 			position="center center"
-	// 			{...{ overlayStyle }}
-	// 			defaultOpen={false}
-	// 			closeOnEscape
-	// 			lockScroll
-	// 			nested
-	// 		>
 	// 			<Change
 	// 				setWhatToChange={setWhatToChange}
-	// 				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 	// 				whatToChange={whatToChange!}
 	// 				mediaPath={media.path}
 	// 			/>
-	// 		</Popup>
-	// 	</OptionsModalWrapper>
-	// );
 }
 
 const options = ({
@@ -138,7 +128,7 @@ const options = ({
 	size,
 	path,
 }: Media) =>
-	({
+	Object.freeze({
 		duration,
 		artist,
 		genres,
@@ -146,7 +136,7 @@ const options = ({
 		album,
 		path,
 		size,
-	} as const);
+	});
 
 export type WhatToChange = Readonly<{
 	whatToSend: ChangeOptionsToSend;
