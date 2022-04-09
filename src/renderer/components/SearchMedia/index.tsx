@@ -1,8 +1,8 @@
-import type { MediaListKindProps } from "../MediaListKind/MediaOptions/Change";
+import type { MediaListKindProps } from "../MediaListKind";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { FixedSizeList, type ListChildComponentProps } from "react-window";
-import { useEffect, useReducer, useRef } from "react";
+import { memo, useEffect, useReducer, useRef } from "react";
 import {
 	MdOutlineSearch as SearchIcon,
 	MdMusicNote as MusicNote,
@@ -49,27 +49,27 @@ const defaultSearcher = Object.freeze({
 	results: [],
 } as const);
 
+const { getState: getPlaylistsFunctions } = usePlaylists;
+const cleanHistory = () =>
+	getPlaylistsFunctions().setPlaylists({
+		type: PlaylistEnum.UPDATE_HISTORY,
+		whatToDo: PlaylistActions.CLEAN,
+	});
+
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
-	const { searchLocalComputerForMedias, searchForMedia, setPlaylists } =
-		usePlaylists();
 	const [searcher, dispatchSearcher] = useReducer(
 		searcherReducer,
 		defaultSearcher,
 	);
 	const searcherRef = useRef(null);
 
-	useOnClickOutside(searcherRef, () => {
-		dispatchSearcher({ type: SearcherAction.SET_SEARCH_TERM, value: "" });
-		dispatchSearcher({ type: SearcherAction.SET_RESULTS, value: [] });
-	});
-
 	const reload = async () => {
 		dispatchSearcher({
-			type: SearcherAction.SET_SEARCH_STATUS,
 			value: SearchStatus.RELOADING_ALL_MEDIAS,
+			type: SearcherAction.SET_SEARCH_STATUS,
 		});
 
-		await searchLocalComputerForMedias(true);
+		await getPlaylistsFunctions().searchLocalComputerForMedias(true);
 
 		dispatchSearcher({
 			type: SearcherAction.SET_SEARCH_STATUS,
@@ -77,26 +77,26 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		});
 	};
 
-	const cleanHistory = () =>
-		setPlaylists({
-			type: PlaylistEnum.UPDATE_HISTORY,
-			whatToDo: PlaylistActions.CLEAN,
-		});
+	useOnClickOutside(searcherRef, () => {
+		dispatchSearcher({ type: SearcherAction.SET_SEARCH_TERM, value: "" });
+		dispatchSearcher({ type: SearcherAction.SET_RESULTS, value: [] });
+	});
 
 	useEffect(() => {
 		if (searcher.searchTerm.length < 2) return;
 
+		// TODO: use useTransition instead.
 		const searchTimeout = setTimeout(
 			() =>
 				dispatchSearcher({
-					value: searchForMedia(searcher.searchTerm),
+					value: getPlaylistsFunctions().searchForMedia(searcher.searchTerm),
 					type: SearcherAction.SET_RESULTS,
 				}),
-			300,
+			400,
 		);
 
 		return () => clearTimeout(searchTimeout);
-	}, [searchForMedia, searcher.searchTerm]);
+	}, [searcher.searchTerm]);
 
 	const buttonToTheSideJSX: Record<ButtonToTheSide, JSX.Element> = {
 		[ButtonToTheSide.RELOAD_BUTTON]: (
@@ -162,64 +162,65 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 }
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
-
-function playMedia(media: Media, playlistName: Playlist["name"]) {
+const playMedia = (media: Media, playlistName: Playlist["name"]) =>
 	getCurrentPlaying().setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlistName,
 		media,
 	});
-}
 
 function SearchResults({
-	results,
 	fromList,
+	results,
 }: {
 	fromList: MediaListKindProps["playlistName"];
 	results: readonly Media[];
 }) {
 	const { playlists } = usePlaylists();
-	const listWrapperReference = useRef<HTMLElement>(null);
+	const listWrapperRef = useRef<HTMLElement>(null);
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const playlist = playlists.find(p => p.name === fromList)!;
 	if (!playlist)
 		console.error(`There should be "${fromList}" to search through!`);
 
-	const Row = ({
-		index,
-		data,
-		style,
-	}: ListChildComponentProps<readonly Media[]>) => {
-		const media = data[index];
+	const Row = memo(
+		({ index, style, data }: ListChildComponentProps<readonly Media[]>) => {
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const media = data[index]!;
 
-		return (
-			<Result
-				onClick={() => playMedia(media, fromList)}
-				key={media.id}
-				style={style}
-			>
-				<Img>
-					<ImgWithFallback
-						Fallback={<MusicNote size="1.4em" />}
-						media={media}
-					/>
-				</Img>
+			return (
+				<Result
+					onClick={() => playMedia(media, fromList)}
+					key={media.id}
+					style={style}
+				>
+					<Img>
+						<ImgWithFallback
+							Fallback={<MusicNote size="1.4em" />}
+							media={media}
+						/>
+					</Img>
 
-				<Info>
-					<Title style={{ marginLeft: 5, textAlign: "left" }}>
-						{media.title}
-					</Title>
-					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-				</Info>
-			</Result>
-		);
-	};
+					<Info>
+						<Title style={{ marginLeft: 5, textAlign: "left" }}>
+							{media.title}
+						</Title>
+						<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+					</Info>
+				</Result>
+			);
+		},
+		(prevProps, nextProps) =>
+			prevProps.data[prevProps.index]?.id ===
+			nextProps.data[nextProps.index]?.id,
+	);
+	Row.displayName = "Row";
 
 	return (
-		<SearchResultsWrapper ref={listWrapperReference}>
+		<SearchResultsWrapper ref={listWrapperRef}>
 			<FixedSizeList
-				itemKey={(index, results) => results[index].id}
+				itemKey={(index, results) => results[index]?.id ?? 0}
 				itemCount={results.length}
 				itemData={results}
 				overscanCount={15}

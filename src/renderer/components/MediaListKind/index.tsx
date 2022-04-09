@@ -1,4 +1,3 @@
-import type { MediaListKindProps } from "./MediaOptions/Change";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
@@ -11,9 +10,15 @@ import {
 } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { useCurrentPlaying, CurrentPlayingEnum, usePlaylists } from "@contexts";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
+import {
+	type DefaultLists,
+	type Playlist,
+	CurrentPlayingEnum,
+	useCurrentPlaying,
+	usePlaylists,
+} from "@contexts";
 
 import { StyledOverlay } from "./MediaOptions/styles";
 import {
@@ -30,8 +35,16 @@ import {
 const PADDING_SIZE = 5;
 const ROW_HEIGHT = 65;
 
+const { getState } = useCurrentPlaying;
+const playMedia = (media: Media, playlistName: Playlist["name"]) =>
+	getState().setCurrentPlaying({
+		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
+		playlistName,
+		media,
+	});
+
 export function MediaListKind({ playlistName }: MediaListKindProps) {
-	const { setCurrentPlaying, currentPlaying } = useCurrentPlaying();
+	const { currentPlaying } = useCurrentPlaying();
 	const { playlists } = usePlaylists();
 
 	// TODO: ErrorBoundary
@@ -43,18 +56,12 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 			playlists,
 		);
 
-	const playMedia = (media: Media) =>
-		setCurrentPlaying({
-			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-			playlistName,
-			media,
-		});
-
 	const Row = memo(
 		({ index, data, style }: ListChildComponentProps<readonly Media[]>) => {
-			const media = data[index];
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const media = data[index]!;
 
-			return media ? (
+			return (
 				<RowWrapper
 					className={media.id === currentPlaying.media?.id ? "active" : ""}
 					style={{
@@ -64,7 +71,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 						//			^ This way to safely turn style.width to a number.
 					}}
 				>
-					<PlayButton onClick={() => playMedia(media)}>
+					<PlayButton onClick={() => playMedia(media, playlistName)}>
 						<Img>
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4em" />}
@@ -90,7 +97,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 						</Portal>
 					</Dialog>
 				</RowWrapper>
-			) : null;
+			);
 		},
 		(prevProps, nextProps) =>
 			prevProps.data[prevProps.index]?.id ===
@@ -119,3 +126,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 		</ListWrapper>
 	);
 }
+
+export type MediaListKindProps = Readonly<{
+	playlistName: DefaultLists;
+}>;
