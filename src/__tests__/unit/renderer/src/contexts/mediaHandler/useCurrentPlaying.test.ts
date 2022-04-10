@@ -12,7 +12,6 @@ import { hash } from "@common/hash";
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
 	notificationApi: {
-		sendNotificationToElectron: vi.fn(),
 		receiveMsgFromElectron: vi.fn(),
 	},
 	fs: {
@@ -33,7 +32,7 @@ global.electron = {
 		transformPathsToMedias: vi.fn(),
 		convertToAudio: vi.fn(),
 		writeTags: vi.fn(),
-		getInfo: vi.fn(),
+		getBasicInfo: vi.fn(),
 	},
 };
 
@@ -58,7 +57,7 @@ class LocalStorageMock {
 
 		if (index > keys.length) return null;
 
-		return keys[index];
+		return keys[index]!;
 	}
 
 	getItem(key: string) {
@@ -132,9 +131,7 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_THIS_MEDIA) should set the currentPlaying media", () => {
-		for (let i = 0; i < numberOfMedias; ++i) {
-			const media = testList[i];
-
+		testList.forEach(media => {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MEDIA_LIST,
@@ -149,13 +146,13 @@ describe("Testing useCurrentPlaying", () => {
 			};
 
 			expect(expected).toEqual(currentPlaying);
-		}
+		});
 	});
 
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY) should play the previous media from history", () => {
 		for (let i = 0; i < numberOfMedias - 1; ++i) {
-			const media = testList[i];
-			const nextMedia = testList[i + 1];
+			const nextMedia = testList[i + 1]!;
+			const media = testList[i]!;
 
 			// Play a media to make sure history is not empty:
 			getCurrentPlaying().setCurrentPlaying({
@@ -199,7 +196,7 @@ describe("Testing useCurrentPlaying", () => {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MEDIA_LIST,
-				media: testList[i],
+				media: testList[i]!,
 			});
 
 			getCurrentPlaying().setCurrentPlaying({
@@ -223,7 +220,7 @@ describe("Testing useCurrentPlaying", () => {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MEDIA_LIST,
-				media: testList[i],
+				media: testList[i]!,
 			});
 
 			getCurrentPlaying().setCurrentPlaying({

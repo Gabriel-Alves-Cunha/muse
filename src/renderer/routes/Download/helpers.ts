@@ -7,7 +7,7 @@ import { MsgEnum, sendMsg } from "@contexts";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
 
-const { getInfo } = electron.media;
+const { getBasicInfo: getInfo } = electron.media;
 
 export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 	setSearchTerm: ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>

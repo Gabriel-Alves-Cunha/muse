@@ -1,3 +1,4 @@
+import type { ExtensionToBeConvertedTo } from "./electron-window";
 import type { PrettyBytes } from "@common/prettyBytes";
 
 import { pages } from "@utils/app";
@@ -21,21 +22,6 @@ export type Media = Readonly<{
 	path: Path;
 }>;
 
-export enum NotificationEnum {
-	DOWNLOAD_MEDIA,
-	WRITE_TAG,
-	MAXIMIZE,
-	MINIMIZE,
-	QUIT_APP,
-}
-export enum ListenToNotification {
-	DELETE_ONE_MEDIA_FROM_COMPUTER,
-	REFRESH_ALL_MEDIA,
-	REFRESH_ONE_MEDIA,
-	REMOVE_ONE_MEDIA,
-	ADD_ONE_MEDIA,
-}
-
 export type Mutable<T> = {
 	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
 };
@@ -45,6 +31,12 @@ export type DownloadValues = Readonly<{
 	imageURL: string;
 	title: string;
 	url: string;
+}>;
+
+export type ConvertValues = Readonly<{
+	toExtension: ExtensionToBeConvertedTo;
+	canStartConvert: boolean;
+	path: Path;
 }>;
 
 export enum ProgressStatus {

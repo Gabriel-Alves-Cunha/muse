@@ -1,6 +1,3 @@
-* TODO: use Label from radix-ui on album change
-* TODO: use dialog from radix-ui on media details
-* TODO: use toast from radix-ui
 * TODO: use alert dialog from radix-ui to delete media
 * TODO: make visualizer
 

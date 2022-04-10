@@ -1,10 +1,12 @@
-import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
-import type { DownloadValues, Path } from "@common/@types/typesAndEnums";
+import type {
+	DownloadValues,
+	ConvertValues,
+} from "@common/@types/typesAndEnums";
 
 import create from "zustand";
 
+import { ReactElectronAsyncMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
-import { NotificationEnum } from "@common/@types/typesAndEnums";
 import { dbg } from "@common/utils";
 
 const defaultDownloadValues: DownloadValues = Object.freeze({
@@ -78,27 +80,20 @@ globalThis.electron?.notificationApi.receiveMsgFromElectron(object => {
 	dbg("Received 'async-msg' from Electron on React side.\nobject =", object);
 
 	switch (object.type) {
-		case NotificationEnum.DOWNLOAD_MEDIA: {
-			// @ts-ignore - This is a valid value.
-			handleDownloadMedia(object.params);
+		case ReactElectronAsyncMessageEnum.DOWNLOAD_MEDIA: {
+			handleDownloadMedia(object.downloadValues);
 			break;
 		}
 
 		default: {
 			console.error(
-				"This 'async-msg' event has no receiver function!\nobject =",
+				"This event has no receiver function on `receiveMsgFromElectron()`!\nobject =",
 				object,
 			);
 			break;
 		}
 	}
 });
-
-export type ConvertValues = Readonly<{
-	toExtension: ExtensionToBeConvertedTo;
-	canStartConvert: boolean;
-	path: Path;
-}>;
 
 type Action =
 	| Readonly<{ type: MsgEnum.START_CONVERT; value: readonly ConvertValues[] }>

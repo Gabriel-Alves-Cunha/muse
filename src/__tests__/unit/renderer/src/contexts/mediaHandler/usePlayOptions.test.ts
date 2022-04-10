@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
 	notificationApi: {
-		sendNotificationToElectron: vi.fn(),
 		receiveMsgFromElectron: vi.fn(),
 	},
 	fs: {
@@ -24,7 +23,7 @@ global.electron = {
 		transformPathsToMedias: vi.fn(),
 		convertToAudio: vi.fn(),
 		writeTags: vi.fn(),
-		getInfo: vi.fn(),
+		getBasicInfo: vi.fn(),
 	},
 };
 
@@ -49,7 +48,8 @@ class LocalStorageMock {
 
 		if (index > keys.length) return null;
 
-		return keys[index];
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return keys[index]!;
 	}
 
 	getItem(key: string) {

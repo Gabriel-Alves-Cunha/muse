@@ -12,7 +12,6 @@ import { getRandomInt } from "@utils/utils";
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
 	notificationApi: {
-		sendNotificationToElectron: vi.fn(),
 		receiveMsgFromElectron: vi.fn(),
 	},
 	fs: {
@@ -33,7 +32,7 @@ global.electron = {
 		transformPathsToMedias: vi.fn(),
 		convertToAudio: vi.fn(),
 		writeTags: vi.fn(),
-		getInfo: vi.fn(),
+		getBasicInfo: vi.fn(),
 	},
 };
 
@@ -58,7 +57,7 @@ class LocalStorageMock {
 
 		if (index > keys.length) return null;
 
-		return keys[index];
+		return keys[index]!;
 	}
 
 	getItem(key: string) {
@@ -163,7 +162,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 		// Set currentPlaying to first media:
 		const mediaPlaylistList = getPlaylist(MEDIA_LIST)!;
-		const firstMedia = mediaPlaylistList!.list[0];
+		const firstMedia = mediaPlaylistList.list[0]!;
 		getCurrentPlaying().setCurrentPlaying({
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 			playlistName: MEDIA_LIST,
@@ -229,7 +228,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		for (let index = 0; index < numberOfMedias; ++index) {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				media: mediaListPlaylist.list[index],
+				media: mediaListPlaylist.list[index]!,
 				playlistName: MEDIA_LIST,
 			});
 
@@ -257,7 +256,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_HISTORY,
-				media: mediaList[1],
+				media: mediaList[1]!,
 			});
 
 			const newHistory = getPlaylist(HISTORY)!.list;
@@ -272,12 +271,12 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 	describe("Testing PlaylistEnum.UPDATE_FAVORITES", () => {
 		const addOneMediaToFavorites = () => {
-			const mediaList = getPlaylist(MEDIA_LIST)!.list;
+			const mediaList = getPlaylist(MEDIA_LIST).list;
 
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_FAVORITES,
-				media: mediaList[1],
+				media: mediaList[1]!,
 			});
 
 			const newFavorites = getPlaylist(FAVORITES)!.list;
@@ -296,15 +295,15 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		it("(PlaylistActions.REMOVE_ONE_MEDIA) should remove one media of favorites", () => {
 			addOneMediaToFavorites();
 
-			const prevFavorites = getPlaylist(FAVORITES)!.list;
+			const prevFavorites = getPlaylist(FAVORITES).list;
 
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_FAVORITES,
-				mediaIndex: prevFavorites[0].index,
+				mediaIndex: prevFavorites[0]!.index,
 			});
 
-			const newFavorites = getPlaylist(FAVORITES)!.list;
+			const newFavorites = getPlaylist(FAVORITES).list;
 
 			expect(newFavorites.length).toBe(0);
 		});
@@ -315,10 +314,10 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_MEDIA_LIST,
-				media: testList[0],
+				media: testList[0]!,
 			});
 
-			const newMediaList = getPlaylist(MEDIA_LIST)!.list;
+			const newMediaList = getPlaylist(MEDIA_LIST).list;
 
 			expect(newMediaList).toHaveLength(numberOfMedias);
 		});
@@ -351,8 +350,8 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		});
 
 		it("(PlaylistActions.REMOVE_ONE_MEDIA) should remove one media to mediaList", () => {
-			const prevMediaList = getPlaylist(MEDIA_LIST)!.list;
-			const mediaToBeDeleted = prevMediaList[15];
+			const prevMediaList = getPlaylist(MEDIA_LIST).list;
+			const mediaToBeDeleted = prevMediaList[15]!;
 
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
@@ -384,7 +383,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			const size = "1.0 MB" as const;
 			const index = 15;
 			const mediaToBeRefreshed: Media = {
-				...prevMediaList[index],
+				...prevMediaList[index]!,
 				index: 3290,
 				title,
 				size,

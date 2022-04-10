@@ -1,12 +1,13 @@
 import type { MsgObject } from "@common/@types/electron-window";
 import type { Media } from "@common/@types/typesAndEnums";
 
-import { useCallback, useEffect, useRef } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
+import { toast } from "react-toastify";
 
-import { NotificationEnum } from "@common/@types/typesAndEnums";
+import { ReactElectronAsyncMessageEnum } from "@common/@types/electron-window";
 import { usePlaylists } from "@contexts";
 import { capitalize } from "@utils/utils";
 import { dbg } from "@common/utils";
@@ -27,97 +28,18 @@ import {
 
 const { getState: getPlaylistsFunctions } = usePlaylists;
 
-const allowedOptionToChange = Object.freeze({
-	artist: "albumArtists",
-	imageURL: "imageURL",
-	genres: "genres",
-	album: "album",
-	title: "title",
-} as const);
-
-const isChangeable = (option: string): option is ChangeOptions =>
-	Object.keys(allowedOptionToChange).some(opt => opt === option);
-
 export function MediaOptionsModal({ media }: { media: Media }) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
-
-	const changePropsIfAllowed = useCallback(() => {
-		if (contentWrapperRef.current)
-			for (const children of contentWrapperRef.current.children) {
-				for (const element of children.children)
-					if (element instanceof HTMLInputElement && !element.disabled) {
-						const id = element.id as ChangeOptions;
-						const value = element.value.trim();
-
-						Object.entries(media).forEach(([key, value_]) => {
-							if (key === id && value_ !== value) {
-								// If `value_` is undefined AND `value` is empty, there's nothing to do, so just return:
-								if (value_ === undefined && value === "") return;
-
-								// We need to handle the case where the key is an array, as in "genres":
-								if (Array.isArray(value_)) {
-									const valueAsArray = value.split(",").map(v => v.trim());
-
-									// If valueAsArray is `[""]`, then we need to remove the empty string:
-									if (valueAsArray.length === 1 && valueAsArray[0] === "")
-										valueAsArray.pop();
-
-									// If both arrays are equal, we don't need to change anything:
-									if (
-										valueAsArray.length === value_.length &&
-										valueAsArray.every(v => value_.includes(v))
-									)
-										return;
-									else console.log({ value, value_, valueAsArray });
-
-									// If they are different, the writeTag() function will handle splitting the string, so just continue the rest of the function.
-								}
-								console.log({ id, value, key, value_ });
-
-								const whatToSend: ChangeOptionsToSend =
-									allowedOptionToChange[id];
-
-								const msg: MsgObject = {
-									type: NotificationEnum.WRITE_TAG,
-									details: {
-										mediaPath: media.path,
-										whatToSend,
-										value,
-									},
-								};
-
-								window.twoWayComm_React_Electron
-									? window.twoWayComm_React_Electron.postMessage(msg)
-									: console.error(
-											"There is no 'window.twoWayComm_React_Electron'!",
-									  );
-							}
-						});
-
-						handleCloseAll();
-					}
-			}
-	}, [media]);
-
-	const handleCloseAll = () => {
-		console.log("handleCloseAll");
-	};
-
-	const deleteMedia = () => async () => {
-		dbg("Deleting media", media);
-		await getPlaylistsFunctions().deleteMedia(media);
-
-		// TODO: handle close all.
-	};
+	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
 		const handleKeyUp = ({ key }: KeyboardEvent) =>
-			key === "Enter" && changePropsIfAllowed();
+			key === "Enter" && handleChange(contentWrapperRef, closeButtonRef, media);
 
 		window.addEventListener("keyup", handleKeyUp);
 
 		return () => window.removeEventListener("keyup", handleKeyUp);
-	}, [changePropsIfAllowed]);
+	}, [media]);
 
 	return (
 		<StyledContent ref={contentWrapperRef}>
@@ -128,7 +50,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 				you&apos;re done.
 			</StyledDescription>
 
-			<CloseIcon>
+			<CloseIcon ref={closeButtonRef}>
 				<Close />
 			</CloseIcon>
 
@@ -157,7 +79,10 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 							Are you sure you want to delete this media from your computer?
 						</StyledTitle>
 
-						<ButtonToClose onClick={deleteMedia} id="delete-media">
+						<ButtonToClose
+							onClick={() => deleteMedia(closeButtonRef, media)}
+							id="delete-media"
+						>
 							Confirm
 						</ButtonToClose>
 
@@ -165,12 +90,153 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 					</StyledContent>
 				</Dialog>
 
-				<ButtonToClose onClick={changePropsIfAllowed} id="save-changes">
+				<ButtonToClose
+					onClick={() => handleChange(contentWrapperRef, closeButtonRef, media)}
+					id="save-changes"
+				>
 					Save changes
 				</ButtonToClose>
 			</Flex>
 		</StyledContent>
 	);
+}
+
+async function deleteMedia(
+	closeButtonRef: RefObject<HTMLButtonElement>,
+	media: Media,
+) {
+	if (closeButtonRef.current) {
+		try {
+			dbg("Deleting media...", media);
+			await getPlaylistsFunctions().deleteMedia(media);
+
+			handleCloseAll(closeButtonRef);
+
+			toast.success("Media has been successfully deleted.", {
+				hideProgressBar: false,
+				position: "top-right",
+				progress: undefined,
+				closeOnClick: true,
+				pauseOnHover: true,
+				autoClose: 5000,
+				draggable: true,
+			});
+		} catch (error) {
+			console.error(error);
+
+			toast.error(
+				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
+				{
+					hideProgressBar: false,
+					position: "top-right",
+					progress: undefined,
+					closeOnClick: true,
+					pauseOnHover: true,
+					autoClose: 5000,
+					draggable: true,
+				},
+			);
+		}
+	}
+}
+
+function handleChange(
+	contentWrapperRef: RefObject<HTMLDivElement>,
+	closeButtonRef: RefObject<HTMLButtonElement>,
+	media: Media,
+) {
+	if (contentWrapperRef.current && closeButtonRef.current) {
+		try {
+			changePropsIfAllowed(contentWrapperRef, media);
+			handleCloseAll(closeButtonRef);
+
+			toast.success("New media metadata has been saved.", {
+				hideProgressBar: false,
+				position: "top-right",
+				progress: undefined,
+				closeOnClick: true,
+				pauseOnHover: true,
+				autoClose: 5000,
+				draggable: true,
+			});
+		} catch (error) {
+			console.error(error);
+
+			toast.error(
+				"Unable to save new metadata. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
+				{
+					hideProgressBar: false,
+					position: "top-right",
+					progress: undefined,
+					closeOnClick: true,
+					pauseOnHover: true,
+					autoClose: 5000,
+					draggable: true,
+				},
+			);
+		}
+	}
+}
+
+function changePropsIfAllowed(
+	contentWrapper: RefObject<HTMLDivElement>,
+	media: Media,
+) {
+	if (contentWrapper.current)
+		for (const children of contentWrapper.current.children)
+			for (const element of children.children)
+				if (element instanceof HTMLInputElement && !element.disabled) {
+					const id = element.id as ChangeOptions;
+					const newValue = element.value.trim();
+
+					Object.entries(media).forEach(([key, oldValue]) => {
+						if (key === id && oldValue !== newValue) {
+							// If `oldValue` is undefined AND `newValue` is empty, there's nothing to do, so just return:
+							if (oldValue === undefined && newValue === "") return;
+
+							// We need to handle the case where the key is an array, as in "genres":
+							if (Array.isArray(oldValue)) {
+								const newValueAsArray = newValue.split(",").map(v => v.trim());
+
+								// If valueAsArray is `[""]`, then we need to remove the empty string:
+								if (newValueAsArray.length === 1 && newValueAsArray[0] === "")
+									newValueAsArray.pop();
+
+								// If both arrays are equal by values, we don't need to change anything:
+								if (
+									newValueAsArray.length === oldValue.length &&
+									newValueAsArray.every(v => oldValue.includes(v))
+								)
+									return;
+
+								dbg({
+									newValueAsArray,
+									oldValue,
+									newValue,
+									key,
+									id,
+								});
+
+								// If they are different, the writeTag() function will handle splitting the string, so just continue the rest of the function.
+							}
+							dbg({ id, newValue, key, oldValue });
+
+							const whatToSend: ChangeOptionsToSend = allowedOptionToChange[id];
+
+							// Send message to Electron to execute the function writeTag() in the main process:
+							const msg: MsgObject = {
+								type: ReactElectronAsyncMessageEnum.WRITE_TAG,
+								params: {
+									whatToChange: whatToSend,
+									mediaPath: media.path,
+									newValue,
+								},
+							};
+
+							window.postMessage(msg);
+						}
+					});
+				}
 }
 
 const options = ({
@@ -192,6 +258,20 @@ const options = ({
 		size,
 	});
 
+const allowedOptionToChange = Object.freeze({
+	artist: "albumArtists",
+	imageURL: "imageURL",
+	genres: "genres",
+	album: "album",
+	title: "title",
+} as const);
+
+const isChangeable = (option: string): option is ChangeOptions =>
+	Object.keys(allowedOptionToChange).some(opt => opt === option);
+
+const handleCloseAll = (element: RefObject<HTMLButtonElement>) =>
+	element.current?.click();
+
 export type WhatToChange = Readonly<{
 	whatToSend: ChangeOptionsToSend;
 	whatToChange: ChangeOptions;
@@ -200,4 +280,4 @@ export type WhatToChange = Readonly<{
 
 type Keys = keyof typeof allowedOptionToChange;
 type ChangeOptions = keyof typeof allowedOptionToChange;
-type ChangeOptionsToSend = typeof allowedOptionToChange[Keys];
+export type ChangeOptionsToSend = typeof allowedOptionToChange[Keys];

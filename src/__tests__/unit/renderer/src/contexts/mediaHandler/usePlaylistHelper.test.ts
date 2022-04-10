@@ -7,7 +7,6 @@ import { faker } from "@faker-js/faker";
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
 	notificationApi: {
-		sendNotificationToElectron: vi.fn(),
 		receiveMsgFromElectron: vi.fn(),
 	},
 	fs: {
@@ -28,7 +27,7 @@ global.electron = {
 		transformPathsToMedias: vi.fn(),
 		convertToAudio: vi.fn(),
 		writeTags: vi.fn(),
-		getInfo: vi.fn(),
+		getBasicInfo: vi.fn(),
 	},
 };
 
@@ -60,7 +59,7 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 	it("should return a NEW array with new item(s) at the start of the array", () => {
 		for (let i = 0; i < numberOfMedias; ++i) {
 			const prevHistory: readonly Media[] = Object.freeze([]);
-			const newMediaToAdd = testList[i];
+			const newMediaToAdd = testList[i]!;
 
 			const newList = [newMediaToAdd, ...prevHistory];
 			const expectedNewList = returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
@@ -83,8 +82,8 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 
 		expect(prevHistory.length).toBe(99);
 
-		const newMediaToAdd_1 = testList[5];
-		const newMediaToAdd_2 = testList[7];
+		const newMediaToAdd_1 = testList[5]!;
+		const newMediaToAdd_2 = testList[7]!;
 
 		const newList = [newMediaToAdd_1, ...prevHistory];
 		const expectedNewList_1 = returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(

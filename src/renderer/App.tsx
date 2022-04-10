@@ -65,7 +65,7 @@ function Main() {
 			if (!event.dataTransfer) return;
 
 			const fileList = event.dataTransfer.files;
-			console.log("fileList =", fileList);
+			console.log({ fileList });
 
 			const files = getMediaFiles(fileList);
 

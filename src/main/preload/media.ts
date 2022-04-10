@@ -21,6 +21,8 @@ import sanitize from "sanitize-filename";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
+import { ReactElectronAsyncMessageEnum } from "@common/@types/electron-window";
+import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { hash } from "@common/hash";
 import { dirs } from "../utils";
@@ -31,10 +33,6 @@ import {
 	isDevelopment,
 	getBasename,
 } from "@common/utils";
-import {
-	ListenToNotification,
-	ProgressStatus,
-} from "@common/@types/typesAndEnums";
 
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
@@ -107,11 +105,12 @@ const createMedia = async (
 			img,
 		};
 
+		console.timeEnd(`Nº ${index}, "${basename}" took`);
+
 		dbg(basename, {
 			tag: { pictures, album, genres, albumArtists },
 			properties: { durationMilliseconds },
 		});
-		console.timeEnd(`Nº ${index}, "${basename}" took`);
 
 		return resolve(media);
 	});
@@ -132,7 +131,7 @@ export async function transformPathsToMedias(
 		),
 	);
 	(await Promise.allSettled(promises)).forEach(p => {
-		if (p.status === "fulfilled" && p.value) medias.push(p.value);
+		if (p.status === "fulfilled") medias.push(p.value);
 	});
 	console.timeEnd("Runnig 'for' on all medias");
 
@@ -155,17 +154,11 @@ export function handleCreateOrCancelDownload({
 }: HandleDownload & {
 	destroy: Readonly<boolean>;
 }) {
-	if (url && !currentDownloads.has(url))
+	if (!currentDownloads.has(url))
 		makeStream({ imageURL, url, title, electronPort });
-	else if (url && destroy) {
-		const stream = currentDownloads.get(url);
-
-		stream
-			? stream.emit("destroy")
-			: console.error(
-					`There is no stream on "currentDownloads" with url: "${url}"`,
-			  );
-	}
+	else if (destroy)
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		currentDownloads.get(url)!.emit("destroy");
 }
 
 export function makeStream({
@@ -198,7 +191,8 @@ export function makeStream({
 				isDownloading: false,
 			});
 			electronPort.close();
-			interval && clearInterval(interval);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
 
 			const readAnswer = readStream.destroy(
 				new Error("This readStream is being destroyed!"),
@@ -249,16 +243,13 @@ export function makeStream({
 				isDownloading: false,
 			});
 			electronPort.close();
-			interval && clearInterval(interval);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
 
-			try {
-				console.log("Going to writeTags...");
-				await writeTags(saveSite, { imageURL, isNewMedia: true });
-			} catch (error) {
-				console.error(error);
-			} finally {
-				currentDownloads.delete(url);
-			}
+			console.log("Going to writeTags...");
+			await writeTags(saveSite, { imageURL, isNewMedia: true });
+
+			currentDownloads.delete(url);
 		})
 		.on("error", error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
@@ -270,7 +261,8 @@ export function makeStream({
 				error,
 			});
 			electronPort.close();
-			interval && clearInterval(interval);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
 
 			currentDownloads.delete(url);
 		});
@@ -293,17 +285,11 @@ export function handleCreateOrCancelConvert({
 	mediaPath,
 	destroy,
 }: HandleConversion & { destroy: boolean }) {
-	if (mediaPath && !mediasConverting.has(mediaPath))
+	if (!mediasConverting.has(mediaPath))
 		convertToAudio({ mediaPath, toExtension, electronPort });
-	else if (mediaPath && destroy) {
-		const stream = mediasConverting.get(mediaPath);
-
-		stream
-			? stream.emit("destroy")
-			: console.error(
-					`There is no stream on "mediasConverting" with path: "${mediaPath}".`,
-			  );
-	}
+	else if (destroy)
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		mediasConverting.get(mediaPath)!.emit("destroy");
 }
 
 export function convertToAudio({
@@ -318,28 +304,43 @@ export function convertToAudio({
 	const readStream = createReadStream(mediaPath);
 
 	let interval: NodeJS.Timer | undefined = undefined;
-	let timeConverted = "";
-	let sizeConverted = 0;
+	// let timeConverted = "";
+	// let sizeConverted = 0;
 
 	fluent_ffmpeg(readStream)
 		.toFormat(toExtension)
 		.save(saveSite)
-		.on("progress", p => {
-			// targetSize: current size of the target file in kilobytes
-			// timemark: the timestamp of the current frame in seconds
-			sizeConverted = p.targetSize;
-			timeConverted = p.timemark;
+		.on(
+			"progress",
+			({ targetSize, timemark }: { targetSize: number; timemark: number }) => {
+				// targetSize: current size of the target file in kilobytes
+				// timemark: the timestamp of the current frame in seconds
 
-			// To react:
-			if (!interval) {
-				// ^ Only in the firt time this setInterval is called!
-				interval = setInterval(
-					() => electronPort.postMessage({ sizeConverted, timeConverted }),
-					2_000,
-				);
-			}
-		})
+				// TODO: test this:
+				// To react:
+				if (!interval) {
+					// ^ Only in the firt time this setInterval is called!
+					interval = setInterval(
+						() =>
+							electronPort.postMessage({
+								sizeConverted: targetSize,
+								timeConverted: timemark,
+							}),
+						2_000,
+					);
+				}
+				// // To react:
+				// if (!interval) {
+				// 	// ^ Only in the firt time this setInterval is called!
+				// 	interval = setInterval(
+				// 		() => electronPort.postMessage({ sizeConverted, timeConverted }),
+				// 		2_000,
+				// 	);
+				// }
+			},
+		)
 		.on("error", error => {
+			// TODO: see if it's necessary to delete the file if it's not converted successfully!
 			console.error(
 				`Error converting file: "${titleWithExtension}"!\n\n`,
 				error,
@@ -352,7 +353,8 @@ export function convertToAudio({
 				error,
 			});
 			electronPort.close();
-			interval && clearInterval(interval);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
 
 			mediasConverting.delete(mediaPath);
 		})
@@ -368,11 +370,37 @@ export function convertToAudio({
 				isConverting: false,
 			});
 			electronPort.close();
-			interval && clearInterval(interval);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
+
+			{
+				// Treat the file successfully converted as a new media:
+				console.log("Adding new media:", {
+					msg: "Treat the file successfully converted as a new media...",
+					type: "ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA",
+					mediaPath: saveSite,
+				});
+				window.postMessage({
+					type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA,
+					mediaPath: saveSite,
+				});
+
+				// and remove old one
+				console.log("Removing old media:", {
+					msg: "and remove old one.",
+					type: "ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA",
+					mediaPath,
+				});
+				window.postMessage({
+					type: ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA,
+					mediaPath,
+				});
+			}
 
 			mediasConverting.delete(mediaPath);
 		})
 		.on("destroy", () => {
+			// TODO: see if it's necessary to delete the file if it's not converted successfully!
 			console.log(
 				"%cDestroy was called on readStream for converter!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
@@ -383,7 +411,8 @@ export function convertToAudio({
 				isConverting: false,
 			});
 			electronPort.close();
-			interval && clearInterval(interval);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
 
 			const readAnswer = readStream.destroy(
 				new Error("This readStream is being destroyed!"),
@@ -452,7 +481,7 @@ export async function writeTags(
 					} else {
 						// Assume we received an img as a base64 string like: `data:${string};base64,${string}`.
 						if (
-							data.imageURL?.includes("data:image/") &&
+							data.imageURL?.includes("data:image/", 0) &&
 							data.imageURL?.includes("base64,")
 						) {
 							const imgAsString = data.imageURL as string;
@@ -486,12 +515,24 @@ export async function writeTags(
 				case "albumArtists": {
 					dbg("On 'albumArtists' branch.", { value });
 
-					const artists = value as string[];
-					file.tag.albumArtists = artists;
+					if (Array.isArray(value)) {
+						const albumArtists = value as string[];
 
-					console.log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
-						artists,
-					});
+						file.tag.albumArtists = albumArtists;
+
+						console.log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
+							albumArtists,
+						});
+					} else {
+						const albumArtists = (value as string)
+							.split(",")
+							.map(v => v.trim());
+
+						file.tag.albumArtists = albumArtists;
+						console.log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
+							albumArtists,
+						});
+					}
 
 					break;
 				}
@@ -536,7 +577,17 @@ export async function writeTags(
 		file.save();
 		file.dispose();
 	} catch (error) {
-		console.error(error);
+		// Send error to client:
+		console.log({
+			type: "ReactElectronAsyncMessageEnum.ERROR",
+			error,
+		});
+		window.postMessage({
+			type: ReactElectronAsyncMessageEnum.ERROR,
+			error,
+		});
+
+		throw error;
 	} finally {
 		if (fileNewPath) {
 			try {
@@ -545,61 +596,67 @@ export async function writeTags(
 				// Since media has a new path, create a new media...
 				console.log("Adding new media:", {
 					msg: "Since media has a new path, create a new media...",
-					type: "ListenToNotification.ADD_MEDIA",
-					path: fileNewPath,
+					type: "ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA",
+					mediaPath: fileNewPath,
 				});
-				window.twoWayComm_React_Electron?.postMessage({
-					type: ListenToNotification.ADD_ONE_MEDIA,
-					path: fileNewPath,
+				window.postMessage({
+					type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA,
+					mediaPath: fileNewPath,
 				});
 
 				// and remove old one
 				console.log("Removing old media:", {
 					msg: "and remove old one.",
-					type: "ListenToNotification.REMOVE_MEDIA",
-					path: mediaPath,
+					type: "ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA",
+					mediaPath,
 				});
-				window.twoWayComm_React_Electron?.postMessage({
-					type: ListenToNotification.REMOVE_ONE_MEDIA,
-					path: mediaPath,
+				window.postMessage({
+					type: ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA,
+					mediaPath,
 				});
 			} catch (error) {
-				console.error(error);
-
-				// Just refresh media:
-				console.log({
-					type: "ListenToNotification.REFRESH_MEDIA",
-					path: mediaPath,
-					fileNewPath,
+				// Send error to react process: (error renaming file => file has old path)
+				console.error({
+					type: "ReactElectronAsyncMessageEnum.ERROR",
+					error,
 				});
-				window.twoWayComm_React_Electron?.postMessage({
-					type: ListenToNotification.REFRESH_ONE_MEDIA,
-					path: mediaPath,
+				window.postMessage({
+					type: ReactElectronAsyncMessageEnum.ERROR,
+					error,
+				});
+
+				// Since there was an error, let's at least refresh media:
+				console.log({
+					type: "ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA",
+					mediaPath,
+				});
+				window.postMessage({
+					type: ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA,
+					mediaPath,
 				});
 			} finally {
 				console.log("Was file renamed?", existsSync(fileNewPath));
 				console.log("Does old file remains?", existsSync(mediaPath));
 			}
 		} else if (data.isNewMedia) {
-			// Add media:
+			// Add new media:
 			console.log({
-				type: "ListenToNotification.ADD_ONE_MEDIA",
-				path: mediaPath,
+				type: "ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA",
+				mediaPath,
 			});
-			window.twoWayComm_React_Electron?.postMessage({
-				type: ListenToNotification.ADD_ONE_MEDIA,
-				path: mediaPath,
+			window.postMessage({
+				type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA,
+				mediaPath,
 			});
 		} else {
 			// Refresh media:
 			console.log({
-				type: "ListenToNotification.REFRESH_MEDIA",
-				path: mediaPath,
-				fileNewPath,
+				type: "ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA",
+				mediaPath,
 			});
-			window.twoWayComm_React_Electron?.postMessage({
-				type: ListenToNotification.REFRESH_ONE_MEDIA,
-				path: mediaPath,
+			window.postMessage({
+				type: ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA,
+				mediaPath,
 			});
 		}
 	}

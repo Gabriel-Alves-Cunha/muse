@@ -7,12 +7,9 @@ import { resolve } from "path";
 
 // Getting everything ready for the tests...
 
-import { addListeners } from "@main/preload/notificationApi";
-
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
 	notificationApi: {
-		sendNotificationToElectron: vi.fn(),
 		receiveMsgFromElectron: vi.fn(),
 	},
 	fs: {
@@ -33,25 +30,11 @@ global.electron = {
 		transformPathsToMedias: vi.fn(),
 		convertToAudio: vi.fn(),
 		writeTags: vi.fn(),
-		getInfo: vi.fn(),
+		getBasicInfo: vi.fn(),
 	},
 };
 
-import { usePlaylists } from "@contexts";
-
-const { getState: getUsePlaylistsFunctions } = usePlaylists;
-const addListenersForReactSide = getUsePlaylistsFunctions().addListeners;
-
-const { port1: reactPort, port2 } = new MessageChannel();
-
-const electronPort = addListeners(port2);
-
-// @ts-ignore Mocking window for 'writeTags' testing:
-global.window = {
-	twoWayComm_React_Electron: addListenersForReactSide(reactPort),
-};
-
-import { getThumbnail, writeTags } from "@main/preload/media";
+import { writeTags } from "@main/preload/media";
 
 const originalTitle = "audio for tests" as const;
 const mediaPath = resolve(
