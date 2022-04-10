@@ -21,7 +21,7 @@ import sanitize from "sanitize-filename";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
-import { ReactElectronAsyncMessageEnum } from "@common/@types/electron-window";
+import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { hash } from "@common/hash";
@@ -381,7 +381,7 @@ export function convertToAudio({
 					mediaPath: saveSite,
 				});
 				window.postMessage({
-					type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA,
+					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 					mediaPath: saveSite,
 				});
 
@@ -392,7 +392,7 @@ export function convertToAudio({
 					mediaPath,
 				});
 				window.postMessage({
-					type: ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA,
+					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 					mediaPath,
 				});
 			}
@@ -583,7 +583,7 @@ export async function writeTags(
 			error,
 		});
 		window.postMessage({
-			type: ReactElectronAsyncMessageEnum.ERROR,
+			type: ElectronToReactMessageEnum.ERROR,
 			error,
 		});
 
@@ -600,7 +600,7 @@ export async function writeTags(
 					mediaPath: fileNewPath,
 				});
 				window.postMessage({
-					type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA,
+					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 					mediaPath: fileNewPath,
 				});
 
@@ -611,7 +611,7 @@ export async function writeTags(
 					mediaPath,
 				});
 				window.postMessage({
-					type: ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA,
+					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 					mediaPath,
 				});
 			} catch (error) {
@@ -621,7 +621,7 @@ export async function writeTags(
 					error,
 				});
 				window.postMessage({
-					type: ReactElectronAsyncMessageEnum.ERROR,
+					type: ElectronToReactMessageEnum.ERROR,
 					error,
 				});
 
@@ -631,7 +631,7 @@ export async function writeTags(
 					mediaPath,
 				});
 				window.postMessage({
-					type: ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA,
+					type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
 					mediaPath,
 				});
 			} finally {
@@ -645,7 +645,7 @@ export async function writeTags(
 				mediaPath,
 			});
 			window.postMessage({
-				type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 				mediaPath,
 			});
 		} else {
@@ -655,7 +655,7 @@ export async function writeTags(
 				mediaPath,
 			});
 			window.postMessage({
-				type: ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
 				mediaPath,
 			});
 		}

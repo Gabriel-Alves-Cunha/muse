@@ -1,6 +1,6 @@
 import type { ExtensionToBeConvertedTo } from "@common/@types/electron-window";
+import type { Path, ConvertValues } from "@common/@types/typesAndEnums";
 import type { ProgressProps } from "@components/Progress";
-import type { Path } from "@common/@types/typesAndEnums";
 
 import { useEffect, useRef, useState } from "react";
 import { MdCompareArrows as Convert } from "react-icons/md";
@@ -8,7 +8,8 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
-import { ReactElectronAsyncMessageEnum } from "@common/@types/electron-window";
+import { useConvertValues, usePlaylists, MsgEnum, sendMsg } from "@contexts";
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
@@ -16,13 +17,6 @@ import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
-import {
-	useConvertValues,
-	ConvertValues,
-	usePlaylists,
-	MsgEnum,
-	sendMsg,
-} from "@contexts";
 
 import { Trigger, Wrapper, Popup, Title } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -52,7 +46,7 @@ export function Converting() {
 					const electronPort = createNewConvert(convertValue);
 
 					// Sending port so we can communicate with electron:
-					window.postMessage(ReactElectronAsyncMessageEnum.CONVERT_MEDIA, "*", [
+					window.postMessage(ReactToElectronMessageEnum.CONVERT_MEDIA, "*", [
 						electronPort,
 					]);
 				} catch (error) {

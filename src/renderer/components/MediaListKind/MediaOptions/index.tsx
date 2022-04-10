@@ -1,4 +1,4 @@
-import type { MsgObject } from "@common/@types/electron-window";
+import type { MsgObjectReactToElectron } from "@common/@types/electron-window";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { type RefObject, useEffect, useRef } from "react";
@@ -7,7 +7,7 @@ import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 import { toast } from "react-toastify";
 
-import { ReactElectronAsyncMessageEnum } from "@common/@types/electron-window";
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { usePlaylists } from "@contexts";
 import { capitalize } from "@utils/utils";
 import { dbg } from "@common/utils";
@@ -224,8 +224,8 @@ function changePropsIfAllowed(
 							const whatToSend: ChangeOptionsToSend = allowedOptionToChange[id];
 
 							// Send message to Electron to execute the function writeTag() in the main process:
-							const msg: MsgObject = {
-								type: ReactElectronAsyncMessageEnum.WRITE_TAG,
+							const msg: MsgObjectReactToElectron = {
+								type: ReactToElectronMessageEnum.WRITE_TAG,
 								params: {
 									whatToChange: whatToSend,
 									mediaPath: media.path,

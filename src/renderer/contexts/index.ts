@@ -1,10 +1,9 @@
 export { usePage } from "./page";
 
-export type { ConvertValues } from "./communicationBetweenChildren";
 export {
 	useDownloadValues,
 	useConvertValues,
-	MsgEnum,
+	MsgBetweenChildrenEnum as MsgEnum,
 	sendMsg,
 } from "./communicationBetweenChildren";
 

@@ -9,14 +9,17 @@ import {
 	Notification,
 	nativeImage,
 	MenuItem,
-	ipcMain,
 	Menu,
 	Tray,
 	app,
+	ipcMain,
 } from "electron";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
-import { NotificationEnum } from "@common/@types/typesAndEnums";
+import {
+	ElectronIpcMainProcessNotificationEnum,
+	ElectronToReactMessageEnum,
+} from "@common/@types/electron-window";
 import { logoPath } from "./utils.js";
 
 let electronWindow: BrowserWindow | undefined;
@@ -145,7 +148,7 @@ app
 
 									// Send msg to ipcRenderer:
 									electronWindow?.webContents.send("async-msg", {
-										type: NotificationEnum.DOWNLOAD_MEDIA,
+										type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
 										params: {
 											imageURL: thumbnails.at(-1)?.url ?? "",
 											type: "download media",
@@ -175,16 +178,17 @@ ipcMain.on(
 	(
 		event,
 		object: Readonly<{
-			type: NotificationEnum;
+			type: ElectronIpcMainProcessNotificationEnum;
+			msg?: string;
 		}>,
 	) => {
 		switch (object.type) {
-			case NotificationEnum.QUIT_APP: {
+			case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
 				app.quit();
 				break;
 			}
 
-			case NotificationEnum.MAXIMIZE: {
+			case ElectronIpcMainProcessNotificationEnum.MAXIMIZE: {
 				const focusedWindow = BrowserWindow.getFocusedWindow();
 				if (!focusedWindow) break;
 
@@ -194,14 +198,14 @@ ipcMain.on(
 				break;
 			}
 
-			case NotificationEnum.MINIMIZE: {
+			case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
 				BrowserWindow.getFocusedWindow()?.minimize();
 				break;
 			}
 
 			default: {
 				console.error(
-					"This 'notify' event has no receiver function!\nEvent =",
+					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
 					event,
 				);
 				break;

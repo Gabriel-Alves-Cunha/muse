@@ -2,16 +2,30 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
 import { Convert, Download, Favorites, History, Home, Settings } from "@routes";
-import { usePlaylists, usePage } from "@contexts";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
-import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
+import {
+	PlaylistActions,
+	PlaylistEnum,
+	usePlaylists,
+	usePage,
+	sendMsg,
+} from "@contexts";
+import {
+	type MsgObjectElectronToReact,
+	ElectronToReactMessageEnum,
+} from "@common/@types/electron-window";
+import {
+	getMediaFiles,
+	MEDIA_LIST,
+} from "@contexts/mediaHandler/usePlaylistsHelper";
 
 import { GlobalCSS } from "@styles/global";
 import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
+import { MsgBetweenChildrenEnum } from "@contexts/communicationBetweenChildren";
 
 export function App() {
 	GlobalCSS();
@@ -25,22 +39,12 @@ export function App() {
 	);
 }
 
+const { getState: getPlaylistsFunctions } = usePlaylists;
+
 function Main() {
-	const { addListeners, searchLocalComputerForMedias } = usePlaylists();
-
 	useEffect(() => {
-		(async () => await searchLocalComputerForMedias())();
-
-		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-
-		const { port1: reactPort, port2: electronPort } = new MessageChannel();
-
-		window.twoWayComm_React_Electron = addListeners(reactPort);
-
-		dbg("Sending 'async two way comm' to Electron side.");
-		window.postMessage("async two way comm", "*", [electronPort]);
+		(async () =>
+			await getPlaylistsFunctions().searchLocalComputerForMedias())();
 
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
@@ -77,7 +81,7 @@ function Main() {
 			window.removeEventListener("dragover", listenToDragoverEvent);
 			window.removeEventListener("drop", listenToDropEvent);
 		};
-	}, [addListeners, searchLocalComputerForMedias]);
+	}, []);
 
 	return (
 		<Content>
@@ -124,3 +128,147 @@ function PageToShow() {
 			return assertUnreachable(page);
 	}
 }
+
+const { transformPathsToMedias } = window.electron.media;
+
+window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
+	dbg("Received message from MessagePort on React side.\ndata =", event.data);
+
+	switch (event.data.type) {
+		case ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS: {
+			sendMsg({
+				type: MsgBetweenChildrenEnum.START_DOWNLOAD,
+				value: event.data.downloadValues,
+			});
+			break;
+		} // 1
+
+		case ElectronToReactMessageEnum.ADD_ONE_MEDIA: {
+			const { mediaPath } = event.data;
+
+			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
+
+			const media = (await transformPathsToMedias([mediaPath]))[0];
+
+			if (!media) {
+				console.error(`Could not transform "${mediaPath}" to media.`);
+				break;
+			}
+
+			getPlaylistsFunctions().setPlaylists({
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				media,
+			});
+			break;
+		} // 2
+
+		case ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER: {
+			const { mediaPath } = event.data;
+
+			dbg("At ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER:", {
+				mediaPath,
+			});
+
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const media = getPlaylistsFunctions()
+				.playlists.find(p => p.name === MEDIA_LIST)!
+				.list.find(m => m.path === mediaPath);
+
+			if (media) {
+				try {
+					await getPlaylistsFunctions().deleteMedia(media);
+					console.log(`Media "${{ media }}" deleted.`);
+				} catch (error) {
+					console.error(error);
+				}
+			}
+			break;
+		} // 3
+
+		case ElectronToReactMessageEnum.REFRESH_ALL_MEDIA: {
+			dbg("At ListenToNotification.REFRESH_ALL_MEDIA:");
+			await getPlaylistsFunctions().searchLocalComputerForMedias(true);
+			break;
+		} // 4
+
+		case ElectronToReactMessageEnum.REFRESH_ONE_MEDIA: {
+			const { mediaPath } = event.data;
+
+			dbg("At ListenToNotification.REFRESH_MEDIA:", { mediaPath });
+
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const mediaIndex = getPlaylistsFunctions()
+				.playlists.find(p => p.name === MEDIA_LIST)!
+				.list.findIndex(m => m.path === mediaPath);
+
+			if (mediaIndex === -1) {
+				console.warn(
+					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media.`,
+				);
+
+				await getPlaylistsFunctions().searchLocalComputerForMedias(true);
+				break;
+			}
+
+			const refreshedMedia = (await transformPathsToMedias([mediaPath]))[0];
+
+			if (!refreshedMedia) {
+				console.error(
+					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!`,
+				);
+				break;
+			}
+
+			getPlaylistsFunctions().setPlaylists({
+				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				media: refreshedMedia,
+			});
+			break;
+		} // 5
+
+		case ElectronToReactMessageEnum.REMOVE_ONE_MEDIA: {
+			const { mediaPath } = event.data;
+
+			dbg("At ListenToNotification.REMOVE_MEDIA:", { mediaPath });
+
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const media = getPlaylistsFunctions()
+				.playlists.find(p => p.name === MEDIA_LIST)!
+				.list.find(m => m.path === mediaPath);
+
+			if (!media) {
+				console.error(
+					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
+				);
+				break;
+			}
+
+			getPlaylistsFunctions().setPlaylists({
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
+				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				mediaIndex: media.index,
+			});
+			break;
+		} // 6
+
+		case ElectronToReactMessageEnum.ERROR: {
+			console.error("@TODO: ERROR");
+
+			break;
+		} // 7
+
+		default: {
+			assertUnreachable(event.data);
+
+			console.error(
+				`There is no method to handle this event.data: (${typeof event.data}) '`,
+				event.data,
+				"'\nEvent =",
+				event,
+			);
+			break;
+		}
+	}
+};

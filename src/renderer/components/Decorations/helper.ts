@@ -1,10 +1,14 @@
-import { NotificationEnum } from "@common/@types/typesAndEnums";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
 
-const notify = electron.notificationApi.sendNotificationToElectron;
+const notify =
+	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
-export const toggleMaximize = () => notify({ type: NotificationEnum.MAXIMIZE });
-export const minimizeWindow = () => notify({ type: NotificationEnum.MINIMIZE });
-export const closeWindow = () => notify({ type: NotificationEnum.QUIT_APP });
+export const toggleMaximize = () =>
+	notify({ type: ElectronIpcMainProcessNotificationEnum.MAXIMIZE });
+export const minimizeWindow = () =>
+	notify({ type: ElectronIpcMainProcessNotificationEnum.MINIMIZE });
+export const closeWindow = () =>
+	notify({ type: ElectronIpcMainProcessNotificationEnum.QUIT_APP });
 
 export const imageUrl = new URL(
 	"../../assets/icons/logo.svg?width=16",

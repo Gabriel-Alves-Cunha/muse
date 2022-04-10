@@ -12,7 +12,8 @@ import { hash } from "@common/hash";
 // Mocking `global.electron` before importing code that calls it:
 global.electron = {
 	notificationApi: {
-		receiveMsgFromElectron: vi.fn(),
+		sendNotificationToElectronIpcMainProcess: vi.fn(),
+		receiveMsgFromElectronWindow: vi.fn(),
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory: vi.fn(),

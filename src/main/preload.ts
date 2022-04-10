@@ -1,13 +1,10 @@
 import type { HandleConversion, HandleDownload } from "./preload/media";
+import type { MsgObjectReactToElectron } from "@common/@types/electron-window";
 
 import { contextBridge } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
-import {
-	MsgObject,
-	ReactElectronAsyncMessageEnum,
-} from "@common/@types/electron-window";
-import { receiveMsgFromElectron } from "./preload/notificationApi";
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
 import { homeDir, dirs } from "./utils";
 import { dbg } from "@common/utils";
@@ -24,12 +21,17 @@ import {
 	readFile,
 	readdir,
 } from "./preload/file";
+import {
+	sendNotificationToElectronIpcMainProcess,
+	receiveMsgFromElectronWindow,
+} from "./preload/notificationApi";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("electron", {
 	notificationApi: {
-		receiveMsgFromElectron,
+		sendNotificationToElectronIpcMainProcess,
+		receiveMsgFromElectron: receiveMsgFromElectronWindow,
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory,
@@ -49,14 +51,7 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 });
 
-setTimeout(() => {
-	window.postMessage(
-		{ message: "Testing if message from Electron arrives on client (React)!" },
-		"*",
-	);
-}, 5_000);
-
-window.onmessage = async (event: MessageEvent<MsgObject>) => {
+window.onmessage = async (event: MessageEvent<MsgObjectReactToElectron>) => {
 	// @ts-ignore event is actually `event: MessageEvent<MsgObject | any>`,
 	// but I'm doing this to have type safety on the switch statement.
 	if (event.data?.source?.includes("react-devtools")) return;
@@ -64,31 +59,7 @@ window.onmessage = async (event: MessageEvent<MsgObject>) => {
 	const electronPort = event.ports[0];
 
 	switch (event.data.type) {
-		case ReactElectronAsyncMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER: {
-			console.error("@TODO: DELETE_ONE_MEDIA_FROM_COMPUTER");
-
-			break;
-		} // 1
-
-		case ReactElectronAsyncMessageEnum.REFRESH_ALL_MEDIA: {
-			console.error("@TODO: REFRESH_ALL_MEDIA");
-
-			break;
-		} // 2
-
-		case ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA: {
-			console.error("@TODO: REFRESH_ONE_MEDIA");
-
-			break;
-		} // 3
-
-		case ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA: {
-			console.error("@TODO: REMOVE_ONE_MEDIA");
-
-			break;
-		} // 4
-
-		case ReactElectronAsyncMessageEnum.DOWNLOAD_MEDIA: {
+		case ReactToElectronMessageEnum.DOWNLOAD_MEDIA: {
 			if (!electronPort) {
 				console.error("There should be a electronPort to download media!");
 				break;
@@ -107,15 +78,9 @@ window.onmessage = async (event: MessageEvent<MsgObject>) => {
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
 			break;
-		} // 5
+		} // 1
 
-		case ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA: {
-			console.error("@TODO: ADD_ONE_MEDIA");
-
-			break;
-		} // 6
-
-		case ReactElectronAsyncMessageEnum.CONVERT_MEDIA: {
+		case ReactToElectronMessageEnum.CONVERT_MEDIA: {
 			if (!electronPort) {
 				console.error("There should be a electronPort to download media!");
 				break;
@@ -134,9 +99,9 @@ window.onmessage = async (event: MessageEvent<MsgObject>) => {
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
 			break;
-		} // 7
+		} // 2
 
-		case ReactElectronAsyncMessageEnum.WRITE_TAG: {
+		case ReactToElectronMessageEnum.WRITE_TAG: {
 			const { mediaPath, whatToChange, newValue } = event.data.params;
 
 			const data: Parameters<typeof writeTags>[1] = {
@@ -150,13 +115,13 @@ window.onmessage = async (event: MessageEvent<MsgObject>) => {
 
 			await writeTags(mediaPath, data);
 			break;
-		} // 8
+		} // 3
 
-		case ReactElectronAsyncMessageEnum.ERROR: {
-			console.error("@TODO: ERROR");
+		case ReactToElectronMessageEnum.ERROR: {
+			console.error("@TODO: ERROR", event.data.error);
 
 			break;
-		} // 9
+		} // 4
 
 		default: {
 			assertUnreachable(event.data);

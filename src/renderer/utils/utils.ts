@@ -24,7 +24,9 @@ export const capitalize = (string: string) =>
 	string.charAt(0).toUpperCase() + string.slice(1);
 
 export const assertUnreachable = (received: never): never => {
+	const error = JSON.stringify(received, null, 2) ?? received;
+
 	throw new Error(
-		`I shouldn't get here (on 'assertUnreachable')!\nreceived = ${received}`,
+		"I shouldn't get here (on 'assertUnreachable')!\nreceived = " + error,
 	);
 };

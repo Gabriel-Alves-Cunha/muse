@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Media, Path } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
 import merge from "deepmerge";
 
 import { push, remove, replace } from "@utils/array";
-import { ListenToNotification } from "@common/@types/typesAndEnums";
 import { assertUnreachable } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
 import { hash } from "@common/hash";
@@ -49,7 +48,6 @@ type UsePlaylistsActions = Readonly<{
 	updatePlaylists: (playlists: readonly Playlist[]) => void;
 	createPlaylist: (playlists: readonly Playlist[]) => void;
 	deleteMedia: (media: Readonly<Media>) => Promise<void>;
-	addListeners: (port: MessagePort) => MessagePort;
 	playlists: readonly Playlist[];
 }>;
 
@@ -57,143 +55,6 @@ export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
 		(set, get) => ({
 			playlists: defaultPlaylists,
-			addListeners: (port: MessagePort) => {
-				port.onmessage = async event => {
-					dbg(
-						"Received message from MessagePort on React side.\ndata =",
-						event.data,
-					);
-
-					const { msg, path }: Msg = event.data;
-
-					switch (msg) {
-						case ListenToNotification.ADD_ONE_MEDIA: {
-							if (!path) {
-								console.error(
-									"There should be a path if you want to add a media!",
-								);
-								break;
-							}
-
-							dbg("At ListenToNotification.ADD_MEDIA:", { path });
-
-							const media = (await transformPathsToMedias([path]))[0];
-
-							if (!media) {
-								console.error(`Could not transform "${path}" to media.`);
-								break;
-							}
-
-							get().setPlaylists({
-								whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-								type: PlaylistEnum.UPDATE_MEDIA_LIST,
-								media,
-							});
-							break;
-						}
-
-						case ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER: {
-							dbg("At ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER:", {
-								path,
-							});
-
-							if (!path) {
-								console.error(
-									"There should be a path if you want to delete a media!",
-								);
-								break;
-							}
-
-							const media = get()
-								.playlists.find(p => p.name === MEDIA_LIST)!
-								.list.find(m => m.path === path);
-
-							if (media) {
-								await get().deleteMedia(media);
-								console.log(`Media "${{ media }}" deleted.`);
-							}
-							break;
-						}
-
-						case ListenToNotification.REFRESH_ALL_MEDIA: {
-							dbg("At ListenToNotification.REFRESH_ALL_MEDIA:");
-							await get().searchLocalComputerForMedias(true);
-							break;
-						}
-
-						case ListenToNotification.REFRESH_ONE_MEDIA: {
-							dbg("At ListenToNotification.REFRESH_MEDIA:", { path });
-
-							if (!path) {
-								console.error(
-									"There should be a path if you want to refresh a media!",
-								);
-								break;
-							}
-
-							const mediaIndex = get()
-								.playlists.find(p => p.name === MEDIA_LIST)!
-								.list.findIndex(m => m.path === path);
-
-							if (mediaIndex === -1) {
-								console.warn(
-									`There should be a media with path = "${path}" to be refreshed, but there isn't!\nRefreshing all media.`,
-								);
-
-								await get().searchLocalComputerForMedias(true);
-								break;
-							}
-
-							const refreshedMedia = (await transformPathsToMedias([path]))[0];
-
-							if (!refreshedMedia) {
-								console.error(
-									`I wasn't able to transform this path (${path}) to a media to be refreshed!`,
-								);
-								break;
-							}
-
-							get().setPlaylists({
-								whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-								type: PlaylistEnum.UPDATE_MEDIA_LIST,
-								media: refreshedMedia,
-							});
-							break;
-						}
-
-						case ListenToNotification.REMOVE_ONE_MEDIA: {
-							dbg("At ListenToNotification.REMOVE_MEDIA:", { path });
-
-							const media = get()
-								.playlists.find(p => p.name === MEDIA_LIST)!
-								.list.find(m => m.path === path);
-
-							if (!media) {
-								console.error(
-									`I wasn't able to find this path "${path}" to a media to be removed!`,
-								);
-								break;
-							}
-
-							get().setPlaylists({
-								whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
-								type: PlaylistEnum.UPDATE_MEDIA_LIST,
-								mediaIndex: media.index,
-							});
-							break;
-						}
-
-						default: {
-							console.error("There is no function to handle this event:", {
-								event,
-							});
-							break;
-						}
-					}
-				};
-
-				return port;
-			},
 			deleteMedia: async (media: Media) => {
 				await rm(media.path);
 
@@ -536,8 +397,6 @@ export const usePlaylists = create<UsePlaylistsActions>(
 		},
 	),
 );
-
-type Msg = { msg: ListenToNotification; path?: Path };
 
 export type DefaultLists =
 	| "sorted by date"

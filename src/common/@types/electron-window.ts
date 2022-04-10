@@ -15,7 +15,15 @@ declare global {
 
 type VisibleElectron = Readonly<{
 	notificationApi: {
-		receiveMsgFromElectron(handleMsg: (msgObject: MsgObject) => void): void;
+		sendNotificationToElectronIpcMainProcess(
+			object: Readonly<{
+				type: ElectronIpcMainProcessNotificationEnum;
+				msg?: string;
+			}>,
+		): void;
+		receiveMsgFromElectronWindow(
+			handleMsg: (msgObject: MsgObjectReactToElectron) => void,
+		): void;
 	};
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory(
@@ -41,58 +49,73 @@ type VisibleElectron = Readonly<{
 	};
 }>;
 
-export enum ReactElectronAsyncMessageEnum {
-	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer", // 1
-	REFRESH_ALL_MEDIA = "refresh all media", // 2
-	REFRESH_ONE_MEDIA = "refresh one media", // 3
-	REMOVE_ONE_MEDIA = "remove one media", // 4
-	DOWNLOAD_MEDIA = "download media", // 5
-	ADD_ONE_MEDIA = "add one media", // 6
-	CONVERT_MEDIA = "convert media", // 7
-	WRITE_TAG = "write tag", // 8
-	ERROR = "error", // 9
+export enum ReactToElectronMessageEnum {
+	DOWNLOAD_MEDIA = "download media", // 1
+	CONVERT_MEDIA = "convert media", // 2
+	WRITE_TAG = "write tag", // 3
+	ERROR = "error", // 4
 }
 
-export type MsgObject =
+export type MsgObjectReactToElectron =
 	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
-			media: Media;
+			type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA;
+			downloadValues: DownloadValues;
 	  }> // 1
 	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.REFRESH_ALL_MEDIA;
+			type: ReactToElectronMessageEnum.CONVERT_MEDIA;
+			convertValues: ConvertValues;
 	  }> // 2
 	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA;
-			mediaPath: Path;
-	  }> // 3
-	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA;
-			mediaPath: Path;
-	  }> // 4
-	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.DOWNLOAD_MEDIA;
-			downloadValues: DownloadValues;
-	  }> // 5
-	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA;
-			mediaPath: Path;
-	  }> // 6
-	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.CONVERT_MEDIA;
-			convertValues: ConvertValues;
-	  }> // 7
-	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.WRITE_TAG;
+			type: ReactToElectronMessageEnum.WRITE_TAG;
 			params: Readonly<{
 				newValue: string | readonly string[];
 				whatToChange: ChangeOptionsToSend;
 				mediaPath: Path;
 			}>;
-	  }> // 8
+	  }> // 3
 	| Readonly<{
-			type: ReactElectronAsyncMessageEnum.ERROR;
+			type: ReactToElectronMessageEnum.ERROR;
 			error: Error;
-	  }>; // 9
+	  }>; // 4
+
+export enum ElectronToReactMessageEnum {
+	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer", // 1
+	DISPLAY_DOWNLOADING_MEDIAS = "display downloading medias", // 2
+	REFRESH_ALL_MEDIA = "refresh all media", // 3
+	REFRESH_ONE_MEDIA = "refresh one media", // 4
+	REMOVE_ONE_MEDIA = "remove one media", // 5
+	ADD_ONE_MEDIA = "add one media", // 6
+	ERROR = "error", // 7
+}
+
+export type MsgObjectElectronToReact =
+	| Readonly<{
+			type: ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
+			mediaPath: Path;
+	  }> // 1
+	| Readonly<{
+			type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS;
+			downloadValues: DownloadValues;
+	  }> // 2
+	| Readonly<{
+			type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA;
+	  }> // 3
+	| Readonly<{
+			type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA;
+			mediaPath: Path;
+	  }> // 4
+	| Readonly<{
+			type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA;
+			mediaPath: Path;
+	  }> // 5
+	| Readonly<{
+			type: ElectronToReactMessageEnum.ADD_ONE_MEDIA;
+			mediaPath: Path;
+	  }> // 6
+	| Readonly<{
+			type: ElectronToReactMessageEnum.ERROR;
+			error: Error;
+	  }>; // 7
 
 export type WriteTag = Readonly<{
 	albumArtists?: readonly string[];
@@ -102,7 +125,7 @@ export type WriteTag = Readonly<{
 	title?: string;
 }>;
 
-export enum NotificationEnum {
+export enum ElectronIpcMainProcessNotificationEnum {
 	MAXIMIZE,
 	MINIMIZE,
 	QUIT_APP,
