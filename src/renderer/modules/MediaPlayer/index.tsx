@@ -47,10 +47,7 @@ const { ceil } = Math;
 const useProgress = create<Progress>(() => ({ percentage: 0, current: 0 }));
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 const { getState: getPlayOptions } = usePlayOptions;
-const { getState: getPlaylists } = usePlaylists;
 const { setState: setProgress } = useProgress;
-
-const { isFavorite } = getPlaylists();
 
 const toggleRepeatThisMedia = () =>
 	getPlayOptions().setPlayOptions({
@@ -80,12 +77,12 @@ const playPreviousMedia = () =>
 	});
 
 export function MediaPlayer() {
+	const { isRandom, loopThisMedia } = usePlayOptions().playOptions;
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const { currentPlaying } = useCurrentPlaying();
-	const {
-		playOptions: { isRandom, loopThisMedia },
-	} = usePlayOptions();
+	const { mainList } = usePlaylists();
 
+	const media = mainList.find(m => m.id === currentPlaying.mediaID);
 	const audio = audioRef.current;
 
 	const seek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -132,10 +129,10 @@ export function MediaPlayer() {
 					<Dots size="17" />
 				</OptionsButton>
 
-				<Album>{currentPlaying.media?.album}</Album>
+				<Album>{media?.album}</Album>
 
 				<ScaleUpIconButton style={{ width: 25, height: 25 }}>
-					{isFavorite(currentPlaying.media?.id) ? (
+					{media?.favorite ? (
 						<Favorite size="17" />
 					) : (
 						<AddFavorite size="17" />
@@ -147,14 +144,14 @@ export function MediaPlayer() {
 				<div>
 					<ImgWithFallback
 						Fallback={<MusicNote size="1.4em" />}
-						media={currentPlaying?.media}
+						media={media}
 					/>
 				</div>
 			</SquareImage>
 
 			<Info>
-				<span className="title">{currentPlaying?.media?.title}</span>
-				<span className="subtitle">{currentPlaying?.media?.artist}</span>
+				<span className="title">{media?.title}</span>
+				<span className="subtitle">{media?.artist}</span>
 			</Info>
 
 			<ControlsAndSeekerContainer>

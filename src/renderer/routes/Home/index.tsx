@@ -1,16 +1,16 @@
 import { MediaListKind, SearchMedia, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia";
-import { MEDIA_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 
 export function Home() {
 	return (
 		<MainArea>
 			<SearchMedia
 				buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
-				fromList={MEDIA_LIST}
+				fromList={MAIN_LIST}
 			/>
 
-			<MediaListKind playlistName={MEDIA_LIST} />
+			<MediaListKind playlistName={MAIN_LIST} />
 		</MainArea>
 	);
 }

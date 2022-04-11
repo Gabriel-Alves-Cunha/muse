@@ -43,7 +43,7 @@ it("should format duration in seconds to something like: '00:00:00'. #formatDura
 		"01:49:03",
 		"03:44",
 		"15:00",
-		"",
+		"00:00",
 	]);
 });
 

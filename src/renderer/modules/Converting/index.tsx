@@ -9,19 +9,13 @@ import { toast } from "react-toastify";
 import create from "zustand";
 
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
-import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
 import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
+import { usePlaylists } from "@contexts";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
-import {
-	MsgBetweenChildrenEnum,
-	useConvertValues,
-	usePlaylists,
-	sendMsg,
-} from "@contexts";
 
 import { Trigger, Wrapper, Popup, Title } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -32,13 +26,21 @@ const useConvertList = create<
 	convertList: [],
 }));
 
-const { setState: setConvertList, getState: getConvertList } = useConvertList;
-const { getState: getPlaylistsFunctions } = usePlaylists;
+export const useConvertValues = create<{
+	convertValues: readonly ConvertValues[];
+}>(() => ({
+	convertValues: [],
+}));
+
+// This prevents an infinite loop:
+const constRefToEmptyArray = Object.freeze([]);
+
+const { setState: setConvertValues } = useConvertValues;
 
 export function Converting() {
 	const [showPopup, setShowPopup] = useState(false);
 	const { convertValues } = useConvertValues();
-	const { convertList } = getConvertList();
+	const { convertList } = useConvertList();
 
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -71,7 +73,7 @@ export function Converting() {
 		});
 
 		// Once all downloads are handled, we can remove the values from the list:
-		sendMsg({ type: MsgBetweenChildrenEnum.RESET_CONVERT_VALUES });
+		setConvertValues({ convertValues: constRefToEmptyArray });
 	}, [convertValues]);
 
 	useEffect(() => {
@@ -141,13 +143,20 @@ const ConvertBox = ({
 	</div>
 );
 
-function createNewConvert(values: ConvertValues): MessagePort {
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+const { setState: setConvertList, getState: getConvertList } = useConvertList;
+const { getState: getPlaylistsFunctions } = usePlaylists;
+
+function createNewConvert(convertValues: ConvertValues): MessagePort {
 	{
 		const indexIfThereIsOneAlready = getConvertList().convertList.findIndex(
-			c => c.path === values.path,
+			c => c.path === convertValues.path,
 		);
 		if (indexIfThereIsOneAlready !== -1) {
-			const info = `There is already one convert of "${values.path}"!`;
+			const info = `There is already one convert of "${convertValues.path}"!`;
 
 			toast.info(info, {
 				hideProgressBar: false,
@@ -169,12 +178,11 @@ function createNewConvert(values: ConvertValues): MessagePort {
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 	const convertStatus: MediaBeingConverted = {
-		index: getConvertList().convertList.length,
-		toExtension: values.toExtension,
+		toExtension: convertValues.toExtension,
 		status: ProgressStatus.ACTIVE,
 		isConverting: true,
 		timeConverted: "",
-		path: values.path,
+		path: convertValues.path,
 		sizeConverted: 0,
 		port: myPort,
 	};
@@ -192,8 +200,17 @@ function createNewConvert(values: ConvertValues): MessagePort {
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
 		// dbg("myPort msg received =", data);
+		const convertList = getConvertList().convertList;
+
+		const index = convertList.findIndex(c => c.path === data.path);
+
+		if (index === -1) {
+			console.error("There is no convert with path =", data.path, convertList);
+			return;
+		}
+
 		setConvertList({
-			convertList: replace(getConvertList().convertList, convertStatus.index, {
+			convertList: replace(convertList, index, {
 				...convertStatus,
 				...data, // new data will override old ones.
 			}),
@@ -270,14 +287,19 @@ function createNewConvert(values: ConvertValues): MessagePort {
 }
 
 function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
-	const mediaBeingConverted = getConvertList().convertList.find(
+	const convertList = getConvertList().convertList;
+
+	const mediaBeingConvertedIndex = convertList.findIndex(
 		c => c.path === mediaPath,
 	);
-	if (!mediaBeingConverted)
+	if (mediaBeingConvertedIndex === -1)
 		return console.error(
 			`There should be a download with path "${mediaPath}"!\nconvertList =`,
-			getConvertList().convertList,
+			convertList,
 		);
+
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const mediaBeingConverted = convertList[mediaBeingConvertedIndex]!;
 
 	if (mediaBeingConverted.isConverting)
 		mediaBeingConverted.port.postMessage({
@@ -286,9 +308,7 @@ function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
 		});
 
 	setConvertList({
-		convertList: reaplyOrderedIndex(
-			remove(getConvertList().convertList, mediaBeingConverted.index),
-		),
+		convertList: remove(getConvertList().convertList, mediaBeingConvertedIndex),
 	});
 }
 
@@ -301,6 +321,5 @@ type MediaBeingConverted = Readonly<{
 	timeConverted: string;
 	isConverting: boolean;
 	port: MessagePort;
-	index: number;
 	path: Path;
 }>;

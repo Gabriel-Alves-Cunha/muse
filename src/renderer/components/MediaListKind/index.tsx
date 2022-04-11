@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
@@ -12,6 +12,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
+import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import {
 	type DefaultLists,
 	type Playlist,
@@ -36,20 +37,31 @@ const PADDING_SIZE = 5;
 const ROW_HEIGHT = 65;
 
 const { getState } = useCurrentPlaying;
-const playMedia = (media: Media, playlistName: Playlist["name"]) =>
+const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 	getState().setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlistName,
-		media,
+		mediaID,
 	});
 
 export function MediaListKind({ playlistName }: MediaListKindProps) {
+	const { playlists, mainList } = usePlaylists();
 	const { currentPlaying } = useCurrentPlaying();
-	const { playlists } = usePlaylists();
+	let list: readonly Media[];
 
 	// TODO: ErrorBoundary
-	// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-	const list = playlists.find(p => p.name === playlistName)!;
+	// Handle when playlistName === MAIN_LIST:
+	if (playlistName === MAIN_LIST) {
+		list = mainList;
+	} else {
+		console.time("loop to find all medias by id");
+		// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+		list = playlists
+			.find(p => p.name === playlistName)!
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			.list.map(mediaID => mainList.find(media => media.id === mediaID)!);
+		console.timeEnd("loop to find all medias by id");
+	}
 	if (!list)
 		console.error(
 			`There should/must be a list with name = "${playlistName}"!\nplaylists =`,
@@ -63,7 +75,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 
 			return (
 				<RowWrapper
-					className={media.id === currentPlaying.media?.id ? "active" : ""}
+					className={media.id === currentPlaying.mediaID ? "active" : ""}
 					style={{
 						...style,
 						height: (parseFloat(String(style.height)) || 0) - PADDING_SIZE,
@@ -71,7 +83,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 						//			^ This way to safely turn style.width to a number.
 					}}
 				>
-					<PlayButton onClick={() => playMedia(media, playlistName)}>
+					<PlayButton onClick={() => playMedia(media.id, playlistName)}>
 						<Img>
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4em" />}
@@ -105,6 +117,8 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 	);
 	Row.displayName = "Row";
 
+	console.log({ list });
+
 	return (
 		<ListWrapper>
 			<AutoSizer>
@@ -112,10 +126,10 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 					<List
 						itemKey={(index, data) => data[index]?.id ?? 0 + Date.now()}
 						itemSize={ROW_HEIGHT + PADDING_SIZE}
-						itemCount={list.list.length}
-						itemData={list.list}
 						overscanCount={15}
+						itemCount={length}
 						className="list"
+						itemData={list}
 						height={height}
 						width={width}
 					>

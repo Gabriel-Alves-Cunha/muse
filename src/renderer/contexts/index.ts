@@ -1,13 +1,6 @@
 export { usePage } from "./page";
 
 export {
-	MsgBetweenChildrenEnum,
-	useDownloadValues,
-	useConvertValues,
-	sendMsg,
-} from "./communicationBetweenChildren";
-
-export {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
 } from "./mediaHandler/useCurrentPlaying";

@@ -101,7 +101,6 @@ const createMedia = async (
 			id: hash(path),
 			genres,
 			album,
-			index,
 			path,
 			img,
 		};

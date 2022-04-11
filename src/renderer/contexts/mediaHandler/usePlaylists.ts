@@ -21,6 +21,7 @@ import {
 	sortByName,
 	FAVORITES,
 	HISTORY,
+	MAIN_LIST,
 } from "./usePlaylistsHelper";
 
 const {
@@ -38,8 +39,11 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 ] as const);
 
 type UsePlaylistsActions = Readonly<{
+	searchForMediaFromList: (
+		searchTerm_: Readonly<string>,
+		fromList: DefaultLists,
+	) => readonly Media[];
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
-	searchForMedia: (searchTerm_: Readonly<string>) => readonly Media[];
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
 	updatePlaylists: (playlists: readonly Playlist[]) => void;
 	createPlaylist: (playlists: readonly Playlist[]) => void;
@@ -51,6 +55,7 @@ type UsePlaylistsActions = Readonly<{
 export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
 		(set, get) => ({
+			mainList: [],
 			playlists: defaultPlaylists,
 			deleteMedia: async ({ path, id }: Media) => {
 				await rm(path);
@@ -61,14 +66,29 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					mediaID: id,
 				});
 			},
-			searchForMedia: (searchTerm_: Readonly<string>) => {
+			searchForMediaFromList: (
+				searchTerm_: Readonly<string>,
+				fromList: DefaultLists,
+			) => {
 				const searchTerm = searchTerm_.toLowerCase();
+				const mainList = get().mainList;
+				let results: readonly Media[];
 
-				console.time("Searching for file");
-				const results = get().mainList.filter(m =>
-					m.title.toLowerCase().includes(searchTerm),
-				);
-				console.timeEnd("Searching for file");
+				// Handle when fromList === MAIN_LIST
+				if (fromList === MAIN_LIST) {
+					console.time("Searching for file");
+					results = mainList.filter(m =>
+						m.title.toLowerCase().includes(searchTerm),
+					);
+					console.timeEnd("Searching for file");
+				} else {
+					console.time("Searching for file");
+					results = get()
+						.playlists.find(p => p.name === fromList)!
+						.list.map(mediaID => mainList.find(m => m.id === mediaID)!)
+						.filter(m => m.title.toLowerCase().includes(searchTerm));
+					console.timeEnd("Searching for file");
+				}
 
 				return results;
 			},
@@ -136,7 +156,14 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							case PlaylistActions.REMOVE_ONE_MEDIA: {
-								const newFavorites = remove(prevFavorites, action.mediaID);
+								const index = prevFavorites.indexOf(action.mediaID);
+
+								if (index === -1) {
+									console.error("Media not found in favorites");
+									break;
+								}
+
+								const newFavorites = remove(prevFavorites, index);
 
 								dbg(
 									"setPlaylists on 'UPDATE_FAVORITES'->'REMOVE_ONE_MEDIA'. newFavorites =",
@@ -239,7 +266,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 								const refreshedMedia: Media = {
 									...action.media,
-									id: hash(action.media.title),
+									id: hash(action.media.path),
 								};
 
 								const newMainList = replace(
@@ -366,11 +393,15 @@ export const usePlaylists = create<UsePlaylistsActions>(
 		}),
 		{
 			name: playlistsKey,
-			serialize: ({ state }) => JSON.stringify(state.mainList),
-			partialize: ({ mainList }) => ({ mainList }),
-			deserialize: mainList => JSON.parse(mainList),
+			partialize: ({ mainList, playlists }) => ({ mainList, playlists }),
+			deserialize: object => JSON.parse(object),
 			merge: (persistedState, currentState) =>
 				merge(persistedState, currentState),
+			serialize: ({ state }) =>
+				JSON.stringify({
+					playlists: state.playlists,
+					mainList: state.mainList,
+				}),
 		},
 	),
 );
@@ -379,7 +410,7 @@ export type DefaultLists =
 	| "sorted by date"
 	| "sorted by name"
 	| "favorites"
-	| "mediaList"
+	| "main list"
 	| "history";
 
 export type Playlist = Readonly<{

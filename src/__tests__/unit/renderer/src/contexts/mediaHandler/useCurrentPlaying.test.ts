@@ -1,86 +1,21 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { CurrentPlaying } from "@contexts";
-import type { Media } from "@common/@types/typesAndEnums";
-
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { faker } from "@faker-js/faker";
+
+import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
+mockGlobalsBeforeTests();
 
 import { formatDuration } from "@common/utils";
 import { hash } from "@common/hash";
 
-// Mocking `global.electron` before importing code that calls it:
-global.electron = {
-	notificationApi: {
-		sendNotificationToElectronIpcMainProcess: vi.fn(),
-		receiveMsgFromElectronWindow: vi.fn(),
-	},
-	fs: {
-		getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
-		readdir: vi.fn(),
-		readFile: vi.fn(),
-		deleteFile: vi.fn(),
-	},
-	os: {
-		homeDir: "test/homeDir",
-		dirs: {
-			documents: "test/documents",
-			downloads: "test/downloads",
-			music: "test/music",
-		},
-	},
-	media: {
-		transformPathsToMedias: vi.fn(),
-		convertToAudio: vi.fn(),
-		writeTags: vi.fn(),
-		getBasicInfo: vi.fn(),
-	},
-};
-
-// Mocking global.localStorage
-class LocalStorageMock {
-	#store: Record<string, string>;
-
-	constructor() {
-		this.#store = {};
-	}
-
-	get length() {
-		return Object.keys(this.#store).length;
-	}
-
-	clear() {
-		this.#store = {};
-	}
-
-	key(index: number): string | null {
-		const keys = Object.keys(this.#store);
-
-		if (index > keys.length) return null;
-
-		return keys[index]!;
-	}
-
-	getItem(key: string) {
-		return this.#store[key] ?? null;
-	}
-
-	setItem(key: string, value: string) {
-		this.#store[key] = String(value);
-	}
-
-	removeItem(key: string) {
-		delete this.#store[key];
-	}
-}
-
-global.localStorage = new LocalStorageMock();
-
-import { MEDIA_LIST, HISTORY } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MAIN_LIST, HISTORY } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { Media } from "@common/@types/typesAndEnums";
 import {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
 	PlaylistActions,
+	CurrentPlaying,
 	usePlaylists,
 	DefaultLists,
 	PlaylistEnum,
@@ -96,7 +31,7 @@ const getPlaylist = (listName: DefaultLists) =>
 const testList: Media[] = [];
 const numberOfMedias = 30;
 for (let index = 0; index < numberOfMedias; ++index) {
-	const title = faker.unique(faker.name.title);
+	const title = faker.unique(faker.name.jobTitle);
 
 	testList.push({
 		dateOfArival: faker.date.past().getTime(),
@@ -106,9 +41,9 @@ for (let index = 0; index < numberOfMedias; ++index) {
 		id: hash(title),
 		size: "3.0 MB",
 		title,
-		index,
 	});
 }
+Object.freeze(testList);
 
 describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {
@@ -118,8 +53,8 @@ describe("Testing useCurrentPlaying", () => {
 			list: testList,
 		});
 		{
-			const mediaList = getPlaylist(MEDIA_LIST)!.list;
-			expect(mediaList).toEqual(testList);
+			const mainList = getPlaylistsFuncs().mainList;
+			expect(mainList).toEqual(testList);
 		}
 
 		getPlaylistsFuncs().setPlaylists({
@@ -136,15 +71,15 @@ describe("Testing useCurrentPlaying", () => {
 		testList.forEach(media => {
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MEDIA_LIST,
-				media,
+				playlistName: MAIN_LIST,
+				mediaID: media.id,
 			});
 
 			const currentPlaying = getCurrentPlaying().currentPlaying;
 			const expected: CurrentPlaying = {
-				playlistName: MEDIA_LIST,
+				playlistName: MAIN_LIST,
+				mediaID: media.id,
 				currentTime: 0,
-				media,
 			};
 
 			expect(expected).toEqual(currentPlaying);
@@ -152,88 +87,93 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY) should play the previous media from history", () => {
-		for (let i = 0; i < numberOfMedias - 1; ++i) {
-			const nextMedia = testList[i + 1]!;
-			const media = testList[i]!;
+		testList.forEach((media, index) => {
+			if (index === 29) return;
+
+			const nextMedia = testList[index + 1]!;
 
 			// Play a media to make sure history is not empty:
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MEDIA_LIST,
-				media,
+				playlistName: MAIN_LIST,
+				mediaID: media.id,
 			});
 
 			const updatedHistory_1 = getPlaylist(HISTORY)!.list;
-			expect(updatedHistory_1[0]).toEqual(media);
+			expect(updatedHistory_1[0]).toEqual(media.id);
 
 			// Play the next media:
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MEDIA_LIST,
-				media: nextMedia,
+				playlistName: MAIN_LIST,
+				mediaID: nextMedia.id,
 			});
 
 			const updatedHistory_2 = getPlaylist(HISTORY)!.list;
-			expect(updatedHistory_2[0]).toEqual(nextMedia);
+			expect(updatedHistory_2[0]).toEqual(nextMedia.id);
 
 			// Play previous media:
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY,
-				playlistName: MEDIA_LIST,
+				playlistName: MAIN_LIST,
 			});
 
 			const currentPlaying = getCurrentPlaying().currentPlaying;
 			const expected: CurrentPlaying = {
-				playlistName: MEDIA_LIST,
+				playlistName: MAIN_LIST,
+				mediaID: media.id,
 				currentTime: 0,
-				media,
 			};
 
 			expect(expected).toEqual(currentPlaying);
-		}
+		});
 	});
 
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST) should play the previous media from mediaList", () => {
-		for (let i = 0; i < numberOfMedias - 1; ++i) {
+		testList.forEach((media, index) => {
+			if (index === 29) return;
+
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MEDIA_LIST,
-				media: testList[i]!,
+				playlistName: MAIN_LIST,
+				mediaID: media.id,
 			});
 
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
-				playlistName: MEDIA_LIST,
+				playlistName: MAIN_LIST,
 			});
 
 			const currentPlaying = getCurrentPlaying().currentPlaying;
 			const expected: CurrentPlaying = {
-				media: testList.at(i - 1),
-				playlistName: MEDIA_LIST,
+				mediaID: testList.at(index - 1)!.id,
+				playlistName: MAIN_LIST,
 				currentTime: 0,
 			};
 
 			expect(expected).toEqual(currentPlaying);
-		}
+		});
 	});
 
 	it("(CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST) should play the next media from a given playlist", () => {
-		for (let i = 0; i < numberOfMedias - 1; ++i) {
+		testList.forEach((media, index) => {
+			if (index === 29) return;
+
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MEDIA_LIST,
-				media: testList[i]!,
+				playlistName: MAIN_LIST,
+				mediaID: media.id,
 			});
 
 			getCurrentPlaying().setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
-				playlistName: MEDIA_LIST,
+				playlistName: MAIN_LIST,
 			});
 
-			const currMedia = getCurrentPlaying().currentPlaying.media;
-			const expectedMedia = testList[i + 1];
+			const currMediaID = getCurrentPlaying().currentPlaying.mediaID;
+			const expectedMediaID = testList[index + 1]!.id;
 
-			expect(expectedMedia).toEqual(currMedia);
-		}
+			expect(expectedMediaID).toEqual(currMediaID);
+		});
 	});
 });

@@ -2,9 +2,10 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
 import { Convert, Download, Favorites, History, Home } from "@routes";
-import { MsgBetweenChildrenEnum } from "@contexts/communicationBetweenChildren";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
+import { useDownloadValues } from "@modules/Downloading";
+import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 import {
@@ -12,16 +13,11 @@ import {
 	PlaylistEnum,
 	usePlaylists,
 	usePage,
-	sendMsg,
 } from "@contexts";
 import {
 	type MsgObjectElectronToReact,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
-import {
-	getMediaFiles,
-	MEDIA_LIST,
-} from "@contexts/mediaHandler/usePlaylistsHelper";
 
 import { GlobalCSS } from "@styles/global";
 import { Content } from "@styles/appStyles";
@@ -89,7 +85,8 @@ function PageToShow() {
 	}
 }
 
-const { transformPathsToMedias } = window.electron.media;
+const { setState: setDownloadValues } = useDownloadValues;
+const { transformPathsToMedias } = electron.media;
 
 window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 	// @ts-ignore When the message is from react-devtools, ignore it:
@@ -99,9 +96,8 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 
 	switch (event.data.type) {
 		case ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS: {
-			sendMsg({
-				type: MsgBetweenChildrenEnum.START_DOWNLOAD,
-				value: event.data.downloadValues,
+			setDownloadValues({
+				downloadValues: event.data.downloadValues,
 			});
 			break;
 		} // 1
@@ -133,18 +129,20 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 				mediaPath,
 			});
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const media = getPlaylistsFunctions()
-				.playlists.find(p => p.name === MEDIA_LIST)!
-				.list.find(m => m.path === mediaPath);
+			const media = getPlaylistsFunctions().mainList.find(
+				p => p.path === mediaPath,
+			);
 
-			if (media) {
-				try {
-					await getPlaylistsFunctions().deleteMedia(media);
-					console.log(`Media "${{ media }}" deleted.`);
-				} catch (error) {
-					console.error(error);
-				}
+			if (!media) {
+				console.error("Could not find media to delete.");
+				break;
+			}
+
+			try {
+				await getPlaylistsFunctions().deleteMedia(media);
+				console.log(`Media "${{ media }}" deleted.`);
+			} catch (error) {
+				console.error(error);
 			}
 			break;
 		} // 3
@@ -158,12 +156,11 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 		case ElectronToReactMessageEnum.REFRESH_ONE_MEDIA: {
 			const { mediaPath } = event.data;
 
-			dbg("At ListenToNotification.REFRESH_MEDIA:", { mediaPath });
+			dbg("At ListenToNotification.REFRESH_MEDIA:", { data: event.data });
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const mediaIndex = getPlaylistsFunctions()
-				.playlists.find(p => p.name === MEDIA_LIST)!
-				.list.findIndex(m => m.path === mediaPath);
+			const mediaIndex = getPlaylistsFunctions().mainList.findIndex(
+				m => m.path === mediaPath,
+			);
 
 			if (mediaIndex === -1) {
 				console.warn(
@@ -196,10 +193,9 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 
 			dbg("At ListenToNotification.REMOVE_MEDIA:", { mediaPath });
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const media = getPlaylistsFunctions()
-				.playlists.find(p => p.name === MEDIA_LIST)!
-				.list.find(m => m.path === mediaPath);
+			const media = getPlaylistsFunctions().mainList.find(
+				m => m.path === mediaPath,
+			);
 
 			if (!media) {
 				console.error(
@@ -211,13 +207,13 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 			getPlaylistsFunctions().setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				mediaIndex: media.index,
+				mediaID: media.id,
 			});
 			break;
 		} // 6
 
 		case ElectronToReactMessageEnum.ERROR: {
-			console.error("@TODO: ERROR");
+			console.error("@TODO: ERROR", event.data.error);
 
 			break;
 		} // 7

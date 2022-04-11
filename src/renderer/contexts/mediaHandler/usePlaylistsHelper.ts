@@ -1,7 +1,7 @@
 import type {
-	Media,
 	MediaID,
 	Mutable,
+	Media,
 	Path,
 } from "@common/@types/typesAndEnums";
 
@@ -76,12 +76,6 @@ export const getAllowedMedias = (
 	filenames.filter(filename =>
 		allowedMedias.some(extension => extension === getLastExtension(filename)),
 	);
-
-type ListWithOrder<T> = ReadonlyArray<
-	Readonly<T> & Readonly<{ index: number }>
->;
-export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
-	list.map((item, index) => ({ ...item, index }));
 
 export const sortByDate = (newList: readonly Media[]) =>
 	sort(newList, (a, b) => {

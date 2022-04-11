@@ -1,7 +1,6 @@
 import type { MediaListKindProps } from "../MediaListKind";
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
-import { FixedSizeList, type ListChildComponentProps } from "react-window";
 import { memo, useEffect, useReducer, useRef } from "react";
 import {
 	MdOutlineSearch as SearchIcon,
@@ -9,6 +8,10 @@ import {
 	MdAutorenew as Reload,
 	MdDelete as Clean,
 } from "react-icons/md";
+import {
+	type ListChildComponentProps,
+	FixedSizeList as List,
+} from "react-window";
 
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
@@ -89,14 +92,17 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		const searchTimeout = setTimeout(
 			() =>
 				dispatchSearcher({
-					value: getPlaylistsFunctions().searchForMedia(searcher.searchTerm),
+					value: getPlaylistsFunctions().searchForMediaFromList(
+						searcher.searchTerm,
+						fromList,
+					),
 					type: SearcherAction.SET_RESULTS,
 				}),
 			400,
 		);
 
 		return () => clearTimeout(searchTimeout);
-	}, [searcher.searchTerm]);
+	}, [fromList, searcher.searchTerm]);
 
 	const buttonToTheSideJSX: Record<ButtonToTheSide, JSX.Element> = {
 		[ButtonToTheSide.RELOAD_BUTTON]: (
@@ -162,11 +168,11 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 }
 
 const { getState: getCurrentPlaying } = useCurrentPlaying;
-const playMedia = (media: Media, playlistName: Playlist["name"]) =>
+const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 	getCurrentPlaying().setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlistName,
-		media,
+		mediaID,
 	});
 
 function SearchResults({
@@ -176,13 +182,7 @@ function SearchResults({
 	fromList: MediaListKindProps["playlistName"];
 	results: readonly Media[];
 }) {
-	const { playlists } = usePlaylists();
 	const listWrapperRef = useRef<HTMLElement>(null);
-
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const playlist = playlists.find(p => p.name === fromList)!;
-	if (!playlist)
-		console.error(`There should be "${fromList}" to search through!`);
 
 	const Row = memo(
 		({ index, style, data }: ListChildComponentProps<readonly Media[]>) => {
@@ -191,7 +191,7 @@ function SearchResults({
 
 			return (
 				<Result
-					onClick={() => playMedia(media, fromList)}
+					onClick={() => playMedia(media.id, fromList)}
 					key={media.id}
 					style={style}
 				>
@@ -219,7 +219,7 @@ function SearchResults({
 
 	return (
 		<SearchResultsWrapper ref={listWrapperRef}>
-			<FixedSizeList
+			<List
 				itemKey={(index, results) => results[index]?.id ?? 0}
 				itemCount={results.length}
 				itemData={results}
@@ -230,7 +230,7 @@ function SearchResults({
 				width={250}
 			>
 				{Row}
-			</FixedSizeList>
+			</List>
 		</SearchResultsWrapper>
 	);
 }

@@ -1,39 +1,16 @@
+// Getting everything ready for the tests...
+import { mockElectronPlusNodeGlobalsBeforeTests } from "../mockElectronPlusNodeGlobalsBeforeTests";
+mockElectronPlusNodeGlobalsBeforeTests();
+
+import { mockGlobalsBeforeTests } from "../../renderer/mockGlobalsBeforeTests";
+mockGlobalsBeforeTests();
+
 import type { ImgString } from "@common/@types/electron-window";
 
 import { readFile, rename as renameFile } from "fs/promises";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
 import { resolve } from "path";
-
-// Getting everything ready for the tests...
-
-// Mocking `global.electron` before importing code that calls it:
-global.electron = {
-	notificationApi: {
-		sendNotificationToElectronIpcMainProcess: vi.fn(),
-		receiveMsgFromElectronWindow: vi.fn(),
-	},
-	fs: {
-		getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
-		readdir: vi.fn(),
-		readFile: vi.fn(),
-		deleteFile: vi.fn(),
-	},
-	os: {
-		homeDir: "test/homeDir",
-		dirs: {
-			documents: "test/documents",
-			downloads: "test/downloads",
-			music: "test/music",
-		},
-	},
-	media: {
-		transformPathsToMedias: vi.fn(),
-		convertToAudio: vi.fn(),
-		writeTags: vi.fn(),
-		getBasicInfo: vi.fn(),
-	},
-};
 
 import { writeTags } from "@main/preload/media";
 
@@ -78,19 +55,21 @@ describe("It should account for the switch possibilities and the message sending
 			`${changedData.title}.mp3`,
 		);
 
-		// Changing the title and basename of the file:
-		await writeTags(mediaPath, changedData);
+		try {
+			// Changing the title and basename of the file:
+			await writeTags(mediaPath, changedData);
 
-		// Here, the file is renamed and the title is changed.
-		const {
-			tag: { title: changedTitle },
-		} = MediaFile.createFromPath(changedPath);
+			// Here, the file is renamed and the title is changed.
+			const changedTitle = MediaFile.createFromPath(changedPath).tag.title;
 
-		// Assuring that the title and basename are changed:
-		expect(changedTitle).toBe(changedData.title);
-
-		// Changing the title and basename of the file back:
-		await renameFile(changedPath, mediaPath);
+			// Assuring that the title and basename are changed:
+			expect(changedTitle).toBe(changedData.title);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			// Changing the title and basename of the file back:
+			await renameFile(changedPath, mediaPath);
+		}
 	});
 
 	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
@@ -98,9 +77,7 @@ describe("It should account for the switch possibilities and the message sending
 
 		await writeTags(mediaPath, data);
 
-		const {
-			tag: { albumArtists },
-		} = MediaFile.createFromPath(mediaPath);
+		const { albumArtists } = MediaFile.createFromPath(mediaPath).tag;
 
 		expect(albumArtists).toEqual(data.albumArtists);
 	});
@@ -110,9 +87,7 @@ describe("It should account for the switch possibilities and the message sending
 
 		await writeTags(mediaPath, data);
 
-		const {
-			tag: { album },
-		} = MediaFile.createFromPath(mediaPath);
+		const { album } = MediaFile.createFromPath(mediaPath).tag;
 
 		expect(album).toBe(data.album);
 	});
@@ -122,9 +97,7 @@ describe("It should account for the switch possibilities and the message sending
 
 		await writeTags(mediaPath, data);
 
-		const {
-			tag: { pictures },
-		} = MediaFile.createFromPath(mediaPath);
+		const { pictures } = MediaFile.createFromPath(mediaPath).tag;
 
 		expect(pictures.length).toBe(0);
 	});
@@ -147,9 +120,7 @@ describe("It should account for the switch possibilities and the message sending
 
 		await writeTags(mediaPath, data);
 
-		const {
-			tag: { pictures },
-		} = MediaFile.createFromPath(mediaPath);
+		const { pictures } = MediaFile.createFromPath(mediaPath).tag;
 
 		expect(pictures[0].data.toString()).toBe(imgContents);
 	});

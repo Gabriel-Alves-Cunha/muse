@@ -3,9 +3,11 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { MsgBetweenChildrenEnum, sendMsg } from "@contexts";
+import { useConvertValues } from "@modules/Converting";
 
 import { MainAreaExtended } from "./styles";
+
+const { setState: setConvertValues } = useConvertValues;
 
 export function Convert() {
 	const [selectedExtensionToBeConvertedTo] =
@@ -24,17 +26,18 @@ export function Convert() {
 	}
 
 	useEffect(() => {
-		function convertTo() {
-			const values = selectedMediasPath.map(path => ({
+		const convertTo = () => {
+			const convertValues = selectedMediasPath.map(path => ({
 				toExtension: selectedExtensionToBeConvertedTo,
 				canStartConvert: true,
 				path,
 			}));
 
-			sendMsg({ type: MsgBetweenChildrenEnum.START_CONVERT, values });
+			// Start convert:
+			setConvertValues({ convertValues });
 
 			setSelectedMediasPath([]);
-		}
+		};
 
 		// If there is selected files, convert them:
 		if (selectedMediasPath.length > 0) convertTo();
