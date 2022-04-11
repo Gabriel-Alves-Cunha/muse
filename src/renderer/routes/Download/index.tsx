@@ -31,16 +31,19 @@ const SearcherWrapper = () => {
 		search,
 	} = useDownloadHelper();
 
-	const Ref2Url2Search = useRef("");
-	const url2Search = Ref2Url2Search.current;
+	const urlToSearchForRef = useRef("");
+	const urlToSearchFor = urlToSearchForRef.current;
 
 	useEffect(() => {
-		if (!url2Search || url2Search.length < 10) return;
+		if (!urlToSearchFor || urlToSearchFor.length < 10) return;
 
-		const searchTimeout = setTimeout(async () => await search(url2Search), 300);
+		const searchTimeout = setTimeout(
+			async () => await search(urlToSearchFor),
+			400,
+		);
 
 		return () => clearTimeout(searchTimeout);
-	}, [search, url2Search]);
+	}, [search, urlToSearchFor]);
 
 	return (
 		<SearchWrapper>
@@ -50,7 +53,7 @@ const SearcherWrapper = () => {
 					placeholder="Paste Youtube url here"
 					onChange={setSearchTerm}
 					autoCapitalize="off"
-					value={url2Search}
+					value={urlToSearchFor}
 					spellCheck="false"
 					autoCorrect="off"
 					type="text"

@@ -1,9 +1,11 @@
 import { styled } from "@styles/global";
 
 export const MainArea = styled("div", {
+	gridArea: "main-area",
+
 	position: "relative",
-	display: "flex",
-	flexDirection: "column",
+	display: "inline-block",
+	alignSelf: "stretch", // for grid: column
 
 	size: "100%",
 

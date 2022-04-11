@@ -14,6 +14,9 @@ const defaultDownloadValues: DownloadValues = Object.freeze({
 	url: "",
 } as const);
 
+// This prevents an infinite loop:
+const constRefToEmptyArray = Object.freeze([]);
+
 export const useDownloadValues = create<{
 	downloadValues: DownloadValues;
 }>(() => ({
@@ -49,13 +52,13 @@ export function sendMsg(action: Action) {
 		}
 
 		case MsgBetweenChildrenEnum.RESET_CONVERT_VALUES: {
-			setConvertValuesState({ convertValues: [] });
+			setConvertValuesState({ convertValues: constRefToEmptyArray });
 			break;
 		}
 
 		case MsgBetweenChildrenEnum.START_CONVERT: {
 			setConvertValuesState({
-				convertValues: action.value.map(values => ({
+				convertValues: action.values.map(values => ({
 					toExtension: values.toExtension,
 					canStartConvert: true,
 					path: values.path,
@@ -76,7 +79,7 @@ type Action =
 	| Readonly<{ type: MsgBetweenChildrenEnum.RESET_CONVERT_VALUES }>
 	| Readonly<{
 			type: MsgBetweenChildrenEnum.START_CONVERT;
-			value: readonly ConvertValues[];
+			values: readonly ConvertValues[];
 	  }>
 	| Readonly<{
 			type: MsgBetweenChildrenEnum.START_DOWNLOAD;

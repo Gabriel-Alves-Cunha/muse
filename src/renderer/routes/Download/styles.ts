@@ -1,10 +1,10 @@
+import { MainArea } from "@components";
 import { styled } from "@styles/global";
 
-export const Wrapper = styled("section", {
-	display: "flex",
+export const Wrapper = styled(MainArea, {
 	position: "relative",
-	flexDirection: "column",
-	justifyContent: "flex-start",
+	display: "inline-block",
+	justifySelf: "flex-start", // for grid: row
 
 	height: "calc(100vh - 20vh)",
 	width: "100%",

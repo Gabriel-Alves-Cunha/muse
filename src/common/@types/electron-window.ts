@@ -45,7 +45,7 @@ type VisibleElectron = Readonly<{
 		convertToAudio(mediaPath: Path, extension: ExtensionToBeConvertedTo): void;
 		transformPathsToMedias(paths: readonly Path[]): Promise<readonly Media[]>;
 		writeTags(pathOfMedia: Path, data: WriteTag): Promise<Readonly<boolean>>;
-		getBasicInfo(url: string): Promise<void | Readonly<videoInfo>>;
+		getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
 	};
 }>;
 

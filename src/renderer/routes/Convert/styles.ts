@@ -1,8 +1,9 @@
+import { MainArea } from "@components";
 import { styled } from "@styles/global";
 
-export const Wrapper = styled("div", {
-	display: "flex", // row
-	justifyContent: "center",
+export const MainAreaExtended = styled(MainArea, {
+	display: "inline-block",
+	justifySelf: "center", // for grid: row
 	width: "100%",
 
 	div: {
@@ -22,12 +23,12 @@ export const Wrapper = styled("div", {
 		color: "$text",
 
 		border: "1px solid $accent",
+		cursor: "pointer",
 
 		"&:hover": {
 			transition: "$bgc",
 			backgroundColor: "$accent",
 
-			cursor: "pointer",
 			color: "white",
 		},
 	},

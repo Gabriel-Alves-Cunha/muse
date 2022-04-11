@@ -3,9 +3,9 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { MsgEnum, sendMsg } from "@contexts";
+import { MsgBetweenChildrenEnum, sendMsg } from "@contexts";
 
-import { Wrapper } from "./styles";
+import { MainAreaExtended } from "./styles";
 
 export function Convert() {
 	const [selectedExtensionToBeConvertedTo] =
@@ -25,24 +25,25 @@ export function Convert() {
 
 	useEffect(() => {
 		function convertTo() {
-			const value = selectedMediasPath.map(path => ({
+			const values = selectedMediasPath.map(path => ({
 				toExtension: selectedExtensionToBeConvertedTo,
 				canStartConvert: true,
 				path,
 			}));
 
-			sendMsg({ type: MsgEnum.START_CONVERT, value });
+			sendMsg({ type: MsgBetweenChildrenEnum.START_CONVERT, values });
 
 			setSelectedMediasPath([]);
 		}
 
-		if (selectedMediasPath[0]) convertTo();
+		// If there is selected files, convert them:
+		if (selectedMediasPath.length > 0) convertTo();
 	}, [selectedExtensionToBeConvertedTo, selectedMediasPath]);
 
 	const handleClick = () => inputRef.current?.click();
 
 	return (
-		<Wrapper>
+		<MainAreaExtended>
 			<div onClick={handleClick}>
 				<input
 					onInput={handleSelectedFiles}
@@ -53,11 +54,6 @@ export function Convert() {
 				/>
 				Select a media
 			</div>
-		</Wrapper>
+		</MainAreaExtended>
 	);
 }
-
-Convert.whyDidYouRender = {
-	logOnDifferentValues: false,
-	customName: "Convert",
-};

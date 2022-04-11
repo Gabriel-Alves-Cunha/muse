@@ -1,13 +1,12 @@
 import type { ChangeEvent } from "react";
-import type { videoInfo } from "ytdl-core";
 
 import create from "zustand";
 
-import { MsgEnum, sendMsg } from "@contexts";
+import { MsgBetweenChildrenEnum, sendMsg } from "@contexts";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
 
-const { getBasicInfo: getInfo } = electron.media;
+const { getBasicInfo } = electron.media;
 
 export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 	setSearchTerm: ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
@@ -27,7 +26,7 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		dbg("Sending msg to download", url);
 
 		sendMsg({
-			type: MsgEnum.START_DOWNLOAD,
+			type: MsgBetweenChildrenEnum.START_DOWNLOAD,
 			value: {
 				imageURL: result.imageURL,
 				canStartDownload: true,
@@ -50,7 +49,7 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		set({ searcher: { ...searcher, isLoading: true, error: "" } });
 
 		try {
-			const videoInfo = (await getInfo(url)) as videoInfo;
+			const videoInfo = await getBasicInfo(url);
 
 			const result: UrlMediaMetadata = {
 				imageURL: videoInfo.videoDetails.thumbnails.at(-1)?.url ?? "",

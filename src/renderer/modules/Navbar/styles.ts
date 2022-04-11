@@ -2,6 +2,8 @@ import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
 export const Nav = styled("nav", {
+	gridArea: "nav",
+
 	display: "flex", // row
 	flexDirection: "column",
 	justifyContent: "space-between",

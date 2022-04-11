@@ -1,7 +1,8 @@
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
-import { Convert, Download, Favorites, History, Home, Settings } from "@routes";
+import { Convert, Download, Favorites, History, Home } from "@routes";
+import { MsgBetweenChildrenEnum } from "@contexts/communicationBetweenChildren";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
 import { Decorations } from "@components";
@@ -25,13 +26,24 @@ import {
 import { GlobalCSS } from "@styles/global";
 import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
-import { MsgBetweenChildrenEnum } from "@contexts/communicationBetweenChildren";
 
 export function App() {
 	GlobalCSS();
 
 	return (
 		<>
+			<ToastContainer
+				hideProgressBar={false}
+				position="top-right"
+				pauseOnFocusLoss
+				autoClose={5000}
+				closeOnClick
+				pauseOnHover
+				newestOnTop
+				rtl={false}
+				draggable
+			/>
+
 			<Decorations />
 
 			<Main />
@@ -45,63 +57,13 @@ function Main() {
 	useEffect(() => {
 		(async () =>
 			await getPlaylistsFunctions().searchLocalComputerForMedias())();
-
-		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////
-
-		// listen for files drop
-		function listenToDragoverEvent(event: DragEvent) {
-			event.stopPropagation();
-			event.preventDefault();
-
-			if (!event.dataTransfer) return;
-
-			event.dataTransfer.dropEffect = "copy";
-			// ^ Style the drag-and-drop as a "copy file" operation.
-		}
-		window.addEventListener("dragover", listenToDragoverEvent);
-
-		function listenToDropEvent(event: DragEvent) {
-			event.stopPropagation();
-			event.preventDefault();
-
-			if (!event.dataTransfer) return;
-
-			const fileList = event.dataTransfer.files;
-			console.log({ fileList });
-
-			const files = getMediaFiles(fileList);
-
-			console.error("@TODO: handle these files droped!", files);
-		}
-		window.addEventListener("drop", listenToDropEvent);
-
-		return () => {
-			window.removeEventListener("dragover", listenToDragoverEvent);
-			window.removeEventListener("drop", listenToDropEvent);
-		};
 	}, []);
 
 	return (
 		<Content>
-			<ToastContainer
-				hideProgressBar={false}
-				position="top-right"
-				pauseOnFocusLoss
-				autoClose={5000}
-				closeOnClick
-				pauseOnHover
-				newestOnTop
-				rtl={false}
-				draggable
-			/>
-
 			<Navbar />
 
-			<>
-				<PageToShow />
-			</>
+			<PageToShow />
 
 			<MediaPlayer />
 		</Content>
@@ -109,7 +71,7 @@ function Main() {
 }
 
 function PageToShow() {
-	const page = usePage().page;
+	const { page } = usePage();
 
 	switch (page) {
 		case "Convert":
@@ -122,8 +84,6 @@ function PageToShow() {
 			return <History />;
 		case "Home":
 			return <Home />;
-		case "Settings":
-			return <Settings />;
 		default:
 			return assertUnreachable(page);
 	}
@@ -132,6 +92,9 @@ function PageToShow() {
 const { transformPathsToMedias } = window.electron.media;
 
 window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
+	// @ts-ignore When the message is from react-devtools, ignore it:
+	if (event.data.source?.includes("react-devtools")) return;
+
 	dbg("Received message from MessagePort on React side.\ndata =", event.data);
 
 	switch (event.data.type) {
@@ -272,3 +235,31 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 		}
 	}
 };
+
+// listen for files drop
+function listenToDragoverEvent(event: DragEvent) {
+	event.stopPropagation();
+	event.preventDefault();
+
+	if (!event.dataTransfer) return;
+
+	event.dataTransfer.dropEffect = "copy";
+	// ^ Style the drag-and-drop as a "copy file" operation.
+}
+
+function listenToDropEvent(event: DragEvent) {
+	event.stopPropagation();
+	event.preventDefault();
+
+	if (!event.dataTransfer) return;
+
+	const fileList = event.dataTransfer.files;
+	console.log({ fileList });
+
+	const files = getMediaFiles(fileList);
+
+	console.error("@TODO: handle these files droped!", files);
+}
+
+window.addEventListener("dragover", listenToDragoverEvent);
+window.addEventListener("drop", listenToDropEvent);

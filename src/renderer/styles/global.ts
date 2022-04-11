@@ -199,8 +199,9 @@ export const lightTheme = createTheme({
 });
 
 export const GlobalCSS = globalCss({
-	"*": {
+	"*, *:after, *:before": {
 		"-webkit-font-smoothing": "antialiased",
+		boxSizing: "border-box",
 		padding: 0,
 		margin: 0,
 

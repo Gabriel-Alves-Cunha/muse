@@ -1,31 +1,33 @@
 import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
+const padding = "10px";
+
 export const Wrapper = styled("div", {
-	position: "absolute",
-	display: "flex",
-	flexDirection: "column",
-	justifyContent: "flex-start",
-	alignContent: "center",
+	gridArea: "media-player",
 
-	height: `calc(100vh - 2 * ${DECORATIONS_HEADER_HEIGHT})`,
-	minWidth: 176,
-	width: "25vw",
+	position: "relative",
+	display: "inline-block",
 
-	zIndex: 30,
-	right: 0,
+	justifyItems: "center", // for grid: row
+	alignItems: "center", // for grid: column
+
+	justifySelf: "center", // for grid: row
+	alignSelf: "start", // for grid: column
+
+	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
+	width: "100%",
+	padding,
 
 	background:
 		"linear-gradient(0deg, rgba(195,101,34,1) 0%, rgba(253,187,45,1) 100%)",
-	padding: "1rem",
 
 	"@media-player": {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignContent: "center",
+		display: "inline-block",
+		justifySelf: "center", // for grid: row
+		alignSelf: "center", // for grid: column
 		width: "100vw",
 		height: 70,
-		bottom: 0,
 	},
 });
 
@@ -67,7 +69,6 @@ export const SquareImage = styled("div", {
 	alignSelf: "center",
 
 	marginTop: "25%",
-	width: "90%",
 
 	backgroundColor: "transparent",
 	boxShadow: "$medium-black",
@@ -140,7 +141,7 @@ export const ControlsAndSeekerContainer = styled("div", {
 	flexDirection: "column",
 	bottom: 40,
 
-	width: "87%",
+	width: `calc(100% - 2 * ${padding})`,
 });
 
 export const SeekerContainer = styled("div", {

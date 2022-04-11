@@ -8,7 +8,6 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
-import { useConvertValues, usePlaylists, MsgEnum, sendMsg } from "@contexts";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
@@ -17,6 +16,12 @@ import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
+import {
+	MsgBetweenChildrenEnum,
+	useConvertValues,
+	usePlaylists,
+	sendMsg,
+} from "@contexts";
 
 import { Trigger, Wrapper, Popup, Title } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -65,17 +70,13 @@ export function Converting() {
 				}
 		});
 
-		// This way to prevent infinite updates:
-		if (convertValues[0]) sendMsg({ type: MsgEnum.RESET_CONVERT_VALUES });
-		// We have to do this to reset downloadValues ^
-		// so that it is ready for a new media convertion!
-
-		console.log({ convertValues, convertList });
-	}, [convertList, convertValues]);
+		// Once all downloads are handled, we can remove the values from the list:
+		sendMsg({ type: MsgBetweenChildrenEnum.RESET_CONVERT_VALUES });
+	}, [convertValues]);
 
 	useEffect(() => {
-		const handleEscKey = (event: KeyboardEvent) =>
-			event.key === "Escape" && setShowPopup(false);
+		const handleEscKey = ({ key }: KeyboardEvent) =>
+			key === "Escape" && setShowPopup(false);
 
 		window.addEventListener("keydown", handleEscKey);
 
@@ -84,7 +85,10 @@ export function Converting() {
 
 	return (
 		<Wrapper ref={popupRef}>
-			<Trigger onClick={() => setShowPopup(prev => !prev)}>
+			<Trigger
+				onClick={() => setShowPopup(prev => !prev)}
+				className={showPopup ? "active" : ""}
+			>
 				<Convert size="20" />
 			</Trigger>
 
@@ -98,6 +102,44 @@ export function Converting() {
 		</Wrapper>
 	);
 }
+
+const ConvertBox = ({
+	mediaBeingConverted,
+}: {
+	mediaBeingConverted: MediaBeingConverted;
+}) => (
+	<div>
+		<Title>
+			<p>
+				{getBasename(mediaBeingConverted.path) +
+					"." +
+					mediaBeingConverted.toExtension}
+			</p>
+
+			<span>
+				<Cancel
+					onClick={() =>
+						cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
+					}
+					color="#777"
+					size={13}
+				/>
+			</span>
+		</Title>
+
+		<ConvertionProgress>
+			<table>
+				<tbody>
+					<tr>
+						<td>Seconds/size converted:</td>
+						<td>{format(mediaBeingConverted.timeConverted)}s</td>
+						<td>&nbsp;{prettyBytes(mediaBeingConverted.sizeConverted)}</td>
+					</tr>
+				</tbody>
+			</table>
+		</ConvertionProgress>
+	</div>
+);
 
 function createNewConvert(values: ConvertValues): MessagePort {
 	{
@@ -249,44 +291,6 @@ function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
 		),
 	});
 }
-
-const ConvertBox = ({
-	mediaBeingConverted,
-}: {
-	mediaBeingConverted: MediaBeingConverted;
-}) => (
-	<div>
-		<Title>
-			<p>
-				{getBasename(mediaBeingConverted.path) +
-					"." +
-					mediaBeingConverted.toExtension}
-			</p>
-
-			<span>
-				<Cancel
-					onClick={() =>
-						cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
-					}
-					color="#777"
-					size={13}
-				/>
-			</span>
-		</Title>
-
-		<ConvertionProgress>
-			<table>
-				<tbody>
-					<tr>
-						<td>Seconds/size converted:</td>
-						<td>{format(mediaBeingConverted.timeConverted)}s</td>
-						<td>&nbsp;{prettyBytes(mediaBeingConverted.sizeConverted)}</td>
-					</tr>
-				</tbody>
-			</table>
-		</ConvertionProgress>
-	</div>
-);
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
 

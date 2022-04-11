@@ -7,13 +7,14 @@ export const Wrapper = styled("div", {
 	width: "100%",
 });
 
-export const Trigger = styled("div", {
+export const Trigger = styled("button", {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
 	backgroundColor: "transparent",
 	cursor: "pointer",
+	border: "none",
 	size: 40,
 
 	color: "$deactivated-icon",

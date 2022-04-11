@@ -4,7 +4,7 @@ import { FcCancel as Cancel } from "react-icons/fc";
 import { toast } from "react-toastify";
 import create from "zustand";
 
-import { useDownloadValues, MsgEnum, sendMsg } from "@contexts";
+import { useDownloadValues, MsgBetweenChildrenEnum, sendMsg } from "@contexts";
 import { reaplyOrderedIndex } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
@@ -205,7 +205,7 @@ function useDownloading() {
 
 				// We have to `sendMsg` to reset downloadValues
 				// so that it is ready for a new media download:
-				sendMsg({ type: MsgEnum.RESET_DOWNLOAD_VALUES });
+				sendMsg({ type: MsgBetweenChildrenEnum.RESET_DOWNLOAD_VALUES });
 
 				// Sending port so we can communicate with Electron:
 				window.postMessage("download media", "*", [electronPort]);
@@ -245,9 +245,8 @@ export function Downloading() {
 	useOnClickOutside(popupRef, () => setShowPopup(false));
 
 	useEffect(() => {
-		function handleEscKey(event: KeyboardEvent) {
-			if (event.key === "Escape") setShowPopup(false);
-		}
+		const handleEscKey = ({ key }: KeyboardEvent) =>
+			key === "Escape" && setShowPopup(false);
 
 		window.addEventListener("keydown", handleEscKey);
 
@@ -258,7 +257,7 @@ export function Downloading() {
 		<Wrapper ref={popupRef}>
 			<Trigger
 				onClick={() => setShowPopup(prev => !prev)}
-				className={`${showPopup ? "active" : ""}`}
+				className={showPopup ? "active" : ""}
 			>
 				<DownloadingIcon size="20" />
 			</Trigger>
@@ -272,11 +271,11 @@ export function Downloading() {
 
 								<span>
 									<Cancel
-										size={13}
-										color="#777"
 										onClick={() =>
 											cancelDownloadAndOrRemoveItFromList(download.url)
 										}
+										color="#777"
+										size={13}
 									/>
 								</span>
 							</Title>
