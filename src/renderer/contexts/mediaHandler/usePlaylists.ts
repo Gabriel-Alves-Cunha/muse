@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
@@ -12,13 +12,11 @@ import { keyPrefix } from "@utils/app";
 import { hash } from "@common/hash";
 import { dbg } from "@common/utils";
 import {
-	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
+	returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia,
 	searchDirectoryResult,
-	reaplyOrderedIndex,
 	getAllowedMedias,
 	SORTED_BY_DATE,
 	SORTED_BY_NAME,
-	MEDIA_LIST,
 	sortByDate,
 	sortByName,
 	FAVORITES,
@@ -32,16 +30,14 @@ const {
 
 const playlistsKey = `${keyPrefix}playlists` as const;
 
-const defaultPlaylists: readonly Playlist[] = Object.freeze(<const>[
+const defaultPlaylists: readonly Playlist[] = Object.freeze([
 	{ name: SORTED_BY_DATE, list: [] },
 	{ name: SORTED_BY_NAME, list: [] },
-	{ name: MEDIA_LIST, list: [] },
 	{ name: FAVORITES, list: [] },
 	{ name: HISTORY, list: [] },
-]);
+] as const);
 
 type UsePlaylistsActions = Readonly<{
-	isFavorite: (mediaId: Readonly<Media["id"]> | undefined) => Readonly<boolean>;
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
 	searchForMedia: (searchTerm_: Readonly<string>) => readonly Media[];
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
@@ -49,45 +45,37 @@ type UsePlaylistsActions = Readonly<{
 	createPlaylist: (playlists: readonly Playlist[]) => void;
 	deleteMedia: (media: Readonly<Media>) => Promise<void>;
 	playlists: readonly Playlist[];
+	mainList: readonly Media[];
 }>;
 
 export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
 		(set, get) => ({
 			playlists: defaultPlaylists,
-			deleteMedia: async (media: Media) => {
-				await rm(media.path);
+			deleteMedia: async ({ path, id }: Media) => {
+				await rm(path);
 
 				get().setPlaylists({
 					whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
-					type: PlaylistEnum.UPDATE_MEDIA_LIST,
-					mediaIndex: media.index,
+					type: PlaylistEnum.UPDATE_MAIN_LIST,
+					mediaID: id,
 				});
 			},
 			searchForMedia: (searchTerm_: Readonly<string>) => {
 				const searchTerm = searchTerm_.toLowerCase();
-				const mediaList = get().playlists.find(
-					p => p.name === MEDIA_LIST,
-				)!.list;
 
 				console.time("Searching for file");
-				const results = mediaList.filter(m =>
+				const results = get().mainList.filter(m =>
 					m.title.toLowerCase().includes(searchTerm),
 				);
 				console.timeEnd("Searching for file");
 
 				return results;
 			},
-			isFavorite: (mediaId: Media["id"] | undefined) =>
-				mediaId
-					? get()
-							.playlists.find(p => p.name === FAVORITES)!
-							.list.some(m => m.id === mediaId)
-					: false,
 			setPlaylists: (action: PlaylistsReducer_Action) => {
-				const prevPlaylistArray = get().playlists;
+				const prevPlaylistsContainer = get().playlists;
 				const getPlaylist = (listName: DefaultLists) =>
-					prevPlaylistArray.find(p => p.name === listName);
+					prevPlaylistsContainer.find(p => p.name === listName);
 
 				switch (action.type) {
 					case PlaylistEnum.UPDATE_HISTORY: {
@@ -96,9 +84,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						switch (action.whatToDo) {
 							case PlaylistActions.ADD_ONE_MEDIA: {
 								const newHistory =
-									returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
+									returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
 										prevHistory,
-										action.media,
+										action.mediaID,
 									);
 
 								dbg(
@@ -134,10 +122,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 						switch (action.whatToDo) {
 							case PlaylistActions.ADD_ONE_MEDIA: {
-								const newFavorites = push(prevFavorites, {
-									...action.media,
-									index: prevFavorites.length,
-								});
+								const newFavorites = push(prevFavorites, action.mediaID);
 
 								dbg(
 									"setPlaylists on 'UPDATE_FAVORITES'->'ADD_ONE_MEDIA'. newFavorites =",
@@ -151,9 +136,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 							}
 
 							case PlaylistActions.REMOVE_ONE_MEDIA: {
-								const newFavorites = reaplyOrderedIndex(
-									remove(prevFavorites, action.mediaIndex),
-								);
+								const newFavorites = remove(prevFavorites, action.mediaID);
 
 								dbg(
 									"setPlaylists on 'UPDATE_FAVORITES'->'REMOVE_ONE_MEDIA'. newFavorites =",
@@ -183,69 +166,67 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						break;
 					}
 
-					case PlaylistEnum.UPDATE_MEDIA_LIST: {
-						const prevMediaList = getPlaylist(MEDIA_LIST)!.list;
+					case PlaylistEnum.UPDATE_MAIN_LIST: {
+						const mainList = get().mainList;
 
 						const updateSortedListsAndFinish = (
-							newMediaList: readonly Media[],
-						) =>
+							newMainList: readonly Media[],
+						) => {
 							get().updatePlaylists([
-								{ list: sortByDate(newMediaList), name: SORTED_BY_DATE },
-								{ list: sortByName(newMediaList), name: SORTED_BY_NAME },
-								{ list: newMediaList, name: MEDIA_LIST },
+								{ list: sortByDate(newMainList), name: SORTED_BY_DATE },
+								{ list: sortByName(newMainList), name: SORTED_BY_NAME },
 							]);
+							set(() => ({ mainList: newMainList }));
+						};
 
 						switch (action.whatToDo) {
 							case PlaylistActions.ADD_ONE_MEDIA: {
-								if (prevMediaList.find(m => m.path === action.media.path)) {
+								if (mainList.find(m => m.path === action.media.path)) {
 									console.error(
 										`A media with path "${action.media.path}" already exists. Therefore, I'm not gonna add it.`,
 									);
 									break;
 								}
 
-								const newMediaList = push(prevMediaList, {
-									...action.media,
-									index: prevMediaList.length,
-								});
+								const newMainList = push(mainList, action.media);
 
 								dbg(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'->'ADD_ONE_MEDIA' (yet to be sorted). newMediaList =",
-									newMediaList,
+									"setPlaylists on 'UPDATE_MEDIA_LIST'->'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
+									newMainList,
 								);
 
-								updateSortedListsAndFinish(newMediaList);
+								updateSortedListsAndFinish(newMainList);
 								break;
 							}
 
 							case PlaylistActions.REMOVE_ONE_MEDIA: {
-								const newMediaList = reaplyOrderedIndex(
-									remove(prevMediaList, action.mediaIndex),
+								const newMainList = mainList.filter(
+									({ id }) => id !== action.mediaID,
 								);
 
 								dbg(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'->'REMOVE_ONE_MEDIA' (yet to be sorted). newMediaList =",
-									newMediaList,
+									"setPlaylists on 'UPDATE_MEDIA_LIST'->'REMOVE_ONE_MEDIA' (yet to be sorted). newMainList =",
+									newMainList,
 								);
 
-								updateSortedListsAndFinish(newMediaList);
+								updateSortedListsAndFinish(newMainList);
 								break;
 							}
 
 							case PlaylistActions.REPLACE_ENTIRE_LIST: {
-								const newMediaList = reaplyOrderedIndex(action.list);
+								const newMainList = action.list;
 
 								dbg(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'->'REPLACE_ENTIRE_LIST' (yet to be sorted). newMediaList =",
-									newMediaList,
+									"setPlaylists on 'UPDATE_MEDIA_LIST'->'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
+									newMainList,
 								);
 
-								updateSortedListsAndFinish(newMediaList);
+								updateSortedListsAndFinish(newMainList);
 								break;
 							}
 
 							case PlaylistActions.REFRESH_ONE_MEDIA_BY_ID: {
-								const oldMediaIndex = prevMediaList.findIndex(
+								const oldMediaIndex = mainList.findIndex(
 									p => p.id === action.media.id,
 								);
 
@@ -256,32 +237,31 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									break;
 								}
 
-								const newMediaWithCorrectIndex: Media = {
+								const refreshedMedia: Media = {
 									...action.media,
 									id: hash(action.media.title),
-									index: oldMediaIndex,
 								};
 
-								const newMediaList = replace(
-									prevMediaList,
+								const newMainList = replace(
+									mainList,
 									oldMediaIndex,
-									newMediaWithCorrectIndex,
+									refreshedMedia,
 								);
 
 								dbg(
 									"playlistsReducer on 'UPDATE_MEDIA_LIST'->'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
-									newMediaWithCorrectIndex,
-									"\nnewMediaList =",
-									newMediaList,
+									refreshedMedia,
+									"\nnewMainList =",
+									newMainList,
 								);
 
-								updateSortedListsAndFinish(newMediaList);
+								updateSortedListsAndFinish(newMainList);
 								break;
 							}
 
 							case PlaylistActions.CLEAN: {
 								dbg(
-									"playlistsReducer on 'UPDATE_MEDIA_LIST'->'CLEAN' (yet to be sorted). newMediaList = []",
+									"playlistsReducer on 'UPDATE_MEDIA_LIST'->'CLEAN' (yet to be sorted). newMainList = []",
 								);
 
 								updateSortedListsAndFinish([]);
@@ -303,14 +283,11 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				}
 			},
 			searchLocalComputerForMedias: async (force = false) => {
-				const playlists = get().playlists;
-
-				const mediaList = playlists.find(p => p.name === MEDIA_LIST)!.list;
-
 				const isThereNewMedia = (paths: readonly string[]) => {
-					const isThereNewMedia = paths.length !== mediaList.length;
+					const mainListLength = get().mainList.length;
+					const isThereNewMedia = paths.length !== mainListLength;
 					console.log(
-						`mediaList.length = ${mediaList.length}. Is there new media? ${isThereNewMedia}`,
+						`mainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
 					);
 					return isThereNewMedia;
 				};
@@ -321,14 +298,14 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 					if (force || isThereNewMedia(paths)) {
 						console.time("Reading metadata of all medias");
-						const newMediaList = await transformPathsToMedias(paths);
+						const newMainList = await transformPathsToMedias(paths);
 						console.timeEnd("Reading metadata of all medias");
-						dbg("Finished searching. Medias =", newMediaList);
+						dbg("Finished searching. Medias =", newMainList);
 
 						get().setPlaylists({
 							whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-							type: PlaylistEnum.UPDATE_MEDIA_LIST,
-							list: newMediaList,
+							type: PlaylistEnum.UPDATE_MAIN_LIST,
+							list: newMainList,
 						});
 					}
 				} catch (error) {
@@ -336,32 +313,32 @@ export const usePlaylists = create<UsePlaylistsActions>(
 				}
 			},
 			createPlaylist: (playlists: readonly Playlist[]) => {
-				const prevPlaylistArray = get().playlists;
+				const prevPlaylistsContainer = get().playlists;
 
-				const isOneAlreadyCreated = prevPlaylistArray
+				const isOneAlreadyCreated = prevPlaylistsContainer
 					.map(playlist => playlists.some(p => p.name === playlist.name))
 					.some(Boolean);
 
 				if (isOneAlreadyCreated) return get().updatePlaylists(playlists);
 
-				const newPlaylistArray = [...prevPlaylistArray];
+				const newPlaylistsContainer = [...prevPlaylistsContainer];
 
-				for (const playlist of playlists) newPlaylistArray.push(playlist);
+				for (const playlist of playlists) newPlaylistsContainer.push(playlist);
 
 				dbg(
-					"setPlaylists on 'create or update playlists'->'create'. New playlist =",
-					newPlaylistArray,
+					"setPlaylists on 'createPlaylist'. New playlist =",
+					newPlaylistsContainer,
 				);
 
-				set({ playlists: newPlaylistArray });
+				set({ playlists: newPlaylistsContainer });
 			},
 			updatePlaylists: (newPlaylists: readonly Playlist[]) => {
-				const oldPlaylists = get().playlists;
+				const oldPlaylistsContainer = get().playlists;
 
 				// Assert there isn't a not-created playlist:
 				let foundOneAlreadyCreated = true;
 				for (const newPlaylist of newPlaylists)
-					foundOneAlreadyCreated = oldPlaylists.some(
+					foundOneAlreadyCreated = oldPlaylistsContainer.some(
 						p => p.name === newPlaylist.name,
 					);
 
@@ -370,28 +347,28 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						"One of the playlists I got was not already created. I'm not made to handle it's creation, only to update; to create, use the function `createPlaylist`.\nPlaylists received =",
 						newPlaylists,
 						"\nExisting playlists =",
-						oldPlaylists,
+						oldPlaylistsContainer,
 					);
 
-				const updatedPlaylists = [...oldPlaylists];
-				for (const [index, oldPlaylist] of oldPlaylists.entries())
+				const updatedPlaylistsContainer = [...oldPlaylistsContainer];
+				for (const [index, oldPlaylist] of oldPlaylistsContainer.entries())
 					for (const newPlaylist of newPlaylists)
 						if (oldPlaylist.name === newPlaylist.name)
-							updatedPlaylists[index] = newPlaylist;
+							updatedPlaylistsContainer[index] = newPlaylist;
 
 				dbg(
-					"setPlaylists on 'create or update playlists'->'update'. New playlist =",
-					updatedPlaylists,
+					"setPlaylists on 'updatePlaylists'. New playlist =",
+					updatedPlaylistsContainer,
 				);
 
-				set({ playlists: updatedPlaylists });
+				set({ playlists: updatedPlaylistsContainer });
 			},
 		}),
 		{
 			name: playlistsKey,
-			serialize: ({ state }) => JSON.stringify(state.playlists),
-			partialize: ({ playlists }) => ({ playlists }),
-			deserialize: playlists => JSON.parse(playlists),
+			serialize: ({ state }) => JSON.stringify(state.mainList),
+			partialize: ({ mainList }) => ({ mainList }),
+			deserialize: mainList => JSON.parse(mainList),
 			merge: (persistedState, currentState) =>
 				merge(persistedState, currentState),
 		},
@@ -407,19 +384,19 @@ export type DefaultLists =
 
 export type Playlist = Readonly<{
 	name: DefaultLists & string;
-	list: readonly Media[];
+	list: readonly MediaID[];
 }>;
 
 export type PlaylistsReducer_Action =
 	| Readonly<{
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
 			type: PlaylistEnum.UPDATE_FAVORITES;
-			media: Media;
+			mediaID: MediaID;
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA;
 			type: PlaylistEnum.UPDATE_FAVORITES;
-			mediaIndex: Media["index"];
+			mediaID: MediaID;
 	  }>
 	| Readonly<{
 			type: PlaylistEnum.UPDATE_FAVORITES;
@@ -429,7 +406,7 @@ export type PlaylistsReducer_Action =
 	| Readonly<{
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
 			type: PlaylistEnum.UPDATE_HISTORY;
-			media: Media;
+			mediaID: MediaID;
 	  }>
 	| Readonly<{
 			type: PlaylistEnum.UPDATE_HISTORY;
@@ -440,21 +417,21 @@ export type PlaylistsReducer_Action =
 			whatToDo:
 				| PlaylistActions.REFRESH_ONE_MEDIA_BY_ID
 				| PlaylistActions.ADD_ONE_MEDIA;
-			type: PlaylistEnum.UPDATE_MEDIA_LIST;
+			type: PlaylistEnum.UPDATE_MAIN_LIST;
 			media: Media;
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA;
-			type: PlaylistEnum.UPDATE_MEDIA_LIST;
-			mediaIndex: number;
+			type: PlaylistEnum.UPDATE_MAIN_LIST;
+			mediaID: MediaID;
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST;
-			type: PlaylistEnum.UPDATE_MEDIA_LIST;
+			type: PlaylistEnum.UPDATE_MAIN_LIST;
 			list: readonly Media[];
 	  }>
 	| Readonly<{
-			type: PlaylistEnum.UPDATE_MEDIA_LIST;
+			type: PlaylistEnum.UPDATE_MAIN_LIST;
 			whatToDo: PlaylistActions.CLEAN;
 	  }>;
 
@@ -467,7 +444,7 @@ export enum PlaylistActions {
 }
 
 export enum PlaylistEnum {
-	UPDATE_MEDIA_LIST,
+	UPDATE_MAIN_LIST,
 	UPDATE_FAVORITES,
 	UPDATE_HISTORY,
 }

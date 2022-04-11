@@ -5,6 +5,7 @@ import { pages } from "@utils/app";
 
 export type Page = Readonly<typeof pages[number]>;
 export type Path = Readonly<string>;
+export type MediaID = Media["id"];
 
 type DateAsNumber = Readonly<number>;
 
@@ -12,11 +13,11 @@ export type Media = Readonly<{
 	dateOfArival: DateAsNumber;
 	genres?: readonly string[];
 	size: PrettyBytes;
+	favorite: boolean;
 	duration: string;
 	artist?: string;
 	album?: string;
 	title: string;
-	index: number;
 	img?: string;
 	id: number;
 	path: Path;

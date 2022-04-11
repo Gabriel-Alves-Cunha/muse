@@ -1,4 +1,9 @@
-import type { Media, Mutable, Path } from "@common/@types/typesAndEnums";
+import type {
+	Media,
+	MediaID,
+	Mutable,
+	Path,
+} from "@common/@types/typesAndEnums";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
 import { sort, unshift } from "@utils/array";
@@ -10,17 +15,17 @@ const {
 
 // fns
 export const maxSizeOfHistory = 100;
-export function returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
-	previousHistory: readonly Media[],
-	newMedia: Media,
-): readonly Media[] {
+export function returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
+	previousHistory: readonly MediaID[],
+	newMediaID: MediaID,
+): readonly MediaID[] {
 	// if the newMedia is the same as the first media in the list, don't add it again:
-	if (newMedia.id === previousHistory[0]?.id) return previousHistory;
+	if (newMediaID === previousHistory[0]) return previousHistory;
 
 	// add newMedia to the start of array:
-	const newHistory: Media[] = reaplyOrderedIndex(
-		unshift(previousHistory, newMedia) as Mutable<Media[]>,
-	);
+	const newHistory: MediaID[] = unshift(previousHistory, newMediaID) as Mutable<
+		MediaID[]
+	>;
 
 	// history has a max size of maxSizeOfHistory:
 	if (newHistory.length > maxSizeOfHistory)
@@ -46,20 +51,20 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 }
 
 export async function searchDirectoryResult() {
-	const documentsDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-		dirs.documents,
-	);
-	const downloadDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-		dirs.downloads,
-	);
-	const musicDirectoryPromise = getFullPathOfFilesForFilesInThisDirectory(
-		dirs.music,
-	);
-	const _1 = await documentsDirectoryPromise;
-	const _2 = await downloadDirectoryPromise;
-	const _3 = await musicDirectoryPromise;
+	const fullPaths: Array<readonly string[]> = [];
+	console.time("searchDirectoryResult");
+	(
+		await Promise.allSettled([
+			getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
+			getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
+			getFullPathOfFilesForFilesInThisDirectory(dirs.music),
+		])
+	).forEach(p => {
+		if (p.status === "fulfilled") fullPaths.push(p.value);
+	});
+	console.timeEnd("searchDirectoryResult");
 
-	return [_1, _2, _3].flat() as readonly string[];
+	return fullPaths.flat();
 }
 
 export const searchDirectoryForMedias = async (directory: Path) =>
@@ -78,36 +83,24 @@ type ListWithOrder<T> = ReadonlyArray<
 export const reaplyOrderedIndex = <T>(list: ListWithOrder<T>) =>
 	list.map((item, index) => ({ ...item, index }));
 
-type ListWithDateAndOrder<T> = ReadonlyArray<
-	Readonly<T> & Readonly<{ dateOfArival: number; index: number }>
->;
+export const sortByDate = (newList: readonly Media[]) =>
+	sort(newList, (a, b) => {
+		if (a.dateOfArival > b.dateOfArival) return 1;
+		if (a.dateOfArival < b.dateOfArival) return -1;
+		// a must be equal to b:
+		return 0;
+	}).map(media => media.id);
 
-export const sortByDate = <T>(list: ListWithDateAndOrder<T>) =>
-	reaplyOrderedIndex(
-		sort(list, (a, b) => {
-			if (a.dateOfArival > b.dateOfArival) return 1;
-			if (a.dateOfArival < b.dateOfArival) return -1;
-			// a must be equal to b:
-			return 0;
-		}),
-	);
-
-type ListWithNameAndOrder<T> = ReadonlyArray<
-	Readonly<T> & Readonly<{ title: string; index: number }>
->;
-
-export const sortByName = <T>(list: ListWithNameAndOrder<T>) =>
-	reaplyOrderedIndex(
-		sort(list, (a, b) => {
-			if (a.title > b.title) return 1;
-			if (a.title < b.title) return -1;
-			// a must be equal to b:
-			return 0;
-		}),
-	);
+export const sortByName = (list: readonly Media[]) =>
+	sort(list, (a, b) => {
+		if (a.title > b.title) return 1;
+		if (a.title < b.title) return -1;
+		// a must be equal to b:
+		return 0;
+	}).map(media => media.id);
 
 export const SORTED_BY_DATE = "sorted by date";
 export const SORTED_BY_NAME = "sorted by name";
 export const FAVORITES = "favorites";
-export const MEDIA_LIST = "mediaList";
+export const MAIN_LIST = "main list";
 export const HISTORY = "history";

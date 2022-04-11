@@ -323,7 +323,7 @@ if (globalThis.window) {
 					getPlaylists().setPlaylists({
 						media: { ...media, duration: formatDuration(audio.duration) },
 						whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-						type: PlaylistEnum.UPDATE_MEDIA_LIST,
+						type: PlaylistEnum.UPDATE_MAIN_LIST,
 					});
 
 					if (currentTime > 10) {

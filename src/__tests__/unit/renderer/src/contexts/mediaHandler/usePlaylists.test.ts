@@ -87,7 +87,6 @@ import {
 import {
 	// SORTED_BY_DATE,
 	// SORTED_BY_NAME,
-	MEDIA_LIST,
 	FAVORITES,
 	HISTORY,
 } from "@contexts/mediaHandler/usePlaylistsHelper";
@@ -102,10 +101,10 @@ for (let index = 0; index < numberOfMedias; ++index) {
 		dateOfArival: faker.date.past().getTime(),
 		duration: formatDuration(index + 10),
 		path: `home/Music/test/${title}.mp3`,
+		favorite: false,
 		id: hash(title),
 		size: "3.0 MB",
 		title,
-		index,
 	};
 
 	testList.push(fakeMedia);
@@ -122,13 +121,13 @@ describe("Testing list updates", () => {
 	it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
 		getPlaylistsFuncs().setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: PlaylistEnum.UPDATE_MEDIA_LIST,
+			type: PlaylistEnum.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 
-		const currMediaList = getPlaylist(MEDIA_LIST).list;
+		const currMainList = getPlaylistsFuncs().mainList;
 
-		expect(currMediaList).toEqual(testList);
+		expect(currMainList).toEqual(testList);
 	});
 });
 
@@ -137,7 +136,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		// (PlaylistActions.REPLACE_ENTIRE_LIST) Set the mediaList to our test list:
 		getPlaylistsFuncs().setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: PlaylistEnum.UPDATE_MEDIA_LIST,
+			type: PlaylistEnum.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 
@@ -163,6 +162,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 		// Set currentPlaying to first media:
 		const mediaPlaylistList = getPlaylist(MEDIA_LIST)!;
+		const currMainList = getPlaylistsFuncs().mainList;
 		const firstMedia = mediaPlaylistList.list[0]!;
 		getCurrentPlaying().setCurrentPlaying({
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
@@ -314,7 +314,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		it("(!PlaylistActions.ADD_ONE_MEDIA) should NOT add one media to mediaList because there already exists one with the same path", () => {
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: testList[0]!,
 			});
 
@@ -337,7 +337,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: newMedia,
 			});
 
@@ -356,7 +356,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				mediaIndex: mediaToBeDeleted.index,
 			});
 
@@ -369,7 +369,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 		it("(PlaylistActions.CLEAN) should clean mediaList", () => {
 			getPlaylistsFuncs().setPlaylists({
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				whatToDo: PlaylistActions.CLEAN,
 			});
 
@@ -392,7 +392,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 			getPlaylistsFuncs().setPlaylists({
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: mediaToBeRefreshed,
 			});
 

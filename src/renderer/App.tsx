@@ -120,7 +120,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 
 			getPlaylistsFunctions().setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media,
 			});
 			break;
@@ -185,7 +185,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 
 			getPlaylistsFunctions().setPlaylists({
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: refreshedMedia,
 			});
 			break;
@@ -210,7 +210,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 
 			getPlaylistsFunctions().setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
-				type: PlaylistEnum.UPDATE_MEDIA_LIST,
+				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				mediaIndex: media.index,
 			});
 			break;

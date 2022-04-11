@@ -102,6 +102,7 @@ for (let index = 0; index < numberOfMedias; ++index) {
 		dateOfArival: faker.date.past().getTime(),
 		duration: formatDuration(index + 10),
 		path: `home/Music/test/${title}.mp3`,
+		favorite: false,
 		id: hash(title),
 		size: "3.0 MB",
 		title,
@@ -113,7 +114,7 @@ describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {
 		getPlaylistsFuncs().setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: PlaylistEnum.UPDATE_MEDIA_LIST,
+			type: PlaylistEnum.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 		{

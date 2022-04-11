@@ -34,7 +34,7 @@ global.electron = {
 
 import {
 	maxSizeOfHistory,
-	returnNewArrayWithNewMediaOnHistoryOfPlayedMedia,
+	returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia,
 } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { formatDuration } from "@common/utils";
 import { hash } from "@common/hash";
@@ -49,6 +49,7 @@ for (let index = 0; index < numberOfMedias; ++index) {
 		dateOfArival: faker.date.past().getTime(),
 		duration: formatDuration(index + 10),
 		path: `home/Music/test/${title}.mp3`,
+		favorite: false,
 		id: hash(title),
 		size: "3.0 MB",
 		title,
@@ -63,10 +64,11 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 			const newMediaToAdd = testList[i]!;
 
 			const newList = [newMediaToAdd, ...prevHistory];
-			const expectedNewList = returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
-				prevHistory,
-				newMediaToAdd,
-			);
+			const expectedNewList =
+				returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
+					prevHistory,
+					newMediaToAdd,
+				);
 
 			expect(expectedNewList).not.toBe(prevHistory);
 			expect(expectedNewList).toEqual(newList);
@@ -87,19 +89,21 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 		const newMediaToAdd_2 = testList[7]!;
 
 		const newList = [newMediaToAdd_1, ...prevHistory];
-		const expectedNewList_1 = returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
-			prevHistory,
-			newMediaToAdd_1,
-		);
+		const expectedNewList_1 =
+			returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
+				prevHistory,
+				newMediaToAdd_1,
+			);
 
 		expect(expectedNewList_1).not.toBe(prevHistory);
 		expect(expectedNewList_1).toEqual(newList);
 		expect(expectedNewList_1.length).toBe(100);
 
-		const expectedNewList_2 = returnNewArrayWithNewMediaOnHistoryOfPlayedMedia(
-			prevHistory,
-			newMediaToAdd_2,
-		);
+		const expectedNewList_2 =
+			returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
+				prevHistory,
+				newMediaToAdd_2,
+			);
 
 		expect(expectedNewList_2).not.toBe(expectedNewList_1);
 		expect(expectedNewList_2[0]).toBe(newMediaToAdd_2);

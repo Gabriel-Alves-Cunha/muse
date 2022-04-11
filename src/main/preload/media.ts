@@ -97,6 +97,7 @@ const createMedia = async (
 			artist: albumArtists[0] ?? "",
 			dateOfArival: Date.now(),
 			title: title ?? basename,
+			favorite: false,
 			id: hash(path),
 			genres,
 			album,
