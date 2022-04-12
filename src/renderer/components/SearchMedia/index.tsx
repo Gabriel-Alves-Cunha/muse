@@ -2,16 +2,13 @@ import type { MediaListKindProps } from "../MediaListKind";
 import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
 import { memo, useEffect, useReducer, useRef } from "react";
+import { Virtuoso } from "react-virtuoso";
 import {
 	MdOutlineSearch as SearchIcon,
 	MdMusicNote as MusicNote,
 	MdAutorenew as Reload,
 	MdDelete as Clean,
 } from "react-icons/md";
-import {
-	type ListChildComponentProps,
-	FixedSizeList as List,
-} from "react-window";
 
 import { useOnClickOutside } from "@hooks";
 import { assertUnreachable } from "@utils/utils";
@@ -83,6 +80,10 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	useOnClickOutside(searcherRef, () => {
 		dispatchSearcher({ type: SearcherAction.SET_SEARCH_TERM, value: "" });
 		dispatchSearcher({ type: SearcherAction.SET_RESULTS, value: [] });
+		dispatchSearcher({
+			type: SearcherAction.SET_SEARCH_STATUS,
+			value: SearchStatus.DOING_NOTHING,
+		});
 	});
 
 	useEffect(() => {
@@ -182,55 +183,41 @@ function SearchResults({
 	fromList: MediaListKindProps["playlistName"];
 	results: readonly Media[];
 }) {
-	const listWrapperRef = useRef<HTMLElement>(null);
-
 	const Row = memo(
-		({ index, style, data }: ListChildComponentProps<readonly Media[]>) => {
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const media = data[index]!;
+		({ media }: { media: Media }) => (
+			<Result onClick={() => playMedia(media.id, fromList)}>
+				<Img>
+					<ImgWithFallback
+						Fallback={<MusicNote size="1.4em" />}
+						media={media}
+					/>
+				</Img>
 
-			return (
-				<Result
-					onClick={() => playMedia(media.id, fromList)}
-					key={media.id}
-					style={style}
-				>
-					<Img>
-						<ImgWithFallback
-							Fallback={<MusicNote size="1.4em" />}
-							media={media}
-						/>
-					</Img>
-
-					<Info>
-						<Title style={{ marginLeft: 5, textAlign: "left" }}>
-							{media.title}
-						</Title>
-						<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-					</Info>
-				</Result>
-			);
-		},
-		(prevProps, nextProps) =>
-			prevProps.data[prevProps.index]?.id ===
-			nextProps.data[nextProps.index]?.id,
+				<Info>
+					<Title style={{ marginLeft: 5, textAlign: "left" }}>
+						{media.title}
+					</Title>
+					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+				</Info>
+			</Result>
+		),
+		(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id,
 	);
 	Row.displayName = "Row";
 
 	return (
-		<SearchResultsWrapper ref={listWrapperRef}>
-			<List
-				itemKey={(index, results) => results[index]?.id ?? 0}
-				itemCount={results.length}
-				itemData={results}
-				overscanCount={15}
+		<SearchResultsWrapper>
+			<Virtuoso
+				itemContent={(_, media) => <Row media={media} />}
+				computeItemKey={(_, media) => media.id}
+				totalCount={results.length}
+				fixedItemHeight={60}
 				className="list"
-				itemSize={60}
+				data={results}
+				overscan={10}
 				height={400}
 				width={250}
-			>
-				{Row}
-			</List>
+			/>
 		</SearchResultsWrapper>
 	);
 }

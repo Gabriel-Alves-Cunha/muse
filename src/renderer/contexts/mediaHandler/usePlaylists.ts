@@ -31,12 +31,13 @@ const {
 
 const playlistsKey = `${keyPrefix}playlists` as const;
 
+const constRefToEmptyArray = Object.freeze([]);
 const defaultPlaylists: readonly Playlist[] = Object.freeze([
-	{ name: SORTED_BY_DATE, list: [] },
-	{ name: SORTED_BY_NAME, list: [] },
-	{ name: FAVORITES, list: [] },
-	{ name: HISTORY, list: [] },
-] as const);
+	{ name: SORTED_BY_DATE, list: constRefToEmptyArray },
+	{ name: SORTED_BY_NAME, list: constRefToEmptyArray },
+	{ name: FAVORITES, list: constRefToEmptyArray },
+	{ name: HISTORY, list: constRefToEmptyArray },
+]);
 
 type UsePlaylistsActions = Readonly<{
 	searchForMediaFromList: (
@@ -55,7 +56,7 @@ type UsePlaylistsActions = Readonly<{
 export const usePlaylists = create<UsePlaylistsActions>(
 	persist(
 		(set, get) => ({
-			mainList: [],
+			mainList: constRefToEmptyArray,
 			playlists: defaultPlaylists,
 			deleteMedia: async ({ path, id }: Media) => {
 				await rm(path);
@@ -90,7 +91,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					console.timeEnd("Searching for file");
 				}
 
-				return results;
+				return Object.freeze(results);
 			},
 			setPlaylists: (action: PlaylistsReducer_Action) => {
 				const prevPlaylistsContainer = get().playlists;
@@ -116,7 +117,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 
 								if (newHistory === prevHistory) break;
 
-								get().updatePlaylists([{ list: newHistory, name: HISTORY }]);
+								get().updatePlaylists([
+									{ list: Object.freeze(newHistory), name: HISTORY },
+								]);
 								break;
 							}
 
@@ -125,7 +128,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									"setPlaylists on 'UPDATE_HISTORY'->'CLEAN'. newHistory = []",
 								);
 
-								get().updatePlaylists([{ list: [], name: HISTORY }]);
+								get().updatePlaylists([
+									{ list: constRefToEmptyArray, name: HISTORY },
+								]);
 								break;
 							}
 
@@ -150,7 +155,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								);
 
 								get().updatePlaylists([
-									{ list: newFavorites, name: FAVORITES },
+									{ list: Object.freeze(newFavorites), name: FAVORITES },
 								]);
 								break;
 							}
@@ -171,7 +176,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								);
 
 								get().updatePlaylists([
-									{ list: newFavorites, name: FAVORITES },
+									{ list: Object.freeze(newFavorites), name: FAVORITES },
 								]);
 								break;
 							}
@@ -181,7 +186,9 @@ export const usePlaylists = create<UsePlaylistsActions>(
 									"setPlaylists on 'UPDATE_FAVORITES'->'CLEAN'. newfavorites = []",
 								);
 
-								get().updatePlaylists([{ list: [], name: FAVORITES }]);
+								get().updatePlaylists([
+									{ list: constRefToEmptyArray, name: FAVORITES },
+								]);
 								break;
 							}
 
@@ -203,7 +210,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 								{ list: sortByDate(newMainList), name: SORTED_BY_DATE },
 								{ list: sortByName(newMainList), name: SORTED_BY_NAME },
 							]);
-							set(() => ({ mainList: newMainList }));
+							set(() => ({ mainList: Object.freeze(newMainList) }));
 						};
 
 						switch (action.whatToDo) {
@@ -332,7 +339,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						get().setPlaylists({
 							whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
 							type: PlaylistEnum.UPDATE_MAIN_LIST,
-							list: newMainList,
+							list: Object.freeze(newMainList),
 						});
 					}
 				} catch (error) {
@@ -357,7 +364,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					newPlaylistsContainer,
 				);
 
-				set({ playlists: newPlaylistsContainer });
+				set({ playlists: Object.freeze(newPlaylistsContainer) });
 			},
 			updatePlaylists: (newPlaylists: readonly Playlist[]) => {
 				const oldPlaylistsContainer = get().playlists;
@@ -388,7 +395,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					updatedPlaylistsContainer,
 				);
 
-				set({ playlists: updatedPlaylistsContainer });
+				set({ playlists: Object.freeze(updatedPlaylistsContainer) });
 			},
 		}),
 		{

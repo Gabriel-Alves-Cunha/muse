@@ -132,11 +132,7 @@ export function MediaPlayer() {
 				<Album>{media?.album}</Album>
 
 				<ScaleUpIconButton style={{ width: 25, height: 25 }}>
-					{media?.favorite ? (
-						<Favorite size="17" />
-					) : (
-						<AddFavorite size="17" />
-					)}
+					{media?.favorite ? <Favorite size="17" /> : <AddFavorite size="17" />}
 				</ScaleUpIconButton>
 			</OptionsAndAlbum>
 
