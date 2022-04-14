@@ -17,6 +17,10 @@ export const Img = styled("div", {
 	margin: "0 10px",
 	border: "none",
 
+	"&:not(:has(> img))": {
+		border: "1px solid lightgray",
+	},
+
 	"& img": {
 		objectFit: "cover",
 		size: "$$size",
@@ -41,7 +45,9 @@ export const Info = styled("div", {
 });
 
 export const Title = styled("p", {
-	letterSpacing: "0.03em",
+	margin: "unset", // Virtuoso asks for this for performance reasons
+
+	letterSpacing: "0.03rem",
 	fontFamily: "$primary",
 	fontSize: "1rem",
 	fontWeight: 500,
@@ -66,16 +72,17 @@ export const Title = styled("p", {
 });
 
 export const SubTitle = styled("p", {
-	letterSpacing: "0.03em",
+	margin: "unset", // Virtuoso asks for this for performance reasons
+
+	letterSpacing: "0.03rem",
 	fontFamily: "$primary",
 	color: "$gray-text",
-	fontSize: "0.8em",
+	fontSize: "0.8rem",
 	fontWeight: 500,
 });
 
 export const TriggerOptions = styled(Trigger, {
-	display: "flex",
-	flexDirection: "column",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
@@ -83,7 +90,7 @@ export const TriggerOptions = styled(Trigger, {
 	borderRadius: 7,
 	margin: 5,
 
-	height: "80%",
+	height: 40,
 	width: 25,
 
 	cursor: "pointer",
@@ -91,17 +98,14 @@ export const TriggerOptions = styled(Trigger, {
 
 	"&:hover": {
 		transition: "$boxShadow",
-		boxShadow: "5px 5px 15px 5px #000000",
+		boxShadow: "$small",
 	},
 });
 
 export const ListWrapper = styled("div", {
-	boxSizing: "border-box",
-
 	margin: "2em 5%",
-	height: "65vh",
+	height: "70vh",
 	maxWidth: 600,
-	zIndex: 1,
 
 	"@sm": {
 		margin: "0.5em 5%",
@@ -137,9 +141,10 @@ export const RowWrapper = styled("div", {
 	alignItems: "center",
 
 	width: "98% !important",
+	height: 65,
 
 	borderRadius: 7,
-	margin: 7,
+	padding: 7,
 
 	"&:hover": {
 		transition: "$boxShadow",
@@ -149,13 +154,10 @@ export const RowWrapper = styled("div", {
 	"&.active": {
 		boxShadow: "$medium",
 		background: "white",
-
-		outline: "3px solid $bgMain",
-		outlineOffset: -3,
 	},
 });
 
-export const PlayButton = styled("div", {
+export const PlayButton = styled("button", {
 	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
@@ -165,43 +167,4 @@ export const PlayButton = styled("div", {
 	width: "90%",
 
 	cursor: "pointer",
-});
-
-export const InputWrapper = styled("div", {
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-	height: 50,
-	width: 320,
-
-	background: "$bg-main",
-	boxShadow: "$medium",
-	overflowY: "hidden",
-	padding: "0.5rem",
-	borderRadius: 7,
-
-	input: {
-		letterSpacing: "0.03em",
-		boxSizing: "border-box",
-		fontFamily: "$primary",
-		fontSize: "1.05rem",
-		fontWeight: 500,
-		color: "$alternative-text",
-
-		width: "100%",
-		height: 26,
-
-		background: "transparent",
-		paddingLeft: 10,
-		border: "none",
-
-		"::-webkit-input-placeholder": {
-			display: "flex", // row
-			justifyContent: "flex-start",
-			alignItems: "center",
-
-			color: "rgba(0, 0, 0, 0.5)",
-			fontStyle: "italic",
-		},
-	},
 });

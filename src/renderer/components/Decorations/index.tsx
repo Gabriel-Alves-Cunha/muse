@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
+import { BsArrowRight as RightArrow } from "react-icons/bs";
 import {
 	VscChromeMaximize as Maximize,
 	VscChromeMinimize as Minimize,
@@ -23,25 +24,25 @@ import {
 } from "./styles";
 
 export function Decorations() {
-	const [showDecorations, setShowDecorations] = useState(true);
+	// const [showDecorations, setShowDecorations] = useState(true);
 
-	useEffect(() => {
-		function handlelistenToResizeEvent() {
-			setTimeout(() => {
-				window.innerWidth / window.screen.width >= 0.97 &&
-				window.innerHeight / window.screen.height >= 0.97
-					? setShowDecorations(false)
-					: setShowDecorations(true);
-			}, 500);
-		}
+	// useEffect(() => {
+	// 	function handlelistenToResizeEvent() {
+	// 		setTimeout(() => {
+	// 			window.innerWidth / window.screen.width >= 0.97 &&
+	// 			window.innerHeight / window.screen.height >= 0.97
+	// 				? setShowDecorations(false)
+	// 				: setShowDecorations(true);
+	// 		}, 500);
+	// 	}
 
-		window.addEventListener("resize", handlelistenToResizeEvent);
+	// 	window.addEventListener("resize", handlelistenToResizeEvent);
 
-		return () =>
-			window.removeEventListener("resize", handlelistenToResizeEvent);
-	}, []);
+	// 	return () =>
+	// 		window.removeEventListener("resize", handlelistenToResizeEvent);
+	// }, []);
 
-	return showDecorations ? (
+	return (
 		<Wrapper>
 			{/* ^ window-draggable-region */}
 			<AppIcon>
@@ -52,7 +53,7 @@ export function Decorations() {
 
 			<Buttons />
 		</Wrapper>
-	) : null;
+	);
 }
 
 function Buttons() {
@@ -85,7 +86,9 @@ function AppName_Folder() {
 
 	return (
 		<AppName_Folder_Wrapper>
-			{`${page} - ${capitalizedAppName}`}
+			{page}
+			<RightArrow />
+			{capitalizedAppName}
 		</AppName_Folder_Wrapper>
 	);
 }

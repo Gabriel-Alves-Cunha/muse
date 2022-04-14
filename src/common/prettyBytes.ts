@@ -26,5 +26,6 @@ export const prettyBytes = (num: number, precision = 3): PrettyBytes => {
 		((num < 0 ? -num : num) / 1_000 ** exponent).toPrecision(precision),
 	);
 
+	// @ts-ignore I'm almost sure exponent is a number < UNITS.length >= 0
 	return `${num < 0 ? "-" : ""}${n} ${UNITS[exponent]}`;
 };

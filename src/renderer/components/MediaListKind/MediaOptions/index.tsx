@@ -278,6 +278,5 @@ export type WhatToChange = Readonly<{
 	current: string;
 }>;
 
-type Keys = keyof typeof allowedOptionToChange;
 type ChangeOptions = keyof typeof allowedOptionToChange;
-export type ChangeOptionsToSend = typeof allowedOptionToChange[Keys];
+export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];

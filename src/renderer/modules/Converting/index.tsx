@@ -40,7 +40,6 @@ const { setState: setConvertValues } = useConvertValues;
 export function Converting() {
 	const [showPopup, setShowPopup] = useState(false);
 	const { convertValues } = useConvertValues();
-	const { convertList } = useConvertList();
 
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -94,16 +93,22 @@ export function Converting() {
 				<Convert size="20" />
 			</Trigger>
 
-			{showPopup && (
-				<Popup>
-					{convertList.map(m => (
-						<ConvertBox mediaBeingConverted={m} key={m.path} />
-					))}
-				</Popup>
-			)}
+			{showPopup && <Popup_ />}
 		</Wrapper>
 	);
 }
+
+const Popup_ = () => {
+	const { convertList } = useConvertList();
+
+	return (
+		<Popup>
+			{convertList.map(m => (
+				<ConvertBox mediaBeingConverted={m} key={m.path} />
+			))}
+		</Popup>
+	);
+};
 
 const ConvertBox = ({
 	mediaBeingConverted,

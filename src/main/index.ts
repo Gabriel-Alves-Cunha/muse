@@ -9,18 +9,18 @@ import {
 	Notification,
 	nativeImage,
 	MenuItem,
+	ipcMain,
 	Menu,
 	Tray,
 	app,
-	ipcMain,
 } from "electron";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
+import { logoPath } from "./utils.js";
 import {
 	ElectronIpcMainProcessNotificationEnum,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
-import { logoPath } from "./utils.js";
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -129,11 +129,10 @@ app
 				.on("text-changed", async () => {
 					const url = extendedClipboard.readText("clipboard");
 
-					if (validateURL(url)) {
+					if (validateURL(url))
 						try {
-							const {
-								videoDetails: { title, thumbnails },
-							} = await getBasicInfo(url);
+							const { title, thumbnails } = (await getBasicInfo(url))
+								.videoDetails;
 
 							new Notification({
 								title: "Click to download this video as 'mp3'",
@@ -162,7 +161,6 @@ app
 						} catch (error) {
 							console.error(error);
 						}
-					}
 				})
 				.startWatching();
 		} catch (error) {

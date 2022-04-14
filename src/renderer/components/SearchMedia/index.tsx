@@ -61,7 +61,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 		searcherReducer,
 		defaultSearcher,
 	);
-	const searcherRef = useRef(null);
+	const searcherRef = useRef<HTMLHeadingElement>(null);
 
 	const reload = async () => {
 		dispatchSearcher({

@@ -24,15 +24,15 @@ export const Progress = ({
 	</Component>
 );
 
-const iconObj: Record<ProgressStatus, JSX.Element> = Object.freeze({
-	[ProgressStatus.SUCCESS]: <Success size={12} color="green" />,
-	[ProgressStatus.CANCEL]: <Cancel size={12} color="blue" />,
-	[ProgressStatus.FAIL]: <Fail size={12} color="red" />,
-	[ProgressStatus.ACTIVE]: <Downloading size={12} />,
-	[ProgressStatus.CONVERT]: <Convert size={12} />,
-});
+const iconObj: Map<ProgressStatus, JSX.Element> = new Map();
+iconObj.set(ProgressStatus.SUCCESS, <Success size={12} color="green" />);
+iconObj.set(ProgressStatus.CANCEL, <Cancel size={12} color="blue" />);
+iconObj.set(ProgressStatus.FAIL, <Fail size={12} color="red" />);
+iconObj.set(ProgressStatus.ACTIVE, <Downloading size={12} />);
+iconObj.set(ProgressStatus.CONVERT, <Convert size={12} />);
+Object.freeze(iconObj);
 
-export const icon = (status: ProgressStatus) => iconObj[status];
+export const icon = (status: ProgressStatus) => iconObj.get(status);
 
 export type ProgressProps = {
 	readonly showStatus: boolean;

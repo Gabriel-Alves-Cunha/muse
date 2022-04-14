@@ -135,7 +135,7 @@ export async function transformPathsToMedias(
 	});
 	console.timeEnd("Runnig 'for' on all medias");
 
-	return medias;
+	return Object.freeze(medias);
 }
 
 export type HandleDownload = Readonly<{
@@ -173,7 +173,6 @@ export function makeStream({
 	const startTime = Date.now();
 
 	let interval: NodeJS.Timer | undefined = undefined;
-	let percentageToSend = "";
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
@@ -205,20 +204,18 @@ export function makeStream({
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
 			const percentage = ((downloaded / total) * 100).toFixed(2);
-			percentageToSend = percentage;
 			const estimatedDownloadTime = (
 				+minutesDownloading / (+percentage / 100) -
 				+minutesDownloading
 			).toFixed(2);
 
 			// To react:
-			if (!interval) {
+			if (!interval)
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
-					() => electronPort.postMessage({ percentage: percentageToSend }),
+					() => electronPort.postMessage({ percentage }),
 					2_000,
 				);
-			}
 
 			// To node console if is in development:
 			if (isDevelopment) {

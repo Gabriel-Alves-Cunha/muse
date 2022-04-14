@@ -15,9 +15,10 @@ import {
 export function Download() {
 	return (
 		<Wrapper>
-			<SearcherWrapper />
-
-			<IsLoading />
+			<>
+				<SearcherWrapper />
+				<IsLoading />
+			</>
 
 			<Result />
 		</Wrapper>
@@ -52,8 +53,8 @@ const SearcherWrapper = () => {
 				<input
 					placeholder="Paste Youtube url here"
 					onChange={setSearchTerm}
-					autoCapitalize="off"
 					value={urlToSearchFor}
+					autoCapitalize="off"
 					spellCheck="false"
 					autoCorrect="off"
 					type="text"

@@ -49,7 +49,6 @@ const { setState: setDownloadValues } = useDownloadValues;
 
 export function Downloading() {
 	const [showPopup, setShowPopup] = useState(false);
-	const { downloadingList } = useDownloadingList();
 	const { downloadValues } = useDownloadValues();
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -102,36 +101,43 @@ export function Downloading() {
 				<DownloadingIcon size="20" />
 			</Trigger>
 
-			{showPopup && (
-				<Popup>
-					{downloadingList.map(download => (
-						<div key={download.url}>
-							<Title>
-								<p>{download.title}</p>
-
-								<span>
-									<Cancel
-										onClick={() =>
-											cancelDownloadAndOrRemoveItFromList(download.url)
-										}
-										color="#777"
-										size={13}
-									/>
-								</span>
-							</Title>
-
-							<Progress
-								percent_0_to_100={download.percentage}
-								status={download.status}
-								showStatus={true}
-							/>
-						</div>
-					))}
-				</Popup>
-			)}
+			{showPopup && <Popup_ />}
 		</Wrapper>
 	);
 }
+
+const Popup_ = () => {
+	const { downloadingList } = useDownloadingList();
+
+	return (
+		<Popup>
+			{downloadingList.map(download => (
+				<div key={download.url}>
+					<Title>
+						<p>{download.title}</p>
+
+						<span>
+							<Cancel
+								onClick={() =>
+									cancelDownloadAndOrRemoveItFromList(download.url)
+								}
+								color="#777"
+								size={13}
+							/>
+						</span>
+					</Title>
+
+					<Progress
+						percent_0_to_100={download.percentage}
+						status={download.status}
+						showStatus={true}
+					/>
+				</div>
+			))}
+		</Popup>
+	);
+};
+
 // export function Downloading() {
 // 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
 // 	const { downloadingList } = useDownloadingList();
@@ -360,13 +366,12 @@ function cancelDownloadAndOrRemoveItFromList(url: string) {
 	});
 }
 
-type DownloadingMedia = {
-	readonly imageURL: string;
-	readonly title: string;
-	readonly url: string;
-
+type DownloadingMedia = Readonly<{
 	status: ProgressStatus;
 	isDownloading: boolean;
 	percentage: number;
 	port: MessagePort;
-};
+	imageURL: string;
+	title: string;
+	url: string;
+}>;

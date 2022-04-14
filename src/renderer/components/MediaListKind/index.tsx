@@ -47,13 +47,18 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 		if (playlistName === MAIN_LIST) return mainList;
 		else {
 			console.time("loop to find all medias by id");
-			// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-			const ret = playlists
-				.find(p => p.name === playlistName)!
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				.list.map(mediaID => mainList.find(media => media.id === mediaID)!);
-			console.timeEnd("loop to find all medias by id");
-			return ret;
+			try {
+				console.log();
+				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+				const ret = playlists
+					.find(p => p.name === playlistName)!
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					.list.map(mediaID => mainList.find(media => media.id === mediaID)!);
+
+				return Object.freeze(ret);
+			} finally {
+				console.timeEnd("loop to find all medias by id");
+			}
 		}
 	}, [mainList, playlistName, playlists]);
 

@@ -10,24 +10,24 @@ enum Status {
 
 const { SUCCESS, FAILURE, PENDING } = Status;
 
-const cache: Record<number, Status> = {};
+const cache: Map<number, Status> = new Map();
 
 export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
-	if (
-		!media?.img?.length ||
-		cache[media.id] === FAILURE ||
-		cache[media.id] === PENDING
-	)
-		return Fallback;
-	if (cache[media.id] === SUCCESS)
+	if (!media?.img?.length) return Fallback;
+
+	const cacheStatus = cache.get(media.id);
+
+	if (cacheStatus === FAILURE || cacheStatus === PENDING) return Fallback;
+
+	if (cacheStatus === SUCCESS)
 		return <img src={media.img} loading="lazy" decoding="async" />;
 
-	cache[media.id] = PENDING;
+	cache.set(media.id, PENDING);
 
 	let img: HTMLImageElement | null = new Image();
 
 	img.onload = () => {
-		cache[media.id] = SUCCESS;
+		cache.set(media.id, SUCCESS);
 		console.log(
 			`%c"${media.path}" img loaded with success`,
 			"font-weight: bold; color: blue;",
@@ -39,13 +39,13 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 		console.error("Failed img, erasing it", ev);
 
 		// await writeTags(media.path, { imageURL: "erase img" });
-		cache[media.id] = FAILURE;
+		cache.set(media.id, FAILURE);
 		img = null;
 	};
 
 	img.src = media.img;
 
-	return cache[media.id] === SUCCESS ? (
+	return cache.get(media.id) === SUCCESS ? (
 		<img src={media.img} loading="lazy" decoding="async" />
 	) : (
 		Fallback

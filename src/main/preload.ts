@@ -31,7 +31,7 @@ import {
 contextBridge.exposeInMainWorld("electron", {
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess,
-		receiveMsgFromElectron: receiveMsgFromElectronWindow,
+		receiveMsgFromElectronWindow,
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory,
@@ -45,8 +45,8 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 	media: {
 		transformPathsToMedias,
-		getInfo: getBasicInfo,
 		convertToAudio,
+		getBasicInfo,
 		writeTags,
 	},
 });

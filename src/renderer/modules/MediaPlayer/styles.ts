@@ -38,11 +38,11 @@ export const OptionsAndAlbum = styled("div", {
 });
 
 export const Album = styled("span", {
+	color: "$alternative-text",
 	letterSpacing: "0.04rem",
 	fontFamily: "$primary",
 	fontSize: "1rem",
 	fontWeight: 500,
-	color: "$alternative-text",
 });
 
 export const OptionsButton = styled("button", {
@@ -121,13 +121,13 @@ export const Info = styled("div", {
 
 		overflowY: "hidden",
 
-		"&.title": {
+		"#title": {
 			fontSize: "1.15rem",
 			fontWeight: 500,
 			color: "$text",
 		},
 
-		"&.subtitle": {
+		"#subtitle": {
 			color: "$gray-text",
 			fontSize: "0.9rem",
 			fontWeight: 400,
@@ -165,7 +165,7 @@ export const SeekerContainer = styled("div", {
 	},
 });
 
-export const Controls = styled("div", {
+export const ControlsWrapper = styled("div", {
 	display: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",
@@ -196,7 +196,7 @@ export const Controls = styled("div", {
 				},
 			},
 
-			"&.play-pause": {
+			"#play-pause": {
 				borderRadius: "50%",
 				cursor: "pointer",
 				size: 50,
@@ -248,7 +248,7 @@ export const ProgressWrapper = styled("div", {
 
 	"&:hover span": {
 		position: "absolute",
-		display: "block",
+		// display: "block",
 		justifyContent: "center",
 		alignItems: "center",
 		bottom: 10,
@@ -273,18 +273,3 @@ export const ProgressThumb = styled("div", {
 
 	backgroundColor: "$accent",
 });
-
-// export const ProgressBar = styled("div", {
-// 	position: "absolute",
-// 	right: -3,
-// 	height: 6,
-// 	width: 6,
-// 	top: 0,
-
-// 	border: "1px solid $accent",
-// 	borderRadius: "50%",
-// 	background: "white",
-
-// 	animation: "move 1s linear infinite",
-// 	transform: "translate(0, -25%)",
-// });
