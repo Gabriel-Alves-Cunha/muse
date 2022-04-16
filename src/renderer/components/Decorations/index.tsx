@@ -1,5 +1,3 @@
-// import { useEffect, useState } from "react";
-import { BsArrowRight as RightArrow } from "react-icons/bs";
 import {
 	VscChromeMaximize as Maximize,
 	VscChromeMinimize as Minimize,
@@ -23,72 +21,45 @@ import {
 	Wrapper,
 } from "./styles";
 
-export function Decorations() {
-	// const [showDecorations, setShowDecorations] = useState(true);
+export const Decorations = () => (
+	<Wrapper>
+		{/* ^ window-draggable-region */}
+		<AppIcon>
+			<img src={imageUrl.href} width="24px" height="24px" alt="Muse's logo" />
+		</AppIcon>
 
-	// useEffect(() => {
-	// 	function handlelistenToResizeEvent() {
-	// 		setTimeout(() => {
-	// 			window.innerWidth / window.screen.width >= 0.97 &&
-	// 			window.innerHeight / window.screen.height >= 0.97
-	// 				? setShowDecorations(false)
-	// 				: setShowDecorations(true);
-	// 		}, 500);
-	// 	}
+		<AppName_Folder />
 
-	// 	window.addEventListener("resize", handlelistenToResizeEvent);
+		<Buttons />
+	</Wrapper>
+);
 
-	// 	return () =>
-	// 		window.removeEventListener("resize", handlelistenToResizeEvent);
-	// }, []);
+const Buttons = () => (
+	<WindowButtons>
+		<WindowButton
+			aria-label="Close window"
+			onClick={closeWindow}
+			className="close"
+		>
+			<Close size="16px" />
+		</WindowButton>
 
-	return (
-		<Wrapper>
-			{/* ^ window-draggable-region */}
-			<AppIcon>
-				<img src={imageUrl.href} width="24px" height="24px" alt="Muse's logo" />
-			</AppIcon>
+		<WindowButton aria-label="Toggle maximize window" onClick={toggleMaximize}>
+			<Maximize size="16px" />
+		</WindowButton>
 
-			<AppName_Folder />
-
-			<Buttons />
-		</Wrapper>
-	);
-}
-
-function Buttons() {
-	return (
-		<WindowButtons>
-			<WindowButton
-				aria-label="Close window"
-				onClick={closeWindow}
-				className="close"
-			>
-				<Close size="16px" />
-			</WindowButton>
-
-			<WindowButton
-				aria-label="Toggle maximize window"
-				onClick={toggleMaximize}
-			>
-				<Maximize size="16px" />
-			</WindowButton>
-
-			<WindowButton onClick={minimizeWindow} aria-label="Minize window">
-				<Minimize size="16px" />
-			</WindowButton>
-		</WindowButtons>
-	);
-}
+		<WindowButton onClick={minimizeWindow} aria-label="Minize window">
+			<Minimize size="16px" />
+		</WindowButton>
+	</WindowButtons>
+);
 
 function AppName_Folder() {
 	const { page } = usePage();
 
 	return (
 		<AppName_Folder_Wrapper>
-			{page}
-			<RightArrow />
-			{capitalizedAppName}
+			{capitalizedAppName} {"\u279D"} {page}
 		</AppName_Folder_Wrapper>
 	);
 }

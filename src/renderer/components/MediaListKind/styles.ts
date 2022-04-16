@@ -44,33 +44,6 @@ export const Info = styled("div", {
 	overflow: "hidden",
 });
 
-export const Title = styled("p", {
-	margin: "unset", // Virtuoso asks for this for performance reasons
-
-	letterSpacing: "0.03rem",
-	fontFamily: "$primary",
-	fontSize: "1rem",
-	fontWeight: 500,
-	color: "$alternative-text",
-
-	wordWrap: "normal",
-	overflow: "hidden",
-	/* white-space: nowrap; // make it one-line. */
-
-	/* animation: 6s linear 0s infinite move;
-
-	@keyframes move {
-		from {
-			transform: translateX(0%);
-			left: 0%;
-		}
-		to {
-			transform: translateX(-110%);
-			left: 110%;
-		}
-	} */
-});
-
 export const SubTitle = styled("p", {
 	margin: "unset", // Virtuoso asks for this for performance reasons
 
@@ -136,24 +109,21 @@ export const ListWrapper = styled("div", {
 });
 
 export const RowWrapper = styled("div", {
+	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-
-	width: "98% !important",
+	width: "98%",
 	height: 65,
+	left: 7,
 
+	transition: "0.3s",
 	borderRadius: 7,
 	padding: 7,
 
-	"&:hover": {
+	"&:hover, &:focus, &.active": {
 		transition: "$boxShadow",
-		boxShadow: "$medium",
-	},
-
-	"&.active": {
-		boxShadow: "$medium",
-		background: "white",
+		boxShadow: "$simple",
 	},
 });
 
@@ -162,9 +132,26 @@ export const PlayButton = styled("button", {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
+	zIndex: 1000,
 
 	height: "100%",
 	width: "90%",
 
+	background: "transparent",
 	cursor: "pointer",
+	border: "none",
+});
+
+export const Title = styled("p", {
+	margin: "unset", // Virtuoso asks for this for performance reasons
+
+	color: "$alternative-text",
+	letterSpacing: "0.03rem",
+	fontFamily: "$secondary",
+	fontSize: "1rem",
+	fontWeight: 500,
+
+	whiteSpace: "nowrap", // make it one-line.
+	textOverflow: "ellipsis",
+	overflow: "hidden",
 });

@@ -17,8 +17,8 @@ import {
 import { useCallback, useEffect, useRef } from "react";
 import create from "zustand";
 
-import { dbg, formatDuration } from "@common/utils";
 import { ImgWithFallback } from "@components";
+import { formatDuration } from "@common/utils";
 import {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
@@ -46,7 +46,6 @@ import {
 const { ceil } = Math;
 
 const useProgress = create<Progress>(() => ({ percentage: 0, currentTime: 0 }));
-const { getState: getPlaylistsFunctions } = usePlaylists;
 const { getState: getCurrentPlaying } = useCurrentPlaying;
 const { getState: getPlayOptions } = usePlayOptions;
 const { setState: setProgress } = useProgress;
@@ -55,6 +54,12 @@ const toggleRepeatThisMedia = () =>
 	getPlayOptions().setPlayOptions({
 		value: getPlayOptions().playOptions.loopThisMedia ? false : true,
 		type: PlayOptionsType.LOOP_THIS_MEDIA,
+	});
+
+const toggleRandomAndLoop = () =>
+	getPlayOptions().setPlayOptions({
+		value: getPlayOptions().playOptions.isRandom ? false : true,
+		type: PlayOptionsType.IS_RANDOM,
 	});
 
 const playOrPauseMedia = (audio: HTMLAudioElement | null) =>
@@ -82,17 +87,16 @@ export function MediaPlayer() {
 	const { isRandom, loopThisMedia } = usePlayOptions().playOptions;
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const { currentPlaying } = useCurrentPlaying();
+	const { mainList } = usePlaylists();
 
-	const media = getPlaylistsFunctions().mainList.find(
-		m => m.id === currentPlaying.mediaID,
-	);
+	const media = mainList.find(m => m.id === currentPlaying.mediaID);
 	const audio = audioRef.current;
 
 	const seek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if (!audio) return;
-		const duration = audio.duration;
+		if (!audio || !audio.duration) return;
 		const div = document.getElementById("goto");
-		if (!div || !duration) return;
+		const duration = audio.duration;
+		if (!div) return;
 
 		const width = Number(getComputedStyle(div).width.replace("px", ""));
 		const clickX = e.nativeEvent.offsetX;
@@ -103,7 +107,6 @@ export function MediaPlayer() {
 
 	useEffect(() => {
 		if (!audio) return;
-		dbg("Setting progress listener.");
 
 		const handleProgress = () => {
 			const { duration, currentTime } = audio;
@@ -165,7 +168,7 @@ export function MediaPlayer() {
 
 					<Controls audio={audio} />
 
-					<ButtonForRandomAndLoop>
+					<ButtonForRandomAndLoop onClick={toggleRandomAndLoop}>
 						{/* TODO ^ */}
 						{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 					</ButtonForRandomAndLoop>
@@ -191,6 +194,8 @@ const Controls = ({ audio }: { audio: HTMLAudioElement | null }) => (
 	</div>
 );
 
+const { isNaN } = Number;
+
 function SeekerWrapper({
 	duration,
 	seek,
@@ -203,7 +208,7 @@ function SeekerWrapper({
 	const { percentage, currentTime } = useProgress();
 
 	const isDurationValid =
-		typeof duration === "number" && !Number.isNaN(duration);
+		typeof duration === "number" && !isNaN(duration) && duration > 0;
 
 	const handleTooltip = useCallback(
 		({
@@ -224,9 +229,9 @@ function SeekerWrapper({
 
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
 			const time = (mouseXPercentage / 100) * duration;
-
 			const left = mouseX - (35 >> 1); // 35 is the width of the tooltip. Also, (35 >> 1) is the half of the width (binary divide by 2).
-			tooltip.innerText = formatDuration(time);
+
+			tooltip.textContent = formatDuration(time);
 			tooltip.style.left = `${left}px`;
 		},
 		[duration, isDurationValid],
@@ -244,7 +249,7 @@ function SeekerWrapper({
 				id="goto"
 			>
 				<span
-					style={{ display: isDurationValid ? "block" : "none" }}
+					style={isDurationValid ? {} : { display: "none" }}
 					ref={timeTooltipRef}
 				/>
 
@@ -261,6 +266,6 @@ function SeekerWrapper({
 }
 
 type Progress = Readonly<{
-	percentage: number;
 	currentTime: number;
+	percentage: number;
 }>;

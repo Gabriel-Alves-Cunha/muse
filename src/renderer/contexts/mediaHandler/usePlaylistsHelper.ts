@@ -31,7 +31,7 @@ export function returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
 	if (newHistory.length > maxSizeOfHistory)
 		newHistory.length = maxSizeOfHistory;
 
-	return newHistory;
+	return Object.freeze(newHistory);
 }
 
 export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
@@ -64,7 +64,7 @@ export async function searchDirectoryResult() {
 	});
 	console.timeEnd("searchDirectoryResult");
 
-	return fullPaths.flat();
+	return Object.freeze(fullPaths.flat());
 }
 
 export const searchDirectoryForMedias = async (directory: Path) =>
@@ -73,25 +73,31 @@ export const searchDirectoryForMedias = async (directory: Path) =>
 export const getAllowedMedias = (
 	filenames: readonly string[],
 ): readonly string[] =>
-	filenames.filter(filename =>
-		allowedMedias.some(extension => extension === getLastExtension(filename)),
+	Object.freeze(
+		filenames.filter(filename =>
+			allowedMedias.some(extension => extension === getLastExtension(filename)),
+		),
 	);
 
 export const sortByDate = (newList: readonly Media[]) =>
-	sort(newList, (a, b) => {
-		if (a.dateOfArival > b.dateOfArival) return 1;
-		if (a.dateOfArival < b.dateOfArival) return -1;
-		// a must be equal to b:
-		return 0;
-	}).map(media => media.id);
+	Object.freeze(
+		sort(newList, (a, b) => {
+			if (a.dateOfArival > b.dateOfArival) return 1;
+			if (a.dateOfArival < b.dateOfArival) return -1;
+			// a must be equal to b:
+			return 0;
+		}).map(media => media.id),
+	);
 
 export const sortByName = (list: readonly Media[]) =>
-	sort(list, (a, b) => {
-		if (a.title > b.title) return 1;
-		if (a.title < b.title) return -1;
-		// a must be equal to b:
-		return 0;
-	}).map(media => media.id);
+	Object.freeze(
+		sort(list, (a, b) => {
+			if (a.title > b.title) return 1;
+			if (a.title < b.title) return -1;
+			// a must be equal to b:
+			return 0;
+		}).map(media => media.id),
+	);
 
 export const SORTED_BY_DATE = "sorted by date";
 export const SORTED_BY_NAME = "sorted by name";

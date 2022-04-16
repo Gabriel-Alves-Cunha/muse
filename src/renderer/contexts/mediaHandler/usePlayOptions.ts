@@ -18,7 +18,6 @@ export const usePlayOptions = create<PlayOptionsActions>(
 		(set, _get) => ({
 			playOptions: {
 				loopThisMedia: false,
-				loopAllMedia: true,
 				isRandom: false,
 			},
 			setPlayOptions: (action: PlayOptionsAction) => {
@@ -31,16 +30,6 @@ export const usePlayOptions = create<PlayOptionsActions>(
 							playOptions: {
 								...state.playOptions,
 								loopThisMedia: action.value,
-							},
-						}));
-						break;
-					}
-
-					case PlayOptionsType.LOOP_ALL_MEDIA: {
-						set(state => ({
-							playOptions: {
-								...state.playOptions,
-								loopAllMedia: action.value,
 							},
 						}));
 						break;
@@ -76,26 +65,20 @@ export const usePlayOptions = create<PlayOptionsActions>(
 
 export type PlayOptionsAction =
 	| Readonly<{
-			type: PlayOptionsType.LOOP_ALL_MEDIA;
-			value: PlayOptions["loopAllMedia"];
+			type: PlayOptionsType.LOOP_THIS_MEDIA;
+			value: PlayOptions["loopThisMedia"];
 	  }>
 	| Readonly<{
 			type: PlayOptionsType.IS_RANDOM;
 			value: PlayOptions["isRandom"];
-	  }>
-	| Readonly<{
-			value: PlayOptions["loopThisMedia"];
-			type: PlayOptionsType.LOOP_THIS_MEDIA;
 	  }>;
 
 export type PlayOptions = Readonly<{
 	loopThisMedia: boolean;
-	loopAllMedia: boolean;
 	isRandom: boolean;
 }>;
 
 export enum PlayOptionsType {
 	LOOP_THIS_MEDIA,
-	LOOP_ALL_MEDIA,
 	IS_RANDOM,
 }

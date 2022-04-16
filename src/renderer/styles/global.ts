@@ -129,12 +129,13 @@ export const darkTheme = createTheme({
 			-7.3px -7.3px 35.2px -28px rgba(255, 255, 255, 0.131),
 			-20px -20px 80px -28px rgba(255, 255, 255, 0.19)`,
 		glow: "0 0 3px 1px",
+		simple: "rgba(255, 255, 255, 0.25) 0 0 4px",
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 	},
 });
-
+//2px 2px 50px rgba(0, 0, 0, 0.2)
 export const lightTheme = createTheme({
 	colors: {
 		"scrollbar-thumb-hover": "#555",
@@ -192,6 +193,7 @@ export const lightTheme = createTheme({
 			-7.3px -7.3px 35.2px -28px rgba(0, 0, 0, 0.131),
 			-20px -20px 80px -28px rgba(0, 0, 0, 0.19)`,
 		glow: "0px 0px 3px 1px",
+		simple: "rgba(0, 0, 0, 0.16) 0 0 4px",
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",

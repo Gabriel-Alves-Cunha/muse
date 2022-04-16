@@ -31,29 +31,6 @@ describe("Testing usePlayOptions", () => {
 		}
 	});
 
-	it("should get a new playOptions with .loopAllMedia set", () => {
-		{
-			getPlayOptions().setPlayOptions({
-				type: PlayOptionsType.LOOP_ALL_MEDIA,
-				value: true,
-			});
-
-			const playOptions = getPlayOptions().playOptions;
-
-			expect(playOptions).toHaveProperty("loopAllMedia", true);
-		}
-		{
-			getPlayOptions().setPlayOptions({
-				type: PlayOptionsType.LOOP_ALL_MEDIA,
-				value: false,
-			});
-
-			const playOptions = getPlayOptions().playOptions;
-
-			expect(playOptions).toHaveProperty("loopAllMedia", false);
-		}
-	});
-
 	it("should get a new playOptions with .isRandom set", () => {
 		{
 			getPlayOptions().setPlayOptions({

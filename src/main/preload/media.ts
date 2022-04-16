@@ -135,7 +135,7 @@ export async function transformPathsToMedias(
 	});
 	console.timeEnd("Runnig 'for' on all medias");
 
-	return Object.freeze(medias);
+	return medias;
 }
 
 export type HandleDownload = Readonly<{

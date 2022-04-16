@@ -121,13 +121,13 @@ export const Info = styled("div", {
 
 		overflowY: "hidden",
 
-		"#title": {
+		"&#title": {
 			fontSize: "1.15rem",
 			fontWeight: 500,
 			color: "$text",
 		},
 
-		"#subtitle": {
+		"&#subtitle": {
 			color: "$gray-text",
 			fontSize: "0.9rem",
 			fontWeight: 400,
@@ -196,7 +196,7 @@ export const ControlsWrapper = styled("div", {
 				},
 			},
 
-			"#play-pause": {
+			"&#play-pause": {
 				borderRadius: "50%",
 				cursor: "pointer",
 				size: 50,
@@ -242,13 +242,13 @@ export const ProgressWrapper = styled("div", {
 	cursor: "pointer",
 	margin: "0 7px",
 
-	span: {
+	"& span": {
 		display: "none",
 	},
 
 	"&:hover span": {
 		position: "absolute",
-		// display: "block",
+		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
 		bottom: 10,
@@ -259,6 +259,7 @@ export const ProgressWrapper = styled("div", {
 		borderRadius: 2,
 
 		fontFamily: "$primary",
+		textAlign: "center",
 		fontSize: "0.8rem",
 		fontWeight: 500,
 		color: "$text",
@@ -266,10 +267,6 @@ export const ProgressWrapper = styled("div", {
 });
 
 export const ProgressThumb = styled("div", {
-	position: "relative",
-	height: 3,
-	left: 0,
-	top: 0,
-
-	backgroundColor: "$accent",
+	background: "$accent",
+	height: "100%",
 });

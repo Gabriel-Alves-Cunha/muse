@@ -234,7 +234,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			expect(prevFavorites.length).toBe(1);
 
 			getPlaylistsFuncs().setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_FAVORITES,
 				mediaID: prevFavorites[0]!,
 			});
@@ -287,7 +287,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			const mediaToBeDeleted = prevMainList[15]!;
 
 			getPlaylistsFuncs().setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				mediaID: mediaToBeDeleted.id,
 			});

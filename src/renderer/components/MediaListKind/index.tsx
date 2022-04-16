@@ -76,7 +76,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 					</Img>
 
 					<Info>
-						<Title>{media.title}</Title>
+						<Title className="mytitle">{media.title}</Title>
 						<SubTitle>{media.duration}</SubTitle>
 					</Info>
 				</PlayButton>
@@ -108,6 +108,8 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 				className="list"
 				overscan={10}
 				data={data}
+				noValidate
+				async
 			/>
 		</ListWrapper>
 	);

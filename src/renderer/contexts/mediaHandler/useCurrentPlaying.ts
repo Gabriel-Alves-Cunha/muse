@@ -388,15 +388,14 @@ const { getState: getCurrentPlaying } = useCurrentPlaying;
 const timeKey = "Reading <audio> file took";
 let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
 
-if (globalThis.window) {
+if (globalThis.window)
 	useCurrentPlaying.subscribe(
 		state => state.currentPlaying.mediaID,
 		function setAudioToHTMLAudioElement() {
-			if (prevMediaTimer) clearTimeout(prevMediaTimer);
+			// @ts-ignore It will just return undefined if it's undefined.
+			clearTimeout(prevMediaTimer);
 
-			const {
-				currentPlaying: { mediaID, currentTime },
-			} = getCurrentPlaying();
+			const { mediaID, currentTime } = getCurrentPlaying().currentPlaying;
 			if (!mediaID) return;
 
 			const media = getPlaylistsFunctions().mainList.find(
@@ -420,7 +419,7 @@ if (globalThis.window) {
 						type: PlaylistEnum.UPDATE_MAIN_LIST,
 					});
 
-					if (currentTime > 10) {
+					if (currentTime > 20) {
 						console.log(
 							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
 						);
@@ -459,7 +458,6 @@ if (globalThis.window) {
 			prevMediaTimer = mediaTimer;
 		},
 	);
-}
 
 export type currentPlayingReducer_Action =
 	| Readonly<{

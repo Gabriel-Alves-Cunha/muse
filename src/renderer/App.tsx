@@ -205,7 +205,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 			}
 
 			getPlaylistsFunctions().setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA,
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				mediaID: media.id,
 			});

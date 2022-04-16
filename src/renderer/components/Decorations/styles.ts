@@ -31,13 +31,13 @@ export const WindowButton = styled("button", {
 
 	backgroundColor: "transparent",
 
+	"&:hover": {
+		backgroundColor: "$button-hovered",
+	},
+
 	"&.close:hover": {
 		backgroundColor: "#e70000",
 		color: "white",
-	},
-
-	"&:hover": {
-		backgroundColor: "$button-hovered",
 	},
 });
 
@@ -59,14 +59,15 @@ export const AppName_Folder_Wrapper = styled("div", {
 	width: "20%",
 	left: "50%",
 
-	backgroundColor: "transparent",
-	border: "none",
-
 	transform: "translate(-50%)",
 
-	letterSpacing: "0.03em",
+	backgroundColor: "transparent",
+	border: "none",
+	zIndex: 10,
+
+	letterSpacing: "0.03rem",
 	fontFamily: "$primary",
-	fontSize: "0.93em",
+	fontSize: "0.93rem",
 	fontWeight: 300,
 	color: "$text",
 
