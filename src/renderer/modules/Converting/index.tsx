@@ -11,6 +11,7 @@ import create from "zustand";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { usePlaylists } from "@contexts";
@@ -52,9 +53,13 @@ export function Converting() {
 					const electronPort = createNewConvert(convertValue);
 
 					// Sending port so we can communicate with electron:
-					window.postMessage(ReactToElectronMessageEnum.CONVERT_MEDIA, "*", [
+					sendMsgToBackend(
+						{
+							type: ReactToElectronMessageEnum.CONVERT_MEDIA,
+							convertValue,
+						},
 						electronPort,
-					]);
+					);
 				} catch (error) {
 					toast.error(
 						`There was an error trying to download "${convertValue.path}"! Please, try again later.`,
@@ -90,7 +95,7 @@ export function Converting() {
 				onClick={() => setShowPopup(prev => !prev)}
 				className={showPopup ? "active" : ""}
 			>
-				<Convert size="20" />
+				<Convert size={20} />
 			</Trigger>
 
 			{showPopup && <Popup_ />}
@@ -156,8 +161,9 @@ const { setState: setConvertList, getState: getConvertList } = useConvertList;
 const { getState: getPlaylistsFunctions } = usePlaylists;
 
 function createNewConvert(convertValues: ConvertValues): MessagePort {
+	const { convertList } = getConvertList();
 	{
-		const indexIfThereIsOneAlready = getConvertList().convertList.findIndex(
+		const indexIfThereIsOneAlready = convertList.findIndex(
 			c => c.path === convertValues.path,
 		);
 		if (indexIfThereIsOneAlready !== -1) {
@@ -173,7 +179,7 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 				draggable: true,
 			});
 
-			console.error(info, getConvertList().convertList);
+			console.error(info, convertList);
 			throw new Error(info);
 		}
 	}
@@ -185,15 +191,15 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 	const convertStatus: MediaBeingConverted = {
 		toExtension: convertValues.toExtension,
 		status: ProgressStatus.ACTIVE,
+		path: convertValues.path,
 		isConverting: true,
 		timeConverted: "",
-		path: convertValues.path,
 		sizeConverted: 0,
 		port: myPort,
 	};
 
 	setConvertList({
-		convertList: [...getConvertList().convertList, convertStatus],
+		convertList: [...convertList, convertStatus],
 	});
 
 	myPort.postMessage({
@@ -313,7 +319,7 @@ function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
 		});
 
 	setConvertList({
-		convertList: remove(getConvertList().convertList, mediaBeingConvertedIndex),
+		convertList: remove(convertList, mediaBeingConvertedIndex),
 	});
 }
 

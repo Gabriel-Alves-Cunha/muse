@@ -22,6 +22,7 @@ import readline from "readline";
 import ytdl from "ytdl-core";
 
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { hash } from "@common/hash";
@@ -200,6 +201,8 @@ export function makeStream({
 
 			currentDownloads.delete(url);
 			dbg({ currentDownloads });
+
+			console.log("Was file renamed?", existsSync(saveSite));
 		})
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
@@ -262,6 +265,8 @@ export function makeStream({
 			clearInterval(interval!);
 
 			currentDownloads.delete(url);
+
+			console.log("Was file renamed?", existsSync(saveSite));
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
@@ -315,7 +320,7 @@ export function convertToAudio({
 
 				// TODO: test this:
 				// To react:
-				if (!interval) {
+				if (!interval)
 					// ^ Only in the firt time this setInterval is called!
 					interval = setInterval(
 						() =>
@@ -325,7 +330,7 @@ export function convertToAudio({
 							}),
 						2_000,
 					);
-				}
+
 				// // To react:
 				// if (!interval) {
 				// 	// ^ Only in the firt time this setInterval is called!
@@ -371,30 +376,22 @@ export function convertToAudio({
 			clearInterval(interval!);
 
 			{
-				// Treat the file successfully converted as a new media:
-				console.log("Adding new media:", {
-					msg: "Treat the file successfully converted as a new media...",
-					type: "ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA",
-					mediaPath: saveSite,
-				});
-				window.postMessage({
+				// Treat the successfully converted file as a new media...
+				sendMsgToClient({
 					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 					mediaPath: saveSite,
 				});
 
-				// and remove old one
-				console.log("Removing old media:", {
-					msg: "and remove old one.",
-					type: "ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA",
-					mediaPath,
-				});
-				window.postMessage({
+				// ...and remove old one
+				sendMsgToClient({
 					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 					mediaPath,
 				});
 			}
 
 			mediasConverting.delete(mediaPath);
+
+			console.log("Was file renamed?", existsSync(saveSite));
 		})
 		.on("destroy", () => {
 			// TODO: see if it's necessary to delete the file if it's not converted successfully!
@@ -418,6 +415,8 @@ export function convertToAudio({
 
 			mediasConverting.delete(mediaPath);
 			dbg({ mediasConverting });
+
+			console.log("Was file renamed?", existsSync(saveSite));
 		});
 
 	mediasConverting.set(mediaPath, readStream);
@@ -495,7 +494,7 @@ export async function writeTags(
 								ByteVector.fromString(txtForByteVector, StringType.Latin1),
 							);
 							picture.description =
-								"This image was download when this media downloaded.";
+								"This image was download when this media was downloaded.";
 							picture.filename = `${getBasename(mediaPath)}`;
 							picture.type = PictureType.Media;
 							picture.mimeType = mimeType;
@@ -575,13 +574,9 @@ export async function writeTags(
 		file.dispose();
 	} catch (error) {
 		// Send error to client:
-		console.log({
-			type: "ReactElectronAsyncMessageEnum.ERROR",
-			error,
-		});
-		window.postMessage({
+		sendMsgToClient({
 			type: ElectronToReactMessageEnum.ERROR,
-			error,
+			error: error as Error,
 		});
 
 		throw error;
@@ -591,43 +586,25 @@ export async function writeTags(
 				await renameFile(mediaPath, fileNewPath);
 
 				// Since media has a new path, create a new media...
-				console.log("Adding new media:", {
-					msg: "Since media has a new path, create a new media...",
-					type: "ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA",
-					mediaPath: fileNewPath,
-				});
-				window.postMessage({
+				sendMsgToClient({
 					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 					mediaPath: fileNewPath,
 				});
 
 				// and remove old one
-				console.log("Removing old media:", {
-					msg: "and remove old one.",
-					type: "ReactElectronAsyncMessageEnum.REMOVE_ONE_MEDIA",
-					mediaPath,
-				});
-				window.postMessage({
+				sendMsgToClient({
 					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 					mediaPath,
 				});
 			} catch (error) {
 				// Send error to react process: (error renaming file => file has old path)
-				console.error({
-					type: "ReactElectronAsyncMessageEnum.ERROR",
-					error,
-				});
-				window.postMessage({
+				sendMsgToClient({
 					type: ElectronToReactMessageEnum.ERROR,
-					error,
+					error: error as Error,
 				});
 
 				// Since there was an error, let's at least refresh media:
-				console.log({
-					type: "ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA",
-					mediaPath,
-				});
-				window.postMessage({
+				sendMsgToClient({
 					type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
 					mediaPath,
 				});
@@ -636,22 +613,14 @@ export async function writeTags(
 				console.log("Does old file remains?", existsSync(mediaPath));
 			}
 		} else if (data.isNewMedia) {
-			// Add new media:
-			console.log({
-				type: "ReactElectronAsyncMessageEnum.ADD_ONE_MEDIA",
-				mediaPath,
-			});
-			window.postMessage({
+			// Add the new media:
+			sendMsgToClient({
 				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 				mediaPath,
 			});
 		} else {
 			// Refresh media:
-			console.log({
-				type: "ReactElectronAsyncMessageEnum.REFRESH_ONE_MEDIA",
-				mediaPath,
-			});
-			window.postMessage({
+			sendMsgToClient({
 				type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
 				mediaPath,
 			});
@@ -660,7 +629,7 @@ export async function writeTags(
 }
 
 export const getThumbnail = async (url: string): Promise<ImgString> =>
-	new Promise((resolve, reject) => {
+	new Promise((resolve, reject) =>
 		get(url, res => {
 			res.setEncoding("base64");
 
@@ -671,5 +640,5 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 		}).on("error", e => {
 			console.error(`Got error getting image on Electron side: ${e.message}`);
 			reject(e);
-		});
-	});
+		}),
+	);

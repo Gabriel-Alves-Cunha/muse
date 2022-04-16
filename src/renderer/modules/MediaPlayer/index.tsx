@@ -14,7 +14,7 @@ import {
 	MdRepeat as Repeat,
 } from "react-icons/md";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import create from "zustand";
 
 import { ImgWithFallback } from "@components";
@@ -94,11 +94,11 @@ export function MediaPlayer() {
 
 	const seek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (!audio || !audio.duration) return;
-		const div = document.getElementById("goto");
 		const duration = audio.duration;
-		if (!div) return;
 
-		const width = Number(getComputedStyle(div).width.replace("px", ""));
+		const width = Number(
+			getComputedStyle(e.currentTarget).width.replace("px", ""),
+		);
 		const clickX = e.nativeEvent.offsetX;
 		const desiredTime = (clickX / width) * duration;
 
@@ -169,7 +169,6 @@ export function MediaPlayer() {
 					<Controls audio={audio} />
 
 					<ButtonForRandomAndLoop onClick={toggleRandomAndLoop}>
-						{/* TODO ^ */}
 						{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 					</ButtonForRandomAndLoop>
 				</ControlsWrapper>
@@ -207,8 +206,11 @@ function SeekerWrapper({
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 	const { percentage, currentTime } = useProgress();
 
-	const isDurationValid =
-		typeof duration === "number" && !isNaN(duration) && duration > 0;
+	const isDurationValid = useMemo(
+		() => typeof duration === "number" && !isNaN(duration) && duration > 0,
+		[duration],
+	);
+	const formatedDuration = useMemo(() => formatDuration(duration), [duration]);
 
 	const handleTooltip = useCallback(
 		({
@@ -228,8 +230,10 @@ function SeekerWrapper({
 			const progressBarWidth = ceil(width);
 
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
-			const time = (mouseXPercentage / 100) * duration;
-			const left = mouseX - (35 >> 1); // 35 is the width of the tooltip. Also, (35 >> 1) is the half of the width (binary divide by 2).
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const time = (mouseXPercentage / 100) * duration!;
+			const left = mouseX - (35 >> 1); // 35 is the width of the tooltip.
+			// Also, (35 >> 1) is the half of the width (binary divide by 2).
 
 			tooltip.textContent = formatDuration(time);
 			tooltip.style.left = `${left}px`;
@@ -246,7 +250,6 @@ function SeekerWrapper({
 				onMouseMove={handleTooltip}
 				ref={progressWrapperRef}
 				onClick={seek}
-				id="goto"
 			>
 				<span
 					style={isDurationValid ? {} : { display: "none" }}
@@ -260,7 +263,7 @@ function SeekerWrapper({
 				></ProgressThumb>
 			</ProgressWrapper>
 
-			<span>{formatDuration(duration)}</span>
+			<span>{formatedDuration}</span>
 		</SeekerContainer>
 	);
 }

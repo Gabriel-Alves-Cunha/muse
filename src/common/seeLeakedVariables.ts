@@ -44,6 +44,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 		window.document.body.appendChild(iframe);
 		browserGlobals = Object.keys(iframe.contentWindow as Window);
 		window.document.body.removeChild(iframe);
+
 		return browserGlobals;
 	}
 
@@ -59,6 +60,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 		const runtimeGlobals = Object.keys(window).filter(key => {
 			const isFromBrowser = browserGlobals.includes(key);
 			const isIgnored = ignoredGlobals.includes(key);
+
 			return !isFromBrowser && !isIgnored;
 		});
 

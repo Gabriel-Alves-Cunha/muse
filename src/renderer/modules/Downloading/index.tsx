@@ -5,8 +5,10 @@ import { toast } from "react-toastify";
 import create from "zustand";
 
 import { DownloadValues, ProgressStatus } from "@common/@types/typesAndEnums";
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { remove, replace } from "@utils/array";
 import { Progress } from "@components/Progress";
 
@@ -29,7 +31,7 @@ const defaultDownloadValues: DownloadValues = Object.freeze({
 	imageURL: "",
 	title: "",
 	url: "",
-} as const);
+});
 
 const useDownloadingList = create<{
 	downloadingList: readonly DownloadingMedia[];
@@ -43,8 +45,6 @@ export const useDownloadValues = create<{
 	downloadValues: defaultDownloadValues,
 }));
 
-const { setState: setDownloadingList, getState: getDownloadingList } =
-	useDownloadingList;
 const { setState: setDownloadValues } = useDownloadValues;
 
 export function Downloading() {
@@ -56,7 +56,7 @@ export function Downloading() {
 
 	useEffect(() => {
 		// For each new DownloadingValues, start a new download:
-		if (downloadValues.canStartDownload) {
+		if (downloadValues.canStartDownload)
 			try {
 				const electronPort = createNewDownload(downloadValues);
 
@@ -65,7 +65,13 @@ export function Downloading() {
 				setDownloadValues({ downloadValues: defaultDownloadValues });
 
 				// Sending port so we can communicate with Electron:
-				window.postMessage("download media", "*", [electronPort]);
+				sendMsgToBackend(
+					{
+						type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA,
+						downloadValues,
+					},
+					electronPort,
+				);
 			} catch (error) {
 				toast.error(
 					`There was an error trying to download "${downloadValues.title}"! Please, try again later.`,
@@ -80,7 +86,6 @@ export function Downloading() {
 					},
 				);
 			}
-		}
 	}, [downloadValues, downloadValues.canStartDownload, downloadValues.title]);
 
 	useEffect(() => {
@@ -130,7 +135,7 @@ const Popup_ = () => {
 					<Progress
 						percent_0_to_100={download.percentage}
 						status={download.status}
-						showStatus={true}
+						showStatus
 					/>
 				</div>
 			))}
@@ -191,15 +196,17 @@ const Popup_ = () => {
 // 	);
 // }
 
+const { setState: setDownloadingList, getState: getDownloadingList } =
+	useDownloadingList;
+
 /**
  * This function returns a MessagePort that will be send to
  * Electron to enable 2 way communication between it
  * and React.
  */
 function createNewDownload(downloadValues: DownloadValues): MessagePort {
+	const { downloadingList } = getDownloadingList();
 	{
-		const { downloadingList } = getDownloadingList();
-
 		// First, see if there is another one that has the same url
 		// and stop if true:
 		const indexIfThereIsOneAlready = downloadingList.findIndex(
@@ -242,16 +249,7 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 
 	// Adding newly created DownloadingMedia:
 	setDownloadingList({
-		downloadingList: [...getDownloadingList().downloadingList, downloadStatus],
-	});
-
-	// Send a msg with the necessary info to Electron
-	// to start a new download:
-	myPort.postMessage({
-		imageURL: downloadValues.imageURL,
-		title: downloadStatus.title,
-		url: downloadValues.url,
-		// ^ On every `postMessage` you have to send the url as an ID!
+		downloadingList: [...downloadingList, downloadStatus],
 	});
 
 	// Adding event listeners to React's MessagePort to receive and
@@ -279,7 +277,8 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 		// Handle ProgressStatus's cases:
 		switch (data.status) {
 			case ProgressStatus.FAIL: {
-				// ^ In this case, `data` include an `error: Error` key.
+				// @ts-ignore In this case, `data` include an `error: Error` key.
+				console.assert(data.error);
 				console.error((data as typeof data & { error: Error }).error);
 
 				toast.error(`Download of "${downloadStatus.title}" failed!`, {
@@ -331,13 +330,15 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 			case ProgressStatus.CONVERT:
 				break;
 
-			default:
+			default: {
 				assertUnreachable(data.status);
+				break;
+			}
 		}
 	};
 
 	// @ts-ignore: this fn DOES exists
-	myPort.onclose = () => console.log("Closing ports (myPort).");
+	myPort.onclose = () => console.log("Closing ports (react port).");
 
 	return electronPort;
 }

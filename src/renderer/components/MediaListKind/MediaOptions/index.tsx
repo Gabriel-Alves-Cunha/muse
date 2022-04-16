@@ -1,4 +1,3 @@
-import type { MsgObjectReactToElectron } from "@common/@types/electron-window";
 import type { Media } from "@common/@types/typesAndEnums";
 
 import { type RefObject, useEffect, useRef } from "react";
@@ -8,6 +7,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { toast } from "react-toastify";
 
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { usePlaylists } from "@contexts";
 import { capitalize } from "@utils/utils";
 import { dbg } from "@common/utils";
@@ -105,7 +105,7 @@ async function deleteMedia(
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	media: Media,
 ) {
-	if (closeButtonRef.current) {
+	if (closeButtonRef.current)
 		try {
 			dbg("Deleting media...", media);
 			await getPlaylistsFunctions().deleteMedia(media);
@@ -137,7 +137,6 @@ async function deleteMedia(
 				},
 			);
 		}
-	}
 }
 
 function handleChange(
@@ -145,7 +144,7 @@ function handleChange(
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	media: Media,
 ) {
-	if (contentWrapperRef.current && closeButtonRef.current) {
+	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
 			changePropsIfAllowed(contentWrapperRef, media);
 			handleCloseAll(closeButtonRef);
@@ -175,7 +174,6 @@ function handleChange(
 				},
 			);
 		}
-	}
 }
 
 function changePropsIfAllowed(
@@ -191,7 +189,8 @@ function changePropsIfAllowed(
 
 					Object.entries(media).forEach(([key, oldValue]) => {
 						if (key === id && oldValue !== newValue) {
-							// If `oldValue` is undefined AND `newValue` is empty, there's nothing to do, so just return:
+							// If `oldValue` is undefined AND `newValue` is
+							// empty, there's nothing to do, so just return:
 							if (oldValue === undefined && newValue === "") return;
 
 							// We need to handle the case where the key is an array, as in "genres":
@@ -217,23 +216,23 @@ function changePropsIfAllowed(
 									id,
 								});
 
-								// If they are different, the writeTag() function will handle splitting the string, so just continue the rest of the function.
+								// If they are different, the writeTag() function will
+								// handle splitting the string, so just continue the
+								// rest of the function.
 							}
 							dbg({ id, newValue, key, oldValue });
 
 							const whatToSend: ChangeOptionsToSend = allowedOptionToChange[id];
 
 							// Send message to Electron to execute the function writeTag() in the main process:
-							const msg: MsgObjectReactToElectron = {
+							sendMsgToBackend({
 								type: ReactToElectronMessageEnum.WRITE_TAG,
 								params: {
 									whatToChange: whatToSend,
 									mediaPath: media.path,
 									newValue,
 								},
-							};
-
-							window.postMessage(msg);
+							});
 						}
 					});
 				}

@@ -29,6 +29,7 @@ import {
 	Img,
 } from "./styles";
 
+const timeLabel = "Loop to find all medias by id";
 const { getState } = useCurrentPlaying;
 const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 	getState().setCurrentPlaying({
@@ -45,21 +46,19 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 	const data = useMemo(() => {
 		// Handle when playlistName === MAIN_LIST:
 		if (playlistName === MAIN_LIST) return mainList;
-		else {
-			console.time("loop to find all medias by id");
+		else
 			try {
-				console.log();
+				console.time(timeLabel);
 				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-				const ret = playlists
+				const data = playlists
 					.find(p => p.name === playlistName)!
 					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					.list.map(mediaID => mainList.find(media => media.id === mediaID)!);
+					.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
 
-				return Object.freeze(ret);
+				return Object.freeze(data);
 			} finally {
-				console.timeEnd("loop to find all medias by id");
+				console.timeEnd(timeLabel);
 			}
-		}
 	}, [mainList, playlistName, playlists]);
 
 	const Row = memo(
@@ -102,7 +101,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 		<ListWrapper>
 			<Virtuoso
 				itemContent={(_, media) => <Row media={media} />}
-				computeItemKey={(_, media) => media.id}
+				computeItemKey={(_, { id }) => id}
 				totalCount={data.length}
 				fixedItemHeight={65}
 				className="list"

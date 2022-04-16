@@ -29,7 +29,7 @@ export function ThemeToggler() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const handleClick = () => {
+	const toggleTheme = () => {
 		html.classList.remove(availableThemes[theme]);
 		html.classList.add(availableThemes[nextTheme]);
 
@@ -37,7 +37,7 @@ export function ThemeToggler() {
 	};
 
 	return (
-		<Button onClick={handleClick}>
+		<Button onClick={toggleTheme}>
 			{theme === "light" ? <Dark size="20px" /> : <Light size="20px" />}
 		</Button>
 	);

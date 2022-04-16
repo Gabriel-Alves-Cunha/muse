@@ -63,7 +63,7 @@ export type MsgObjectReactToElectron =
 	  }> // 1
 	| Readonly<{
 			type: ReactToElectronMessageEnum.CONVERT_MEDIA;
-			convertValues: ConvertValues;
+			convertValue: ConvertValues;
 	  }> // 2
 	| Readonly<{
 			type: ReactToElectronMessageEnum.WRITE_TAG;

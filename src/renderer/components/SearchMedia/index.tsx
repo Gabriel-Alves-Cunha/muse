@@ -209,7 +209,7 @@ function SearchResults({
 		<SearchResultsWrapper>
 			<Virtuoso
 				itemContent={(_, media) => <Row media={media} />}
-				computeItemKey={(_, media) => media.id}
+				computeItemKey={(_, { id }) => id}
 				totalCount={results.length}
 				fixedItemHeight={60}
 				className="list"
@@ -217,6 +217,8 @@ function SearchResults({
 				overscan={10}
 				height={400}
 				width={250}
+				noValidate
+				async
 			/>
 		</SearchResultsWrapper>
 	);

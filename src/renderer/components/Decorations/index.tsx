@@ -25,7 +25,7 @@ export const Decorations = () => (
 	<Wrapper>
 		{/* ^ window-draggable-region */}
 		<AppIcon>
-			<img src={imageUrl.href} width="24px" height="24px" alt="Muse's logo" />
+			<img src={imageUrl.href} width={24} height={24} alt="Muse's logo" />
 		</AppIcon>
 
 		<AppName_Folder />
@@ -36,20 +36,16 @@ export const Decorations = () => (
 
 const Buttons = () => (
 	<WindowButtons>
-		<WindowButton
-			aria-label="Close window"
-			onClick={closeWindow}
-			className="close"
-		>
-			<Close size="16px" />
+		<WindowButton aria-label="Close window" onClick={closeWindow} id="close">
+			<Close size={16} />
 		</WindowButton>
 
 		<WindowButton aria-label="Toggle maximize window" onClick={toggleMaximize}>
-			<Maximize size="16px" />
+			<Maximize size={16} />
 		</WindowButton>
 
 		<WindowButton onClick={minimizeWindow} aria-label="Minize window">
-			<Minimize size="16px" />
+			<Minimize size={16} />
 		</WindowButton>
 	</WindowButtons>
 );

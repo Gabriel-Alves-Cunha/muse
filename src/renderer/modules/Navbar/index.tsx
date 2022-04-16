@@ -40,8 +40,6 @@ const ButtonsForPages = () => {
 			{pages.map(page => (
 				<ScaleUpIconButton
 					className={page === currPage ? "active" : ""}
-					onMouseDown={e => e.preventDefault()}
-					// ^ Takes focus off of button so that the `outline` css can be applied
 					onClick={() => setPage({ page })}
 					aria-label={"Go to " + page}
 					key={page}

@@ -35,7 +35,7 @@ export const WindowButton = styled("button", {
 		backgroundColor: "$button-hovered",
 	},
 
-	"&.close:hover": {
+	"&#close:hover": {
 		backgroundColor: "#e70000",
 		color: "white",
 	},
