@@ -50,7 +50,7 @@ export const Popup = styled("div", {
 	zIndex: 500,
 
 	backgroundColor: "$bg-popover",
-	boxShadow: "$small-black",
+	boxShadow: "$popup",
 
 	/* width */
 	"::-webkit-scrollbar": {

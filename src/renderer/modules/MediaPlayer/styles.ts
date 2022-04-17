@@ -19,8 +19,7 @@ export const Wrapper = styled("div", {
 	width: "100%",
 	padding,
 
-	background:
-		"linear-gradient(0deg, rgba(195,101,34,1) 0%, rgba(253,187,45,1) 100%)",
+	background: "linear-gradient(to bottom, #8e2de2, #4a00e0);",
 
 	"@media-player": {
 		display: "inline-block",
@@ -28,6 +27,10 @@ export const Wrapper = styled("div", {
 		alignSelf: "center", // for grid: column
 		width: "100vw",
 		height: 70,
+	},
+
+	"& svg": {
+		color: "$media-player-icons",
 	},
 });
 
@@ -45,22 +48,30 @@ export const Album = styled("span", {
 	fontWeight: 500,
 });
 
-export const OptionsButton = styled("button", {
-	display: "block",
+/** You need to set the width! */
+export const IconButton = styled("button", {
+	position: "relative",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-	size: 25,
 
 	backgroundColor: "transparent",
+	borderRadius: "50%",
 	cursor: "pointer",
 	border: "none",
 
-	transition: "$color",
-	color: "$deactivated-icon",
+	transition: "$bgc",
 
 	"&:hover": {
-		transition: "$color",
-		color: "$active-icon",
+		transition: "$bgc",
+		backgroundColor: "$icon-button",
+	},
+
+	// Hack to make the height the same size as the width:
+	"&:before": {
+		content: "",
+		float: "left",
+		pt: "100%", // ratio of 1:1
 	},
 });
 
@@ -69,9 +80,10 @@ export const SquareImage = styled("div", {
 	alignSelf: "center",
 
 	marginTop: "25%",
+	mx: "10%",
 
 	backgroundColor: "transparent",
-	boxShadow: "$medium-black",
+	boxShadow: "$media-player-img",
 	borderRadius: 17,
 	border: "none",
 
@@ -165,52 +177,20 @@ export const SeekerContainer = styled("div", {
 	},
 });
 
-export const ControlsWrapper = styled("div", {
+export const ControlsButtonsWrapper = styled("div", {
 	display: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",
 	mt: "10%",
-	gap: 10,
+});
 
-	"> div": {
-		display: "flex", // row
-		justifyContent: "center",
-		alignItems: "center",
+export const ControlsWrapper = styled("div", {
+	display: "inline-flex", // row
+	justifyContent: "center",
+	alignItems: "center",
+	width: "100%",
 
-		span: {
-			display: "flex", // row
-			justifyContent: "center",
-			alignItems: "center",
-
-			"&.previous-or-next": {
-				borderRadius: "50%",
-				cursor: "pointer",
-				size: 40,
-
-				transition: "$color",
-				color: "$deactivated-icon",
-
-				"&:hover": {
-					transition: "$color",
-					color: "$active-icon",
-				},
-			},
-
-			"&#play-pause": {
-				borderRadius: "50%",
-				cursor: "pointer",
-				size: 50,
-
-				transition: "$color",
-				color: "$deactivated-icon",
-
-				"&:hover": {
-					transition: "$color",
-					color: "$active-icon",
-				},
-			},
-		},
-	},
+	gap: "5%",
 });
 
 export const ButtonForRandomAndLoop = styled("button", {

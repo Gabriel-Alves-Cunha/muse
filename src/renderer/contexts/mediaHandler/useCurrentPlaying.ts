@@ -165,7 +165,33 @@ export const useCurrentPlaying = create(
 							break;
 						}
 
-						case CurrentPlayingEnum.RESUME: {
+						case CurrentPlayingEnum.TOGGLE_PLAY_PAUSE: {
+							(async () => {
+								const audio = document.getElementById(
+									"audio",
+								) as HTMLAudioElement;
+								const isPaused = audio.paused;
+
+								if (isPaused) await audio.play();
+								else {
+									const { mediaID, playlistName } = previousPlaying;
+
+									audio.pause();
+
+									set({
+										currentPlaying: {
+											currentTime: audio.currentTime,
+											playlistName,
+											mediaID,
+										},
+									});
+								}
+							})();
+
+							break;
+						}
+
+						case CurrentPlayingEnum.PLAY: {
 							(async () =>
 								await (
 									document.getElementById("audio") as HTMLAudioElement
@@ -477,16 +503,18 @@ export type currentPlayingReducer_Action =
 			type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST;
 			playlistName: Playlist["name"];
 	  }>
-	| Readonly<{ type: CurrentPlayingEnum.RESUME }>
-	| Readonly<{ type: CurrentPlayingEnum.PAUSE }>;
+	| Readonly<{ type: CurrentPlayingEnum.TOGGLE_PLAY_PAUSE }>
+	| Readonly<{ type: CurrentPlayingEnum.PAUSE }>
+	| Readonly<{ type: CurrentPlayingEnum.PLAY }>;
 
 export enum CurrentPlayingEnum {
 	PLAY_PREVIOUS_FROM_PLAYLIST,
 	PLAY_PREVIOUS_FROM_HISTORY,
 	PLAY_NEXT_FROM_PLAYLIST,
+	TOGGLE_PLAY_PAUSE,
 	PLAY_THIS_MEDIA,
-	RESUME,
 	PAUSE,
+	PLAY,
 }
 
 type CurrentPlayingAction = Readonly<{

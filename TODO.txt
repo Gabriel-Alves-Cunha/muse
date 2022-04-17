@@ -1,4 +1,4 @@
-* TODO: use alert dialog from radix-ui to delete media
+* TODO: 'no downloads at the moment' svg
 * TODO: make visualizer
 
 NOTES:

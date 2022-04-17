@@ -26,7 +26,7 @@ import {
 	SubTitle,
 	Title,
 	Info,
-	Img,
+	ImgWrapper,
 } from "./styles";
 
 const timeLabel = "Loop to find all medias by id";
@@ -67,12 +67,12 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 				className={media.id === currentPlaying.mediaID ? "active" : ""}
 			>
 				<PlayButton onClick={() => playMedia(media.id, playlistName)}>
-					<Img>
+					<ImgWrapper>
 						<ImgWithFallback
 							Fallback={<MusicNote size="1.4em" />}
 							media={media}
 						/>
-					</Img>
+					</ImgWrapper>
 
 					<Info>
 						<Title className="mytitle">{media.title}</Title>
@@ -81,7 +81,7 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 				</PlayButton>
 
 				<Dialog modal>
-					<TriggerOptions>
+					<TriggerOptions style={{ width: 30 }}>
 						<Dots />
 					</TriggerOptions>
 

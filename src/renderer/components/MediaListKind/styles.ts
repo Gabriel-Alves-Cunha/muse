@@ -2,7 +2,7 @@ import { Trigger } from "@radix-ui/react-dialog";
 
 import { styled } from "@styles/global";
 
-export const Img = styled("div", {
+export const ImgWrapper = styled("div", {
 	$$size: "45px",
 
 	display: "flex", // row
@@ -12,14 +12,9 @@ export const Img = styled("div", {
 	minWidth: "$$size",
 	height: "$$size",
 
-	boxShadow: "$small",
 	borderRadius: 13,
 	margin: "0 10px",
 	border: "none",
-
-	"&:not(:has(> img))": {
-		border: "1px solid lightgray",
-	},
 
 	"& img": {
 		objectFit: "cover",
@@ -54,24 +49,31 @@ export const SubTitle = styled("p", {
 	fontWeight: 500,
 });
 
+/** You need to set the width! */
 export const TriggerOptions = styled(Trigger, {
+	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
 	background: "transparent",
-	borderRadius: 7,
-	margin: 5,
-
-	height: 40,
-	width: 25,
-
+	borderRadius: "50%",
 	cursor: "pointer",
 	border: "none",
+	margin: 5,
+
+	transition: "$bgc",
 
 	"&:hover": {
-		transition: "$boxShadow",
-		boxShadow: "$small",
+		transition: "$bgc",
+		backgroundColor: "$icon-button",
+	},
+
+	// Hack to make the height the same size as the width:
+	"&:before": {
+		content: "",
+		float: "left",
+		pt: "100%", // ratio of 1:1
 	},
 });
 
@@ -123,7 +125,7 @@ export const RowWrapper = styled("div", {
 
 	"&:hover, &:focus, &.active": {
 		transition: "$boxShadow",
-		boxShadow: "$simple",
+		boxShadow: "$row-wrapper",
 	},
 });
 
@@ -132,7 +134,6 @@ export const PlayButton = styled("button", {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-	zIndex: 1000,
 
 	height: "100%",
 	width: "90%",

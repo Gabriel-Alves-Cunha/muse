@@ -12,23 +12,22 @@ export const Wrapper = styled(MainArea, {
 	overflowY: "hidden",
 
 	/* width */
-	"::-webkit-scrollbar": {
-		height: 5,
-		width: 5,
+	"&::-webkit-scrollbar": {
+		size: 5,
 	},
 
 	/* Track */
-	"::-webkit-scrollbar-track": {
+	"&::-webkit-scrollbar-track": {
 		background: "$scrollbar",
 	},
 
 	/* Handle */
-	"::-webkit-scrollbar-thumb": {
+	"&::-webkit-scrollbar-thumb": {
 		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
-	"::-webkit-scrollbar-thumb:hover": {
+	"&::-webkit-scrollbar-thumb:hover": {
 		background: "$scrollbar-thumb-hover",
 	},
 });
@@ -124,7 +123,6 @@ export const ResultContainer = styled("div", {
 	img: {
 		objectFit: "cover",
 		display: "flex",
-
 		size: "90%",
 
 		maxHeight: 300,
@@ -142,6 +140,7 @@ export const ResultContainer = styled("div", {
 		transition: "$transform",
 
 		"&:hover": {
+			transition: "$transform",
 			transform: "scale(1.04)",
 		},
 	},
@@ -151,7 +150,6 @@ export const ResultContainer = styled("div", {
 		textAlign: "center",
 		margin: "2rem 1rem",
 		fontSize: "1.1rem",
-
 		wordWrap: "normal",
 		color: "$text",
 	},
@@ -160,9 +158,8 @@ export const ResultContainer = styled("div", {
 		fontFamily: "$primary",
 		textAlign: "center",
 		margin: "1rem auto",
-		fontSize: "1rem",
-
 		wordWrap: "normal",
+		fontSize: "1rem",
 		color: "$text",
 	},
 });
@@ -177,15 +174,15 @@ export const Button = styled("button", {
 	fontFamily: "$primary",
 	textAlign: "center",
 	fontSize: "1rem",
+	color: "$text",
 	padding: 10,
 
 	backgroundColor: "$bg-main",
-	boxShadow: "$small",
 	cursor: "pointer",
-	color: "black",
-
 	borderRadius: 5,
 	border: "none",
+
+	transition: "$opacity",
 	opacity: 0.65,
 
 	"&:hover": {

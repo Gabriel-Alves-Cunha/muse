@@ -30,7 +30,7 @@ export const Search = styled("div", {
 	height: 30,
 
 	background: "transparent",
-	boxShadow: "$small",
+	// boxShadow: "$",
 	borderRadius: 15,
 	border: "none",
 	cursor: "text",

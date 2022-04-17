@@ -22,7 +22,7 @@ import {
 	usePlaylists,
 } from "@contexts";
 
-import { Img, Info, SubTitle, Title } from "../MediaListKind/styles";
+import { ImgWrapper, Info, SubTitle, Title } from "../MediaListKind/styles";
 import { Loading } from "@styles/appStyles";
 import {
 	SearchResultsWrapper,
@@ -186,12 +186,12 @@ function SearchResults({
 	const Row = memo(
 		({ media }: { media: Media }) => (
 			<Result onClick={() => playMedia(media.id, fromList)}>
-				<Img>
+				<ImgWrapper>
 					<ImgWithFallback
 						Fallback={<MusicNote size="1.4em" />}
 						media={media}
 					/>
-				</Img>
+				</ImgWrapper>
 
 				<Info>
 					<Title style={{ marginLeft: 5, textAlign: "left" }}>
