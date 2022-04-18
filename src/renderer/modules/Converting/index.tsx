@@ -18,13 +18,31 @@ import { usePlaylists } from "@contexts";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 
-import { Trigger, Wrapper, Popup, Title } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
+import {
+	TitleAndCancelWrapper,
+	Content,
+	Trigger,
+	Wrapper,
+	Popup,
+} from "../Downloading/styles";
+
+// const { port1: testPort } = new MessageChannel();
+// const testConvertingMedia: MediaBeingConverted = Object.freeze({
+// 	status: ProgressStatus.ACTIVE,
+// 	path: "/test/fake/path",
+// 	timeConverted: "01:20",
+// 	sizeConverted: 1000,
+// 	isConverting: true,
+// 	toExtension: "mp3",
+// 	percentage: 50,
+// 	port: testPort,
+// } as const);
 
 const useConvertList = create<
 	Readonly<{ convertList: readonly MediaBeingConverted[] }>
 >(() => ({
-	convertList: [],
+	convertList: [], // new Array(10).fill(testConvertingMedia),
 }));
 
 export const useConvertValues = create<{
@@ -108,9 +126,13 @@ const Popup_ = () => {
 
 	return (
 		<Popup>
-			{convertList.map(m => (
-				<ConvertBox mediaBeingConverted={m} key={m.path} />
-			))}
+			{convertList.length > 0 ? (
+				convertList.map(m => (
+					<ConvertBox mediaBeingConverted={m} key={m.path} />
+				))
+			) : (
+				<p>No conversions in progress!</p>
+			)}
 		</Popup>
 	);
 };
@@ -120,37 +142,29 @@ const ConvertBox = ({
 }: {
 	mediaBeingConverted: MediaBeingConverted;
 }) => (
-	<div>
-		<Title>
+	<Content>
+		<TitleAndCancelWrapper>
 			<p>
 				{getBasename(mediaBeingConverted.path) +
 					"." +
 					mediaBeingConverted.toExtension}
 			</p>
 
-			<span>
-				<Cancel
-					onClick={() =>
-						cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
-					}
-					color="#777"
-					size={13}
-				/>
-			</span>
-		</Title>
+			<button
+				onClick={() =>
+					cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
+				}
+			>
+				<Cancel size={13} />
+			</button>
+		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>
-			<table>
-				<tbody>
-					<tr>
-						<td>Seconds/size converted:</td>
-						<td>{format(mediaBeingConverted.timeConverted)}s</td>
-						<td>&nbsp;{prettyBytes(mediaBeingConverted.sizeConverted)}</td>
-					</tr>
-				</tbody>
-			</table>
+			Seconds/size converted:
+			<div>{format(mediaBeingConverted.timeConverted)}s</div>
+			<div>{prettyBytes(mediaBeingConverted.sizeConverted)}</div>
 		</ConvertionProgress>
-	</div>
+	</Content>
 );
 
 ///////////////////////////////////////////////////////////////////////////

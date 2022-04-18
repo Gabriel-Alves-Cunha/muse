@@ -42,7 +42,7 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 type UsePlaylistsActions = Readonly<{
 	searchForMediaFromList: (
 		searchTerm_: Readonly<string>,
-		fromList: DefaultLists,
+		fromList: Playlist["name"],
 	) => readonly Media[];
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
@@ -69,27 +69,26 @@ export const usePlaylists = create<UsePlaylistsActions>(
 			},
 			searchForMediaFromList: (
 				searchTerm_: Readonly<string>,
-				fromList: DefaultLists,
+				fromList: Playlist["name"],
 			) => {
 				const searchTerm = searchTerm_.toLowerCase();
 				const mainList = get().mainList;
+				const timeLabel = `The search for "${searchTerm}" from list "${fromList}" took`;
 				let results: readonly Media[];
 
+				console.time(timeLabel);
 				// Handle when fromList === MAIN_LIST
 				if (fromList === MAIN_LIST) {
-					console.time("Searching for file");
 					results = mainList.filter(m =>
 						m.title.toLowerCase().includes(searchTerm),
 					);
-					console.timeEnd("Searching for file");
 				} else {
-					console.time("Searching for file");
 					results = get()
 						.playlists.find(p => p.name === fromList)!
 						.list.map(mediaID => mainList.find(m => m.id === mediaID)!)
 						.filter(m => m.title.toLowerCase().includes(searchTerm));
-					console.timeEnd("Searching for file");
 				}
+				console.timeEnd(timeLabel);
 
 				return Object.freeze(results);
 			},
@@ -416,7 +415,7 @@ export type DefaultLists =
 	| "history";
 
 export type Playlist = Readonly<{
-	name: DefaultLists & string;
+	name: DefaultLists | string;
 	list: readonly MediaID[];
 }>;
 

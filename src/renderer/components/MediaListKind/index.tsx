@@ -10,7 +10,6 @@ import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
 import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import {
-	type DefaultLists,
 	type Playlist,
 	CurrentPlayingEnum,
 	useCurrentPlaying,
@@ -115,5 +114,5 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 }
 
 export type MediaListKindProps = Readonly<{
-	playlistName: DefaultLists;
+	playlistName: Playlist["name"];
 }>;

@@ -39,41 +39,65 @@ export const Popup = styled("div", {
 
 	transform: "translate(60%, -80%)",
 
+	maxHeight: 300,
 	minHeight: 100,
-	gap: "1rem",
 	width: 260,
+	gap: 16,
 	top: 0,
 
-	overflowY: "1auto",
+	overflowY: "scroll",
 	borderRadius: 5,
-	padding: 20,
+	padding: 10,
 	zIndex: 500,
 
-	backgroundColor: "$bg-popover",
+	background: "$bg-popover",
 	boxShadow: "$popup",
 
+	p: {
+		position: "absolute",
+		top: "50%", // position the top  edge of the element at the middle of the parent
+		left: "50%", // position the left edge of the element at the middle of the parent
+		transform: "translate(-50%, -50%)",
+
+		color: "$deactivated-icon",
+		letterSpacing: "0.03rem",
+		fontFamily: "$secondary",
+		textAlign: "center",
+		fontSize: "1.05rem",
+		fontWeight: 500,
+	},
+
 	/* width */
-	"::-webkit-scrollbar": {
+	"&::-webkit-scrollbar": {
 		size: 5,
 	},
 
 	/* Track */
-	"::-webkit-scrollbar-track": {
+	"&::-webkit-scrollbar-track": {
 		background: "$scrollbar",
 	},
 
 	/* Handle */
-	"::-webkit-scrollbar-thumb": {
+	"&::-webkit-scrollbar-thumb": {
 		background: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
-	"::-webkit-scrollbar-thumb:hover": {
+	"&::-webkit-scrollbar-thumb:hover": {
 		background: "$scrollbar-thumb-hover",
 	},
 });
 
-export const Title = styled("div", {
+export const Content = styled("div", {
+	display: "flex",
+	flexDirection: "column",
+
+	border: "1px solid lightgray",
+	borderRadius: 5,
+	padding: 10,
+});
+
+export const TitleAndCancelWrapper = styled("div", {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
@@ -82,29 +106,30 @@ export const Title = styled("div", {
 	width: "100%",
 
 	p: {
+		color: "$alternative-text",
 		fontFamily: "$primary",
-		whiteSpace: "nowrap",
-		fontSize: "0.8rem",
+		whiteSpace: "nowrap", // keep it one line
+		fontSize: "0.9rem",
 		textAlign: "left",
-		color: "$text",
 
 		overflow: "hidden",
 		width: "90%",
 	},
 
-	span: {
+	button: {
 		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
-		size: 20,
+		size: 21,
 
 		backgroundColor: "transparent",
 		borderRadius: "50%",
+		cursor: "pointer",
 		marginLeft: 10,
+		border: "none",
 
-		"&:hover": {
-			backgroundColor: "rgba(125, 125, 125, 0.3)",
-			color: "red",
+		"&:focus, &:hover": {
+			background: "$button-hovered",
 
 			"& svg": {
 				fill: "red",

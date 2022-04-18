@@ -1,6 +1,6 @@
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
-import { FcCancel as Cancel } from "react-icons/fc";
+import { GrClose as Cancel } from "react-icons/gr";
 import { toast } from "react-toastify";
 import create from "zustand";
 
@@ -12,10 +12,16 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { remove, replace } from "@utils/array";
 import { Progress } from "@components/Progress";
 
-import { Title, Trigger, Popup, Wrapper } from "./styles";
+import {
+	TitleAndCancelWrapper,
+	Content,
+	Trigger,
+	Wrapper,
+	Popup,
+} from "./styles";
 
 // const { port1: testPort } = new MessageChannel();
-// const testDownloadingMedia: DownloadingMedia = Object.freeze({
+// const testDownloadingMedia: MediaBeingDownloaded = Object.freeze({
 // 	status: ProgressStatus.ACTIVE,
 // 	url: "http://test.com",
 // 	isDownloading: true,
@@ -34,9 +40,9 @@ const defaultDownloadValues: DownloadValues = Object.freeze({
 });
 
 const useDownloadingList = create<{
-	downloadingList: readonly DownloadingMedia[];
+	downloadingList: readonly MediaBeingDownloaded[];
 }>(() => ({
-	downloadingList: [], // [testDownloadingMedia],
+	downloadingList: [], //new Array(10).fill(testDownloadingMedia),
 }));
 
 export const useDownloadValues = create<{
@@ -116,29 +122,31 @@ const Popup_ = () => {
 
 	return (
 		<Popup>
-			{downloadingList.map(download => (
-				<div key={download.url}>
-					<Title>
-						<p>{download.title}</p>
+			{downloadingList.length > 0 ? (
+				downloadingList.map(download => (
+					<Content key={download.url}>
+						<TitleAndCancelWrapper>
+							<p>{download.title}</p>
 
-						<span>
-							<Cancel
+							<button
 								onClick={() =>
 									cancelDownloadAndOrRemoveItFromList(download.url)
 								}
-								color="#777"
-								size={13}
-							/>
-						</span>
-					</Title>
+							>
+								<Cancel size={9} />
+							</button>
+						</TitleAndCancelWrapper>
 
-					<Progress
-						percent_0_to_100={download.percentage}
-						status={download.status}
-						showStatus
-					/>
-				</div>
-			))}
+						<Progress
+							percent_0_to_100={download.percentage}
+							status={download.status}
+							showStatus
+						/>
+					</Content>
+				))
+			) : (
+				<p>No downloads in progress!</p>
+			)}
 		</Popup>
 	);
 };
@@ -237,7 +245,7 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 	// Creating a new DownloadingMedia:
-	const downloadStatus: DownloadingMedia = {
+	const downloadStatus: MediaBeingDownloaded = {
 		imageURL: downloadValues.imageURL,
 		status: ProgressStatus.ACTIVE,
 		title: downloadValues.title,
@@ -254,7 +262,7 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
-	myPort.onmessage = ({ data }: { data: Partial<DownloadingMedia> }) => {
+	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
 		const { downloadingList } = getDownloadingList();
 
 		const index = downloadingList.findIndex(d => d.url === data.url);
@@ -367,7 +375,7 @@ function cancelDownloadAndOrRemoveItFromList(url: string) {
 	});
 }
 
-type DownloadingMedia = Readonly<{
+type MediaBeingDownloaded = Readonly<{
 	status: ProgressStatus;
 	isDownloading: boolean;
 	percentage: number;

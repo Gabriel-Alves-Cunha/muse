@@ -1,6 +1,7 @@
 import { styled, keyframes } from "@styles/global";
 
 export const Wrapper = styled("header", {
+	position: "relative",
 	display: "flex", // row,
 	justifyContent: "space-between !important",
 	alignItems: "center",
@@ -12,7 +13,6 @@ export const Wrapper = styled("header", {
 });
 
 export const SearchWrapper = styled("div", {
-	position: "relative",
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "flex-start",
@@ -29,32 +29,21 @@ export const Search = styled("div", {
 	maxWidth: 500,
 	height: 30,
 
+	border: "1px solid lightgray",
 	background: "transparent",
-	// boxShadow: "$",
 	borderRadius: 15,
-	border: "none",
 	cursor: "text",
 
 	color: "$text",
-
-	transition: "$opacity",
-	opacity: 0.6,
 
 	"& svg": {
 		marginLeft: 10,
 	},
 
-	"&:hover": {
-		boxShadow: "$insetSmall",
-
-		transition: "$opacity",
-		opacity: 1,
-	},
-
 	input: {
-		letterSpacing: "0.03em",
+		letterSpacing: "0.03rem",
 		boxSizing: "border-box",
-		fontFamily: "$primary",
+		fontFamily: "$secondary",
 		fontSize: "0.9rem",
 		color: "$text",
 
@@ -71,6 +60,10 @@ export const Search = styled("div", {
 		"&:hover": {
 			transition: "$opacity",
 			opacity: 1,
+		},
+
+		"&:focus-visible": {
+			outline: "none",
 		},
 	},
 });
@@ -109,7 +102,7 @@ export const Button = styled("button", {
 	border: "none",
 });
 
-export const SearchResultsWrapper = styled("section", {
+export const SearchResultsWrapper = styled("div", {
 	position: "absolute",
 	display: "flex",
 	flexDirection: "column",
@@ -173,15 +166,26 @@ export const Result = styled("button", {
 });
 
 export const NothingFound = styled("div", {
+	position: "absolute",
 	display: "flex", // row,
-	justifyContent: "flex-start",
+	justifyContent: "center",
 	alignItems: "center",
+	width: "100%",
+	height: 50,
+	top: 40,
+	left: 0, // position the left edge of the element at the middle of the parent
 
-	width: "95% !important",
-
-	backgroundColor: "$bg-main",
+	border: "1px solid lightgray",
+	background: "$bg-popover",
 	margin: "10px !important",
+	boxShadow: "$popup",
 	cursor: "pointer",
 	borderRadius: 7,
-	border: "none",
+
+	color: "$deactivated-icon",
+	letterSpacing: "0.03rem",
+	fontFamily: "$secondary",
+	textAlign: "center",
+	fontSize: "1.05rem",
+	fontWeight: 500,
 });

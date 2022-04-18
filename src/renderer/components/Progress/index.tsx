@@ -1,6 +1,6 @@
+import { RiDownloadFill as Downloading } from "react-icons/ri";
 import {
 	MdOutlineFileDownloadDone as Success,
-	MdDownloading as Downloading,
 	MdCompareArrows as Convert,
 	MdOutlineClose as Cancel,
 	MdOutlineClose as Fail,
@@ -20,6 +20,7 @@ export const Progress = ({
 			value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}
 			max="100"
 		/>
+
 		{showStatus && icon(status)}
 	</Component>
 );

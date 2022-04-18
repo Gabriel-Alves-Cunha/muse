@@ -96,7 +96,7 @@ export const darkTheme = createTheme({
 		accent: "#550c18",
 	},
 	shadows: {
-		popup: "0 0 4px 25px rgba(0, 0, 0, 0.07)",
+		popup: "0 0 8px rgba(255, 255, 255, 0.2)",
 		"media-player-img": "rgba(0, 0, 0, 0.3) 0 0 20px",
 		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
 		reflect:
@@ -129,7 +129,7 @@ export const lightTheme = createTheme({
 		accent: "#9882AC",
 	},
 	shadows: {
-		popup: "3px 3px 4px rgba(0, 0, 0, 0.07)",
+		popup: "0 0 8px rgba(0, 0, 0, 0.2)",
 		"media-player-img": "rgba(255, 255, 255, 0.3) 0 0 20px",
 		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
 		reflect:
