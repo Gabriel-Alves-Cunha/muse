@@ -67,21 +67,9 @@ const SearcherWrapper = () => {
 };
 
 const IsLoading = () => {
-	const {
-		searcher: { isLoading },
-	} = useDownloadHelper();
+	const { isLoading } = useDownloadHelper().searcher;
 
-	return (
-		<div
-			style={{
-				transform: "scale(0.3)",
-				position: "relative",
-				marginLeft: "1rem",
-			}}
-		>
-			{isLoading && <Loading />}
-		</div>
-	);
+	return <div>{isLoading && <Loading />}</div>;
 };
 
 const { getState: getDownloadHelper } = useDownloadHelper;

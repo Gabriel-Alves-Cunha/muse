@@ -69,7 +69,8 @@ export const Popup = styled("div", {
 
 	/* width */
 	"&::-webkit-scrollbar": {
-		size: 5,
+		display: "block",
+		size: 2,
 	},
 
 	/* Track */

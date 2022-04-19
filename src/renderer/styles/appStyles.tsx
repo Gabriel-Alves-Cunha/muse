@@ -65,11 +65,25 @@ const AnimStyle = styled("div", {
 	},
 });
 
-export const Loading = () => (
-	<AnimStyle>
-		<div className="lds-ripple">
-			<div></div>
-			<div></div>
-		</div>
-	</AnimStyle>
-);
+const rotating = keyframes({
+	to: {
+		transform: "rotate(1turn)",
+	},
+});
+
+export const Loading = styled("div", {
+	animation: `${rotating} 1s infinite`,
+	border: "6px solid #e5e5e5",
+	borderTopColor: "#51d4db",
+	borderRadius: "50%",
+	size: 50,
+});
+
+// export const Loading = () => (
+// 	<AnimStyle>
+// 		<div className="lds-ripple">
+// 			<div></div>
+// 			<div></div>
+// 		</div>
+// 	</AnimStyle>
+// );

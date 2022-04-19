@@ -1,36 +1,32 @@
-import { MainArea } from "@components";
 import { styled } from "@styles/global";
 
-export const MainAreaExtended = styled(MainArea, {
-	display: "inline-block",
-	justifySelf: "center", // for grid: row
-	width: "100%",
+export const BorderedButton = styled("button", {
+	display: "flex", // row
+	justifyContent: "center",
+	alignItems: "center",
 
-	div: {
-		display: "flex", // row
-		justifyContent: "center",
-		alignItems: "center",
+	marginTop: 40,
+	padding: 16,
+	width: 200,
+	height: 50,
+	mx: "auto",
 
-		marginTop: "2rem",
-		padding: "1rem",
-		width: 200,
-		height: 30,
+	letterSpacing: "0.03rem",
+	fontFamily: "$primary",
+	fontSize: "1.1rem",
+	fontWeight: 500,
+	color: "$text",
 
-		letterSpacing: "0.03rem",
-		fontFamily: "$primary",
-		fontSize: "1.1rem",
-		fontWeight: 500,
-		color: "$text",
+	border: "1px solid $accent",
+	background: "transparent",
+	cursor: "pointer",
+	borderRadius: 7,
 
-		border: "1px solid $accent",
-		cursor: "pointer",
+	"&:hover": {
+		transition: "$bgc",
+		backgroundColor: "$accent",
 
-		"&:hover": {
-			transition: "$bgc",
-			backgroundColor: "$accent",
-
-			color: "white",
-		},
+		color: "white",
 	},
 
 	input: {

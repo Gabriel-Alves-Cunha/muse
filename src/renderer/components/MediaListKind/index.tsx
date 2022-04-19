@@ -3,6 +3,8 @@ import type { Media, MediaID } from "@common/@types/typesAndEnums";
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { Dialog, Portal } from "@radix-ui/react-dialog";
+import { ErrorBoundary } from "react-error-boundary";
+
 import { memo, useMemo } from "react";
 import { Virtuoso } from "react-virtuoso";
 
@@ -22,13 +24,16 @@ import {
 	ListWrapper,
 	PlayButton,
 	RowWrapper,
-	SubTitle,
-	Title,
-	Info,
 	ImgWrapper,
+	SubTitle,
+	Button,
+	Title,
+	Alert,
+	Info,
+	Msg,
 } from "./styles";
 
-const timeLabel = "Loop to find all medias by id";
+const timeLabel = "Loop to find all medias by id took";
 const { getState } = useCurrentPlaying;
 const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 	getState().setCurrentPlaying({
@@ -37,27 +42,38 @@ const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 		mediaID,
 	});
 
-// TODO: ErrorBoundary if there is no playlist with playlistName
-export function MediaListKind({ playlistName }: MediaListKindProps) {
+export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
+	<ErrorBoundary
+		FallbackComponent={ErrorFallback}
+		onReset={() => {
+			// TODO: reset the state of your app so the error doesn't happen again
+			console.error(
+				"This should reset all app data, but it does nothing at the moment",
+			);
+		}}
+	>
+		<MediaListKind_ playlistName={playlistName} />
+	</ErrorBoundary>
+);
+
+function MediaListKind_({ playlistName }: MediaListKindProps) {
 	const { playlists, mainList } = usePlaylists();
 	const { currentPlaying } = useCurrentPlaying();
 
 	const data = useMemo(() => {
 		// Handle when playlistName === MAIN_LIST:
 		if (playlistName === MAIN_LIST) return mainList;
-		else
-			try {
-				console.time(timeLabel);
-				// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-				const data = playlists
-					.find(p => p.name === playlistName)!
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
+		else {
+			console.time(timeLabel);
+			// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+			const data = playlists
+				.find(p => p.name === playlistName)!
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
 
-				return Object.freeze(data);
-			} finally {
-				console.timeEnd(timeLabel);
-			}
+			console.timeEnd(timeLabel);
+			return Object.freeze(data);
+		}
 	}, [mainList, playlistName, playlists]);
 
 	const Row = memo(
@@ -99,8 +115,8 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 	return (
 		<ListWrapper>
 			<Virtuoso
-				itemContent={(_, media) => <Row media={media} />}
-				computeItemKey={(_, { id }) => id}
+				itemContent={(_, m) => <Row media={m} />}
+				computeItemKey={(_, m) => m.id}
 				totalCount={data.length}
 				fixedItemHeight={65}
 				className="list"
@@ -112,6 +128,27 @@ export function MediaListKind({ playlistName }: MediaListKindProps) {
 		</ListWrapper>
 	);
 }
+
+function ErrorFallback({ error, resetErrorBoundary }: ErrorBoundaryProps) {
+	return (
+		<Alert role="alert">
+			<Title>Something went wrong:</Title>
+			<SubTitle>
+				Try closing and opening the app, if the error persists, click on the
+				button below!
+			</SubTitle>
+
+			<Msg>{error.message}</Msg>
+
+			<Button onClick={resetErrorBoundary}>Reset all app data!</Button>
+		</Alert>
+	);
+}
+
+type ErrorBoundaryProps = {
+	resetErrorBoundary: () => void;
+	error: Error;
+};
 
 export type MediaListKindProps = Readonly<{
 	playlistName: Playlist["name"];

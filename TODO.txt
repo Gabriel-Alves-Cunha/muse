@@ -1,5 +1,5 @@
-* TODO: 'no downloads at the moment' svg
 * TODO: make visualizer
+* TODO: tooltips
 
 NOTES:
 

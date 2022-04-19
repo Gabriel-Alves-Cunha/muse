@@ -152,7 +152,40 @@ export const Title = styled("p", {
 	fontSize: "1rem",
 	fontWeight: 500,
 
-	whiteSpace: "nowrap", // make it one-line.
 	textOverflow: "ellipsis",
+	whiteSpace: "nowrap", // make it one-line.
 	overflow: "hidden",
+});
+
+export const Alert = styled("div", {
+	position: "absolute",
+	top: 0,
+	left: 0,
+	width: "100%",
+	height: "100%",
+
+});
+
+export const Msg = styled("pre", {
+
+	color: "$alternative-text",
+	letterSpacing: "0.03rem",
+	fontFamily: "$secondary",
+	fontSize: "0.8rem",
+	fontWeight: 500,
+});
+
+export const Button = styled("button", {
+	position: "relative",
+	display: "flex", // row
+	justifyContent: "center",
+	alignItems: "center",
+
+	height: 40,
+	width: 200,
+
+	border: "1px solid lightgray",
+	background: "transparent",
+	cursor: "pointer",
+	borderRadius: 7,
 });

@@ -41,11 +41,11 @@ export const OptionsAndAlbum = styled("div", {
 });
 
 export const Album = styled("span", {
-	color: "$alternative-text",
 	letterSpacing: "0.04rem",
-	fontFamily: "$primary",
+	fontFamily: "$secondary",
 	fontSize: "1rem",
 	fontWeight: 500,
+	color: "white",
 });
 
 /** You need to set the width! */
@@ -126,21 +126,20 @@ export const Info = styled("div", {
 		alignItems: "center",
 		width: "100%",
 
-		letterSpacing: "0.04em",
-		fontFamily: "$primary",
+		letterSpacing: "0.03rem",
+		fontFamily: "$secondary",
 		textAlign: "center",
 		flexWrap: "wrap",
+		color: "white",
 
 		overflowY: "hidden",
 
 		"&#title": {
-			fontSize: "1.15rem",
+			fontSize: "1.2rem",
 			fontWeight: 500,
-			color: "$text",
 		},
 
 		"&#subtitle": {
-			color: "$gray-text",
 			fontSize: "0.9rem",
 			fontWeight: 400,
 		},

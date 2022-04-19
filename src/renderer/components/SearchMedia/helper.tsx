@@ -2,8 +2,6 @@ import type { MediaListKindProps } from "@components/MediaListKind";
 import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
 import { FiTrash as Clean } from "react-icons/fi";
-import { Virtuoso } from "react-virtuoso";
-import { memo } from "react";
 import {
 	MdMusicNote as MusicNote,
 	MdAutorenew as Reload,
@@ -21,15 +19,8 @@ import {
 	usePlaylists,
 } from "@contexts";
 
+import { SearchResultsWrapper, NothingFound, Result, Button } from "./styles";
 import { ImgWrapper, Info, SubTitle, Title } from "../MediaListKind/styles";
-import { Loading } from "@styles/appStyles";
-import {
-	SearchResultsWrapper,
-	ReloadContainer,
-	NothingFound,
-	Result,
-	Button,
-} from "./styles";
 
 export enum SearchStatus {
 	RELOADING_ALL_MEDIAS,
@@ -108,14 +99,14 @@ export const useSearcher = create<{
 			}
 
 			case SearcherAction.SET_TO_DEFAULT_STATE: {
-				set({
-					searcher: defaultSearcher,
-				});
+				set({ searcher: defaultSearcher });
 				break;
 			}
 
-			default:
+			default: {
 				assertUnreachable(action);
+				break;
+			}
 		}
 	},
 }));
@@ -154,47 +145,25 @@ const playMedia = (mediaID: MediaID) =>
 		mediaID,
 	});
 
-function SearchResults({ results }: { results: readonly Media[] }) {
-	const Row = memo(
-		({ media }: { media: Media }) => (
-			<Result onClick={() => playMedia(media.id)}>
-				<ImgWrapper>
-					<ImgWithFallback
-						Fallback={<MusicNote size="1.4em" />}
-						media={media}
-					/>
-				</ImgWrapper>
+const Row = ({ media }: { media: Media }) => (
+	<Result onClick={() => playMedia(media.id)}>
+		<ImgWrapper>
+			<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+		</ImgWrapper>
 
-				<Info>
-					<Title style={{ marginLeft: 5, textAlign: "left" }}>
-						{media.title}
-					</Title>
-					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-				</Info>
-			</Result>
-		),
-		(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id,
-	);
-	Row.displayName = "Row";
-
-	return (
-		<SearchResultsWrapper>
-			<Virtuoso
-				itemContent={(_, media) => <Row media={media} />}
-				computeItemKey={(_, { id }) => id}
-				totalCount={results.length}
-				fixedItemHeight={60}
-				className="list"
-				data={results}
-				overscan={10}
-				height={400}
-				width={250}
-				noValidate
-				async
-			/>
-		</SearchResultsWrapper>
-	);
-}
+		<Info>
+			<Title style={{ marginLeft: 5, textAlign: "left" }}>{media.title}</Title>
+			<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+		</Info>
+	</Result>
+);
+const SearchResults = ({ results }: { results: readonly Media[] }) => (
+	<SearchResultsWrapper>
+		{results.map(m => (
+			<Row media={m} key={m.id} />
+		))}
+	</SearchResultsWrapper>
+);
 
 const searchResultJSX: Map<SearchStatus, () => JSX.Element> = new Map();
 searchResultJSX.set(SearchStatus.NOTHING_FOUND, () => (
@@ -214,20 +183,21 @@ export { searchResultJSX };
 
 const buttonToTheSideJSX: Map<ButtonToTheSide, () => JSX.Element> = new Map();
 buttonToTheSideJSX.set(ButtonToTheSide.RELOAD_BUTTON, () => (
-	<ReloadContainer onClick={reload}>
-		{getSearcherFunctions().searcher.searchStatus ===
-		SearchStatus.RELOADING_ALL_MEDIAS ? (
-			<div style={{ transform: "scale(0.3)", animation: "" }}>
-				<Loading />
-			</div>
-		) : (
-			<Reload size={17} color="#ccc" />
-		)}
-	</ReloadContainer>
+	<Button onClick={reload} className="reload">
+		<Reload
+			className={
+				getSearcherFunctions().searcher.searchStatus ===
+				SearchStatus.RELOADING_ALL_MEDIAS
+					? "reloading"
+					: ""
+			}
+			size={17}
+		/>
+	</Button>
 ));
 buttonToTheSideJSX.set(ButtonToTheSide.CLEAN, () => (
 	<Button>
-		<Clean size={17} onClick={cleanHistory} />
+		<Clean size={15} onClick={cleanHistory} />
 	</Button>
 ));
 buttonToTheSideJSX.set(ButtonToTheSide.NOTHING, () => <></>);

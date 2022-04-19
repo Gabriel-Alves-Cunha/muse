@@ -61,15 +61,22 @@ export const Searcher = styled("button", {
 	width: "80%",
 	height: 40,
 
-	border: "1px solid $text",
-	borderRadius: 10,
+	border: "1px solid lightgray",
+	borderRadius: 20,
 	cursor: "text",
+
+	transition: "$opacity",
+	opacity: 0.8,
+
+	"&:hover": {
+		opacity: 1,
+	},
 
 	"& svg": {
 		transition: "$opacity",
-		opacity: 0.5,
+		opacity: 0.8,
 
-		marginLeft: "10px",
+		marginLeft: 10,
 		color: "$text",
 	},
 
@@ -77,18 +84,9 @@ export const Searcher = styled("button", {
 		opacity: 1,
 	},
 
-	"&::after": {
-		transition: "$opacity",
-		opacity: 0.5,
-	},
-
-	"&:hover::after": {
-		opacity: 1,
-	},
-
 	input: {
-		letterSpacing: "0.03em",
-		fontFamily: "$primary",
+		letterSpacing: "0.03rem",
+		fontFamily: "$secondary",
 		fontSize: "0.9rem",
 
 		boxSizing: "border-box",
@@ -99,7 +97,7 @@ export const Searcher = styled("button", {
 		border: "none",
 
 		color: "$text",
-		opacity: 0.5,
+		opacity: 0.8,
 		px: 10,
 
 		"&::placeholder": {

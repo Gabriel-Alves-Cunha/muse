@@ -89,6 +89,7 @@ export const darkTheme = createTheme({
 		"bg-popover": "white",
 		"bg-main": "#191716",
 
+		"icon-button-2": "#88888880",
 		"button-hovered": "#dbdadc",
 		"icon-button": "#dbdadc80",
 
@@ -122,6 +123,7 @@ export const lightTheme = createTheme({
 		"bg-popover": "white",
 		"bg-main": "#f9f6f5",
 
+		"icon-button-2": "#88888830",
 		"button-hovered": "#dbdadc",
 		"icon-button": "#E5E8EC40",
 
@@ -147,6 +149,12 @@ export const GlobalCSS = globalCss({
 
 		"&:focus": {
 			outline: "none !important",
+		},
+	},
+
+	input: {
+		"&:focus-visible": {
+			outline: "none",
 		},
 	},
 

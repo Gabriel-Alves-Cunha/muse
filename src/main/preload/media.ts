@@ -4,10 +4,11 @@ import type { Media, Path } from "@common/@types/typesAndEnums";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "stream";
 
-import { createReadStream, existsSync } from "fs";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
 import { rename as renameFile } from "fs/promises";
+import { createReadStream } from "fs";
 import { dirname, join } from "path";
+import { pathExists } from "fs-extra";
 import { get } from "https";
 import {
 	File as MediaFile,
@@ -25,6 +26,7 @@ import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
+import { deleteFile } from "./file";
 import { hash } from "@common/hash";
 import { dirs } from "../utils";
 import { dbg } from "@common/utils";
@@ -180,7 +182,7 @@ export function makeStream({
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.on("destroy", () => {
+		.on("destroy", async () => {
 			console.log(
 				"%cDestroy was called on readStream!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
@@ -202,7 +204,7 @@ export function makeStream({
 			currentDownloads.delete(url);
 			dbg({ currentDownloads });
 
-			console.log("Was file renamed?", existsSync(saveSite));
+			console.log("Was file renamed?", await pathExists(saveSite));
 		})
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
@@ -251,7 +253,7 @@ export function makeStream({
 
 			currentDownloads.delete(url);
 		})
-		.on("error", error => {
+		.on("error", async error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
 
 			// To react
@@ -266,7 +268,7 @@ export function makeStream({
 
 			currentDownloads.delete(url);
 
-			console.log("Was file renamed?", existsSync(saveSite));
+			console.log("Was file renamed?", await pathExists(saveSite));
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
@@ -341,12 +343,14 @@ export function convertToAudio({
 				// }
 			},
 		)
-		.on("error", error => {
-			// TODO: see if it's necessary to delete the file if it's not converted successfully!
+		.on("error", async error => {
 			console.error(
 				`Error converting file: "${titleWithExtension}"!\n\n`,
 				error,
 			);
+
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
 
 			// To react:
 			electronPort.postMessage({
@@ -391,14 +395,16 @@ export function convertToAudio({
 
 			mediasConverting.delete(mediaPath);
 
-			console.log("Was file renamed?", existsSync(saveSite));
+			console.log("Was file renamed?", await pathExists(saveSite));
 		})
-		.on("destroy", () => {
-			// TODO: see if it's necessary to delete the file if it's not converted successfully!
+		.on("destroy", async () => {
 			console.log(
 				"%cDestroy was called on readStream for converter!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
+
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
 
 			electronPort.postMessage({
 				status: ProgressStatus.CANCEL,
@@ -416,7 +422,7 @@ export function convertToAudio({
 			mediasConverting.delete(mediaPath);
 			dbg({ mediasConverting });
 
-			console.log("Was file renamed?", existsSync(saveSite));
+			console.log("Was file renamed?", await pathExists(saveSite));
 		});
 
 	mediasConverting.set(mediaPath, readStream);
@@ -609,8 +615,8 @@ export async function writeTags(
 					mediaPath,
 				});
 			} finally {
-				console.log("Was file renamed?", existsSync(fileNewPath));
-				console.log("Does old file remains?", existsSync(mediaPath));
+				console.log("Was file renamed?", await pathExists(fileNewPath));
+				console.log("Does old file remains?", await pathExists(mediaPath));
 			}
 		} else if (data.isNewMedia) {
 			// Add the new media:

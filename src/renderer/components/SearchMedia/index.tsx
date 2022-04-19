@@ -1,6 +1,6 @@
 import type { MediaListKindProps } from "../MediaListKind";
 
-import { FiSearch as SearchIcon } from "react-icons/fi";
+import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect, useRef } from "react";
 
 import { useOnClickOutside } from "@hooks";
@@ -23,10 +23,8 @@ const { getState: getPlaylistsFunctions } = usePlaylists;
 const { searchForMediaFromList } = getPlaylistsFunctions();
 
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
+	const { searchStatus, searchTerm } = useSearcher().searcher;
 	const searcherRef = useRef<HTMLHeadingElement>(null);
-	const {
-		searcher: { searchStatus, searchTerm },
-	} = useSearcher();
 
 	useOnClickOutside(searcherRef, () =>
 		setSearcher({ type: SearcherAction.SET_TO_DEFAULT_STATE }),
@@ -38,12 +36,12 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	}, []);
 
 	useEffect(() => {
-		if (searchTerm.length < 2) return;
-
 		setSearcher({
 			type: SearcherAction.SET_SEARCH_STATUS,
 			value: SearchStatus.SEARCHING,
 		});
+
+		if (searchTerm.length < 2) return;
 
 		// TODO: use useTransition instead.
 		const searchTimeout = setTimeout(() => {
