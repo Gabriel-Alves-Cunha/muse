@@ -8,13 +8,13 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
+import { searchLocalComputerForMedias } from "@contexts";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
 import { useOnClickOutside } from "@hooks";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
-import { usePlaylists } from "@contexts";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 
@@ -54,7 +54,7 @@ export const useConvertValues = create<{
 // This prevents an infinite loop:
 const constRefToEmptyArray = Object.freeze([]);
 
-const { setState: setConvertValues } = useConvertValues;
+export const { setState: setConvertValues } = useConvertValues;
 
 export function Converting() {
 	const [showPopup, setShowPopup] = useState(false);
@@ -74,7 +74,6 @@ export function Converting() {
 					sendMsgToBackend(
 						{
 							type: ReactToElectronMessageEnum.CONVERT_MEDIA,
-							convertValue,
 						},
 						electronPort,
 					);
@@ -172,7 +171,6 @@ const ConvertBox = ({
 ///////////////////////////////////////////////////////////////////////////
 
 const { setState: setConvertList, getState: getConvertList } = useConvertList;
-const { getState: getPlaylistsFunctions } = usePlaylists;
 
 function createNewConvert(convertValues: ConvertValues): MessagePort {
 	const { convertList } = getConvertList();
@@ -269,8 +267,7 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 					draggable: true,
 				});
 
-				(async () =>
-					await getPlaylistsFunctions().searchLocalComputerForMedias(true))();
+				(async () => await searchLocalComputerForMedias(true))();
 				break;
 			}
 

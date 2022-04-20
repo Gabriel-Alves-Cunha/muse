@@ -3,17 +3,17 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { useConvertValues } from "@modules/Converting";
+import { setConvertValues } from "@modules/Converting";
 import { MainArea } from "@components";
 
 import { BorderedButton } from "./styles";
 
-const { setState: setConvertValues } = useConvertValues;
-
 export function Convert() {
 	const [selectedExtensionToBeConvertedTo] =
 		useState<ExtensionToBeConvertedTo>("mp3");
-	const [selectedMediasPath, setSelectedMediasPath] = useState<readonly Path[]>([]);
+	const [selectedMediasPath, setSelectedMediasPath] = useState<readonly Path[]>(
+		[],
+	);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	function handleSelectedFiles(e: ChangeEvent<HTMLInputElement>) {

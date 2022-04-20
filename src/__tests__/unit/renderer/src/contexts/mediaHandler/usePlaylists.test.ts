@@ -12,12 +12,15 @@ import { Media } from "@common/@types/typesAndEnums";
 import { hash } from "@common/hash";
 
 import {
+	searchForMediaFromList,
 	CurrentPlayingEnum,
-	useCurrentPlaying,
+	setCurrentPlaying,
+	getCurrentPlaying,
 	PlaylistActions,
 	PlaylistEnum,
-	usePlaylists,
 	DefaultLists,
+	setPlaylists,
+	getPlaylists,
 } from "@contexts";
 import {
 	// SORTED_BY_DATE,
@@ -47,22 +50,19 @@ for (let index = 0; index < numberOfMedias; ++index) {
 }
 Object.freeze(testList);
 
-const { getState: getCurrentPlaying } = useCurrentPlaying;
-const { getState: getPlaylistsFuncs } = usePlaylists;
-
-const getPlaylist = (listName: DefaultLists) =>
-	getPlaylistsFuncs().playlists.find(p => p.name === listName)!;
+const getPlaylist = (listName: DefaultLists | string) =>
+	getPlaylists().playlists.find(p => p.name === listName)!;
 
 // Tests:
 describe("Testing list updates", () => {
 	it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
-		getPlaylistsFuncs().setPlaylists({
+		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
 			type: PlaylistEnum.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 
-		const currMainList = getPlaylistsFuncs().mainList;
+		const currMainList = getPlaylists().mainList;
 
 		expect(currMainList).toEqual(testList);
 	});
@@ -71,14 +71,14 @@ describe("Testing list updates", () => {
 describe("Testing functions that depend on `getPlaylistsFuncs().playlists` working correctly. In other words: testing the `getPlaylistsFuncs().setPlaylists()` fn", () => {
 	beforeEach(() => {
 		// (PlaylistActions.REPLACE_ENTIRE_LIST) Set the mediaList to our test list:
-		getPlaylistsFuncs().setPlaylists({
+		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
 			type: PlaylistEnum.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 
 		// (PlaylistActions.CLEAN) Clean history:
-		getPlaylistsFuncs().setPlaylists({
+		setPlaylists({
 			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
 		});
@@ -88,7 +88,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		}
 
 		// (PlaylistActions.CLEAN) Clean favorites:
-		getPlaylistsFuncs().setPlaylists({
+		setPlaylists({
 			type: PlaylistEnum.UPDATE_FAVORITES,
 			whatToDo: PlaylistActions.CLEAN,
 		});
@@ -98,9 +98,9 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		}
 
 		// Set currentPlaying to first media:
-		const currMainList = getPlaylistsFuncs().mainList;
+		const currMainList = getPlaylists().mainList;
 		const firstMedia = currMainList[0]!;
-		getCurrentPlaying().setCurrentPlaying({
+		setCurrentPlaying({
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 			playlistName: MAIN_LIST,
 			mediaID: firstMedia.id,
@@ -113,10 +113,10 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	});
 
 	const playNextMediaFn = () => {
-		const currMainList = getPlaylistsFuncs().mainList;
+		const currMainList = getPlaylists().mainList;
 
 		testList.forEach((_, index) => {
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
 				playlistName: MAIN_LIST,
 			});
@@ -139,10 +139,10 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	it("should play the next media", playNextMediaFn);
 
 	it("should play the previous media", () => {
-		const currMainList = getPlaylistsFuncs().mainList;
+		const currMainList = getPlaylists().mainList;
 
 		for (let i = numberOfMedias; i === 0; --i) {
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
 				playlistName: MAIN_LIST,
 			});
@@ -155,7 +155,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	});
 
 	it("should play a chosen media", () => {
-		const currMainList = getPlaylistsFuncs().mainList;
+		const currMainList = getPlaylists().mainList;
 		const randomMediaIndexes = testList.map(() =>
 			getRandomInt(0, numberOfMedias),
 		);
@@ -163,7 +163,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		testList.forEach((_, index) => {
 			const randomMediaID = currMainList[randomMediaIndexes[index]!]!.id;
 
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
 				mediaID: randomMediaID,
@@ -187,9 +187,9 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		});
 
 		it("(PlaylistActions.ADD_ONE_MEDIA) should add one to the history list", () => {
-			const mediaIdToAdd = getPlaylistsFuncs().mainList[1]!.id;
+			const mediaIdToAdd = getPlaylists().mainList[1]!.id;
 
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_HISTORY,
 				mediaID: mediaIdToAdd,
@@ -207,9 +207,9 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 	describe("Testing PlaylistEnum.UPDATE_FAVORITES", () => {
 		const addOneMediaToFavorites = () => {
-			const mediaID = getPlaylistsFuncs().mainList[1]!.id;
+			const mediaID = getPlaylists().mainList[1]!.id;
 
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_FAVORITES,
 				mediaID,
@@ -233,7 +233,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 			expect(prevFavorites.length).toBe(1);
 
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_FAVORITES,
 				mediaID: prevFavorites[0]!,
@@ -247,13 +247,13 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 	describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		it("(!PlaylistActions.ADD_ONE_MEDIA) should NOT add one media to mediaList because there already exists one with the same path", () => {
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: testList[0]!,
 			});
 
-			const newMainList = getPlaylistsFuncs().mainList;
+			const newMainList = getPlaylists().mainList;
 
 			expect(newMainList).toHaveLength(numberOfMedias);
 		});
@@ -270,29 +270,29 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 				title,
 			};
 
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: newMedia,
 			});
 
-			const newMainList = getPlaylistsFuncs().mainList;
+			const newMainList = getPlaylists().mainList;
 
 			expect(newMainList).toHaveLength(numberOfMedias + 1);
 			expect(newMainList.slice(-1)[0]).toEqual(newMedia);
 		});
 
 		it("(PlaylistActions.REMOVE_ONE_MEDIA) should remove one media to mediaList", () => {
-			const prevMainList = getPlaylistsFuncs().mainList;
+			const prevMainList = getPlaylists().mainList;
 			const mediaToBeDeleted = prevMainList[15]!;
 
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				mediaID: mediaToBeDeleted.id,
 			});
 
-			const newMainList = getPlaylistsFuncs().mainList;
+			const newMainList = getPlaylists().mainList;
 
 			expect(newMainList).toHaveLength(numberOfMedias - 1);
 
@@ -301,18 +301,18 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		});
 
 		it("(PlaylistActions.CLEAN) should clean mediaList", () => {
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				whatToDo: PlaylistActions.CLEAN,
 			});
 
-			const newMainList = getPlaylistsFuncs().mainList;
+			const newMainList = getPlaylists().mainList;
 
 			expect(newMainList).toHaveLength(0);
 		});
 
 		it("(PlaylistActions.REFRESH_ONE_MEDIA_BY_ID) should refresh one media (the caller should not update the media id, it will be updated, if needed, when calling PlaylistActions.REFRESH_ONE_MEDIA_BY_ID).", () => {
-			const prevMainList = getPlaylistsFuncs().mainList;
+			const prevMainList = getPlaylists().mainList;
 			const title = "I'm an updated title";
 			const size = "1.0 MB" as const;
 			const index = 15;
@@ -322,13 +322,13 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 				size,
 			};
 
-			getPlaylistsFuncs().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: mediaToBeRefreshed,
 			});
 
-			const newMainList = getPlaylistsFuncs().mainList;
+			const newMainList = getPlaylists().mainList;
 			const refreshedMedia = newMainList[index];
 
 			expect(refreshedMedia).toHaveProperty("title", title);
@@ -340,7 +340,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 describe("Testing the other fns of getPlaylistsFuncs()", () => {
 	it("(getPlaylistsFuncs().searchForMedia()) should return a searched media", () => {
-		const results = getPlaylistsFuncs().searchForMediaFromList("es", MAIN_LIST);
+		const results = searchForMediaFromList("es", MAIN_LIST);
 
 		expect(results.length).toBeGreaterThan(0);
 	});

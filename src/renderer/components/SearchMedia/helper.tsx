@@ -12,11 +12,12 @@ import { assertUnreachable } from "@utils/utils";
 import { ImgWithFallback } from "@components";
 import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import {
+	searchLocalComputerForMedias,
 	CurrentPlayingEnum,
-	useCurrentPlaying,
+	setCurrentPlaying,
 	PlaylistActions,
 	PlaylistEnum,
-	usePlaylists,
+	setPlaylists,
 } from "@contexts";
 
 import { SearchResultsWrapper, NothingFound, Result, Button } from "./styles";
@@ -111,11 +112,8 @@ export const useSearcher = create<{
 	},
 }));
 
-const { getState: getSearcherFunctions } = useSearcher;
-const { setSearcher } = getSearcherFunctions();
-
-const { getState: getPlaylistsFunctions } = usePlaylists;
-const { setPlaylists, searchLocalComputerForMedias } = getPlaylistsFunctions();
+export const { getState: getSearcherFunctions } = useSearcher;
+export const { setSearcher } = getSearcherFunctions();
 
 export const cleanHistory = () =>
 	setPlaylists({
@@ -137,9 +135,8 @@ export const reload = async () => {
 	});
 };
 
-const { getState: getCurrentPlaying } = useCurrentPlaying;
 const playMedia = (mediaID: MediaID) =>
-	getCurrentPlaying().setCurrentPlaying({
+	setCurrentPlaying({
 		playlistName: getSearcherFunctions().searcher.fromList,
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		mediaID,

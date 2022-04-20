@@ -1,13 +1,18 @@
 import type { HandleConversion, HandleDownload } from "./preload/media";
-import type { MsgObjectReactToElectron } from "@common/@types/electron-window";
 
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
+import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
 import { homeDir, dirs } from "./utils";
 import { dbg } from "@common/utils";
+import {
+	type MsgWithSource,
+	sendMsgToClient,
+	reactSource,
+} from "@common/crossCommunication";
 import {
 	handleCreateOrCancelDownload,
 	handleCreateOrCancelConvert,
@@ -22,16 +27,15 @@ import {
 	readdir,
 } from "./preload/file";
 import {
-	sendNotificationToElectronIpcMainProcess,
-	receiveMsgFromElectronWindow,
-} from "./preload/notificationApi";
+	type MsgObjectReactToElectron,
+	ElectronToReactMessageEnum,
+} from "@common/@types/electron-window";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("electron", {
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess,
-		receiveMsgFromElectronWindow,
 	},
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory,
@@ -51,14 +55,27 @@ contextBridge.exposeInMainWorld("electron", {
 	},
 });
 
-window.onmessage = async (event: MessageEvent<MsgObjectReactToElectron>) => {
-	// @ts-ignore event is actually `event: MessageEvent<MsgObject | any>`,
-	// but I'm doing this to have type safety on the switch statement.
-	if (event.data?.source?.includes("react-devtools")) return;
+// Relay messages from the main process to the renderer process:
+ipcRenderer.on(
+	ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+	(_event, downloadValues) =>
+		sendMsgToClient({
+			type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+			downloadValues,
+		}),
+);
+
+window.onmessage = async (
+	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>,
+) => {
+	if (event.data.source !== reactSource) return;
+
+	dbg("Received message from React:", event.data);
 
 	const electronPort = event.ports[0];
+	const msg = event.data.msg;
 
-	switch (event.data.type) {
+	switch (msg.type) {
 		case ReactToElectronMessageEnum.DOWNLOAD_MEDIA: {
 			if (!electronPort) {
 				console.error("There should be a electronPort to download media!");
@@ -68,7 +85,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectReactToElectron>) => {
 			electronPort.onmessage = ({
 				data,
 			}: {
-				data: HandleDownload & { destroy: boolean };
+				data: HandleDownload & { destroy?: boolean };
 			}) => handleCreateOrCancelDownload({ ...data, electronPort });
 
 			electronPort.addEventListener("close", () =>
@@ -89,7 +106,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectReactToElectron>) => {
 			electronPort.onmessage = ({
 				data,
 			}: {
-				data: HandleConversion & { destroy: boolean };
+				data: HandleConversion & { destroy?: boolean };
 			}) => handleCreateOrCancelConvert({ ...data, electronPort });
 
 			electronPort.addEventListener("close", () =>
@@ -98,18 +115,19 @@ window.onmessage = async (event: MessageEvent<MsgObjectReactToElectron>) => {
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
+
 			break;
 		} // 2
 
 		case ReactToElectronMessageEnum.WRITE_TAG: {
-			const { mediaPath, whatToChange, newValue } = event.data.params;
+			const { mediaPath, whatToChange, newValue } = msg.params;
 
 			const data: Parameters<typeof writeTags>[1] = {
 				[whatToChange]: newValue,
 			};
 
-			dbg("On 'preload.ts' at window.onmessage:", { event }, "\n\n\n", {
-				params: event.data.params,
+			dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", {
+				params: msg.params,
 				data,
 			});
 
@@ -118,20 +136,20 @@ window.onmessage = async (event: MessageEvent<MsgObjectReactToElectron>) => {
 		} // 3
 
 		case ReactToElectronMessageEnum.ERROR: {
-			console.error("@TODO: ERROR", event.data.error);
+			console.error("@TODO: ERROR", msg.error);
 
 			break;
 		} // 4
 
 		default: {
-			assertUnreachable(event.data);
-
 			console.error(
 				`There is no method to handle this event.data: (${typeof event.data}) '`,
 				event.data,
 				"'\nEvent =",
 				event,
 			);
+
+			assertUnreachable(msg);
 			break;
 		}
 	}

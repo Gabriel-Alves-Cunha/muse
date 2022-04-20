@@ -13,19 +13,18 @@ import { MAIN_LIST, HISTORY } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Media } from "@common/@types/typesAndEnums";
 import {
 	CurrentPlayingEnum,
-	useCurrentPlaying,
+	setCurrentPlaying,
+	getCurrentPlaying,
 	PlaylistActions,
 	CurrentPlaying,
-	usePlaylists,
 	DefaultLists,
 	PlaylistEnum,
+	setPlaylists,
+	getPlaylists,
 } from "@contexts";
 
-const { getState: getCurrentPlaying } = useCurrentPlaying;
-const { getState: getPlaylistsFuncs } = usePlaylists;
-
 const getPlaylist = (listName: DefaultLists) =>
-	getPlaylistsFuncs().playlists.find(p => p.name === listName)!;
+	getPlaylists().playlists.find(p => p.name === listName)!;
 
 // Make a test list full of fake medias:
 const testList: Media[] = [];
@@ -47,17 +46,17 @@ Object.freeze(testList);
 
 describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {
-		getPlaylistsFuncs().setPlaylists({
+		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
 			type: PlaylistEnum.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 		{
-			const mainList = getPlaylistsFuncs().mainList;
+			const mainList = getPlaylists().mainList;
 			expect(mainList).toEqual(testList);
 		}
 
-		getPlaylistsFuncs().setPlaylists({
+		setPlaylists({
 			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
 		});
@@ -69,7 +68,7 @@ describe("Testing useCurrentPlaying", () => {
 
 	it("(CurrentPlayingEnum.PLAY_THIS_MEDIA) should set the currentPlaying media", () => {
 		testList.forEach(media => {
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
 				mediaID: media.id,
@@ -93,7 +92,7 @@ describe("Testing useCurrentPlaying", () => {
 			const nextMedia = testList[index + 1]!;
 
 			// Play a media to make sure history is not empty:
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
 				mediaID: media.id,
@@ -103,7 +102,7 @@ describe("Testing useCurrentPlaying", () => {
 			expect(updatedHistory_1[0]).toEqual(media.id);
 
 			// Play the next media:
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
 				mediaID: nextMedia.id,
@@ -113,7 +112,7 @@ describe("Testing useCurrentPlaying", () => {
 			expect(updatedHistory_2[0]).toEqual(nextMedia.id);
 
 			// Play previous media:
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY,
 				playlistName: MAIN_LIST,
 			});
@@ -133,13 +132,13 @@ describe("Testing useCurrentPlaying", () => {
 		testList.forEach((media, index) => {
 			if (index === 29) return;
 
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
 				mediaID: media.id,
 			});
 
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
 				playlistName: MAIN_LIST,
 			});
@@ -159,13 +158,13 @@ describe("Testing useCurrentPlaying", () => {
 		testList.forEach((media, index) => {
 			if (index === 29) return;
 
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
 				mediaID: media.id,
 			});
 
-			getCurrentPlaying().setCurrentPlaying({
+			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
 				playlistName: MAIN_LIST,
 			});

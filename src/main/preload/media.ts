@@ -155,7 +155,7 @@ export function handleCreateOrCancelDownload({
 	title,
 	url,
 }: HandleDownload & {
-	destroy: Readonly<boolean>;
+	destroy?: Readonly<boolean>;
 }) {
 	if (!currentDownloads.has(url))
 		makeStream({ imageURL, url, title, electronPort });
@@ -170,6 +170,8 @@ export function makeStream({
 	title,
 	url,
 }: HandleDownload) {
+	dbg(`Creating stream for "${title}" to download.`);
+
 	const extension: AllowedMedias = "mp3";
 	const titleWithExtension = sanitize(`${title}.${extension}`);
 	const saveSite = join(dirs.music, titleWithExtension);
@@ -249,7 +251,11 @@ export function makeStream({
 			clearInterval(interval!);
 
 			console.log("Going to writeTags...");
-			await writeTags(saveSite, { imageURL, isNewMedia: true });
+			await writeTags(saveSite, {
+				downloadImg: true,
+				isNewMedia: true,
+				imageURL,
+			});
 
 			currentDownloads.delete(url);
 		})
@@ -288,7 +294,7 @@ export function handleCreateOrCancelConvert({
 	toExtension,
 	mediaPath,
 	destroy,
-}: HandleConversion & { destroy: boolean }) {
+}: HandleConversion & { destroy?: boolean }) {
 	if (!mediasConverting.has(mediaPath))
 		convertToAudio({ mediaPath, toExtension, electronPort });
 	else if (destroy)
@@ -301,6 +307,8 @@ export function convertToAudio({
 	toExtension,
 	mediaPath,
 }: HandleConversion) {
+	dbg(`Creating stream for "${mediaPath}" to convert.`);
+
 	const titleWithExtension = sanitize(
 		`${getBasename(mediaPath)}.${toExtension}`,
 	);
@@ -443,11 +451,13 @@ export async function writeTags(
 			switch (tag) {
 				case "imageURL": {
 					if (data.imageURL === "erase img") {
+						dbg("Erasing picture...");
 						// if imageURL === 'erase img' => erase img so we don't keep
 						// getting an error on the browser.
 						file.tag.pictures = [];
 					} else if (data.downloadImg) {
 						dbg("Downloading picture...");
+
 						try {
 							const imgAsString: ImgString = await getThumbnail(
 								data.imageURL as string,
@@ -481,7 +491,8 @@ export async function writeTags(
 							);
 						}
 					} else {
-						// Assume we received an img as a base64 string like: `data:${string};base64,${string}`.
+						// Here, assume we received an img as a base64 string
+						// like: `data:${string};base64,${string}`.
 						if (
 							data.imageURL?.includes("data:image/", 0) &&
 							data.imageURL?.includes("base64,")
@@ -508,7 +519,7 @@ export async function writeTags(
 							file.tag.pictures = [picture];
 
 							console.log({ fileTagPictures: file.tag.pictures, picture });
-						} else console.error("Invalid imageURL! imageURL =", data.imageURL);
+						} else console.error(`Invalid imgAsString = "${data.imageURL}"!`);
 					}
 
 					break;

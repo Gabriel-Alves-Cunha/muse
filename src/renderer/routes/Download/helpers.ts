@@ -2,13 +2,11 @@ import type { ChangeEvent } from "react";
 
 import create from "zustand";
 
-import { useDownloadValues } from "@modules/Downloading";
+import { setDownloadValues } from "@modules/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
 
 const { getBasicInfo } = electron.media;
-
-const { setState: setDownloadValues } = useDownloadValues;
 
 export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 	setSearchTerm: ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
@@ -84,6 +82,10 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		}
 	},
 }));
+
+export const { getState: getDownloadHelper, setState: setDowloadHelper } =
+	useDownloadHelper;
+export const { download, search, setSearchTerm } = getDownloadHelper();
 
 type DownloadHelper = Readonly<{
 	setSearchTerm(e: ChangeEvent<HTMLInputElement>): void;

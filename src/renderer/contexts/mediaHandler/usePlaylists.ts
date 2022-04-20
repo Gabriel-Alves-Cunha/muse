@@ -26,7 +26,7 @@ import {
 
 const {
 	media: { transformPathsToMedias },
-	fs: { deleteFile: rm },
+	fs: { deleteFile },
 } = electron;
 
 const playlistsKey = `${keyPrefix}playlists` as const;
@@ -42,13 +42,13 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 type UsePlaylistsActions = Readonly<{
 	searchForMediaFromList: (
 		searchTerm_: Readonly<string>,
-		fromList: Playlist["name"],
+		fromList: Readonly<Playlist["name"]>,
 	) => readonly Media[];
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
 	updatePlaylists: (playlists: readonly Playlist[]) => void;
 	createPlaylist: (playlists: readonly Playlist[]) => void;
-	deleteMedia: (media: Readonly<Media>) => Promise<void>;
+	deleteMedia: (media: Media) => Promise<void>;
 	playlists: readonly Playlist[];
 	mainList: readonly Media[];
 }>;
@@ -59,7 +59,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 			mainList: constRefToEmptyArray,
 			playlists: defaultPlaylists,
 			deleteMedia: async ({ path, id }: Media) => {
-				await rm(path);
+				await deleteFile(path);
 
 				get().setPlaylists({
 					whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
@@ -406,6 +406,15 @@ export const usePlaylists = create<UsePlaylistsActions>(
 		},
 	),
 );
+
+export const { getState: getPlaylists } = usePlaylists;
+export const {
+	searchLocalComputerForMedias,
+	searchForMediaFromList,
+	createPlaylist,
+	setPlaylists,
+	deleteMedia,
+} = getPlaylists();
 
 export type DefaultLists =
 	| "sorted by date"

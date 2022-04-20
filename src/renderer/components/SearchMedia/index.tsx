@@ -3,24 +3,20 @@ import type { MediaListKindProps } from "../MediaListKind";
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect, useRef } from "react";
 
+import { searchForMediaFromList } from "@contexts";
 import { useOnClickOutside } from "@hooks";
-import { usePlaylists } from "@contexts";
 import {
+	getSearcherFunctions,
 	buttonToTheSideJSX,
 	searchResultJSX,
 	ButtonToTheSide,
 	SearcherAction,
 	SearchStatus,
 	useSearcher,
+	setSearcher,
 } from "./helper";
 
 import { SearchWrapper, Wrapper, Search } from "./styles";
-
-const { getState: getSearcherFunctions } = useSearcher;
-const { setSearcher } = getSearcherFunctions();
-
-const { getState: getPlaylistsFunctions } = usePlaylists;
-const { searchForMediaFromList } = getPlaylistsFunctions();
 
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const { searchStatus, searchTerm } = useSearcher().searcher;

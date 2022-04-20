@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { usePlaylists } from "@contexts";
+import { deleteMedia } from "@contexts";
 import { capitalize } from "@utils/utils";
 import { dbg } from "@common/utils";
 
@@ -25,8 +25,6 @@ import {
 	Label,
 	Flex,
 } from "./styles";
-
-const { getState: getPlaylistsFunctions } = usePlaylists;
 
 export function MediaOptionsModal({ media }: { media: Media }) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
@@ -80,7 +78,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 						</StyledTitle>
 
 						<ButtonToClose
-							onClick={() => deleteMedia(closeButtonRef, media)}
+							onClick={() => deleteMedia_(closeButtonRef, media)}
 							id="delete-media"
 						>
 							Confirm
@@ -101,14 +99,14 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 	);
 }
 
-async function deleteMedia(
+async function deleteMedia_(
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	media: Media,
 ) {
 	if (closeButtonRef.current)
 		try {
 			dbg("Deleting media...", media);
-			await getPlaylistsFunctions().deleteMedia(media);
+			await deleteMedia(media);
 
 			handleCloseAll(closeButtonRef);
 

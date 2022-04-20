@@ -14,8 +14,7 @@ type PlayOptionsActions = Readonly<{
 
 export const usePlayOptions = create<PlayOptionsActions>(
 	persist(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		(set, _get) => ({
+		(set, get) => ({
 			playOptions: {
 				loopThisMedia: false,
 				isRandom: false,
@@ -26,22 +25,22 @@ export const usePlayOptions = create<PlayOptionsActions>(
 						(document.getElementById("audio") as HTMLAudioElement).loop =
 							action.value;
 
-						set(state => ({
+						set({
 							playOptions: {
-								...state.playOptions,
+								...get().playOptions,
 								loopThisMedia: action.value,
 							},
-						}));
+						});
 						break;
 					}
 
 					case PlayOptionsType.IS_RANDOM: {
-						set(state => ({
+						set({
 							playOptions: {
-								...state.playOptions,
+								...get().playOptions,
 								isRandom: action.value,
 							},
-						}));
+						});
 						break;
 					}
 
@@ -62,6 +61,9 @@ export const usePlayOptions = create<PlayOptionsActions>(
 		},
 	),
 );
+
+export const { getState: getPlayOptions } = usePlayOptions;
+export const { setPlayOptions } = getPlayOptions();
 
 export type PlayOptionsAction =
 	| Readonly<{

@@ -3,14 +3,12 @@ import { describe, expect, it } from "vitest";
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
-import { PlayOptionsType, usePlayOptions } from "@contexts";
-
-const { getState: getPlayOptions } = usePlayOptions;
+import { getPlayOptions, PlayOptionsType, setPlayOptions } from "@contexts";
 
 describe("Testing usePlayOptions", () => {
 	it("should get a new playOptions with .loopThisMedia set", () => {
 		{
-			getPlayOptions().setPlayOptions({
+			setPlayOptions({
 				type: PlayOptionsType.LOOP_THIS_MEDIA,
 				value: true,
 			});
@@ -20,7 +18,7 @@ describe("Testing usePlayOptions", () => {
 			expect(playOptions).toHaveProperty("loopThisMedia", true);
 		}
 		{
-			getPlayOptions().setPlayOptions({
+			setPlayOptions({
 				type: PlayOptionsType.LOOP_THIS_MEDIA,
 				value: false,
 			});
@@ -33,7 +31,7 @@ describe("Testing usePlayOptions", () => {
 
 	it("should get a new playOptions with .isRandom set", () => {
 		{
-			getPlayOptions().setPlayOptions({
+			setPlayOptions({
 				type: PlayOptionsType.IS_RANDOM,
 				value: true,
 			});
@@ -43,7 +41,7 @@ describe("Testing usePlayOptions", () => {
 			expect(playOptions).toHaveProperty("isRandom", true);
 		}
 		{
-			getPlayOptions().setPlayOptions({
+			setPlayOptions({
 				type: PlayOptionsType.IS_RANDOM,
 				value: false,
 			});

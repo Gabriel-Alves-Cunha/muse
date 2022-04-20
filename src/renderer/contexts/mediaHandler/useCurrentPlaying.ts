@@ -10,22 +10,21 @@ import merge from "deepmerge";
 import { assertUnreachable, getRandomInt } from "@utils/utils";
 import { HISTORY, MAIN_LIST } from "./usePlaylistsHelper";
 import { formatDuration } from "@common/utils";
-import { usePlayOptions } from "./usePlayOptions";
+import { getPlayOptions } from "./usePlayOptions";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
 	type DefaultLists,
 	type Playlist,
 	PlaylistActions,
-	usePlaylists,
 	PlaylistEnum,
+	setPlaylists,
+	getPlaylists,
 } from "./usePlaylists";
 
 const { readFile } = electron.fs;
 
 const currentPlayingKey = `${keyPrefix}current_playing` as const;
-const { getState: getPlaylistsFunctions } = usePlaylists;
-const { getState: getPlayOptions } = usePlayOptions;
 
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	playlistName: MAIN_LIST,
@@ -54,8 +53,8 @@ export const useCurrentPlaying = create(
 				currentPlaying: defaultCurrentPlaying,
 				setCurrentPlaying: (action: currentPlayingReducer_Action) => {
 					const previousPlaying = get().currentPlaying;
-					const getPlaylist = (listName: DefaultLists) =>
-						getPlaylistsFunctions().playlists.find(p => p.name === listName);
+					const getPlaylist = (listName: DefaultLists | string) =>
+						getPlaylists().playlists.find(p => p.name === listName);
 
 					switch (action.type) {
 						case CurrentPlayingEnum.PLAY_THIS_MEDIA: {
@@ -70,7 +69,7 @@ export const useCurrentPlaying = create(
 
 							// We need to update history:
 							dbg("Adding media to history...");
-							getPlaylistsFunctions().setPlaylists({
+							setPlaylists({
 								whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 								type: PlaylistEnum.UPDATE_HISTORY,
 								mediaID,
@@ -104,7 +103,7 @@ export const useCurrentPlaying = create(
 
 							// Handle if it's the "main list":
 							if (playlistName === MAIN_LIST) {
-								const mainList = getPlaylistsFunctions().mainList;
+								const mainList = getPlaylists().mainList;
 								const currMediaIDIndex = mainList.findIndex(
 									m => m.id === currMediaID,
 								);
@@ -148,7 +147,7 @@ export const useCurrentPlaying = create(
 							if (headOfHistory) {
 								// We need to update history:
 								dbg("Adding media to history");
-								getPlaylistsFunctions().setPlaylists({
+								setPlaylists({
 									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 									type: PlaylistEnum.UPDATE_HISTORY,
 									mediaID: headOfHistory,
@@ -239,7 +238,7 @@ export const useCurrentPlaying = create(
 
 							// Handle if it's the "main list":
 							if (playlistName === MAIN_LIST) {
-								const mainList = getPlaylistsFunctions().mainList;
+								const mainList = getPlaylists().mainList;
 
 								if (getPlayOptions().playOptions.isRandom) {
 									const randomMedia =
@@ -254,7 +253,7 @@ export const useCurrentPlaying = create(
 									}
 
 									// We need to update history:
-									getPlaylistsFunctions().setPlaylists({
+									setPlaylists({
 										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 										type: PlaylistEnum.UPDATE_HISTORY,
 										mediaID: randomMedia.id,
@@ -282,7 +281,7 @@ export const useCurrentPlaying = create(
 
 										// We need to update history:
 										dbg("Adding media to history");
-										getPlaylistsFunctions().setPlaylists({
+										setPlaylists({
 											whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 											mediaID: firstMediaFromTheSameList.id,
 											type: PlaylistEnum.UPDATE_HISTORY,
@@ -299,7 +298,7 @@ export const useCurrentPlaying = create(
 									}
 
 									// We need to update history:
-									getPlaylistsFunctions().setPlaylists({
+									setPlaylists({
 										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 										mediaID: nextMediaFromTheSameList.id,
 										type: PlaylistEnum.UPDATE_HISTORY,
@@ -328,7 +327,7 @@ export const useCurrentPlaying = create(
 									}
 
 									// We need to update history:
-									getPlaylistsFunctions().setPlaylists({
+									setPlaylists({
 										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 										type: PlaylistEnum.UPDATE_HISTORY,
 										mediaID: randomMedia,
@@ -356,7 +355,7 @@ export const useCurrentPlaying = create(
 
 										// We need to update history:
 										dbg("Adding media to history");
-										getPlaylistsFunctions().setPlaylists({
+										setPlaylists({
 											whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 											mediaID: firstMediaFromTheSameList,
 											type: PlaylistEnum.UPDATE_HISTORY,
@@ -373,7 +372,7 @@ export const useCurrentPlaying = create(
 									}
 
 									// We need to update history:
-									getPlaylistsFunctions().setPlaylists({
+									setPlaylists({
 										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 										type: PlaylistEnum.UPDATE_HISTORY,
 										mediaID: nextMediaFromTheSameList,
@@ -410,7 +409,9 @@ export const useCurrentPlaying = create(
 	),
 );
 
-const { getState: getCurrentPlaying } = useCurrentPlaying;
+export const { getState: getCurrentPlaying } = useCurrentPlaying;
+export const { setCurrentPlaying } = getCurrentPlaying();
+
 const timeKey = "Reading <audio> file took";
 let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
 
@@ -424,9 +425,7 @@ if (globalThis.window)
 			const { mediaID, currentTime } = getCurrentPlaying().currentPlaying;
 			if (!mediaID) return;
 
-			const media = getPlaylistsFunctions().mainList.find(
-				m => m.id === mediaID,
-			)!;
+			const media = getPlaylists().mainList.find(m => m.id === mediaID)!;
 
 			const mediaTimer = setTimeout(async () => {
 				console.time(timeKey);
@@ -439,7 +438,7 @@ if (globalThis.window)
 				// Adding event listeners:
 				audio.addEventListener("loadeddata", () => {
 					// Updating the duration of media:
-					getPlaylistsFunctions().setPlaylists({
+					setPlaylists({
 						media: { ...media, duration: formatDuration(audio.duration) },
 						whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
 						type: PlaylistEnum.UPDATE_MAIN_LIST,

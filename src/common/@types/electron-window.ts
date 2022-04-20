@@ -1,11 +1,6 @@
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
-import type {
-	DownloadValues,
-	ConvertValues,
-	Media,
-	Path,
-} from "./typesAndEnums";
+import type { DownloadValues, Media, Path } from "./typesAndEnums";
 
 declare global {
 	/* eslint-disable no-var */
@@ -20,9 +15,6 @@ type VisibleElectron = Readonly<{
 				type: ElectronIpcMainProcessNotificationEnum;
 				msg?: string;
 			}>,
-		): void;
-		receiveMsgFromElectronWindow(
-			handleMsg: (msgObject: MsgObjectReactToElectron) => void,
 		): void;
 	};
 	fs: {
@@ -59,11 +51,9 @@ export enum ReactToElectronMessageEnum {
 export type MsgObjectReactToElectron =
 	| Readonly<{
 			type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA;
-			downloadValues: DownloadValues;
 	  }> // 1
 	| Readonly<{
 			type: ReactToElectronMessageEnum.CONVERT_MEDIA;
-			convertValue: ConvertValues;
 	  }> // 2
 	| Readonly<{
 			type: ReactToElectronMessageEnum.WRITE_TAG;

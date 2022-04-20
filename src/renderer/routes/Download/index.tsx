@@ -1,7 +1,13 @@
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect, useRef } from "react";
 
-import { useDownloadHelper } from "./helpers";
+import {
+	getDownloadHelper,
+	useDownloadHelper,
+	setSearchTerm,
+	download,
+	search,
+} from "./helpers";
 
 import { Loading } from "@styles/appStyles";
 import {
@@ -26,13 +32,9 @@ export function Download() {
 }
 
 const SearcherWrapper = () => {
-	const {
-		searcher: { error },
-		setSearchTerm,
-		search,
-	} = useDownloadHelper();
-
+	const { error } = useDownloadHelper().searcher;
 	const urlToSearchForRef = useRef("");
+
 	const urlToSearchFor = urlToSearchForRef.current;
 
 	useEffect(() => {
@@ -44,7 +46,7 @@ const SearcherWrapper = () => {
 		);
 
 		return () => clearTimeout(searchTimeout);
-	}, [search, urlToSearchFor]);
+	}, [urlToSearchFor]);
 
 	return (
 		<SearchWrapper>
@@ -72,9 +74,7 @@ const IsLoading = () => {
 	return <div>{isLoading && <Loading />}</div>;
 };
 
-const { getState: getDownloadHelper } = useDownloadHelper;
-const startDownload = () =>
-	getDownloadHelper().download(getDownloadHelper().searcher.searchTerm);
+const startDownload = () => download(getDownloadHelper().searcher.searchTerm);
 
 const Result = () => {
 	const { result } = useDownloadHelper().searcher;

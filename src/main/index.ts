@@ -21,6 +21,7 @@ import {
 	ElectronIpcMainProcessNotificationEnum,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
+import { DownloadValues } from "@common/@types/typesAndEnums.js";
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -143,19 +144,23 @@ app
 								body: title,
 							})
 								.on("click", () => {
-									console.log("Clicked notification!");
+									const downloadValues: DownloadValues = {
+										imageURL: thumbnails.at(-1)?.url ?? "",
+										canStartDownload: true,
+										title,
+										url,
+									};
 
-									// Send msg to ipcRenderer:
-									electronWindow?.webContents.send("async-msg", {
-										type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
-										params: {
-											imageURL: thumbnails.at(-1)?.url ?? "",
-											type: "download media",
-											canStartDownload: true,
-											title,
-											url,
-										},
-									});
+									// Send msg to ipcMain:
+									electronWindow?.webContents.send(
+										ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+										downloadValues,
+									);
+
+									console.log(
+										"Clicked notification and sent data:",
+										downloadValues,
+									);
 								})
 								.show();
 						} catch (error) {
@@ -171,16 +176,26 @@ app
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+// Relay message from electronWindow to ipcRenderer:
+ipcMain.on(
+	ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+	(_e, downloadValues: DownloadValues) => {
+		console.log("ipcMain received data from electronWindow:", downloadValues);
+
+		ipcMain.emit(ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS, downloadValues);
+	},
+);
+
 ipcMain.on(
 	"notify",
 	(
 		event,
-		object: Readonly<{
+		msg: Readonly<{
 			type: ElectronIpcMainProcessNotificationEnum;
 			msg?: string;
 		}>,
 	) => {
-		switch (object.type) {
+		switch (msg.type) {
 			case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
 				app.quit();
 				break;

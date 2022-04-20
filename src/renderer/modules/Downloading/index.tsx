@@ -51,7 +51,7 @@ export const useDownloadValues = create<{
 	downloadValues: defaultDownloadValues,
 }));
 
-const { setState: setDownloadValues } = useDownloadValues;
+export const { setState: setDownloadValues } = useDownloadValues;
 
 export function Downloading() {
 	const [showPopup, setShowPopup] = useState(false);
@@ -74,7 +74,6 @@ export function Downloading() {
 				sendMsgToBackend(
 					{
 						type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA,
-						downloadValues,
 					},
 					electronPort,
 				);
@@ -259,6 +258,9 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 	setDownloadingList({
 		downloadingList: [...downloadingList, downloadStatus],
 	});
+
+	// Send msg to electronPort to download:
+	myPort.postMessage(downloadValues);
 
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:

@@ -15,6 +15,7 @@ import {
 	type Playlist,
 	CurrentPlayingEnum,
 	useCurrentPlaying,
+	setCurrentPlaying,
 	usePlaylists,
 } from "@contexts";
 
@@ -34,9 +35,8 @@ import {
 } from "./styles";
 
 const timeLabel = "Loop to find all medias by id took";
-const { getState } = useCurrentPlaying;
 const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
-	getState().setCurrentPlaying({
+	setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlistName,
 		mediaID,
@@ -72,7 +72,7 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 				.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
 
 			console.timeEnd(timeLabel);
-			return Object.freeze(data);
+			return data;
 		}
 	}, [mainList, playlistName, playlists]);
 
@@ -90,7 +90,7 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 					</ImgWrapper>
 
 					<Info>
-						<Title className="mytitle">{media.title}</Title>
+						<Title>{media.title}</Title>
 						<SubTitle>{media.duration}</SubTitle>
 					</Info>
 				</PlayButton>

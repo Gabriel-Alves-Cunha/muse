@@ -2,16 +2,20 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
 import { Convert, Download, Favorites, History, Home } from "@routes";
+import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
-import { useDownloadValues } from "@modules/Downloading";
+import { setDownloadValues } from "@modules/Downloading";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 import {
+	searchLocalComputerForMedias,
 	PlaylistActions,
 	PlaylistEnum,
-	usePlaylists,
+	setPlaylists,
+	getPlaylists,
+	deleteMedia,
 	usePage,
 } from "@contexts";
 import {
@@ -47,12 +51,9 @@ export function App() {
 	);
 }
 
-const { getState: getPlaylistsFunctions } = usePlaylists;
-
 function Main() {
 	useEffect(() => {
-		(async () =>
-			await getPlaylistsFunctions().searchLocalComputerForMedias())();
+		(async () => await searchLocalComputerForMedias())();
 	}, []);
 
 	return (
@@ -85,25 +86,26 @@ function PageToShow() {
 	}
 }
 
-const { setState: setDownloadValues } = useDownloadValues;
 const { transformPathsToMedias } = electron.media;
 
-window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
-	// @ts-ignore When the message is from react-devtools, ignore it:
-	if (event.data.source?.includes("react-devtools")) return;
+window.onmessage = async (
+	event: MessageEvent<MsgWithSource<MsgObjectElectronToReact>>,
+) => {
+	if (event.data.source !== electronSource) return;
 
-	dbg("Received message from MessagePort on React side.\ndata =", event.data);
+	dbg("Received message from Electron.\ndata =", event.data);
+	const msg = event.data.msg;
 
-	switch (event.data.type) {
+	switch (msg.type) {
 		case ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS: {
 			setDownloadValues({
-				downloadValues: event.data.downloadValues,
+				downloadValues: msg.downloadValues,
 			});
 			break;
 		} // 1
 
 		case ElectronToReactMessageEnum.ADD_ONE_MEDIA: {
-			const { mediaPath } = event.data;
+			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
 
@@ -114,7 +116,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 				break;
 			}
 
-			getPlaylistsFunctions().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media,
@@ -123,15 +125,13 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 		} // 2
 
 		case ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER: {
-			const { mediaPath } = event.data;
+			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER:", {
 				mediaPath,
 			});
 
-			const media = getPlaylistsFunctions().mainList.find(
-				p => p.path === mediaPath,
-			);
+			const media = getPlaylists().mainList.find(p => p.path === mediaPath);
 
 			if (!media) {
 				console.error("Could not find media to delete.");
@@ -139,7 +139,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 			}
 
 			try {
-				await getPlaylistsFunctions().deleteMedia(media);
+				await deleteMedia(media);
 				console.log(`Media "${{ media }}" deleted.`);
 			} catch (error) {
 				console.error(error);
@@ -149,16 +149,16 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 
 		case ElectronToReactMessageEnum.REFRESH_ALL_MEDIA: {
 			dbg("At ListenToNotification.REFRESH_ALL_MEDIA:");
-			await getPlaylistsFunctions().searchLocalComputerForMedias(true);
+			await searchLocalComputerForMedias(true);
 			break;
 		} // 4
 
 		case ElectronToReactMessageEnum.REFRESH_ONE_MEDIA: {
-			const { mediaPath } = event.data;
+			const { mediaPath } = msg;
 
-			dbg("At ListenToNotification.REFRESH_MEDIA:", { data: event.data });
+			dbg("At ListenToNotification.REFRESH_MEDIA:", { data: msg });
 
-			const mediaIndex = getPlaylistsFunctions().mainList.findIndex(
+			const mediaIndex = getPlaylists().mainList.findIndex(
 				m => m.path === mediaPath,
 			);
 
@@ -167,11 +167,11 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media.`,
 				);
 
-				await getPlaylistsFunctions().searchLocalComputerForMedias(true);
+				await searchLocalComputerForMedias(true);
 				break;
 			}
 
-			const refreshedMedia = (await transformPathsToMedias([mediaPath]))[0];
+			const [refreshedMedia] = await transformPathsToMedias([mediaPath]);
 
 			if (!refreshedMedia) {
 				console.error(
@@ -180,7 +180,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 				break;
 			}
 
-			getPlaylistsFunctions().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: refreshedMedia,
@@ -189,13 +189,11 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 		} // 5
 
 		case ElectronToReactMessageEnum.REMOVE_ONE_MEDIA: {
-			const { mediaPath } = event.data;
+			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.REMOVE_MEDIA:", { mediaPath });
 
-			const media = getPlaylistsFunctions().mainList.find(
-				m => m.path === mediaPath,
-			);
+			const media = getPlaylists().mainList.find(m => m.path === mediaPath);
 
 			if (!media) {
 				console.error(
@@ -204,7 +202,7 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 				break;
 			}
 
-			getPlaylistsFunctions().setPlaylists({
+			setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				mediaID: media.id,
@@ -213,20 +211,20 @@ window.onmessage = async (event: MessageEvent<MsgObjectElectronToReact>) => {
 		} // 6
 
 		case ElectronToReactMessageEnum.ERROR: {
-			console.error("@TODO: ERROR", event.data.error);
+			console.error("@TODO: ERROR", msg.error);
 
 			break;
 		} // 7
 
 		default: {
-			assertUnreachable(event.data);
-
 			console.error(
-				`There is no method to handle this event.data: (${typeof event.data}) '`,
-				event.data,
+				`There is no method to handle this event.data: (${typeof msg}) '`,
+				msg,
 				"'\nEvent =",
 				event,
 			);
+
+			assertUnreachable(msg);
 			break;
 		}
 	}

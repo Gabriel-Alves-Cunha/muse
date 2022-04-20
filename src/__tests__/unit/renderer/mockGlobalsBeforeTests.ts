@@ -5,7 +5,6 @@ export const mockGlobalsBeforeTests = () => {
 	vi.stubGlobal("electron", {
 		notificationApi: {
 			sendNotificationToElectronIpcMainProcess: vi.fn(),
-			receiveMsgFromElectronWindow: vi.fn(),
 		},
 		fs: {
 			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),

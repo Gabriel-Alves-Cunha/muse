@@ -22,9 +22,12 @@ import { formatDuration } from "@common/utils";
 import { useProgress } from ".";
 import {
 	CurrentPlayingEnum,
-	useCurrentPlaying,
+	getCurrentPlaying,
+	setCurrentPlaying,
 	PlayOptionsType,
 	usePlayOptions,
+	setPlayOptions,
+	getPlayOptions,
 } from "@contexts";
 
 import {
@@ -41,34 +44,31 @@ import {
 
 const { ceil } = Math;
 
-const { getState: getCurrentPlaying } = useCurrentPlaying;
-const { getState: getPlayOptions } = usePlayOptions;
-
 const toggleRepeatThisMedia = () =>
-	getPlayOptions().setPlayOptions({
+	setPlayOptions({
 		value: getPlayOptions().playOptions.loopThisMedia ? false : true,
 		type: PlayOptionsType.LOOP_THIS_MEDIA,
 	});
 
 const toggleRandomAndLoop = () =>
-	getPlayOptions().setPlayOptions({
+	setPlayOptions({
 		value: getPlayOptions().playOptions.isRandom ? false : true,
 		type: PlayOptionsType.IS_RANDOM,
 	});
 
 const togglePlayOrPauseMedia = () =>
-	getCurrentPlaying().setCurrentPlaying({
+	setCurrentPlaying({
 		type: CurrentPlayingEnum.TOGGLE_PLAY_PAUSE,
 	});
 
 const playPreviousMedia = () =>
-	getCurrentPlaying().setCurrentPlaying({
+	setCurrentPlaying({
 		playlistName: getCurrentPlaying().currentPlaying.playlistName,
 		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
 	});
 
 export const playNextMedia = () =>
-	getCurrentPlaying().setCurrentPlaying({
+	setCurrentPlaying({
 		playlistName: getCurrentPlaying().currentPlaying.playlistName,
 		type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
 	});
