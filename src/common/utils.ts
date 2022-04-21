@@ -4,14 +4,16 @@ const { trunc, floor } = Math;
 
 // @ts-ignore This has to be this way, otherwise it just does not work...
 export const isDevelopment = process.env.NODE_ENV === "development";
-console.log("Electron isDevelopment =", isDevelopment);
+// @ts-ignore This has to be this way, otherwise it just does not work...
+export const isTesting = process.env.VITEST ? true : false;
+console.log({ isDevelopment, isTesting });
 
 export const capitalizedAppName = "Muse" as const;
 export const lowercaseAppName = "muse" as const;
 
 export const dbg = debug(lowercaseAppName);
 
-if (isDevelopment) enable(lowercaseAppName);
+if (isDevelopment || isTesting) enable(lowercaseAppName);
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 export const allowedMedias = Object.freeze(<const>[

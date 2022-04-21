@@ -100,6 +100,7 @@ const createMedia = async (
 			artist: albumArtists[0] ?? "",
 			dateOfArival: Date.now(),
 			title: title ?? basename,
+			selected: false,
 			favorite: false,
 			id: hash(path),
 			genres,
@@ -108,12 +109,12 @@ const createMedia = async (
 			img,
 		};
 
-		console.timeEnd(`Nº ${index}, "${basename}" took`);
-
 		dbg(basename, {
 			tag: { pictures, album, genres, albumArtists },
 			properties: { durationMilliseconds },
 		});
+
+		console.timeEnd(`Nº ${index}, "${basename}" took`);
 
 		return resolve(media);
 	});
@@ -140,13 +141,6 @@ export async function transformPathsToMedias(
 
 	return medias;
 }
-
-export type HandleDownload = Readonly<{
-	electronPort: Readonly<MessagePort>;
-	imageURL: Readonly<string>;
-	title: Readonly<string>;
-	url: Readonly<string>;
-}>;
 
 export function handleCreateOrCancelDownload({
 	electronPort,
@@ -198,15 +192,13 @@ export function makeStream({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
-			const readAnswer = readStream.destroy(
-				new Error("This readStream is being destroyed!"),
-			);
-			dbg("readStream 'destroy()' answer =", readAnswer);
-
 			currentDownloads.delete(url);
 			dbg({ currentDownloads });
 
-			console.log("Was file renamed?", await pathExists(saveSite));
+			console.log(
+				"ytdl stream was destroyed. Does the downloaded file still exists?",
+				await pathExists(saveSite),
+			);
 		})
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
@@ -250,7 +242,6 @@ export function makeStream({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
-			console.log("Going to writeTags...");
 			await writeTags(saveSite, {
 				downloadImg: true,
 				isNewMedia: true,
@@ -258,6 +249,7 @@ export function makeStream({
 			});
 
 			currentDownloads.delete(url);
+			dbg({ currentDownloads });
 		})
 		.on("error", async error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
@@ -272,9 +264,15 @@ export function makeStream({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
-			currentDownloads.delete(url);
+			// I only found it to work when I send it with an Error:
+			readStream.destroy(
+				new Error(
+					"This readStream is being destroyed because the ffmpeg threw an error.",
+				),
+			);
 
-			console.log("Was file renamed?", await pathExists(saveSite));
+			currentDownloads.delete(url);
+			dbg({ currentDownloads });
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
@@ -282,12 +280,6 @@ export function makeStream({
 	currentDownloads.set(url, readStream);
 	dbg(`Added "${url}" to currentDownloads =`, currentDownloads);
 }
-
-export type HandleConversion = Readonly<{
-	electronPort: Readonly<MessagePort>;
-	toExtension: AllowedMedias;
-	mediaPath: Readonly<Path>;
-}>;
 
 export function handleCreateOrCancelConvert({
 	electronPort,
@@ -320,7 +312,6 @@ export function convertToAudio({
 	// let sizeConverted = 0;
 
 	fluent_ffmpeg(readStream)
-		.toFormat(toExtension)
 		.save(saveSite)
 		.on(
 			"progress",
@@ -370,6 +361,13 @@ export function convertToAudio({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
+			// I only found it to work when I send it with an Error:
+			readStream.destroy(
+				new Error(
+					"This readStream is being destroyed because the ffmpeg threw an error.",
+				),
+			);
+
 			mediasConverting.delete(mediaPath);
 		})
 		.on("end", async () => {
@@ -401,6 +399,8 @@ export function convertToAudio({
 				});
 			}
 
+			readStream.close();
+
 			mediasConverting.delete(mediaPath);
 
 			console.log("Was file renamed?", await pathExists(saveSite));
@@ -422,10 +422,12 @@ export function convertToAudio({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
-			const readAnswer = readStream.destroy(
-				new Error("This readStream is being destroyed!"),
+			// I only found it to work when I send it with an Error:
+			readStream.destroy(
+				new Error(
+					"This readStream is being destroyed because the ffmpeg is being destroyed.",
+				),
 			);
-			dbg("readStream 'destroy()' answer =", readAnswer);
 
 			mediasConverting.delete(mediaPath);
 			dbg({ mediasConverting });
@@ -659,3 +661,16 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 			reject(e);
 		}),
 	);
+
+export type HandleConversion = Readonly<{
+	electronPort: Readonly<MessagePort>;
+	toExtension: AllowedMedias;
+	mediaPath: Readonly<Path>;
+}>;
+
+export type HandleDownload = Readonly<{
+	electronPort: Readonly<MessagePort>;
+	imageURL: Readonly<string>;
+	title: Readonly<string>;
+	url: Readonly<string>;
+}>;

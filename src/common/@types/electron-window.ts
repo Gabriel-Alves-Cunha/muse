@@ -1,6 +1,6 @@
+import type { DownloadValues, Media, Path } from "./typesAndEnums";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
-import type { DownloadValues, Media, Path } from "./typesAndEnums";
 
 declare global {
 	/* eslint-disable no-var */

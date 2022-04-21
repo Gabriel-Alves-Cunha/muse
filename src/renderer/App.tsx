@@ -1,7 +1,6 @@
 import { ToastContainer } from "react-toastify";
-import { useEffect } from "react";
 
-import { Convert, Download, Favorites, History, Home } from "@routes";
+import { Favorites, Download, Convert, History, Home } from "@routes";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
@@ -51,21 +50,15 @@ export function App() {
 	);
 }
 
-function Main() {
-	useEffect(() => {
-		(async () => await searchLocalComputerForMedias())();
-	}, []);
+const Main = () => (
+	<Content>
+		<Navbar />
 
-	return (
-		<Content>
-			<Navbar />
+		<PageToShow />
 
-			<PageToShow />
-
-			<MediaPlayer />
-		</Content>
-	);
-}
+		<MediaPlayer />
+	</Content>
+);
 
 function PageToShow() {
 	const { page } = usePage();

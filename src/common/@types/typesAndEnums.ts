@@ -12,6 +12,7 @@ type DateAsNumber = Readonly<number>;
 export type Media = Readonly<{
 	dateOfArival: DateAsNumber;
 	genres?: readonly string[];
+	selected: boolean;
 	size: PrettyBytes;
 	favorite: boolean;
 	duration: string;

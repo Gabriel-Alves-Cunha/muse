@@ -22,3 +22,6 @@ export const dirs = Object.freeze({
 	downloads: join(homeDir, "Downloads"),
 	music: join(homeDir, "Music"),
 });
+
+export const sleep = (ms: number): Promise<void> =>
+	new Promise(r => setTimeout(r, ms));

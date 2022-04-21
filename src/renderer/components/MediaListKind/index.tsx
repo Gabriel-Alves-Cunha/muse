@@ -1,4 +1,4 @@
-import type { Media, MediaID } from "@common/@types/typesAndEnums";
+import type { Media, MediaID, Mutable } from "@common/@types/typesAndEnums";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
@@ -16,7 +16,11 @@ import {
 	CurrentPlayingEnum,
 	useCurrentPlaying,
 	setCurrentPlaying,
+	PlaylistActions,
 	usePlaylists,
+	setPlaylists,
+	PlaylistEnum,
+	getPlaylists,
 } from "@contexts";
 
 import { StyledOverlay } from "./MediaOptions/styles";
@@ -79,7 +83,8 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 	const Row = memo(
 		({ media }: { media: Media }) => (
 			<RowWrapper
-				className={media.id === currentPlaying.mediaID ? "active" : ""}
+				onClick={e => selectMeIfCtrlPlusLeftClick(e, media.id)}
+				className={classes(media, currentPlaying.mediaID)}
 			>
 				<PlayButton onClick={() => playMedia(media.id, playlistName)}>
 					<ImgWrapper>
@@ -128,6 +133,39 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		</ListWrapper>
 	);
 }
+
+const selectMeIfCtrlPlusLeftClick = (
+	e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+	mediaID: MediaID,
+) => {
+	// `e.button === 0` is left click
+	if (!e.ctrlKey || e.button !== 0) return;
+
+	// Make it have the className "selected":
+	e.currentTarget.classList.add("selected");
+
+	// Mark media as selected:
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const media = getPlaylists().mainList.find(
+		m => m.id === mediaID,
+	)! as Mutable<Media>;
+	media.selected = true;
+
+	setPlaylists({
+		whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+		type: PlaylistEnum.UPDATE_MAIN_LIST,
+		media,
+	});
+};
+
+const classes = (media: Media, currentPlayingID: number | undefined) => {
+	let classes = "";
+
+	if (media.id === currentPlayingID) classes += "active" + " ";
+	if (media.selected) classes += "selected" + " ";
+
+	return classes;
+};
 
 function ErrorFallback({ error, resetErrorBoundary }: ErrorBoundaryProps) {
 	return (

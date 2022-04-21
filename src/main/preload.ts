@@ -6,6 +6,7 @@ import { getBasicInfo } from "ytdl-core";
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
+import { recognizeMedia } from "./preload/audioRecognition";
 import { homeDir, dirs } from "./utils";
 import { dbg } from "@common/utils";
 import {
@@ -50,6 +51,7 @@ contextBridge.exposeInMainWorld("electron", {
 	media: {
 		transformPathsToMedias,
 		convertToAudio,
+		recognizeMedia,
 		getBasicInfo,
 		writeTags,
 	},
