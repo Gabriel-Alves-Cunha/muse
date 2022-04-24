@@ -65,7 +65,7 @@ const Main = () => (
 	</Content>
 );
 
-function PageToShow() {
+const PageToShow = () => {
 	const { page } = usePage();
 
 	switch (page) {
@@ -82,7 +82,7 @@ function PageToShow() {
 		default:
 			return assertUnreachable(page);
 	}
-}
+};
 
 const { transformPathsToMedias } = electron.media;
 
@@ -107,7 +107,7 @@ window.onmessage = async (
 
 			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
 
-			const media = (await transformPathsToMedias([mediaPath]))[0];
+			const [media] = await transformPathsToMedias([mediaPath]);
 
 			if (!media) {
 				console.error(`Could not transform "${mediaPath}" to media.`);
@@ -173,8 +173,10 @@ window.onmessage = async (
 
 			if (!refreshedMedia) {
 				console.error(
-					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!`,
+					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media.`,
 				);
+
+				await searchLocalComputerForMedias(true);
 				break;
 			}
 

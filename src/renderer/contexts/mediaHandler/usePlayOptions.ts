@@ -12,7 +12,7 @@ type PlayOptionsActions = Readonly<{
 	playOptions: PlayOptions;
 }>;
 
-export const usePlayOptions = create<PlayOptionsActions>(
+export const usePlayOptions = create<PlayOptionsActions>()(
 	persist(
 		(set, get) => ({
 			playOptions: {
@@ -57,7 +57,7 @@ export const usePlayOptions = create<PlayOptionsActions>(
 			deserialize: playOptions => JSON.parse(playOptions),
 			partialize: ({ playOptions }) => ({ playOptions }),
 			merge: (persistedState, currentState) =>
-				merge(persistedState, currentState),
+				merge(persistedState as Partial<PlayOptionsActions>, currentState),
 		},
 	),
 );

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { GetState, Mutate, SetState, StoreApi } from "zustand";
 import type { MediaID } from "@common/@types/typesAndEnums";
 
 import { persist, subscribeWithSelector } from "zustand/middleware";
@@ -8,10 +7,10 @@ import create from "zustand";
 import merge from "deepmerge";
 
 import { assertUnreachable, getRandomInt } from "@utils/utils";
-import { HISTORY, MAIN_LIST } from "./usePlaylistsHelper";
 import { formatDuration } from "@common/utils";
 import { getPlayOptions } from "./usePlayOptions";
 import { keyPrefix } from "@utils/app";
+import { MAIN_LIST } from "./usePlaylistsHelper";
 import { dbg } from "@common/utils";
 import {
 	type DefaultLists,
@@ -30,7 +29,7 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	playlistName: MAIN_LIST,
 	mediaID: undefined,
 	currentTime: 0,
-} as const);
+});
 
 export type CurrentPlaying = Readonly<{
 	playlistName: Playlist["name"];
@@ -38,17 +37,9 @@ export type CurrentPlaying = Readonly<{
 	currentTime: number;
 }>;
 
-export const useCurrentPlaying = create(
+export const useCurrentPlaying = create<CurrentPlayingAction>()(
 	subscribeWithSelector(
-		persist<
-			CurrentPlayingAction,
-			SetState<CurrentPlayingAction>,
-			GetState<CurrentPlayingAction>,
-			Mutate<
-				StoreApi<CurrentPlayingAction>,
-				[["zustand/persist", Partial<CurrentPlayingAction>]]
-			>
-		>(
+		persist(
 			(set, get) => ({
 				currentPlaying: defaultCurrentPlaying,
 				setCurrentPlaying: (action: currentPlayingReducer_Action) => {
@@ -68,7 +59,6 @@ export const useCurrentPlaying = create(
 							}
 
 							// We need to update history:
-							dbg("Adding media to history...");
 							setPlaylists({
 								whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 								type: PlaylistEnum.UPDATE_HISTORY,
@@ -87,7 +77,7 @@ export const useCurrentPlaying = create(
 
 						case CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST: {
 							dbg(
-								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST\naction =",
+								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST\naction =",
 								action,
 							);
 							const { playlistName } = action;
@@ -102,28 +92,29 @@ export const useCurrentPlaying = create(
 							}
 
 							// Handle if it's the "main list":
-							if (playlistName === MAIN_LIST) {
-								const mainList = getPlaylists().mainList;
-								const currMediaIDIndex = mainList.findIndex(
-									m => m.id === currMediaID,
+							const list =
+								playlistName === MAIN_LIST
+									? getPlaylists().mainList.map(m => m.id)
+									: getPlaylist(playlistName)!.list;
+
+							const currMediaIDIndex = list.findIndex(id => id === currMediaID);
+
+							if (currMediaIDIndex === -1) {
+								console.error(
+									"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!",
 								);
+								break;
+							}
 
-								const prevMediaID = mainList.at(currMediaIDIndex - 1)!.id;
+							const prevMediaID = list.at(currMediaIDIndex - 1);
 
-								set({
-									currentPlaying: {
-										mediaID: prevMediaID,
-										currentTime: 0,
-										playlistName,
-									},
+							if (prevMediaID) {
+								// We need to update history:
+								setPlaylists({
+									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+									type: PlaylistEnum.UPDATE_HISTORY,
+									mediaID: prevMediaID,
 								});
-							} else {
-								const currPlaylist = getPlaylist(playlistName)!.list;
-								const currMediaIDIndex = currPlaylist.findIndex(
-									id => id === currMediaID,
-								);
-
-								const prevMediaID = currPlaylist.at(currMediaIDIndex - 1);
 
 								set({
 									currentPlaying: {
@@ -133,34 +124,6 @@ export const useCurrentPlaying = create(
 									},
 								});
 							}
-							break;
-						}
-
-						case CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY: {
-							dbg(
-								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY\naction =",
-								action,
-							);
-
-							const headOfHistory = getPlaylist(HISTORY)!.list[1];
-
-							if (headOfHistory) {
-								// We need to update history:
-								dbg("Adding media to history");
-								setPlaylists({
-									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-									type: PlaylistEnum.UPDATE_HISTORY,
-									mediaID: headOfHistory,
-								});
-
-								set({
-									currentPlaying: {
-										playlistName: action.playlistName,
-										mediaID: headOfHistory,
-										currentTime: 0,
-									},
-								});
-							} else console.error("There is no previous media in history!");
 							break;
 						}
 
@@ -280,7 +243,6 @@ export const useCurrentPlaying = create(
 										const firstMediaFromTheSameList = mainList[0]!;
 
 										// We need to update history:
-										dbg("Adding media to history");
 										setPlaylists({
 											whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 											mediaID: firstMediaFromTheSameList.id,
@@ -354,7 +316,6 @@ export const useCurrentPlaying = create(
 										const firstMediaFromTheSameList = list[0]!;
 
 										// We need to update history:
-										dbg("Adding media to history");
 										setPlaylists({
 											whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 											mediaID: firstMediaFromTheSameList,
@@ -403,7 +364,7 @@ export const useCurrentPlaying = create(
 				serialize: ({ state }) => JSON.stringify(state.currentPlaying),
 				deserialize: currentPlaying => JSON.parse(currentPlaying),
 				merge: (persistedState, currentState) =>
-					merge(persistedState, currentState),
+					merge(persistedState as Partial<CurrentPlayingAction>, currentState),
 			},
 		),
 	),
@@ -500,10 +461,6 @@ export type currentPlayingReducer_Action =
 			playlistName: Playlist["name"];
 	  }>
 	| Readonly<{
-			type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY;
-			playlistName: Playlist["name"];
-	  }>
-	| Readonly<{
 			type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST;
 			playlistName: Playlist["name"];
 	  }>
@@ -513,7 +470,6 @@ export type currentPlayingReducer_Action =
 
 export enum CurrentPlayingEnum {
 	PLAY_PREVIOUS_FROM_PLAYLIST,
-	PLAY_PREVIOUS_FROM_HISTORY,
 	PLAY_NEXT_FROM_PLAYLIST,
 	TOGGLE_PLAY_PAUSE,
 	PLAY_THIS_MEDIA,

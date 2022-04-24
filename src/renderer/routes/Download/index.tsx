@@ -18,18 +18,16 @@ import {
 	Button,
 } from "./styles";
 
-export function Download() {
-	return (
-		<Wrapper>
-			<>
-				<SearcherWrapper />
-				<IsLoading />
-			</>
+export const Download = () => (
+	<Wrapper>
+		<>
+			<SearcherWrapper />
+			<IsLoading />
+		</>
 
-			<Result />
-		</Wrapper>
-	);
-}
+		<Result />
+	</Wrapper>
+);
 
 const SearcherWrapper = () => {
 	const { error } = useDownloadHelper().searcher;

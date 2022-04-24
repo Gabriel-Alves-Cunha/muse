@@ -8,24 +8,20 @@ import react from "@vitejs/plugin-react";
 const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
 
-// @ts-ignore This has to be this way, otherwise it just does not work...
-const isDevelopment = String(process.env.NODE_ENV === "development");
-// @ts-ignore This has to be this way, otherwise it just does not work...
-const isTesting = String(process.env.VITEST ? true : false);
-console.log({ isDevelopment, isTesting });
+// For some reason import.meta.env is not working...
+
+// // @ts-ignore This has to be this way, otherwise it just does not work...
+// const isDevelopment = String(process.env.NODE_ENV === "development");
+// // @ts-ignore This has to be this way, otherwise it just does not work...
+// const isTesting = String(process.env.VITEST ? true : false);
+// console.log({ isDevelopment, isTesting });
 
 const config: UserConfigFromVitest & UserConfigFromVite = {
-	plugins: [react()],
-	root: rendererPath,
-	base: "./",
-	define: {
-		VITE_IS_DEVELOPMENT: JSON.stringify(isDevelopment),
-		VITE_IS_TESTING: JSON.stringify(isTesting),
-	},
 	test: {
+		dir: "../__tests__",
 		coverage: {
 			// reporter: ["html", "text"],
-			reporter: ["text"],
+			// reporter: ["text"],
 			all: true,
 		},
 		exclude: [
@@ -40,6 +36,13 @@ const config: UserConfigFromVitest & UserConfigFromVite = {
 			"**/*.d.ts",
 		],
 	},
+	plugins: [react()],
+	root: rendererPath,
+	base: "./",
+	// define: {
+	// 	VITE_IS_DEVELOPMENT: JSON.stringify(isDevelopment),
+	// 	VITE_IS_TESTING: JSON.stringify(isTesting),
+	// },
 	build: {
 		outDir: outDirRenderer,
 		emptyOutDir: true,

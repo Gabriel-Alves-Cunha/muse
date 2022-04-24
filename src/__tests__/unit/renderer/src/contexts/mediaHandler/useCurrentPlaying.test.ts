@@ -64,57 +64,14 @@ describe("Testing useCurrentPlaying", () => {
 		});
 	});
 
-	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY) should play the previous media from history", () => {
-		testList.forEach((media, index) => {
-			if (index === 29) return;
-
-			const nextMedia = testList[index + 1]!;
-
-			// Play a media to make sure history is not empty:
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MAIN_LIST,
-				mediaID: media.id,
-			});
-
-			const updatedHistory_1 = getPlaylist(HISTORY)!.list;
-			expect(updatedHistory_1[0]).toEqual(media.id);
-
-			// Play the next media:
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MAIN_LIST,
-				mediaID: nextMedia.id,
-			});
-
-			const updatedHistory_2 = getPlaylist(HISTORY)!.list;
-			expect(updatedHistory_2[0]).toEqual(nextMedia.id);
-
-			// Play previous media:
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_HISTORY,
-				playlistName: MAIN_LIST,
-			});
-
-			const currentPlaying = getCurrentPlaying().currentPlaying;
-			const expected: CurrentPlaying = {
-				playlistName: MAIN_LIST,
-				mediaID: media.id,
-				currentTime: 0,
-			};
-
-			expect(expected).toEqual(currentPlaying);
-		});
-	});
-
-	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_LIST) should play the previous media from mediaList", () => {
-		testList.forEach((media, index) => {
+	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST) should play the previous media from mediaList  and update history", () => {
+		testList.forEach(({ id }, index) => {
 			if (index === 29) return;
 
 			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 				playlistName: MAIN_LIST,
-				mediaID: media.id,
+				mediaID: id,
 			});
 
 			setCurrentPlaying({
@@ -122,9 +79,13 @@ describe("Testing useCurrentPlaying", () => {
 				playlistName: MAIN_LIST,
 			});
 
+			const history = getPlaylist(HISTORY).list;
+
+			expect(history.length).toBe(index * 2 + 2);
+
 			const currentPlaying = getCurrentPlaying().currentPlaying;
 			const expected: CurrentPlaying = {
-				mediaID: testList.at(index - 1)!.id,
+				mediaID: testList.at(index - 1)?.id,
 				playlistName: MAIN_LIST,
 				currentTime: 0,
 			};

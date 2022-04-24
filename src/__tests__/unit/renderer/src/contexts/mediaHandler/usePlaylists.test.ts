@@ -112,22 +112,6 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 	it("should play the next media", playNextMediaFn);
 
-	it("should play the previous media", () => {
-		const currMainList = getPlaylists().mainList;
-
-		testList.forEach((_, i) => {
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
-				playlistName: MAIN_LIST,
-			});
-
-			const currMediaID = getCurrentPlaying().currentPlaying.mediaID;
-			const expectedMediaID = currMainList.at(i - 1)?.id;
-
-			expect(currMediaID).toBe(expectedMediaID);
-		});
-	});
-
 	it("should play a chosen media", () => {
 		const currMainList = getPlaylists().mainList;
 		const randomMediaIndexes = testList.map(() =>

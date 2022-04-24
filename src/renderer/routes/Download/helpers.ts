@@ -49,13 +49,13 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 		set({ searcher: { ...searcher, isLoading: true, error: "" } });
 
 		try {
-			const videoInfo = await getBasicInfo(url);
+			const { videoDetails } = await getBasicInfo(url);
 
 			const result: UrlMediaMetadata = {
-				imageURL: videoInfo.videoDetails.thumbnails.at(-1)?.url ?? "",
+				imageURL: videoDetails.thumbnails.at(-1)?.url ?? "",
 				// ^ Highest quality is last in this array.
-				artist: videoInfo.videoDetails.media.artist ?? "",
-				title: videoInfo.videoDetails.title,
+				artist: videoDetails.media.artist ?? "",
+				title: videoDetails.title,
 			};
 
 			set({

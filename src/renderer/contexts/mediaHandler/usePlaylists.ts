@@ -53,7 +53,7 @@ type UsePlaylistsActions = Readonly<{
 	mainList: readonly Media[];
 }>;
 
-export const usePlaylists = create<UsePlaylistsActions>(
+export const usePlaylists = create<UsePlaylistsActions>()(
 	persist(
 		(set, get) => ({
 			mainList: constRefToEmptyArray,
@@ -407,7 +407,7 @@ export const usePlaylists = create<UsePlaylistsActions>(
 			partialize: ({ mainList, playlists }) => ({ mainList, playlists }),
 			deserialize: object => JSON.parse(object),
 			merge: (persistedState, currentState) =>
-				merge(persistedState, currentState),
+				merge(persistedState as Partial<UsePlaylistsActions>, currentState),
 			serialize: ({ state: { playlists, mainList } }) =>
 				JSON.stringify({ playlists, mainList }),
 		},

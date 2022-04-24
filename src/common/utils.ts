@@ -13,7 +13,7 @@ export const lowercaseAppName = "muse" as const;
 
 export const dbg = debug(lowercaseAppName);
 
-if (isDevelopment || isTesting) enable(lowercaseAppName);
+if (isDevelopment) enable(lowercaseAppName);
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 export const allowedMedias = Object.freeze(<const>[

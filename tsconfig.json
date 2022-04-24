@@ -50,5 +50,5 @@
 			"@main/*": ["main/*"]
 		}
 	},
-	"exclude": ["node_modules/**/*", "app/**/*", "out/**/*"]
+	"exclude": ["node_modules", "app", "out"]
 }

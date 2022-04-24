@@ -31,11 +31,12 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 	});
 
 	it(`have a maximum size of ${maxSizeOfHistory}`, () => {
-		expect(testList.length).toBe(10);
+		const testListWithSize10 = testList.slice(0, 10);
+		expect(testListWithSize10.length).toBe(10);
 
-		const prevHistory = testList
+		const prevHistory = testListWithSize10
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			.map(_ => testList)
+			.map(_ => testListWithSize10)
 			.flat()
 			.map(media => media.id);
 		prevHistory.pop();
@@ -43,8 +44,8 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 
 		expect(prevHistory.length).toBe(99);
 
-		const newMediaIdToAdd_1 = testList[5]!.id;
-		const newMediaIdToAdd_2 = testList[7]!.id;
+		const newMediaIdToAdd_1 = testListWithSize10[5]!.id;
+		const newMediaIdToAdd_2 = testListWithSize10[7]!.id;
 
 		const newList = [newMediaIdToAdd_1, ...prevHistory];
 		const expectedNewList_1 =
