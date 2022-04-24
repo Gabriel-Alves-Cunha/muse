@@ -412,7 +412,6 @@ export const useCurrentPlaying = create(
 export const { getState: getCurrentPlaying } = useCurrentPlaying;
 export const { setCurrentPlaying } = getCurrentPlaying();
 
-const timeKey = "Reading <audio> file took";
 let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
 
 if (globalThis.window)
@@ -428,9 +427,15 @@ if (globalThis.window)
 			const media = getPlaylists().mainList.find(m => m.id === mediaID)!;
 
 			const mediaTimer = setTimeout(async () => {
-				console.time(timeKey);
+				const start = performance.now();
+
 				const url = URL.createObjectURL(new Blob([await readFile(media.path)]));
-				console.timeEnd(timeKey);
+
+				const end = performance.now();
+				console.log(
+					`%cReading <audio> file took: ${end - start} ms.`,
+					"color:brown",
+				);
 
 				const audio = document.getElementById("audio") as HTMLAudioElement;
 				audio.src = url;
@@ -444,7 +449,7 @@ if (globalThis.window)
 						type: PlaylistEnum.UPDATE_MAIN_LIST,
 					});
 
-					if (currentTime > 20) {
+					if (currentTime > 30) {
 						console.log(
 							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
 						);

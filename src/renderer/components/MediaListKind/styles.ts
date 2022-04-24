@@ -163,11 +163,9 @@ export const Alert = styled("div", {
 	left: 0,
 	width: "100%",
 	height: "100%",
-
 });
 
 export const Msg = styled("pre", {
-
 	color: "$alternative-text",
 	letterSpacing: "0.03rem",
 	fontFamily: "$secondary",

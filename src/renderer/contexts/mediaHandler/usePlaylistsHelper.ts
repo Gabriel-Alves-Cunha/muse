@@ -51,8 +51,9 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 }
 
 export async function searchDirectoryResult() {
+	const start = performance.now();
+
 	const fullPaths: Array<readonly string[]> = [];
-	console.time("searchDirectoryResult");
 	(
 		await Promise.allSettled([
 			getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
@@ -62,9 +63,13 @@ export async function searchDirectoryResult() {
 	).forEach(p => {
 		if (p.status === "fulfilled") fullPaths.push(p.value);
 	});
-	console.timeEnd("searchDirectoryResult");
 
-	return Object.freeze(fullPaths.flat());
+	const ret = Object.freeze(fullPaths.flat());
+
+	const end = performance.now();
+	console.log(`%csearchDirectoryResult took: ${end - start}ms.`, "color:brown");
+
+	return ret;
 }
 
 export const searchDirectoryForMedias = async (directory: Path) =>

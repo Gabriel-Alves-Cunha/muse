@@ -1,6 +1,6 @@
 import { MediaListKind, SearchMedia, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia/helper";
-import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MAIN_LIST } from "@contexts";
 
 export function Home() {
 	return (

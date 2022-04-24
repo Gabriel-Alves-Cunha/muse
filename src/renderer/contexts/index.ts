@@ -38,3 +38,14 @@ export type {
 	DefaultLists,
 	Playlist,
 } from "./mediaHandler/usePlaylists";
+
+export {
+	returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia,
+	maxSizeOfHistory,
+	SORTED_BY_DATE,
+	SORTED_BY_NAME,
+	getMediaFiles,
+	FAVORITES,
+	MAIN_LIST,
+	HISTORY,
+} from "./mediaHandler/usePlaylistsHelper";

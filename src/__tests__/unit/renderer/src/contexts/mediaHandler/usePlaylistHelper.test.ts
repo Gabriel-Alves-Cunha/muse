@@ -1,36 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { describe, expect, it } from "vitest";
-import { faker } from "@faker-js/faker";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
+import { testList } from "./getFakeTestList";
+
 mockGlobalsBeforeTests();
 
-import { Media, MediaID } from "@common/@types/typesAndEnums";
-import { formatDuration } from "@common/utils";
-import { hash } from "@common/hash";
+import { MediaID } from "@common/@types/typesAndEnums";
 import {
 	returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia,
 	maxSizeOfHistory,
-} from "@contexts/mediaHandler/usePlaylistsHelper";
-
-// Make a test list full of fake medias:
-const numberOfMedias = 10;
-const testList: Media[] = [];
-for (let index = 0; index < numberOfMedias; ++index) {
-	const title = faker.unique(faker.name.jobTitle);
-
-	testList.push({
-		dateOfArival: faker.date.past().getTime(),
-		duration: formatDuration(index + 10),
-		path: `home/Music/test/${title}.mp3`,
-		favorite: false,
-		id: hash(title),
-		size: "3.0 MB",
-		title,
-	});
-}
-Object.freeze(testList);
+} from "@contexts";
 
 describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 	it("should return a NEW array with new item(s) at the start of the array", () => {

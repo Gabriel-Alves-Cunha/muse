@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { faker } from "@faker-js/faker";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
+import { testList } from "./getFakeTestList";
+
 mockGlobalsBeforeTests();
 
-import { formatDuration } from "@common/utils";
-import { hash } from "@common/hash";
-
-import { MAIN_LIST, HISTORY } from "@contexts/mediaHandler/usePlaylistsHelper";
-import { Media } from "@common/@types/typesAndEnums";
+import { MAIN_LIST, HISTORY } from "@contexts";
 import {
 	CurrentPlayingEnum,
 	setCurrentPlaying,
@@ -25,24 +22,6 @@ import {
 
 const getPlaylist = (listName: DefaultLists) =>
 	getPlaylists().playlists.find(p => p.name === listName)!;
-
-// Make a test list full of fake medias:
-const testList: Media[] = [];
-const numberOfMedias = 30;
-for (let index = 0; index < numberOfMedias; ++index) {
-	const title = faker.unique(faker.name.jobTitle);
-
-	testList.push({
-		dateOfArival: faker.date.past().getTime(),
-		duration: formatDuration(index + 10),
-		path: `home/Music/test/${title}.mp3`,
-		favorite: false,
-		id: hash(title),
-		size: "3.0 MB",
-		title,
-	});
-}
-Object.freeze(testList);
 
 describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {

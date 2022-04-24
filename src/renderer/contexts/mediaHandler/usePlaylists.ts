@@ -73,10 +73,10 @@ export const usePlaylists = create<UsePlaylistsActions>(
 			) => {
 				const searchTerm = searchTerm_.toLowerCase();
 				const mainList = get().mainList;
-				const timeLabel = `The search for "${searchTerm}" from list "${fromList}" took`;
 				let results: readonly Media[];
 
-				console.time(timeLabel);
+				const start = performance.now();
+
 				// Handle when fromList === MAIN_LIST
 				if (fromList === MAIN_LIST) {
 					results = mainList.filter(m =>
@@ -88,9 +88,18 @@ export const usePlaylists = create<UsePlaylistsActions>(
 						.list.map(mediaID => mainList.find(m => m.id === mediaID)!)
 						.filter(m => m.title.toLowerCase().includes(searchTerm));
 				}
-				console.timeEnd(timeLabel);
 
-				return Object.freeze(results);
+				Object.freeze(results);
+
+				const end = performance.now();
+				console.log(
+					`%cThe search for "${searchTerm}" from list "${fromList}" took: ${
+						end - start
+					} ms.`,
+					"color:brown",
+				);
+
+				return results;
 			},
 			setPlaylists: (action: PlaylistsReducer_Action) => {
 				const prevPlaylistsContainer = get().playlists;
@@ -328,15 +337,13 @@ export const usePlaylists = create<UsePlaylistsActions>(
 					dbg("Finished searching. Paths =", paths);
 
 					if (force || isThereNewMedia(paths)) {
-						console.time("Reading metadata of all medias");
 						const newMainList = await transformPathsToMedias(paths);
-						console.timeEnd("Reading metadata of all medias");
 						dbg("Finished searching. Medias =", newMainList);
 
 						get().setPlaylists({
 							whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
 							type: PlaylistEnum.UPDATE_MAIN_LIST,
-							list: Object.freeze(newMainList),
+							list: newMainList,
 						});
 					}
 				} catch (error) {

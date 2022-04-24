@@ -6,7 +6,6 @@ import { getBasicInfo } from "ytdl-core";
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
-import { recognizeMedia } from "./preload/audioRecognition";
 import { homeDir, dirs } from "./utils";
 import { dbg } from "@common/utils";
 import {
@@ -51,7 +50,6 @@ contextBridge.exposeInMainWorld("electron", {
 	media: {
 		transformPathsToMedias,
 		convertToAudio,
-		recognizeMedia,
 		getBasicInfo,
 		writeTags,
 	},
@@ -84,11 +82,8 @@ window.onmessage = async (
 				break;
 			}
 
-			electronPort.onmessage = ({
-				data,
-			}: {
-				data: HandleDownload & { destroy?: boolean };
-			}) => handleCreateOrCancelDownload({ ...data, electronPort });
+			electronPort.onmessage = ({ data }: HandleCreateOrCancelDownload) =>
+				handleCreateOrCancelDownload({ ...data, electronPort });
 
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
@@ -101,15 +96,12 @@ window.onmessage = async (
 
 		case ReactToElectronMessageEnum.CONVERT_MEDIA: {
 			if (!electronPort) {
-				console.error("There should be a electronPort to download media!");
+				console.error("There should be a electronPort to convert media!");
 				break;
 			}
 
-			electronPort.onmessage = ({
-				data,
-			}: {
-				data: HandleConversion & { destroy?: boolean };
-			}) => handleCreateOrCancelConvert({ ...data, electronPort });
+			electronPort.onmessage = ({ data }: HandleCreateOrCancelConvert) =>
+				handleCreateOrCancelConvert({ ...data, electronPort });
 
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
@@ -155,4 +147,12 @@ window.onmessage = async (
 			break;
 		}
 	}
+};
+
+type HandleCreateOrCancelDownload = {
+	data: HandleDownload & { destroy?: boolean };
+};
+
+type HandleCreateOrCancelConvert = {
+	data: HandleConversion & { destroy?: boolean };
 };

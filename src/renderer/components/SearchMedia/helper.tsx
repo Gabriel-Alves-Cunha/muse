@@ -10,7 +10,6 @@ import create from "zustand";
 
 import { assertUnreachable } from "@utils/utils";
 import { ImgWithFallback } from "@components";
-import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import {
 	searchLocalComputerForMedias,
 	CurrentPlayingEnum,
@@ -18,6 +17,7 @@ import {
 	PlaylistActions,
 	PlaylistEnum,
 	setPlaylists,
+	MAIN_LIST,
 } from "@contexts";
 
 import { SearchResultsWrapper, NothingFound, Result, Button } from "./styles";

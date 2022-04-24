@@ -8,10 +8,20 @@ import react from "@vitejs/plugin-react";
 const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
 
-export default defineConfig({
+// @ts-ignore This has to be this way, otherwise it just does not work...
+const isDevelopment = String(process.env.NODE_ENV === "development");
+// @ts-ignore This has to be this way, otherwise it just does not work...
+const isTesting = String(process.env.VITEST ? true : false);
+console.log({ isDevelopment, isTesting });
+
+const config: UserConfigFromVitest & UserConfigFromVite = {
 	plugins: [react()],
-	base: "./",
 	root: rendererPath,
+	base: "./",
+	define: {
+		VITE_IS_DEVELOPMENT: JSON.stringify(isDevelopment),
+		VITE_IS_TESTING: JSON.stringify(isTesting),
+	},
 	test: {
 		coverage: {
 			// reporter: ["html", "text"],
@@ -86,4 +96,6 @@ export default defineConfig({
 			},
 		],
 	},
-} as UserConfigFromVitest & UserConfigFromVite);
+};
+
+export default defineConfig(config);

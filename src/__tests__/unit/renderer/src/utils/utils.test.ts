@@ -3,7 +3,7 @@ import { assert, expect, it } from "vitest";
 import { assertUnreachable, getRandomInt, capitalize } from "@utils/utils";
 
 it("should capitalize a string", () => {
-	const strings = [
+	const strings = Object.freeze([
 		"1 cup of water",
 		".gitignore",
 		"jupyter",
@@ -12,7 +12,7 @@ it("should capitalize a string", () => {
 		"Venus",
 		"mars",
 		"",
-	];
+	]);
 
 	const result = strings.map(str => capitalize(str));
 
@@ -29,13 +29,9 @@ it("should capitalize a string", () => {
 });
 
 it("should get a random integer between min (included) and max (not included)", () => {
-	const results1 = [];
-	const results2 = [];
-
-	for (let i = 0; i <= 100; ++i) {
-		results1.push(getRandomInt(i, i + 100));
-		results2.push(getRandomInt(i, i + 100));
-	}
+	const length = 100;
+	const results1 = Array.from({ length }, (_, i) => getRandomInt(i, i + 100));
+	const results2 = Array.from({ length }, (_, i) => getRandomInt(i, i + 100));
 
 	const additional = [
 		getRandomInt(10.2427687, 23.24356),

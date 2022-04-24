@@ -1,9 +1,8 @@
+import type { DownloadValues } from "@common/@types/typesAndEnums.js";
+
 import { validateURL, getBasicInfo } from "ytdl-core";
 import { pathToFileURL } from "url";
 import { join } from "path";
-import installExtension, {
-	REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer";
 import {
 	BrowserWindow,
 	Notification,
@@ -21,7 +20,6 @@ import {
 	ElectronIpcMainProcessNotificationEnum,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
-import { DownloadValues } from "@common/@types/typesAndEnums.js";
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -109,13 +107,22 @@ app
 		// initialization and is ready to create browser windows.
 		// Some APIs can only be used after this event occurs.
 
-		await installExtension(REACT_DEVELOPER_TOOLS, {
-			loadExtensionOptions: { allowFileAccess: true },
-		})
-			.then(name => console.log(`Added Extension: ${name}`))
-			.catch(err =>
-				console.error("An error occurred while installing extension: ", err),
-			);
+		// TODO: there is something wrong with this lib:
+		// if (isDevelopment) {
+		// 	const devtoolsInstaller = await import("electron-devtools-installer");
+		// 	const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
+		// 	const { default: installExtension } = devtoolsInstaller.default;
+
+		// 	console.log({ installExtension });
+
+		// 	await installExtension(REACT_DEVELOPER_TOOLS, {
+		// 		loadExtensionOptions: { allowFileAccess: true },
+		// 	})
+		// 		.then(name => console.log(`Added Extension: ${name}`))
+		// 		.catch(err =>
+		// 			console.error("An error occurred while installing extension: ", err),
+		// 		);
+		// }
 
 		electronWindow = await createWindow();
 		tray = new Tray(nativeImage.createFromPath(logoPath));
@@ -182,7 +189,10 @@ ipcMain.on(
 	(_e, downloadValues: DownloadValues) => {
 		console.log("ipcMain received data from electronWindow:", downloadValues);
 
-		ipcMain.emit(ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS, downloadValues);
+		ipcMain.emit(
+			ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+			downloadValues,
+		);
 	},
 );
 

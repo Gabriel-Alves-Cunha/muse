@@ -10,7 +10,7 @@ import { Virtuoso } from "react-virtuoso";
 
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
-import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MAIN_LIST } from "@contexts";
 import {
 	type Playlist,
 	CurrentPlayingEnum,
@@ -38,7 +38,6 @@ import {
 	Msg,
 } from "./styles";
 
-const timeLabel = "Loop to find all medias by id took";
 const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 	setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
@@ -68,14 +67,17 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		// Handle when playlistName === MAIN_LIST:
 		if (playlistName === MAIN_LIST) return mainList;
 		else {
-			console.time(timeLabel);
+			const start = performance.now();
+
 			// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
 			const data = playlists
 				.find(p => p.name === playlistName)!
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
 
-			console.timeEnd(timeLabel);
+			const end = performance.now();
+			console.log(`%cLoop to find all medias by id took: ${end - start} ms.`);
+
 			return data;
 		}
 	}, [mainList, playlistName, playlists]);

@@ -4,11 +4,10 @@ import type { Media, Path } from "@common/@types/typesAndEnums";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "stream";
 
+import { rename as renameFile, access } from "fs/promises";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
-import { rename as renameFile } from "fs/promises";
 import { createReadStream } from "fs";
 import { dirname, join } from "path";
-import { pathExists } from "fs-extra";
 import { get } from "https";
 import {
 	File as MediaFile,
@@ -22,26 +21,26 @@ import sanitize from "sanitize-filename";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
+import { getLastExtension, formatDuration, getBasename } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { dbg, isDevelopment } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
 import { hash } from "@common/hash";
 import { dirs } from "../utils";
-import { dbg } from "@common/utils";
-import {
-	getLastExtension,
-	formatDuration,
-	isDevelopment,
-	getBasename,
-} from "@common/utils";
 
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
 const currentDownloads: Map<string, Readable> = new Map();
 const mediasConverting: Map<Path, Readable> = new Map();
+
+const pathExists = async (path: Path): Promise<boolean> =>
+	access(path)
+		.then(() => true)
+		.catch(() => false);
 
 const createMedia = async (
 	path: Path,
@@ -50,8 +49,9 @@ const createMedia = async (
 	ignoreMediaWithLessThan60Seconds: boolean,
 ): Promise<Media> =>
 	new Promise((resolve, reject) => {
+		const start = performance.now();
+
 		const basename = getBasename(path);
-		console.time(`Nº ${index}, "${basename}" took`);
 
 		const {
 			fileAbstraction: {
@@ -67,7 +67,11 @@ const createMedia = async (
 			console.info(
 				`Skipping "${path}" because the duration is ${duration} seconds (< 60 seconds)!`,
 			);
-			console.timeEnd(`Nº ${index}, "${basename}" took`);
+			const end = performance.now();
+			console.log(
+				`%cNº ${index}, "${basename}" took: ${end - start} ms.`,
+				"color:brown",
+			);
 			return reject();
 		}
 
@@ -75,7 +79,11 @@ const createMedia = async (
 			console.info(
 				`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
 			);
-			console.timeEnd(`Nº ${index}, "${basename}" took`);
+			const end = performance.now();
+			console.log(
+				`%cNº ${index}, "${basename}" took: ${end - start} ms.`,
+				"color:brown",
+			);
 			return reject();
 		}
 
@@ -114,7 +122,11 @@ const createMedia = async (
 			properties: { durationMilliseconds },
 		});
 
-		console.timeEnd(`Nº ${index}, "${basename}" took`);
+		const end = performance.now();
+		console.log(
+			`%cNº ${index}, "${basename}" took: ${end - start} ms.`,
+			"color:brown",
+		);
 
 		return resolve(media);
 	});
@@ -124,8 +136,10 @@ export async function transformPathsToMedias(
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<readonly Media[]> {
+	const start = performance.now();
+
 	const medias: Media[] = [];
-	console.time("Runnig 'for' on all medias");
+
 	const promises = paths.map((path, index) =>
 		createMedia(
 			path,
@@ -134,10 +148,18 @@ export async function transformPathsToMedias(
 			ignoreMediaWithLessThan60Seconds,
 		),
 	);
+
 	(await Promise.allSettled(promises)).forEach(p => {
 		if (p.status === "fulfilled") medias.push(p.value);
 	});
-	console.timeEnd("Runnig 'for' on all medias");
+
+	Object.freeze(medias);
+
+	const end = performance.now();
+	console.log(
+		`%cRunnig 'for' on all medias took: ${end - start} ms.`,
+		"color:brown",
+	);
 
 	return medias;
 }

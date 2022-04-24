@@ -8,9 +8,9 @@ export const mockGlobalsBeforeTests = () => {
 		},
 		fs: {
 			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
-			readdir: vi.fn(),
-			readFile: vi.fn(),
 			deleteFile: vi.fn(),
+			readFile: vi.fn(),
+			readdir: vi.fn(),
 		},
 		os: {
 			homeDir: "test/homeDir",
@@ -23,8 +23,8 @@ export const mockGlobalsBeforeTests = () => {
 		media: {
 			transformPathsToMedias: vi.fn(),
 			convertToAudio: vi.fn(),
-			writeTags: vi.fn(),
 			getBasicInfo: vi.fn(),
+			writeTags: vi.fn(),
 		},
 	});
 

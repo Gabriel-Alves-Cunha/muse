@@ -2,10 +2,10 @@ import { debug, enable } from "debug";
 
 const { trunc, floor } = Math;
 
-// @ts-ignore This has to be this way, otherwise it just does not work...
-export const isDevelopment = process.env.NODE_ENV === "development";
-// @ts-ignore This has to be this way, otherwise it just does not work...
-export const isTesting = process.env.VITEST ? true : false;
+export const isDevelopment = true;
+export const isTesting = false;
+// export const isDevelopment = VITE_IS_DEVELOPMENT === "true";
+// export const isTesting = VITE_IS_TESTING === "true";
 console.log({ isDevelopment, isTesting });
 
 export const capitalizedAppName = "Muse" as const;

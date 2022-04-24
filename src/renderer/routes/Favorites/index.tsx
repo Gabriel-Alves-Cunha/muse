@@ -1,6 +1,6 @@
 import { SearchMedia, MediaListKind, MainArea } from "@components";
 import { ButtonToTheSide } from "@components/SearchMedia/helper";
-import { FAVORITES } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { FAVORITES } from "@contexts";
 
 export function Favorites() {
 	return (

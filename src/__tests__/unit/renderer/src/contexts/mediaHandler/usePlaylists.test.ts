@@ -3,14 +3,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { faker } from "@faker-js/faker";
 
+import { numberOfMedias, testList } from "./getFakeTestList";
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
+
 mockGlobalsBeforeTests();
 
+import { MAIN_LIST, FAVORITES, HISTORY } from "@contexts";
 import { formatDuration } from "@common/utils";
 import { getRandomInt } from "@utils/utils";
 import { Media } from "@common/@types/typesAndEnums";
 import { hash } from "@common/hash";
-
 import {
 	searchForMediaFromList,
 	CurrentPlayingEnum,
@@ -22,38 +24,10 @@ import {
 	setPlaylists,
 	getPlaylists,
 } from "@contexts";
-import {
-	// SORTED_BY_DATE,
-	// SORTED_BY_NAME,
-	MAIN_LIST,
-	FAVORITES,
-	HISTORY,
-} from "@contexts/mediaHandler/usePlaylistsHelper";
-
-// Make a test list full of fake medias:
-const numberOfMedias = 30;
-const testList: Media[] = [];
-for (let index = 0; index < numberOfMedias; ++index) {
-	const title = faker.unique(faker.name.jobTitle);
-
-	const fakeMedia: Media = {
-		dateOfArival: faker.date.past().getTime(),
-		duration: formatDuration(index + 10),
-		path: `home/Music/test/${title}.mp3`,
-		favorite: false,
-		id: hash(title),
-		size: "3.0 MB",
-		title,
-	};
-
-	testList.push(fakeMedia);
-}
-Object.freeze(testList);
 
 const getPlaylist = (listName: DefaultLists | string) =>
 	getPlaylists().playlists.find(p => p.name === listName)!;
 
-// Tests:
 describe("Testing list updates", () => {
 	it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
 		setPlaylists({
@@ -141,7 +115,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	it("should play the previous media", () => {
 		const currMainList = getPlaylists().mainList;
 
-		for (let i = numberOfMedias; i === 0; --i) {
+		testList.forEach((_, i) => {
 			setCurrentPlaying({
 				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
 				playlistName: MAIN_LIST,
@@ -151,7 +125,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			const expectedMediaID = currMainList.at(i - 1)?.id;
 
 			expect(currMediaID).toBe(expectedMediaID);
-		}
+		});
 	});
 
 	it("should play a chosen media", () => {
@@ -264,6 +238,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 				dateOfArival: faker.date.past().getTime(),
 				path: `home/Music/test/${title}.mp3`,
 				duration: formatDuration(100 + 10),
+				selected: false,
 				favorite: false,
 				id: hash(title),
 				size: "3.0 MB",

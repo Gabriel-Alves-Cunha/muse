@@ -1,16 +1,17 @@
 import { ToastContainer } from "react-toastify";
+import { useEffect } from "react";
 
 import { Favorites, Download, Convert, History, Home } from "@routes";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
 import { setDownloadValues } from "@modules/Downloading";
-import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
 	PlaylistActions,
+	getMediaFiles,
 	PlaylistEnum,
 	setPlaylists,
 	getPlaylists,
@@ -27,6 +28,10 @@ import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
 
 export function App() {
+	useEffect(() => {
+		(async () => searchLocalComputerForMedias(true))();
+	}, []);
+
 	GlobalCSS();
 
 	return (
