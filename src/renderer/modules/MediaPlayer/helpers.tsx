@@ -20,6 +20,7 @@ import { useCallback, useMemo, useRef } from "react";
 
 import { formatDuration } from "@common/utils";
 import { useProgress } from ".";
+import { Tooltip } from "@components";
 import {
 	CurrentPlayingEnum,
 	getCurrentPlaying,
@@ -81,15 +82,19 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 			<SeekerWrapper audio={audio} />
 
 			<ControlsButtonsWrapper>
-				<IconButton onClick={toggleRepeatThisMedia} style={{ width: 40 }}>
-					{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
-				</IconButton>
+				<Tooltip text="Toggle repeat this media">
+					<IconButton onClick={toggleRepeatThisMedia} style={{ width: 40 }}>
+						{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
+					</IconButton>
+				</Tooltip>
 
 				<Controls isPaused={audio?.paused} />
 
-				<IconButton onClick={toggleRandomAndLoop} style={{ width: 40 }}>
-					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
-				</IconButton>
+				<Tooltip text="Toggle random and loop" arrow={false}>
+					<IconButton onClick={toggleRandomAndLoop} style={{ width: 40 }}>
+						{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
+					</IconButton>
+				</Tooltip>
 			</ControlsButtonsWrapper>
 		</ControlsAndSeekerContainer>
 	);
@@ -97,43 +102,53 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 
 export const Header = ({ media }: RefToMedia) => (
 	<OptionsAndAlbum>
-		<IconButton style={{ width: 30 }}>
-			<Dots size="19" />
-		</IconButton>
+		<Tooltip text="Media options">
+			<IconButton style={{ width: 30 }}>
+				<Dots size="19" />
+			</IconButton>
+		</Tooltip>
 
 		<Album>{media?.album}</Album>
 
-		<IconButton style={{ width: 30 }}>
-			{media?.favorite ? <Favorite size="17" /> : <AddFavorite size="17" />}
-		</IconButton>
+		<Tooltip text="Toggle favorite" arrow={false}>
+			<IconButton style={{ width: 30 }}>
+				{media?.favorite ? <Favorite size="17" /> : <AddFavorite size="17" />}
+			</IconButton>
+		</Tooltip>
 	</OptionsAndAlbum>
 );
 
 export const Controls = ({ isPaused = false }: IsPaused) => (
 	<ControlsWrapper>
-		<IconButton
-			className="previous-or-next"
-			onClick={playPreviousMedia}
-			style={{ width: 30 }}
-		>
-			<Previous />
-		</IconButton>
+		<Tooltip text="Play previous track">
+			<IconButton
+				className="previous-or-next"
+				onClick={playPreviousMedia}
+				style={{ width: 30 }}
+			>
+				<Previous />
+			</IconButton>
+		</Tooltip>
 
-		<IconButton
-			onClick={togglePlayOrPauseMedia}
-			style={{ width: 50 }}
-			id="play-pause"
-		>
-			{isPaused ? <Play size="25" /> : <Pause size="25" />}
-		</IconButton>
+		<Tooltip text="Play/pause">
+			<IconButton
+				onClick={togglePlayOrPauseMedia}
+				style={{ width: 50 }}
+				id="play-pause"
+			>
+				{isPaused ? <Play size="25" /> : <Pause size="25" />}
+			</IconButton>
+		</Tooltip>
 
-		<IconButton
-			className="previous-or-next"
-			onClick={playNextMedia}
-			style={{ width: 30 }}
-		>
-			<Next />
-		</IconButton>
+		<Tooltip text="Play next track" arrow={false}>
+			<IconButton
+				className="previous-or-next"
+				onClick={playNextMedia}
+				style={{ width: 30 }}
+			>
+				<Next />
+			</IconButton>
+		</Tooltip>
 	</ControlsWrapper>
 );
 

@@ -95,6 +95,13 @@ export const darkTheme = createTheme({
 
 		"accent-light": "#574f82",
 		accent: "#550c18",
+
+		"ctx-menu-item-text-disabled": "#d3d3d5",
+		"ctx-menu-item-bg-focus": "#6c56d0",
+		"ctx-menu-item-text-focus": "white",
+		"ctx-menu-item-text": "#5747a6",
+		"ctx-menu-separator": "#d7d3e2",
+		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
 		popup: "0 0 8px rgba(255, 255, 255, 0.2)",
@@ -129,6 +136,13 @@ export const lightTheme = createTheme({
 
 		"accent-light": "#9381FF",
 		accent: "#9882AC",
+
+		"ctx-menu-item-text-disabled": "#d3d3d5",
+		"ctx-menu-item-bg-focus": "#6c56d0",
+		"ctx-menu-item-text-focus": "white",
+		"ctx-menu-item-text": "#5747a6",
+		"ctx-menu-separator": "#d7d3e2",
+		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
 		popup: "0 0 8px rgba(0, 0, 0, 0.2)",

@@ -10,6 +10,7 @@ import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { deleteMedia } from "@contexts";
 import { capitalize } from "@utils/utils";
+import { Tooltip } from "@components";
 import { dbg } from "@common/utils";
 
 import {
@@ -48,9 +49,11 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 				you&apos;re done.
 			</StyledDescription>
 
-			<CloseIcon ref={closeButtonRef}>
-				<Close />
-			</CloseIcon>
+			<Tooltip text="Close">
+				<CloseIcon ref={closeButtonRef}>
+					<Close />
+				</CloseIcon>
+			</Tooltip>
 
 			{Object.entries(options(media)).map(([option, value]) => (
 				<Fieldset key={option}>

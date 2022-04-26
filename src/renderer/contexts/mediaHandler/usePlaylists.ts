@@ -327,7 +327,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 					const mainListLength = get().mainList.length;
 					const isThereNewMedia = paths.length !== mainListLength;
 					console.log(
-						`mainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
+						`%cmainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
+						"color:blue",
 					);
 					return isThereNewMedia;
 				};

@@ -1,12 +1,13 @@
+import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
 import { Favorites, Download, Convert, History, Home } from "@routes";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
+import { ContextMenu, Decorations } from "@components";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
 import { setDownloadValues } from "@modules/Downloading";
-import { Decorations } from "@components";
 import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
@@ -48,9 +49,13 @@ export function App() {
 				draggable
 			/>
 
-			<Decorations />
+			<TooltipProvider delayDuration={500} skipDelayDuration={0}>
+				<Decorations />
 
-			<Main />
+				<ContextMenu>
+					<Main />
+				</ContextMenu>
+			</TooltipProvider>
 		</>
 	);
 }
@@ -92,7 +97,7 @@ window.onmessage = async (
 	if (event.data.source !== electronSource) return;
 
 	dbg("Received message from Electron.\ndata =", event.data);
-	const msg = event.data.msg;
+	const { msg } = event.data;
 
 	switch (msg.type) {
 		case ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS: {
@@ -136,12 +141,9 @@ window.onmessage = async (
 				break;
 			}
 
-			try {
-				await deleteMedia(media);
-				console.log(`Media "${{ media }}" deleted.`);
-			} catch (error) {
-				console.error(error);
-			}
+			deleteMedia(media)
+				.then(() => console.log(`Media "${{ media }}" deleted.`))
+				.catch(console.error);
 			break;
 		} // 3
 
@@ -164,7 +166,6 @@ window.onmessage = async (
 				console.warn(
 					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media.`,
 				);
-
 				await searchLocalComputerForMedias(true);
 				break;
 			}
@@ -175,7 +176,6 @@ window.onmessage = async (
 				console.error(
 					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media.`,
 				);
-
 				await searchLocalComputerForMedias(true);
 				break;
 			}
@@ -248,10 +248,9 @@ function listenToDropEvent(event: DragEvent) {
 	if (!event.dataTransfer) return;
 
 	const fileList = event.dataTransfer.files;
-	console.log({ fileList });
-
 	const files = getMediaFiles(fileList);
 
+	console.log({ fileList, files });
 	console.error("@TODO: handle these files droped!", files);
 }
 

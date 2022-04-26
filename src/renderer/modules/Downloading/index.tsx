@@ -11,6 +11,7 @@ import { useOnClickOutside } from "@hooks";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { remove, replace } from "@utils/array";
 import { Progress } from "@components/Progress";
+import { Tooltip } from "@components";
 
 import {
 	TitleAndCancelWrapper,
@@ -104,12 +105,14 @@ export function Downloading() {
 
 	return (
 		<Wrapper ref={popupRef}>
-			<Trigger
-				onClick={() => setShowPopup(prev => !prev)}
-				className={showPopup ? "active" : ""}
-			>
-				<DownloadingIcon size="20" />
-			</Trigger>
+			<Tooltip text="Show all downloading medias" arrow={false} side="right">
+				<Trigger
+					onClick={() => setShowPopup(prev => !prev)}
+					className={showPopup ? "active" : ""}
+				>
+					<DownloadingIcon size="20" />
+				</Trigger>
+			</Tooltip>
 
 			{showPopup && <Popup_ />}
 		</Wrapper>
@@ -127,13 +130,15 @@ const Popup_ = () => {
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>
 
-							<button
-								onClick={() =>
-									cancelDownloadAndOrRemoveItFromList(download.url)
-								}
-							>
-								<Cancel size={9} />
-							</button>
+							<Tooltip text="Cancel download">
+								<button
+									onClick={() =>
+										cancelDownloadAndOrRemoveItFromList(download.url)
+									}
+								>
+									<Cancel size={9} />
+								</button>
+							</Tooltip>
 						</TitleAndCancelWrapper>
 
 						<Progress

@@ -5,6 +5,7 @@ import {
 } from "react-icons/vsc";
 
 import { capitalizedAppName } from "@common/utils";
+import { Tooltip } from "@components";
 import { usePage } from "@contexts";
 import {
 	toggleMaximize,
@@ -36,21 +37,27 @@ export const Decorations = () => (
 
 const Buttons = () => (
 	<WindowButtons>
-		<WindowButton aria-label="Close window" onClick={closeWindow} id="close">
-			<Close size={16} />
-		</WindowButton>
+		<Tooltip text="Close window" arrow={false}>
+			<WindowButton onClick={closeWindow} id="close">
+				<Close size={16} />
+			</WindowButton>
+		</Tooltip>
 
-		<WindowButton aria-label="Toggle maximize window" onClick={toggleMaximize}>
-			<Maximize size={16} />
-		</WindowButton>
+		<Tooltip text="Toggle maximize window" arrow={false}>
+			<WindowButton onClick={toggleMaximize}>
+				<Maximize size={16} />
+			</WindowButton>
+		</Tooltip>
 
-		<WindowButton onClick={minimizeWindow} aria-label="Minize window">
-			<Minimize size={16} />
-		</WindowButton>
+		<Tooltip text="Minimize window">
+			<WindowButton onClick={minimizeWindow}>
+				<Minimize size={16} />
+			</WindowButton>
+		</Tooltip>
 	</WindowButtons>
 );
 
-function AppName_Folder() {
+const AppName_Folder = () => {
 	const { page } = usePage();
 
 	return (
@@ -58,4 +65,4 @@ function AppName_Folder() {
 			{capitalizedAppName} {"\u279D"} {page}
 		</AppName_Folder_Wrapper>
 	);
-}
+};

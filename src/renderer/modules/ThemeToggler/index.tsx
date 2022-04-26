@@ -6,6 +6,7 @@ import {
 
 import { useLocalStorage } from "@hooks";
 import { keyPrefix } from "@utils/app";
+import { Tooltip } from "@components";
 
 import { styled, darkTheme, lightTheme } from "@styles/global";
 
@@ -37,9 +38,11 @@ export function ThemeToggler() {
 	};
 
 	return (
-		<Button onClick={toggleTheme}>
-			{theme === "light" ? <Dark size="20px" /> : <Light size="20px" />}
-		</Button>
+		<Tooltip text="Toggle theme" side="right">
+			<Button onClick={toggleTheme}>
+				{theme === "light" ? <Dark size="20px" /> : <Light size="20px" />}
+			</Button>
+		</Tooltip>
 	);
 }
 

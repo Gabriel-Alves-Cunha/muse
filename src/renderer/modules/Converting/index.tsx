@@ -17,6 +17,7 @@ import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { getBasename } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
+import { Tooltip } from "@components";
 
 import { ConvertionProgress } from "./styles";
 import {
@@ -108,12 +109,14 @@ export function Converting() {
 
 	return (
 		<Wrapper ref={popupRef}>
-			<Trigger
-				onClick={() => setShowPopup(prev => !prev)}
-				className={showPopup ? "active" : ""}
-			>
-				<Convert size={20} />
-			</Trigger>
+			<Tooltip text="Show all converting medias" arrow={false} side="right">
+				<Trigger
+					onClick={() => setShowPopup(prev => !prev)}
+					className={showPopup ? "active" : ""}
+				>
+					<Convert size={20} />
+				</Trigger>
+			</Tooltip>
 
 			{showPopup && <Popup_ />}
 		</Wrapper>
@@ -149,13 +152,15 @@ const ConvertBox = ({
 					mediaBeingConverted.toExtension}
 			</p>
 
-			<button
-				onClick={() =>
-					cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
-				}
-			>
-				<Cancel size={13} />
-			</button>
+			<Tooltip text="Cancel conversion">
+				<button
+					onClick={() =>
+						cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
+					}
+				>
+					<Cancel size={13} />
+				</button>
+			</Tooltip>
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>

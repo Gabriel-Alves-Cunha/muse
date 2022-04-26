@@ -11,6 +11,7 @@ import { Virtuoso } from "react-virtuoso";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components";
 import { MAIN_LIST } from "@contexts";
+import { Tooltip } from "@components";
 import {
 	type Playlist,
 	CurrentPlayingEnum,
@@ -65,21 +66,23 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 
 	const data = useMemo(() => {
 		// Handle when playlistName === MAIN_LIST:
-		if (playlistName === MAIN_LIST) return mainList;
-		else {
-			const start = performance.now();
+		const start = performance.now();
+		const data =
+			playlistName === MAIN_LIST
+				? mainList
+				: // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+				  playlists
+						.find(p => p.name === playlistName)!
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+						.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
 
-			// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-			const data = playlists
-				.find(p => p.name === playlistName)!
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
+		const end = performance.now();
+		console.log(
+			`%cLoop to find all medias by id took: ${end - start} ms.`,
+			"color:brown",
+		);
 
-			const end = performance.now();
-			console.log(`%cLoop to find all medias by id took: ${end - start} ms.`);
-
-			return data;
-		}
+		return data;
 	}, [mainList, playlistName, playlists]);
 
 	const Row = memo(
@@ -88,24 +91,28 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 				onClick={e => selectMeIfCtrlPlusLeftClick(e, media.id)}
 				className={classes(media, currentPlaying.mediaID)}
 			>
-				<PlayButton onClick={() => playMedia(media.id, playlistName)}>
-					<ImgWrapper>
-						<ImgWithFallback
-							Fallback={<MusicNote size="1.4em" />}
-							media={media}
-						/>
-					</ImgWrapper>
+				<Tooltip text="Play this media">
+					<PlayButton onClick={() => playMedia(media.id, playlistName)}>
+						<ImgWrapper>
+							<ImgWithFallback
+								Fallback={<MusicNote size="1.4em" />}
+								media={media}
+							/>
+						</ImgWrapper>
 
-					<Info>
-						<Title>{media.title}</Title>
-						<SubTitle>{media.duration}</SubTitle>
-					</Info>
-				</PlayButton>
+						<Info>
+							<Title>{media.title}</Title>
+							<SubTitle>{media.duration}</SubTitle>
+						</Info>
+					</PlayButton>
+				</Tooltip>
 
 				<Dialog modal>
-					<TriggerOptions style={{ width: 30 }}>
-						<Dots />
-					</TriggerOptions>
+					<Tooltip text="Open media options">
+						<TriggerOptions style={{ width: 29 }}>
+							<Dots />
+						</TriggerOptions>
+					</Tooltip>
 
 					<Portal>
 						<StyledOverlay>

@@ -10,6 +10,7 @@ import create from "zustand";
 
 import { assertUnreachable } from "@utils/utils";
 import { ImgWithFallback } from "@components";
+import { Tooltip } from "@components";
 import {
 	searchLocalComputerForMedias,
 	CurrentPlayingEnum,
@@ -143,16 +144,20 @@ const playMedia = (mediaID: MediaID) =>
 	});
 
 const Row = ({ media }: { media: Media }) => (
-	<Result onClick={() => playMedia(media.id)}>
-		<ImgWrapper>
-			<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
-		</ImgWrapper>
+	<Tooltip text="Play this media">
+		<Result onClick={() => playMedia(media.id)}>
+			<ImgWrapper>
+				<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+			</ImgWrapper>
 
-		<Info>
-			<Title style={{ marginLeft: 5, textAlign: "left" }}>{media.title}</Title>
-			<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-		</Info>
-	</Result>
+			<Info>
+				<Title style={{ marginLeft: 5, textAlign: "left" }}>
+					{media.title}
+				</Title>
+				<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+			</Info>
+		</Result>
+	</Tooltip>
 );
 const SearchResults = ({ results }: { results: readonly Media[] }) => (
 	<SearchResultsWrapper>
@@ -180,22 +185,26 @@ export { searchResultJSX };
 
 const buttonToTheSideJSX: Map<ButtonToTheSide, () => JSX.Element> = new Map();
 buttonToTheSideJSX.set(ButtonToTheSide.RELOAD_BUTTON, () => (
-	<Button onClick={reload} className="reload">
-		<Reload
-			className={
-				getSearcherFunctions().searcher.searchStatus ===
-				SearchStatus.RELOADING_ALL_MEDIAS
-					? "reloading"
-					: ""
-			}
-			size={17}
-		/>
-	</Button>
+	<Tooltip text="Reload all medias">
+		<Button onClick={reload} className="reload">
+			<Reload
+				className={
+					getSearcherFunctions().searcher.searchStatus ===
+					SearchStatus.RELOADING_ALL_MEDIAS
+						? "reloading"
+						: ""
+				}
+				size={17}
+			/>
+		</Button>
+	</Tooltip>
 ));
 buttonToTheSideJSX.set(ButtonToTheSide.CLEAN, () => (
-	<Button>
-		<Clean size={15} onClick={cleanHistory} />
-	</Button>
+	<Tooltip text="Clean history">
+		<Button>
+			<Clean size={15} onClick={cleanHistory} />
+		</Button>
+	</Tooltip>
 ));
 buttonToTheSideJSX.set(ButtonToTheSide.NOTHING, () => <></>);
 Object.freeze(buttonToTheSideJSX);

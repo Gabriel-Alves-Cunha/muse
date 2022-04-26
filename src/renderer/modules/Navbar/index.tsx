@@ -11,6 +11,7 @@ import {
 
 import { Downloading, Converting } from "@modules";
 import { ThemeToggler } from "@modules/ThemeToggler";
+import { Tooltip } from "@components";
 import { usePage } from "@contexts";
 import { pages } from "@utils/app";
 
@@ -38,14 +39,14 @@ const ButtonsForPages = () => {
 	return (
 		<Buttons>
 			{pages.map(page => (
-				<ScaleUpIconButton
-					className={page === currPage ? "active" : ""}
-					onClick={() => setPage({ page })}
-					aria-label={"Go to " + page}
-					key={page}
-				>
-					{icon(page)}
-				</ScaleUpIconButton>
+				<Tooltip text={"Go to " + page} key={page} side="right">
+					<ScaleUpIconButton
+						className={page === currPage ? "active" : ""}
+						onClick={() => setPage({ page })}
+					>
+						{icon(page)}
+					</ScaleUpIconButton>
+				</Tooltip>
 			))}
 		</Buttons>
 	);

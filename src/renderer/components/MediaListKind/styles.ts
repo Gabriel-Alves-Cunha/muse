@@ -66,7 +66,7 @@ export const TriggerOptions = styled(Trigger, {
 
 	"&:hover": {
 		transition: "$bgc",
-		backgroundColor: "$icon-button",
+		backgroundColor: "#88888860",
 	},
 
 	// Hack to make the height the same size as the width:
