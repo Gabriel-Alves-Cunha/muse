@@ -45,7 +45,6 @@ export function App() {
 				closeOnClick
 				pauseOnHover
 				newestOnTop
-				rtl={false}
 				draggable
 			/>
 

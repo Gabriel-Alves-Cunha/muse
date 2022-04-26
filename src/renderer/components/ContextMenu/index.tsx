@@ -1,110 +1,39 @@
-import { IoIosArrowForward as RightArrow } from "react-icons/io";
-import { Root, Trigger, RadioGroup } from "@radix-ui/react-context-menu";
-import { type ReactNode, useState } from "react";
-import { MdCheck as Check } from "react-icons/md";
-import { BsDot as Dot } from "react-icons/bs";
+import { type ReactNode } from "react";
 
-import {
-	StyledItemIndicator,
-	StyledCheckboxItem,
-	StyledTriggerItem,
-	StyledRadioItem,
-	StyledSeparator,
-	StyledContent,
-	StyledLabel,
-	StyledItem,
-	RightSlot,
-	Box,
-} from "./styles";
+import { Root, Trigger } from "@radix-ui/react-context-menu";
 
-export const ContextMenu = ({ children }: Props) => {
-	const [bookmarksChecked, setBookmarksChecked] = useState(true);
-	const [urlsChecked, setUrlsChecked] = useState(false);
-	const [person, setPerson] = useState("pedro");
+import { assertUnreachable } from "@utils/utils";
+import { MainCtxMenu } from "./mainCtxMenu";
 
-	return (
-		<Box>
-			<Root>
-				<Trigger>{children}</Trigger>
+import { StyledContent, Box } from "./styles";
 
-				<StyledContent sideOffset={5}>
-					<StyledItem>
-						Back <RightSlot>{"⌘+["}</RightSlot>
-					</StyledItem>
+export enum Content {
+	MAIN,
+}
 
-					<StyledItem disabled>
-						Foward <RightSlot>{"⌘+]"}</RightSlot>
-					</StyledItem>
+const { MAIN } = Content;
 
-					<Root>
-						<StyledTriggerItem>
-							More Tools
-							<RightSlot>
-								<RightArrow size={15} />
-							</RightSlot>
-						</StyledTriggerItem>
+export const ContextMenu = ({ children, content = MAIN }: Props) => (
+	<Box>
+		<Root>
+			<Trigger>{children}</Trigger>
 
-						<StyledContent sideOffset={2} alignOffset={-5}>
-							<StyledItem>
-								Save Page As… <RightSlot>⌘+S</RightSlot>
-							</StyledItem>
+			<StyledContent sideOffset={5}>{contentToShow(content)}</StyledContent>
+		</Root>
+	</Box>
+);
 
-							<StyledItem>Create Shortcut…</StyledItem>
-							<StyledItem>Name Window…</StyledItem>
+const contentToShow = (content: NonNullable<Props["content"]>) => {
+	switch (content) {
+		case MAIN:
+			return <MainCtxMenu />;
 
-							<StyledSeparator />
-
-							<StyledItem>Developer Tools</StyledItem>
-						</StyledContent>
-					</Root>
-
-					<StyledSeparator />
-
-					<StyledCheckboxItem
-						onCheckedChange={setBookmarksChecked}
-						checked={bookmarksChecked}
-					>
-						<StyledItemIndicator>
-							<Check size={15} />
-						</StyledItemIndicator>
-						Show Bookmarks <RightSlot>⌘+B</RightSlot>
-					</StyledCheckboxItem>
-
-					<StyledCheckboxItem
-						checked={urlsChecked}
-						onCheckedChange={setUrlsChecked}
-					>
-						<StyledItemIndicator>
-							<Check size={15} />
-						</StyledItemIndicator>
-						Show Full URLs
-					</StyledCheckboxItem>
-
-					<StyledSeparator />
-
-					<StyledLabel>People</StyledLabel>
-
-					<RadioGroup value={person} onValueChange={setPerson}>
-						<StyledRadioItem value="pedro">
-							<StyledItemIndicator>
-								<Dot />
-							</StyledItemIndicator>
-							Pedro Duarte
-						</StyledRadioItem>
-
-						<StyledRadioItem value="colm">
-							<StyledItemIndicator>
-								<Dot />
-							</StyledItemIndicator>
-							Colm Tuite
-						</StyledRadioItem>
-					</RadioGroup>
-				</StyledContent>
-			</Root>
-		</Box>
-	);
+		default:
+			return assertUnreachable(content);
+	}
 };
 
 type Props = {
 	children: ReactNode;
+	content?: Content;
 };
