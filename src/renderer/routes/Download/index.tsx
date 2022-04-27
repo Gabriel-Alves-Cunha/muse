@@ -1,29 +1,29 @@
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import {
 	getDownloadHelper,
 	useDownloadHelper,
-	setSearchTerm,
 	download,
 	search,
 } from "./helpers";
 
+import { BorderedButton } from "@routes/Convert/styles";
 import { Loading } from "@styles/appStyles";
 import {
 	ResultContainer,
 	SearchWrapper,
 	Searcher,
 	Wrapper,
-	Button,
+	Box,
 } from "./styles";
 
 export const Download = () => (
 	<Wrapper>
-		<>
+		<Box>
 			<SearcherWrapper />
 			<IsLoading />
-		</>
+		</Box>
 
 		<Result />
 	</Wrapper>
@@ -31,29 +31,24 @@ export const Download = () => (
 
 const SearcherWrapper = () => {
 	const { error } = useDownloadHelper().searcher;
-	const urlToSearchForRef = useRef("");
-
-	const urlToSearchFor = urlToSearchForRef.current;
+	const [url, setUrl] = useState("");
 
 	useEffect(() => {
-		if (!urlToSearchFor || urlToSearchFor.length < 10) return;
+		if (!url || url.length < 10) return;
 
-		const searchTimeout = setTimeout(
-			async () => await search(urlToSearchFor),
-			400,
-		);
+		const searchTimeout = setTimeout(async () => await search(url), 400);
 
 		return () => clearTimeout(searchTimeout);
-	}, [urlToSearchFor]);
+	}, [url]);
 
 	return (
 		<SearchWrapper>
 			<Searcher>
-				<SearchIcon size="1.2em" />
+				<SearchIcon size="1.2rem" />
+
 				<input
+					onChange={e => setUrl(e.target.value)}
 					placeholder="Paste Youtube url here"
-					onChange={setSearchTerm}
-					value={urlToSearchFor}
 					autoCapitalize="off"
 					spellCheck="false"
 					autoCorrect="off"
@@ -69,7 +64,11 @@ const SearcherWrapper = () => {
 const IsLoading = () => {
 	const { isLoading } = useDownloadHelper().searcher;
 
-	return <div>{isLoading && <Loading />}</div>;
+	return (
+		<div style={{ width: 25, height: 25, marginLeft: 10 }}>
+			{isLoading && <Loading />}
+		</div>
+	);
 };
 
 const startDownload = () => download(getDownloadHelper().searcher.searchTerm);
@@ -83,7 +82,7 @@ const Result = () => {
 
 			<p>{result.title}</p>
 
-			<Button onClick={startDownload}>Download</Button>
+			<BorderedButton onClick={startDownload}>Download</BorderedButton>
 		</ResultContainer>
 	) : null;
 };

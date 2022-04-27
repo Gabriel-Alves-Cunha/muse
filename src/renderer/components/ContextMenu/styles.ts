@@ -1,19 +1,19 @@
 import {
-	CheckboxItem,
-	ItemIndicator,
-	TriggerItem,
-	RadioItem,
-	Separator,
-	Content,
-	Label,
-	Item,
+	ItemIndicator as CtxItemIndicator,
+	CheckboxItem as CtxCheckboxItem,
+	TriggerItem as CtxTriggerItem,
+	RadioItem as CtxRadioItem,
+	Separator as CtxSeparator,
+	Content as CtxContent,
+	Label as CtxLabel,
+	Item as CtxItem,
 } from "@radix-ui/react-context-menu";
 
 import { styled } from "@styles/global";
 
 export const Box = styled("div", {});
 
-export const StyledContent = styled(Content, {
+export const Content = styled(CtxContent, {
 	overflow: "hidden",
 	minWidth: 220,
 
@@ -71,17 +71,17 @@ export const RightSlot = styled("div", {
 	},
 });
 
-export const StyledItem = styled(Item, { ...itemStyles });
+export const Item = styled(CtxItem, { ...itemStyles });
 
-export const StyledCheckboxItem = styled(CheckboxItem, {
+export const CheckboxItem = styled(CtxCheckboxItem, {
 	...itemStyles,
 });
 
-export const StyledRadioItem = styled(RadioItem, {
+export const RadioItem = styled(CtxRadioItem, {
 	...itemStyles,
 });
 
-export const StyledTriggerItem = styled(TriggerItem, {
+export const TriggerItem = styled(CtxTriggerItem, {
 	"&[data-state='open']": {
 		color: "$ctx-menu-item-text",
 		backgroundColor: "white",
@@ -90,7 +90,7 @@ export const StyledTriggerItem = styled(TriggerItem, {
 	...itemStyles,
 });
 
-export const StyledLabel = styled(Label, {
+export const Label = styled(CtxLabel, {
 	pl: 25,
 
 	fontFamily: "$secondary",
@@ -99,13 +99,13 @@ export const StyledLabel = styled(Label, {
 	fontSize: 12,
 });
 
-export const StyledSeparator = styled(Separator, {
+export const Separator = styled(CtxSeparator, {
 	backgroundColor: "$ctx-menu-separator",
 	height: 1,
 	margin: 5,
 });
 
-export const StyledItemIndicator = styled(ItemIndicator, {
+export const ItemIndicator = styled(CtxItemIndicator, {
 	position: "absolute",
 	display: "inline-flex",
 	justifyContent: "center",

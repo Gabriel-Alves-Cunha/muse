@@ -200,28 +200,6 @@ export function makeStream({
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.on("destroy", async () => {
-			console.log(
-				"%cDestroy was called on readStream!",
-				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
-			);
-
-			electronPort.postMessage({
-				status: ProgressStatus.CANCEL,
-				isDownloading: false,
-			});
-			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			clearInterval(interval!);
-
-			currentDownloads.delete(url);
-			dbg({ currentDownloads });
-
-			console.log(
-				"ytdl stream was destroyed. Does the downloaded file still exists?",
-				await pathExists(saveSite),
-			);
-		})
 		.on("progress", (_, downloaded, total) => {
 			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
 			const percentage = ((downloaded / total) * 100).toFixed(2);
@@ -249,6 +227,29 @@ export function makeStream({
 				);
 			}
 		})
+		.on("destroy", async () => {
+			console.log(
+				"%cDestroy was called on readStream!",
+				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
+			);
+
+			electronPort.postMessage({
+				status: ProgressStatus.CANCEL,
+				isDownloading: false,
+			});
+			electronPort.close();
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			clearInterval(interval!);
+
+			dbg("Deleting stream from currentDownloads...");
+			currentDownloads.delete(url);
+			dbg({ currentDownloads });
+
+			console.log(
+				"ytdl stream was destroyed. Does the downloaded file still exists?",
+				await pathExists(saveSite),
+			);
+		})
 		.on("end", async () => {
 			console.log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
@@ -270,6 +271,7 @@ export function makeStream({
 				imageURL,
 			});
 
+			dbg("Deleting stream from currentDownloads...");
 			currentDownloads.delete(url);
 			dbg({ currentDownloads });
 		})
@@ -289,10 +291,11 @@ export function makeStream({
 			// I only found it to work when I send it with an Error:
 			readStream.destroy(
 				new Error(
-					"This readStream is being destroyed because the ffmpeg threw an error.",
+					"This readStream is being destroyed because ffmpeg threw an error.",
 				),
 			);
 
+			dbg("Deleting stream from currentDownloads...");
 			currentDownloads.delete(url);
 			dbg({ currentDownloads });
 		});
@@ -594,6 +597,9 @@ export async function writeTags(
 					fileNewPath = newPath;
 					break;
 				}
+
+				case "downloadImg":
+					break;
 
 				case "isNewMedia":
 					break;

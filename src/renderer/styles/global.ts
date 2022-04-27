@@ -78,6 +78,9 @@ export const darkTheme = createTheme({
 		"scrollbar-thumb": "#888",
 		scrollbar: "#f1f1f1",
 
+		"linear-gradient-1": "#8e2de2",
+		"linear-gradient-2": "#4a00e0",
+
 		"media-player-icons": "#0C0910",
 		"deactivated-icon": "dimgray",
 		"active-icon": "#f1f0ea",
@@ -119,6 +122,9 @@ export const lightTheme = createTheme({
 		"scrollbar-thumb": "#888",
 		scrollbar: "#f1f1f1",
 
+		"lingrad-1": "#8e2de2",
+		"lingrad-2": "#4a00e0",
+
 		"media-player-icons": "white",
 		"deactivated-icon": "dimgray",
 		"active-icon": "#0C0910",
@@ -156,7 +162,6 @@ export const lightTheme = createTheme({
 
 export const GlobalCSS = globalCss({
 	"*, *:after, *:before": {
-		"-webkit-font-smoothing": "antialiased",
 		boxSizing: "border-box",
 		padding: 0,
 		margin: 0,

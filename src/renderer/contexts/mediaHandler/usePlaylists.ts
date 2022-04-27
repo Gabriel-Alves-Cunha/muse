@@ -73,23 +73,17 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 			) => {
 				const searchTerm = searchTerm_.toLowerCase();
 				const mainList = get().mainList;
-				let results: readonly Media[];
 
 				const start = performance.now();
 
 				// Handle when fromList === MAIN_LIST
-				if (fromList === MAIN_LIST) {
-					results = mainList.filter(m =>
-						m.title.toLowerCase().includes(searchTerm),
-					);
-				} else {
-					results = get()
-						.playlists.find(p => p.name === fromList)!
-						.list.map(mediaID => mainList.find(m => m.id === mediaID)!)
-						.filter(m => m.title.toLowerCase().includes(searchTerm));
-				}
-
-				Object.freeze(results);
+				const results: readonly Media[] =
+					fromList === MAIN_LIST
+						? mainList.filter(m => m.title.toLowerCase().includes(searchTerm))
+						: get()
+								.playlists.find(p => p.name === fromList)!
+								.list.map(mediaID => mainList.find(m => m.id === mediaID)!)
+								.filter(m => m.title.toLowerCase().includes(searchTerm));
 
 				const end = performance.now();
 				console.log(

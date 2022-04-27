@@ -63,32 +63,28 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 
 	return (
 		<Wrapper ref={searcherRef}>
-			<>
-				<SearchWrapper>
-					<>
-						<Search>
-							<SearchIcon size="1.2em" />
-							<input
-								onChange={e =>
-									setSearcher({
-										type: SearcherAction.SET_SEARCH_TERM,
-										value: e.target.value,
-									})
-								}
-								placeholder="Search for songs"
-								autoCapitalize="on"
-								spellCheck="false"
-								autoCorrect="off"
-								type="text"
-							/>
-						</Search>
+			<SearchWrapper>
+				<Search>
+					<SearchIcon size="1.2em" />
+					<input
+						onChange={e =>
+							setSearcher({
+								type: SearcherAction.SET_SEARCH_TERM,
+								value: e.target.value,
+							})
+						}
+						placeholder="Search for songs"
+						autoCapitalize="on"
+						spellCheck="false"
+						autoCorrect="off"
+						type="text"
+					/>
+				</Search>
 
-						{searchResultJSX.get(searchStatus)?.()}
-					</>
-				</SearchWrapper>
+				{searchResultJSX.get(searchStatus)?.()}
+			</SearchWrapper>
 
-				{buttonToTheSideJSX.get(buttonToTheSide)?.()}
-			</>
+			{buttonToTheSideJSX.get(buttonToTheSide)?.()}
 		</Wrapper>
 	);
 }

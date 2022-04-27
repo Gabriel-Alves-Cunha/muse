@@ -15,6 +15,7 @@ import {
 } from "electron";
 
 import { capitalizedAppName, isDevelopment } from "@common/utils";
+import { assertUnreachable } from "@utils/utils.js";
 import { logoPath } from "./utils.js";
 import {
 	ElectronIpcMainProcessNotificationEnum,
@@ -226,11 +227,18 @@ ipcMain.on(
 				break;
 			}
 
+			case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
+				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
+				break;
+			}
+
 			default: {
 				console.error(
 					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
 					event,
 				);
+
+				assertUnreachable(msg.type);
 				break;
 			}
 		}

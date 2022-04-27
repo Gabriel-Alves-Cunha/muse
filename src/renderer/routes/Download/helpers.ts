@@ -1,5 +1,3 @@
-import type { ChangeEvent } from "react";
-
 import create from "zustand";
 
 import { setDownloadValues } from "@modules/Downloading";
@@ -9,21 +7,18 @@ import { dbg } from "@common/utils";
 const { getBasicInfo } = electron.media;
 
 export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
-	setSearchTerm: ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
-		set({
-			searcher: {
-				searchTerm: value,
-				result: undefined,
-				isLoading: false,
-				error: "",
-			},
-		}),
+	searcher: {
+		result: undefined,
+		isLoading: false,
+		searchTerm: "",
+		error: "",
+	},
 
 	download: (url: string) => {
 		const { result } = get().searcher;
 
 		if (!result) return;
-		dbg("Sending msg to download", url);
+		dbg(`Sending msg to download "${url}".`);
 
 		// Start download:
 		setDownloadValues({
@@ -34,19 +29,29 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 				url,
 			},
 		});
-	},
 
-	searcher: {
-		result: undefined,
-		isLoading: false,
-		searchTerm: "",
-		error: "",
+		// Reset values:
+		set({
+			searcher: {
+				result: undefined,
+				isLoading: false,
+				searchTerm: "",
+				error: "",
+			},
+		});
 	},
 
 	search: async (url: string) => {
-		const searcher = get().searcher;
+		dbg(`Searching for "${url}".`);
 
-		set({ searcher: { ...searcher, isLoading: true, error: "" } });
+		set({
+			searcher: {
+				result: undefined,
+				searchTerm: url,
+				isLoading: true,
+				error: "",
+			},
+		});
 
 		try {
 			const { videoDetails } = await getBasicInfo(url);
@@ -58,37 +63,36 @@ export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
 				title: videoDetails.title,
 			};
 
-			set({
+			set(({ searcher: { searchTerm } }) => ({
 				searcher: {
-					...searcher,
 					isLoading: false,
+					searchTerm,
 					error: "",
 					result,
 				},
-			});
+			}));
 		} catch (error) {
-			set({
+			set(({ searcher: { searchTerm } }) => ({
 				searcher: {
 					isLoading: false,
 					result: undefined,
-					searchTerm: searcher.searchTerm,
+					searchTerm,
 					error: getErrorMessage(error).includes("No video id found")
 						? "No video ID found!"
 						: "There was an error getting media information!",
 				},
-			});
+			}));
 
-			throw error;
+			console.error(error);
 		}
 	},
 }));
 
 export const { getState: getDownloadHelper, setState: setDowloadHelper } =
 	useDownloadHelper;
-export const { download, search, setSearchTerm } = getDownloadHelper();
+export const { download, search } = getDownloadHelper();
 
 type DownloadHelper = Readonly<{
-	setSearchTerm(e: ChangeEvent<HTMLInputElement>): void;
 	search(url: string): Promise<void>;
 	download(url: string): void;
 	searcher: SearcherProps;

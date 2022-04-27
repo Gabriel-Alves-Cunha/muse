@@ -28,22 +28,20 @@ import {
 	Popup,
 } from "../Downloading/styles";
 
-// const { port1: testPort } = new MessageChannel();
-// const testConvertingMedia: MediaBeingConverted = Object.freeze({
-// 	status: ProgressStatus.ACTIVE,
-// 	path: "/test/fake/path",
-// 	timeConverted: "01:20",
-// 	sizeConverted: 1000,
-// 	isConverting: true,
-// 	toExtension: "mp3",
-// 	percentage: 50,
-// 	port: testPort,
-// } as const);
+const { port1: testPort } = new MessageChannel();
+const testConvertingMedia: MediaBeingConverted = Object.freeze({
+	status: ProgressStatus.ACTIVE,
+	path: "/test/fake/path",
+	timeConverted: "01:20",
+	sizeConverted: 1000,
+	isConverting: true,
+	toExtension: "mp3",
+	percentage: 50,
+	port: testPort,
+} as const);
 
-const useConvertList = create<
-	Readonly<{ convertList: readonly MediaBeingConverted[] }>
->(() => ({
-	convertList: [], // new Array(10).fill(testConvertingMedia),
+const useConvertList = create<PopupProps>(() => ({
+	convertList: new Array(10).fill(testConvertingMedia),
 }));
 
 export const useConvertValues = create<{
@@ -60,6 +58,7 @@ export const { setState: setConvertValues } = useConvertValues;
 export function Converting() {
 	const [showPopup, setShowPopup] = useState(false);
 	const { convertValues } = useConvertValues();
+	const { convertList } = useConvertList();
 
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -112,38 +111,32 @@ export function Converting() {
 			<Tooltip text="Show all converting medias" arrow={false} side="right">
 				<Trigger
 					onClick={() => setShowPopup(prev => !prev)}
-					className={showPopup ? "active" : ""}
+					className={
+						(convertList.length ? "has-downloads " : "") +
+						(showPopup ? "active" : "")
+					}
 				>
+					<i data-length={convertList.length}></i>
 					<Convert size={20} />
 				</Trigger>
 			</Tooltip>
 
-			{showPopup && <Popup_ />}
+			{showPopup && <Popup_ convertList={convertList} />}
 		</Wrapper>
 	);
 }
 
-const Popup_ = () => {
-	const { convertList } = useConvertList();
+const Popup_ = ({ convertList }: PopupProps) => (
+	<Popup>
+		{convertList.length > 0 ? (
+			convertList.map(m => <ConvertBox mediaBeingConverted={m} key={m.path} />)
+		) : (
+			<p>No conversions in progress!</p>
+		)}
+	</Popup>
+);
 
-	return (
-		<Popup>
-			{convertList.length > 0 ? (
-				convertList.map(m => (
-					<ConvertBox mediaBeingConverted={m} key={m.path} />
-				))
-			) : (
-				<p>No conversions in progress!</p>
-			)}
-		</Popup>
-	);
-};
-
-const ConvertBox = ({
-	mediaBeingConverted,
-}: {
-	mediaBeingConverted: MediaBeingConverted;
-}) => (
+const ConvertBox = ({ mediaBeingConverted }: ConvertBoxProps) => (
 	<Content>
 		<TitleAndCancelWrapper>
 			<p>
@@ -152,13 +145,13 @@ const ConvertBox = ({
 					mediaBeingConverted.toExtension}
 			</p>
 
-			<Tooltip text="Cancel conversion">
+			<Tooltip text="Cancel conversion" side="right">
 				<button
 					onClick={() =>
 						cancelDownloadAndOrRemoveItFromList(mediaBeingConverted.path)
 					}
 				>
-					<Cancel size={13} />
+					<Cancel size={12} />
 				</button>
 			</Tooltip>
 		</TitleAndCancelWrapper>
@@ -349,4 +342,12 @@ type MediaBeingConverted = Readonly<{
 	isConverting: boolean;
 	port: MessagePort;
 	path: Path;
+}>;
+
+type PopupProps = Readonly<{
+	convertList: readonly MediaBeingConverted[];
+}>;
+
+type ConvertBoxProps = Readonly<{
+	mediaBeingConverted: MediaBeingConverted;
 }>;

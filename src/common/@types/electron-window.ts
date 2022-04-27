@@ -116,6 +116,7 @@ export type WriteTag = Readonly<{
 }>;
 
 export enum ElectronIpcMainProcessNotificationEnum {
+	TOGGLE_DEVELOPER_TOOLS,
 	MAXIMIZE,
 	MINIMIZE,
 	QUIT_APP,

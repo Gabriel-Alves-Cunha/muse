@@ -13,6 +13,7 @@ export const Wrapper = styled("header", {
 });
 
 export const SearchWrapper = styled("div", {
+	position: "relative",
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "flex-start",
@@ -121,9 +122,9 @@ export const SearchResultsWrapper = styled("div", {
 	alignItems: "center",
 	maxHeight: "40vh",
 	minHeight: 80,
+	left: "-25%",
 	width: 350,
 	top: 50,
-	left: 0,
 
 	border: "1px solid lightgray",
 	background: "$bg-popover",
@@ -180,10 +181,10 @@ export const NothingFound = styled("div", {
 	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
+	left: "-25%",
 	width: 350,
 	height: 50,
 	top: 50,
-	left: 0,
 
 	border: "1px solid lightgray",
 	background: "$bg-popover",

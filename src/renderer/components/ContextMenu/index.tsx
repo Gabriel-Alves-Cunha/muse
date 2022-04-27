@@ -2,29 +2,34 @@ import { type ReactNode } from "react";
 
 import { Root, Trigger } from "@radix-ui/react-context-menu";
 
+import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
 import { assertUnreachable } from "@utils/utils";
 import { MainCtxMenu } from "./mainCtxMenu";
 
-import { StyledContent, Box } from "./styles";
+import { Content, Box } from "./styles";
 
-export enum Content {
+export enum ContentEnum {
+	FULL_EXAMPLE,
 	MAIN,
 }
 
-const { MAIN } = Content;
+const { FULL_EXAMPLE, MAIN } = ContentEnum;
 
-export const ContextMenu = ({ children, content = MAIN }: Props) => (
+export const ContextMenu = ({ children, content = FULL_EXAMPLE }: Props) => (
 	<Box>
 		<Root>
 			<Trigger>{children}</Trigger>
 
-			<StyledContent sideOffset={5}>{contentToShow(content)}</StyledContent>
+			<Content sideOffset={5}>{contentToShow(content)}</Content>
 		</Root>
 	</Box>
 );
 
 const contentToShow = (content: NonNullable<Props["content"]>) => {
 	switch (content) {
+		case FULL_EXAMPLE:
+			return <FullExampleCtxMenu />;
+
 		case MAIN:
 			return <MainCtxMenu />;
 
@@ -34,6 +39,6 @@ const contentToShow = (content: NonNullable<Props["content"]>) => {
 };
 
 type Props = {
+	content?: ContentEnum;
 	children: ReactNode;
-	content?: Content;
 };

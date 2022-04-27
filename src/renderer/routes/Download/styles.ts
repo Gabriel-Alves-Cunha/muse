@@ -3,16 +3,16 @@ import { styled } from "@styles/global";
 
 export const Wrapper = styled(MainArea, {
 	position: "relative",
-	display: "inline-block",
-	justifySelf: "flex-start", // for grid: row
-
-	height: "calc(100vh - 20vh)",
+	display: "flex",
+	flexDirection: "column",
+	height: "100vh",
 	width: "100%",
 
-	overflowY: "hidden",
+	overflowY: "auto",
 
 	/* width */
 	"&::-webkit-scrollbar": {
+		display: "block",
 		size: 5,
 	},
 
@@ -32,21 +32,29 @@ export const Wrapper = styled(MainArea, {
 	},
 });
 
+export const Box = styled("div", {
+	display: "flex", // row
+	justifyContent: "center",
+	alignItems: "center",
+	width: "100%",
+});
+
 export const SearchWrapper = styled("div", {
 	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-
-	padding: "0 5%",
+	width: "80%",
 	height: 60,
 
 	p: {
-		letterSpacing: "0.02rem",
-		fontFamily: "$primary",
 		position: "absolute",
-		fontSize: "0.8rem",
 		marginTop: "4rem",
+
+		letterSpacing: "0.03rem",
+		fontFamily: "$secondary",
+		fontSize: "0.9rem",
+		fontWeight: 300,
 		color: "red",
 	},
 });
@@ -58,7 +66,7 @@ export const Searcher = styled("button", {
 	alignItems: "center",
 
 	background: "transparent",
-	width: "80%",
+	width: "100%",
 	height: 40,
 
 	border: "1px solid lightgray",
@@ -73,11 +81,9 @@ export const Searcher = styled("button", {
 	},
 
 	"& svg": {
-		transition: "$opacity",
-		opacity: 0.8,
-
 		marginLeft: 10,
 		color: "$text",
+		opacity: 0.8,
 	},
 
 	"&:hover svg": {
@@ -117,6 +123,7 @@ export const ResultContainer = styled("div", {
 	justifyContent: "center",
 	alignItems: "center",
 	mb: "1.3rem",
+	mt: 30,
 
 	img: {
 		objectFit: "cover",
@@ -135,11 +142,11 @@ export const ResultContainer = styled("div", {
 
 		boxShadow: "$reflect",
 
-		transition: "$transform",
+		transition: "$scale",
 
 		"&:hover": {
-			transition: "$transform",
-			transform: "scale(1.04)",
+			transition: "$scale",
+			transform: "scale(1.1)",
 		},
 	},
 
@@ -159,32 +166,5 @@ export const ResultContainer = styled("div", {
 		wordWrap: "normal",
 		fontSize: "1rem",
 		color: "$text",
-	},
-});
-
-export const Button = styled("button", {
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-	width: 160,
-	height: 42,
-
-	fontFamily: "$primary",
-	textAlign: "center",
-	fontSize: "1rem",
-	color: "$text",
-	padding: 10,
-
-	backgroundColor: "$bg-main",
-	cursor: "pointer",
-	borderRadius: 5,
-	border: "none",
-
-	transition: "$opacity",
-	opacity: 0.65,
-
-	"&:hover": {
-		transition: "$opacity",
-		opacity: 1,
 	},
 });

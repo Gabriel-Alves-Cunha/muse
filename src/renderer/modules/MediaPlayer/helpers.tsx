@@ -43,8 +43,6 @@ import {
 	Album,
 } from "./styles";
 
-const { ceil } = Math;
-
 const toggleRepeatThisMedia = () =>
 	setPlayOptions({
 		value: getPlayOptions().playOptions.loopThisMedia ? false : true,
@@ -166,6 +164,7 @@ const seek = (e: SeekEvent, audio: Audio) => {
 };
 
 const { isNaN } = Number;
+const { floor } = Math;
 
 export function SeekerWrapper({ audio }: RefToAudio) {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
@@ -195,7 +194,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			if (!div || !tooltip) return;
 
 			const { width } = div.getBoundingClientRect();
-			const progressBarWidth = ceil(width);
+			const progressBarWidth = floor(width);
 
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion

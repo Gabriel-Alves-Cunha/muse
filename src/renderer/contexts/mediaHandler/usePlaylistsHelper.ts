@@ -39,8 +39,7 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 
 	for (const file of fileList) {
 		// Faster than regex:
-		if (file.type.indexOf("audio") === -1 && file.type.indexOf("video") === -1)
-			continue;
+		if (!file.type.includes("audio") && !file.type.includes("video")) continue;
 
 		console.log(file);
 

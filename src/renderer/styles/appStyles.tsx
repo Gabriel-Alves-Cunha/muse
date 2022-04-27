@@ -29,8 +29,8 @@ const rotating = keyframes({
 
 export const Loading = styled("div", {
 	animation: `${rotating} 1s infinite`,
-	border: "6px solid #e5e5e5",
-	borderTopColor: "#51d4db",
+	border: "2px solid #e5e5e5",
+	borderTopColor: "$accent",
 	borderRadius: "50%",
-	size: 50,
+	size: 25,
 });

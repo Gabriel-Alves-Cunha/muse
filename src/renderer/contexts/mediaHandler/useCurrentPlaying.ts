@@ -80,9 +80,8 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST\naction =",
 								action,
 							);
-							const { playlistName } = action;
-
 							const currMediaID = get().currentPlaying.mediaID;
+							const { playlistName } = action;
 
 							if (!currMediaID) {
 								console.error(
@@ -189,8 +188,8 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 								"CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST\naction =",
 								action,
 							);
-							const { playlistName } = action;
 							const prevMediaID = previousPlaying.mediaID;
+							const { playlistName } = action;
 
 							if (!prevMediaID) {
 								console.error(

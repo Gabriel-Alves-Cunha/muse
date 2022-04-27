@@ -1,6 +1,6 @@
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
-import { GrClose as Cancel } from "react-icons/gr";
+import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { toast } from "react-toastify";
 import create from "zustand";
 
@@ -21,17 +21,17 @@ import {
 	Popup,
 } from "./styles";
 
-// const { port1: testPort } = new MessageChannel();
-// const testDownloadingMedia: MediaBeingDownloaded = Object.freeze({
-// 	status: ProgressStatus.ACTIVE,
-// 	url: "http://test.com",
-// 	isDownloading: true,
-// 	percentage: 50,
-// 	port: testPort,
-// 	title: "test",
-// 	imageURL: "",
-// 	index: 0,
-// } as const);
+const { port1: testPort } = new MessageChannel();
+const testDownloadingMedia: MediaBeingDownloaded = Object.freeze({
+	status: ProgressStatus.ACTIVE,
+	url: "http://test.com",
+	isDownloading: true,
+	percentage: 50,
+	port: testPort,
+	title: "test",
+	imageURL: "",
+	index: 0,
+} as const);
 
 const defaultDownloadValues: DownloadValues = Object.freeze({
 	canStartDownload: false,
@@ -40,10 +40,8 @@ const defaultDownloadValues: DownloadValues = Object.freeze({
 	url: "",
 });
 
-const useDownloadingList = create<{
-	downloadingList: readonly MediaBeingDownloaded[];
-}>(() => ({
-	downloadingList: [], //new Array(10).fill(testDownloadingMedia),
+const useDownloadingList = create<PopupProps>(() => ({
+	downloadingList: new Array(10).fill(testDownloadingMedia),
 }));
 
 export const useDownloadValues = create<{
@@ -56,6 +54,7 @@ export const { setState: setDownloadValues } = useDownloadValues;
 
 export function Downloading() {
 	const [showPopup, setShowPopup] = useState(false);
+	const { downloadingList } = useDownloadingList();
 	const { downloadValues } = useDownloadValues();
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -108,105 +107,52 @@ export function Downloading() {
 			<Tooltip text="Show all downloading medias" arrow={false} side="right">
 				<Trigger
 					onClick={() => setShowPopup(prev => !prev)}
-					className={showPopup ? "active" : ""}
+					className={
+						(downloadingList.length ? "has-downloads " : "") +
+						(showPopup ? "active" : "")
+					}
 				>
+					<i data-length={downloadingList.length}></i>
 					<DownloadingIcon size="20" />
 				</Trigger>
 			</Tooltip>
 
-			{showPopup && <Popup_ />}
+			{showPopup && <Popup_ downloadingList={downloadingList} />}
 		</Wrapper>
 	);
 }
 
-const Popup_ = () => {
-	const { downloadingList } = useDownloadingList();
+const Popup_ = ({ downloadingList }: PopupProps) => (
+	<Popup>
+		{downloadingList.length > 0 ? (
+			downloadingList.map(download => (
+				<Content key={download.url}>
+					<TitleAndCancelWrapper>
+						<p>{download.title}</p>
 
-	return (
-		<Popup>
-			{downloadingList.length > 0 ? (
-				downloadingList.map(download => (
-					<Content key={download.url}>
-						<TitleAndCancelWrapper>
-							<p>{download.title}</p>
+						<Tooltip text="Cancel download" side="right">
+							<button
+								onClick={() =>
+									cancelDownloadAndOrRemoveItFromList(download.url)
+								}
+							>
+								<Cancel size={12} />
+							</button>
+						</Tooltip>
+					</TitleAndCancelWrapper>
 
-							<Tooltip text="Cancel download">
-								<button
-									onClick={() =>
-										cancelDownloadAndOrRemoveItFromList(download.url)
-									}
-								>
-									<Cancel size={9} />
-								</button>
-							</Tooltip>
-						</TitleAndCancelWrapper>
-
-						<Progress
-							percent_0_to_100={download.percentage}
-							status={download.status}
-							showStatus
-						/>
-					</Content>
-				))
-			) : (
-				<p>No downloads in progress!</p>
-			)}
-		</Popup>
-	);
-};
-
-// export function Downloading() {
-// 	const cancelDownloadAndOrRemoveItFromList = useDownloading();
-// 	const { downloadingList } = useDownloadingList();
-
-// 	return (
-// 		<StyledRoot modal>
-// 			<StyledAnchor>
-// 				<StyledPopoverTrigger asChild>
-// 					<DownloadingIcon size="20" aria-label="See downloads" />
-// 				</StyledPopoverTrigger>
-// 			</StyledAnchor>
-
-// 			<StyledContent
-// 				collisionTolerance={30}
-// 				sideOffset={5*2}
-// 				side="right"
-// 			>
-// 				<Text>Downloading</Text>
-
-// 				{downloadingList.map(download => (
-// 					<div key={download.url}>
-// 						<Title>
-// 							<p>{download.title}</p>
-
-// 							<span>
-// 								<Cancel
-// 									size={13}
-// 									color="#777"
-// 									onClick={() =>
-// 										cancelDownloadAndOrRemoveItFromList(download.url)
-// 									}
-// 								/>
-// 							</span>
-// 						</Title>
-
-// 						<Progress
-// 							percent_0_to_100={download.percentage}
-// 							status={download.status}
-// 							showStatus
-// 						/>
-// 					</div>
-// 				))}
-
-// 				{/* <StyledArrow /> */}
-
-// 				<StyledClose aria-label="Close">
-// 					<Close size="15" />
-// 				</StyledClose>
-// 			</StyledContent>
-// 		</StyledRoot>
-// 	);
-// }
+					<Progress
+						percent_0_to_100={download.percentage}
+						status={download.status}
+						showStatus
+					/>
+				</Content>
+			))
+		) : (
+			<p>No downloads in progress!</p>
+		)}
+	</Popup>
+);
 
 const { setState: setDownloadingList, getState: getDownloadingList } =
 	useDownloadingList;
@@ -272,13 +218,12 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
 		const { downloadingList } = getDownloadingList();
 
-		const index = downloadingList.findIndex(d => d.url === data.url);
+		const index = downloadingList.findIndex(d => d.url === downloadValues.url);
 
 		if (index === -1)
 			return console.error(
 				"Received a message from Electron but the url is not in the list",
-				data,
-				downloadingList,
+				{ data, downloadingList },
 			);
 
 		// Update React's information about this DownloadingMedia:
@@ -390,4 +335,8 @@ type MediaBeingDownloaded = Readonly<{
 	imageURL: string;
 	title: string;
 	url: string;
+}>;
+
+type PopupProps = Readonly<{
+	downloadingList: readonly MediaBeingDownloaded[];
 }>;

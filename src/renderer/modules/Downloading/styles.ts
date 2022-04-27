@@ -30,6 +30,37 @@ export const Trigger = styled("button", {
 		transform: "scale(1.4)",
 		color: "$active-icon",
 	},
+
+	"&.has-downloads": {
+		position: "relative",
+		display: "inline-block",
+
+		i: {
+			position: "absolute",
+			boxSizing: "content-box",
+			right: -5,
+			size: 16,
+			top: 0,
+
+			backgroundColor: "#5cb85c",
+			border: "1px solid #fff",
+			borderRadius: "50%",
+
+			letterSpacing: "0.03rem",
+			fontFamily: "$primary",
+			fontStyle: "normal",
+			fontWeight: 500,
+			color: "black",
+			fontSize: 10,
+
+			"&:before": {
+				content: "attr(data-length)",
+				position: "absolute",
+				right: 2,
+				top: 1,
+			},
+		},
+	},
 });
 
 export const Popup = styled("div", {
@@ -99,12 +130,13 @@ export const Content = styled("div", {
 });
 
 export const TitleAndCancelWrapper = styled("div", {
+	position: "relative",
 	display: "flex", // row
-	justifyContent: "center",
+	justifyContent: "flex-start",
 	alignItems: "center",
 	marginBottom: 10,
-	height: "1rem",
-	width: "100%",
+	width: "90%",
+	height: 16,
 
 	p: {
 		color: "$alternative-text",
@@ -114,19 +146,20 @@ export const TitleAndCancelWrapper = styled("div", {
 		textAlign: "left",
 
 		overflow: "hidden",
-		width: "90%",
+		width: "100%",
 	},
 
 	button: {
+		position: "absolute",
 		display: "flex", // row
 		justifyContent: "center",
 		alignItems: "center",
-		size: 21,
+		right: -21,
+		size: 20,
 
 		backgroundColor: "transparent",
 		borderRadius: "50%",
 		cursor: "pointer",
-		marginLeft: 10,
 		border: "none",
 
 		"&:focus, &:hover": {

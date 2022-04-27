@@ -19,7 +19,7 @@ export const Wrapper = styled("div", {
 	width: "100%",
 	padding,
 
-	background: "linear-gradient(to bottom, #8e2de2, #4a00e0);",
+	background: "linear-gradient(to bottom, $lingrad-1, $lingrad-2);",
 
 	"@media-player": {
 		display: "inline-block",

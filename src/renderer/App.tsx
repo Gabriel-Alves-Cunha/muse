@@ -48,7 +48,7 @@ export function App() {
 				draggable
 			/>
 
-			<TooltipProvider delayDuration={500} skipDelayDuration={0}>
+			<TooltipProvider delayDuration={500} skipDelayDuration={300}>
 				<Decorations />
 
 				<ContextMenu>
