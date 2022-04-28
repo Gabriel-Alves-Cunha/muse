@@ -1,12 +1,13 @@
 import { debug, enable } from "debug";
 
 const { trunc, floor } = Math;
+const { isNaN } = Number;
 
 export const isDevelopment = true;
 export const isTesting = false;
 // export const isDevelopment = VITE_IS_DEVELOPMENT === "true";
 // export const isTesting = VITE_IS_TESTING === "true";
-console.log({ isDevelopment, isTesting });
+console.log({ isDevelopment, isTesting, "import.meta": import.meta });
 
 export const capitalizedAppName = "Muse" as const;
 export const lowercaseAppName = "muse" as const;
@@ -23,7 +24,6 @@ export const allowedMedias = Object.freeze(<const>[
 	"opus",
 	"mp3",
 	"pcm",
-	"pcm",
 	"aac",
 	"m4a",
 	"m4p",
@@ -34,7 +34,7 @@ export const allowedMedias = Object.freeze(<const>[
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
 export const formatDuration = (time: number | undefined) => {
-	if (time === undefined || Number.isNaN(time)) return "00:00";
+	if (!time || isNaN(time)) return "00:00";
 	time = trunc(time);
 
 	const days = floor(time / 86_400),

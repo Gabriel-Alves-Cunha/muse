@@ -1,23 +1,25 @@
-import type { HandleConversion, HandleDownload } from "./preload/media";
-
 import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { assertUnreachable } from "@utils/utils";
-import { homeDir, dirs } from "./utils";
+import { dirs } from "./utils";
 import { dbg } from "@common/utils";
+import {
+	type VisibleElectron,
+	ReactToElectronMessageEnum,
+} from "@common/@types/electron-window";
 import {
 	type MsgWithSource,
 	sendMsgToClient,
 	reactSource,
 } from "@common/crossCommunication";
 import {
+	type HandleConversion,
+	type HandleDownload,
 	handleCreateOrCancelDownload,
 	handleCreateOrCancelConvert,
 	transformPathsToMedias,
-	convertToAudio,
 	writeTags,
 } from "./preload/media";
 import {
@@ -33,27 +35,26 @@ import {
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
-contextBridge.exposeInMainWorld("electron", {
-	notificationApi: {
-		sendNotificationToElectronIpcMainProcess,
-	},
+const electron: VisibleElectron = Object.freeze({
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory,
 		deleteFile,
 		readFile,
 		readdir,
 	},
-	os: {
-		homeDir,
-		dirs,
-	},
 	media: {
 		transformPathsToMedias,
-		convertToAudio,
 		getBasicInfo,
-		writeTags,
+	},
+	notificationApi: {
+		sendNotificationToElectronIpcMainProcess,
+	},
+	os: {
+		dirs,
 	},
 });
+
+contextBridge.exposeInMainWorld("electron", electron);
 
 // Relay messages from the main process to the renderer process:
 ipcRenderer.on(
@@ -65,6 +66,7 @@ ipcRenderer.on(
 		}),
 );
 
+// Handle messages from the renderer process:
 window.onmessage = async (
 	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>,
 ) => {
@@ -82,9 +84,8 @@ window.onmessage = async (
 				break;
 			}
 
-			electronPort.onmessage = ({ data }: HandleCreateOrCancelDownload) =>
+			electronPort.onmessage = ({ data }: { data: HandleDownload }) =>
 				handleCreateOrCancelDownload({ ...data, electronPort });
-
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
 			);
@@ -100,16 +101,14 @@ window.onmessage = async (
 				break;
 			}
 
-			electronPort.onmessage = ({ data }: HandleCreateOrCancelConvert) =>
+			electronPort.onmessage = ({ data }: { data: HandleConversion }) =>
 				handleCreateOrCancelConvert({ ...data, electronPort });
-
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
 			);
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
-
 			break;
 		} // 2
 
@@ -147,12 +146,4 @@ window.onmessage = async (
 			break;
 		}
 	}
-};
-
-type HandleCreateOrCancelDownload = {
-	data: HandleDownload & { destroy?: boolean };
-};
-
-type HandleCreateOrCancelConvert = {
-	data: HandleConversion & { destroy?: boolean };
 };

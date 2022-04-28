@@ -1,0 +1,12 @@
+{
+	"includes": ["src/**/*.*"],
+	"excludes": [],
+	"plugins": [
+		"https://plugins.dprint.dev/prettier-0.7.0.json@4e846f43b32981258cef5095b3d732522947592e090ef52333801f9d6e8adb33"
+	],
+	"prettier": {
+		"trailingComma": "all",
+		"arrowParens": "avoid",
+		"useTabs": true
+	}
+}

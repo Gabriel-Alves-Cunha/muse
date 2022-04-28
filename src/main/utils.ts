@@ -13,14 +13,11 @@ export const logoPath = isDevelopment
 	? join(rootDirectory, "src", "renderer", "assets", "icons", "logo.png")
 	: join(rootDirectory, "assets", "logo.png");
 
-console.log({ rootDirectory, logoPath });
+// console.log({ rootDirectory, logoPath });
 
-export const homeDir = homedir();
+const homeDir = homedir();
 export const dirs = Object.freeze({
 	documents: join(homeDir, "Documents"),
 	downloads: join(homeDir, "Downloads"),
 	music: join(homeDir, "Music"),
 });
-
-export const sleep = (ms: number): Promise<void> =>
-	new Promise(r => setTimeout(r, ms));

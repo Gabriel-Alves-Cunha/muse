@@ -75,6 +75,7 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 						}
 						placeholder="Search for songs"
 						autoCapitalize="on"
+						value={searchTerm}
 						spellCheck="false"
 						autoCorrect="off"
 						type="text"

@@ -8,7 +8,7 @@ declare global {
 	var electron: VisibleElectron;
 }
 
-type VisibleElectron = Readonly<{
+export type VisibleElectron = Readonly<{
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess(
 			object: Readonly<{
@@ -26,7 +26,6 @@ type VisibleElectron = Readonly<{
 		deleteFile(path: Path): Promise<void>;
 	};
 	os: {
-		homeDir: Path;
 		dirs: {
 			documents: Path;
 			downloads: Path;
@@ -34,9 +33,7 @@ type VisibleElectron = Readonly<{
 		};
 	};
 	media: {
-		convertToAudio(mediaPath: Path, extension: ExtensionToBeConvertedTo): void;
 		transformPathsToMedias(paths: readonly Path[]): Promise<readonly Media[]>;
-		writeTags(pathOfMedia: Path, data: WriteTag): Promise<Readonly<boolean>>;
 		getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
 	};
 }>;

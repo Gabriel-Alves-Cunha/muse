@@ -28,20 +28,20 @@ import {
 	Popup,
 } from "../Downloading/styles";
 
-const { port1: testPort } = new MessageChannel();
-const testConvertingMedia: MediaBeingConverted = Object.freeze({
-	status: ProgressStatus.ACTIVE,
-	path: "/test/fake/path",
-	timeConverted: "01:20",
-	sizeConverted: 1000,
-	isConverting: true,
-	toExtension: "mp3",
-	percentage: 50,
-	port: testPort,
-} as const);
+// const { port1: testPort } = new MessageChannel();
+// const testConvertingMedia: MediaBeingConverted = Object.freeze({
+// 	status: ProgressStatus.ACTIVE,
+// 	path: "/test/fake/path",
+// 	timeConverted: "01:20",
+// 	sizeConverted: 1000,
+// 	isConverting: true,
+// 	toExtension: "mp3",
+// 	percentage: 50,
+// 	port: testPort,
+// } as const);
 
 const useConvertList = create<PopupProps>(() => ({
-	convertList: new Array(10).fill(testConvertingMedia),
+	convertList: [], //new Array(10).fill(testConvertingMedia),
 }));
 
 export const useConvertValues = create<{
@@ -208,10 +208,6 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 		port: myPort,
 	};
 
-	setConvertList({
-		convertList: [...convertList, convertStatus],
-	});
-
 	myPort.postMessage({
 		toExtension: convertStatus.toExtension,
 		path: convertStatus.path,
@@ -220,10 +216,29 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 	});
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
-		// dbg("myPort msg received =", data);
-		const convertList = getConvertList().convertList;
+		const { convertList } = getConvertList();
 
-		const index = convertList.findIndex(c => c.path === data.path);
+		// Assert that the download exists:
+		const indexToSeeIfDownloadExists = convertList.findIndex(
+			d => d.path === convertStatus.path,
+		);
+		const doesDownloadExists = indexToSeeIfDownloadExists !== -1;
+
+		if (!doesDownloadExists) {
+			console.warn(
+				"Received a message from Electron but the path is not in the list",
+				{ data, convertList },
+				"Creating it...",
+			);
+
+			setConvertList({
+				convertList: [...convertList, convertStatus],
+			});
+		}
+
+		const index = doesDownloadExists
+			? indexToSeeIfDownloadExists
+			: convertList.length;
 
 		if (index === -1) {
 			console.error("There is no convert with path =", data.path, convertList);
@@ -251,6 +266,8 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 					autoClose: 5000,
 					draggable: true,
 				});
+
+				cancelDownloadAndOrRemoveItFromList(convertStatus.path);
 				break;
 			}
 
@@ -265,6 +282,7 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 					draggable: true,
 				});
 
+				cancelDownloadAndOrRemoveItFromList(convertStatus.path);
 				(async () => await searchLocalComputerForMedias(true))();
 				break;
 			}
@@ -303,11 +321,13 @@ function createNewConvert(convertValues: ConvertValues): MessagePort {
 	// @ts-ignore: this DOES exists
 	myPort.onclose = () => console.log("Closing ports (myPort).");
 
+	myPort.start();
+
 	return electronPort;
 }
 
 function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
-	const convertList = getConvertList().convertList;
+	const { convertList } = getConvertList();
 
 	const mediaBeingConvertedIndex = convertList.findIndex(
 		c => c.path === mediaPath,

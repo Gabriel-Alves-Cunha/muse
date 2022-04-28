@@ -54,6 +54,7 @@ export const ScaleUpIconButton = styled("button", {
 	},
 
 	"&.active": {
+		transform: "scale(1.4)",
 		color: "$active-icon",
 	},
 });

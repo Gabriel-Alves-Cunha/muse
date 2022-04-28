@@ -38,6 +38,8 @@ export const Trigger = styled("button", {
 		i: {
 			position: "absolute",
 			boxSizing: "content-box",
+			width: "100%",
+			// transform: translate(-50%, -50%);
 			right: -5,
 			size: 16,
 			top: 0,
@@ -45,6 +47,7 @@ export const Trigger = styled("button", {
 			backgroundColor: "#5cb85c",
 			border: "1px solid #fff",
 			borderRadius: "50%",
+			mx: "auto",
 
 			letterSpacing: "0.03rem",
 			fontFamily: "$primary",

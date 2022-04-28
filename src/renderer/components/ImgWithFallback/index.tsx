@@ -1,7 +1,5 @@
 import type { Media } from "@common/@types/typesAndEnums";
 
-// const { writeTags } = electron.media;
-
 enum Status {
 	FAILURE,
 	PENDING,
@@ -35,7 +33,7 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 		img = null;
 	};
 
-	img.onerror = async ev => {
+	img.onerror = ev => {
 		console.error("Failed img, erasing it", ev);
 
 		// await writeTags(media.path, { imageURL: "erase img" });

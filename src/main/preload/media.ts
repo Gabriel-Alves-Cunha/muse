@@ -31,6 +31,8 @@ import { deleteFile } from "./file";
 import { hash } from "@common/hash";
 import { dirs } from "../utils";
 
+const { log } = console;
+
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -44,46 +46,40 @@ const pathExists = async (path: Path): Promise<boolean> =>
 
 const createMedia = async (
 	path: Path,
-	index: number,
 	assureMediaSizeIsGreaterThan60KB: boolean,
 	ignoreMediaWithLessThan60Seconds: boolean,
 ): Promise<Media> =>
 	new Promise((resolve, reject) => {
 		const start = performance.now();
 
-		const basename = getBasename(path);
-
 		const {
 			fileAbstraction: {
-				readStream: { length: sizeInBytes },
+				readStream: { length },
 			},
 			tag: { pictures, title, album, genres, albumArtists },
 			properties: { durationMilliseconds },
 		} = MediaFile.createFromPath(path);
 
 		const duration = durationMilliseconds / 1_000;
+		const basename = getBasename(path);
 
 		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
-			console.info(
-				`Skipping "${path}" because the duration is ${duration} seconds (< 60 seconds)!`,
+			log(
+				`Skipping "${path}" because the duration is ${duration.toPrecision(
+					3,
+				)} s (< 60 s)!`,
 			);
 			const end = performance.now();
-			console.log(
-				`%cNº ${index}, "${basename}" took: ${end - start} ms.`,
-				"color:brown",
-			);
+			log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
 			return reject();
 		}
 
-		if (assureMediaSizeIsGreaterThan60KB && sizeInBytes < 60_000) {
-			console.info(
-				`Skipping "${path}" because size is ${sizeInBytes} bytes! (< 60_000 bytes)`,
-			);
+		const size = prettyBytes(length);
+
+		if (assureMediaSizeIsGreaterThan60KB && length < 60_000) {
+			log(`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`);
 			const end = performance.now();
-			console.log(
-				`%cNº ${index}, "${basename}" took: ${end - start} ms.`,
-				"color:brown",
-			);
+			log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
 			return reject();
 		}
 
@@ -102,9 +98,8 @@ const createMedia = async (
 			img = `data:${mimeType};base64,${str}`;
 		}
 
-		const media: Media = {
+		const media: Media = Object.freeze({
 			duration: formatDuration(duration),
-			size: prettyBytes(sizeInBytes),
 			artist: albumArtists[0] ?? "",
 			dateOfArival: Date.now(),
 			title: title ?? basename,
@@ -113,9 +108,10 @@ const createMedia = async (
 			id: hash(path),
 			genres,
 			album,
+			size,
 			path,
 			img,
-		};
+		});
 
 		dbg(basename, {
 			tag: { pictures, album, genres, albumArtists },
@@ -123,10 +119,7 @@ const createMedia = async (
 		});
 
 		const end = performance.now();
-		console.log(
-			`%cNº ${index}, "${basename}" took: ${end - start} ms.`,
-			"color:brown",
-		);
+		log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
 
 		return resolve(media);
 	});
@@ -140,10 +133,9 @@ export async function transformPathsToMedias(
 
 	const medias: Media[] = [];
 
-	const promises = paths.map((path, index) =>
+	const promises = paths.map(path =>
 		createMedia(
 			path,
-			index,
 			assureMediaSizeIsGreaterThan60KB,
 			ignoreMediaWithLessThan60Seconds,
 		),
@@ -153,13 +145,8 @@ export async function transformPathsToMedias(
 		if (p.status === "fulfilled") medias.push(p.value);
 	});
 
-	Object.freeze(medias);
-
 	const end = performance.now();
-	console.log(
-		`%cRunnig 'for' on all medias took: ${end - start} ms.`,
-		"color:brown",
-	);
+	log(`%cRunnig 'for' on all medias took: ${end - start} ms.`, "color:brown");
 
 	return medias;
 }
@@ -170,67 +157,85 @@ export function handleCreateOrCancelDownload({
 	destroy,
 	title,
 	url,
-}: HandleDownload & {
-	destroy?: Readonly<boolean>;
-}) {
-	if (!currentDownloads.has(url))
+}: HandleDownload) {
+	// eslint-disable-next-line prefer-rest-params
+	if (!url) return console.error("Missing required param 'url'!", arguments);
+
+	if (!currentDownloads.has(url)) {
+		if (!imageURL || !title || !electronPort)
+			// eslint-disable-next-line prefer-rest-params
+			return console.error("Missing required params!", arguments);
+
 		makeStream({ imageURL, url, title, electronPort });
-	else if (destroy)
+	} else if (destroy)
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		currentDownloads.get(url)!.emit("destroy");
 }
 
-export function makeStream({
+export async function makeStream({
 	electronPort,
 	imageURL,
 	title,
 	url,
-}: HandleDownload) {
-	dbg(`Creating stream for "${title}" to download.`);
+}: Required<Omit<HandleDownload, "destroy">>) {
+	if (!electronPort || !imageURL || !title || !url)
+		// eslint-disable-next-line prefer-rest-params
+		return console.error("Missing params!", arguments);
 
 	const extension: AllowedMedias = "mp3";
 	const titleWithExtension = sanitize(`${title}.${extension}`);
 	const saveSite = join(dirs.music, titleWithExtension);
 	const startTime = Date.now();
-
 	let interval: NodeJS.Timer | undefined = undefined;
+	let total = "";
+
+	// Assert file doesn't already exists:
+	if (await pathExists(saveSite))
+		return console.error(`File "${saveSite}" already exists!`);
+
+	dbg(`Creating stream for "${title}" to download.`);
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.on("progress", (_, downloaded, total) => {
-			const minutesDownloading = ((Date.now() - startTime) / 6e4).toFixed(2);
-			const percentage = ((downloaded / total) * 100).toFixed(2);
-			const estimatedDownloadTime = (
-				+minutesDownloading / (+percentage / 100) -
-				+minutesDownloading
-			).toFixed(2);
+		.on("progress", (_, downloaded, total_) => {
+			const percentage = (downloaded / total_) * 100;
 
 			// To react:
-			if (!interval)
+			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
-					() => electronPort.postMessage({ percentage }),
+					() => electronPort.postMessage({ percentage: percentage.toFixed(2) }),
 					2_000,
 				);
+				total = prettyBytes(total_);
+			}
 
 			// To node console if is in development:
 			if (isDevelopment) {
+				const minutesDownloading = (Date.now() - startTime) / 6e4;
+				const estimatedDownloadTime = (
+					minutesDownloading / (percentage / 100) -
+					minutesDownloading
+				).toFixed(2);
+
 				readline.cursorTo(process.stdout, 0);
 				readline.clearLine(process.stdout, 0);
 				process.stdout.write(
-					`${percentage}% downloaded, (${prettyBytes(downloaded)}/${prettyBytes(
-						total,
-					)}). Running for: ${minutesDownloading} minutes. ETA: ${estimatedDownloadTime} minutes.`,
+					`${percentage}% downloaded, (${prettyBytes(
+						downloaded,
+					)}/${total}). Running for: ${minutesDownloading.toFixed(
+						2,
+					)} minutes. ETA: ${estimatedDownloadTime} minutes.`,
 				);
 			}
 		})
 		.on("destroy", async () => {
-			console.log(
+			log(
 				"%cDestroy was called on readStream!",
-				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
+				"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
 			);
 
 			electronPort.postMessage({
@@ -241,17 +246,16 @@ export function makeStream({
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
-			dbg("Deleting stream from currentDownloads...");
 			currentDownloads.delete(url);
-			dbg({ currentDownloads });
-
-			console.log(
-				"ytdl stream was destroyed. Does the downloaded file still exists?",
+			dbg(
+				"Download was destroyed. Deleting stream from currentDownloads:",
+				currentDownloads,
+				"Does the downloaded file still exists?",
 				await pathExists(saveSite),
 			);
 		})
 		.on("end", async () => {
-			console.log(
+			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
 			);
@@ -271,9 +275,11 @@ export function makeStream({
 				imageURL,
 			});
 
-			dbg("Deleting stream from currentDownloads...");
 			currentDownloads.delete(url);
-			dbg({ currentDownloads });
+			dbg(
+				"Download ended. Deleting stream from currentDownloads:",
+				currentDownloads,
+			);
 		})
 		.on("error", async error => {
 			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
@@ -295,9 +301,11 @@ export function makeStream({
 				),
 			);
 
-			dbg("Deleting stream from currentDownloads...");
 			currentDownloads.delete(url);
-			dbg({ currentDownloads });
+			dbg(
+				"Download threw an error. Deleting stream from currentDownloads:",
+				currentDownloads,
+			);
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
@@ -306,45 +314,59 @@ export function makeStream({
 	dbg(`Added "${url}" to currentDownloads =`, currentDownloads);
 }
 
-export function handleCreateOrCancelConvert({
+export async function handleCreateOrCancelConvert({
 	electronPort,
 	toExtension,
-	mediaPath,
 	destroy,
-}: HandleConversion & { destroy?: boolean }) {
-	if (!mediasConverting.has(mediaPath))
-		convertToAudio({ mediaPath, toExtension, electronPort });
-	else if (destroy)
+	path,
+}: HandleConversion) {
+	if (!path)
+		// eslint-disable-next-line prefer-rest-params
+		return console.error("Missing required param 'path'!", arguments);
+
+	if (!mediasConverting.has(path)) {
+		if (!toExtension || !electronPort)
+			// eslint-disable-next-line prefer-rest-params
+			return console.error("Missing required params!", arguments);
+
+		await convertToAudio({ path, toExtension, electronPort });
+	} else if (destroy)
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		mediasConverting.get(mediaPath)!.emit("destroy");
+		mediasConverting.get(path)!.emit("destroy");
 }
 
-export function convertToAudio({
+export async function convertToAudio({
 	electronPort,
 	toExtension,
-	mediaPath,
-}: HandleConversion) {
-	dbg(`Creating stream for "${mediaPath}" to convert.`);
+	path,
+}: Required<Omit<HandleConversion, "destroy">>) {
+	if (!electronPort || !toExtension || !path)
+		// eslint-disable-next-line prefer-rest-params
+		return console.error("Missing params!", arguments);
 
-	const titleWithExtension = sanitize(
-		`${getBasename(mediaPath)}.${toExtension}`,
+	// Assert files don't have the extension and that there already doesn't exists one:
+	const pathWithNewExtension = join(
+		dirname(path),
+		sanitize(`${getBasename(path)}.${toExtension}`),
 	);
-	const saveSite = join(dirs.music, titleWithExtension);
-	const readStream = createReadStream(mediaPath);
 
+	if (path.endsWith(toExtension) || (await pathExists(pathWithNewExtension)))
+		return console.error(`File "${path}" already is "${toExtension}"!`);
+
+	const titleWithExtension = sanitize(`${getBasename(path)}.${toExtension}`);
+	const saveSite = join(dirs.music, titleWithExtension);
+	const readStream = createReadStream(path);
 	let interval: NodeJS.Timer | undefined = undefined;
-	// let timeConverted = "";
-	// let sizeConverted = 0;
+
+	dbg(`Creating stream for "${path}" to convert to "${toExtension}".`);
 
 	fluent_ffmpeg(readStream)
-		.save(saveSite)
 		.on(
 			"progress",
 			({ targetSize, timemark }: { targetSize: number; timemark: number }) => {
 				// targetSize: current size of the target file in kilobytes
 				// timemark: the timestamp of the current frame in seconds
 
-				// TODO: test this:
 				// To react:
 				if (!interval)
 					// ^ Only in the firt time this setInterval is called!
@@ -356,15 +378,6 @@ export function convertToAudio({
 							}),
 						2_000,
 					);
-
-				// // To react:
-				// if (!interval) {
-				// 	// ^ Only in the firt time this setInterval is called!
-				// 	interval = setInterval(
-				// 		() => electronPort.postMessage({ sizeConverted, timeConverted }),
-				// 		2_000,
-				// 	);
-				// }
 			},
 		)
 		.on("error", async error => {
@@ -393,10 +406,14 @@ export function convertToAudio({
 				),
 			);
 
-			mediasConverting.delete(mediaPath);
+			mediasConverting.delete(path);
+			dbg(
+				"Convertion threw an error. Deleting from mediasConverting:",
+				mediasConverting,
+			);
 		})
 		.on("end", async () => {
-			console.log(
+			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
 			);
@@ -420,18 +437,22 @@ export function convertToAudio({
 				// ...and remove old one
 				sendMsgToClient({
 					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
-					mediaPath,
+					mediaPath: path,
 				});
 			}
 
 			readStream.close();
 
-			mediasConverting.delete(mediaPath);
-
-			console.log("Was file renamed?", await pathExists(saveSite));
+			mediasConverting.delete(path);
+			dbg(
+				"Convertion successfull. Deleting from mediasConverting:",
+				mediasConverting,
+				"Was file renamed?",
+				await pathExists(saveSite),
+			);
 		})
 		.on("destroy", async () => {
-			console.log(
+			log(
 				"%cDestroy was called on readStream for converter!",
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
@@ -454,14 +475,18 @@ export function convertToAudio({
 				),
 			);
 
-			mediasConverting.delete(mediaPath);
-			dbg({ mediasConverting });
+			mediasConverting.delete(path);
+			dbg(
+				"Convertion was destroyed. Deleting from mediasConverting:",
+				mediasConverting,
+				"Was file renamed?",
+				await pathExists(saveSite),
+			);
+		})
+		.save(saveSite);
 
-			console.log("Was file renamed?", await pathExists(saveSite));
-		});
-
-	mediasConverting.set(mediaPath, readStream);
-	dbg(`Added '${mediaPath}' to mediasConverting =`, mediasConverting);
+	mediasConverting.set(path, readStream);
+	dbg(`Added "${path}" to mediasConverting:`, mediasConverting);
 }
 
 export async function writeTags(
@@ -469,9 +494,9 @@ export async function writeTags(
 	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean }>,
 ): Promise<void> {
 	const file = MediaFile.createFromPath(mediaPath);
-	dbg({ data });
-
 	let fileNewPath = "";
+
+	dbg({ data });
 
 	try {
 		Object.entries(data).forEach(async ([tag, value]) => {
@@ -510,7 +535,7 @@ export async function writeTags(
 
 							file.tag.pictures = [picture];
 
-							console.log({ fileTagPictures: file.tag.pictures, picture });
+							log({ fileTagPictures: file.tag.pictures, picture });
 						} catch (error) {
 							console.error(
 								"There was an error getting the picture data.",
@@ -545,7 +570,7 @@ export async function writeTags(
 
 							file.tag.pictures = [picture];
 
-							console.log({ fileTagPictures: file.tag.pictures, picture });
+							log({ fileTagPictures: file.tag.pictures, picture });
 						} else console.error(`Invalid imgAsString = "${data.imageURL}"!`);
 					}
 
@@ -560,7 +585,7 @@ export async function writeTags(
 
 						file.tag.albumArtists = albumArtists;
 
-						console.log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
+						log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
 							albumArtists,
 						});
 					} else {
@@ -569,7 +594,7 @@ export async function writeTags(
 							.map(v => v.trim());
 
 						file.tag.albumArtists = albumArtists;
-						console.log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
+						log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
 							albumArtists,
 						});
 					}
@@ -588,11 +613,11 @@ export async function writeTags(
 
 					file.tag.title = sanitizedTitle;
 
-					console.log({ value });
+					log({ value });
 
 					if (getBasename(oldPath) === sanitizedTitle) break;
 
-					console.log({ oldPath, newPath });
+					log({ oldPath, newPath });
 
 					fileNewPath = newPath;
 					break;
@@ -608,16 +633,15 @@ export async function writeTags(
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					file.tag[tag] = value;
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
-					console.log(`file.tag[${tag}] =`, file.tag[tag]);
+					log(`file.tag[${tag}] =`, file.tag[tag]);
 
 					break;
 				}
 			}
 		});
 
-		dbg("File tags =", file.tag);
-
 		file.save();
+		dbg("File tags =", file.tag);
 		file.dispose();
 	} catch (error) {
 		// Send error to client:
@@ -656,8 +680,8 @@ export async function writeTags(
 					mediaPath,
 				});
 			} finally {
-				console.log("Was file renamed?", await pathExists(fileNewPath));
-				console.log("Does old file remains?", await pathExists(mediaPath));
+				log("Was file renamed?", await pathExists(fileNewPath));
+				log("Does old file remains?", await pathExists(mediaPath));
 			}
 		} else if (data.isNewMedia) {
 			// Add the new media:
@@ -691,14 +715,16 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 	);
 
 export type HandleConversion = Readonly<{
-	electronPort: Readonly<MessagePort>;
-	toExtension: AllowedMedias;
-	mediaPath: Readonly<Path>;
+	electronPort?: Readonly<MessagePort>;
+	toExtension?: AllowedMedias;
+	path: Readonly<Path>;
+	destroy?: boolean;
 }>;
 
 export type HandleDownload = Readonly<{
-	electronPort: Readonly<MessagePort>;
-	imageURL: Readonly<string>;
-	title: Readonly<string>;
+	electronPort?: Readonly<MessagePort>;
+	imageURL?: Readonly<string>;
+	title?: Readonly<string>;
 	url: Readonly<string>;
+	destroy?: boolean;
 }>;

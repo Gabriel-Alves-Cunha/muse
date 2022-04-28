@@ -9,7 +9,7 @@ export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
 	electronPort?: MessagePort,
 ) => {
-	dbg("Sending message to backend:", { msg, electronPort, window });
+	dbg("Sending message to backend:", { msg, electronPort });
 
 	electronPort
 		? window.postMessage({ msg, source: reactSource }, "*", [electronPort])

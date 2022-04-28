@@ -144,26 +144,25 @@ const playMedia = (mediaID: MediaID) =>
 	});
 
 const Row = ({ media }: { media: Media }) => (
-	<Tooltip text="Play this media">
-		<Result onClick={() => playMedia(media.id)}>
-			<ImgWrapper>
-				<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
-			</ImgWrapper>
+	<Result onClick={() => playMedia(media.id)}>
+		<ImgWrapper>
+			<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+		</ImgWrapper>
 
-			<Info>
-				<Title style={{ marginLeft: 5, textAlign: "left" }}>
-					{media.title}
-				</Title>
-				<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-			</Info>
-		</Result>
-	</Tooltip>
+		<Info>
+			<Title style={{ marginLeft: 5, textAlign: "left" }}>{media.title}</Title>
+			<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+		</Info>
+	</Result>
 );
+
 const SearchResults = ({ results }: { results: readonly Media[] }) => (
 	<SearchResultsWrapper>
-		{results.map(m => (
-			<Row media={m} key={m.id} />
-		))}
+		<div>
+			{results.map(m => (
+				<Row media={m} key={m.id} />
+			))}
+		</div>
 	</SearchResultsWrapper>
 );
 

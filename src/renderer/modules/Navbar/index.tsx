@@ -33,28 +33,7 @@ export const Navbar = () => (
 	</Nav>
 );
 
-const ButtonsForPages = () => {
-	const currPage = usePage().page;
-
-	return (
-		<Buttons>
-			{pages.map(page => (
-				<Tooltip text={"Go to " + page} key={page} side="right">
-					<ScaleUpIconButton
-						className={page === currPage ? "active" : ""}
-						onClick={() => setPage({ page })}
-					>
-						{icon(page)}
-					</ScaleUpIconButton>
-				</Tooltip>
-			))}
-		</Buttons>
-	);
-};
-
-const icon = (folder: Page) => iconObj[folder];
-
-const iconObj: Record<Page, JSX.Element> = Object.freeze({
+const icons: Record<Page, JSX.Element> = Object.freeze({
 	Favorites: <Favorites />,
 	Download: <Download />,
 	Settings: <Settings />,
@@ -62,3 +41,22 @@ const iconObj: Record<Page, JSX.Element> = Object.freeze({
 	Convert: <Convert />,
 	Home: <Home />,
 });
+
+const ButtonsForPages = () => {
+	const currPage = usePage().page;
+
+	return (
+		<Buttons>
+			{pages.map(page => (
+				<Tooltip text={`Go to ${page}`} key={page} side="right">
+					<ScaleUpIconButton
+						className={page === currPage ? "active" : ""}
+						onClick={() => setPage({ page })}
+					>
+						{icons[page]}
+					</ScaleUpIconButton>
+				</Tooltip>
+			))}
+		</Buttons>
+	);
+};

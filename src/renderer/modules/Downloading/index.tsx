@@ -21,17 +21,17 @@ import {
 	Popup,
 } from "./styles";
 
-const { port1: testPort } = new MessageChannel();
-const testDownloadingMedia: MediaBeingDownloaded = Object.freeze({
-	status: ProgressStatus.ACTIVE,
-	url: "http://test.com",
-	isDownloading: true,
-	percentage: 50,
-	port: testPort,
-	title: "test",
-	imageURL: "",
-	index: 0,
-} as const);
+// const { port1: testPort } = new MessageChannel();
+// const testDownloadingMedia: MediaBeingDownloaded = Object.freeze({
+// 	status: ProgressStatus.ACTIVE,
+// 	url: "http://test.com",
+// 	isDownloading: true,
+// 	percentage: 50,
+// 	port: testPort,
+// 	title: "test",
+// 	imageURL: "",
+// 	index: 0,
+// } as const);
 
 const defaultDownloadValues: DownloadValues = Object.freeze({
 	canStartDownload: false,
@@ -41,7 +41,7 @@ const defaultDownloadValues: DownloadValues = Object.freeze({
 });
 
 const useDownloadingList = create<PopupProps>(() => ({
-	downloadingList: new Array(10).fill(testDownloadingMedia),
+	downloadingList: [], //new Array(10).fill(testDownloadingMedia),
 }));
 
 export const useDownloadValues = create<{
@@ -205,11 +205,6 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 		port: myPort,
 	};
 
-	// Adding newly created DownloadingMedia:
-	setDownloadingList({
-		downloadingList: [...downloadingList, downloadStatus],
-	});
-
 	// Send msg to electronPort to download:
 	myPort.postMessage(downloadValues);
 
@@ -218,13 +213,27 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
 		const { downloadingList } = getDownloadingList();
 
-		const index = downloadingList.findIndex(d => d.url === downloadValues.url);
+		// Assert that the download exists:
+		const indexToSeeIfDownloadExists = downloadingList.findIndex(
+			d => d.url === downloadValues.url,
+		);
+		const doesDownloadExists = indexToSeeIfDownloadExists !== -1;
 
-		if (index === -1)
-			return console.error(
+		if (!doesDownloadExists) {
+			console.error(
 				"Received a message from Electron but the url is not in the list",
 				{ data, downloadingList },
+				"Creating it...",
 			);
+
+			setDownloadingList({
+				downloadingList: [...downloadingList, downloadStatus],
+			});
+		}
+
+		const index = doesDownloadExists
+			? indexToSeeIfDownloadExists
+			: downloadingList.length;
 
 		// Update React's information about this DownloadingMedia:
 		setDownloadingList({
@@ -250,6 +259,8 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 					autoClose: 5000,
 					draggable: true,
 				});
+
+				cancelDownloadAndOrRemoveItFromList(downloadStatus.title);
 				break;
 			}
 
@@ -263,6 +274,8 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 					autoClose: 5000,
 					draggable: true,
 				});
+
+				cancelDownloadAndOrRemoveItFromList(downloadStatus.title);
 				break;
 			}
 
@@ -299,6 +312,8 @@ function createNewDownload(downloadValues: DownloadValues): MessagePort {
 
 	// @ts-ignore: this fn DOES exists
 	myPort.onclose = () => console.log("Closing ports (react port).");
+
+	myPort.start();
 
 	return electronPort;
 }

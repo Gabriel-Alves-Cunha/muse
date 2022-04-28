@@ -116,60 +116,64 @@ export const Button = styled("button", {
 
 export const SearchResultsWrapper = styled("div", {
 	position: "absolute",
-	display: "flex",
-	flexDirection: "column",
-	justifyContent: "center",
-	alignItems: "center",
-	maxHeight: "40vh",
-	minHeight: 80,
 	left: "-25%",
-	width: 350,
 	top: 50,
 
-	border: "1px solid lightgray",
-	background: "$bg-popover",
-	boxShadow: "$popup",
-	borderRadius: 7,
-	padding: 10,
-	zIndex: 10,
-	gap: 10,
+	"& div": {
+		position: "relative",
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "center",
+		alignItems: "center",
+		maxHeight: 200,
+		minHeight: 80,
+		width: 350,
 
-	/* width */
-	"&::-webkit-scrollbar": {
-		display: "block",
-		size: 2,
-	},
+		border: "1px solid lightgray",
+		background: "$bg-popover",
+		boxShadow: "$popup",
+		borderRadius: 7,
+		padding: 10,
+		zIndex: 10,
+		gap: 10,
 
-	/* Track */
-	"&::-webkit-scrollbar-track": {
-		background: "$scrollbar",
-	},
+		// overflowY: "auto",
 
-	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
-		background: "$scrollbar-thumb",
-	},
+		/* width */
+		"&::-webkit-scrollbar": {
+			display: "block",
+			size: 2,
+		},
 
-	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
-		background: "$scrollbar-thumb-hover",
+		/* Track */
+		"&::-webkit-scrollbar-track": {
+			background: "$scrollbar",
+		},
+
+		/* Handle */
+		"&::-webkit-scrollbar-thumb": {
+			background: "$scrollbar-thumb",
+		},
+
+		/* Handle on hover */
+		"&::-webkit-scrollbar-thumb:hover": {
+			background: "$scrollbar-thumb-hover",
+		},
 	},
 });
 
 export const Result = styled("div", {
-	position: "relative",
-	display: "flex", // row,
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-
 	width: "100%",
 	height: 60,
-	padding: 7,
 
 	border: "1px solid lightgray",
 	background: "$bg-popover",
 	cursor: "pointer",
 	borderRadius: 7,
+	padding: 7,
 
 	"&:hover": {
 		boxShadow: "$row-wrapper",

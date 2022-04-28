@@ -13,7 +13,6 @@ export const mockGlobalsBeforeTests = () => {
 			readdir: vi.fn(),
 		},
 		os: {
-			homeDir: "test/homeDir",
 			dirs: {
 				documents: "test/documents",
 				downloads: "test/downloads",
@@ -22,9 +21,7 @@ export const mockGlobalsBeforeTests = () => {
 		},
 		media: {
 			transformPathsToMedias: vi.fn(),
-			convertToAudio: vi.fn(),
 			getBasicInfo: vi.fn(),
-			writeTags: vi.fn(),
 		},
 	});
 

@@ -1850,6 +1850,11 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
+dprint@^0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/dprint/-/dprint-0.27.0.tgz#b4d1512cafa1aa2c3749996cf4d6040da0c71887"
+  integrity sha512-LowvtoZ9akBFcKtQ+CmnKj8VosBpf5zTAIDYK5p885xt6YGx62Bjmwzt4dQee2Fij5kREROSW5a3eK87nvGaEA==
+
 duplexer3@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/duplexer3/-/duplexer3-0.1.4.tgz#ee01dd1cac0ed3cbc7fdbea37dc0a8f1ce002ce2"
@@ -3686,11 +3691,6 @@ prepend-http@^2.0.0:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
   integrity sha1-6SQ0v6XqjBn0HN/UAddBo8gZ2Jc=
 
-prettier@^2.6.2:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.2.tgz#e26d71a18a74c3d0f0597f55f01fb6c06c206032"
-  integrity sha512-PkUpF+qoXTqhOeWL9fu7As8LXsIUZ1WYaJiY/a7McAQzxjk82OF0tibkFXVCDImZtWxbvojFjerkiLb0/q8mew==
-
 process-exists@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/process-exists/-/process-exists-4.1.0.tgz#4132c516324c1da72d65896851cdbd8bbdf5b9d8"
@@ -3841,10 +3841,10 @@ react-toastify@^8.2.0:
   dependencies:
     clsx "^1.1.1"
 
-react-virtuoso@^2.10.1:
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-2.10.1.tgz#3c88070dad59422cfbf9ff7b7c771e123173cff0"
-  integrity sha512-r5t65uEdkbO2Jijlafus8IQpM8ngFUTAg5gDVtBqoyY+mF5ZJ5X8SdWlfUXUdGsqqSp8/5PKNi+UuW3aeWfEgA==
+react-virtuoso@^2.10.2:
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-2.10.2.tgz#a4002f05019a07c69fca342c5b745451e2baa2ce"
+  integrity sha512-nQ8Wt/q64q6walcXo4y9SXkvZqjwuLiNUv7aKW3poKoZno8agTgeqcX1GMq3GPlaJ8wR5XMGwBxX4HONBMAGfg==
   dependencies:
     "@virtuoso.dev/react-urx" "^0.2.12"
     "@virtuoso.dev/urx" "^0.2.12"
