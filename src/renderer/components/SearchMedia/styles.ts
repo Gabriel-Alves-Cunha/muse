@@ -50,8 +50,9 @@ export const Search = styled("div", {
 	},
 
 	input: {
-		letterSpacing: "0.03rem",
 		boxSizing: "border-box",
+
+		letterSpacing: "0.03rem",
 		fontFamily: "$secondary",
 		fontSize: "0.9rem",
 		color: "$text",
@@ -114,55 +115,54 @@ export const Button = styled("button", {
 	},
 });
 
-export const SearchResultsWrapper = styled("div", {
+export const SearchResultsWrapper = styled("ul", {
 	position: "absolute",
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "center",
+	alignItems: "center",
 	left: "-25%",
+	height: 200,
+	width: 350,
 	top: 50,
 
-	"& div": {
-		position: "relative",
-		display: "flex",
-		flexDirection: "column",
-		justifyContent: "center",
-		alignItems: "center",
-		maxHeight: 200,
-		minHeight: 80,
-		width: 350,
+	border: "1px solid lightgray",
+	background: "$bg-popover",
+	boxShadow: "$popup",
+	borderRadius: 7,
+	padding: 10,
+	zIndex: 10,
+	gap: 10,
 
-		border: "1px solid lightgray",
-		background: "$bg-popover",
-		boxShadow: "$popup",
-		borderRadius: 7,
-		padding: 10,
-		zIndex: 10,
-		gap: 10,
+	overflowY: "auto",
+	listStyle: "none",
 
-		// overflowY: "auto",
+	/* width */
+	"&::-webkit-scrollbar": {
+		display: "block",
+		size: 2,
+	},
 
-		/* width */
-		"&::-webkit-scrollbar": {
-			display: "block",
-			size: 2,
-		},
+	/* Track */
+	"&::-webkit-scrollbar-track": {
+		background: "$scrollbar",
+	},
 
-		/* Track */
-		"&::-webkit-scrollbar-track": {
-			background: "$scrollbar",
-		},
+	/* Handle */
+	"&::-webkit-scrollbar-thumb": {
+		background: "$scrollbar-thumb",
+	},
 
-		/* Handle */
-		"&::-webkit-scrollbar-thumb": {
-			background: "$scrollbar-thumb",
-		},
-
-		/* Handle on hover */
-		"&::-webkit-scrollbar-thumb:hover": {
-			background: "$scrollbar-thumb-hover",
-		},
+	/* Handle on hover */
+	"&::-webkit-scrollbar-thumb:hover": {
+		background: "$scrollbar-thumb-hover",
 	},
 });
 
-export const Result = styled("div", {
+export const DivToPosition = styled("ul", {});
+
+export const Result = styled("li", {
+	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",

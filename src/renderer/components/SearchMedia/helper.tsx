@@ -21,8 +21,8 @@ import {
 	MAIN_LIST,
 } from "@contexts";
 
-import { SearchResultsWrapper, NothingFound, Result, Button } from "./styles";
 import { ImgWrapper, Info, SubTitle, Title } from "../MediaListKind/styles";
+import { Result, Button } from "./styles";
 
 export enum SearchStatus {
 	RELOADING_ALL_MEDIAS,
@@ -143,44 +143,42 @@ const playMedia = (mediaID: MediaID) =>
 		mediaID,
 	});
 
-const Row = ({ media }: { media: Media }) => (
-	<Result onClick={() => playMedia(media.id)}>
-		<ImgWrapper>
-			<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
-		</ImgWrapper>
+export const Row = ({ media }: { media: Media }) => (
+	<Tooltip text="Play this media">
+		<Result onClick={() => playMedia(media.id)}>
+			<ImgWrapper>
+				<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+			</ImgWrapper>
 
-		<Info>
-			<Title style={{ marginLeft: 5, textAlign: "left" }}>{media.title}</Title>
-			<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-		</Info>
-	</Result>
+			<Info>
+				<Title style={{ marginLeft: 5, textAlign: "left" }}>
+					{media.title}
+				</Title>
+				<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+			</Info>
+		</Result>
+	</Tooltip>
 );
 
-const SearchResults = ({ results }: { results: readonly Media[] }) => (
-	<SearchResultsWrapper>
-		<div>
-			{results.map(m => (
-				<Row media={m} key={m.id} />
-			))}
-		</div>
-	</SearchResultsWrapper>
-);
-
-const searchResultJSX: Map<SearchStatus, () => JSX.Element> = new Map();
-searchResultJSX.set(SearchStatus.NOTHING_FOUND, () => (
-	<NothingFound>
-		Nothing was found for &quot;{getSearcherFunctions().searcher.searchTerm}
-		&quot;
-	</NothingFound>
-));
-searchResultJSX.set(SearchStatus.FOUND_SOMETHING, () => (
-	<SearchResults results={getSearcherFunctions().searcher.results} />
-));
-searchResultJSX.set(SearchStatus.RELOADING_ALL_MEDIAS, () => <></>);
-searchResultJSX.set(SearchStatus.DOING_NOTHING, () => <></>);
-searchResultJSX.set(SearchStatus.SEARCHING, () => <></>);
-Object.freeze(searchResultJSX);
-export { searchResultJSX };
+// const searchResultJSX: Map<SearchStatus, () => JSX.Element> = new Map();
+// searchResultJSX.set(SearchStatus.NOTHING_FOUND, () => (
+// 	<NothingFound>
+// 		Nothing was found for &quot;{getSearcherFunctions().searcher.searchTerm}
+// 		&quot;
+// 	</NothingFound>
+// ));
+// searchResultJSX.set(SearchStatus.FOUND_SOMETHING, () => (
+// 	<SearchResultsWrapper>
+// 		{getSearcherFunctions().searcher.results.map(m => (
+// 			<Row media={m} key={m.id} />
+// 		))}
+// 	</SearchResultsWrapper>
+// ));
+// searchResultJSX.set(SearchStatus.RELOADING_ALL_MEDIAS, () => <></>);
+// searchResultJSX.set(SearchStatus.DOING_NOTHING, () => <></>);
+// searchResultJSX.set(SearchStatus.SEARCHING, () => <></>);
+// Object.freeze(searchResultJSX);
+// export { searchResultJSX };
 
 const buttonToTheSideJSX: Map<ButtonToTheSide, () => JSX.Element> = new Map();
 buttonToTheSideJSX.set(ButtonToTheSide.RELOAD_BUTTON, () => (

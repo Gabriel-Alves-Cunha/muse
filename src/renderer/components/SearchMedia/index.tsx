@@ -1,22 +1,33 @@
 import type { MediaListKindProps } from "../MediaListKind";
 
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
+import { MdAutorenew as Reload } from "react-icons/md";
 import { useEffect, useRef } from "react";
+import { FiTrash as Clean } from "react-icons/fi";
 
 import { searchForMediaFromList } from "@contexts";
 import { useOnClickOutside } from "@hooks";
+import { Tooltip } from "@components";
 import {
 	getSearcherFunctions,
-	buttonToTheSideJSX,
-	searchResultJSX,
 	ButtonToTheSide,
 	SearcherAction,
 	SearchStatus,
+	cleanHistory,
 	useSearcher,
 	setSearcher,
+	reload,
+	Row,
 } from "./helper";
 
-import { SearchWrapper, Wrapper, Search } from "./styles";
+import {
+	SearchResultsWrapper,
+	SearchWrapper,
+	NothingFound,
+	Wrapper,
+	Search,
+	Button,
+} from "./styles";
 
 export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 	const { searchStatus, searchTerm } = useSearcher().searcher;
@@ -63,29 +74,75 @@ export function SearchMedia({ fromList, buttonToTheSide }: Props) {
 
 	return (
 		<Wrapper ref={searcherRef}>
-			<SearchWrapper>
-				<Search>
-					<SearchIcon size="1.2em" />
-					<input
-						onChange={e =>
-							setSearcher({
-								type: SearcherAction.SET_SEARCH_TERM,
-								value: e.target.value,
-							})
+			<>
+				<SearchWrapper>
+					<>
+						<Search>
+							<SearchIcon size="1.2em" />
+							<input
+								onChange={e =>
+									setSearcher({
+										type: SearcherAction.SET_SEARCH_TERM,
+										value: e.target.value,
+									})
+								}
+								placeholder="Search for songs"
+								autoCapitalize="on"
+								value={searchTerm}
+								spellCheck="false"
+								autoCorrect="off"
+								type="text"
+							/>
+						</Search>
+
+						{
+							{
+								[SearchStatus.NOTHING_FOUND]: (
+									<NothingFound>
+										Nothing was found for &quot;
+										{getSearcherFunctions().searcher.searchTerm}
+										&quot;
+									</NothingFound>
+								),
+								[SearchStatus.FOUND_SOMETHING]: (
+									<SearchResultsWrapper>
+										{getSearcherFunctions().searcher.results.map(m => (
+											<Row media={m} key={m.id} />
+										))}
+									</SearchResultsWrapper>
+								),
+							}[String(searchStatus)]
 						}
-						placeholder="Search for songs"
-						autoCapitalize="on"
-						value={searchTerm}
-						spellCheck="false"
-						autoCorrect="off"
-						type="text"
-					/>
-				</Search>
+					</>
+				</SearchWrapper>
 
-				{searchResultJSX.get(searchStatus)?.()}
-			</SearchWrapper>
-
-			{buttonToTheSideJSX.get(buttonToTheSide)?.()}
+				{
+					{
+						[ButtonToTheSide.RELOAD_BUTTON]: (
+							<Tooltip text="Reload all medias">
+								<Button onClick={reload} className="reload">
+									<Reload
+										className={
+											getSearcherFunctions().searcher.searchStatus ===
+											SearchStatus.RELOADING_ALL_MEDIAS
+												? "reloading"
+												: ""
+										}
+										size={17}
+									/>
+								</Button>
+							</Tooltip>
+						),
+						[ButtonToTheSide.CLEAN]: (
+							<Tooltip text="Clean history">
+								<Button>
+									<Clean size={15} onClick={cleanHistory} />
+								</Button>
+							</Tooltip>
+						),
+					}[String(buttonToTheSide)]
+				}
+			</>
 		</Wrapper>
 	);
 }
