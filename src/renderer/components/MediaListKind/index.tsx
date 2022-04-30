@@ -170,8 +170,8 @@ const selectMeIfCtrlPlusLeftClick = (
 const classes = (media: Media, currentPlayingID: number | undefined) => {
 	let classes = "";
 
-	if (media.id === currentPlayingID) classes += "active" + " ";
-	if (media.selected) classes += "selected" + " ";
+	if (media.id === currentPlayingID) classes += "active ";
+	if (media.selected) classes += "selected ";
 
 	return classes;
 };

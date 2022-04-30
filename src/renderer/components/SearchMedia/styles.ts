@@ -117,6 +117,7 @@ export const Button = styled("button", {
 
 export const SearchResultsWrapper = styled("ul", {
 	position: "absolute",
+	// position: "relative",
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "center",
@@ -126,8 +127,8 @@ export const SearchResultsWrapper = styled("ul", {
 	width: 350,
 	top: 50,
 
+	backgroundColor: "$bg-popover",
 	border: "1px solid lightgray",
-	background: "$bg-popover",
 	boxShadow: "$popup",
 	borderRadius: 7,
 	padding: 10,
@@ -158,8 +159,6 @@ export const SearchResultsWrapper = styled("ul", {
 		background: "$scrollbar-thumb-hover",
 	},
 });
-
-export const DivToPosition = styled("ul", {});
 
 export const Result = styled("li", {
 	position: "relative",

@@ -155,6 +155,10 @@ export const Title = styled("p", {
 	textOverflow: "ellipsis",
 	whiteSpace: "nowrap", // make it one-line.
 	overflow: "hidden",
+
+	"&.highlight": {
+		backgroundColor: "yellowgreen",
+	},
 });
 
 export const Alert = styled("div", {

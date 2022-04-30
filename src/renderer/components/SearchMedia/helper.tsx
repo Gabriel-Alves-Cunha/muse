@@ -8,9 +8,8 @@ import {
 } from "react-icons/md";
 import create from "zustand";
 
+import { ImgWithFallback, Tooltip } from "@components";
 import { assertUnreachable } from "@utils/utils";
-import { ImgWithFallback } from "@components";
-import { Tooltip } from "@components";
 import {
 	searchLocalComputerForMedias,
 	CurrentPlayingEnum,
@@ -21,8 +20,8 @@ import {
 	MAIN_LIST,
 } from "@contexts";
 
+import { Result, Button, NothingFound, SearchResultsWrapper } from "./styles";
 import { ImgWrapper, Info, SubTitle, Title } from "../MediaListKind/styles";
-import { Result, Button } from "./styles";
 
 export enum SearchStatus {
 	RELOADING_ALL_MEDIAS,
@@ -143,22 +142,30 @@ const playMedia = (mediaID: MediaID) =>
 		mediaID,
 	});
 
-export const Row = ({ media }: { media: Media }) => (
-	<Tooltip text="Play this media">
-		<Result onClick={() => playMedia(media.id)}>
-			<ImgWrapper>
-				<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
-			</ImgWrapper>
+export const Row = ({ highlight, media }: RowProps) => {
+	const index = media.title.toLowerCase().indexOf(highlight);
 
-			<Info>
-				<Title style={{ marginLeft: 5, textAlign: "left" }}>
-					{media.title}
-				</Title>
-				<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-			</Info>
-		</Result>
-	</Tooltip>
-);
+	return (
+		<Tooltip text="Play this media">
+			<Result onClick={() => playMedia(media.id)}>
+				<ImgWrapper>
+					<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+				</ImgWrapper>
+
+				<Info>
+					<Title style={{ marginLeft: 5, textAlign: "left" }}>
+						{media.title.slice(0, index)}
+						<span className="highlight">
+							{media.title.slice(index, index + highlight.length)}
+						</span>
+						{media.title.slice(index + highlight.length)}
+					</Title>
+					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+				</Info>
+			</Result>
+		</Tooltip>
+	);
+};
 
 // const searchResultJSX: Map<SearchStatus, () => JSX.Element> = new Map();
 // searchResultJSX.set(SearchStatus.NOTHING_FOUND, () => (
@@ -233,4 +240,9 @@ type SearcherProps = Readonly<{
 	searchStatus: SearchStatus;
 	results: readonly Media[];
 	searchTerm: string;
+}>;
+
+type RowProps = Readonly<{
+	highlight: string;
+	media: Media;
 }>;
