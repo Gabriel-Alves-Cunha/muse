@@ -7,7 +7,7 @@ export function Home() {
 		<MainArea>
 			<SearchMedia
 				buttonToTheSide={ButtonToTheSide.RELOAD_BUTTON}
-				fromList={MAIN_LIST}
+				playlistName={MAIN_LIST}
 			/>
 
 			<MediaListKind playlistName={MAIN_LIST} />

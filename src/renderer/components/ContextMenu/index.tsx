@@ -42,3 +42,8 @@ type Props = {
 	content?: ContentEnum;
 	children: ReactNode;
 };
+
+ContextMenu.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "ContextMenu",
+};

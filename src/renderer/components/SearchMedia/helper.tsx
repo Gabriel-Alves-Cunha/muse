@@ -1,4 +1,3 @@
-import type { MediaListKindProps } from "@components/MediaListKind";
 import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
 import { FiTrash as Clean } from "react-icons/fi";
@@ -9,7 +8,6 @@ import {
 import create from "zustand";
 
 import { ImgWithFallback, Tooltip } from "@components";
-import { assertUnreachable } from "@utils/utils";
 import {
 	searchLocalComputerForMedias,
 	CurrentPlayingEnum,
@@ -17,11 +15,10 @@ import {
 	PlaylistActions,
 	PlaylistEnum,
 	setPlaylists,
-	MAIN_LIST,
 } from "@contexts";
 
-import { Result, Button, NothingFound, SearchResultsWrapper } from "./styles";
 import { ImgWrapper, Info, SubTitle, Title } from "../MediaListKind/styles";
+import { Result, Button } from "./styles";
 
 export enum SearchStatus {
 	RELOADING_ALL_MEDIAS,
@@ -37,83 +34,15 @@ export enum ButtonToTheSide {
 	CLEAN,
 }
 
-export enum SearcherAction {
-	SET_TO_DEFAULT_STATE,
-	SET_SEARCH_STATUS,
-	SET_SEARCH_TERM,
-	SET_FROM_LIST,
-	SET_RESULTS,
-}
-
-const defaultSearcher = Object.freeze({
+export const constRefToEmptyArray = [];
+export const defaultSearcher: SearcherProps = Object.freeze({
 	searchStatus: SearchStatus.DOING_NOTHING,
-	fromList: MAIN_LIST,
+	results: constRefToEmptyArray,
 	searchTerm: "",
-	results: [],
 });
 
-export const useSearcher = create<{
-	setSearcher: (action: Action) => void;
-	searcher: SearcherProps;
-}>((set, get) => ({
-	searcher: defaultSearcher,
-	setSearcher: (action: Action) => {
-		switch (action.type) {
-			case SearcherAction.SET_RESULTS: {
-				set({
-					searcher: {
-						...get().searcher,
-						results: action.value,
-					},
-				});
-				break;
-			}
-
-			case SearcherAction.SET_SEARCH_TERM: {
-				set({
-					searcher: {
-						...get().searcher,
-						searchTerm: action.value,
-					},
-				});
-				break;
-			}
-
-			case SearcherAction.SET_SEARCH_STATUS: {
-				set({
-					searcher: {
-						...get().searcher,
-						searchStatus: action.value,
-					},
-				});
-				break;
-			}
-
-			case SearcherAction.SET_FROM_LIST: {
-				set({
-					searcher: {
-						...get().searcher,
-						fromList: action.value,
-					},
-				});
-				break;
-			}
-
-			case SearcherAction.SET_TO_DEFAULT_STATE: {
-				set({ searcher: defaultSearcher });
-				break;
-			}
-
-			default: {
-				assertUnreachable(action);
-				break;
-			}
-		}
-	},
-}));
-
-export const { getState: getSearcherFunctions } = useSearcher;
-export const { setSearcher } = getSearcherFunctions();
+export const useSearcher = create(() => defaultSearcher);
+export const { getState: getSearcher, setState: setSearcher } = useSearcher;
 
 export const cleanHistory = () =>
 	setPlaylists({
@@ -123,47 +52,57 @@ export const cleanHistory = () =>
 
 export const reload = async () => {
 	setSearcher({
-		value: SearchStatus.RELOADING_ALL_MEDIAS,
-		type: SearcherAction.SET_SEARCH_STATUS,
+		...defaultSearcher,
+		searchStatus: SearchStatus.RELOADING_ALL_MEDIAS,
 	});
 
 	await searchLocalComputerForMedias(true);
 
 	setSearcher({
-		type: SearcherAction.SET_SEARCH_STATUS,
-		value: SearchStatus.DOING_NOTHING,
+		...defaultSearcher,
+		searchStatus: SearchStatus.DOING_NOTHING,
 	});
 };
 
-const playMedia = (mediaID: MediaID) =>
+export const handleInputChange = ({
+	target: { value },
+}: React.ChangeEvent<HTMLInputElement>) =>
+	setSearcher(prev => ({
+		...prev,
+		searchTerm: value.toLowerCase(),
+	}));
+
+const playMedia = (mediaID: MediaID, playlistName: string) =>
 	setCurrentPlaying({
-		playlistName: getSearcherFunctions().searcher.fromList,
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
+		playlistName,
 		mediaID,
 	});
 
-export const Row = ({ highlight, media }: RowProps) => {
+export const Row = ({ highlight, media, playlistName }: RowProps) => {
 	const index = media.title.toLowerCase().indexOf(highlight);
 
 	return (
-		<Tooltip text="Play this media">
-			<Result onClick={() => playMedia(media.id)}>
-				<ImgWrapper>
-					<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
-				</ImgWrapper>
+		<Result onClick={() => playMedia(media.id, playlistName)}>
+			<Tooltip text="Play this media">
+				<>
+					<ImgWrapper>
+						<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+					</ImgWrapper>
 
-				<Info>
-					<Title style={{ marginLeft: 5, textAlign: "left" }}>
-						{media.title.slice(0, index)}
-						<span className="highlight">
-							{media.title.slice(index, index + highlight.length)}
-						</span>
-						{media.title.slice(index + highlight.length)}
-					</Title>
-					<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-				</Info>
-			</Result>
-		</Tooltip>
+					<Info>
+						<Title style={{ marginLeft: 5, textAlign: "left" }}>
+							{media.title.slice(0, index)}
+							<span className="highlight">
+								{media.title.slice(index, index + highlight.length)}
+							</span>
+							{media.title.slice(index + highlight.length)}
+						</Title>
+						<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
+					</Info>
+				</>
+			</Tooltip>
+		</Result>
 	);
 };
 
@@ -193,8 +132,7 @@ buttonToTheSideJSX.set(ButtonToTheSide.RELOAD_BUTTON, () => (
 		<Button onClick={reload} className="reload">
 			<Reload
 				className={
-					getSearcherFunctions().searcher.searchStatus ===
-					SearchStatus.RELOADING_ALL_MEDIAS
+					getSearcher().searchStatus === SearchStatus.RELOADING_ALL_MEDIAS
 						? "reloading"
 						: ""
 				}
@@ -214,35 +152,14 @@ buttonToTheSideJSX.set(ButtonToTheSide.NOTHING, () => <></>);
 Object.freeze(buttonToTheSideJSX);
 export { buttonToTheSideJSX };
 
-type Action =
-	| Readonly<{
-			type: SearcherAction.SET_TO_DEFAULT_STATE;
-	  }>
-	| Readonly<{
-			type: SearcherAction.SET_SEARCH_STATUS;
-			value: SearcherProps["searchStatus"];
-	  }>
-	| Readonly<{
-			type: SearcherAction.SET_FROM_LIST;
-			value: SearcherProps["fromList"];
-	  }>
-	| Readonly<{
-			type: SearcherAction.SET_RESULTS;
-			value: SearcherProps["results"];
-	  }>
-	| Readonly<{
-			type: SearcherAction.SET_SEARCH_TERM;
-			value: SearcherProps["searchTerm"];
-	  }>;
-
 type SearcherProps = Readonly<{
-	fromList: MediaListKindProps["playlistName"];
+	searchTerm: Lowercase<string>;
 	searchStatus: SearchStatus;
 	results: readonly Media[];
-	searchTerm: string;
 }>;
 
 type RowProps = Readonly<{
+	playlistName: string;
 	highlight: string;
 	media: Media;
 }>;

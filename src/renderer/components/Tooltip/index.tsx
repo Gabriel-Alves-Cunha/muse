@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 
 import {
 	type TooltipContentProps,
+	Provider,
 	Trigger,
 	Root,
 } from "@radix-ui/react-tooltip";
@@ -14,20 +15,22 @@ export const Tooltip = ({
 	children,
 	text,
 }: Props) => (
-	<Root>
-		<Trigger asChild>{children}</Trigger>
+	<Provider delayDuration={500} skipDelayDuration={300}>
+		<Root>
+			<Trigger asChild>{children}</Trigger>
 
-		<StyledContent
-			collisionTolerance={20}
-			sideOffset={5}
-			align="center"
-			side={side}
-		>
-			{text}
+			<StyledContent
+				collisionTolerance={20}
+				sideOffset={5}
+				align="center"
+				side={side}
+			>
+				{text}
 
-			{arrow && <StyledArrow />}
-		</StyledContent>
-	</Root>
+				{arrow && <StyledArrow />}
+			</StyledContent>
+		</Root>
+	</Provider>
 );
 
 type Props = {
@@ -35,4 +38,9 @@ type Props = {
 	children: ReactNode;
 	arrow?: boolean;
 	text: string;
+};
+
+Tooltip.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "Tooltip",
 };

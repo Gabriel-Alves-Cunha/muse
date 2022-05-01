@@ -1061,6 +1061,13 @@
   dependencies:
     sirv "^2.0.2"
 
+"@welldone-software/why-did-you-render@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@welldone-software/why-did-you-render/-/why-did-you-render-7.0.1.tgz#09f487d84844bd8e66435843c2e0305702e61efb"
+  integrity sha512-Qe/8Xxa2G+LMdI6VoazescPzjjkHYduCDa8aHOJR50e9Bgs8ihkfMBY+ev7B4oc3N59Zm547Sgjf8h5y0FOyoA==
+  dependencies:
+    lodash "^4"
+
 acorn-jsx@^5.3.1:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -1850,10 +1857,12 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dprint@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/dprint/-/dprint-0.27.0.tgz#b4d1512cafa1aa2c3749996cf4d6040da0c71887"
-  integrity sha512-LowvtoZ9akBFcKtQ+CmnKj8VosBpf5zTAIDYK5p885xt6YGx62Bjmwzt4dQee2Fij5kREROSW5a3eK87nvGaEA==
+dprint@^0.27.1:
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/dprint/-/dprint-0.27.1.tgz#d3341dc83a3f939fb90b38b172f63aad0249516c"
+  integrity sha512-V0kUvnbA2qXkUEgSFLl0HgOta461nUB2UkuUwOEHhERhoVTML+suajA7UFYPHprCuiEFdfJTSJlCFSmlAD17MA==
+  dependencies:
+    yauzl "=2.10.0"
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -3231,7 +3240,7 @@ lodash.merge@^4.6.2:
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
-lodash@^4.17.10, lodash@^4.17.15:
+lodash@^4, lodash@^4.17.10, lodash@^4.17.15:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -4754,7 +4763,7 @@ yargs@^17.0.1:
     y18n "^5.0.5"
     yargs-parser "^21.0.0"
 
-yauzl@^2.10.0:
+yauzl@=2.10.0, yauzl@^2.10.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/yauzl/-/yauzl-2.10.0.tgz#c7eb17c93e112cb1086fa6d8e51fb0667b79a5f9"
   integrity sha1-x+sXyT4RLLEIb6bY5R+wZnt5pfk=

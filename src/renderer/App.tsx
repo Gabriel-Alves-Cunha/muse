@@ -1,4 +1,3 @@
-import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 
@@ -48,13 +47,11 @@ export function App() {
 				draggable
 			/>
 
-			<TooltipProvider delayDuration={500} skipDelayDuration={300}>
-				<Decorations />
+			<Decorations />
 
-				<ContextMenu>
-					<Main />
-				</ContextMenu>
-			</TooltipProvider>
+			<ContextMenu>
+				<Main />
+			</ContextMenu>
 		</>
 	);
 }

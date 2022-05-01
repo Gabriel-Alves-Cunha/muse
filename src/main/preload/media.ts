@@ -133,6 +133,7 @@ export async function transformPathsToMedias(
 
 	const medias: Media[] = [];
 
+	console.groupCollapsed("Creating medias...");
 	const promises = paths.map(path =>
 		createMedia(
 			path,
@@ -144,6 +145,7 @@ export async function transformPathsToMedias(
 	(await Promise.allSettled(promises)).forEach(p => {
 		if (p.status === "fulfilled") medias.push(p.value);
 	});
+	console.groupEnd();
 
 	const end = performance.now();
 	log(`%cRunnig 'for' on all medias took: ${end - start} ms.`, "color:brown");

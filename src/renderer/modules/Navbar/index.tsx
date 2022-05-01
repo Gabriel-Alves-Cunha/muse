@@ -60,3 +60,8 @@ const ButtonsForPages = () => {
 		</Buttons>
 	);
 };
+
+Navbar.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "Navbar",
+};

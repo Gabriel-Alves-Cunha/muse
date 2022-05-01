@@ -74,3 +74,8 @@ type Progress = Readonly<{
 	currentTime: number;
 	percentage: number;
 }>;
+
+MediaPlayer.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "MediaPlayer",
+};

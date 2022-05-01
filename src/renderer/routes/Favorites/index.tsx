@@ -7,7 +7,7 @@ export function Favorites() {
 		<MainArea>
 			<SearchMedia
 				buttonToTheSide={ButtonToTheSide.NOTHING}
-				fromList={FAVORITES}
+				playlistName={FAVORITES}
 			/>
 
 			<MediaListKind playlistName={FAVORITES} />

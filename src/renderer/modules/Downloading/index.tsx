@@ -355,3 +355,8 @@ type MediaBeingDownloaded = Readonly<{
 type PopupProps = Readonly<{
 	downloadingList: readonly MediaBeingDownloaded[];
 }>;
+
+Downloading.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "Downloading",
+};

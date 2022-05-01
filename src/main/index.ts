@@ -109,21 +109,24 @@ app
 		// Some APIs can only be used after this event occurs.
 
 		// TODO: there is something wrong with this lib:
-		// if (isDevelopment) {
-		// 	const devtoolsInstaller = await import("electron-devtools-installer");
-		// 	const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-		// 	const { default: installExtension } = devtoolsInstaller.default;
+		if (isDevelopment) {
+			const devtoolsInstaller = await import("electron-devtools-installer");
+			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
+			// @ts-ignore - this is a workaround for a bug in the lib
+			const { default: installExtension } = devtoolsInstaller.default;
 
-		// 	console.log({ installExtension });
+			console.log({ installExtension });
 
-		// 	await installExtension(REACT_DEVELOPER_TOOLS, {
-		// 		loadExtensionOptions: { allowFileAccess: true },
-		// 	})
-		// 		.then(name => console.log(`Added Extension: ${name}`))
-		// 		.catch(err =>
-		// 			console.error("An error occurred while installing extension: ", err),
-		// 		);
-		// }
+			await installExtension(REACT_DEVELOPER_TOOLS, {
+				loadExtensionOptions: { allowFileAccess: true },
+			})
+				// @ts-ignore - this is a workaround for a bug in the lib
+				.then(name => console.log(`Added Extension: ${name}`))
+				// @ts-ignore - this is a workaround for a bug in the lib
+				.catch(err =>
+					console.error("An error occurred while installing extension: ", err),
+				);
+		}
 
 		electronWindow = await createWindow();
 		tray = new Tray(nativeImage.createFromPath(logoPath));

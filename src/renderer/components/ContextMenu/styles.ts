@@ -56,8 +56,6 @@ export const itemStyles = styled("div", {
 	},
 });
 
-console.log({ itemStyles });
-
 export const RightSlot = styled("div", {
 	ml: "auto",
 	pl: 20,

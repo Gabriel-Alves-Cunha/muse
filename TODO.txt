@@ -1,3 +1,4 @@
+* TODO: impl select on media
 
 NOTES:
 

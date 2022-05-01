@@ -371,3 +371,8 @@ type PopupProps = Readonly<{
 type ConvertBoxProps = Readonly<{
 	mediaBeingConverted: MediaBeingConverted;
 }>;
+
+Converting.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "Converting",
+};

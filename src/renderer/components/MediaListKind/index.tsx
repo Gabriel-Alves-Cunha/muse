@@ -8,20 +8,18 @@ import { ErrorBoundary } from "react-error-boundary";
 import { memo, useMemo } from "react";
 import { Virtuoso } from "react-virtuoso";
 
+import { ImgWithFallback, Tooltip } from "@components";
 import { MediaOptionsModal } from "./MediaOptions";
-import { ImgWithFallback } from "@components";
-import { MAIN_LIST } from "@contexts";
-import { Tooltip } from "@components";
 import {
 	type Playlist,
 	CurrentPlayingEnum,
-	useCurrentPlaying,
 	setCurrentPlaying,
 	PlaylistActions,
 	usePlaylists,
 	setPlaylists,
 	PlaylistEnum,
 	getPlaylists,
+	MAIN_LIST,
 } from "@contexts";
 
 import { StyledOverlay } from "./MediaOptions/styles";
@@ -39,13 +37,6 @@ import {
 	Msg,
 } from "./styles";
 
-const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
-	setCurrentPlaying({
-		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		playlistName,
-		mediaID,
-	});
-
 export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
 	<ErrorBoundary
 		FallbackComponent={ErrorFallback}
@@ -62,7 +53,6 @@ export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
 
 function MediaListKind_({ playlistName }: MediaListKindProps) {
 	const { playlists, mainList } = usePlaylists();
-	const { currentPlaying } = useCurrentPlaying();
 
 	const data = useMemo(() => {
 		// Handle when playlistName === MAIN_LIST:
@@ -85,52 +75,11 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		return data;
 	}, [mainList, playlistName, playlists]);
 
-	const Row = memo(
-		({ media }: { media: Media }) => (
-			<RowWrapper
-				onClick={e => selectMeIfCtrlPlusLeftClick(e, media.id)}
-				className={classes(media, currentPlaying.mediaID)}
-			>
-				<Tooltip text="Play this media">
-					<PlayButton onClick={() => playMedia(media.id, playlistName)}>
-						<ImgWrapper>
-							<ImgWithFallback
-								Fallback={<MusicNote size="1.4em" />}
-								media={media}
-							/>
-						</ImgWrapper>
-
-						<Info>
-							<Title>{media.title}</Title>
-							<SubTitle>{media.duration}</SubTitle>
-						</Info>
-					</PlayButton>
-				</Tooltip>
-
-				<Dialog modal>
-					<Tooltip text="Open media options">
-						<TriggerOptions style={{ width: 29 }}>
-							<Dots />
-						</TriggerOptions>
-					</Tooltip>
-
-					<Portal>
-						<StyledOverlay>
-							<MediaOptionsModal media={media} />
-						</StyledOverlay>
-					</Portal>
-				</Dialog>
-			</RowWrapper>
-		),
-		(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id,
-	);
-	Row.displayName = "Row";
-
 	return (
 		<ListWrapper>
 			<Virtuoso
-				itemContent={(_, m) => <Row media={m} />}
-				computeItemKey={(_, m) => m.id}
+				computeItemKey={computeItemKey}
+				itemContent={itemContent}
 				totalCount={data.length}
 				fixedItemHeight={65}
 				className="list"
@@ -142,6 +91,59 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		</ListWrapper>
 	);
 }
+
+const Row = memo(
+	({ media, playlistName }: RowProps) => (
+		<RowWrapper
+			onClick={e => selectMeIfCtrlPlusLeftClick(e, media.id)}
+			className={media.selected ? "selected" : ""}
+		>
+			<Tooltip text="Play this media">
+				<PlayButton onClick={() => playMedia(media.id, playlistName)}>
+					<ImgWrapper>
+						<ImgWithFallback
+							Fallback={<MusicNote size="1.4em" />}
+							media={media}
+						/>
+					</ImgWrapper>
+
+					<Info>
+						<Title>{media.title}</Title>
+						<SubTitle>{media.duration}</SubTitle>
+					</Info>
+				</PlayButton>
+			</Tooltip>
+
+			<Dialog modal>
+				<Tooltip text="Open media options">
+					<TriggerOptions style={{ width: 29 }}>
+						<Dots />
+					</TriggerOptions>
+				</Tooltip>
+
+				<Portal>
+					<StyledOverlay>
+						<MediaOptionsModal media={media} />
+					</StyledOverlay>
+				</Portal>
+			</Dialog>
+		</RowWrapper>
+	),
+	(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id,
+);
+Row.displayName = "Row";
+
+const computeItemKey = (_: number, media: Media) => media.id;
+const itemContent = (_: number, media: Media, playlistName: string) => (
+	<Row playlistName={playlistName} media={media} />
+);
+
+const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
+	setCurrentPlaying({
+		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
+		playlistName,
+		mediaID,
+	});
 
 const selectMeIfCtrlPlusLeftClick = (
 	e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -167,15 +169,6 @@ const selectMeIfCtrlPlusLeftClick = (
 	});
 };
 
-const classes = (media: Media, currentPlayingID: number | undefined) => {
-	let classes = "";
-
-	if (media.id === currentPlayingID) classes += "active ";
-	if (media.selected) classes += "selected ";
-
-	return classes;
-};
-
 function ErrorFallback({ error, resetErrorBoundary }: ErrorBoundaryProps) {
 	return (
 		<Alert role="alert">
@@ -197,6 +190,16 @@ type ErrorBoundaryProps = {
 	error: Error;
 };
 
+type RowProps = Readonly<{
+	playlistName: Playlist["name"];
+	media: Media;
+}>;
+
 export type MediaListKindProps = Readonly<{
 	playlistName: Playlist["name"];
 }>;
+
+MediaListKind_.whyDidYouRender = {
+	logOnDifferentValues: true,
+	customName: "MediaListKind_",
+};
