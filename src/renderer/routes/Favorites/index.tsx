@@ -1,12 +1,12 @@
 import { SearchMedia, MediaListKind, MainArea } from "@components";
-import { ButtonToTheSide } from "@components/SearchMedia/helper";
+import { ButtonToTheSideEnum } from "@components/SearchMedia/helper";
 import { FAVORITES } from "@contexts";
 
 export function Favorites() {
 	return (
 		<MainArea>
 			<SearchMedia
-				buttonToTheSide={ButtonToTheSide.NOTHING}
+				buttonToTheSide={ButtonToTheSideEnum.NOTHING}
 				playlistName={FAVORITES}
 			/>
 

@@ -156,7 +156,7 @@ export const Title = styled("p", {
 	whiteSpace: "nowrap", // make it one-line.
 	overflow: "hidden",
 
-	"&.highlight": {
+	"& .highlight": {
 		backgroundColor: "yellowgreen",
 	},
 });

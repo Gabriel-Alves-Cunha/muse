@@ -357,6 +357,5 @@ type PopupProps = Readonly<{
 }>;
 
 Downloading.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "Downloading",
 };

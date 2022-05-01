@@ -373,6 +373,5 @@ type ConvertBoxProps = Readonly<{
 }>;
 
 Converting.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "Converting",
 };

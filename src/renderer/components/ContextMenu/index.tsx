@@ -44,6 +44,5 @@ type Props = {
 };
 
 ContextMenu.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "ContextMenu",
 };

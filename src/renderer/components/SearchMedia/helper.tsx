@@ -1,5 +1,7 @@
+import type { MediaListKindProps } from "@components/MediaListKind";
 import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
+import { useEffect, useTransition } from "react";
 import { FiTrash as Clean } from "react-icons/fi";
 import {
 	MdMusicNote as MusicNote,
@@ -10,6 +12,7 @@ import create from "zustand";
 import { ImgWithFallback, Tooltip } from "@components";
 import {
 	searchLocalComputerForMedias,
+	searchForMediaFromList,
 	CurrentPlayingEnum,
 	setCurrentPlaying,
 	PlaylistActions,
@@ -17,8 +20,17 @@ import {
 	setPlaylists,
 } from "@contexts";
 
-import { ImgWrapper, Info, SubTitle, Title } from "../MediaListKind/styles";
-import { Result, Button } from "./styles";
+import { ImgWrapper, Info } from "../MediaListKind/styles";
+import {
+	ResultsWrapper,
+	SearchResults,
+	NothingFound,
+	ReloadButton,
+	Highlight,
+	SubTitle,
+	Result,
+	Title,
+} from "./styles";
 
 export enum SearchStatus {
 	RELOADING_ALL_MEDIAS,
@@ -28,16 +40,25 @@ export enum SearchStatus {
 	SEARCHING,
 }
 
-export enum ButtonToTheSide {
+export enum ButtonToTheSideEnum {
 	RELOAD_BUTTON,
 	NOTHING,
 	CLEAN,
 }
 
-export const constRefToEmptyArray = [];
-export const defaultSearcher: SearcherProps = Object.freeze({
-	searchStatus: SearchStatus.DOING_NOTHING,
+const { CLEAN, RELOAD_BUTTON } = ButtonToTheSideEnum;
+const {
+	RELOADING_ALL_MEDIAS,
+	FOUND_SOMETHING,
+	NOTHING_FOUND,
+	DOING_NOTHING,
+	SEARCHING,
+} = SearchStatus;
+
+export const constRefToEmptyArray = Object.freeze([]);
+export const defaultSearcher: Searcher = Object.freeze({
 	results: constRefToEmptyArray,
+	searchStatus: DOING_NOTHING,
 	searchTerm: "",
 });
 
@@ -53,24 +74,18 @@ export const cleanHistory = () =>
 export const reload = async () => {
 	setSearcher({
 		...defaultSearcher,
-		searchStatus: SearchStatus.RELOADING_ALL_MEDIAS,
+		searchStatus: RELOADING_ALL_MEDIAS,
 	});
 
 	await searchLocalComputerForMedias(true);
 
 	setSearcher({
-		...defaultSearcher,
-		searchStatus: SearchStatus.DOING_NOTHING,
+		searchStatus: DOING_NOTHING,
 	});
 };
 
-export const handleInputChange = ({
-	target: { value },
-}: React.ChangeEvent<HTMLInputElement>) =>
-	setSearcher(prev => ({
-		...prev,
-		searchTerm: value.toLowerCase(),
-	}));
+export const handleInputChange = ({ target: { value } }: InputChange) =>
+	setSearcher({ searchTerm: value.toLowerCase() });
 
 const playMedia = (mediaID: MediaID, playlistName: string) =>
 	setCurrentPlaying({
@@ -83,76 +98,114 @@ export const Row = ({ highlight, media, playlistName }: RowProps) => {
 	const index = media.title.toLowerCase().indexOf(highlight);
 
 	return (
-		<Result onClick={() => playMedia(media.id, playlistName)}>
-			<Tooltip text="Play this media">
-				<>
-					<ImgWrapper>
-						<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
-					</ImgWrapper>
+		<Tooltip text="Play this media">
+			<Result onClick={() => playMedia(media.id, playlistName)}>
+				<ImgWrapper>
+					<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+				</ImgWrapper>
 
-					<Info>
-						<Title style={{ marginLeft: 5, textAlign: "left" }}>
-							{media.title.slice(0, index)}
-							<span className="highlight">
-								{media.title.slice(index, index + highlight.length)}
-							</span>
-							{media.title.slice(index + highlight.length)}
-						</Title>
-						<SubTitle style={{ marginLeft: 5 }}>{media.duration}</SubTitle>
-					</Info>
-				</>
-			</Tooltip>
-		</Result>
+				<Info>
+					<Title>
+						{media.title.slice(0, index)}
+						<Highlight>
+							{media.title.slice(index, index + highlight.length)}
+						</Highlight>
+						{media.title.slice(index + highlight.length)}
+					</Title>
+					<SubTitle>{media.duration}</SubTitle>
+				</Info>
+			</Result>
+		</Tooltip>
 	);
 };
 
-// const searchResultJSX: Map<SearchStatus, () => JSX.Element> = new Map();
-// searchResultJSX.set(SearchStatus.NOTHING_FOUND, () => (
-// 	<NothingFound>
-// 		Nothing was found for &quot;{getSearcherFunctions().searcher.searchTerm}
-// 		&quot;
-// 	</NothingFound>
-// ));
-// searchResultJSX.set(SearchStatus.FOUND_SOMETHING, () => (
-// 	<SearchResultsWrapper>
-// 		{getSearcherFunctions().searcher.results.map(m => (
-// 			<Row media={m} key={m.id} />
-// 		))}
-// 	</SearchResultsWrapper>
-// ));
-// searchResultJSX.set(SearchStatus.RELOADING_ALL_MEDIAS, () => <></>);
-// searchResultJSX.set(SearchStatus.DOING_NOTHING, () => <></>);
-// searchResultJSX.set(SearchStatus.SEARCHING, () => <></>);
-// Object.freeze(searchResultJSX);
-// export { searchResultJSX };
+export const Input = ({ playlistName }: Props2) => {
+	const [, startTransition] = useTransition();
+	const { searchTerm } = useSearcher();
 
-const buttonToTheSideJSX: Map<ButtonToTheSide, () => JSX.Element> = new Map();
-buttonToTheSideJSX.set(ButtonToTheSide.RELOAD_BUTTON, () => (
-	<Tooltip text="Reload all medias">
-		<Button onClick={reload} className="reload">
-			<Reload
-				className={
-					getSearcher().searchStatus === SearchStatus.RELOADING_ALL_MEDIAS
-						? "reloading"
-						: ""
-				}
-				size={17}
-			/>
-		</Button>
-	</Tooltip>
-));
-buttonToTheSideJSX.set(ButtonToTheSide.CLEAN, () => (
-	<Tooltip text="Clean history">
-		<Button>
-			<Clean size={15} onClick={cleanHistory} />
-		</Button>
-	</Tooltip>
-));
-buttonToTheSideJSX.set(ButtonToTheSide.NOTHING, () => <></>);
-Object.freeze(buttonToTheSideJSX);
-export { buttonToTheSideJSX };
+	useEffect(() => {
+		setSearcher({
+			results: constRefToEmptyArray,
+			searchStatus: SEARCHING,
+		});
 
-type SearcherProps = Readonly<{
+		if (searchTerm.length < 2) return;
+
+		startTransition(() => {
+			const results = searchForMediaFromList(searchTerm, playlistName);
+			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+
+			setSearcher({
+				searchStatus,
+				results,
+			});
+		});
+	}, [playlistName, searchTerm]);
+
+	return (
+		<input
+			placeholder="Search for songs"
+			onChange={handleInputChange}
+			value={searchTerm}
+			spellCheck="false"
+			autoCorrect="off"
+		/>
+	);
+};
+
+export const Results = ({ playlistName }: Props2) => {
+	const { searchStatus, searchTerm, results } = useSearcher();
+
+	return (
+		<ResultsWrapper>
+			{searchStatus === NOTHING_FOUND ? (
+				<NothingFound>
+					Nothing was found for &quot;{searchTerm}&quot;
+				</NothingFound>
+			) : searchStatus === FOUND_SOMETHING ? (
+				<SearchResults>
+					{results.map(media => (
+						<Row
+							playlistName={playlistName}
+							highlight={searchTerm}
+							key={media.id}
+							media={media}
+						/>
+					))}
+				</SearchResults>
+			) : undefined}
+		</ResultsWrapper>
+	);
+};
+
+export const ButtonToTheSide = ({ buttonToTheSide }: Props1) => {
+	const { searchStatus } = useSearcher();
+
+	return (
+		<div>
+			{buttonToTheSide === RELOAD_BUTTON ? (
+				<Tooltip text="Reload all medias">
+					<ReloadButton onClick={reload} className="reload">
+						<Reload
+							className={
+								searchStatus === RELOADING_ALL_MEDIAS ? "reloading" : ""
+							}
+							size={17}
+						/>
+					</ReloadButton>
+				</Tooltip>
+			) : buttonToTheSide === CLEAN ? (
+				<Tooltip text="Clean history">
+					<ReloadButton>
+						<Clean size={15} onClick={cleanHistory} />
+					</ReloadButton>
+				</Tooltip>
+			) : undefined}
+		</div>
+	);
+};
+
+type Searcher = Readonly<{
 	searchTerm: Lowercase<string>;
 	searchStatus: SearchStatus;
 	results: readonly Media[];
@@ -163,3 +216,31 @@ type RowProps = Readonly<{
 	highlight: string;
 	media: Media;
 }>;
+
+type Props1 = Readonly<{
+	buttonToTheSide: ButtonToTheSideEnum;
+}>;
+
+type Props2 = Readonly<{
+	playlistName: MediaListKindProps["playlistName"];
+}>;
+
+type InputChange = React.ChangeEvent<HTMLInputElement>;
+
+export type Props = Props1 & Props2;
+
+Row.whyDidYouRender = {
+	customName: "Row",
+};
+
+Input.whyDidYouRender = {
+	customName: "Input",
+};
+
+Results.whyDidYouRender = {
+	customName: "Results",
+};
+
+ButtonToTheSide.whyDidYouRender = {
+	customName: "ButtonToTheSide",
+};

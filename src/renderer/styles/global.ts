@@ -182,8 +182,8 @@ export const GlobalCSS = globalCss({
 	},
 
 	body: {
-		position: "fixed",
 		overflow: "hidden !important",
+		position: "fixed",
 		size: "100%",
 	},
 

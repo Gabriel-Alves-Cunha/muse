@@ -83,7 +83,7 @@ const spin = keyframes({
 	},
 });
 
-export const Button = styled("button", {
+export const ReloadButton = styled("button", {
 	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
@@ -103,7 +103,7 @@ export const Button = styled("button", {
 
 	"&:hover": {
 		transition: "$bgc",
-		backgroundColor: "$icon-button-2",
+		background: "$icon-button-2",
 	},
 
 	"&.reload:hover": {
@@ -115,17 +115,45 @@ export const Button = styled("button", {
 	},
 });
 
-export const SearchResultsWrapper = styled("ul", {
-	position: "absolute",
-	// position: "relative",
+export const Title = styled("p", {
+	overflow: "hidden",
+	marginLeft: 5,
+
+	color: "$alternative-text",
+	textOverflow: "ellipsis",
+	letterSpacing: "0.03rem",
+	fontFamily: "$secondary",
+	whiteSpace: "nowrap", // make it one-line.
+	textAlign: "left",
+	fontSize: "1rem",
+	fontWeight: 500,
+});
+
+export const SubTitle = styled("p", {
+	marginLeft: 5,
+
+	letterSpacing: "0.03rem",
+	fontFamily: "$primary",
+	color: "$gray-text",
+	fontSize: "0.8rem",
+	fontWeight: 500,
+});
+
+export const Highlight = styled("span", {
+	background: "yellowgreen",
+	color: "white",
+});
+
+export const SearchResults = styled("ul", {
+	boxSizing: "content-box",
+
+	position: "relative",
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "center",
 	alignItems: "center",
-	left: "-25%",
 	height: 200,
 	width: 350,
-	top: 50,
 
 	backgroundColor: "$bg-popover",
 	border: "1px solid lightgray",
@@ -161,6 +189,7 @@ export const SearchResultsWrapper = styled("ul", {
 });
 
 export const Result = styled("li", {
+	boxSizing: "content-box",
 	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
@@ -180,6 +209,7 @@ export const Result = styled("li", {
 });
 
 export const NothingFound = styled("div", {
+	boxSizing: "content-box",
 	position: "absolute",
 	display: "flex", // row,
 	justifyContent: "center",
@@ -201,4 +231,11 @@ export const NothingFound = styled("div", {
 	textAlign: "center",
 	fontSize: "1.05rem",
 	fontWeight: 500,
+});
+
+export const ResultsWrapper = styled("div", {
+	boxSizing: "content-box",
+	position: "absolute",
+	left: "-25%",
+	top: 50,
 });

@@ -76,6 +76,5 @@ type Progress = Readonly<{
 }>;
 
 MediaPlayer.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "MediaPlayer",
 };

@@ -41,6 +41,5 @@ type Props = {
 };
 
 Tooltip.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "Tooltip",
 };

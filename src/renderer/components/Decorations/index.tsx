@@ -68,6 +68,5 @@ const AppName_Folder = () => {
 };
 
 Decorations.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "Decorations",
 };

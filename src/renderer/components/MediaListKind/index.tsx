@@ -200,6 +200,5 @@ export type MediaListKindProps = Readonly<{
 }>;
 
 MediaListKind_.whyDidYouRender = {
-	logOnDifferentValues: true,
 	customName: "MediaListKind_",
 };
