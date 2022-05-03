@@ -1,102 +1,76 @@
 import create from "zustand";
 
-import { setDownloadValues } from "@modules/Downloading";
+import { setDownloadInfo } from "@modules/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
 
 const { getBasicInfo } = electron.media;
 
-export const useDownloadHelper = create<DownloadHelper>((set, get) => ({
-	searcher: {
+const defaultSearchInfo: SearcherInfo = Object.freeze({
+	result: undefined,
+	isLoading: false,
+	error: "",
+	url: "",
+});
+
+export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
+export const { setState: setSearchInfo, getState: getSearchInfo } =
+	useSearchInfo;
+
+export const downloadMedia = () => {
+	const { result, url } = getSearchInfo();
+
+	if (!result) return;
+	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
+
+	// Start download:
+	setDownloadInfo({
+		imageURL: result.imageURL,
+		canStartDownload: true,
+		title: result.title,
+		url,
+	});
+
+	// Reset values:
+	setSearchInfo(defaultSearchInfo);
+};
+
+export const search = async () => {
+	const { url } = getSearchInfo();
+
+	if (!url || url.length < 10) return;
+
+	dbg(`Searching for "${url}".`);
+
+	setSearchInfo({
 		result: undefined,
-		isLoading: false,
-		searchTerm: "",
+		isLoading: true,
 		error: "",
-	},
+	});
 
-	download: (url: string) => {
-		const { result } = get().searcher;
+	try {
+		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
 
-		if (!result) return;
-		dbg(`Sending msg to download "${url}".`);
+		const result: UrlMediaMetadata = {
+			imageURL: thumbnails.at(-1)?.url ?? "",
+			// ^ Highest quality is last in this array.
+			artist: media.artist ?? "",
+			title,
+		};
 
-		// Start download:
-		setDownloadValues({
-			downloadValues: {
-				imageURL: result.imageURL,
-				canStartDownload: true,
-				title: result.title,
-				url,
-			},
+		setSearchInfo({ isLoading: false, result });
+	} catch (error) {
+		setSearchInfo({
+			isLoading: false,
+			result: undefined,
+			error: getErrorMessage(error).includes("No video id found")
+				? "No video ID found!"
+				: "There was an error getting media information!",
 		});
 
-		// Reset values:
-		set({
-			searcher: {
-				result: undefined,
-				isLoading: false,
-				searchTerm: "",
-				error: "",
-			},
-		});
-	},
-
-	search: async (url: string) => {
-		dbg(`Searching for "${url}".`);
-
-		set({
-			searcher: {
-				result: undefined,
-				searchTerm: url,
-				isLoading: true,
-				error: "",
-			},
-		});
-
-		try {
-			const { videoDetails } = await getBasicInfo(url);
-
-			const result: UrlMediaMetadata = {
-				imageURL: videoDetails.thumbnails.at(-1)?.url ?? "",
-				// ^ Highest quality is last in this array.
-				artist: videoDetails.media.artist ?? "",
-				title: videoDetails.title,
-			};
-
-			set(({ searcher: { searchTerm } }) => ({
-				searcher: {
-					isLoading: false,
-					searchTerm,
-					error: "",
-					result,
-				},
-			}));
-		} catch (error) {
-			set(({ searcher: { searchTerm } }) => ({
-				searcher: {
-					isLoading: false,
-					result: undefined,
-					searchTerm,
-					error: getErrorMessage(error).includes("No video id found")
-						? "No video ID found!"
-						: "There was an error getting media information!",
-				},
-			}));
-
-			console.error(error);
-		}
-	},
-}));
-
-export const { getState: getDownloadHelper, setState: setDowloadHelper } =
-	useDownloadHelper;
-export const { download, search } = getDownloadHelper();
-
-type DownloadHelper = Readonly<{
-	search(url: string): Promise<void>;
-	download(url: string): void;
-	searcher: SearcherProps;
-}>;
+		console.error(error);
+	}
+};
 
 type UrlMediaMetadata = Readonly<{
 	imageURL: string;
@@ -104,9 +78,9 @@ type UrlMediaMetadata = Readonly<{
 	title: string;
 }>;
 
-type SearcherProps = Readonly<{
+type SearcherInfo = Readonly<{
 	result: UrlMediaMetadata | undefined;
 	isLoading: boolean;
-	searchTerm: string;
 	error: string;
+	url: string;
 }>;

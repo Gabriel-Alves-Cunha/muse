@@ -144,9 +144,16 @@ export const Highlight = styled("span", {
 	color: "white",
 });
 
-export const SearchResults = styled("ul", {
-	boxSizing: "content-box",
+export const ResultsWrapper = styled("div", {
+	display: "inline-block",
+	position: "absolute",
+	minWidth: "100%",
+	left: "-25%",
+	top: 50,
+});
 
+export const SearchResults = styled("ul", {
+	// boxSizing: "content-box", // padding and borders can add to the element actual rendered size
 	position: "relative",
 	display: "flex",
 	flexDirection: "column",
@@ -189,7 +196,6 @@ export const SearchResults = styled("ul", {
 });
 
 export const Result = styled("li", {
-	boxSizing: "content-box",
 	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",
@@ -209,7 +215,6 @@ export const Result = styled("li", {
 });
 
 export const NothingFound = styled("div", {
-	boxSizing: "content-box",
 	position: "absolute",
 	display: "flex", // row,
 	justifyContent: "center",
@@ -231,11 +236,4 @@ export const NothingFound = styled("div", {
 	textAlign: "center",
 	fontSize: "1.05rem",
 	fontWeight: 500,
-});
-
-export const ResultsWrapper = styled("div", {
-	boxSizing: "content-box",
-	position: "absolute",
-	left: "-25%",
-	top: 50,
 });

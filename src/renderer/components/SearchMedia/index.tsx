@@ -6,7 +6,6 @@ import {
 	type Props,
 	ButtonToTheSide,
 	defaultSearcher,
-	useSearcher,
 	setSearcher,
 	Results,
 	Input,
@@ -16,11 +15,8 @@ import { SearchWrapper, Wrapper, Search } from "./styles";
 
 export function SearchMedia({ buttonToTheSide, playlistName }: Props) {
 	const searcherRef = useRef<HTMLHeadingElement>(null);
-	const searcher = useSearcher();
 
-	useOnClickOutside(searcherRef, () =>
-		searcher === defaultSearcher ? noop() : setSearcher(defaultSearcher),
-	);
+	useOnClickOutside(searcherRef, () => setSearcher(defaultSearcher));
 
 	return (
 		<Wrapper>
@@ -42,6 +38,3 @@ export function SearchMedia({ buttonToTheSide, playlistName }: Props) {
 SearchMedia.whyDidYouRender = {
 	customName: "SearchMedia",
 };
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {};

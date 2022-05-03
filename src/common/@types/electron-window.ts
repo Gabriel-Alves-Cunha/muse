@@ -1,4 +1,4 @@
-import type { DownloadValues, Media, Path } from "./typesAndEnums";
+import type { DownloadInfo, Media, Path } from "./typesAndEnums";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
 
@@ -82,7 +82,7 @@ export type MsgObjectElectronToReact =
 	  }> // 1
 	| Readonly<{
 			type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS;
-			downloadValues: DownloadValues;
+			downloadValues: DownloadInfo;
 	  }> // 2
 	| Readonly<{
 			type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA;
@@ -118,7 +118,5 @@ export enum ElectronIpcMainProcessNotificationEnum {
 	MINIMIZE,
 	QUIT_APP,
 }
-
-export type ExtensionToBeConvertedTo = "mp3";
 
 export type ImgString = `data:${string};base64,${string}`;

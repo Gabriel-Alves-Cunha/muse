@@ -63,15 +63,15 @@ export const defaultSearcher: Searcher = Object.freeze({
 });
 
 export const useSearcher = create(() => defaultSearcher);
-export const { getState: getSearcher, setState: setSearcher } = useSearcher;
+export const { setState: setSearcher } = useSearcher;
 
-export const cleanHistory = () =>
+const cleanHistory = () =>
 	setPlaylists({
 		type: PlaylistEnum.UPDATE_HISTORY,
 		whatToDo: PlaylistActions.CLEAN,
 	});
 
-export const reload = async () => {
+const reload = async () => {
 	setSearcher({
 		...defaultSearcher,
 		searchStatus: RELOADING_ALL_MEDIAS,
@@ -79,12 +79,10 @@ export const reload = async () => {
 
 	await searchLocalComputerForMedias(true);
 
-	setSearcher({
-		searchStatus: DOING_NOTHING,
-	});
+	setSearcher({ searchStatus: DOING_NOTHING });
 };
 
-export const handleInputChange = ({ target: { value } }: InputChange) =>
+export const changeInput = ({ target: { value } }: InputChange) =>
 	setSearcher({ searchTerm: value.toLowerCase() });
 
 const playMedia = (mediaID: MediaID, playlistName: string) =>
@@ -94,25 +92,26 @@ const playMedia = (mediaID: MediaID, playlistName: string) =>
 		mediaID,
 	});
 
-export const Row = ({ highlight, media, playlistName }: RowProps) => {
-	const index = media.title.toLowerCase().indexOf(highlight);
+const Row = ({ highlight, media, playlistName }: RowProps) => {
+	const { title, id, duration } = media;
+	const index = title.toLowerCase().indexOf(highlight);
 
 	return (
 		<Tooltip text="Play this media">
-			<Result onClick={() => playMedia(media.id, playlistName)}>
+			<Result onClick={() => playMedia(id, playlistName)}>
 				<ImgWrapper>
 					<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
 				</ImgWrapper>
 
 				<Info>
 					<Title>
-						{media.title.slice(0, index)}
+						{title.slice(0, index)}
 						<Highlight>
-							{media.title.slice(index, index + highlight.length)}
+							{title.slice(index, index + highlight.length)}
 						</Highlight>
-						{media.title.slice(index + highlight.length)}
+						{title.slice(index + highlight.length)}
 					</Title>
-					<SubTitle>{media.duration}</SubTitle>
+					<SubTitle>{duration}</SubTitle>
 				</Info>
 			</Result>
 		</Tooltip>
@@ -135,17 +134,14 @@ export const Input = ({ playlistName }: Props2) => {
 			const results = searchForMediaFromList(searchTerm, playlistName);
 			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
-			setSearcher({
-				searchStatus,
-				results,
-			});
+			setSearcher({ searchStatus, results });
 		});
 	}, [playlistName, searchTerm]);
 
 	return (
 		<input
 			placeholder="Search for songs"
-			onChange={handleInputChange}
+			onChange={changeInput}
 			value={searchTerm}
 			spellCheck="false"
 			autoCorrect="off"
@@ -212,10 +208,10 @@ type Searcher = Readonly<{
 }>;
 
 type RowProps = Readonly<{
-	playlistName: string;
-	highlight: string;
+	highlight: Lowercase<string>;
 	media: Media;
-}>;
+}> &
+	Props2;
 
 type Props1 = Readonly<{
 	buttonToTheSide: ButtonToTheSideEnum;

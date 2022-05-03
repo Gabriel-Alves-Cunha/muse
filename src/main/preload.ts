@@ -84,8 +84,8 @@ window.onmessage = async (
 				break;
 			}
 
-			electronPort.onmessage = ({ data }: { data: HandleDownload }) =>
-				handleCreateOrCancelDownload({ ...data, electronPort });
+			electronPort.onmessage = async ({ data }: { data: HandleDownload }) =>
+				await handleCreateOrCancelDownload({ ...data, electronPort });
 			electronPort.addEventListener("close", () =>
 				dbg("Closing ports (electronPort)."),
 			);

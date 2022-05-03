@@ -1,4 +1,5 @@
 import { createStitches } from "@stitches/react";
+import { toast } from "react-toastify";
 
 export const { styled, globalCss, keyframes, createTheme } = createStitches({
 	media: {
@@ -115,7 +116,7 @@ export const darkTheme = createTheme({
 		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 	},
 });
-//2px 2px 50px rgba(0, 0, 0, 0.2)
+
 export const lightTheme = createTheme({
 	colors: {
 		"scrollbar-thumb-hover": "#555",
@@ -162,7 +163,7 @@ export const lightTheme = createTheme({
 
 export const GlobalCSS = globalCss({
 	"*, *:after, *:before": {
-		boxSizing: "border-box",
+		boxSizing: "inherit",
 		padding: 0,
 		margin: 0,
 
@@ -188,6 +189,7 @@ export const GlobalCSS = globalCss({
 	},
 
 	html: {
+		boxSizing: "border-box",
 		overflow: "hidden",
 
 		"::selection": {
@@ -200,3 +202,36 @@ export const GlobalCSS = globalCss({
 		},
 	},
 });
+
+export const successToast = (info: string) =>
+	toast.success(info, {
+		hideProgressBar: false,
+		position: "top-right",
+		progress: undefined,
+		closeOnClick: true,
+		pauseOnHover: true,
+		autoClose: 5000,
+		draggable: true,
+	});
+
+export const infoToast = (info: string) =>
+	toast.info(info, {
+		hideProgressBar: false,
+		position: "top-right",
+		progress: undefined,
+		closeOnClick: true,
+		pauseOnHover: true,
+		autoClose: 5000,
+		draggable: true,
+	});
+
+export const errorToast = (info: string) =>
+	toast.error(info, {
+		hideProgressBar: false,
+		position: "top-right",
+		progress: undefined,
+		closeOnClick: true,
+		pauseOnHover: true,
+		autoClose: 5000,
+		draggable: true,
+	});

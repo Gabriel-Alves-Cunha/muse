@@ -1,4 +1,4 @@
-import type { DownloadValues } from "@common/@types/typesAndEnums.js";
+import type { DownloadInfo } from "@common/@types/typesAndEnums.js";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
 import { pathToFileURL } from "url";
@@ -155,9 +155,10 @@ app
 								body: title,
 							})
 								.on("click", () => {
-									const downloadValues: DownloadValues = {
+									const downloadInfo: DownloadInfo = {
 										imageURL: thumbnails.at(-1)?.url ?? "",
 										canStartDownload: true,
+										extension: "mp3",
 										title,
 										url,
 									};
@@ -165,12 +166,12 @@ app
 									// Send msg to ipcMain:
 									electronWindow?.webContents.send(
 										ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
-										downloadValues,
+										downloadInfo,
 									);
 
 									console.log(
 										"Clicked notification and sent data:",
-										downloadValues,
+										downloadInfo,
 									);
 								})
 								.show();
@@ -190,7 +191,7 @@ app
 // Relay message from electronWindow to ipcRenderer:
 ipcMain.on(
 	ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
-	(_e, downloadValues: DownloadValues) => {
+	(_e, downloadValues: DownloadInfo) => {
 		console.log("ipcMain received data from electronWindow:", downloadValues);
 
 		ipcMain.emit(

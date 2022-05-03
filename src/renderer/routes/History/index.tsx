@@ -5,7 +5,10 @@ import { HISTORY } from "@contexts";
 export function History() {
 	return (
 		<MainArea>
-			<SearchMedia playlistName={HISTORY} buttonToTheSide={ButtonToTheSideEnum.CLEAN} />
+			<SearchMedia
+				playlistName={HISTORY}
+				buttonToTheSide={ButtonToTheSideEnum.CLEAN}
+			/>
 
 			<MediaListKind playlistName={HISTORY} />
 		</MainArea>

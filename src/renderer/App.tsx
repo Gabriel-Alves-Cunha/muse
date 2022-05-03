@@ -6,7 +6,7 @@ import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { ContextMenu, Decorations } from "@components";
 import { MediaPlayer, Navbar } from "@modules";
 import { assertUnreachable } from "@utils/utils";
-import { setDownloadValues } from "@modules/Downloading";
+import { setDownloadInfo } from "@modules/Downloading";
 import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
@@ -97,9 +97,7 @@ window.onmessage = async (
 
 	switch (msg.type) {
 		case ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS: {
-			setDownloadValues({
-				downloadValues: msg.downloadValues,
-			});
+			setDownloadInfo(msg.downloadValues);
 			break;
 		} // 1
 

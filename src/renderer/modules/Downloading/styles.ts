@@ -66,7 +66,7 @@ export const Trigger = styled("button", {
 	},
 });
 
-export const Popup = styled("div", {
+export const Popup_ = styled("div", {
 	position: "absolute",
 	display: "flex",
 	flexDirection: "column",

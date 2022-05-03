@@ -1,12 +1,7 @@
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import {
-	getDownloadHelper,
-	useDownloadHelper,
-	download,
-	search,
-} from "./helpers";
+import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
 
 import { BorderedButton } from "@routes/Convert/styles";
 import { Loading } from "@styles/appStyles";
@@ -30,13 +25,10 @@ export const Download = () => (
 );
 
 const SearcherWrapper = () => {
-	const { error } = useDownloadHelper().searcher;
-	const [url, setUrl] = useState("");
+	const { error, url } = useSearchInfo();
 
 	useEffect(() => {
-		if (!url || url.length < 10) return;
-
-		const searchTimeout = setTimeout(async () => await search(url), 400);
+		const searchTimeout = setTimeout(async () => await search(), 400);
 
 		return () => clearTimeout(searchTimeout);
 	}, [url]);
@@ -47,7 +39,7 @@ const SearcherWrapper = () => {
 				<SearchIcon size="1.2rem" />
 
 				<input
-					onChange={e => setUrl(e.target.value)}
+					onChange={e => setSearchInfo({ url: e.target.value })}
 					placeholder="Paste Youtube url here"
 					autoCapitalize="off"
 					spellCheck="false"
@@ -56,13 +48,13 @@ const SearcherWrapper = () => {
 				/>
 			</Searcher>
 
-			{error && <p>{error}</p>}
+			<p>{error}</p>
 		</SearchWrapper>
 	);
 };
 
 const IsLoading = () => {
-	const { isLoading } = useDownloadHelper().searcher;
+	const { isLoading } = useSearchInfo();
 
 	return (
 		<div style={{ width: 25, height: 25, marginLeft: 10 }}>
@@ -71,10 +63,8 @@ const IsLoading = () => {
 	);
 };
 
-const startDownload = () => download(getDownloadHelper().searcher.searchTerm);
-
 const Result = () => {
-	const { result } = useDownloadHelper().searcher;
+	const { result } = useSearchInfo();
 
 	return result ? (
 		<ResultContainer>
@@ -82,7 +72,7 @@ const Result = () => {
 
 			<p>{result.title}</p>
 
-			<BorderedButton onClick={startDownload}>Download</BorderedButton>
+			<BorderedButton onClick={downloadMedia}>Download</BorderedButton>
 		</ResultContainer>
 	) : null;
 };

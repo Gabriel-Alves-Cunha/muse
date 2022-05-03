@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable prefer-rest-params */
+
 import type { ImgString, WriteTag } from "@common/@types/electron-window";
 import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/typesAndEnums";
@@ -31,7 +34,7 @@ import { deleteFile } from "./file";
 import { hash } from "@common/hash";
 import { dirs } from "../utils";
 
-const { log } = console;
+const { log, error } = console;
 
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
@@ -67,7 +70,7 @@ const createMedia = async (
 			log(
 				`Skipping "${path}" because the duration is ${duration.toPrecision(
 					3,
-				)} s (< 60 s)!`,
+				)} s (less than 60 s)!`,
 			);
 			const end = performance.now();
 			log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
@@ -148,52 +151,48 @@ export async function transformPathsToMedias(
 	console.groupEnd();
 
 	const end = performance.now();
-	log(`%cRunnig 'for' on all medias took: ${end - start} ms.`, "color:brown");
+	log(`%cReading all medias took: ${end - start} ms.`, "color:brown");
 
 	return medias;
 }
 
-export function handleCreateOrCancelDownload({
+export async function handleCreateOrCancelDownload({
 	electronPort,
+	extension,
 	imageURL,
 	destroy,
 	title,
 	url,
 }: HandleDownload) {
-	// eslint-disable-next-line prefer-rest-params
-	if (!url) return console.error("Missing required param 'url'!", arguments);
+	if (!url) return error("Missing required param 'url'!", arguments);
 
 	if (!currentDownloads.has(url)) {
-		if (!imageURL || !title || !electronPort)
-			// eslint-disable-next-line prefer-rest-params
-			return console.error("Missing required params!", arguments);
+		if (!electronPort || !imageURL || !title || !url || !extension)
+			return error("Missing required params!", arguments);
 
-		makeStream({ imageURL, url, title, electronPort });
-	} else if (destroy)
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		currentDownloads.get(url)!.emit("destroy");
+		await makeStream({ imageURL, url, title, electronPort, extension });
+	} else if (destroy) currentDownloads.get(url)!.emit("destroy");
 }
 
 export async function makeStream({
 	electronPort,
+	extension,
 	imageURL,
 	title,
 	url,
 }: Required<Omit<HandleDownload, "destroy">>) {
-	if (!electronPort || !imageURL || !title || !url)
-		// eslint-disable-next-line prefer-rest-params
-		return console.error("Missing params!", arguments);
-
-	const extension: AllowedMedias = "mp3";
 	const titleWithExtension = sanitize(`${title}.${extension}`);
 	const saveSite = join(dirs.music, titleWithExtension);
-	const startTime = Date.now();
-	let interval: NodeJS.Timer | undefined = undefined;
-	let total = "";
 
 	// Assert file doesn't already exists:
-	if (await pathExists(saveSite))
-		return console.error(`File "${saveSite}" already exists!`);
+	{
+		if (await pathExists(saveSite))
+			return error(`File "${saveSite}" already exists!`);
+	}
+
+	const startTime = Date.now();
+	let interval: NodeJS.Timer | undefined = undefined;
+	let prettyTotal = "";
 
 	dbg(`Creating stream for "${title}" to download.`);
 
@@ -202,17 +201,18 @@ export async function makeStream({
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.on("progress", (_, downloaded, total_) => {
-			const percentage = (downloaded / total_) * 100;
+		.on("progress", (_, downloaded, total) => {
+			const percentage = (downloaded / total) * 100;
+			const percentageStr = percentage.toFixed(2);
 
 			// To react:
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
-					() => electronPort.postMessage({ percentage: percentage.toFixed(2) }),
+					() => electronPort.postMessage({ percentage: percentageStr }),
 					2_000,
 				);
-				total = prettyBytes(total_);
+				prettyTotal = prettyBytes(total);
 			}
 
 			// To node console if is in development:
@@ -226,9 +226,9 @@ export async function makeStream({
 				readline.cursorTo(process.stdout, 0);
 				readline.clearLine(process.stdout, 0);
 				process.stdout.write(
-					`${percentage}% downloaded, (${prettyBytes(
+					`${percentageStr}% downloaded, (${prettyBytes(
 						downloaded,
-					)}/${total}). Running for: ${minutesDownloading.toFixed(
+					)}/${prettyTotal}). Running for: ${minutesDownloading.toFixed(
 						2,
 					)} minutes. ETA: ${estimatedDownloadTime} minutes.`,
 				);
@@ -240,12 +240,14 @@ export async function makeStream({
 				"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
 			);
 
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
+
 			electronPort.postMessage({
 				status: ProgressStatus.CANCEL,
 				isDownloading: false,
 			});
 			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
 			currentDownloads.delete(url);
@@ -268,9 +270,9 @@ export async function makeStream({
 				isDownloading: false,
 			});
 			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
+			// Write media image:
 			await writeTags(saveSite, {
 				downloadImg: true,
 				isNewMedia: true,
@@ -283,30 +285,30 @@ export async function makeStream({
 				currentDownloads,
 			);
 		})
-		.on("error", async error => {
-			console.error(`Error downloading file: "${titleWithExtension}"!`, error);
+		.on("error", async err => {
+			error(`Error downloading file: "${titleWithExtension}"!`, err);
+
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
 
 			// To react
 			electronPort.postMessage({
 				status: ProgressStatus.FAIL,
 				isDownloading: false,
-				error,
+				error: err,
 			});
 			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
 			// I only found it to work when I send it with an Error:
-			readStream.destroy(
-				new Error(
-					"This readStream is being destroyed because ffmpeg threw an error.",
-				),
-			);
+			readStream.destroy(err);
 
 			currentDownloads.delete(url);
 			dbg(
 				"Download threw an error. Deleting stream from currentDownloads:",
 				currentDownloads,
+				"Does the downloaded file still exists?",
+				await pathExists(saveSite),
 			);
 		});
 
@@ -322,19 +324,14 @@ export async function handleCreateOrCancelConvert({
 	destroy,
 	path,
 }: HandleConversion) {
-	if (!path)
-		// eslint-disable-next-line prefer-rest-params
-		return console.error("Missing required param 'path'!", arguments);
+	if (!path) return error("Missing required param 'path'!", arguments);
 
 	if (!mediasConverting.has(path)) {
 		if (!toExtension || !electronPort)
-			// eslint-disable-next-line prefer-rest-params
-			return console.error("Missing required params!", arguments);
+			return error("Missing required params!", arguments);
 
 		await convertToAudio({ path, toExtension, electronPort });
-	} else if (destroy)
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		mediasConverting.get(path)!.emit("destroy");
+	} else if (destroy) mediasConverting.get(path)!.emit("destroy");
 }
 
 export async function convertToAudio({
@@ -342,20 +339,17 @@ export async function convertToAudio({
 	toExtension,
 	path,
 }: Required<Omit<HandleConversion, "destroy">>) {
-	if (!electronPort || !toExtension || !path)
-		// eslint-disable-next-line prefer-rest-params
-		return console.error("Missing params!", arguments);
-
-	// Assert files don't have the extension and that there already doesn't exists one:
-	const pathWithNewExtension = join(
-		dirname(path),
-		sanitize(`${getBasename(path)}.${toExtension}`),
-	);
-
-	if (path.endsWith(toExtension) || (await pathExists(pathWithNewExtension)))
-		return console.error(`File "${path}" already is "${toExtension}"!`);
-
 	const titleWithExtension = sanitize(`${getBasename(path)}.${toExtension}`);
+
+	{
+		// Assert files don't have the same extension
+		const pathWithNewExtension = join(dirname(path), titleWithExtension);
+
+		// && that there already doesn't exists one:
+		if (path.endsWith(toExtension) || (await pathExists(pathWithNewExtension)))
+			return error(`File "${path}" already is "${toExtension}"!`);
+	}
+
 	const saveSite = join(dirs.music, titleWithExtension);
 	const readStream = createReadStream(path);
 	let interval: NodeJS.Timer | undefined = undefined;
@@ -382,11 +376,8 @@ export async function convertToAudio({
 					);
 			},
 		)
-		.on("error", async error => {
-			console.error(
-				`Error converting file: "${titleWithExtension}"!\n\n`,
-				error,
-			);
+		.on("error", async err => {
+			error(`Error converting file: "${titleWithExtension}"!\n\n`, err);
 
 			// Delete the file if it's not converted successfully:
 			if (await pathExists(saveSite)) await deleteFile(saveSite);
@@ -395,23 +386,20 @@ export async function convertToAudio({
 			electronPort.postMessage({
 				status: ProgressStatus.FAIL,
 				isConverting: false,
-				error,
+				error: err,
 			});
 			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
 			// I only found it to work when I send it with an Error:
-			readStream.destroy(
-				new Error(
-					"This readStream is being destroyed because the ffmpeg threw an error.",
-				),
-			);
+			readStream.destroy(err);
 
 			mediasConverting.delete(path);
 			dbg(
 				"Convertion threw an error. Deleting from mediasConverting:",
 				mediasConverting,
+				"Was file deleted?",
+				await pathExists(saveSite),
 			);
 		})
 		.on("end", async () => {
@@ -426,11 +414,10 @@ export async function convertToAudio({
 				isConverting: false,
 			});
 			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
+			// Treat the successfully converted file as a new media...
 			{
-				// Treat the successfully converted file as a new media...
 				sendMsgToClient({
 					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 					mediaPath: saveSite,
@@ -449,8 +436,6 @@ export async function convertToAudio({
 			dbg(
 				"Convertion successfull. Deleting from mediasConverting:",
 				mediasConverting,
-				"Was file renamed?",
-				await pathExists(saveSite),
 			);
 		})
 		.on("destroy", async () => {
@@ -467,7 +452,6 @@ export async function convertToAudio({
 				isConverting: false,
 			});
 			electronPort.close();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			clearInterval(interval!);
 
 			// I only found it to work when I send it with an Error:
@@ -481,7 +465,7 @@ export async function convertToAudio({
 			dbg(
 				"Convertion was destroyed. Deleting from mediasConverting:",
 				mediasConverting,
-				"Was file renamed?",
+				"Was file deleted?",
 				await pathExists(saveSite),
 			);
 		})
@@ -517,65 +501,20 @@ export async function writeTags(
 								data.imageURL as string,
 							);
 
-							const txtForByteVector = imgAsString.slice(
-								imgAsString.indexOf(",") + 1,
-								imgAsString.length,
-							);
-							const mimeType = imgAsString.slice(
-								imgAsString.indexOf(":") + 1,
-								imgAsString.indexOf(";"),
-							);
-
-							const picture = Picture.fromData(
-								ByteVector.fromString(txtForByteVector, StringType.Latin1),
-							);
-							picture.description =
-								"This image was download when this media downloaded.";
-							picture.filename = `${getBasename(mediaPath)}`;
-							picture.type = PictureType.Media;
-							picture.mimeType = mimeType;
-
-							file.tag.pictures = [picture];
-
-							log({ fileTagPictures: file.tag.pictures, picture });
-						} catch (error) {
-							console.error(
-								"There was an error getting the picture data.",
-								error,
-							);
+							createImage(imgAsString, file);
+						} catch (err) {
+							error("There was an error getting the picture data.", err);
 						}
 					} else {
 						// Here, assume we received an img as a base64 string
 						// like: `data:${string};base64,${string}`.
 						if (
-							data.imageURL?.includes("data:image/", 0) &&
-							data.imageURL?.includes("base64,")
-						) {
-							const imgAsString = data.imageURL as string;
-							const txtForByteVector = imgAsString.slice(
-								imgAsString.indexOf(",") + 1,
-								imgAsString.length,
-							);
-							const mimeType = imgAsString.slice(
-								imgAsString.indexOf(":") + 1,
-								imgAsString.indexOf(";"),
-							);
-
-							const picture = Picture.fromData(
-								ByteVector.fromString(txtForByteVector, StringType.Latin1),
-							);
-							picture.description =
-								"This image was download when this media was downloaded.";
-							picture.filename = `${getBasename(mediaPath)}`;
-							picture.type = PictureType.Media;
-							picture.mimeType = mimeType;
-
-							file.tag.pictures = [picture];
-
-							log({ fileTagPictures: file.tag.pictures, picture });
-						} else console.error(`Invalid imgAsString = "${data.imageURL}"!`);
+							data.imageURL!.includes("data:image/", 0) &&
+							data.imageURL!.includes("base64,")
+						)
+							createImage(data.imageURL as ImgString, file);
+						else error(`Invalid imgAsString = "${data.imageURL}"!`);
 					}
-
 					break;
 				}
 
@@ -596,11 +535,11 @@ export async function writeTags(
 							.map(v => v.trim());
 
 						file.tag.albumArtists = albumArtists;
+
 						log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
 							albumArtists,
 						});
 					}
-
 					break;
 				}
 
@@ -615,7 +554,7 @@ export async function writeTags(
 
 					file.tag.title = sanitizedTitle;
 
-					log({ value });
+					log({ "file.tag.title": file.tag.title, value });
 
 					if (getBasename(oldPath) === sanitizedTitle) break;
 
@@ -635,7 +574,7 @@ export async function writeTags(
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					file.tag[tag] = value;
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
-					log(`file.tag[${tag}] =`, file.tag[tag]);
+					log(`On default case: file.tag[${tag}] =`, file.tag[tag]);
 
 					break;
 				}
@@ -692,7 +631,7 @@ export async function writeTags(
 				mediaPath,
 			});
 		} else {
-			// Refresh media:
+			// If everything else fails, refresh media:
 			sendMsgToClient({
 				type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
 				mediaPath,
@@ -700,6 +639,29 @@ export async function writeTags(
 		}
 	}
 }
+
+const createImage = (imgAsString: ImgString, file: MediaFile) => {
+	const txtForByteVector = imgAsString.slice(
+		imgAsString.indexOf(",") + 1,
+		imgAsString.length,
+	);
+	const mimeType = imgAsString.slice(
+		imgAsString.indexOf(":") + 1,
+		imgAsString.indexOf(";"),
+	);
+
+	const picture = Picture.fromData(
+		ByteVector.fromString(txtForByteVector, StringType.Latin1),
+	);
+	picture.description =
+		"This image was download when this media was downloaded.";
+	picture.type = PictureType.Media;
+	picture.mimeType = mimeType;
+
+	file.tag.pictures = [picture];
+
+	log({ fileTagPictures: file.tag.pictures, picture });
+};
 
 export const getThumbnail = async (url: string): Promise<ImgString> =>
 	new Promise((resolve, reject) =>
@@ -711,7 +673,7 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 			res.on("data", chunk => (body += chunk));
 			res.on("end", () => resolve(body as ImgString));
 		}).on("error", e => {
-			console.error(`Got error getting image on Electron side: ${e.message}`);
+			error(`Got error getting image on Electron side: ${e.message}`);
 			reject(e);
 		}),
 	);
@@ -724,9 +686,10 @@ export type HandleConversion = Readonly<{
 }>;
 
 export type HandleDownload = Readonly<{
-	electronPort?: Readonly<MessagePort>;
-	imageURL?: Readonly<string>;
-	title?: Readonly<string>;
-	url: Readonly<string>;
+	electronPort?: MessagePort;
+	extension?: AllowedMedias;
+	imageURL?: string;
 	destroy?: boolean;
+	title?: string;
+	url: string;
 }>;
