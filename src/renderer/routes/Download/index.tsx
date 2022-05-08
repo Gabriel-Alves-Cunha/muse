@@ -7,6 +7,7 @@ import { BorderedButton } from "@routes/Convert/styles";
 import { Loading } from "@styles/appStyles";
 import {
 	ResultContainer,
+	LoadingWrapper,
 	SearchWrapper,
 	Searcher,
 	Wrapper,
@@ -44,6 +45,7 @@ const SearcherWrapper = () => {
 					autoCapitalize="off"
 					spellCheck="false"
 					autoCorrect="off"
+					value={url}
 					type="text"
 				/>
 			</Searcher>
@@ -56,11 +58,7 @@ const SearcherWrapper = () => {
 const IsLoading = () => {
 	const { isLoading } = useSearchInfo();
 
-	return (
-		<div style={{ width: 25, height: 25, marginLeft: 10 }}>
-			{isLoading && <Loading />}
-		</div>
-	);
+	return <LoadingWrapper>{isLoading && <Loading />}</LoadingWrapper>;
 };
 
 const Result = () => {
@@ -68,7 +66,7 @@ const Result = () => {
 
 	return result ? (
 		<ResultContainer>
-			<img src={result.imageURL} alt="thumbnail" />
+			<img src={result.imageURL} alt="Video thumbnail" />
 
 			<p>{result.title}</p>
 

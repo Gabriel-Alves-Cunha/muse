@@ -168,3 +168,8 @@ export const ResultContainer = styled("div", {
 		color: "$text",
 	},
 });
+
+export const LoadingWrapper = styled("div", {
+	marginLeft: 10,
+	size: 25,
+});

@@ -15,31 +15,21 @@ import { Tooltip } from "@components";
 import { TitleAndCancelWrapper, Content, Popup_ } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
 
-// const { port1: testPort } = new MessageChannel();
-// const testConvertingMedia: MediaBeingConverted = Object.freeze({
-// 	status: ProgressStatus.ACTIVE,
-// 	path: "/test/fake/path",
-// 	timeConverted: "01:20",
-// 	sizeConverted: 1000,
-// 	isConverting: true,
-// 	toExtension: "mp3",
-// 	percentage: 50,
-// 	port: testPort,
-// } as const);
+export const Popup = () => {
+	const convertingList = useConvertingList();
 
-export const useConvertInfoList = create<ConvertInfoList>(() => []);
-export const useConvertingList = create<ConvertList>(() => []); //new Array(10).fill(testConvertingMedia)
-export const { setState: setConvertInfoList } = useConvertInfoList;
-
-export const Popup = ({ convertList }: PopupProps) => (
-	<Popup_>
-		{convertList.length > 0 ? (
-			convertList.map(m => <ConvertBox mediaBeingConverted={m} key={m.path} />)
-		) : (
-			<p>No conversions in progress!</p>
-		)}
-	</Popup_>
-);
+	return (
+		<Popup_>
+			{convertingList.length > 0 ? (
+				convertingList.map(m => (
+					<ConvertBox mediaBeingConverted={m} key={m.path} />
+				))
+			) : (
+				<p>No conversions in progress!</p>
+			)}
+		</Popup_>
+	);
+};
 
 export const ConvertBox = ({
 	mediaBeingConverted: { path, toExtension, timeConverted, sizeConverted },
@@ -67,6 +57,19 @@ export const ConvertBox = ({
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+// const { port1: testPort } = new MessageChannel();
+// const testConvertingMedia: MediaBeingConverted = Object.freeze({
+// 	status: ProgressStatus.ACTIVE,
+// 	path: "/test/fake/path",
+// 	timeConverted: "01:20",
+// 	sizeConverted: 1000,
+// 	isConverting: true,
+// 	toExtension: "mp3",
+// 	percentage: 50,
+// 	port: testPort,
+// } as const);
+
+export const useConvertingList = create<ConvertList>(() => []); //new Array(10).fill(testConvertingMedia)
 const { setState: setConvertingList, getState: getConvertingList } =
 	useConvertingList;
 
@@ -75,7 +78,7 @@ export function createNewConvert(convertValues: ConvertInfo): MessagePort {
 
 	{
 		const indexIfThereIsOneAlready = convertingList.findIndex(
-			c => c.path === convertValues.path,
+			c => c.path === convertValues.path
 		);
 		if (indexIfThereIsOneAlready !== -1) {
 			const info = `There is already one convert of "${convertValues.path}"!`;
@@ -113,7 +116,7 @@ export function createNewConvert(convertValues: ConvertInfo): MessagePort {
 
 		// Assert that the download exists:
 		const indexToSeeIfDownloadExists = convertingList.findIndex(
-			d => d.path === convertStatus.path,
+			d => d.path === convertStatus.path
 		);
 		const doesDownloadExists = indexToSeeIfDownloadExists !== -1;
 
@@ -121,7 +124,7 @@ export function createNewConvert(convertValues: ConvertInfo): MessagePort {
 			console.warn(
 				"Received a message from Electron but the path is not in the list",
 				{ data, convertList: convertingList },
-				"Creating it...",
+				"Creating it..."
 			);
 
 			setConvertingList([...convertingList, convertStatus]);
@@ -135,7 +138,7 @@ export function createNewConvert(convertValues: ConvertInfo): MessagePort {
 			replace(convertingList, index, {
 				...convertStatus,
 				...data, // new data will override old ones.
-			}),
+			})
 		);
 
 		switch (data.status) {
@@ -192,12 +195,12 @@ function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
 	const convertingList = getConvertingList();
 
 	const mediaBeingConvertedIndex = convertingList.findIndex(
-		c => c.path === mediaPath,
+		c => c.path === mediaPath
 	);
 	if (mediaBeingConvertedIndex === -1)
 		return console.error(
 			`There should be a download with path "${mediaPath}"!\nconvertList =`,
-			convertingList,
+			convertingList
 		);
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -225,12 +228,7 @@ type MediaBeingConverted = Readonly<{
 }>;
 
 type ConvertList = readonly MediaBeingConverted[];
-type ConvertInfoList = readonly ConvertInfo[];
 
 type ConvertBoxProps = Readonly<{
 	mediaBeingConverted: MediaBeingConverted;
-}>;
-
-type PopupProps = Readonly<{
-	convertList: ConvertList;
 }>;

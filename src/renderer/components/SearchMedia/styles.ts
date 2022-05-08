@@ -1,3 +1,5 @@
+import { Anchor } from "@radix-ui/react-popover";
+
 import { styled, keyframes } from "@styles/global";
 
 export const Wrapper = styled("header", {
@@ -144,8 +146,7 @@ export const Highlight = styled("span", {
 	color: "white",
 });
 
-export const ResultsWrapper = styled("div", {
-	display: "inline-block",
+export const PopoverAnchor = styled(Anchor, {
 	position: "absolute",
 	minWidth: "100%",
 	left: "-25%",
@@ -159,40 +160,12 @@ export const SearchResults = styled("ul", {
 	flexDirection: "column",
 	justifyContent: "center",
 	alignItems: "center",
-	height: 200,
-	width: 350,
+	size: "100%",
 
-	backgroundColor: "$bg-popover",
-	border: "1px solid lightgray",
-	boxShadow: "$popup",
-	borderRadius: 7,
 	padding: 10,
-	zIndex: 10,
 	gap: 10,
 
-	overflowY: "auto",
 	listStyle: "none",
-
-	/* width */
-	"&::-webkit-scrollbar": {
-		display: "block",
-		size: 2,
-	},
-
-	/* Track */
-	"&::-webkit-scrollbar-track": {
-		background: "$scrollbar",
-	},
-
-	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
-		background: "$scrollbar-thumb",
-	},
-
-	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
-		background: "$scrollbar-thumb-hover",
-	},
 });
 
 export const Result = styled("li", {
@@ -215,20 +188,10 @@ export const Result = styled("li", {
 });
 
 export const NothingFound = styled("div", {
-	position: "absolute",
 	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
-	left: "-25%",
-	width: 350,
 	height: 50,
-	top: 50,
-
-	border: "1px solid lightgray",
-	background: "$bg-popover",
-	boxShadow: "$popup",
-	borderRadius: 7,
-	zIndex: 10,
 
 	color: "$deactivated-icon",
 	letterSpacing: "0.03rem",

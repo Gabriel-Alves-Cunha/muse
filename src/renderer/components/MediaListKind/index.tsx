@@ -43,7 +43,7 @@ export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
 		onReset={() => {
 			// TODO: reset the state of your app so the error doesn't happen again
 			console.error(
-				"This should reset all app data, but it does nothing at the moment",
+				"This should reset all app data, but it does nothing at the moment"
 			);
 		}}
 	>
@@ -69,7 +69,7 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		const end = performance.now();
 		console.log(
 			`%cLoop to find all medias by id took: ${end - start} ms.`,
-			"color:brown",
+			"color:brown"
 		);
 
 		return data;
@@ -121,15 +121,16 @@ const Row = memo(
 					</TriggerOptions>
 				</Tooltip>
 
-				<Portal>
-					<StyledOverlay>
-						<MediaOptionsModal media={media} />
-					</StyledOverlay>
-				</Portal>
+				{/* TODO: Test this without Portal  */}
+				{/* <Portal> */}
+				<StyledOverlay>
+					<MediaOptionsModal media={media} />
+				</StyledOverlay>
+				{/* </Portal> */}
 			</Dialog>
 		</RowWrapper>
 	),
-	(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id,
+	(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id
 );
 Row.displayName = "Row";
 
@@ -147,7 +148,7 @@ const playMedia = (mediaID: MediaID, playlistName: Playlist["name"]) =>
 
 const selectMeIfCtrlPlusLeftClick = (
 	e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-	mediaID: MediaID,
+	mediaID: MediaID
 ) => {
 	// `e.button === 0` is left click
 	if (!e.ctrlKey || e.button !== 0) return;
@@ -158,7 +159,7 @@ const selectMeIfCtrlPlusLeftClick = (
 	// Mark media as selected:
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const media = getPlaylists().mainList.find(
-		m => m.id === mediaID,
+		m => m.id === mediaID
 	)! as Mutable<Media>;
 	media.selected = true;
 
@@ -185,10 +186,10 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorBoundaryProps) {
 	);
 }
 
-type ErrorBoundaryProps = {
+type ErrorBoundaryProps = Readonly<{
 	resetErrorBoundary: () => void;
 	error: Error;
-};
+}>;
 
 type RowProps = Readonly<{
 	playlistName: Playlist["name"];

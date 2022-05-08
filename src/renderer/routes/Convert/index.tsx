@@ -3,7 +3,7 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { setConvertInfoList } from "@modules/Converting/helper";
+import { setConvertInfoList } from "@modules/Converting";
 import { MainArea } from "@components";
 
 import { BorderedButton } from "./styles";
@@ -15,15 +15,18 @@ export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	function handleSelectedFiles(e: ChangeEvent<HTMLInputElement>) {
-		const files = e.target.files;
+	const handleSelectedFiles = ({
+		target: { files },
+	}: ChangeEvent<HTMLInputElement>) => {
 		if (!files) return;
 
 		const paths: Path[] = [];
 		for (const file of files) paths.push(file.path);
 
 		setSelectedMediasPath(paths);
-	}
+	};
+
+	const handleClick = () => inputRef.current?.click();
 
 	useEffect(() => {
 		const convertTo = () => {
@@ -42,8 +45,6 @@ export function Convert() {
 		// If there is selected files, convert them:
 		if (selectedMediasPath.length > 0) convertTo();
 	}, [toExtension, selectedMediasPath]);
-
-	const handleClick = () => inputRef.current?.click();
 
 	return (
 		<MainArea>

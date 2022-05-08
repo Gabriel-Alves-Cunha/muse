@@ -1,6 +1,8 @@
-import { AiOutlineClose as Cancel } from "react-icons/ai";
+import { type MediaBeingDownloaded } from ".";
 
-import { type MediaBeingDownloaded, useDownloadingList } from ".";
+import { AiOutlineClose as Cancel } from "react-icons/ai";
+import create from "zustand";
+
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { Progress, Tooltip } from "@components";
@@ -44,6 +46,9 @@ export const Popup = ({ downloadingList }: PopupProps) => (
 	</Popup_>
 );
 
+export const useDownloadingList = create<PopupProps["downloadingList"]>(
+	() => [],
+);
 const { setState: setDownloadingList, getState: getDownloadingList } =
 	useDownloadingList;
 

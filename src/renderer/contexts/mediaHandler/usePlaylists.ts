@@ -6,7 +6,7 @@ import { persist } from "zustand/middleware";
 import create from "zustand";
 import merge from "deepmerge";
 
-import { push, remove, replace } from "@utils/array";
+import { constRefToEmptyArray, push, remove, replace } from "@utils/array";
 import { assertUnreachable } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
 import { hash } from "@common/hash";
@@ -31,7 +31,6 @@ const {
 
 const playlistsKey = `${keyPrefix}playlists` as const;
 
-const constRefToEmptyArray = Object.freeze([]);
 const defaultPlaylists: readonly Playlist[] = Object.freeze([
 	{ name: SORTED_BY_DATE, list: constRefToEmptyArray },
 	{ name: SORTED_BY_NAME, list: constRefToEmptyArray },

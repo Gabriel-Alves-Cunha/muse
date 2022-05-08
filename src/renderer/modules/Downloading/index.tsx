@@ -1,19 +1,18 @@
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import create from "zustand";
 
+import { Popover, PopoverContent, PopoverTrigger, Tooltip } from "@components";
+import { createNewDownload, Popup, useDownloadingList } from "./helper";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
-import { createNewDownload, Popup } from "./helper";
-import { useOnClickOutside } from "@hooks";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { Tooltip } from "@components";
+import { errorToast } from "@styles/global";
 import {
 	type DownloadInfo,
 	ProgressStatus,
 } from "@common/@types/typesAndEnums";
 
-import { Trigger, Wrapper } from "./styles";
-import { errorToast } from "@styles/global";
+import { TriggerButton, Wrapper } from "./styles";
 
 // const { port1: testPort } = new MessageChannel();
 // const testDownloadingMedias: MediaBeingDownloaded[] = new Array.fill(Object.freeze({
@@ -36,17 +35,14 @@ const defaultDownloadInfo: DownloadInfo = Object.freeze({
 });
 
 export const useDownloadInfo = create<DownloadInfo>(() => defaultDownloadInfo);
-export const useDownloadingList = create<DownloadingList>(() => []);
-
 export const { setState: setDownloadInfo } = useDownloadInfo;
 
 export function Downloading() {
-	const [showPopup, setShowPopup] = useState(false);
-	const popupRef = useRef<HTMLDivElement>(null);
+	const [isOpen, setIsOpen] = useState(false);
 	const downloadingList = useDownloadingList();
 	const downloadInfo = useDownloadInfo();
 
-	useOnClickOutside(popupRef, () => setShowPopup(false));
+	const toggleIsOpen = (isOpen: boolean) => setIsOpen(!isOpen);
 
 	useEffect(() => {
 		// For each new `DownloadingInfo`, start a new download:
@@ -56,7 +52,8 @@ export function Downloading() {
 
 				// We have to reset `downloadValues`
 				// (more specificaly, `canStartDownload`) so
-				// that it is ready for a new media download:
+				// that it is ready for a new media download,
+				// but let's clear everything to not leak:
 				setDownloadInfo(defaultDownloadInfo);
 
 				// Sending port so we can communicate with Electron:
@@ -64,40 +61,43 @@ export function Downloading() {
 					{
 						type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA,
 					},
-					electronPort,
+					electronPort
 				);
 			} catch (error) {
+				console.error(error);
+
 				errorToast(
-					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`,
+					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`
 				);
 			}
 	}, [downloadInfo, downloadInfo.canStartDownload, downloadInfo.title]);
 
-	useEffect(() => {
-		const handleEscKey = ({ key }: KeyboardEvent) =>
-			key === "Escape" && setShowPopup(false);
-
-		window.addEventListener("keydown", handleEscKey);
-
-		return () => window.removeEventListener("keydown", handleEscKey);
-	}, []);
-
 	return (
-		<Wrapper ref={popupRef}>
-			<Tooltip text="Show all downloading medias" arrow={false} side="right">
-				<Trigger
-					onClick={() => setShowPopup(prev => !prev)}
-					className={
-						(downloadingList.length ? "has-downloads " : "") +
-						(showPopup ? "active" : "")
-					}
-				>
-					<i data-length={downloadingList.length}></i>
-					<DownloadingIcon size="20" />
-				</Trigger>
-			</Tooltip>
+		<Wrapper>
+			<Popover open={isOpen} onOpenChange={toggleIsOpen}>
+				<PopoverTrigger>
+					<Tooltip
+						text="Show all downloading medias"
+						arrow={false}
+						side="right"
+					>
+						<TriggerButton
+							className={
+								(downloadingList.length ? "has-downloads " : "") +
+								(isOpen ? "active" : "")
+							}
+						>
+							<i data-length={downloadingList.length}></i>
 
-			{showPopup && <Popup downloadingList={downloadingList} />}
+							<DownloadingIcon size="20" />
+						</TriggerButton>
+					</Tooltip>
+				</PopoverTrigger>
+
+				<PopoverContent size="large">
+					<Popup downloadingList={downloadingList} />
+				</PopoverContent>
+			</Popover>
 		</Wrapper>
 	);
 }
@@ -111,8 +111,6 @@ export type MediaBeingDownloaded = Readonly<{
 	title: string;
 	url: string;
 }>;
-
-type DownloadingList = readonly MediaBeingDownloaded[];
 
 Downloading.whyDidYouRender = {
 	customName: "Downloading",

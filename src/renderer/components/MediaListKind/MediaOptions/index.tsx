@@ -4,9 +4,9 @@ import { type RefObject, useEffect, useRef } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
-import { toast } from "react-toastify";
 
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { deleteMedia } from "@contexts";
 import { capitalize } from "@utils/utils";
@@ -81,7 +81,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 						</StyledTitle>
 
 						<ButtonToClose
-							onClick={() => deleteMedia_(closeButtonRef, media)}
+							onClick={() => handleMediaDeletion(closeButtonRef, media)}
 							id="delete-media"
 						>
 							Confirm
@@ -102,84 +102,50 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 	);
 }
 
-async function deleteMedia_(
+const handleMediaDeletion = async (
 	closeButtonRef: RefObject<HTMLButtonElement>,
-	media: Media,
-) {
+	media: Media
+) => {
 	if (closeButtonRef.current)
 		try {
 			dbg("Deleting media...", media);
 			await deleteMedia(media);
 
-			handleCloseAll(closeButtonRef);
+			closeEverything(closeButtonRef);
 
-			toast.success("Media has been successfully deleted.", {
-				hideProgressBar: false,
-				position: "top-right",
-				progress: undefined,
-				closeOnClick: true,
-				pauseOnHover: true,
-				autoClose: 5000,
-				draggable: true,
-			});
+			successToast("Media has been successfully deleted.");
 		} catch (error) {
 			console.error(error);
 
-			toast.error(
-				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
-				{
-					hideProgressBar: false,
-					position: "top-right",
-					progress: undefined,
-					closeOnClick: true,
-					pauseOnHover: true,
-					autoClose: 5000,
-					draggable: true,
-				},
+			errorToast(
+				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'."
 			);
 		}
-}
+};
 
-function handleChange(
+const handleChange = (
 	contentWrapperRef: RefObject<HTMLDivElement>,
 	closeButtonRef: RefObject<HTMLButtonElement>,
-	media: Media,
-) {
+	media: Media
+) => {
 	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
 			changePropsIfAllowed(contentWrapperRef, media);
-			handleCloseAll(closeButtonRef);
+			closeEverything(closeButtonRef);
 
-			toast.success("New media metadata has been saved.", {
-				hideProgressBar: false,
-				position: "top-right",
-				progress: undefined,
-				closeOnClick: true,
-				pauseOnHover: true,
-				autoClose: 5000,
-				draggable: true,
-			});
+			successToast("New media metadata has been saved.");
 		} catch (error) {
 			console.error(error);
 
-			toast.error(
-				"Unable to save new metadata. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
-				{
-					hideProgressBar: false,
-					position: "top-right",
-					progress: undefined,
-					closeOnClick: true,
-					pauseOnHover: true,
-					autoClose: 5000,
-					draggable: true,
-				},
+			errorToast(
+				"Unable to save new metadata. See console by pressing 'Ctrl' + 'Shift' + 'i'."
 			);
 		}
-}
+};
 
 function changePropsIfAllowed(
 	contentWrapper: RefObject<HTMLDivElement>,
-	media: Media,
+	media: Media
 ) {
 	if (contentWrapper.current)
 		for (const children of contentWrapper.current.children)
@@ -269,7 +235,7 @@ const allowedOptionToChange = Object.freeze({
 const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).some(opt => opt === option);
 
-const handleCloseAll = (element: RefObject<HTMLButtonElement>) =>
+const closeEverything = (element: RefObject<HTMLButtonElement>) =>
 	element.current?.click();
 
 export type WhatToChange = Readonly<{
@@ -278,5 +244,5 @@ export type WhatToChange = Readonly<{
 	current: string;
 }>;
 
-type ChangeOptions = keyof typeof allowedOptionToChange;
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
+type ChangeOptions = keyof typeof allowedOptionToChange;

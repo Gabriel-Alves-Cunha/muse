@@ -1,6 +1,6 @@
-import { type UserConfig as UserConfigFromVitest } from "vitest";
+import { type UserConfig as VitestUserConfig } from "vitest";
 
-import { type UserConfig as UserConfigFromVite, defineConfig } from "vite";
+import { type UserConfig as ViteUserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
@@ -16,7 +16,9 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 // const isTesting = String(process.env.VITEST ? true : false);
 // console.log({ isDevelopment, isTesting });
 
-const config: UserConfigFromVitest & UserConfigFromVite = {
+type UserConfig = ViteUserConfig & VitestUserConfig;
+
+const config: UserConfig = {
 	test: {
 		dir: "../__tests__",
 		coverage: {

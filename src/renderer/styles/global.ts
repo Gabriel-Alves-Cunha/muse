@@ -108,7 +108,9 @@ export const darkTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		popup: "0 0 8px rgba(255, 255, 255, 0.2)",
+		// popup: "0 0 8px rgba(255, 255, 255, 0.2)",
+		popup: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px"`,
 		"media-player-img": "rgba(0, 0, 0, 0.3) 0 0 20px",
 		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
 		reflect:
@@ -152,7 +154,9 @@ export const lightTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		popup: "0 0 8px rgba(0, 0, 0, 0.2)",
+		// popup: "0 0 8px rgba(0, 0, 0, 0.2)",
+		popup: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px"`,
 		"media-player-img": "rgba(255, 255, 255, 0.3) 0 0 20px",
 		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
 		reflect:

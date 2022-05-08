@@ -52,3 +52,5 @@ export const unshift = <T>(
 	array: readonly T[],
 	...items: T[]
 ): readonly T[] => [...items, ...array];
+
+export const constRefToEmptyArray = Object.freeze([]);

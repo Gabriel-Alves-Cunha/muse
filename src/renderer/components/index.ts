@@ -1,3 +1,4 @@
+export { PopoverContent, PopoverTrigger, Popover } from "./Popover";
 export { ImgWithFallback } from "./ImgWithFallback";
 export { MediaListKind } from "./MediaListKind";
 export { ContextMenu } from "./ContextMenu";

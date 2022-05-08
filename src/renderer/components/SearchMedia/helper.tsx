@@ -9,7 +9,8 @@ import {
 } from "react-icons/md";
 import create from "zustand";
 
-import { ImgWithFallback, Tooltip } from "@components";
+import { ImgWithFallback, PopoverContent, Popover, Tooltip } from "@components";
+import { constRefToEmptyArray } from "@utils/array";
 import {
 	searchLocalComputerForMedias,
 	searchForMediaFromList,
@@ -22,7 +23,7 @@ import {
 
 import { ImgWrapper, Info } from "../MediaListKind/styles";
 import {
-	ResultsWrapper,
+	PopoverAnchor,
 	SearchResults,
 	NothingFound,
 	ReloadButton,
@@ -55,10 +56,10 @@ const {
 	SEARCHING,
 } = SearchStatus;
 
-export const constRefToEmptyArray = Object.freeze([]);
 export const defaultSearcher: Searcher = Object.freeze({
 	results: constRefToEmptyArray,
 	searchStatus: DOING_NOTHING,
+	playlistName: "",
 	searchTerm: "",
 });
 
@@ -73,8 +74,9 @@ const cleanHistory = () =>
 
 const reload = async () => {
 	setSearcher({
-		...defaultSearcher,
 		searchStatus: RELOADING_ALL_MEDIAS,
+		results: constRefToEmptyArray,
+		searchTerm: "",
 	});
 
 	await searchLocalComputerForMedias(true);
@@ -85,50 +87,51 @@ const reload = async () => {
 export const changeInput = ({ target: { value } }: InputChange) =>
 	setSearcher({ searchTerm: value.toLowerCase() });
 
-const playMedia = (mediaID: MediaID, playlistName: string) =>
+const playMedia = (mediaID: MediaID) => {
+	const { playlistName } = useSearcher.getState();
+
 	setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlistName,
 		mediaID,
 	});
+};
 
-const Row = ({ highlight, media, playlistName }: RowProps) => {
-	const { title, id, duration } = media;
-	const index = title.toLowerCase().indexOf(highlight);
+const Row = ({ highlight, media }: RowProps) => {
+	const index = media.title.toLowerCase().indexOf(highlight);
 
 	return (
 		<Tooltip text="Play this media">
-			<Result onClick={() => playMedia(id, playlistName)}>
+			<Result onClick={() => playMedia(media.id)}>
 				<ImgWrapper>
 					<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
 				</ImgWrapper>
 
 				<Info>
 					<Title>
-						{title.slice(0, index)}
+						{media.title.slice(0, index)}
 						<Highlight>
-							{title.slice(index, index + highlight.length)}
+							{media.title.slice(index, index + highlight.length)}
 						</Highlight>
-						{title.slice(index + highlight.length)}
+						{media.title.slice(index + highlight.length)}
 					</Title>
-					<SubTitle>{duration}</SubTitle>
+					<SubTitle>{media.duration}</SubTitle>
 				</Info>
 			</Result>
 		</Tooltip>
 	);
 };
 
-export const Input = ({ playlistName }: Props2) => {
+export const Input = () => {
+	const { searchTerm, playlistName } = useSearcher();
 	const [, startTransition] = useTransition();
-	const { searchTerm } = useSearcher();
 
 	useEffect(() => {
-		setSearcher({
-			results: constRefToEmptyArray,
-			searchStatus: SEARCHING,
-		});
+		setSearcher({ results: constRefToEmptyArray });
 
 		if (searchTerm.length < 2) return;
+
+		setSearcher({ searchStatus: SEARCHING });
 
 		startTransition(() => {
 			const results = searchForMediaFromList(searchTerm, playlistName);
@@ -136,7 +139,8 @@ export const Input = ({ playlistName }: Props2) => {
 
 			setSearcher({ searchStatus, results });
 		});
-	}, [playlistName, searchTerm]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchTerm]);
 
 	return (
 		<input
@@ -149,28 +153,30 @@ export const Input = ({ playlistName }: Props2) => {
 	);
 };
 
-export const Results = ({ playlistName }: Props2) => {
+export const Results = () => {
 	const { searchStatus, searchTerm, results } = useSearcher();
+	const foundSomething = searchStatus === FOUND_SOMETHING;
+	const nothingFound = searchStatus === NOTHING_FOUND;
+	const shouldOpen = nothingFound || foundSomething;
 
 	return (
-		<ResultsWrapper>
-			{searchStatus === NOTHING_FOUND ? (
-				<NothingFound>
-					Nothing was found for &quot;{searchTerm}&quot;
-				</NothingFound>
-			) : searchStatus === FOUND_SOMETHING ? (
-				<SearchResults>
-					{results.map(media => (
-						<Row
-							playlistName={playlistName}
-							highlight={searchTerm}
-							key={media.id}
-							media={media}
-						/>
-					))}
-				</SearchResults>
-			) : undefined}
-		</ResultsWrapper>
+		<Popover open={shouldOpen}>
+			<PopoverAnchor />
+
+			<PopoverContent size={nothingFound ? "small" : "medium"}>
+				{nothingFound ? (
+					<NothingFound>
+						Nothing was found for &quot;{searchTerm}&quot;
+					</NothingFound>
+				) : foundSomething ? (
+					<SearchResults>
+						{results.map(media => (
+							<Row highlight={searchTerm} key={media.id} media={media} />
+						))}
+					</SearchResults>
+				) : undefined}
+			</PopoverContent>
+		</Popover>
 	);
 };
 
@@ -202,6 +208,7 @@ export const ButtonToTheSide = ({ buttonToTheSide }: Props1) => {
 };
 
 type Searcher = Readonly<{
+	playlistName: MediaListKindProps["playlistName"];
 	searchTerm: Lowercase<string>;
 	searchStatus: SearchStatus;
 	results: readonly Media[];
@@ -210,8 +217,7 @@ type Searcher = Readonly<{
 type RowProps = Readonly<{
 	highlight: Lowercase<string>;
 	media: Media;
-}> &
-	Props2;
+}>;
 
 type Props1 = Readonly<{
 	buttonToTheSide: ButtonToTheSideEnum;

@@ -7,7 +7,7 @@ export const Wrapper = styled("div", {
 	width: "100%",
 });
 
-export const Trigger = styled("button", {
+export const TriggerButton = styled("button", {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
@@ -66,16 +66,13 @@ export const Trigger = styled("button", {
 	},
 });
 
-export const Popup_ = styled("div", {
+const Popup_ = styled("div", {
 	position: "absolute",
 	display: "flex",
 	flexDirection: "column",
 
 	transform: "translate(60%, -80%)",
 
-	maxHeight: 300,
-	minHeight: 100,
-	width: 260,
 	gap: 16,
 	top: 0,
 
