@@ -2,8 +2,8 @@ import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import create from "zustand";
 
-import { Popover, PopoverContent, PopoverTrigger, Tooltip } from "@components";
 import { createNewDownload, Popup, useDownloadingList } from "./helper";
+import { PopoverRoot, PopoverContent, Tooltip } from "@components";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
@@ -12,7 +12,8 @@ import {
 	ProgressStatus,
 } from "@common/@types/typesAndEnums";
 
-import { TriggerButton, Wrapper } from "./styles";
+import { StyledPopoverTrigger, Wrapper } from "./styles";
+import { PopoverAnchor } from "@modules/Converting/styles";
 
 // const { port1: testPort } = new MessageChannel();
 // const testDownloadingMedias: MediaBeingDownloaded[] = new Array.fill(Object.freeze({
@@ -42,7 +43,7 @@ export function Downloading() {
 	const downloadingList = useDownloadingList();
 	const downloadInfo = useDownloadInfo();
 
-	const toggleIsOpen = (isOpen: boolean) => setIsOpen(!isOpen);
+	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
 		// For each new `DownloadingInfo`, start a new download:
@@ -74,30 +75,32 @@ export function Downloading() {
 
 	return (
 		<Wrapper>
-			<Popover open={isOpen} onOpenChange={toggleIsOpen}>
-				<PopoverTrigger>
-					<Tooltip
-						text="Show all downloading medias"
-						arrow={false}
-						side="right"
+			<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
+				<Tooltip text="Show all downloading medias" side="right">
+					<StyledPopoverTrigger
+						className={
+							(downloadingList.length ? "has-items " : "") +
+							(isOpen ? "active " : "")
+						}
 					>
-						<TriggerButton
-							className={
-								(downloadingList.length ? "has-downloads " : "") +
-								(isOpen ? "active" : "")
-							}
-						>
-							<i data-length={downloadingList.length}></i>
+						<i data-length={downloadingList.length}></i>
 
-							<DownloadingIcon size="20" />
-						</TriggerButton>
-					</Tooltip>
-				</PopoverTrigger>
+						<DownloadingIcon size="20" />
+					</StyledPopoverTrigger>
+				</Tooltip>
 
-				<PopoverContent size="large">
+				<PopoverAnchor />
+
+				<PopoverContent
+					size={
+						downloadingList.length === 0
+							? "nothingFoundForConvertionsOrDownloads"
+							: "convertionsOrDownloads"
+					}
+				>
 					<Popup downloadingList={downloadingList} />
 				</PopoverContent>
-			</Popover>
+			</PopoverRoot>
 		</Wrapper>
 	);
 }

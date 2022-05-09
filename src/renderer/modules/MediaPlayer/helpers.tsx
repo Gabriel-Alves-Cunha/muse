@@ -88,7 +88,7 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 
 				<Controls isPaused={audio?.paused} />
 
-				<Tooltip text="Toggle random and loop" arrow={false}>
+				<Tooltip text="Toggle random and loop">
 					<IconButton onClick={toggleRandomAndLoop} style={{ width: 40 }}>
 						{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 					</IconButton>
@@ -108,7 +108,7 @@ export const Header = ({ media }: RefToMedia) => (
 
 		<Album>{media?.album}</Album>
 
-		<Tooltip text="Toggle favorite" arrow={false}>
+		<Tooltip text="Toggle favorite">
 			<IconButton style={{ width: 30 }}>
 				{media?.favorite ? <Favorite size="17" /> : <AddFavorite size="17" />}
 			</IconButton>
@@ -138,7 +138,7 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 			</IconButton>
 		</Tooltip>
 
-		<Tooltip text="Play next track" arrow={false}>
+		<Tooltip text="Play next track">
 			<IconButton
 				className="previous-or-next"
 				onClick={playNextMedia}
@@ -155,7 +155,7 @@ const seek = (e: SeekEvent, audio: Audio) => {
 	const duration = audio.duration;
 
 	const width = Number(
-		getComputedStyle(e.currentTarget).width.replace("px", ""),
+		getComputedStyle(e.currentTarget).width.replace("px", "")
 	);
 	const clickX = e.nativeEvent.offsetX;
 	const desiredTime = (clickX / width) * duration;
@@ -178,7 +178,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 				typeof duration === "number" && !isNaN(duration) && duration > 0,
 			formatedDuration: formatDuration(duration),
 		}),
-		[duration],
+		[duration]
 	);
 
 	const handleTooltip = useCallback(
@@ -205,7 +205,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			tooltip.textContent = formatDuration(time);
 			tooltip.style.left = `${left}px`;
 		},
-		[duration, isDurationValid],
+		[duration, isDurationValid]
 	);
 
 	return (

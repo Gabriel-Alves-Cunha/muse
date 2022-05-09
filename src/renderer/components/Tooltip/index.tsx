@@ -7,14 +7,9 @@ import {
 	Root,
 } from "@radix-ui/react-tooltip";
 
-import { StyledArrow, StyledContent } from "./styles";
+import { StyledContent } from "./styles";
 
-export const Tooltip = ({
-	side = "bottom",
-	arrow = true,
-	children,
-	text,
-}: Props) => (
+export const Tooltip = ({ side = "bottom", children, text }: Props) => (
 	<Provider delayDuration={500} skipDelayDuration={300}>
 		<Root>
 			<Trigger asChild>{children}</Trigger>
@@ -26,8 +21,6 @@ export const Tooltip = ({
 				side={side}
 			>
 				{text}
-
-				{arrow && <StyledArrow />}
 			</StyledContent>
 		</Root>
 	</Provider>

@@ -1,4 +1,4 @@
-import { Content, Arrow } from "@radix-ui/react-tooltip";
+import { Content } from "@radix-ui/react-tooltip";
 
 import { styled, keyframes } from "@styles/global";
 
@@ -23,16 +23,15 @@ const slideLeftAndFade = keyframes({
 });
 
 export const StyledContent = styled(Content, {
-	backgroundColor: "white",
+	boxSizing: "border-box", // So that border doens't occupy space
+
+	background: "$bg-tooltip",
 	padding: "10px 15px",
 	borderRadius: 4,
 
-	boxShadow: `
-	hsl(206 22% 7% / 35%)
-	0px 10px 38px -10px,
-	hsl(206 22% 7% / 20%)
-	0px 10px 20px -15px`,
+	boxShadow: "$tooltip",
 
+	border: "1px solid lightgray",
 	letterSpacing: "0.03rem",
 	fontFamily: "$secondary",
 	fontWeight: 500,
@@ -41,8 +40,9 @@ export const StyledContent = styled(Content, {
 	fontSize: 15,
 
 	"@media (prefers-reduced-motion: no-preference)": {
-		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
 		willChange: "transform, opacity",
+
+		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
 		animationFillMode: "forwards",
 		animationDuration: "400ms",
 
@@ -53,8 +53,4 @@ export const StyledContent = styled(Content, {
 			"&[data-side='top']": { animationName: slideDownAndFade },
 		},
 	},
-});
-
-export const StyledArrow = styled(Arrow, {
-	fill: "white",
 });

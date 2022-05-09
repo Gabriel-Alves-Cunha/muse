@@ -1,21 +1,31 @@
+import type { State, StateCreator } from "zustand";
 import type { ConvertInfo } from "@common/@types/typesAndEnums";
 
 import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
-import useTilg from "tilg";
-import create, { State, StateCreator } from "zustand";
+import create from "zustand";
 
-import { Popover, PopoverContent, PopoverTrigger, Tooltip } from "@components";
 import { useConvertingList, createNewConvert, Popup } from "./helper";
+import { PopoverRoot, PopoverContent, Tooltip } from "@components";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 // This `constRefToEmptyArray` prevents an infinite loop:
 import { constRefToEmptyArray } from "@utils/array";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
 
-import { TriggerButton, Wrapper } from "../Downloading/styles";
+import { StyledPopoverTrigger, Wrapper } from "../Downloading/styles";
+import { PopoverAnchor } from "./styles";
 
-type LoggerImpl = <T extends State>(
+/**
+ * I'm doing all this turnaround because for some reason
+ * when I set `useConvertInfoList` to an empty array, it
+ * changes it to an Object... I don't know why, maybe it
+ * has something to do with the fact that the `set` fn
+ * changes it partialy, so much so that the fix is just
+ * `set(a[0], true);`, the `true` is to replace it instead
+ * of updating.
+ */
+type BugFixImpl = <T extends State>(
 	f: PopArgument<StateCreator<T, [], []>>,
 	name?: string
 ) => PopArgument<StateCreator<T, [], []>>;
@@ -26,25 +36,24 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 	? (...a: A) => R
 	: never;
 
-// TODO: see about a middleware that does: `store.setState = loggedSet;`
-const logger: LoggerImpl = (fn, name) => (set, get, store) => {
-	const loggedSet: typeof set = (...a) => {
-		console.log("previous:", ...(name ? [`${name}:`] : []), get());
-		console.log(a);
-		set(a[0], true);
-		console.log("now:", ...(name ? [`${name}:`] : []), ...a, get());
-		console.log("isArray:", Array.isArray(get()));
+const fixBugThatSetsItToAnObject: BugFixImpl =
+	(fn /*, name */) => (set, get, store) => {
+		const loggedSet: typeof set = (...a) => {
+			// console.log("previous:", ...(name ? [`${name}:`] : []), get());
+			// console.log(a);
+			set(a[0], true);
+			// console.log("now:", ...(name ? [`${name}:`] : []), ...a, get());
+			// console.log("isArray:", Array.isArray(get()));
+		};
+
+		store.setState = loggedSet;
+
+		return fn(loggedSet, get, store);
 	};
 
-	store.setState = loggedSet;
-
-	return fn(loggedSet, get, store);
-};
-
-const fixBugThatSetsItToAnObject = logger;
-
 export const useConvertInfoList = create<ConvertInfoList>(
-	fixBugThatSetsItToAnObject((set, get, store) => [], "convertInfoList")
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	fixBugThatSetsItToAnObject((_set, _get, _store) => [])
 );
 export const { setState: setConvertInfoList } = useConvertInfoList;
 
@@ -53,9 +62,7 @@ export function Converting() {
 	const convertInfoList = useConvertInfoList();
 	const convertingList = useConvertingList();
 
-	const toggleIsOpen = (isOpen: boolean) => setIsOpen(!isOpen);
-
-	useTilg();
+	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
 		convertInfoList.forEach(convertInfo => {
@@ -87,26 +94,32 @@ export function Converting() {
 
 	return (
 		<Wrapper>
-			<Popover open={isOpen} onOpenChange={toggleIsOpen}>
-				<PopoverTrigger>
-					<Tooltip text="Show all converting medias" arrow={false} side="right">
-						<TriggerButton
-							className={
-								(convertingList.length ? "has-downloads " : "") +
-								(isOpen ? "active" : "")
-							}
-						>
-							<i data-length={convertingList.length}></i>
+			<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
+				<Tooltip text="Show all converting medias" side="right">
+					<StyledPopoverTrigger
+						className={
+							(convertingList.length ? "has-items " : "") +
+							(isOpen ? "active" : "")
+						}
+					>
+						<i data-length={convertingList.length}></i>
 
-							<Convert size={20} />
-						</TriggerButton>
-					</Tooltip>
-				</PopoverTrigger>
+						<Convert size={20} />
+					</StyledPopoverTrigger>
+				</Tooltip>
 
-				<PopoverContent size="large">
+				<PopoverAnchor />
+
+				<PopoverContent
+					size={
+						convertingList.length === 0
+							? "nothingFoundForConvertionsOrDownloads"
+							: "convertionsOrDownloads"
+					}
+				>
 					<Popup />
 				</PopoverContent>
-			</Popover>
+			</PopoverRoot>
 		</Wrapper>
 	);
 }

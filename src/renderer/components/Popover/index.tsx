@@ -1,10 +1,11 @@
+import type { VariantProps } from "@stitches/react";
+
 import { forwardRef, type Ref, type ReactNode } from "react";
-import { PopperContentProps, Trigger, Root } from "@radix-ui/react-popover";
+import { PopperContentProps, Root } from "@radix-ui/react-popover";
 
 import { StyledArrow, StyledContent } from "./styles";
 
-export const PopoverTrigger = Trigger;
-export const Popover = Root;
+export const PopoverRoot = Root;
 
 /** Usage:
  *
@@ -31,6 +32,6 @@ export const PopoverContent = forwardRef(
 PopoverContent.displayName = "PopoverContent";
 
 type Props = PopperContentProps & {
-	size: "small" | "medium" | "large";
+	size: VariantProps<typeof StyledContent>["size"];
 	children: ReactNode;
 };

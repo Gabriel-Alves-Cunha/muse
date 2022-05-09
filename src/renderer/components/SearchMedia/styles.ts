@@ -146,7 +146,7 @@ export const Highlight = styled("span", {
 	color: "white",
 });
 
-export const PopoverAnchor = styled(Anchor, {
+export const SearchMediaPopoverAnchor = styled(Anchor, {
 	position: "absolute",
 	minWidth: "100%",
 	left: "-25%",

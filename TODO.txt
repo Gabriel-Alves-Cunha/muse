@@ -1,5 +1,4 @@
 * TODO: impl select on media
-* TODO: use Popup from radix
 * TODO: use progress from radix
 * TODO: see about not using deepmerge
 

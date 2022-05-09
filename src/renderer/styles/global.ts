@@ -90,8 +90,10 @@ export const darkTheme = createTheme({
 		"gray-text": "#a8a8a8",
 		text: "#e0ddcf",
 
+		"bg-tooltip": "#efece6",
 		"bg-popover": "white",
 		"bg-main": "#191716",
+		"bg-dialog": "white",
 
 		"icon-button-2": "#88888880",
 		"button-hovered": "#dbdadc",
@@ -108,13 +110,21 @@ export const darkTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		// popup: "0 0 8px rgba(255, 255, 255, 0.2)",
-		popup: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-		hsl(206 22% 7% / 20%) 0px 10px 20px -15px"`,
+		tooltip:
+			"rgba(17, 17, 26, 0.1) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 48px",
+
+		popover: "0 0 8px rgba(255, 255, 255, 0.2)",
+
+		dialog: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px`,
+
 		"media-player-img": "rgba(0, 0, 0, 0.3) 0 0 20px",
+
 		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
+
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
+
 		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 	},
 });
@@ -136,8 +146,10 @@ export const lightTheme = createTheme({
 		"gray-text": "#a8a8a8",
 		text: "#0C0910",
 
-		"bg-popover": "white",
+		"bg-tooltip": "#f7f7f7",
+		"bg-popover": "#efece6",
 		"bg-main": "#f9f6f5",
+		"bg-dialog": "white",
 
 		"icon-button-2": "#88888830",
 		"button-hovered": "#dbdadc",
@@ -154,13 +166,21 @@ export const lightTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		// popup: "0 0 8px rgba(0, 0, 0, 0.2)",
-		popup: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-		hsl(206 22% 7% / 20%) 0px 10px 20px -15px"`,
+		tooltip:
+			"rgba(17, 17, 26, 0.1) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 48px",
+
+		popover: "0 0 8px rgba(0, 0, 0, 0.2)",
+
+		dialog: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px`,
+
 		"media-player-img": "rgba(255, 255, 255, 0.3) 0 0 20px",
+
 		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
+
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
+
 		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
 	},
 });

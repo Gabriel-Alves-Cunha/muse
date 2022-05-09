@@ -1,3 +1,4 @@
+import { Trigger } from "@radix-ui/react-popover";
 import { styled } from "@styles/global";
 
 export const Wrapper = styled("div", {
@@ -7,7 +8,7 @@ export const Wrapper = styled("div", {
 	width: "100%",
 });
 
-export const TriggerButton = styled("button", {
+export const StyledPopoverTrigger = styled(Trigger, {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
@@ -31,7 +32,7 @@ export const TriggerButton = styled("button", {
 		color: "$active-icon",
 	},
 
-	"&.has-downloads": {
+	"&.has-items": {
 		position: "relative",
 		display: "inline-block",
 
@@ -63,60 +64,6 @@ export const TriggerButton = styled("button", {
 				top: 1,
 			},
 		},
-	},
-});
-
-const Popup_ = styled("div", {
-	position: "absolute",
-	display: "flex",
-	flexDirection: "column",
-
-	transform: "translate(60%, -80%)",
-
-	gap: 16,
-	top: 0,
-
-	overflowY: "scroll",
-	borderRadius: 5,
-	padding: 10,
-	zIndex: 500,
-
-	background: "$bg-popover",
-	boxShadow: "$popup",
-
-	p: {
-		position: "absolute",
-		top: "50%", // position the top  edge of the element at the middle of the parent
-		left: "50%", // position the left edge of the element at the middle of the parent
-		transform: "translate(-50%, -50%)",
-
-		color: "$deactivated-icon",
-		letterSpacing: "0.03rem",
-		fontFamily: "$secondary",
-		textAlign: "center",
-		fontSize: "1.05rem",
-		fontWeight: 500,
-	},
-
-	/* width */
-	"&::-webkit-scrollbar": {
-		display: "block",
-		size: 2,
-	},
-
-	/* Track */
-	"&::-webkit-scrollbar-track": {
-		background: "$scrollbar",
-	},
-
-	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
-		background: "$scrollbar-thumb",
-	},
-
-	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
-		background: "$scrollbar-thumb-hover",
 	},
 });
 

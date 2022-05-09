@@ -37,13 +37,13 @@ export const Decorations = () => (
 
 const Buttons = () => (
 	<WindowButtons>
-		<Tooltip text="Close window" arrow={false}>
+		<Tooltip text="Close window">
 			<WindowButton onClick={closeWindow} id="close">
 				<Close size={16} />
 			</WindowButton>
 		</Tooltip>
 
-		<Tooltip text="Toggle maximize window" arrow={false}>
+		<Tooltip text="Toggle maximize window">
 			<WindowButton onClick={toggleMaximize}>
 				<Maximize size={16} />
 			</WindowButton>
@@ -62,7 +62,7 @@ const AppName_Folder = () => {
 
 	return (
 		<AppName_Folder_Wrapper>
-			{capitalizedAppName} {"\u279D"} {page}
+			{capitalizedAppName} • {page}
 		</AppName_Folder_Wrapper>
 	);
 };

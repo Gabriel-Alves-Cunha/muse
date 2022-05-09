@@ -7,7 +7,10 @@ export const isDevelopment = true;
 export const isTesting = false;
 // export const isDevelopment = VITE_IS_DEVELOPMENT === "true";
 // export const isTesting = VITE_IS_TESTING === "true";
-console.log({ isDevelopment, isTesting, "import.meta": import.meta });
+console.log({
+	isDevelopment,
+	isTesting,
+});
 
 export const capitalizedAppName = "Muse" as const;
 export const lowercaseAppName = "muse" as const;

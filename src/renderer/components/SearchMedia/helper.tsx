@@ -9,7 +9,6 @@ import {
 } from "react-icons/md";
 import create from "zustand";
 
-import { ImgWithFallback, PopoverContent, Popover, Tooltip } from "@components";
 import { constRefToEmptyArray } from "@utils/array";
 import {
 	searchLocalComputerForMedias,
@@ -20,10 +19,16 @@ import {
 	PlaylistEnum,
 	setPlaylists,
 } from "@contexts";
+import {
+	ImgWithFallback,
+	PopoverContent,
+	PopoverRoot,
+	Tooltip,
+} from "@components";
 
 import { ImgWrapper, Info } from "../MediaListKind/styles";
 import {
-	PopoverAnchor,
+	SearchMediaPopoverAnchor,
 	SearchResults,
 	NothingFound,
 	ReloadButton,
@@ -84,7 +89,7 @@ const reload = async () => {
 	setSearcher({ searchStatus: DOING_NOTHING });
 };
 
-export const changeInput = ({ target: { value } }: InputChange) =>
+export const setSearchTerm = ({ target: { value } }: InputChange) =>
 	setSearcher({ searchTerm: value.toLowerCase() });
 
 const playMedia = (mediaID: MediaID) => {
@@ -145,7 +150,7 @@ export const Input = () => {
 	return (
 		<input
 			placeholder="Search for songs"
-			onChange={changeInput}
+			onChange={setSearchTerm}
 			value={searchTerm}
 			spellCheck="false"
 			autoCorrect="off"
@@ -160,10 +165,14 @@ export const Results = () => {
 	const shouldOpen = nothingFound || foundSomething;
 
 	return (
-		<Popover open={shouldOpen}>
-			<PopoverAnchor />
+		<PopoverRoot open={shouldOpen}>
+			<SearchMediaPopoverAnchor />
 
-			<PopoverContent size={nothingFound ? "small" : "medium"}>
+			<PopoverContent
+				size={
+					nothingFound ? "nothingFoundForSearchMedia" : "searchMediaResults"
+				}
+			>
 				{nothingFound ? (
 					<NothingFound>
 						Nothing was found for &quot;{searchTerm}&quot;
@@ -176,7 +185,7 @@ export const Results = () => {
 					</SearchResults>
 				) : undefined}
 			</PopoverContent>
-		</Popover>
+		</PopoverRoot>
 	);
 };
 

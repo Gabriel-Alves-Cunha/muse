@@ -12,14 +12,14 @@ import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { Tooltip } from "@components";
 
-import { TitleAndCancelWrapper, Content, Popup_ } from "../Downloading/styles";
+import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
 
 export const Popup = () => {
 	const convertingList = useConvertingList();
 
 	return (
-		<Popup_>
+		<>
 			{convertingList.length > 0 ? (
 				convertingList.map(m => (
 					<ConvertBox mediaBeingConverted={m} key={m.path} />
@@ -27,7 +27,7 @@ export const Popup = () => {
 			) : (
 				<p>No conversions in progress!</p>
 			)}
-		</Popup_>
+		</>
 	);
 };
 
@@ -69,19 +69,22 @@ export const ConvertBox = ({
 // 	port: testPort,
 // } as const);
 
-export const useConvertingList = create<ConvertList>(() => []); //new Array(10).fill(testConvertingMedia)
+export const useConvertingList = create<ConvertList>(
+	() => []
+	// new Array(10).fill(testConvertingMedia)
+);
 const { setState: setConvertingList, getState: getConvertingList } =
 	useConvertingList;
 
-export function createNewConvert(convertValues: ConvertInfo): MessagePort {
+export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 	const convertingList = getConvertingList();
 
 	{
 		const indexIfThereIsOneAlready = convertingList.findIndex(
-			c => c.path === convertValues.path
+			c => c.path === convertInfo.path
 		);
 		if (indexIfThereIsOneAlready !== -1) {
-			const info = `There is already one convert of "${convertValues.path}"!`;
+			const info = `There is already one convert of "${convertInfo.path}"!`;
 
 			infoToast(info);
 
@@ -95,9 +98,9 @@ export function createNewConvert(convertValues: ConvertInfo): MessagePort {
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 	const convertStatus: MediaBeingConverted = {
-		toExtension: convertValues.toExtension,
+		toExtension: convertInfo.toExtension,
 		status: ProgressStatus.ACTIVE,
-		path: convertValues.path,
+		path: convertInfo.path,
 		isConverting: true,
 		timeConverted: "",
 		sizeConverted: 0,
@@ -184,28 +187,32 @@ export function createNewConvert(convertValues: ConvertInfo): MessagePort {
 	};
 
 	// @ts-ignore: this DOES exists
-	myPort.onclose = () => console.log("Closing ports (react port).");
+	myPort.onclose = handleOnClose;
 
 	myPort.start();
 
 	return electronPort;
 }
 
-function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
+const cancelDownloadAndOrRemoveItFromList = (mediaPath: string) => {
 	const convertingList = getConvertingList();
 
 	const mediaBeingConvertedIndex = convertingList.findIndex(
 		c => c.path === mediaPath
 	);
-	if (mediaBeingConvertedIndex === -1)
-		return console.error(
-			`There should be a download with path "${mediaPath}"!\nconvertList =`,
-			convertingList
-		);
+
+	{
+		if (mediaBeingConvertedIndex === -1)
+			return console.error(
+				`There should be a conversion with path "${mediaPath}"!\nconvertList =`,
+				convertingList
+			);
+	}
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const mediaBeingConverted = convertingList[mediaBeingConvertedIndex]!;
 
+	// Cancel conversion
 	if (mediaBeingConverted.isConverting)
 		mediaBeingConverted.port.postMessage({
 			path: mediaBeingConverted.path,
@@ -213,9 +220,11 @@ function cancelDownloadAndOrRemoveItFromList(mediaPath: string) {
 		});
 
 	setConvertingList(remove(convertingList, mediaBeingConvertedIndex));
-}
+};
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
+
+export const handleOnClose = () => console.log("Closing ports (react port).");
 
 type MediaBeingConverted = Readonly<{
 	status: ProgressProps["status"];

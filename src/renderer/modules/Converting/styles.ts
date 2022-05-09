@@ -1,3 +1,5 @@
+import { Anchor } from "@radix-ui/react-popover";
+
 import { styled } from "@styles/global";
 
 export const ConvertionProgress = styled("div", {
@@ -21,4 +23,11 @@ export const ConvertionProgress = styled("div", {
 		// mt: 5,
 		width: 15,
 	},
+});
+
+export const PopoverAnchor = styled(Anchor, {
+	position: "relative",
+
+	left: 10,
+	top: 10,
 });

@@ -1,6 +1,6 @@
-import { type UserConfig as VitestUserConfig } from "vitest";
+/// <reference types="vitest" />
+import { defineConfig } from "vite";
 
-import { type UserConfig as ViteUserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
@@ -16,9 +16,9 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 // const isTesting = String(process.env.VITEST ? true : false);
 // console.log({ isDevelopment, isTesting });
 
-type UserConfig = ViteUserConfig & VitestUserConfig;
+// const config: UserConfig = ;
 
-const config: UserConfig = {
+export default defineConfig({
 	test: {
 		dir: "../__tests__",
 		coverage: {
@@ -37,14 +37,11 @@ const config: UserConfig = {
 			"coverage/**",
 			"**/*.d.ts",
 		],
+		logHeapUsage: true,
 	},
 	plugins: [react()],
 	root: rendererPath,
 	base: "./",
-	// define: {
-	// 	VITE_IS_DEVELOPMENT: JSON.stringify(isDevelopment),
-	// 	VITE_IS_TESTING: JSON.stringify(isTesting),
-	// },
 	build: {
 		outDir: outDirRenderer,
 		emptyOutDir: true,
@@ -101,6 +98,4 @@ const config: UserConfig = {
 			},
 		],
 	},
-};
-
-export default defineConfig(config);
+});

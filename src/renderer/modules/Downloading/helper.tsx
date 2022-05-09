@@ -7,15 +7,16 @@ import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { Progress, Tooltip } from "@components";
 import { remove, replace } from "@utils/array";
+import { handleOnClose } from "@modules/Converting/helper";
 import {
 	type DownloadInfo,
 	ProgressStatus,
 } from "@common/@types/typesAndEnums";
 
-import { Popup_, Content, TitleAndCancelWrapper } from "./styles";
+import { Content, TitleAndCancelWrapper } from "./styles";
 
 export const Popup = ({ downloadingList }: PopupProps) => (
-	<Popup_>
+	<>
 		{downloadingList.length > 0 ? (
 			downloadingList.map(download => (
 				<Content key={download.url}>
@@ -43,11 +44,11 @@ export const Popup = ({ downloadingList }: PopupProps) => (
 		) : (
 			<p>No downloads in progress!</p>
 		)}
-	</Popup_>
+	</>
 );
 
 export const useDownloadingList = create<PopupProps["downloadingList"]>(
-	() => [],
+	() => []
 );
 const { setState: setDownloadingList, getState: getDownloadingList } =
 	useDownloadingList;
@@ -64,7 +65,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 		// First, see if there is another one that has the same url
 		// and quit if true:
 		const indexIfThereIsOneAlready = downloadingList.findIndex(
-			d => d.url === downloadInfo.url,
+			d => d.url === downloadInfo.url
 		);
 		const doesMediaAlreadyExist = indexIfThereIsOneAlready !== -1;
 
@@ -105,7 +106,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		// Assert that the download exists:
 		const indexToSeeIfDownloadExists = downloadingList.findIndex(
-			d => d.url === downloadInfo.url,
+			d => d.url === downloadInfo.url
 		);
 		const doesDownloadExists = indexToSeeIfDownloadExists !== -1;
 
@@ -113,7 +114,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			console.info(
 				"Received a message from Electron but the url is not in the list. This is fine if we are creating a download!",
 				{ data, downloadingList },
-				"Creating it a new download...",
+				"Creating it a new download..."
 			);
 
 			setDownloadingList([...downloadingList, downloadStatus]);
@@ -128,7 +129,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			replace(downloadingList, index, {
 				...downloadStatus,
 				...data,
-			}),
+			})
 		);
 
 		// Handle ProgressStatus's cases:
@@ -175,14 +176,14 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	};
 
 	// @ts-ignore: this fn DOES exists
-	myPort.onclose = () => console.log("Closing ports (react port).");
+	myPort.onclose = handleOnClose;
 
 	myPort.start();
 
 	return electronPort;
 }
 
-function cancelDownloadAndOrRemoveItFromList(url: string) {
+const cancelDownloadAndOrRemoveItFromList = (url: string) => {
 	const downloadingList = getDownloadingList();
 
 	// Find the DownloadingMedia:
@@ -192,7 +193,7 @@ function cancelDownloadAndOrRemoveItFromList(url: string) {
 		if (index === -1)
 			return console.error(
 				`There should be a download with url "${url}"!\ndownloadList =`,
-				downloadingList,
+				downloadingList
 			);
 	}
 
@@ -205,7 +206,7 @@ function cancelDownloadAndOrRemoveItFromList(url: string) {
 
 	// Update downloading list:
 	setDownloadingList(remove(downloadingList, index));
-}
+};
 
 type PopupProps = Readonly<{
 	downloadingList: readonly MediaBeingDownloaded[];

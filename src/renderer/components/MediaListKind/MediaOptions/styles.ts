@@ -46,6 +46,8 @@ export const StyledOverlay = styled(Overlay, {
 
 export const StyledContent = styled(Content, {
 	position: "fixed",
+
+	// Center:
 	transform: "translate(-50%, -50%)",
 	left: "50%",
 	top: "50%",
@@ -55,24 +57,21 @@ export const StyledContent = styled(Content, {
 	minWidth: 300,
 	padding: 30,
 
-	background: "white",
+	background: "$bg-dialog",
 	borderRadius: 4,
 
-	boxShadow: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-		hsl(206 22% 7% / 20%) 0px 10px 20px -15px`,
+	boxShadow: "$dialog",
 
 	"@media (prefers-reduced-motion: no-preference)": {
-		animation: `${contentShow} .15ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+		animation: `${contentShow} 25ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
-
-	"&:focus": { outline: "none" },
 });
 
 export const StyledTitle = styled(Title, {
 	margin: 0,
 
 	fontFamily: "$secondary",
-	letterSpacing: "0.03rem",
+	letterSpacing: "0.04rem",
 	fontSize: "1.1rem",
 	fontWeight: 600,
 	color: "$text",
@@ -90,6 +89,7 @@ export const StyledDescription = styled(Description, {
 
 export const TriggerToRemoveMedia = styled(Trigger, {
 	boxSizing: "border-box", // So that border doens't occupy space
+
 	display: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",
