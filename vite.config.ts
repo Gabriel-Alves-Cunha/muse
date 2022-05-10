@@ -1,24 +1,13 @@
-/// <reference types="vitest" />
-import { defineConfig } from "vite";
-
 import { configDefaults } from "vitest/config";
-import { resolve } from "path";
+import { defineConfig } from "vite";
+import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
 const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
 
-// For some reason import.meta.env is not working...
-
-// // @ts-ignore This has to be this way, otherwise it just does not work...
-// const isDevelopment = String(process.env.NODE_ENV === "development");
-// // @ts-ignore This has to be this way, otherwise it just does not work...
-// const isTesting = String(process.env.VITEST ? true : false);
-// console.log({ isDevelopment, isTesting });
-
-// const config: UserConfig = ;
-
 export default defineConfig({
+	// @ts-ignore For some reason, I can't get the type of 'test' to work:
 	test: {
 		dir: "../__tests__",
 		coverage: {

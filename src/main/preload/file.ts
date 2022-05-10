@@ -1,20 +1,20 @@
 import type { Path } from "@common/@types/typesAndEnums";
 
-import { join } from "path";
+import { join } from "node:path";
 import {
 	readFile as fsReadFile,
 	readdir as fsReadDir,
 	unlink,
-} from "fs/promises";
+} from "node:fs/promises";
 
 export async function getFullPathOfFilesForFilesInThisDirectory(
-	dir: Readonly<Path>,
+	dir: Readonly<Path>
 ): Promise<readonly Path[]> {
 	return (await readdir(dir)).map(filename => join(dir, filename));
 }
 
 export async function readFile(
-	path: Readonly<Path>,
+	path: Readonly<Path>
 ): Promise<Readonly<Buffer>> {
 	return await fsReadFile(path);
 }

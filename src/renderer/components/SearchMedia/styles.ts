@@ -5,7 +5,7 @@ import { styled, keyframes } from "@styles/global";
 export const Wrapper = styled("header", {
 	position: "relative",
 	display: "flex", // row,
-	justifyContent: "space-between !important",
+	justifyContent: "space-between",
 	alignItems: "center",
 
 	padding: "0 5%",
@@ -117,8 +117,17 @@ export const ReloadButton = styled("button", {
 	},
 });
 
-export const Title = styled("p", {
+export const Info = styled("div", {
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "flex-start",
+	alignItems: "flex-start",
+
+	size: "calc(100% - 5px)",
 	overflow: "hidden",
+});
+
+export const Title = styled("p", {
 	marginLeft: 5,
 
 	color: "$alternative-text",
@@ -148,36 +157,19 @@ export const Highlight = styled("span", {
 
 export const SearchMediaPopoverAnchor = styled(Anchor, {
 	position: "absolute",
-	minWidth: "100%",
-	left: "-25%",
-	top: 50,
+	left: "50%",
+	top: 30,
 });
 
-export const SearchResults = styled("ul", {
-	// boxSizing: "content-box", // padding and borders can add to the element actual rendered size
-	position: "relative",
-	display: "flex",
-	flexDirection: "column",
-	justifyContent: "center",
-	alignItems: "center",
-	size: "100%",
-
-	padding: 10,
-	gap: 10,
-
-	listStyle: "none",
-});
-
-export const Result = styled("li", {
+export const Result = styled("div", {
 	position: "relative",
 	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	justifyContent: "flex-start",
 	width: "100%",
 	height: 60,
 
 	border: "1px solid lightgray",
-	background: "$bg-popover",
+	background: "$bg-media",
 	cursor: "pointer",
 	borderRadius: 7,
 	padding: 7,
@@ -191,7 +183,6 @@ export const NothingFound = styled("div", {
 	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
-	height: 50,
 
 	color: "$deactivated-icon",
 	letterSpacing: "0.03rem",

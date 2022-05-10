@@ -1,24 +1,16 @@
-import { debug, enable } from "debug";
+import { debug } from "debug";
 
-const { trunc, floor } = Math;
-const { isNaN } = Number;
-
-export const isDevelopment = true;
-export const isTesting = false;
-// export const isDevelopment = VITE_IS_DEVELOPMENT === "true";
-// export const isTesting = VITE_IS_TESTING === "true";
-console.log({
-	isDevelopment,
-	isTesting,
-});
+// @ts-ignore This has to be like this
+export const isDevelopment = process.env.NODE_ENV === "development";
 
 export const capitalizedAppName = "Muse" as const;
 export const lowercaseAppName = "muse" as const;
 
 export const dbg = debug(lowercaseAppName);
+export const dbgTests = debug(`${lowercaseAppName}:tests`);
+export const dbgPlaylists = debug(`${lowercaseAppName}:playlists`);
 
-if (isDevelopment) enable(lowercaseAppName);
-dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
+dbg("\uD834\uDD60 Hello from the muse debug side! \uD834\uDD60");
 
 export const allowedMedias = Object.freeze(<const>[
 	"vorbis",
@@ -35,6 +27,9 @@ export const allowedMedias = Object.freeze(<const>[
 	"m4v",
 ]);
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
+
+const { trunc, floor } = Math;
+const { isNaN } = Number;
 
 export const formatDuration = (time: number | undefined) => {
 	if (!time || isNaN(time)) return "00:00";

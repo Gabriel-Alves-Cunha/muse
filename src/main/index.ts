@@ -1,8 +1,8 @@
 import type { DownloadInfo } from "@common/@types/typesAndEnums.js";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
-import { pathToFileURL } from "url";
-import { join } from "path";
+import { pathToFileURL } from "node:url";
+import { join } from "node:path";
 import {
 	BrowserWindow,
 	Notification,
@@ -14,7 +14,7 @@ import {
 	app,
 } from "electron";
 
-import { capitalizedAppName, isDevelopment } from "@common/utils";
+import { capitalizedAppName, dbg, isDevelopment } from "@common/utils";
 import { assertUnreachable } from "@utils/utils.js";
 import { logoPath } from "./utils.js";
 import {
@@ -63,7 +63,7 @@ async function createWindow() {
 					role: "reload",
 				},
 			],
-		}),
+		})
 	);
 	menu.append(
 		new MenuItem({
@@ -75,14 +75,14 @@ async function createWindow() {
 					role: "toggleDevTools",
 				},
 			],
-		}),
+		})
 	);
 	Menu.setApplicationMenu(menu);
 
 	const url = isDevelopment
 		? "http://localhost:3000"
 		: pathToFileURL(
-				join(__dirname, "vite-renderer-build", "index.html"),
+				join(__dirname, "vite-renderer-build", "index.html")
 		  ).toString();
 
 	await window.loadURL(url);
@@ -124,7 +124,7 @@ app
 				.then(name => console.log(`Added Extension: ${name}`))
 				// @ts-ignore - this is a workaround for a bug in the lib
 				.catch(err =>
-					console.error("An error occurred while installing extension: ", err),
+					console.error("An error occurred while installing extension: ", err)
 				);
 		}
 
@@ -166,12 +166,12 @@ app
 									// Send msg to ipcMain:
 									electronWindow?.webContents.send(
 										ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
-										downloadInfo,
+										downloadInfo
 									);
 
 									console.log(
 										"Clicked notification and sent data:",
-										downloadInfo,
+										downloadInfo
 									);
 								})
 								.show();
@@ -192,13 +192,13 @@ app
 ipcMain.on(
 	ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
 	(_e, downloadValues: DownloadInfo) => {
-		console.log("ipcMain received data from electronWindow:", downloadValues);
+		dbg("ipcMain received data from electronWindow:", downloadValues);
 
 		ipcMain.emit(
 			ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
-			downloadValues,
+			downloadValues
 		);
-	},
+	}
 );
 
 ipcMain.on(
@@ -208,7 +208,7 @@ ipcMain.on(
 		msg: Readonly<{
 			type: ElectronIpcMainProcessNotificationEnum;
 			msg?: string;
-		}>,
+		}>
 	) => {
 		switch (msg.type) {
 			case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
@@ -239,14 +239,14 @@ ipcMain.on(
 			default: {
 				console.error(
 					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
-					event,
+					event
 				);
 
 				assertUnreachable(msg.type);
 				break;
 			}
 		}
-	},
+	}
 );
 
 // Also defining it here with all types required so typescript doesn't complain...
@@ -255,11 +255,11 @@ type ClipboardExtended = Electron.Clipboard & {
 	stopWatching: () => ClipboardExtended;
 	off: <T>(
 		event: string,
-		listener?: (...args: T[]) => void,
+		listener?: (...args: T[]) => void
 	) => ClipboardExtended;
 	on: <T>(event: string, listener: (...args: T[]) => void) => ClipboardExtended;
 	once: <T>(
 		event: string,
-		listener: (...args: T[]) => void,
+		listener: (...args: T[]) => void
 	) => ClipboardExtended;
 };

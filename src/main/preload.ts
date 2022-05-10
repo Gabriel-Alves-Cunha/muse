@@ -63,12 +63,12 @@ ipcRenderer.on(
 		sendMsgToClient({
 			type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
 			downloadValues,
-		}),
+		})
 );
 
 // Handle messages from the renderer process:
 window.onmessage = async (
-	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>,
+	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>
 ) => {
 	if (event.data.source !== reactSource) return;
 
@@ -86,9 +86,8 @@ window.onmessage = async (
 
 			electronPort.onmessage = async ({ data }: { data: HandleDownload }) =>
 				await handleCreateOrCancelDownload({ ...data, electronPort });
-			electronPort.addEventListener("close", () =>
-				dbg("Closing ports (electronPort)."),
-			);
+
+			electronPort.addEventListener("close", handleClosePort);
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
@@ -103,9 +102,8 @@ window.onmessage = async (
 
 			electronPort.onmessage = ({ data }: { data: HandleConversion }) =>
 				handleCreateOrCancelConvert({ ...data, electronPort });
-			electronPort.addEventListener("close", () =>
-				dbg("Closing ports (electronPort)."),
-			);
+
+			electronPort.addEventListener("close", handleClosePort);
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
@@ -129,7 +127,10 @@ window.onmessage = async (
 		} // 3
 
 		case ReactToElectronMessageEnum.ERROR: {
-			console.error("@TODO: ERROR", msg.error);
+			console.error(
+				"@TODO: maybe do something with this error...?\n",
+				msg.error
+			);
 
 			break;
 		} // 4
@@ -139,7 +140,7 @@ window.onmessage = async (
 				`There is no method to handle this event.data: (${typeof event.data}) '`,
 				event.data,
 				"'\nEvent =",
-				event,
+				event
 			);
 
 			assertUnreachable(msg);
@@ -147,3 +148,5 @@ window.onmessage = async (
 		}
 	}
 };
+
+const handleClosePort = () => dbg("Closing ports (electronPort).");

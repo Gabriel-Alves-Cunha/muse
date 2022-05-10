@@ -66,7 +66,7 @@ export async function searchDirectoryResult() {
 	const ret = Object.freeze(fullPaths.flat());
 
 	const end = performance.now();
-	console.log(`%csearchDirectoryResult took: ${end - start}ms.`, "color:brown");
+	console.log(`%csearchDirectoryResult took: ${end - start} ms.`, "color:brown");
 
 	return ret;
 }

@@ -1,6 +1,5 @@
 import { persist } from "zustand/middleware";
 import create from "zustand";
-import merge from "deepmerge";
 
 import { assertUnreachable } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
@@ -57,9 +56,9 @@ export const usePlayOptions = create<PlayOptionsActions>()(
 			deserialize: playOptions => JSON.parse(playOptions),
 			partialize: ({ playOptions }) => ({ playOptions }),
 			merge: (persistedState, currentState) =>
-				merge(persistedState as Partial<PlayOptionsActions>, currentState),
-		},
-	),
+				Object.assign({}, persistedState, currentState),
+		}
+	)
 );
 
 export const { getState: getPlayOptions } = usePlayOptions;

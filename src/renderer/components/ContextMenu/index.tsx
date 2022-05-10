@@ -15,7 +15,7 @@ export enum ContentEnum {
 
 const { FULL_EXAMPLE, MAIN } = ContentEnum;
 
-export const ContextMenu = ({ children, content = FULL_EXAMPLE }: Props) => (
+export const ContextMenu = ({ children, content = MAIN }: Props) => (
 	<Box>
 		<Root>
 			<Trigger>{children}</Trigger>

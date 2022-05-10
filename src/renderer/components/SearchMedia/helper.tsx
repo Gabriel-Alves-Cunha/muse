@@ -26,16 +26,16 @@ import {
 	Tooltip,
 } from "@components";
 
-import { ImgWrapper, Info } from "../MediaListKind/styles";
+import { ImgWrapper } from "../MediaListKind/styles";
 import {
 	SearchMediaPopoverAnchor,
-	SearchResults,
 	NothingFound,
 	ReloadButton,
 	Highlight,
 	SubTitle,
 	Result,
 	Title,
+	Info,
 } from "./styles";
 
 export enum SearchStatus {
@@ -178,11 +178,11 @@ export const Results = () => {
 						Nothing was found for &quot;{searchTerm}&quot;
 					</NothingFound>
 				) : foundSomething ? (
-					<SearchResults>
+					<>
 						{results.map(media => (
 							<Row highlight={searchTerm} key={media.id} media={media} />
 						))}
-					</SearchResults>
+					</>
 				) : undefined}
 			</PopoverContent>
 		</PopoverRoot>

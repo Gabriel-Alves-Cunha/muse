@@ -152,13 +152,12 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 
 const seek = (e: SeekEvent, audio: Audio) => {
 	if (!audio || !audio.duration) return;
-	const duration = audio.duration;
 
 	const width = Number(
 		getComputedStyle(e.currentTarget).width.replace("px", "")
 	);
 	const clickX = e.nativeEvent.offsetX;
-	const desiredTime = (clickX / width) * duration;
+	const desiredTime = (clickX / width) * audio.duration;
 
 	audio.currentTime = desiredTime;
 };

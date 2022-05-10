@@ -1,4 +1,4 @@
-import { Arrow, Content } from "@radix-ui/react-popover";
+import { Content } from "@radix-ui/react-popover";
 
 import { styled, keyframes } from "@styles/global";
 
@@ -30,7 +30,7 @@ export const StyledContent = styled(Content, {
 	variants: {
 		size: {
 			nothingFoundForSearchMedia: {
-				height: 100,
+				height: 50,
 				width: 350,
 
 				overflow: "hidden",
@@ -42,27 +42,27 @@ export const StyledContent = styled(Content, {
 				overflow: "hidden",
 			},
 			searchMediaResults: {
-				height: 200,
+				height: 250,
 				width: 350,
 
-				overflow: "hidden",
+				overflow: "auto",
 			},
 			convertionsOrDownloads: {
 				height: 300,
 				width: 260,
 
-				overflow: "hidden",
+				overflow: "auto",
 			},
 		},
 	},
 
 	background: "$bg-popover",
 	borderRadius: 10,
-	padding: 20,
+	padding: 10,
 
 	border: "1px solid lightgrey",
 	boxShadow: "$popover",
-	gap: 16,
+	gap: 10,
 
 	"@media (prefers-reduced-motion: no-preference)": {
 		willChange: "transform, opacity",
@@ -79,7 +79,7 @@ export const StyledContent = styled(Content, {
 		},
 	},
 
-	p: {
+	"& > p": {
 		position: "relative",
 		top: "50%", // position the top  edge of the element at the middle of the parent
 		left: "50%", // position the left edge of the element at the middle of the parent
@@ -95,6 +95,7 @@ export const StyledContent = styled(Content, {
 
 	"&:focus": {
 		boxShadow: "$popover",
+		outline: "none",
 	},
 
 	/* width */
@@ -117,8 +118,4 @@ export const StyledContent = styled(Content, {
 	"&::-webkit-scrollbar-thumb:hover": {
 		background: "$scrollbar-thumb-hover",
 	},
-});
-
-export const StyledArrow = styled(Arrow, {
-	fill: "$bg-popover",
 });

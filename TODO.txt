@@ -1,6 +1,5 @@
 * TODO: impl select on media
-* TODO: use progress from radix
-* TODO: see about not using deepmerge
+* TODO: impl dark mode
 
 NOTES:
 

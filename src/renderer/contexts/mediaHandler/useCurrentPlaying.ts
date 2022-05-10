@@ -4,7 +4,6 @@ import type { MediaID } from "@common/@types/typesAndEnums";
 
 import { persist, subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
-import merge from "deepmerge";
 
 import { assertUnreachable, getRandomInt } from "@utils/utils";
 import { formatDuration } from "@common/utils";
@@ -78,14 +77,14 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 						case CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST: {
 							dbg(
 								"CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST\naction =",
-								action,
+								action
 							);
 							const currMediaID = get().currentPlaying.mediaID;
 							const { playlistName } = action;
 
 							if (!currMediaID) {
 								console.error(
-									"A media needs to be currently selected to play a previous media!",
+									"A media needs to be currently selected to play a previous media!"
 								);
 								break;
 							}
@@ -100,7 +99,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 							if (currMediaIDIndex === -1) {
 								console.error(
-									"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!",
+									"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!"
 								);
 								break;
 							}
@@ -129,7 +128,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 						case CurrentPlayingEnum.TOGGLE_PLAY_PAUSE: {
 							(async () => {
 								const audio = document.getElementById(
-									"audio",
+									"audio"
 								) as HTMLAudioElement;
 								const isPaused = audio.paused;
 
@@ -169,7 +168,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 							}
 
 							const audio = document.getElementById(
-								"audio",
+								"audio"
 							) as HTMLAudioElement;
 							audio.pause();
 
@@ -186,14 +185,14 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 						case CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST: {
 							dbg(
 								"CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST\naction =",
-								action,
+								action
 							);
 							const prevMediaID = previousPlaying.mediaID;
 							const { playlistName } = action;
 
 							if (!prevMediaID) {
 								console.error(
-									"A media needs to be currently selected to play a next media!",
+									"A media needs to be currently selected to play a next media!"
 								);
 								break;
 							}
@@ -209,7 +208,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 									if (!randomMedia) {
 										console.error(
 											"There should be a random media selected, but there isn't!\nrandomMedia =",
-											randomMedia,
+											randomMedia
 										);
 										break;
 									}
@@ -231,7 +230,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 									});
 								} else {
 									const prevMediaIDIndex = mainList.findIndex(
-										m => m.id === prevMediaID,
+										m => m.id === prevMediaID
 									);
 
 									const nextMediaFromTheSameList =
@@ -282,7 +281,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 									if (!randomMedia) {
 										console.error(
 											"There should be a random media selected, but there isn't!\nrandomMedia =",
-											randomMedia,
+											randomMedia
 										);
 										break;
 									}
@@ -305,7 +304,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 								} else {
 									const prevMediaID = previousPlaying.mediaID;
 									const prevMediaIDIndex = list.findIndex(
-										id => id === prevMediaID,
+										id => id === prevMediaID
 									);
 
 									const nextMediaFromTheSameList = list[prevMediaIDIndex + 1];
@@ -363,10 +362,10 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 				serialize: ({ state }) => JSON.stringify(state.currentPlaying),
 				deserialize: currentPlaying => JSON.parse(currentPlaying),
 				merge: (persistedState, currentState) =>
-					merge(persistedState as Partial<CurrentPlayingAction>, currentState),
-			},
-		),
-	),
+					Object.assign({}, persistedState, currentState),
+			}
+		)
+	)
 );
 
 export const { getState: getCurrentPlaying } = useCurrentPlaying;
@@ -394,7 +393,7 @@ if (globalThis.window)
 				const end = performance.now();
 				console.log(
 					`%cReading <audio> file took: ${end - start} ms.`,
-					"color:brown",
+					"color:brown"
 				);
 
 				const audio = document.getElementById("audio") as HTMLAudioElement;
@@ -411,7 +410,7 @@ if (globalThis.window)
 
 					if (currentTime > 30) {
 						console.log(
-							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`,
+							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`
 						);
 						audio.currentTime = currentTime;
 					}
@@ -425,7 +424,7 @@ if (globalThis.window)
 				audio.addEventListener("stalled", e => {
 					console.log(
 						"Audio is stalled (Fires when the browser is trying to get media data, but data is not available):",
-						e,
+						e
 					);
 				});
 				audio.addEventListener("securitypolicyviolation", e => {
@@ -446,7 +445,7 @@ if (globalThis.window)
 			}, 150);
 
 			prevMediaTimer = mediaTimer;
-		},
+		}
 	);
 
 export type currentPlayingReducer_Action =

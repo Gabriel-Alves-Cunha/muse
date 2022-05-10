@@ -158,7 +158,7 @@ window.onmessage = async (
 
 			if (mediaIndex === -1) {
 				console.warn(
-					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media.`,
+					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`,
 				);
 				await searchLocalComputerForMedias(true);
 				break;

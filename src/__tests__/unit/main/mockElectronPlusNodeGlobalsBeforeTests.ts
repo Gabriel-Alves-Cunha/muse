@@ -6,6 +6,13 @@ export const mockElectronPlusNodeGlobalsBeforeTests = () => {
 		postMessage: vi
 			.fn()
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			.mockImplementation((...args: any[]) => console.log({ args })),
+			.mockImplementation(function () {
+				console.log(
+					"%cwindow.postMessage arguments =",
+					"color:blue",
+					// eslint-disable-next-line prefer-rest-params
+					JSON.stringify(arguments, null, 2)
+				);
+			}),
 	});
 };

@@ -40,7 +40,7 @@ export const StyledOverlay = styled(Overlay, {
 	zIndex: 100,
 
 	"@media (prefers-reduced-motion: no-preference)": {
-		animation: `${overlayShow} .15ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+		animation: `${overlayShow} 25ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
 });
 

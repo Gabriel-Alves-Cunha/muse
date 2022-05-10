@@ -3,7 +3,7 @@ import type { VariantProps } from "@stitches/react";
 import { forwardRef, type Ref, type ReactNode } from "react";
 import { PopperContentProps, Root } from "@radix-ui/react-popover";
 
-import { StyledArrow, StyledContent } from "./styles";
+import { StyledContent } from "./styles";
 
 export const PopoverRoot = Root;
 
@@ -24,8 +24,6 @@ export const PopoverContent = forwardRef(
 	({ children, size, ...props }: Props, forwardedRef: Ref<HTMLDivElement>) => (
 		<StyledContent size={size} sideOffset={5} {...props} ref={forwardedRef}>
 			{children}
-
-			<StyledArrow />
 		</StyledContent>
 	)
 );

@@ -4,13 +4,12 @@ import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
-import merge from "deepmerge";
 
 import { constRefToEmptyArray, push, remove, replace } from "@utils/array";
 import { assertUnreachable } from "@utils/utils";
+import { dbgPlaylists } from "@common/utils";
 import { keyPrefix } from "@utils/app";
 import { hash } from "@common/hash";
-import { dbg } from "@common/utils";
 import {
 	returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia,
 	searchDirectoryResult,
@@ -41,7 +40,7 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 type UsePlaylistsActions = Readonly<{
 	searchForMediaFromList: (
 		searchTerm_: Readonly<string>,
-		fromList: Readonly<Playlist["name"]>,
+		fromList: Readonly<Playlist["name"]>
 	) => readonly Media[];
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
@@ -68,7 +67,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 			},
 			searchForMediaFromList: (
 				searchTerm_: Readonly<string>,
-				fromList: Playlist["name"],
+				fromList: Playlist["name"]
 			) => {
 				const searchTerm = searchTerm_.toLowerCase();
 				const mainList = get().mainList;
@@ -89,7 +88,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 					`%cThe search for "${searchTerm}" from list "${fromList}" took: ${
 						end - start
 					} ms.`,
-					"color:brown",
+					"color:brown"
 				);
 
 				return results;
@@ -108,12 +107,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								const newHistory =
 									returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
 										prevHistory,
-										action.mediaID,
+										action.mediaID
 									);
 
-								dbg(
+								dbgPlaylists(
 									"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
-									newHistory,
+									newHistory
 								);
 
 								if (newHistory === prevHistory) break;
@@ -123,8 +122,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.CLEAN: {
-								dbg(
-									"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. newHistory = []",
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. newHistory = []"
 								);
 
 								get().updatePlaylists([
@@ -148,9 +147,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							case PlaylistActions.ADD_ONE_MEDIA: {
 								const newFavorites = push(prevFavorites, action.mediaID);
 
-								dbg(
+								dbgPlaylists(
 									"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. newFavorites =",
-									newFavorites,
+									newFavorites
 								);
 
 								get().updatePlaylists([
@@ -169,9 +168,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								const newFavorites = remove(prevFavorites, index);
 
-								dbg(
+								dbgPlaylists(
 									"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. newFavorites =",
-									newFavorites,
+									newFavorites
 								);
 
 								get().updatePlaylists([
@@ -181,8 +180,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.CLEAN: {
-								dbg(
-									"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. newfavorites = []",
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. newfavorites = []"
 								);
 
 								get().updatePlaylists([
@@ -203,7 +202,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						const mainList = get().mainList;
 
 						const updateSortedListsAndFinish = (
-							newMainList: readonly Media[],
+							newMainList: readonly Media[]
 						) => {
 							get().updatePlaylists([
 								{ list: sortByDate(newMainList), name: SORTED_BY_DATE },
@@ -216,16 +215,16 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							case PlaylistActions.ADD_ONE_MEDIA: {
 								if (mainList.find(m => m.path === action.media.path)) {
 									console.error(
-										`A media with path "${action.media.path}" already exists. Therefore, I'm not gonna add it.`,
+										`A media with path "${action.media.path}" already exists. Therefore, I'm not gonna add it.`
 									);
 									break;
 								}
 
 								const newMainList = push(mainList, action.media);
 
-								dbg(
+								dbgPlaylists(
 									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
-									newMainList,
+									newMainList
 								);
 
 								updateSortedListsAndFinish(newMainList);
@@ -234,12 +233,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 							case PlaylistActions.REMOVE_ONE_MEDIA_BY_ID: {
 								const newMainList = mainList.filter(
-									m => m.id !== action.mediaID,
+									m => m.id !== action.mediaID
 								);
 
-								dbg(
+								dbgPlaylists(
 									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA' (yet to be sorted). newMainList =",
-									newMainList,
+									newMainList
 								);
 
 								updateSortedListsAndFinish(newMainList);
@@ -249,9 +248,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							case PlaylistActions.REPLACE_ENTIRE_LIST: {
 								const newMainList = action.list;
 
-								dbg(
+								dbgPlaylists(
 									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
-									newMainList,
+									newMainList
 								);
 
 								updateSortedListsAndFinish(newMainList);
@@ -260,12 +259,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 							case PlaylistActions.REFRESH_ONE_MEDIA_BY_ID: {
 								const oldMediaIndex = mainList.findIndex(
-									m => m.id === action.media.id,
+									m => m.id === action.media.id
 								);
 
 								if (oldMediaIndex === -1) {
 									console.error(
-										`I did not find a media with id = "${action.media.id}" when calling 'REFRESH_ONE_MEDIA_BY_ID'!`,
+										`I did not find a media with id = "${action.media.id}" when calling 'REFRESH_ONE_MEDIA_BY_ID'!`
 									);
 									break;
 								}
@@ -278,14 +277,14 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								const newMainList = replace(
 									mainList,
 									oldMediaIndex,
-									refreshedMedia,
+									refreshedMedia
 								);
 
-								dbg(
+								dbgPlaylists(
 									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
 									refreshedMedia,
 									"\nnewMainList =",
-									newMainList,
+									newMainList
 								);
 
 								updateSortedListsAndFinish(newMainList);
@@ -293,8 +292,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.CLEAN: {
-								dbg(
-									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []",
+								dbgPlaylists(
+									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []"
 								);
 
 								updateSortedListsAndFinish(constRefToEmptyArray);
@@ -321,18 +320,18 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 					const isThereNewMedia = paths.length !== mainListLength;
 					console.log(
 						`%cmainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
-						"color:blue",
+						"color:blue"
 					);
 					return isThereNewMedia;
 				};
 
 				try {
 					const paths = getAllowedMedias(await searchDirectoryResult());
-					dbg("Finished searching. Paths =", paths);
+					dbgPlaylists("Finished searching. Paths =", paths);
 
 					if (force || isThereNewMedia(paths)) {
 						const newMainList = await transformPathsToMedias(paths);
-						dbg("Finished searching. Medias =", newMainList);
+						dbgPlaylists("Finished searching. Medias =", newMainList);
 
 						get().setPlaylists({
 							whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
@@ -357,9 +356,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 				for (const playlist of playlists) newPlaylistsContainer.push(playlist);
 
-				dbg(
+				dbgPlaylists(
 					"setPlaylists on 'createPlaylist'. New playlist =",
-					newPlaylistsContainer,
+					newPlaylistsContainer
 				);
 
 				set({ playlists: Object.freeze(newPlaylistsContainer) });
@@ -371,7 +370,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 				let foundOneAlreadyCreated = true;
 				for (const newPlaylist of newPlaylists)
 					foundOneAlreadyCreated = oldPlaylistsContainer.some(
-						p => p.name === newPlaylist.name,
+						p => p.name === newPlaylist.name
 					);
 
 				if (!foundOneAlreadyCreated)
@@ -379,7 +378,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						"One of the playlists I got was not already created. I'm not made to handle it's creation, only to update; to create, use the function `createPlaylist`.\nPlaylists received =",
 						newPlaylists,
 						"\nExisting playlists =",
-						oldPlaylistsContainer,
+						oldPlaylistsContainer
 					);
 
 				const updatedPlaylistsContainer = [...oldPlaylistsContainer];
@@ -388,9 +387,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						if (oldPlaylist.name === newPlaylist.name)
 							updatedPlaylistsContainer[index] = newPlaylist;
 
-				dbg(
+				dbgPlaylists(
 					"setPlaylists on 'updatePlaylists'. New playlist =",
-					updatedPlaylistsContainer,
+					updatedPlaylistsContainer
 				);
 
 				set({ playlists: Object.freeze(updatedPlaylistsContainer) });
@@ -401,11 +400,11 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 			partialize: ({ mainList, playlists }) => ({ mainList, playlists }),
 			deserialize: object => JSON.parse(object),
 			merge: (persistedState, currentState) =>
-				merge(persistedState as Partial<UsePlaylistsActions>, currentState),
+				Object.assign({}, persistedState, currentState),
 			serialize: ({ state: { playlists, mainList } }) =>
 				JSON.stringify({ playlists, mainList }),
-		},
-	),
+		}
+	)
 );
 
 export const { getState: getPlaylists } = usePlaylists;

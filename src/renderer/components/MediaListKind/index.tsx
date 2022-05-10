@@ -2,8 +2,8 @@ import type { Media, MediaID, Mutable } from "@common/@types/typesAndEnums";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { Dialog, Portal } from "@radix-ui/react-dialog";
 import { ErrorBoundary } from "react-error-boundary";
+import { Dialog } from "@radix-ui/react-dialog";
 
 import { memo, useMemo } from "react";
 import { Virtuoso } from "react-virtuoso";
@@ -121,12 +121,9 @@ const Row = memo(
 					</TriggerOptions>
 				</Tooltip>
 
-				{/* TODO: Test this without Portal  */}
-				{/* <Portal> */}
 				<StyledOverlay>
 					<MediaOptionsModal media={media} />
 				</StyledOverlay>
-				{/* </Portal> */}
 			</Dialog>
 		</RowWrapper>
 	),
