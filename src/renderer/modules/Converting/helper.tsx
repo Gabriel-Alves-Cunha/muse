@@ -1,3 +1,4 @@
+import type { State, StateCreator } from "zustand";
 import type { Path, ConvertInfo } from "@common/@types/typesAndEnums";
 import type { ProgressProps } from "@components/Progress";
 
@@ -14,6 +15,48 @@ import { Tooltip } from "@components";
 
 import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
+
+/**
+ * I'm doing all this turnaround because for some reason
+ * when I set `useConvertInfoList` to an empty array, it
+ * changes it to an Object... I don't know why, maybe it
+ * has something to do with the fact that the `set` fn
+ * changes it partialy, so much so that the fix is just
+ * `set(a[0], true);`, the `true` is to replace it instead
+ * of updating.
+ */
+type BugFixImpl = <T extends State>(
+	f: PopArgument<StateCreator<T, [], []>>,
+	name?: string
+) => PopArgument<StateCreator<T, [], []>>;
+
+type PopArgument<T extends (...a: never[]) => unknown> = T extends (
+	...a: [...infer A, infer _]
+) => infer R
+	? (...a: A) => R
+	: never;
+
+const fixBugThatSetsItToAnObject: BugFixImpl =
+	(fn /*, name */) => (set, get, store) => {
+		const loggedSet: typeof set = (...a) => {
+			// console.log("previous:", ...(name ? [`${name}:`] : []), get());
+			// console.log(a);
+			// This true is to replace it instead of updating:
+			set(a[0], true);
+			// console.log("now:", ...(name ? [`${name}:`] : []), ...a, get());
+			// console.log("isArray:", Array.isArray(get()));
+		};
+
+		store.setState = loggedSet;
+
+		return fn(loggedSet, get, store);
+	};
+
+export const useConvertInfoList = create<ConvertInfoList>(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	fixBugThatSetsItToAnObject((_set, _get, _store) => [])
+);
+export const { setState: setConvertInfoList } = useConvertInfoList;
 
 export const Popup = () => {
 	const convertingList = useConvertingList();
@@ -241,3 +284,5 @@ type ConvertList = readonly MediaBeingConverted[];
 type ConvertBoxProps = Readonly<{
 	mediaBeingConverted: MediaBeingConverted;
 }>;
+
+type ConvertInfoList = readonly ConvertInfo[];

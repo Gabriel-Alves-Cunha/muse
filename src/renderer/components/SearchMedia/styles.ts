@@ -1,4 +1,4 @@
-import { Anchor } from "@radix-ui/react-popover";
+import { Anchor, Trigger } from "@radix-ui/react-popover";
 
 import { styled, keyframes } from "@styles/global";
 
@@ -190,4 +190,8 @@ export const NothingFound = styled("div", {
 	textAlign: "center",
 	fontSize: "1.05rem",
 	fontWeight: 500,
+});
+
+export const HiddenPopoverTrigger = styled(Trigger, {
+	display: "none",
 });

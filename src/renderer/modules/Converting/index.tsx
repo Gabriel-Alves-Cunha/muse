@@ -1,61 +1,22 @@
-import type { State, StateCreator } from "zustand";
-import type { ConvertInfo } from "@common/@types/typesAndEnums";
-
 import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
-import create from "zustand";
 
-import { useConvertingList, createNewConvert, Popup } from "./helper";
 import { PopoverRoot, PopoverContent, Tooltip } from "@components";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 // This `constRefToEmptyArray` prevents an infinite loop:
 import { constRefToEmptyArray } from "@utils/array";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
+import {
+	useConvertInfoList,
+	setConvertInfoList,
+	useConvertingList,
+	createNewConvert,
+	Popup,
+} from "./helper";
 
 import { StyledPopoverTrigger, Wrapper } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
-
-/**
- * I'm doing all this turnaround because for some reason
- * when I set `useConvertInfoList` to an empty array, it
- * changes it to an Object... I don't know why, maybe it
- * has something to do with the fact that the `set` fn
- * changes it partialy, so much so that the fix is just
- * `set(a[0], true);`, the `true` is to replace it instead
- * of updating.
- */
-type BugFixImpl = <T extends State>(
-	f: PopArgument<StateCreator<T, [], []>>,
-	name?: string
-) => PopArgument<StateCreator<T, [], []>>;
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-	...a: [...infer A, infer _]
-) => infer R
-	? (...a: A) => R
-	: never;
-
-const fixBugThatSetsItToAnObject: BugFixImpl =
-	(fn /*, name */) => (set, get, store) => {
-		const loggedSet: typeof set = (...a) => {
-			// console.log("previous:", ...(name ? [`${name}:`] : []), get());
-			// console.log(a);
-			set(a[0], true);
-			// console.log("now:", ...(name ? [`${name}:`] : []), ...a, get());
-			// console.log("isArray:", Array.isArray(get()));
-		};
-
-		store.setState = loggedSet;
-
-		return fn(loggedSet, get, store);
-	};
-
-export const useConvertInfoList = create<ConvertInfoList>(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	fixBugThatSetsItToAnObject((_set, _get, _store) => [])
-);
-export const { setState: setConvertInfoList } = useConvertInfoList;
 
 export function Converting() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -123,8 +84,6 @@ export function Converting() {
 		</Wrapper>
 	);
 }
-
-type ConvertInfoList = readonly ConvertInfo[];
 
 Converting.whyDidYouRender = {
 	customName: "Converting",

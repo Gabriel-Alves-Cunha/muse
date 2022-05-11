@@ -216,7 +216,7 @@ ipcMain.on(
 				break;
 			}
 
-			case ElectronIpcMainProcessNotificationEnum.MAXIMIZE: {
+			case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
 				const focusedWindow = BrowserWindow.getFocusedWindow();
 				if (!focusedWindow) break;
 

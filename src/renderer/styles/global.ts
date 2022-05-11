@@ -76,32 +76,33 @@ export const { styled, globalCss, keyframes, createTheme } = createStitches({
 export const darkTheme = createTheme({
 	colors: {
 		"scrollbar-thumb-hover": "#555",
-		"scrollbar-thumb": "#888",
-		scrollbar: "#f1f1f1",
+		"scrollbar-thumb": "#f1f1f1",
+		scrollbar: "#888",
 
-		"linear-gradient-1": "#8e2de2",
-		"linear-gradient-2": "#4a00e0",
+		"lingrad-1": "#8e2de2",
+		"lingrad-2": "#4a00e0",
 
-		"media-player-icons": "#0C0910",
-		"deactivated-icon": "dimgray",
-		"active-icon": "#f1f0ea",
+		"media-player-icons": "#f3f3ee",
+		"deactivated-icon": "#6272a4",
+		"active-icon": "#5747a6",
 
 		"alternative-text": "#ccb69b",
-		"gray-text": "#a8a8a8",
-		text: "#e0ddcf",
+		"gray-text": "#3f4764",
+		text: "#f6f6f6",
 
 		"bg-tooltip": "#efece6",
-		"bg-popover": "white",
-		"bg-main": "#191716",
+		"bg-popover": "#182825",
+		"bg-navbar": "#343746",
+		"bg-main": "#182825",
 		"bg-dialog": "white",
 		"bg-media": "white",
 
+		"icon-button-hovered": "#31324190",
 		"icon-button-2": "#88888880",
 		"button-hovered": "#dbdadc",
-		"icon-button": "#dbdadc80",
 
-		"accent-light": "#574f82",
-		accent: "#550c18",
+		"accent-light": "#D4CDC4",
+		accent: "#6B6D76",
 
 		"ctx-menu-item-text-disabled": "#d3d3d5",
 		"ctx-menu-item-bg-focus": "#6c56d0",
@@ -141,21 +142,22 @@ export const lightTheme = createTheme({
 
 		"media-player-icons": "white",
 		"deactivated-icon": "dimgray",
-		"active-icon": "#0C0910",
+		"active-icon": "#6c56d0",
 
 		"alternative-text": "#0D1F2D",
 		"gray-text": "#a8a8a8",
 		text: "#0C0910",
 
 		"bg-tooltip": "#f7f7f7",
-		"bg-popover": "#efece6",
+		"bg-popover": "#FAFAC6",
+		"bg-navbar": "#f9f6f5",
 		"bg-main": "#f9f6f5",
 		"bg-dialog": "white",
 		"bg-media": "white",
 
+		"icon-button-hovered": "#E5E8EC40",
 		"icon-button-2": "#88888830",
 		"button-hovered": "#dbdadc",
-		"icon-button": "#E5E8EC40",
 
 		"accent-light": "#9381FF",
 		accent: "#9882AC",

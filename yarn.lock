@@ -926,10 +926,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.27.tgz#5da19383bdbeda99bc0d09cfbb88cab7297ebc51"
   integrity sha512-C1pD3kgLoZ56Uuy5lhfOxie4aZlA3UMGLX9rXteq4WitEZH6Rl80mwactt9QG0w0gLFlN/kLBTFnGXtDVWvWQw==
 
-"@types/node@^17.0.31":
-  version "17.0.31"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.31.tgz#a5bb84ecfa27eec5e1c802c6bbf8139bdb163a5d"
-  integrity sha512-AR0x5HbXGqkEx9CadRH3EBYx/VkiUgZIhP4wvPn/+5KIsgpNoyFaRlVe0Zlx9gRtg8fA06a9tskE2MSN7TcG4Q==
+"@types/node@^17.0.32":
+  version "17.0.32"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.32.tgz#51d59d7a90ef2d0ae961791e0900cad2393a0149"
+  integrity sha512-eAIcfAvhf/BkHcf4pkLJ7ECpBAhh9kcxRBpip9cTiO+hf+aJrsxYxBeS6OXvOd9WqNAJmavXVpZvY1rBjNsXmw==
 
 "@types/plist@^3.0.1":
   version "3.0.2"
@@ -1097,10 +1097,10 @@
     react-refresh "^0.13.0"
     resolve "^1.22.0"
 
-"@vitest/ui@^0.12.2":
-  version "0.12.2"
-  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.12.2.tgz#d328fdaa91d61e4440cb10ced5c6a794e79a9657"
-  integrity sha512-XTDCxesb+dZHjv3VRAQdLwlYkmVPyD68ZDFFwo3eyxLfFSObCxwOnrwNcfMNawBCUYpkxAuNT0O9/qj+LqGXaQ==
+"@vitest/ui@^0.12.4":
+  version "0.12.4"
+  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.12.4.tgz#2ed1caafb7ee9ffc829bfc4a19277282ce3388f3"
+  integrity sha512-ARXOOe3Mo3qhyWV7y6Nbi+jyN5Va4RtQkmoTYqxiEtG6V/3Sahg5BIK91VtmkruQuwXvCUwfDzimKkRwv7KjqQ==
   dependencies:
     sirv "^2.0.2"
 
@@ -4512,10 +4512,10 @@ vite@^2.9.8:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.12.2:
-  version "0.12.2"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.12.2.tgz#64208e25a3729cd8b05902e493ec013e4dde71fd"
-  integrity sha512-olNsbdqYEPsAXbMe9Rgg9X8bCWO7+wn+AvoRqNmCOze32b9qQ+FhU1jO5H6Z6AxnTWGOGqoLSrXBea73xdOo1A==
+vitest@^0.12.4:
+  version "0.12.4"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.12.4.tgz#de1e3180bd9af97e87564482d347dd7ac714ca8d"
+  integrity sha512-EDxdhlAt6vcu6y4VouAI60z78iCAVFnfBL4VlSQVQnGmOk5altOtIKvp3xfZ+cfo4iVHgqq1QNyf5qOFiL4leg==
   dependencies:
     "@types/chai" "^4.3.1"
     "@types/chai-subset" "^1.3.3"

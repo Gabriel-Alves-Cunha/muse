@@ -30,10 +30,11 @@ export const StyledContent = styled(Content, {
 	variants: {
 		size: {
 			nothingFoundForSearchMedia: {
-				height: 50,
+				maxHeight: 100,
+				minHeight: 50,
 				width: 350,
 
-				overflow: "hidden",
+				overflow: "auto",
 			},
 			nothingFoundForConvertionsOrDownloads: {
 				height: 100,

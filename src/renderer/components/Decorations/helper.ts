@@ -4,7 +4,7 @@ const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
 export const toggleMaximize = () =>
-	notify({ type: ElectronIpcMainProcessNotificationEnum.MAXIMIZE });
+	notify({ type: ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE });
 export const minimizeWindow = () =>
 	notify({ type: ElectronIpcMainProcessNotificationEnum.MINIMIZE });
 export const closeWindow = () =>

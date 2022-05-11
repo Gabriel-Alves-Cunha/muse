@@ -1,7 +1,7 @@
 import type { MediaListKindProps } from "@components/MediaListKind";
 import type { Media, MediaID } from "@common/@types/typesAndEnums";
 
-import { useEffect, useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { FiTrash as Clean } from "react-icons/fi";
 import {
 	MdMusicNote as MusicNote,
@@ -10,6 +10,7 @@ import {
 import create from "zustand";
 
 import { constRefToEmptyArray } from "@utils/array";
+import { useOnClickOutside } from "@hooks";
 import {
 	searchLocalComputerForMedias,
 	searchForMediaFromList,
@@ -89,8 +90,8 @@ const reload = async () => {
 	setSearcher({ searchStatus: DOING_NOTHING });
 };
 
-export const setSearchTerm = ({ target: { value } }: InputChange) =>
-	setSearcher({ searchTerm: value.toLowerCase() });
+export const setSearchTerm = (e: InputChange) =>
+	setSearcher({ searchTerm: e.target.value.toLowerCase() });
 
 const playMedia = (mediaID: MediaID) => {
 	const { playlistName } = useSearcher.getState();
@@ -129,23 +130,29 @@ const Row = ({ highlight, media }: RowProps) => {
 
 export const Input = () => {
 	const { searchTerm, playlistName } = useSearcher();
+	const inputRef = useRef<HTMLInputElement>(null);
 	const [, startTransition] = useTransition();
 
+	useOnClickOutside(inputRef, () => setSearcher(defaultSearcher));
+
 	useEffect(() => {
-		setSearcher({ results: constRefToEmptyArray });
+		setSearcher({
+			results: constRefToEmptyArray,
+			searchStatus: SEARCHING,
+		});
 
 		if (searchTerm.length < 2) return;
-
-		setSearcher({ searchStatus: SEARCHING });
 
 		startTransition(() => {
 			const results = searchForMediaFromList(searchTerm, playlistName);
 			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
 			setSearcher({ searchStatus, results });
+
+			// Doing this to keep focus on it...
+			setTimeout(() => inputRef.current?.focus(), 0);
 		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchTerm]);
+	}, [playlistName, searchTerm]);
 
 	return (
 		<input
@@ -154,6 +161,8 @@ export const Input = () => {
 			value={searchTerm}
 			spellCheck="false"
 			autoCorrect="off"
+			ref={inputRef}
+			type="text"
 		/>
 	);
 };
@@ -162,7 +171,7 @@ export const Results = () => {
 	const { searchStatus, searchTerm, results } = useSearcher();
 	const foundSomething = searchStatus === FOUND_SOMETHING;
 	const nothingFound = searchStatus === NOTHING_FOUND;
-	const shouldOpen = nothingFound || foundSomething;
+	const shouldOpen = foundSomething || nothingFound;
 
 	return (
 		<PopoverRoot open={shouldOpen}>

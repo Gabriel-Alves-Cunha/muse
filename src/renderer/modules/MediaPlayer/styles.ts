@@ -45,7 +45,7 @@ export const Album = styled("span", {
 	fontFamily: "$secondary",
 	fontSize: "1rem",
 	fontWeight: 500,
-	color: "white",
+	color: "$text",
 });
 
 /** You need to set the width! */
@@ -55,7 +55,7 @@ export const IconButton = styled("button", {
 	justifyContent: "center",
 	alignItems: "center",
 
-	backgroundColor: "transparent",
+	background: "transparent",
 	borderRadius: "50%",
 	cursor: "pointer",
 	border: "none",
@@ -64,7 +64,7 @@ export const IconButton = styled("button", {
 
 	"&:hover": {
 		transition: "$bgc",
-		backgroundColor: "$icon-button",
+		background: "$icon-button-hovered",
 	},
 
 	// Hack to make the height the same size as the width:

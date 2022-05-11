@@ -3,7 +3,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { faker } from "@faker-js/faker";
 
-import { numberOfMedias, testList } from "./getFakeTestList";
+import { numberOfMedias, testList } from "./fakeTestList";
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 
 mockGlobalsBeforeTests();

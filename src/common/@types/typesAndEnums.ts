@@ -1,4 +1,3 @@
-import type { ExtensionToBeConvertedTo } from "./electron-window";
 import type { AllowedMedias } from "@common/utils";
 import type { PrettyBytes } from "@common/prettyBytes";
 
@@ -38,7 +37,7 @@ export type DownloadInfo = Readonly<{
 }>;
 
 export type ConvertInfo = Readonly<{
-	toExtension: ExtensionToBeConvertedTo;
+	toExtension: AllowedMedias;
 	canStartConvert: boolean;
 	path: Path;
 }>;

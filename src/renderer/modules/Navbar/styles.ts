@@ -10,7 +10,7 @@ export const Nav = styled("nav", {
 	alignItems: "center",
 
 	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
-	backgroundColor: "$bg-main",
+	background: "$bg-navbar",
 	width: 65,
 
 	"& > :first-child": {
@@ -26,26 +26,31 @@ export const Buttons = styled("div", {
 	flexDirection: "column",
 	justifyContent: "center",
 	alignItems: "center",
-
 	width: "100%",
+
+	transition: "$bgc",
+
+	"&:hover": {
+		transition: "$bgc",
+		background: "$icon-button-hovered",
+	},
 });
 
 export const ScaleUpIconButton = styled("button", {
 	display: "flex", // row,
 	justifyContent: "center",
 	alignItems: "center",
-	width: "80%",
-	height: 45,
+	size: 45,
 
-	backgroundColor: "transparent",
+	background: "transparent",
 	cursor: "pointer",
+	border: "none",
 
 	color: "$deactivated-icon",
 	fontSize: "1rem",
 
 	willChange: "transform",
 	transition: "$scale",
-	border: "none",
 
 	"&:hover": {
 		transition: "$scale",
@@ -54,7 +59,7 @@ export const ScaleUpIconButton = styled("button", {
 	},
 
 	"&.active": {
-		color: "$lingrad-2",
+		color: "$active-icon",
 	},
 });
 

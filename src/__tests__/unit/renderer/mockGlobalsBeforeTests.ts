@@ -69,7 +69,7 @@ export const mockGlobalsBeforeTests = () => {
 	vi.stubGlobal("document", {
 		getElementById: vi.fn().mockImplementation(
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			(_elementId: string) => ({ loop: true } as HTMLAudioElement),
+			(_elementId: string) => ({ loop: true } as HTMLAudioElement)
 		),
 	});
 };

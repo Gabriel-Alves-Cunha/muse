@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
-import { testList } from "./getFakeTestList";
+import { testList } from "./fakeTestList";
 
 mockGlobalsBeforeTests();
 

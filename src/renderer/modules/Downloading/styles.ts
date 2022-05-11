@@ -12,13 +12,16 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-
-	backgroundColor: "transparent",
-	cursor: "pointer",
-	border: "none",
 	size: 40,
 
+	background: "transparent",
+	cursor: "pointer",
+	border: "none",
+
 	color: "$deactivated-icon",
+	fontSize: "1rem",
+
+	willChange: "transform",
 	transition: "$scale",
 
 	"&:hover": {
@@ -40,7 +43,6 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			position: "absolute",
 			boxSizing: "content-box",
 			width: "100%",
-			// transform: translate(-50%, -50%);
 			right: -5,
 			size: 16,
 			top: 0,

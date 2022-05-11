@@ -3,14 +3,14 @@ import type { Path } from "@common/@types/typesAndEnums";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { setConvertInfoList } from "@modules/Converting";
+import { setConvertInfoList } from "@modules/Converting/helper";
 import { MainArea } from "@components";
 
 import { BorderedButton } from "./styles";
 
 export function Convert() {
 	const [selectedMediasPath, setSelectedMediasPath] = useState<readonly Path[]>(
-		[],
+		[]
 	);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
