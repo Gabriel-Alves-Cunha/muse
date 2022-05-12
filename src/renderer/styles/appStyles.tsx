@@ -9,7 +9,7 @@ export const Content = styled("div", {
 	`,
 
 	marginTop: DECORATIONS_HEADER_HEIGHT,
-	backgroundColor: "$bg-main",
+	background: "$bg-main",
 
 	"@sm": {
 		gridTemplate: `

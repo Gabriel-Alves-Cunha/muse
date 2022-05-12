@@ -19,6 +19,7 @@ import {
 	PlaylistActions,
 	PlaylistEnum,
 	setPlaylists,
+	MAIN_LIST,
 } from "@contexts";
 import {
 	ImgWithFallback,
@@ -38,6 +39,10 @@ import {
 	Title,
 	Info,
 } from "./styles";
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 export enum SearchStatus {
 	RELOADING_ALL_MEDIAS,
@@ -62,15 +67,22 @@ const {
 	SEARCHING,
 } = SearchStatus;
 
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+
 export const defaultSearcher: Searcher = Object.freeze({
 	results: constRefToEmptyArray,
 	searchStatus: DOING_NOTHING,
-	playlistName: "",
 	searchTerm: "",
 });
 
 export const useSearcher = create(() => defaultSearcher);
 export const { setState: setSearcher } = useSearcher;
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 const cleanHistory = () =>
 	setPlaylists({
@@ -80,9 +92,8 @@ const cleanHistory = () =>
 
 const reload = async () => {
 	setSearcher({
+		...defaultSearcher,
 		searchStatus: RELOADING_ALL_MEDIAS,
-		results: constRefToEmptyArray,
-		searchTerm: "",
 	});
 
 	await searchLocalComputerForMedias(true);
@@ -93,15 +104,16 @@ const reload = async () => {
 export const setSearchTerm = (e: InputChange) =>
 	setSearcher({ searchTerm: e.target.value.toLowerCase() });
 
-const playMedia = (mediaID: MediaID) => {
-	const { playlistName } = useSearcher.getState();
-
+const playMedia = (mediaID: MediaID) =>
 	setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		playlistName,
+		playlistName: MAIN_LIST,
 		mediaID,
 	});
-};
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 const Row = ({ highlight, media }: RowProps) => {
 	const index = media.title.toLowerCase().indexOf(highlight);
@@ -128,12 +140,14 @@ const Row = ({ highlight, media }: RowProps) => {
 	);
 };
 
-export const Input = () => {
-	const { searchTerm, playlistName } = useSearcher();
+export function Input() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [, startTransition] = useTransition();
+	const { searchTerm } = useSearcher();
 
-	useOnClickOutside(inputRef, () => setSearcher(defaultSearcher));
+	useOnClickOutside(inputRef, () =>
+		setSearcher(prev => (prev !== defaultSearcher ? defaultSearcher : prev))
+	);
 
 	useEffect(() => {
 		setSearcher({
@@ -144,15 +158,15 @@ export const Input = () => {
 		if (searchTerm.length < 2) return;
 
 		startTransition(() => {
-			const results = searchForMediaFromList(searchTerm, playlistName);
+			const results = searchForMediaFromList(searchTerm);
 			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
 			setSearcher({ searchStatus, results });
 
-			// Doing this to keep focus on it...
+			// Doing this to keep focus on it...	:|
 			setTimeout(() => inputRef.current?.focus(), 0);
 		});
-	}, [playlistName, searchTerm]);
+	}, [searchTerm]);
 
 	return (
 		<input
@@ -165,9 +179,9 @@ export const Input = () => {
 			type="text"
 		/>
 	);
-};
+}
 
-export const Results = () => {
+export function Results() {
 	const { searchStatus, searchTerm, results } = useSearcher();
 	const foundSomething = searchStatus === FOUND_SOMETHING;
 	const nothingFound = searchStatus === NOTHING_FOUND;
@@ -196,9 +210,9 @@ export const Results = () => {
 			</PopoverContent>
 		</PopoverRoot>
 	);
-};
+}
 
-export const ButtonToTheSide = ({ buttonToTheSide }: Props1) => {
+export function ButtonToTheSide({ buttonToTheSide }: Props1) {
 	const { searchStatus } = useSearcher();
 
 	return (
@@ -223,10 +237,13 @@ export const ButtonToTheSide = ({ buttonToTheSide }: Props1) => {
 			) : undefined}
 		</div>
 	);
-};
+}
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 type Searcher = Readonly<{
-	playlistName: MediaListKindProps["playlistName"];
 	searchTerm: Lowercase<string>;
 	searchStatus: SearchStatus;
 	results: readonly Media[];
@@ -248,6 +265,10 @@ type Props2 = Readonly<{
 type InputChange = React.ChangeEvent<HTMLInputElement>;
 
 export type Props = Props1 & Props2;
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 Row.whyDidYouRender = {
 	customName: "Row",

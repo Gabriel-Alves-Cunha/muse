@@ -75,29 +75,30 @@ export const { styled, globalCss, keyframes, createTheme } = createStitches({
 
 export const darkTheme = createTheme({
 	colors: {
-		"scrollbar-thumb-hover": "#555",
-		"scrollbar-thumb": "#f1f1f1",
-		scrollbar: "#888",
+		"scrollbar-thumb-hover": "#565d61",
+		"scrollbar-thumb": "#454a4d",
+		scrollbar: "#202324",
 
-		"lingrad-1": "#8e2de2",
-		"lingrad-2": "#4a00e0",
+		"lingrad-1": "#103783",
+		"lingrad-2": "#0B3866",
 
 		"media-player-icons": "#f3f3ee",
 		"deactivated-icon": "#6272a4",
-		"active-icon": "#5747a6",
+		"active-icon": "#4a00e0",
 
 		"alternative-text": "#ccb69b",
-		"gray-text": "#3f4764",
+		"gray-text": "#828387",
 		text: "#f6f6f6",
 
-		"bg-tooltip": "#efece6",
+		"bg-selected": "#5b6b99",
+		"bg-tooltip": "#343746",
 		"bg-popover": "#182825",
-		"bg-navbar": "#343746",
-		"bg-main": "#182825",
-		"bg-dialog": "white",
-		"bg-media": "white",
+		"bg-navbar": "#191a21",
+		"bg-main": "#191a21",
+		"bg-dialog": "#182825",
+		"bg-media": "#191a21",
 
-		"icon-button-hovered": "#31324190",
+		"icon-button-hovered": "#5b6b99",
 		"icon-button-2": "#88888880",
 		"button-hovered": "#dbdadc",
 
@@ -122,7 +123,7 @@ export const darkTheme = createTheme({
 
 		"media-player-img": "rgba(0, 0, 0, 0.3) 0 0 20px",
 
-		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
+		"row-wrapper": "rgba(255, 255, 255, 0.16) 0 0 6px",
 
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
@@ -142,12 +143,13 @@ export const lightTheme = createTheme({
 
 		"media-player-icons": "white",
 		"deactivated-icon": "dimgray",
-		"active-icon": "#6c56d0",
+		"active-icon": "#4a00e0",
 
 		"alternative-text": "#0D1F2D",
 		"gray-text": "#a8a8a8",
 		text: "#0C0910",
 
+		"bg-selected": "#5b6b99",
 		"bg-tooltip": "#f7f7f7",
 		"bg-popover": "#FAFAC6",
 		"bg-navbar": "#f9f6f5",
@@ -180,7 +182,7 @@ export const lightTheme = createTheme({
 
 		"media-player-img": "rgba(255, 255, 255, 0.3) 0 0 20px",
 
-		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 4px",
+		"row-wrapper": "rgba(0, 0, 0, 0.16) 0 0 6px",
 
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",

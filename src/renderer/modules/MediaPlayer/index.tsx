@@ -54,7 +54,7 @@ export function MediaPlayer() {
 			<SquareImage>
 				<div>
 					<ImgWithFallback
-						Fallback={<MusicNote size="1.4em" />}
+						Fallback={<MusicNote size="1.4rem" />}
 						media={media}
 					/>
 				</div>

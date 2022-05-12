@@ -79,10 +79,10 @@ export const SquareImage = styled("div", {
 	position: "relative",
 	alignSelf: "center",
 
-	marginTop: "25%",
+	mt: "25%",
 	mx: "10%",
 
-	backgroundColor: "transparent",
+	background: "transparent",
 	boxShadow: "$media-player-img",
 	borderRadius: 17,
 	border: "none",
@@ -104,9 +104,6 @@ export const SquareImage = styled("div", {
 	img: {
 		objectFit: "cover",
 		size: "100%",
-
-		borderRadius: 17,
-		border: "none",
 	},
 });
 
@@ -168,10 +165,10 @@ export const SeekerContainer = styled("div", {
 		letterSpacing: "0.03em",
 		fontFamily: "$primary",
 		textAlign: "center",
-		color: "$bg-main",
 		fontSize: "1rem",
+		color: "white",
 
-		backgroundColor: "transparent",
+		background: "transparent",
 		border: "none",
 	},
 });
@@ -198,7 +195,7 @@ export const ButtonForRandomAndLoop = styled("button", {
 	alignItems: "center",
 	size: 25,
 
-	backgroundColor: "transparent",
+	background: "transparent",
 	cursor: "pointer",
 	border: "none",
 
@@ -217,7 +214,7 @@ export const ProgressWrapper = styled("div", {
 	width: 200,
 	height: 3,
 
-	backgroundColor: "$bg-main",
+	background: "$bg-main",
 	cursor: "pointer",
 	margin: "0 7px",
 
@@ -234,7 +231,7 @@ export const ProgressWrapper = styled("div", {
 		height: 20,
 		width: 35,
 
-		backgroundColor: "$bg-main",
+		background: "$bg-main",
 		borderRadius: 2,
 
 		fontFamily: "$primary",

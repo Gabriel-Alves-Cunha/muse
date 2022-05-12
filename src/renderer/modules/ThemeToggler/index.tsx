@@ -54,7 +54,7 @@ const Button = styled("button", {
 	filter: "drop-shadow(0 0px 5px $lingrad-1)",
 
 	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
-	backgroundColor: "$lingrad-2",
+	background: "$lingrad-2",
 	cursor: "pointer",
 	border: "none",
 	color: "white",

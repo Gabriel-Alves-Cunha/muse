@@ -102,7 +102,7 @@ export const Header = ({ media }: RefToMedia) => (
 	<OptionsAndAlbum>
 		<Tooltip text="Media options">
 			<IconButton style={{ width: 30 }}>
-				<Dots size="19" />
+				<Dots size={20} />
 			</IconButton>
 		</Tooltip>
 
@@ -131,10 +131,10 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 		<Tooltip text="Play/pause">
 			<IconButton
 				onClick={togglePlayOrPauseMedia}
-				style={{ width: 50 }}
+				style={{ width: 49 }}
 				id="play-pause"
 			>
-				{isPaused ? <Play size="25" /> : <Pause size="25" />}
+				{isPaused ? <Play size={25} /> : <Pause size={25} />}
 			</IconButton>
 		</Tooltip>
 

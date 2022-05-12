@@ -19,7 +19,6 @@ import {
 	sortByDate,
 	sortByName,
 	FAVORITES,
-	MAIN_LIST,
 	HISTORY,
 } from "./usePlaylistsHelper";
 
@@ -38,10 +37,7 @@ const defaultPlaylists: readonly Playlist[] = Object.freeze([
 ]);
 
 type UsePlaylistsActions = Readonly<{
-	searchForMediaFromList: (
-		searchTerm_: Readonly<string>,
-		fromList: Readonly<Playlist["name"]>
-	) => readonly Media[];
+	searchForMediaFromList: (searchTerm_: Readonly<string>) => readonly Media[];
 	searchLocalComputerForMedias: (force?: Readonly<boolean>) => Promise<void>;
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
 	updatePlaylists: (playlists: readonly Playlist[]) => void;
@@ -65,33 +61,11 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 					mediaID: id,
 				});
 			},
-			searchForMediaFromList: (
-				searchTerm_: Readonly<string>,
-				fromList: Playlist["name"]
-			) => {
+			searchForMediaFromList: (searchTerm_: Readonly<string>) => {
 				const searchTerm = searchTerm_.toLowerCase();
 				const mainList = get().mainList;
 
-				const start = performance.now();
-
-				// Handle when fromList === MAIN_LIST
-				const results: readonly Media[] =
-					fromList === MAIN_LIST
-						? mainList.filter(m => m.title.toLowerCase().includes(searchTerm))
-						: get()
-								.playlists.find(p => p.name === fromList)!
-								.list.map(mediaID => mainList.find(m => m.id === mediaID)!)
-								.filter(m => m.title.toLowerCase().includes(searchTerm));
-
-				const end = performance.now();
-				console.log(
-					`%cThe search for "${searchTerm}" from list "${fromList}" took: ${
-						end - start
-					} ms.`,
-					"color:brown"
-				);
-
-				return results;
+				return mainList.filter(m => m.title.toLowerCase().includes(searchTerm));
 			},
 			setPlaylists: (action: PlaylistsReducer_Action) => {
 				const prevPlaylistsContainer = get().playlists;

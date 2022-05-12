@@ -7,3 +7,7 @@ export const pages = Object.freeze([
 	"Download",
 	"Convert",
 ] as const);
+
+export function resetAllAppData() {
+	localStorage.clear();
+}

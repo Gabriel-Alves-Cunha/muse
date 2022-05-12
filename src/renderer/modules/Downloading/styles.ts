@@ -47,7 +47,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			size: 16,
 			top: 0,
 
-			backgroundColor: "#5cb85c",
+			background: "#5cb85c",
 			border: "1px solid #fff",
 			borderRadius: "50%",
 			mx: "auto",
@@ -106,7 +106,7 @@ export const TitleAndCancelWrapper = styled("div", {
 		right: -21,
 		size: 20,
 
-		backgroundColor: "transparent",
+		background: "transparent",
 		borderRadius: "50%",
 		cursor: "pointer",
 		border: "none",

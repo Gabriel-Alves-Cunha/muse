@@ -24,7 +24,7 @@ export const BorderedButton = styled("button", {
 
 	"&:hover": {
 		transition: "$bgc",
-		backgroundColor: "$accent",
+		background: "$accent",
 
 		color: "white",
 	},

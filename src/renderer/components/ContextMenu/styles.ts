@@ -17,7 +17,7 @@ export const Content = styled(CtxContent, {
 	overflow: "hidden",
 	minWidth: 220,
 
-	backgroundColor: "white",
+	background: "white",
 	borderRadius: 6,
 	padding: 5,
 
@@ -52,7 +52,7 @@ export const itemStyles = styled("div", {
 
 	"&:focus": {
 		color: "$ctx-menu-item-text-focus",
-		backgroundColor: "#6c56d0",
+		background: "#6c56d0",
 	},
 });
 
@@ -82,7 +82,7 @@ export const RadioItem = styled(CtxRadioItem, {
 export const TriggerItem = styled(CtxTriggerItem, {
 	"&[data-state='open']": {
 		color: "$ctx-menu-item-text",
-		backgroundColor: "white",
+		background: "white",
 	},
 
 	...itemStyles,
@@ -98,7 +98,7 @@ export const Label = styled(CtxLabel, {
 });
 
 export const Separator = styled(CtxSeparator, {
-	backgroundColor: "$ctx-menu-separator",
+	background: "$ctx-menu-separator",
 	height: 1,
 	margin: 5,
 });

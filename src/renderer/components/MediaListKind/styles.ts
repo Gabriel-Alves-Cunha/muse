@@ -13,19 +13,22 @@ export const ImgWrapper = styled("div", {
 	height: "$$size",
 
 	borderRadius: 13,
-	margin: "0 10px",
 	border: "none",
+	mx: 10,
 
 	"& img": {
 		objectFit: "cover",
 		size: "$$size",
 
 		borderRadius: 13,
-		border: "none",
 
 		"&:before": {
 			display: "none",
 		},
+	},
+
+	"& svg": {
+		color: "$deactivated-icon",
 	},
 });
 
@@ -37,6 +40,24 @@ export const Info = styled("div", {
 
 	size: "calc(100% - 5px)",
 	overflow: "hidden",
+});
+
+export const Title = styled("p", {
+	margin: "unset", // Virtuoso asks for this for performance reasons
+
+	color: "$alternative-text",
+	letterSpacing: "0.04rem",
+	fontFamily: "$secondary",
+	fontSize: "1rem",
+	fontWeight: 500,
+
+	textOverflow: "ellipsis",
+	whiteSpace: "nowrap", // make it one-line.
+	overflow: "hidden",
+
+	"& .highlight": {
+		background: "yellowgreen",
+	},
 });
 
 export const SubTitle = styled("p", {
@@ -56,6 +77,7 @@ export const TriggerOptions = styled(Trigger, {
 	justifyContent: "center",
 	alignItems: "center",
 
+	color: "$deactivated-icon",
 	background: "transparent",
 	borderRadius: "50%",
 	cursor: "pointer",
@@ -66,7 +88,7 @@ export const TriggerOptions = styled(Trigger, {
 
 	"&:hover": {
 		transition: "$bgc",
-		backgroundColor: "#88888860",
+		background: "#88888860",
 	},
 
 	// Hack to make the height the same size as the width:
@@ -119,13 +141,18 @@ export const RowWrapper = styled("div", {
 	height: 65,
 	left: 7,
 
-	transition: "0.3s",
+	transition: "$boxShadow",
 	borderRadius: 7,
 	padding: 7,
 
 	"&:hover, &:focus, &.active": {
 		transition: "$boxShadow",
 		boxShadow: "$row-wrapper",
+	},
+
+	"&.selected": {
+		background: "$bg-selection",
+		boxShadow: "$bg-selected",
 	},
 });
 
@@ -141,24 +168,6 @@ export const PlayButton = styled("button", {
 	background: "transparent",
 	cursor: "pointer",
 	border: "none",
-});
-
-export const Title = styled("p", {
-	margin: "unset", // Virtuoso asks for this for performance reasons
-
-	color: "$alternative-text",
-	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
-	fontSize: "1rem",
-	fontWeight: 500,
-
-	textOverflow: "ellipsis",
-	whiteSpace: "nowrap", // make it one-line.
-	overflow: "hidden",
-
-	"& .highlight": {
-		backgroundColor: "yellowgreen",
-	},
 });
 
 export const Alert = styled("div", {
@@ -190,4 +199,23 @@ export const Button = styled("button", {
 	background: "transparent",
 	cursor: "pointer",
 	borderRadius: 7,
+});
+
+export const Footer = styled("div", {
+	position: "relative",
+	size: 10,
+
+	background: "transparent",
+});
+
+export const EmptyList = styled("div", {
+	position: "relative",
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
+	size: "100%",
+
+	"&:before": {
+		content: "No medias found...",
+	},
 });

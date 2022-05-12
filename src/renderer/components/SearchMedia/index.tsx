@@ -1,18 +1,10 @@
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 
-import {
-	type Props,
-	ButtonToTheSide,
-	setSearcher,
-	Results,
-	Input,
-} from "./helper";
+import { type Props, ButtonToTheSide, Results, Input } from "./helper";
 
 import { SearchWrapper, Wrapper, Search } from "./styles";
 
-export function SearchMedia({ buttonToTheSide, playlistName }: Props) {
-	setSearcher({ playlistName });
-
+export function SearchMedia({ buttonToTheSide }: Props) {
 	return (
 		<Wrapper>
 			<SearchWrapper>

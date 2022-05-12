@@ -20,10 +20,10 @@ export const Bar = styled("progress", {
 	height: 3,
 
 	"&[value]::-webkit-progress-value": {
-		backgroundColor: "$accent",
+		background: "$accent",
 	},
 
 	"&[value]::-webkit-progress-bar": {
-		backgroundColor: "#a8a8a880",
+		background: "#a8a8a880",
 	},
 });

@@ -35,12 +35,12 @@ export const Search = styled("div", {
 
 	border: "1px solid lightgray",
 	background: "transparent",
-	borderRadius: 15,
+	borderRadius: 15, // half of height
 	cursor: "text",
 
 	transition: "$opacity",
 	color: "$text",
-	opacity: 0.5,
+	opacity: 0.8,
 
 	"&:hover": {
 		transition: "$opacity",
@@ -91,7 +91,7 @@ export const ReloadButton = styled("button", {
 	alignItems: "center",
 	size: 29,
 
-	backgroundColor: "transparent",
+	background: "transparent",
 	borderRadius: "50%",
 	cursor: "pointer",
 	border: "none",

@@ -27,13 +27,6 @@ export const Buttons = styled("div", {
 	justifyContent: "center",
 	alignItems: "center",
 	width: "100%",
-
-	transition: "$bgc",
-
-	"&:hover": {
-		transition: "$bgc",
-		background: "$icon-button-hovered",
-	},
 });
 
 export const ScaleUpIconButton = styled("button", {
