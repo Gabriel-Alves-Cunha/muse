@@ -14,7 +14,7 @@ export const ImgWrapper = styled("div", {
 
 	borderRadius: 13,
 	border: "none",
-	mx: 10,
+	mr: 10,
 
 	"& img": {
 		objectFit: "cover",
@@ -88,7 +88,7 @@ export const TriggerOptions = styled(Trigger, {
 
 	"&:hover": {
 		transition: "$bgc",
-		background: "#88888860",
+		background: "$icon-button-hovered",
 	},
 
 	// Hack to make the height the same size as the width:
@@ -151,7 +151,8 @@ export const RowWrapper = styled("div", {
 	},
 
 	"&.selected": {
-		background: "$bg-selection",
+		border: "2px solid $selected-border-color",
+		background: "$bg-selected",
 		boxShadow: "$bg-selected",
 	},
 });
@@ -186,7 +187,7 @@ export const Msg = styled("pre", {
 	fontWeight: 500,
 });
 
-export const Button = styled("button", {
+export const ResetAllAppDataButton = styled("button", {
 	position: "relative",
 	display: "flex", // row
 	justifyContent: "center",

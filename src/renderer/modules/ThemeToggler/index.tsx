@@ -51,10 +51,10 @@ const Button = styled("button", {
 	justifyContent: "center",
 	alignItems: "center",
 
-	filter: "drop-shadow(0 0px 5px $lingrad-1)",
+	filter: "drop-shadow(0 0px 5px $lingrad-top)",
 
 	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
-	background: "$lingrad-2",
+	background: "$lingrad-bottom",
 	cursor: "pointer",
 	border: "none",
 	color: "white",

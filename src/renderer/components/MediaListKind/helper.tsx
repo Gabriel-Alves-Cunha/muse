@@ -4,7 +4,6 @@ import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { memo, useRef } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
-import ContentLoader from "react-content-loader";
 import create from "zustand";
 
 import { CurrentPlayingEnum, setCurrentPlaying } from "@contexts";
@@ -76,22 +75,6 @@ const Row = memo(
 	(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id
 );
 Row.displayName = "Row";
-
-export const ScrollPlaceholder = memo(() => (
-	<ContentLoader
-		foregroundColor="#ecebeb"
-		backgroundColor="#f3f3f3"
-		viewBox="0 0 200 160"
-		width={200}
-		height={65}
-		speed={2}
-	>
-		<rect x="55" y="26" rx="3" ry="3" width="52" height="6" />
-		<rect x="54" y="9" rx="3" ry="3" width="140" height="6" />
-		<rect x="0" y="0" rx="13" ry="13" width="45" height="45" />
-	</ContentLoader>
-));
-ScrollPlaceholder.displayName = "ScrollPlaceholder";
 
 const playMedia = (mediaID: MediaID) =>
 	setCurrentPlaying({

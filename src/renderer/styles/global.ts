@@ -79,16 +79,21 @@ export const darkTheme = createTheme({
 		"scrollbar-thumb": "#454a4d",
 		scrollbar: "#202324",
 
-		"lingrad-1": "#103783",
-		"lingrad-2": "#0B3866",
+		"lingrad-top": "#103783",
+		"lingrad-bottom": "#0B3866",
 
 		"media-player-icons": "#f3f3ee",
 		"deactivated-icon": "#6272a4",
 		"active-icon": "#4a00e0",
+		"window-buttons": "white",
 
 		"alternative-text": "#ccb69b",
 		"gray-text": "#828387",
 		text: "#f6f6f6",
+
+		"selected-border-color": "#344880",
+
+		"input-disabled": "gray",
 
 		"bg-selected": "#5b6b99",
 		"bg-tooltip": "#343746",
@@ -98,11 +103,11 @@ export const darkTheme = createTheme({
 		"bg-dialog": "#182825",
 		"bg-media": "#191a21",
 
-		"icon-button-hovered": "#5b6b99",
-		"icon-button-2": "#88888880",
+		"media-player-icon-button-hovered": "#fff4",
+		"icon-button-hovered": "#fff2",
 		"button-hovered": "#dbdadc",
 
-		"accent-light": "#D4CDC4",
+		"accent-light": "#9381FF",
 		accent: "#6B6D76",
 
 		"ctx-menu-item-text-disabled": "#d3d3d5",
@@ -138,16 +143,21 @@ export const lightTheme = createTheme({
 		"scrollbar-thumb": "#888",
 		scrollbar: "#f1f1f1",
 
-		"lingrad-1": "#8e2de2",
-		"lingrad-2": "#4a00e0",
+		"lingrad-top": "#8e2de2",
+		"lingrad-bottom": "#4a00e0",
 
 		"media-player-icons": "white",
 		"deactivated-icon": "dimgray",
 		"active-icon": "#4a00e0",
+		"window-buttons": "black",
 
 		"alternative-text": "#0D1F2D",
 		"gray-text": "#a8a8a8",
 		text: "#0C0910",
+
+		"selected-border-color": "#344880",
+
+		"input-disabled": "lightgray",
 
 		"bg-selected": "#5b6b99",
 		"bg-tooltip": "#f7f7f7",
@@ -157,8 +167,8 @@ export const lightTheme = createTheme({
 		"bg-dialog": "white",
 		"bg-media": "white",
 
-		"icon-button-hovered": "#E5E8EC40",
-		"icon-button-2": "#88888830",
+		"media-player-icon-button-hovered": "#fff4",
+		"icon-button-hovered": "#88888820",
 		"button-hovered": "#dbdadc",
 
 		"accent-light": "#9381FF",

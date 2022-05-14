@@ -33,19 +33,13 @@ export const Search = styled("div", {
 	maxWidth: 500,
 	height: 30,
 
-	border: "1px solid lightgray",
+	border: "1px solid $input-disabled",
 	background: "transparent",
 	borderRadius: 15, // half of height
 	cursor: "text",
 
-	transition: "$opacity",
 	color: "$text",
 	opacity: 0.8,
-
-	"&:hover": {
-		transition: "$opacity",
-		opacity: 1,
-	},
 
 	"& svg": {
 		marginLeft: 10,
@@ -63,15 +57,16 @@ export const Search = styled("div", {
 		size: "100%",
 
 		background: "transparent",
-		borderRadius: 15,
 		border: "none",
 
-		transition: "$opacity",
-		opacity: 0.5,
+		"&::placeholder": {
+			color: "$text",
+		},
 
-		"&:hover": {
-			transition: "$opacity",
-			opacity: 1,
+		"&:hover::placeholder": {
+			transition: "text-decoration 300ms ease-in-out",
+			textDecoration: "underline",
+			textUnderlineOffset: "1px",
 		},
 	},
 });
@@ -105,7 +100,7 @@ export const ReloadButton = styled("button", {
 
 	"&:hover": {
 		transition: "$bgc",
-		background: "$icon-button-2",
+		background: "$icon-button-hovered",
 	},
 
 	"&.reload:hover": {
@@ -168,14 +163,15 @@ export const Result = styled("div", {
 	width: "100%",
 	height: 60,
 
-	border: "1px solid lightgray",
+	border: "1px solid $gray-text",
 	background: "$bg-media",
 	cursor: "pointer",
 	borderRadius: 7,
 	padding: 7,
 
 	"&:hover": {
-		boxShadow: "$row-wrapper",
+		transition: "all 100ms ease-in-out",
+		borderColor: "$text",
 	},
 });
 

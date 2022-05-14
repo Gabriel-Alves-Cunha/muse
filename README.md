@@ -1,7 +1,7 @@
 # Muse
 
 <h1 align="center">
-	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="logo">
+	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="Muse's logo">
 </h1>
 
 > Just a simple Electron-React app to download audio from Youtube and play them.
@@ -10,15 +10,15 @@
 
 - [Layout](#Layout)
 - [Tecnologies](#Tecnologies)
-- [Requirements](#Requirements)
 - [Installing](#Installing)
+- [Requirements](#Requirements)
 - [Contributing](#Contributing)
 - [Author](#Author)
 - [License](#License)
 
-<h4 align="center">
+<!-- <h4 align="center">
 	🚧  React - Electron 🚀 Building...  🚧
-</h4>
+</h4> -->
 
 ## Screenshots
 
@@ -66,12 +66,6 @@ The following tools were used on this project construction:
 - [Node TagLib Sharp](https://github.com/benrr101/node-taglib-sharp)
 - [Fluent Ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 
-## 💻 Requirements
-
-Before everything, verify that:
-
-- You have the most recent (LTS) version of `git`, `Node.JS` and `yarn`
-
 ## 🚀 Installing
 
 To install and run Muse, follow these steps:
@@ -93,9 +87,14 @@ Then the binary will be inside the `dist/` folder.
 To start local development:
 
 ```shell
-# We use esbuild to compile the main process Typescript, which is faster
 yarn dev
 ```
+
+## 💻 Requirements
+
+For development, before everything, verify that:
+
+- You have the most recent (LTS) version of `git`, `Node.JS` and `yarn`
 
 ## 📫 Contributing
 

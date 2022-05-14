@@ -7,16 +7,15 @@ import { type Playlist, usePlaylists, MAIN_LIST } from "@contexts";
 import { resetAllAppData } from "@utils/app";
 import {
 	playlistName as playlistNameToSet,
-	ScrollPlaceholder,
 	computeItemKey,
 	itemContent,
 } from "./helper";
 
 import {
+	ResetAllAppDataButton,
 	ListWrapper,
 	EmptyList,
 	SubTitle,
-	Button,
 	Footer,
 	Title,
 	Alert,
@@ -70,14 +69,9 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		<ListWrapper>
 			<Virtuoso
 				components={{
-					ScrollSeekPlaceholder: () => <ScrollPlaceholder />,
 					EmptyPlaceholder: () => <EmptyList />,
 					Header: () => <Footer />,
 					Footer: () => <Footer />,
-				}}
-				scrollSeekConfiguration={{
-					enter: velocity => Math.abs(velocity) > 200,
-					exit: velocity => Math.abs(velocity) < 50,
 				}}
 				computeItemKey={computeItemKey}
 				itemContent={itemContent}
@@ -103,7 +97,9 @@ function ErrorFallback({ error }: ErrorBoundaryProps) {
 
 			<Msg>{error.message}</Msg>
 
-			<Button onClick={resetAllAppData}>Reset all app data!</Button>
+			<ResetAllAppDataButton onClick={resetAllAppData}>
+				Reset all app data!
+			</ResetAllAppDataButton>
 		</Alert>
 	);
 }

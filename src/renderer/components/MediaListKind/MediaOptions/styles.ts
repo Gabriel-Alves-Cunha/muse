@@ -34,13 +34,14 @@ export const StyledOverlay = styled(Overlay, {
 	left: 0,
 	top: 0,
 
-	background: "rgba(0, 0, 0, 0.2)",
+	background: "rgba(0, 0, 0, 0.1)",
+	backdropFilter: "blur(2px)",
 
 	overflowY: "auto",
 	zIndex: 100,
 
 	"@media (prefers-reduced-motion: no-preference)": {
-		animation: `${overlayShow} 25ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+		animation: `${overlayShow} 100ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
 });
 
@@ -63,7 +64,7 @@ export const StyledContent = styled(Content, {
 	boxShadow: "$dialog",
 
 	"@media (prefers-reduced-motion: no-preference)": {
-		animation: `${contentShow} 25ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+		animation: `${contentShow} 100ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
 });
 
@@ -71,7 +72,7 @@ export const StyledTitle = styled(Title, {
 	margin: 0,
 
 	fontFamily: "$secondary",
-	letterSpacing: "0.04rem",
+	letterSpacing: "0.05rem",
 	fontSize: "1.1rem",
 	fontWeight: 600,
 	color: "$text",
@@ -126,7 +127,7 @@ export const CloseIcon = styled(Close, {
 	justifyContent: "center",
 	alignItems: "center",
 	right: 10,
-	size: 25,
+	size: 26,
 	top: 10,
 
 	borderRadius: "50%",
@@ -141,7 +142,11 @@ export const CloseIcon = styled(Close, {
 	},
 
 	"&:hover": {
-		background: "rgba(0, 0, 0, 0.035)",
+		background: "$icon-button-hovered",
+
+		"& svg": {
+			fill: "white",
+		},
 	},
 });
 
@@ -241,21 +246,21 @@ export const Input = styled("input", {
 	width: "100%",
 	height: 35,
 
-	border: "1px solid $gray-text",
+	border: "2px solid lightgray",
 	padding: "0 10px",
 	borderRadius: 4,
 
+	letterSpacing: "0.035rem",
 	fontFamily: "$secondary",
-	letterSpacing: "0.03rem",
 	color: "$accent-light",
+	fontSize: "1rem",
 	lineHeight: 1,
-	fontSize: 15,
 
 	"&:focus": {
 		borderColor: "$accent-light",
 	},
 
 	"&:disabled": {
-		borderColor: "lightgray",
+		border: "1px solid $input-disabled",
 	},
 });

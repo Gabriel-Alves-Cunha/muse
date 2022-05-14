@@ -19,8 +19,6 @@ export default defineConfig({
 			...(configDefaults.exclude as string[]),
 			"**/seeLeakedVariables.ts",
 			"**/.eslintrc.{js,cjs}",
-			"**/forge.config.js",
-			"**/animation.ts",
 			"**/styles.ts",
 			"**/global.ts",
 			"coverage/**",
@@ -35,6 +33,7 @@ export default defineConfig({
 		outDir: outDirRenderer,
 		emptyOutDir: true,
 		sourcemap: false,
+		minify: "esbuild",
 		rollupOptions: {
 			output: {
 				entryFileNames: "[name].js",
@@ -42,6 +41,12 @@ export default defineConfig({
 				assetFileNames: "assets/[name].[ext]",
 			},
 		},
+	},
+	esbuild: {
+		minify: true,
+	},
+	css: {
+		devSourcemap: true,
 	},
 	resolve: {
 		alias: [

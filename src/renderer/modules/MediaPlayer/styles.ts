@@ -19,7 +19,7 @@ export const Wrapper = styled("div", {
 	width: "100%",
 	padding,
 
-	background: "linear-gradient(to bottom, $lingrad-1, $lingrad-2);",
+	background: "linear-gradient(to bottom, $lingrad-top, $lingrad-bottom);",
 
 	"@media-player": {
 		display: "inline-block",
@@ -64,7 +64,7 @@ export const IconButton = styled("button", {
 
 	"&:hover": {
 		transition: "$bgc",
-		background: "$icon-button-hovered",
+		background: "$media-player-icon-button-hovered",
 	},
 
 	// Hack to make the height the same size as the width:
@@ -104,6 +104,8 @@ export const SquareImage = styled("div", {
 	img: {
 		objectFit: "cover",
 		size: "100%",
+
+		borderRadius: 17,
 	},
 });
 

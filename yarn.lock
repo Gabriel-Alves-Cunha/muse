@@ -926,10 +926,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.27.tgz#5da19383bdbeda99bc0d09cfbb88cab7297ebc51"
   integrity sha512-C1pD3kgLoZ56Uuy5lhfOxie4aZlA3UMGLX9rXteq4WitEZH6Rl80mwactt9QG0w0gLFlN/kLBTFnGXtDVWvWQw==
 
-"@types/node@^17.0.32":
-  version "17.0.32"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.32.tgz#51d59d7a90ef2d0ae961791e0900cad2393a0149"
-  integrity sha512-eAIcfAvhf/BkHcf4pkLJ7ECpBAhh9kcxRBpip9cTiO+hf+aJrsxYxBeS6OXvOd9WqNAJmavXVpZvY1rBjNsXmw==
+"@types/node@^17.0.33":
+  version "17.0.33"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.33.tgz#3c1879b276dc63e73030bb91165e62a4509cd506"
+  integrity sha512-miWq2m2FiQZmaHfdZNcbpp9PuXg34W5JZ5CrJ/BaS70VuhoJENBEQybeiYSaPBRNq6KQGnjfEnc/F3PN++D+XQ==
 
 "@types/plist@^3.0.1":
   version "3.0.2"
@@ -944,10 +944,10 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/react-dom@^18.0.3":
-  version "18.0.3"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.3.tgz#a022ea08c75a476fe5e96b675c3e673363853831"
-  integrity sha512-1RRW9kst+67gveJRYPxGmVy8eVJ05O43hg77G2j5m76/RFJtMbcfAs2viQ2UNsvvDg8F7OfQZx8qQcl6ymygaQ==
+"@types/react-dom@^18.0.4":
+  version "18.0.4"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.4.tgz#dcbcadb277bcf6c411ceff70069424c57797d375"
+  integrity sha512-FgTtbqPOCI3dzZPZoC2T/sx3L34qxy99ITWn4eoSA95qPyXDMH0ALoAqUp49ITniiJFsXUVBtalh/KffMpg21Q==
   dependencies:
     "@types/react" "*"
 
@@ -1097,10 +1097,10 @@
     react-refresh "^0.13.0"
     resolve "^1.22.0"
 
-"@vitest/ui@^0.12.4":
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.12.4.tgz#2ed1caafb7ee9ffc829bfc4a19277282ce3388f3"
-  integrity sha512-ARXOOe3Mo3qhyWV7y6Nbi+jyN5Va4RtQkmoTYqxiEtG6V/3Sahg5BIK91VtmkruQuwXvCUwfDzimKkRwv7KjqQ==
+"@vitest/ui@^0.12.6":
+  version "0.12.6"
+  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.12.6.tgz#6dba9bd6781ce1280452e4b25160b3914eb5e435"
+  integrity sha512-3qHt0YWveaEmZEp7yr23Sn4nCWdDSAYjBLSoBHbnDXwpNhryLQz2KVR5XkJ74mQnOInXd+mh//GPMeLrJi7LJA==
   dependencies:
     sirv "^2.0.2"
 
@@ -1880,10 +1880,10 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dprint@^0.27.1:
-  version "0.27.1"
-  resolved "https://registry.yarnpkg.com/dprint/-/dprint-0.27.1.tgz#d3341dc83a3f939fb90b38b172f63aad0249516c"
-  integrity sha512-V0kUvnbA2qXkUEgSFLl0HgOta461nUB2UkuUwOEHhERhoVTML+suajA7UFYPHprCuiEFdfJTSJlCFSmlAD17MA==
+dprint@^0.28.0:
+  version "0.28.0"
+  resolved "https://registry.yarnpkg.com/dprint/-/dprint-0.28.0.tgz#3d80160b2132c52ebb93a79489583b918dbd808c"
+  integrity sha512-HdHnQFlR9GwaRM0SDWkImcJc55VKLqn2UZHNwfl6R0cX98E8n5Zsq2I1z+UrCqSJBVlaKqJx/Lx7La6jCgA7HQ==
   dependencies:
     yauzl "=2.10.0"
 
@@ -3742,11 +3742,6 @@ rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-content-loader@^6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/react-content-loader/-/react-content-loader-6.2.0.tgz#cd8fee8160b8fda6610d0c69ce5aee7b8094cba6"
-  integrity sha512-r1dI6S+uHNLW68qraLE2njJYOuy6976PpCExuCZUcABWbfnF3FMcmuESRI8L4Bj45wnZ7n8g71hkPLzbma7/Cw==
-
 react-dom@^18.1.0:
   version "18.1.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.1.0.tgz#7f6dd84b706408adde05e1df575b3a024d7e8a2f"
@@ -4529,10 +4524,10 @@ vite@^2.9.9:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.12.4:
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.12.4.tgz#de1e3180bd9af97e87564482d347dd7ac714ca8d"
-  integrity sha512-EDxdhlAt6vcu6y4VouAI60z78iCAVFnfBL4VlSQVQnGmOk5altOtIKvp3xfZ+cfo4iVHgqq1QNyf5qOFiL4leg==
+vitest@^0.12.6:
+  version "0.12.6"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.12.6.tgz#9de2cca78e97effe5395230486ebd3830d0721dd"
+  integrity sha512-YWbCTv0XKBuBw5YtuW/iufuguoi8QhGpYyi2g57Oo7akpscMkkWTAaZGgY0ux1oJJtO/pc/8GFt0EF32WFBUUQ==
   dependencies:
     "@types/chai" "^4.3.1"
     "@types/chai-subset" "^1.3.3"

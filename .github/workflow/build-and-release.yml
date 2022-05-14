@@ -1,0 +1,41 @@
+name: Build and release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build_on_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@master
+        with:
+          node-version: 16.5.0
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Show directory
+        run: ls
+
+      - name: Build AppImage
+        run: yarn dist
+
+      - name: Show directory of build
+        run: ls dist
+
+      # Release
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          # This token is provided by Actions, you do not need to create your own token
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          draft: true # Mark this release as draft (not real)
+          files:
+            - dist/Muse-*

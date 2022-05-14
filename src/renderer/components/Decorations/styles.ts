@@ -23,7 +23,7 @@ export const WindowButton = styled("button", {
 	alignContent: "center",
 	alignItems: "center",
 
-	color: "$media-player-icons",
+	color: "$window-buttons",
 	cursor: "pointer",
 	border: "none",
 
@@ -63,7 +63,6 @@ export const AppName_Folder_Wrapper = styled("div", {
 	transform: "translate(-50%)",
 
 	background: "transparent",
-	"user-select": "text",
 	border: "none",
 
 	letterSpacing: "0.03rem",
