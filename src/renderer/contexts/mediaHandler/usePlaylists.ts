@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Media, MediaID } from "@common/@types/typesAndEnums";
+import type { Media, MediaID, Mutable } from "@common/@types/typesAndEnums";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
 
 import { constRefToEmptyArray, push, remove, replace } from "@utils/array";
-import { assertUnreachable } from "@utils/utils";
+import { assertUnreachable, time } from "@utils/utils";
 import { dbgPlaylists } from "@common/utils";
 import { keyPrefix } from "@utils/app";
 import { hash } from "@common/hash";
@@ -53,13 +53,15 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 			mainList: constRefToEmptyArray,
 			playlists: defaultPlaylists,
 			deleteMedia: async ({ path, id }: Media) => {
-				await deleteFile(path);
+				time(async () => {
+					await deleteFile(path);
 
-				get().setPlaylists({
-					whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
-					type: PlaylistEnum.UPDATE_MAIN_LIST,
-					mediaID: id,
-				});
+					get().setPlaylists({
+						whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
+						type: PlaylistEnum.UPDATE_MAIN_LIST,
+						mediaID: id,
+					});
+				}, "deleteMedia");
 			},
 			searchForMediaFromList: (searchTerm_: Readonly<string>) => {
 				const searchTerm = searchTerm_.toLowerCase();
@@ -68,305 +70,362 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 				return mainList.filter(m => m.title.toLowerCase().includes(searchTerm));
 			},
 			setPlaylists: (action: PlaylistsReducer_Action) => {
-				const prevPlaylistsContainer = get().playlists;
-				const getPlaylist = (listName: DefaultLists) =>
-					prevPlaylistsContainer.find(p => p.name === listName);
+				time(() => {
+					const prevPlaylistsContainer = get().playlists;
+					const getPlaylist = (listName: DefaultLists) =>
+						prevPlaylistsContainer.find(p => p.name === listName);
 
-				switch (action.type) {
-					case PlaylistEnum.UPDATE_HISTORY: {
-						const prevHistory = getPlaylist(HISTORY)!.list;
+					switch (action.type) {
+						case PlaylistEnum.UPDATE_HISTORY: {
+							const prevHistory = getPlaylist(HISTORY)!.list;
 
-						switch (action.whatToDo) {
-							case PlaylistActions.ADD_ONE_MEDIA: {
-								const newHistory =
-									returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
-										prevHistory,
-										action.mediaID
+							switch (action.whatToDo) {
+								case PlaylistActions.ADD_ONE_MEDIA_BY_ID: {
+									const newHistory =
+										returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
+											prevHistory,
+											action.mediaID
+										);
+
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
+										newHistory
 									);
 
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
-									newHistory
-								);
+									if (newHistory === prevHistory) break;
 
-								if (newHistory === prevHistory) break;
-
-								get().updatePlaylists([{ list: newHistory, name: HISTORY }]);
-								break;
-							}
-
-							case PlaylistActions.CLEAN: {
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. newHistory = []"
-								);
-
-								get().updatePlaylists([
-									{ list: constRefToEmptyArray, name: HISTORY },
-								]);
-								break;
-							}
-
-							default: {
-								assertUnreachable(action);
-								break;
-							}
-						}
-						break;
-					}
-
-					case PlaylistEnum.UPDATE_FAVORITES: {
-						const prevFavorites = getPlaylist(FAVORITES)!.list;
-
-						switch (action.whatToDo) {
-							case PlaylistActions.ADD_ONE_MEDIA: {
-								const newFavorites = push(prevFavorites, action.mediaID);
-
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. newFavorites =",
-									newFavorites
-								);
-
-								get().updatePlaylists([
-									{ list: Object.freeze(newFavorites), name: FAVORITES },
-								]);
-								break;
-							}
-
-							case PlaylistActions.REMOVE_ONE_MEDIA_BY_ID: {
-								const index = prevFavorites.indexOf(action.mediaID);
-
-								if (index === -1) {
-									console.error("Media not found in favorites");
+									get().updatePlaylists([{ list: newHistory, name: HISTORY }]);
 									break;
 								}
 
-								const newFavorites = remove(prevFavorites, index);
-
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. newFavorites =",
-									newFavorites
-								);
-
-								get().updatePlaylists([
-									{ list: Object.freeze(newFavorites), name: FAVORITES },
-								]);
-								break;
-							}
-
-							case PlaylistActions.CLEAN: {
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. newfavorites = []"
-								);
-
-								get().updatePlaylists([
-									{ list: constRefToEmptyArray, name: FAVORITES },
-								]);
-								break;
-							}
-
-							default: {
-								assertUnreachable(action);
-								break;
-							}
-						}
-						break;
-					}
-
-					case PlaylistEnum.UPDATE_MAIN_LIST: {
-						const mainList = get().mainList;
-
-						const updateSortedListsAndFinish = (
-							newMainList: readonly Media[]
-						) => {
-							get().updatePlaylists([
-								{ list: sortByDate(newMainList), name: SORTED_BY_DATE },
-								{ list: sortByName(newMainList), name: SORTED_BY_NAME },
-							]);
-							set(() => ({ mainList: Object.freeze(newMainList) }));
-						};
-
-						switch (action.whatToDo) {
-							case PlaylistActions.ADD_ONE_MEDIA: {
-								if (mainList.find(m => m.path === action.media.path)) {
-									console.error(
-										`A media with path "${action.media.path}" already exists. Therefore, I'm not gonna add it.`
+								case PlaylistActions.CLEAN: {
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. newHistory = []"
 									);
+
+									get().updatePlaylists([
+										{ list: constRefToEmptyArray, name: HISTORY },
+									]);
 									break;
 								}
 
-								const newMainList = push(mainList, action.media);
-
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
-									newMainList
-								);
-
-								updateSortedListsAndFinish(newMainList);
-								break;
+								default: {
+									assertUnreachable(action);
+									break;
+								}
 							}
+							break;
+						}
 
-							case PlaylistActions.REMOVE_ONE_MEDIA_BY_ID: {
-								const newMainList = mainList.filter(
-									m => m.id !== action.mediaID
-								);
+						case PlaylistEnum.UPDATE_FAVORITES: {
+							const prevFavorites = getPlaylist(FAVORITES)!.list;
 
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA' (yet to be sorted). newMainList =",
-									newMainList
-								);
+							switch (action.whatToDo) {
+								case PlaylistActions.TOGGLE_ONE_MEDIA: {
+									const media = get().mainList.find(
+										m => m.id === action.mediaID
+									) as Mutable<Media>;
+									media.favorite = !media.favorite;
 
-								updateSortedListsAndFinish(newMainList);
-								break;
-							}
+									get().setPlaylists({
+										whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+										type: PlaylistEnum.UPDATE_MAIN_LIST,
+										media,
+									});
 
-							case PlaylistActions.REPLACE_ENTIRE_LIST: {
-								const newMainList = action.list;
+									if (media.favorite)
+										// add to favorites
+										get().updatePlaylists([
+											{
+												list: push(prevFavorites, action.mediaID),
+												name: FAVORITES,
+											},
+										]);
+									// else remove from favorites
+									else {
+										const favoriteMediaIndex = prevFavorites.indexOf(
+											action.mediaID
+										);
 
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
-									newMainList
-								);
+										get().updatePlaylists([
+											{
+												list: remove(prevFavorites, favoriteMediaIndex),
+												name: FAVORITES,
+											},
+										]);
+									}
 
-								updateSortedListsAndFinish(newMainList);
-								break;
-							}
-
-							case PlaylistActions.REFRESH_ONE_MEDIA_BY_ID: {
-								const oldMediaIndex = mainList.findIndex(
-									m => m.id === action.media.id
-								);
-
-								if (oldMediaIndex === -1) {
-									console.error(
-										`I did not find a media with id = "${action.media.id}" when calling 'REFRESH_ONE_MEDIA_BY_ID'!`
-									);
 									break;
 								}
 
-								const refreshedMedia: Media = {
-									...action.media,
-									id: hash(action.media.path),
-								};
+								case PlaylistActions.ADD_ONE_MEDIA_BY_ID: {
+									const newFavorites = push(prevFavorites, action.mediaID);
 
-								const newMainList = replace(
-									mainList,
-									oldMediaIndex,
-									refreshedMedia
-								);
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. newFavorites =",
+										newFavorites
+									);
 
-								dbgPlaylists(
-									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
-									refreshedMedia,
-									"\nnewMainList =",
-									newMainList
-								);
+									const media = get().mainList.find(
+										m => m.id === action.mediaID
+									) as Mutable<Media>;
+									media.favorite = true;
 
-								updateSortedListsAndFinish(newMainList);
-								break;
+									get().setPlaylists({
+										whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
+										type: PlaylistEnum.UPDATE_MAIN_LIST,
+										media,
+									});
+
+									get().updatePlaylists([
+										{ list: Object.freeze(newFavorites), name: FAVORITES },
+									]);
+									break;
+								}
+
+								case PlaylistActions.REMOVE_ONE_MEDIA_BY_ID: {
+									const index = prevFavorites.indexOf(action.mediaID);
+
+									if (index === -1) {
+										console.error("Media not found in favorites");
+										break;
+									}
+
+									const newFavorites = remove(prevFavorites, index);
+
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. newFavorites =",
+										newFavorites
+									);
+
+									get().updatePlaylists([
+										{ list: Object.freeze(newFavorites), name: FAVORITES },
+									]);
+									break;
+								}
+
+								case PlaylistActions.CLEAN: {
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. newfavorites = []"
+									);
+
+									get().updatePlaylists([
+										{ list: constRefToEmptyArray, name: FAVORITES },
+									]);
+									break;
+								}
+
+								default: {
+									assertUnreachable(action);
+									break;
+								}
 							}
-
-							case PlaylistActions.CLEAN: {
-								dbgPlaylists(
-									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []"
-								);
-
-								updateSortedListsAndFinish(constRefToEmptyArray);
-								break;
-							}
-
-							default: {
-								assertUnreachable(action);
-								break;
-							}
+							break;
 						}
-						break;
-					}
 
-					default: {
-						assertUnreachable(action);
-						break;
+						case PlaylistEnum.UPDATE_MAIN_LIST: {
+							const mainList = get().mainList;
+
+							const updateSortedListsAndFinish = (
+								newMainList: readonly Media[]
+							) => {
+								get().updatePlaylists([
+									{ list: sortByDate(newMainList), name: SORTED_BY_DATE },
+									{ list: sortByName(newMainList), name: SORTED_BY_NAME },
+								]);
+								set(() => ({ mainList: Object.freeze(newMainList) }));
+							};
+
+							switch (action.whatToDo) {
+								case PlaylistActions.ADD_ONE_MEDIA_BY_ID: {
+									if (mainList.find(m => m.path === action.media.path)) {
+										console.error(
+											`A media with path "${action.media.path}" already exists. Therefore, I'm not gonna add it.`
+										);
+										break;
+									}
+
+									const newMainList = push(mainList, action.media);
+
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
+										newMainList
+									);
+
+									updateSortedListsAndFinish(newMainList);
+									break;
+								}
+
+								case PlaylistActions.REMOVE_ONE_MEDIA_BY_ID: {
+									const newMainList = mainList.filter(
+										m => m.id !== action.mediaID
+									);
+
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA' (yet to be sorted). newMainList =",
+										newMainList
+									);
+
+									updateSortedListsAndFinish(newMainList);
+									break;
+								}
+
+								case PlaylistActions.REPLACE_ENTIRE_LIST: {
+									const newMainList = action.list;
+
+									dbgPlaylists(
+										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
+										newMainList
+									);
+
+									updateSortedListsAndFinish(newMainList);
+									break;
+								}
+
+								case PlaylistActions.REFRESH_ONE_MEDIA_BY_ID: {
+									const oldMediaIndex = mainList.findIndex(
+										m => m.id === action.media.id
+									);
+
+									if (oldMediaIndex === -1) {
+										console.error(
+											`I did not find a media with id = "${action.media.id}" when calling 'REFRESH_ONE_MEDIA_BY_ID'!`
+										);
+										break;
+									}
+
+									const refreshedMedia: Media = {
+										...action.media,
+										id: hash(action.media.path),
+									};
+
+									const newMainList = replace(
+										mainList,
+										oldMediaIndex,
+										refreshedMedia
+									);
+
+									dbgPlaylists(
+										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMediaWithRightIndex =",
+										refreshedMedia,
+										"\nnewMainList =",
+										newMainList
+									);
+
+									updateSortedListsAndFinish(newMainList);
+									break;
+								}
+
+								case PlaylistActions.CLEAN: {
+									dbgPlaylists(
+										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []"
+									);
+
+									updateSortedListsAndFinish(constRefToEmptyArray);
+									break;
+								}
+
+								default: {
+									assertUnreachable(action);
+									break;
+								}
+							}
+							break;
+						}
+
+						default: {
+							assertUnreachable(action);
+							break;
+						}
 					}
-				}
+				}, "setPlaylists");
 			},
 			searchLocalComputerForMedias: async (force = false) => {
-				const isThereNewMedia = (paths: readonly string[]) => {
-					const mainListLength = get().mainList.length;
-					const isThereNewMedia = paths.length !== mainListLength;
-					console.log(
-						`%cmainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
-						"color:blue"
-					);
-					return isThereNewMedia;
-				};
+				time(async () => {
+					const isThereNewMedia = (paths: readonly string[]) => {
+						const mainListLength = get().mainList.length;
+						const isThereNewMedia = paths.length !== mainListLength;
+						console.log(
+							`%cmainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
+							"color:blue"
+						);
+						return isThereNewMedia;
+					};
 
-				try {
-					const paths = getAllowedMedias(await searchDirectoryResult());
-					dbgPlaylists("Finished searching. Paths =", paths);
+					try {
+						const paths = getAllowedMedias(await searchDirectoryResult());
+						dbgPlaylists("Finished searching. Paths =", paths);
 
-					if (force || isThereNewMedia(paths)) {
-						const newMainList = await transformPathsToMedias(paths);
-						dbgPlaylists("Finished searching. Medias =", newMainList);
+						if (force || isThereNewMedia(paths)) {
+							const newMainList = await transformPathsToMedias(paths);
+							dbgPlaylists("Finished searching. Medias =", newMainList);
 
-						get().setPlaylists({
-							whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-							type: PlaylistEnum.UPDATE_MAIN_LIST,
-							list: newMainList,
-						});
+							get().setPlaylists({
+								whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
+								type: PlaylistEnum.UPDATE_MAIN_LIST,
+								list: newMainList,
+							});
+						}
+					} catch (error) {
+						console.error(error);
 					}
-				} catch (error) {
-					console.error(error);
-				}
+				}, "searchLocalComputerForMedias");
 			},
 			createPlaylist: (playlists: readonly Playlist[]) => {
-				const prevPlaylistsContainer = get().playlists;
+				time(() => {
+					const prevPlaylistsContainer = get().playlists;
 
-				const isOneAlreadyCreated = prevPlaylistsContainer
-					.map(playlist => playlists.some(p => p.name === playlist.name))
-					.some(Boolean);
+					const isOneAlreadyCreated = prevPlaylistsContainer
+						.map(playlist => playlists.some(p => p.name === playlist.name))
+						.some(Boolean);
 
-				if (isOneAlreadyCreated) return get().updatePlaylists(playlists);
+					if (isOneAlreadyCreated) return get().updatePlaylists(playlists);
 
-				const newPlaylistsContainer = [...prevPlaylistsContainer];
+					const newPlaylistsContainer = [...prevPlaylistsContainer];
 
-				for (const playlist of playlists) newPlaylistsContainer.push(playlist);
+					for (const playlist of playlists)
+						newPlaylistsContainer.push(playlist);
 
-				dbgPlaylists(
-					"setPlaylists on 'createPlaylist'. New playlist =",
-					newPlaylistsContainer
-				);
+					dbgPlaylists(
+						"setPlaylists on 'createPlaylist'. New playlist =",
+						newPlaylistsContainer
+					);
 
-				set({ playlists: Object.freeze(newPlaylistsContainer) });
+					set({ playlists: Object.freeze(newPlaylistsContainer) });
+				}, "createPlaylist");
 			},
 			updatePlaylists: (newPlaylists: readonly Playlist[]) => {
-				const oldPlaylistsContainer = get().playlists;
+				time(() => {
+					const oldPlaylistsContainer = get().playlists;
 
-				// Assert there isn't a not-created playlist:
-				let foundOneAlreadyCreated = true;
-				for (const newPlaylist of newPlaylists)
-					foundOneAlreadyCreated = oldPlaylistsContainer.some(
-						p => p.name === newPlaylist.name
-					);
-
-				if (!foundOneAlreadyCreated)
-					return console.error(
-						"One of the playlists I got was not already created. I'm not made to handle it's creation, only to update; to create, use the function `createPlaylist`.\nPlaylists received =",
-						newPlaylists,
-						"\nExisting playlists =",
-						oldPlaylistsContainer
-					);
-
-				const updatedPlaylistsContainer = [...oldPlaylistsContainer];
-				for (const [index, oldPlaylist] of oldPlaylistsContainer.entries())
+					// Assert there isn't a not-created playlist:
+					let foundOneAlreadyCreated = true;
 					for (const newPlaylist of newPlaylists)
-						if (oldPlaylist.name === newPlaylist.name)
-							updatedPlaylistsContainer[index] = newPlaylist;
+						foundOneAlreadyCreated = oldPlaylistsContainer.some(
+							p => p.name === newPlaylist.name
+						);
 
-				dbgPlaylists(
-					"setPlaylists on 'updatePlaylists'. New playlist =",
-					updatedPlaylistsContainer
-				);
+					if (!foundOneAlreadyCreated)
+						return console.error(
+							"One of the playlists I got was not already created. I'm not made to handle it's creation, only to update; to create, use the function `createPlaylist`.\nPlaylists received =",
+							newPlaylists,
+							"\nExisting playlists =",
+							oldPlaylistsContainer
+						);
 
-				set({ playlists: Object.freeze(updatedPlaylistsContainer) });
+					const updatedPlaylistsContainer = [...oldPlaylistsContainer];
+					for (const [index, oldPlaylist] of oldPlaylistsContainer.entries())
+						for (const newPlaylist of newPlaylists)
+							if (oldPlaylist.name === newPlaylist.name)
+								updatedPlaylistsContainer[index] = newPlaylist;
+
+					dbgPlaylists(
+						"setPlaylists on 'updatePlaylists'. New playlist =",
+						updatedPlaylistsContainer
+					);
+
+					set({ playlists: Object.freeze(updatedPlaylistsContainer) });
+				}, "updatePlaylists");
 			},
 		}),
 		{
@@ -404,7 +463,12 @@ export type Playlist = Readonly<{
 
 export type PlaylistsReducer_Action =
 	| Readonly<{
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
+			whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID;
+			type: PlaylistEnum.UPDATE_FAVORITES;
+			mediaID: MediaID;
+	  }>
+	| Readonly<{
+			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA;
 			type: PlaylistEnum.UPDATE_FAVORITES;
 			mediaID: MediaID;
 	  }>
@@ -419,7 +483,7 @@ export type PlaylistsReducer_Action =
 	  }>
 	// ----------------------------------------
 	| Readonly<{
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
+			whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID;
 			type: PlaylistEnum.UPDATE_HISTORY;
 			mediaID: MediaID;
 	  }>
@@ -431,7 +495,7 @@ export type PlaylistsReducer_Action =
 	| Readonly<{
 			whatToDo:
 				| PlaylistActions.REFRESH_ONE_MEDIA_BY_ID
-				| PlaylistActions.ADD_ONE_MEDIA;
+				| PlaylistActions.ADD_ONE_MEDIA_BY_ID;
 			type: PlaylistEnum.UPDATE_MAIN_LIST;
 			media: Media;
 	  }>
@@ -454,7 +518,8 @@ export enum PlaylistActions {
 	REFRESH_ONE_MEDIA_BY_ID,
 	REMOVE_ONE_MEDIA_BY_ID,
 	REPLACE_ENTIRE_LIST,
-	ADD_ONE_MEDIA,
+	ADD_ONE_MEDIA_BY_ID,
+	TOGGLE_ONE_MEDIA,
 	CLEAN,
 }
 

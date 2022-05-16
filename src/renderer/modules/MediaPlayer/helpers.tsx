@@ -29,6 +29,9 @@ import {
 	usePlayOptions,
 	setPlayOptions,
 	getPlayOptions,
+	setPlaylists,
+	PlaylistActions,
+	PlaylistEnum,
 } from "@contexts";
 
 import {
@@ -64,6 +67,14 @@ const playPreviousMedia = () =>
 	setCurrentPlaying({
 		playlistName: getCurrentPlaying().currentPlaying.playlistName,
 		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
+	});
+
+const toggleFavorite = (mediaID?: number) =>
+	mediaID &&
+	setPlaylists({
+		whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
+		type: PlaylistEnum.UPDATE_FAVORITES,
+		mediaID,
 	});
 
 export const playNextMedia = () =>
@@ -109,7 +120,10 @@ export const Header = ({ media }: RefToMedia) => (
 		<Album>{media?.album}</Album>
 
 		<Tooltip text="Toggle favorite">
-			<IconButton style={{ width: 30 }}>
+			<IconButton
+				onClick={() => toggleFavorite(media?.id)}
+				style={{ width: 30 }}
+			>
 				{media?.favorite ? <Favorite size="17" /> : <AddFavorite size="17" />}
 			</IconButton>
 		</Tooltip>

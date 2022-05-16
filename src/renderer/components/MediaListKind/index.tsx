@@ -22,6 +22,9 @@ import {
 	Msg,
 } from "./styles";
 
+// href="https://www.flaticon.com/free-icons/error" =>
+const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
+
 export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
 	<ErrorBoundary
 		FallbackComponent={ErrorFallback}
@@ -69,7 +72,12 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 		<ListWrapper>
 			<Virtuoso
 				components={{
-					EmptyPlaceholder: () => <EmptyList />,
+					EmptyPlaceholder: () => (
+						<EmptyList>
+							<img src={noMediaFoundPng.href} alt="No medias found" />
+							No medias found
+						</EmptyList>
+					),
 					Header: () => <Footer />,
 					Footer: () => <Footer />,
 				}}

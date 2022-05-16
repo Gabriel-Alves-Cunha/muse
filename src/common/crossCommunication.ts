@@ -3,18 +3,18 @@ import type {
 	MsgObjectReactToElectron,
 } from "@common/@types/electron-window";
 
-import { dbg, dbgTests } from "@common/utils";
+import { dbg as dbg_, dbgTests } from "@common/utils";
 
-const dbg_ = (...args: unknown[]) => {
-	dbgTests(JSON.stringify(args, null, 2));
-	dbg(JSON.stringify(args, null, 2));
+const dbg = (...args: unknown[]) => {
+	dbgTests(args);
+	dbg_(args);
 };
 
 export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
 	electronPort?: MessagePort
 ) => {
-	dbg_("Sending message to backend:", { msg, electronPort });
+	dbg("Sending message to backend:", { msg, electronPort });
 
 	electronPort
 		? window.postMessage({ msg, source: reactSource }, "*", [electronPort])

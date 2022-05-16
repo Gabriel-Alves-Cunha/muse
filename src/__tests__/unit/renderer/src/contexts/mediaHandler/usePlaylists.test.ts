@@ -148,7 +148,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			const mediaIdToAdd = getPlaylists().mainList[1]!.id;
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_HISTORY,
 				mediaID: mediaIdToAdd,
 			});
@@ -168,7 +168,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			const mediaID = getPlaylists().mainList[1]!.id;
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_FAVORITES,
 				mediaID,
 			});
@@ -206,7 +206,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		it("(!PlaylistActions.ADD_ONE_MEDIA) should NOT add one media to mediaList because there already exists one with the same path", () => {
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: testList[0]!,
 			});
@@ -230,7 +230,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			};
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 				type: PlaylistEnum.UPDATE_MAIN_LIST,
 				media: newMedia,
 			});

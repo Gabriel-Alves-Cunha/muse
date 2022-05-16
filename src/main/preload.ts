@@ -58,11 +58,11 @@ contextBridge.exposeInMainWorld("electron", electron);
 
 // Relay messages from the main process to the renderer process:
 ipcRenderer.on(
-	ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+	ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 	(_event, downloadValues) =>
 		sendMsgToClient({
-			type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
-			downloadValues,
+			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+			downloadInfo: downloadValues,
 		})
 );
 
@@ -78,7 +78,7 @@ window.onmessage = async (
 	const msg = event.data.msg;
 
 	switch (msg.type) {
-		case ReactToElectronMessageEnum.DOWNLOAD_MEDIA: {
+		case ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD: {
 			if (!electronPort) {
 				console.error("There should be a electronPort to download media!");
 				break;

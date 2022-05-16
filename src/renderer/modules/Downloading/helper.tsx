@@ -1,13 +1,14 @@
 import { type MediaBeingDownloaded } from ".";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
-import create from "zustand";
 
+import { getDownloadingList, setDownloadingList } from "@contexts";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { Progress, Tooltip } from "@components";
 import { remove, replace } from "@utils/array";
 import { handleOnClose } from "@modules/Converting/helper";
+import { dbg } from "@common/utils";
 import {
 	type DownloadInfo,
 	ProgressStatus,
@@ -47,19 +48,17 @@ export const Popup = ({ downloadingList }: PopupProps) => (
 	</>
 );
 
-export const useDownloadingList = create<PopupProps["downloadingList"]>(
-	() => []
-);
-const { setState: setDownloadingList, getState: getDownloadingList } =
-	useDownloadingList;
-
 /**
  * This function returns a MessagePort that will be send to
  * Electron to enable 2 way communication between it
  * and React.
  */
 export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
+	dbg("Trying to create a new download...");
+
 	const downloadingList = getDownloadingList();
+
+	dbg({ downloadingList });
 
 	{
 		// First, see if there is another one that has the same url
@@ -88,7 +87,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// Creating a new DownloadingMedia:
 	const downloadStatus: MediaBeingDownloaded = {
 		imageURL: downloadInfo.imageURL,
-		status: ProgressStatus.ACTIVE,
+		status: ProgressStatus.WAITING,
 		title: downloadInfo.title,
 		url: downloadInfo.url,
 		isDownloading: true,
@@ -96,33 +95,31 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 		port: myPort,
 	};
 
+	// Add it to the list:
+	setDownloadingList([...downloadingList, downloadStatus]);
+
 	// Send msg to electronPort to download:
 	myPort.postMessage(downloadInfo);
 
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
+		dbg(
+			`Received a message from Electron on port for "${downloadInfo.title}":`,
+			data
+		);
+
 		const downloadingList = getDownloadingList();
 
+		dbg({ downloadingList });
+
 		// Assert that the download exists:
-		const indexToSeeIfDownloadExists = downloadingList.findIndex(
-			d => d.url === downloadInfo.url
-		);
-		const doesDownloadExists = indexToSeeIfDownloadExists !== -1;
+		const index = downloadingList.findIndex(d => d.url === downloadInfo.url);
 
-		if (!doesDownloadExists) {
-			console.info(
-				"Received a message from Electron but the url is not in the list. This is fine if we are creating a download!",
-				{ data, downloadingList },
-				"Creating it a new download..."
+		if (index === -1)
+			return console.error(
+				"Received a message from Electron but the url is not in the list!"
 			);
-
-			setDownloadingList([...downloadingList, downloadStatus]);
-		}
-
-		const index = doesDownloadExists
-			? indexToSeeIfDownloadExists
-			: downloadingList.length;
 
 		// Update React's information about this DownloadingMedia:
 		setDownloadingList(
@@ -136,7 +133,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 		switch (data.status) {
 			case ProgressStatus.FAIL: {
 				// @ts-ignore In this case, `data` include an `error: Error` key.
-				console.assert(data.error);
+				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
 
 				errorToast(`Download of "${downloadStatus.title}" failed!`);
@@ -168,6 +165,9 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			case ProgressStatus.CONVERT:
 				break;
 
+			case ProgressStatus.WAITING:
+				break;
+
 			default: {
 				assertUnreachable(data.status);
 				break;
@@ -189,13 +189,11 @@ const cancelDownloadAndOrRemoveItFromList = (url: string) => {
 	// Find the DownloadingMedia:
 	const index = downloadingList.findIndex(d => d.url === url);
 
-	{
-		if (index === -1)
-			return console.error(
-				`There should be a download with url "${url}"!\ndownloadList =`,
-				downloadingList
-			);
-	}
+	if (index === -1)
+		return console.error(
+			`There should be a download with url "${url}"!\ndownloadList =`,
+			downloadingList
+		);
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const download = downloadingList[index]!;

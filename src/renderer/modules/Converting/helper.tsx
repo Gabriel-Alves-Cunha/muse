@@ -5,13 +5,18 @@ import type { ProgressProps } from "@components/Progress";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
+import { type AllowedMedias, getBasename, dbg } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
-import { type AllowedMedias, getBasename } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
 import { remove, replace } from "@utils/array";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { Tooltip } from "@components";
+import {
+	getConvertingList,
+	setConvertingList,
+	useConvertingList,
+} from "@contexts";
 
 import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -38,7 +43,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends (
 
 const fixBugThatSetsItToAnObject: BugFixImpl =
 	(fn /*, name */) => (set, get, store) => {
-		const loggedSet: typeof set = (...a) => {
+		const fixedSetState: typeof set = (...a) => {
 			// console.log("previous:", ...(name ? [`${name}:`] : []), get());
 			// console.log(a);
 			// This true is to replace it instead of updating:
@@ -47,9 +52,9 @@ const fixBugThatSetsItToAnObject: BugFixImpl =
 			// console.log("isArray:", Array.isArray(get()));
 		};
 
-		store.setState = loggedSet;
+		store.setState = fixedSetState;
 
-		return fn(loggedSet, get, store);
+		return fn(fixedSetState, get, store);
 	};
 
 export const useConvertInfoList = create<ConvertInfoList>(
@@ -100,27 +105,12 @@ export const ConvertBox = ({
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// const { port1: testPort } = new MessageChannel();
-// const testConvertingMedia: MediaBeingConverted = Object.freeze({
-// 	status: ProgressStatus.ACTIVE,
-// 	path: "/test/fake/path",
-// 	timeConverted: "01:20",
-// 	sizeConverted: 1000,
-// 	isConverting: true,
-// 	toExtension: "mp3",
-// 	percentage: 50,
-// 	port: testPort,
-// } as const);
-
-export const useConvertingList = create<ConvertList>(
-	() => []
-	// new Array(10).fill(testConvertingMedia)
-);
-const { setState: setConvertingList, getState: getConvertingList } =
-	useConvertingList;
-
 export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
+	dbg("Trying to create a new conversion...");
+
 	const convertingList = getConvertingList();
+
+	dbg({ convertingList });
 
 	{
 		const indexIfThereIsOneAlready = convertingList.findIndex(
@@ -142,13 +132,15 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 
 	const convertStatus: MediaBeingConverted = {
 		toExtension: convertInfo.toExtension,
-		status: ProgressStatus.ACTIVE,
+		status: ProgressStatus.WAITING,
 		path: convertInfo.path,
 		isConverting: true,
 		timeConverted: "",
 		sizeConverted: 0,
 		port: myPort,
 	};
+
+	setConvertingList(prev => [...prev, convertStatus]);
 
 	myPort.postMessage({
 		toExtension: convertStatus.toExtension,
@@ -158,27 +150,22 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 	});
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
+		dbg(
+			`Received a message from Electron on port for "${convertInfo.path}":`,
+			data
+		);
+
 		const convertingList = getConvertingList();
 
+		dbg({ convertingList });
+
 		// Assert that the download exists:
-		const indexToSeeIfDownloadExists = convertingList.findIndex(
-			d => d.path === convertStatus.path
-		);
-		const doesDownloadExists = indexToSeeIfDownloadExists !== -1;
+		const index = convertingList.findIndex(d => d.path === convertStatus.path);
 
-		if (!doesDownloadExists) {
-			console.warn(
-				"Received a message from Electron but the path is not in the list",
-				{ data, convertList: convertingList },
-				"Creating it..."
+		if (index === -1)
+			return console.error(
+				"Received a message from Electron but the path is not in the list!"
 			);
-
-			setConvertingList([...convertingList, convertStatus]);
-		}
-
-		const index = doesDownloadExists
-			? indexToSeeIfDownloadExists
-			: convertingList.length;
 
 		setConvertingList(
 			replace(convertingList, index, {
@@ -190,7 +177,7 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 		switch (data.status) {
 			case ProgressStatus.FAIL: {
 				// @ts-ignore ^ In this case, `data` include an `error: Error` key.
-				console.assert(data.error);
+				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
 
 				errorToast(`Download of "${convertStatus.path}" failed!`);
@@ -222,6 +209,9 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 			case ProgressStatus.CONVERT:
 				break;
 
+			case ProgressStatus.WAITING:
+				break;
+
 			default: {
 				assertUnreachable(data.status);
 				break;
@@ -244,13 +234,11 @@ const cancelDownloadAndOrRemoveItFromList = (mediaPath: string) => {
 		c => c.path === mediaPath
 	);
 
-	{
-		if (mediaBeingConvertedIndex === -1)
-			return console.error(
-				`There should be a conversion with path "${mediaPath}"!\nconvertList =`,
-				convertingList
-			);
-	}
+	if (mediaBeingConvertedIndex === -1)
+		return console.error(
+			`There should be a conversion with path "${mediaPath}"!\nconvertList =`,
+			convertingList
+		);
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const mediaBeingConverted = convertingList[mediaBeingConvertedIndex]!;
@@ -269,7 +257,7 @@ const format = (str: string) => str.slice(0, str.lastIndexOf("."));
 
 export const handleOnClose = () => console.log("Closing ports (react port).");
 
-type MediaBeingConverted = Readonly<{
+export type MediaBeingConverted = Readonly<{
 	status: ProgressProps["status"];
 	toExtension: AllowedMedias;
 	sizeConverted: number;
@@ -278,8 +266,6 @@ type MediaBeingConverted = Readonly<{
 	port: MessagePort;
 	path: Path;
 }>;
-
-type ConvertList = readonly MediaBeingConverted[];
 
 type ConvertBoxProps = Readonly<{
 	mediaBeingConverted: MediaBeingConverted;

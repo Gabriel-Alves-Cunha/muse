@@ -181,20 +181,24 @@ export async function makeStream({
 	title,
 	url,
 }: Required<Omit<HandleDownload, "destroy">>) {
+	dbg(`Attempting to create a stream for "${title}" to download.`);
+
 	const titleWithExtension = sanitize(`${title}.${extension}`);
 	const saveSite = join(dirs.music, titleWithExtension);
 
 	// Assert file doesn't already exists:
 	{
-		if (await pathExists(saveSite))
-			return error(`File "${saveSite}" already exists!`);
+		if (await pathExists(saveSite)) {
+			error(`File "${saveSite}" already exists! Canceling download.`);
+
+			// Send a msg that the download failed:
+			return sendFailedDownloadMsg(url, electronPort);
+		}
 	}
 
 	const startTime = Date.now();
 	let interval: NodeJS.Timer | undefined = undefined;
 	let prettyTotal = "";
-
-	dbg(`Creating stream for "${title}" to download.`);
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
@@ -213,6 +217,12 @@ export async function makeStream({
 					2_000
 				);
 				prettyTotal = prettyBytes(total);
+
+				// Send a message to client that we're starting a download:
+				sendMsgToClient({
+					type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED,
+					url,
+				});
 			}
 
 			// To node console if is in development:
@@ -257,6 +267,8 @@ export async function makeStream({
 				"Does the downloaded file still exists?",
 				await pathExists(saveSite)
 			);
+
+			sendFailedDownloadMsg(url, electronPort);
 		})
 		.on("end", async () => {
 			log(
@@ -310,6 +322,8 @@ export async function makeStream({
 				"Does the downloaded file still exists?",
 				await pathExists(saveSite)
 			);
+
+			sendFailedDownloadMsg(url, electronPort);
 		});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
@@ -346,8 +360,17 @@ export async function convertToAudio({
 		const pathWithNewExtension = join(dirname(path), titleWithExtension);
 
 		// && that there already doesn't exists one:
-		if (path.endsWith(toExtension) || (await pathExists(pathWithNewExtension)))
-			return error(`File "${path}" already is "${toExtension}"!`);
+		if (
+			path.endsWith(toExtension) ||
+			(await pathExists(pathWithNewExtension))
+		) {
+			error(
+				`File "${path}" already is "${toExtension}"! Canceling conversion.`
+			);
+
+			// Send a msg saying that conversion failed;
+			return sendFailedConversionMsg(path, electronPort);
+		}
 	}
 
 	const saveSite = join(dirs.music, titleWithExtension);
@@ -364,7 +387,7 @@ export async function convertToAudio({
 				// timemark: the timestamp of the current frame in seconds
 
 				// To react:
-				if (!interval)
+				if (!interval) {
 					// ^ Only in the firt time this setInterval is called!
 					interval = setInterval(
 						() =>
@@ -374,6 +397,13 @@ export async function convertToAudio({
 							}),
 						2_000
 					);
+
+					// Send a message to client that we're starting a conversion:
+					sendMsgToClient({
+						type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED,
+						path,
+					});
+				}
 			}
 		)
 		.on("error", async err => {
@@ -401,6 +431,8 @@ export async function convertToAudio({
 				"Was file deleted?",
 				await pathExists(saveSite)
 			);
+
+			sendFailedConversionMsg(path, electronPort);
 		})
 		.on("end", async () => {
 			log(
@@ -468,6 +500,8 @@ export async function convertToAudio({
 				"Was file deleted?",
 				await pathExists(saveSite)
 			);
+
+			sendFailedConversionMsg(path, electronPort);
 		})
 		.save(saveSite);
 
@@ -479,10 +513,10 @@ export async function writeTags(
 	mediaPath: Readonly<Path>,
 	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean }>
 ): Promise<void> {
+	dbg("Writing tags to file:", { mediaPath, data });
+
 	const file = MediaFile.createFromPath(mediaPath);
 	let fileNewPath = "";
-
-	dbg({ data });
 
 	try {
 		Object.entries(data).forEach(async ([tag, value]) => {
@@ -582,7 +616,7 @@ export async function writeTags(
 		});
 
 		file.save();
-		dbg("File tags =", file.tag);
+		dbg("New file tags =", file.tag);
 		file.dispose();
 	} catch (error) {
 		// Send error to client:
@@ -638,6 +672,33 @@ export async function writeTags(
 			});
 		}
 	}
+
+	{
+		// Testing if new tags are present:
+		const file = MediaFile.createFromPath(mediaPath);
+
+		Object.keys(data).forEach(key => {
+			switch (key) {
+				case "pictures": {
+					if (data.isNewMedia || data.downloadImg) {
+						const filePictures = file.tag.pictures;
+
+						console.assert(
+							Array.isArray(filePictures),
+							`Invalid pictures = "${filePictures}"!`
+						);
+						console.assert(filePictures.length > 0, "No pictures!");
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+		});
+
+		file.dispose();
+	}
 }
 
 function createImage(imgAsString: ImgString, file: MediaFile) {
@@ -656,6 +717,7 @@ function createImage(imgAsString: ImgString, file: MediaFile) {
 	picture.description =
 		"This image was download when this media was downloaded.";
 	picture.type = PictureType.Media;
+	picture.filename = "thumbnail";
 	picture.mimeType = mimeType;
 
 	file.tag.pictures = [picture];
@@ -677,6 +739,24 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 			reject(e);
 		})
 	);
+
+const sendFailedConversionMsg = (path: Path, electronPort: MessagePort) => {
+	sendMsgToClient({
+		type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED,
+		path,
+	});
+
+	electronPort.close();
+};
+
+const sendFailedDownloadMsg = (url: string, electronPort: MessagePort) => {
+	sendMsgToClient({
+		type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED,
+		url,
+	});
+
+	electronPort.close();
+};
 
 export type HandleConversion = Readonly<{
 	electronPort?: Readonly<MessagePort>;

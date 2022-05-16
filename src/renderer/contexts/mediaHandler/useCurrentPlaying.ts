@@ -59,7 +59,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 							// We need to update history:
 							setPlaylists({
-								whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+								whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 								type: PlaylistEnum.UPDATE_HISTORY,
 								mediaID,
 							});
@@ -109,7 +109,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 							if (prevMediaID) {
 								// We need to update history:
 								setPlaylists({
-									whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+									whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 									type: PlaylistEnum.UPDATE_HISTORY,
 									mediaID: prevMediaID,
 								});
@@ -215,7 +215,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 									// We need to update history:
 									setPlaylists({
-										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+										whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 										type: PlaylistEnum.UPDATE_HISTORY,
 										mediaID: randomMedia.id,
 									});
@@ -242,7 +242,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 										// We need to update history:
 										setPlaylists({
-											whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+											whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 											mediaID: firstMediaFromTheSameList.id,
 											type: PlaylistEnum.UPDATE_HISTORY,
 										});
@@ -259,7 +259,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 									// We need to update history:
 									setPlaylists({
-										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+										whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 										mediaID: nextMediaFromTheSameList.id,
 										type: PlaylistEnum.UPDATE_HISTORY,
 									});
@@ -288,7 +288,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 									// We need to update history:
 									setPlaylists({
-										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+										whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 										type: PlaylistEnum.UPDATE_HISTORY,
 										mediaID: randomMedia,
 									});
@@ -315,7 +315,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 										// We need to update history:
 										setPlaylists({
-											whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+											whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 											mediaID: firstMediaFromTheSameList,
 											type: PlaylistEnum.UPDATE_HISTORY,
 										});
@@ -332,7 +332,7 @@ export const useCurrentPlaying = create<CurrentPlayingAction>()(
 
 									// We need to update history:
 									setPlaylists({
-										whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+										whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
 										type: PlaylistEnum.UPDATE_HISTORY,
 										mediaID: nextMediaFromTheSameList,
 									});

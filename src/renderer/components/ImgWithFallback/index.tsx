@@ -26,10 +26,10 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 
 	img.onload = () => {
 		cache.set(media.id, SUCCESS);
-		console.log(
-			`%c"${media.path}" img loaded with success`,
-			"font-weight: bold; color: blue;",
-		);
+		// console.log(
+		// 	`%c"${media.path}" img loaded with success`,
+		// 	"font-weight: bold; color: blue;",
+		// );
 		img = null;
 	};
 

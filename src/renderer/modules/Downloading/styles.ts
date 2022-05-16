@@ -87,7 +87,7 @@ export const TitleAndCancelWrapper = styled("div", {
 	width: "90%",
 	height: 16,
 
-	p: {
+	"& p": {
 		color: "$alternative-text",
 		fontFamily: "$primary",
 		whiteSpace: "nowrap", // keep it one line

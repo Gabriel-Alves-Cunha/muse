@@ -165,7 +165,7 @@ app
 
 									// Send msg to ipcMain:
 									electronWindow?.webContents.send(
-										ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+										ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 										downloadInfo
 									);
 
@@ -190,12 +190,12 @@ app
 
 // Relay message from electronWindow to ipcRenderer:
 ipcMain.on(
-	ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+	ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 	(_e, downloadValues: DownloadInfo) => {
 		dbg("ipcMain received data from electronWindow:", downloadValues);
 
 		ipcMain.emit(
-			ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS,
+			ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 			downloadValues
 		);
 	}

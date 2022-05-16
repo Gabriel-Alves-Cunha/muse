@@ -211,12 +211,19 @@ export const Footer = styled("div", {
 
 export const EmptyList = styled("div", {
 	position: "relative",
-	display: "flex",
+	display: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-	size: "100%",
+	size: "95%",
 
-	"&:before": {
-		content: "No medias found...",
+	color: "$alternative-text",
+	letterSpacing: "0.04rem",
+	fontFamily: "$secondary",
+	fontSize: "1.1rem",
+	fontWeight: 500,
+
+	img: {
+		size: 52,
+		mr: 20,
 	},
 });

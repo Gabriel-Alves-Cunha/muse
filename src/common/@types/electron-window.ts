@@ -14,12 +14,12 @@ export type VisibleElectron = Readonly<{
 			object: Readonly<{
 				type: ElectronIpcMainProcessNotificationEnum;
 				msg?: string;
-			}>,
+			}>
 		): void;
 	};
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory(
-			dir: Path,
+			dir: Path
 		): Promise<readonly Path[]>;
 		readFile(path: Path): Promise<Readonly<Buffer>>;
 		readdir(dir: Path): Promise<readonly Path[]>;
@@ -39,19 +39,19 @@ export type VisibleElectron = Readonly<{
 }>;
 
 export enum ReactToElectronMessageEnum {
-	DOWNLOAD_MEDIA = "download media", // 1
-	CONVERT_MEDIA = "convert media", // 2
-	WRITE_TAG = "write tag", // 3
-	ERROR = "error", // 4
+	CREATE_A_NEW_DOWNLOAD = "create a new download",
+	CONVERT_MEDIA = "convert media",
+	WRITE_TAG = "write tag",
+	ERROR = "error",
 }
 
 export type MsgObjectReactToElectron =
 	| Readonly<{
-			type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA;
-	  }> // 1
+			type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD;
+	  }>
 	| Readonly<{
 			type: ReactToElectronMessageEnum.CONVERT_MEDIA;
-	  }> // 2
+	  }>
 	| Readonly<{
 			type: ReactToElectronMessageEnum.WRITE_TAG;
 			params: Readonly<{
@@ -59,50 +59,70 @@ export type MsgObjectReactToElectron =
 				whatToChange: ChangeOptionsToSend;
 				mediaPath: Path;
 			}>;
-	  }> // 3
+	  }>
 	| Readonly<{
 			type: ReactToElectronMessageEnum.ERROR;
 			error: Error;
-	  }>; // 4
+	  }>;
 
 export enum ElectronToReactMessageEnum {
-	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer", // 1
-	DISPLAY_DOWNLOADING_MEDIAS = "display downloading medias", // 2
-	REFRESH_ALL_MEDIA = "refresh all media", // 3
-	REFRESH_ONE_MEDIA = "refresh one media", // 4
-	REMOVE_ONE_MEDIA = "remove one media", // 5
-	ADD_ONE_MEDIA = "add one media", // 6
-	ERROR = "error", // 7
+	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer",
+	CREATE_CONVERSION_FAILED = "create conversion failed",
+	CREATE_DOWNLOAD_FAILED = "create download failed",
+	NEW_COVERSION_CREATED = "new conversion created",
+	CREATE_A_NEW_DOWNLOAD = "create a new download",
+	NEW_DOWNLOAD_CREATED = "new download created",
+	REFRESH_ALL_MEDIA = "refresh all media",
+	REFRESH_ONE_MEDIA = "refresh one media",
+	REMOVE_ONE_MEDIA = "remove one media",
+	ADD_ONE_MEDIA = "add one media",
+	ERROR = "error",
 }
 
 export type MsgObjectElectronToReact =
 	| Readonly<{
 			type: ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
 			mediaPath: Path;
-	  }> // 1
+	  }>
 	| Readonly<{
-			type: ElectronToReactMessageEnum.DISPLAY_DOWNLOADING_MEDIAS;
-			downloadValues: DownloadInfo;
-	  }> // 2
+			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD;
+			downloadInfo: DownloadInfo;
+	  }>
 	| Readonly<{
 			type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA;
-	  }> // 3
+	  }>
 	| Readonly<{
 			type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA;
 			mediaPath: Path;
-	  }> // 4
+	  }>
 	| Readonly<{
 			type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA;
 			mediaPath: Path;
-	  }> // 5
+	  }>
 	| Readonly<{
 			type: ElectronToReactMessageEnum.ADD_ONE_MEDIA;
 			mediaPath: Path;
-	  }> // 6
+	  }>
 	| Readonly<{
 			type: ElectronToReactMessageEnum.ERROR;
 			error: Error;
-	  }>; // 7
+	  }>
+	| Readonly<{
+			type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED;
+			url: string;
+	  }>
+	| Readonly<{
+			type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED;
+			url: string;
+	  }>
+	| Readonly<{
+			type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED;
+			path: Path;
+	  }>
+	| Readonly<{
+			type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED;
+			path: Path;
+	  }>;
 
 export type WriteTag = Readonly<{
 	albumArtists?: readonly string[];

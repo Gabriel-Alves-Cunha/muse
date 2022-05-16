@@ -1,77 +1,141 @@
 import { createStitches } from "@stitches/react";
 import { toast } from "react-toastify";
 
-export const { styled, globalCss, keyframes, createTheme } = createStitches({
-	media: {
-		sm: "(max-width: 500px)",
-		md: "(max-width: 768px)",
-		lg: "(max-width: 1024px)",
+export const { styled, globalCss, keyframes, createTheme, css } =
+	createStitches({
+		media: {
+			sm: "(max-width: 500px)",
+			md: "(max-width: 768px)",
+			lg: "(max-width: 1024px)",
 
-		"media-player": "(max-width: 177px)",
-	},
-	theme: {
-		transitions: {
-			boxShadow: "box-shadow .2s ease-in-out 20ms",
-			bgc: "background-color .1s ease-in-out 20ms",
-			scale: "transform .2s ease-in-out 20ms",
-			opacity: "opacity .1s ease-in-out 20ms",
-			color: "color .1s ease-in-out 20ms",
-			filter: "filter .2s ease 20ms",
+			"media-player": "(max-width: 177px)",
 		},
-		fonts: {
-			primary: "'Assistant', sans-serif",
-			secondary: "Source Sans Pro",
+		theme: {
+			transitions: {
+				boxShadow: "box-shadow .2s ease-in-out 20ms",
+				bgc: "background-color .1s ease-in-out 20ms",
+				scale: "transform .2s ease-in-out 20ms",
+				opacity: "opacity .1s ease-in-out 20ms",
+				color: "color .1s ease-in-out 20ms",
+				filter: "filter .2s ease 20ms",
+			},
+			fonts: {
+				primary: "'Assistant', sans-serif",
+				secondary: "Source Sans Pro",
+			},
 		},
-	},
-	utils: {
-		size: (value: number | string) => ({
-			height: value,
-			width: value,
-		}),
+		utils: {
+			size: (value: number | string) => ({
+				height: value,
+				width: value,
+			}),
+			w: (value: number | string) => ({
+				width: value,
+			}),
+			h: (value: number | string) => ({
+				height: value,
+			}),
 
-		pt: (value: number | string) => ({
-			paddingTop: value,
-		}),
-		pr: (value: number | string) => ({
-			paddingRight: value,
-		}),
-		pb: (value: number | string) => ({
-			paddingBottom: value,
-		}),
-		pl: (value: number | string) => ({
-			paddingLeft: value,
-		}),
-		px: (value: number | string) => ({
-			paddingRight: value,
-			paddingLeft: value,
-		}),
-		py: (value: number | string) => ({
-			paddingBottom: value,
-			paddingTop: value,
-		}),
+			p: (value: number | string) => ({
+				padding: value,
+			}),
+			pt: (value: number | string) => ({
+				paddingTop: value,
+			}),
+			pr: (value: number | string) => ({
+				paddingRight: value,
+			}),
+			pb: (value: number | string) => ({
+				paddingBottom: value,
+			}),
+			pl: (value: number | string) => ({
+				paddingLeft: value,
+			}),
+			px: (value: number | string) => ({
+				paddingRight: value,
+				paddingLeft: value,
+			}),
+			py: (value: number | string) => ({
+				paddingBottom: value,
+				paddingTop: value,
+			}),
 
-		mt: (value: number | string) => ({
-			marginTop: value,
-		}),
-		mr: (value: number | string) => ({
-			marginRight: value,
-		}),
-		mb: (value: number | string) => ({
-			marginBottom: value,
-		}),
-		ml: (value: number | string) => ({
-			marginLeft: value,
-		}),
-		mx: (value: number | string) => ({
-			marginRight: value,
-			marginLeft: value,
-		}),
-		my: (value: number | string) => ({
-			marginBottom: value,
-			marginTop: value,
-		}),
-	},
-});
+			m: (value: number | string) => ({
+				margin: value,
+			}),
+			mt: (value: number | string) => ({
+				marginTop: value,
+			}),
+			mr: (value: number | string) => ({
+				marginRight: value,
+			}),
+			mb: (value: number | string) => ({
+				marginBottom: value,
+			}),
+			ml: (value: number | string) => ({
+				marginLeft: value,
+			}),
+			mx: (value: number | string) => ({
+				marginRight: value,
+				marginLeft: value,
+			}),
+			my: (value: number | string) => ({
+				marginBottom: value,
+				marginTop: value,
+			}),
+
+			dflex: (value: string) => ({
+				display: "flex",
+				alignItems: value,
+				justifyContent: value,
+			}),
+
+			sizeMin: (value: number | string) => ({
+				minWidth: value,
+				minHeight: value,
+				width: value,
+				height: value,
+			}),
+
+			textGradient: (value: number | string) => ({
+				backgroundImage: `linear-gradient(${value})`,
+				WebkitTextFillColor: "transparent",
+				WebkitBackgroundClip: "text",
+			}),
+
+			bg: (value: string) => ({
+				background: value,
+			}),
+
+			ta: (value: string) => ({
+				textAlign: value,
+			}),
+
+			d: (value: string) => ({ display: value }),
+			fd: (value: string) => ({
+				flexDirection: value,
+			}),
+			fs: (value: number | string) => ({
+				fontSize: value,
+			}),
+			br: (value: number | string) => ({
+				borderRadius: value,
+			}),
+			bs: (value: number | string) => ({
+				boxShadow: value,
+			}),
+			lh: (value: number | string) => ({
+				lineHeight: value,
+			}),
+			ov: (value: string) => ({ overflow: value }),
+			ox: (value: string) => ({ overflowX: value }),
+			oy: (value: string) => ({ overflowY: value }),
+
+			scale: (value: number | string) => ({
+				transform: `scale(${value})`,
+			}),
+		},
+	});
 
 export const darkTheme = createTheme({
 	colors: {

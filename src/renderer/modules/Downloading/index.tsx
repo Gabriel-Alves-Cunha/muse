@@ -2,9 +2,10 @@ import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import create from "zustand";
 
-import { createNewDownload, Popup, useDownloadingList } from "./helper";
 import { PopoverRoot, PopoverContent, Tooltip } from "@components";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { createNewDownload, Popup } from "./helper";
+import { useDownloadingList } from "@contexts";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
 import {
@@ -60,7 +61,7 @@ export function Downloading() {
 				// Sending port so we can communicate with Electron:
 				sendMsgToBackend(
 					{
-						type: ReactToElectronMessageEnum.DOWNLOAD_MEDIA,
+						type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
 					},
 					electronPort
 				);

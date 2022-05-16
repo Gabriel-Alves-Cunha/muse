@@ -1,4 +1,6 @@
 * TODO: impl select on media
+* TODO: handle msg passing on App.tsx
+* TODO: use NextUI instead of radix
 
 NOTES:
 

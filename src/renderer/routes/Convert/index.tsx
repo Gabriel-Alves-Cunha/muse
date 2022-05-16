@@ -48,7 +48,6 @@ export function Convert() {
 
 	return (
 		<MainArea>
-			{/* TODO: see why this `handleClick`: */}
 			<BorderedButton onClick={handleClick}>
 				<input
 					onInput={handleSelectedFiles}
