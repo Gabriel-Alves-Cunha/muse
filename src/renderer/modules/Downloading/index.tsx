@@ -41,7 +41,7 @@ export const { setState: setDownloadInfo } = useDownloadInfo;
 
 export function Downloading() {
 	const [isOpen, setIsOpen] = useState(false);
-	const downloadingList = useDownloadingList();
+	const downloadingListSize = useDownloadingList().size;
 	const downloadInfo = useDownloadInfo();
 
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
@@ -72,7 +72,7 @@ export function Downloading() {
 					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`
 				);
 			}
-	}, [downloadInfo, downloadInfo.canStartDownload, downloadInfo.title]);
+	}, [downloadInfo.canStartDownload, downloadInfo.title, downloadInfo]);
 
 	return (
 		<Wrapper>
@@ -80,11 +80,11 @@ export function Downloading() {
 				<Tooltip text="Show all downloading medias" side="right">
 					<StyledPopoverTrigger
 						className={
-							(downloadingList.length ? "has-items " : "") +
+							(downloadingListSize ? "has-items " : "") +
 							(isOpen ? "active " : "")
 						}
 					>
-						<i data-length={downloadingList.length}></i>
+						<i data-length={downloadingListSize}></i>
 
 						<DownloadingIcon size="20" />
 					</StyledPopoverTrigger>
@@ -94,12 +94,12 @@ export function Downloading() {
 
 				<PopoverContent
 					size={
-						downloadingList.length === 0
-							? "nothingFoundForConvertionsOrDownloads"
-							: "convertionsOrDownloads"
+						downloadingListSize === 0
+							? "nothing-found-for-convertions-or-downloads"
+							: "convertions-or-downloads"
 					}
 				>
-					<Popup downloadingList={downloadingList} />
+					<Popup />
 				</PopoverContent>
 			</PopoverRoot>
 		</Wrapper>
@@ -113,7 +113,6 @@ export type MediaBeingDownloaded = Readonly<{
 	port: MessagePort;
 	imageURL: string;
 	title: string;
-	url: string;
 }>;
 
 Downloading.whyDidYouRender = {

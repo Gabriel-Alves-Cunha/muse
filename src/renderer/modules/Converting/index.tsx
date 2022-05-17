@@ -20,8 +20,8 @@ import { PopoverAnchor } from "./styles";
 
 export function Converting() {
 	const [isOpen, setIsOpen] = useState(false);
+	const convertingListSize = useConvertingList().size;
 	const convertInfoList = useConvertInfoList();
-	const convertingList = useConvertingList();
 
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
@@ -59,11 +59,11 @@ export function Converting() {
 				<Tooltip text="Show all converting medias" side="right">
 					<StyledPopoverTrigger
 						className={
-							(convertingList.length ? "has-items " : "") +
+							(convertingListSize ? "has-items " : "") +
 							(isOpen ? "active" : "")
 						}
 					>
-						<i data-length={convertingList.length}></i>
+						<i data-length={convertingListSize}></i>
 
 						<Convert size={20} />
 					</StyledPopoverTrigger>
@@ -73,9 +73,9 @@ export function Converting() {
 
 				<PopoverContent
 					size={
-						convertingList.length === 0
-							? "nothingFoundForConvertionsOrDownloads"
-							: "convertionsOrDownloads"
+						convertingListSize === 0
+							? "nothing-found-for-convertions-or-downloads"
+							: "convertions-or-downloads"
 					}
 				>
 					<Popup />

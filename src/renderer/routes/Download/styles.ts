@@ -47,7 +47,7 @@ export const SearchWrapper = styled("div", {
 	width: "80%",
 	height: 60,
 
-	p: {
+	"& p": {
 		position: "absolute",
 		marginTop: "4rem",
 
@@ -128,7 +128,8 @@ export const ResultContainer = styled("div", {
 	img: {
 		objectFit: "cover",
 		display: "flex",
-		size: "90%",
+		height: 168.75,
+		width: 300,
 
 		maxHeight: 300,
 		maxWidth: 300,
@@ -150,7 +151,7 @@ export const ResultContainer = styled("div", {
 		},
 	},
 
-	p: {
+	"& p": {
 		fontFamily: "$primary",
 		textAlign: "center",
 		margin: "2rem 1rem",

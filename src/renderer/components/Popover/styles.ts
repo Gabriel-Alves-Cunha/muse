@@ -29,26 +29,26 @@ export const StyledContent = styled(Content, {
 
 	variants: {
 		size: {
-			nothingFoundForSearchMedia: {
+			"nothing-found-for-search-media": {
 				maxHeight: 100,
 				minHeight: 50,
 				width: 350,
 
 				overflow: "auto",
 			},
-			nothingFoundForConvertionsOrDownloads: {
+			"nothing-found-for-convertions-or-downloads": {
 				height: 100,
 				width: 260,
 
 				overflow: "hidden",
 			},
-			searchMediaResults: {
+			"search-media-results": {
 				height: 250,
 				width: 350,
 
 				overflow: "auto",
 			},
-			convertionsOrDownloads: {
+			"convertions-or-downloads": {
 				height: 300,
 				width: 260,
 

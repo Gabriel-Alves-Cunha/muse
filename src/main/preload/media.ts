@@ -6,6 +6,7 @@ import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/typesAndEnums";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "node:stream";
+import type { MediaUrl } from "@contexts";
 
 import { rename as renameFile, access } from "node:fs/promises";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
@@ -39,7 +40,7 @@ const { log, error } = console;
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
-const currentDownloads: Map<string, Readable> = new Map();
+const currentDownloads: Map<MediaUrl, Readable> = new Map();
 const mediasConverting: Map<Path, Readable> = new Map();
 
 const pathExists = async (path: Path): Promise<boolean> =>
@@ -187,17 +188,16 @@ export async function makeStream({
 	const saveSite = join(dirs.music, titleWithExtension);
 
 	// Assert file doesn't already exists:
-	{
-		if (await pathExists(saveSite)) {
-			error(`File "${saveSite}" already exists! Canceling download.`);
+	if (await pathExists(saveSite)) {
+		error(`File "${saveSite}" already exists! Canceling download.`);
 
-			// Send a msg that the download failed:
-			return sendFailedDownloadMsg(url, electronPort);
-		}
+		// Send a msg that the download failed:
+		return sendFailedDownloadMsg(url, electronPort);
 	}
 
-	const startTime = Date.now();
+	const startTime = performance.now();
 	let interval: NodeJS.Timer | undefined = undefined;
+	let percentageStr = "";
 	let prettyTotal = "";
 
 	// ytdl will 'end' the stream for me.
@@ -207,7 +207,7 @@ export async function makeStream({
 	})
 		.on("progress", (_, downloaded, total) => {
 			const percentage = (downloaded / total) * 100;
-			const percentageStr = percentage.toFixed(2);
+			percentageStr = percentage.toFixed(2);
 
 			// To react:
 			if (!interval) {
@@ -227,10 +227,10 @@ export async function makeStream({
 
 			// To node console if is in development:
 			if (isDevelopment) {
-				const minutesDownloading = (Date.now() - startTime) / 6e4;
+				const secondsDownloading = (performance.now() - startTime) / 1_000;
 				const estimatedDownloadTime = (
-					minutesDownloading / (percentage / 100) -
-					minutesDownloading
+					secondsDownloading / (percentage / 100) -
+					secondsDownloading
 				).toFixed(2);
 
 				readline.cursorTo(process.stdout, 0);
@@ -238,9 +238,9 @@ export async function makeStream({
 				process.stdout.write(
 					`${percentageStr}% downloaded, (${prettyBytes(
 						downloaded
-					)}/${prettyTotal}). Running for: ${minutesDownloading.toFixed(
+					)} / ${prettyTotal}). Running for: ${secondsDownloading.toFixed(
 						2
-					)} minutes. ETA: ${estimatedDownloadTime} minutes.`
+					)} seconds. ETA: ${estimatedDownloadTime} seconds.`
 				);
 			}
 		})

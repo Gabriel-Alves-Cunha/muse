@@ -3,7 +3,6 @@ import { useEffect } from "react";
 
 import { Favorites, Download, Convert, History, Home } from "@routes";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
-import { getItemAndIndex, remove, replace } from "@utils/array";
 import { ERROR_KIND, Path, ProgressStatus } from "@common/@types/typesAndEnums";
 import { ContextMenu, Decorations } from "@components";
 import { MediaPlayer, Navbar } from "@modules";
@@ -14,11 +13,9 @@ import {
 	searchLocalComputerForMedias,
 	downloadsToBeConfirmed,
 	convertsToBeConfirmed,
-	setDownloadingList,
-	getDownloadingList,
-	getConvertingList,
-	setConvertingList,
 	PlaylistActions,
+	downloadingList,
+	convertingList,
 	getMediaFiles,
 	PlaylistEnum,
 	setPlaylists,
@@ -115,30 +112,25 @@ window.onmessage = async (
 			dbg("New download created.");
 
 			try {
-				// In here, there has to be a download to be confirmed:
-				if (downloadsToBeConfirmed.has(msg.url)) {
-					const downloadingList = getDownloadingList();
-					const [download, index] = getItemAndIndex(
-						downloadingList,
-						download => download.url === msg.url
-					);
+				const downloadsToBeConfirmed_ = downloadsToBeConfirmed();
 
-					if (index === -1)
+				// In here, there has to be a download to be confirmed:
+				if (downloadsToBeConfirmed_.has(msg.url)) {
+					const download = downloadingList().get(msg.url);
+
+					if (!download)
 						throw new Error(
 							ERROR_KIND.DOWNLOAD_TO_BE_CONFIRMED_NOT_ON_DOWNLOADING_LIST
 						);
 
-					setDownloadingList(
-						replace(downloadingList, index, {
-							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-							...download!,
-							status: ProgressStatus.ACTIVE,
-						})
-					);
+					downloadingList().set(msg.url, {
+						...download,
+						status: ProgressStatus.ACTIVE,
+					});
 
 					// Since downloadToBeConfirmed is now handled,
 					// delete it from the map:
-					downloadsToBeConfirmed.delete(msg.url);
+					downloadsToBeConfirmed_.delete(msg.url);
 				} else
 					throw new Error(
 						ERROR_KIND.DOWNLOAD_TO_BE_CONFIRMED_NOT_ON_DOWNLOADS_TO_BE_CONFIRMED_LIST
@@ -153,30 +145,25 @@ window.onmessage = async (
 			dbg("New conversion created.");
 
 			try {
-				// In here, there has to be a conversion to be confirmed:
-				if (convertsToBeConfirmed.has(msg.path)) {
-					const convertingList = getConvertingList();
-					const [convertingMedia, index] = getItemAndIndex(
-						convertingList,
-						convertingMedia => convertingMedia.path === msg.path
-					);
+				const convertsToBeConfirmed_ = convertsToBeConfirmed();
 
-					if (index === -1)
+				// In here, there has to be a conversion to be confirmed:
+				if (convertsToBeConfirmed_.has(msg.path)) {
+					const convertingMedia = convertingList().get(msg.path);
+
+					if (!convertingMedia)
 						throw new Error(
 							ERROR_KIND.CONVERTION_TO_BE_CONFIRMED_NOT_ON_CONVERTS_TO_BE_CONFIRMED_LIST
 						);
 
-					setConvertingList(
-						replace(convertingList, index, {
-							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-							...convertingMedia!,
-							status: ProgressStatus.ACTIVE,
-						})
-					);
+					convertingList().set(msg.path, {
+						...convertingMedia,
+						status: ProgressStatus.ACTIVE,
+					});
 
 					// Since convertsToBeConfirmed is now handled,
 					// delete it from the map:
-					convertsToBeConfirmed.delete(msg.path);
+					convertsToBeConfirmed_.delete(msg.path);
 				} else
 					throw new Error(
 						ERROR_KIND.CONVERTION_TO_BE_CONFIRMED_NOT_ON_CONVERTING_LIST
@@ -191,23 +178,18 @@ window.onmessage = async (
 			try {
 				console.error("Create conversion failed!");
 
-				// In here, there has to be a conversion to be confirmed:
-				if (convertsToBeConfirmed.has(msg.path)) {
-					const convertingList = getConvertingList();
-					const index = convertingList.findIndex(
-						convertingMedia => convertingMedia.path === msg.path
-					);
+				const convertsToBeConfirmed_ = convertsToBeConfirmed();
 
-					if (index === -1)
+				// In here, there has to be a conversion to be confirmed:
+				if (convertsToBeConfirmed_.has(msg.path)) {
+					if (!convertingList().delete(msg.path))
 						throw new Error(
 							ERROR_KIND.CONVERTION_TO_BE_CONFIRMED_NOT_ON_CONVERTS_TO_BE_CONFIRMED_LIST
 						);
 
-					setConvertingList(remove(convertingList, index));
-
 					// Since convertsToBeConfirmed is now handled,
 					// delete it from the map:
-					convertsToBeConfirmed.delete(msg.path);
+					convertsToBeConfirmed_.delete(msg.path);
 				} else
 					throw new Error(
 						ERROR_KIND.CONVERTION_TO_BE_CONFIRMED_NOT_ON_CONVERTS_TO_BE_CONFIRMED_LIST
@@ -222,23 +204,18 @@ window.onmessage = async (
 			try {
 				console.error("Download failed!");
 
-				// In here, there has to be a download to be confirmed:
-				if (downloadsToBeConfirmed.has(msg.url)) {
-					const downloadingList = getDownloadingList();
-					const index = downloadingList.findIndex(
-						download => download.url === msg.url
-					);
+				const downloadsToBeConfirmed_ = downloadsToBeConfirmed();
 
-					if (index === -1)
+				// In here, there has to be a download to be confirmed:
+				if (downloadsToBeConfirmed_.has(msg.url)) {
+					if (downloadingList().delete(msg.url))
 						throw new Error(
 							ERROR_KIND.DOWNLOAD_TO_BE_CONFIRMED_NOT_ON_DOWNLOADING_LIST
 						);
 
-					setDownloadingList(remove(downloadingList, index));
-
 					// Since downloadToBeConfirmed is now handled,
 					// delete it from the map:
-					downloadsToBeConfirmed.delete(msg.url);
+					downloadsToBeConfirmed_.delete(msg.url);
 				} else
 					throw new Error(
 						ERROR_KIND.DOWNLOAD_TO_BE_CONFIRMED_NOT_ON_DOWNLOADS_TO_BE_CONFIRMED_LIST
@@ -385,76 +362,53 @@ function handleErrors(error: ERROR_KIND, str: MediaUrl | Path) {
 
 	switch (error) {
 		case ERROR_KIND.DOWNLOAD_TO_BE_CONFIRMED_NOT_ON_DOWNLOADS_TO_BE_CONFIRMED_LIST: {
-			const downloadingList = getDownloadingList();
-
-			// If the download is not in the `downloadsToBeConfirmed` list, handle error:
 			console.error(
-				"There should be a download to be confirmed on `downloadsToBeConfirmed`, but there is none!"
+				"There should be a download to be confirmed on `downloadsToBeConfirmed`, but there is none!",
+				{
+					downloadsToBeConfirmed: downloadsToBeConfirmed(),
+					downloadingList: downloadingList(),
+				}
 			);
-
-			// On the possibility that the download is on the `downloadingList`, let's remove it:
-			const index = downloadingList.findIndex(download => download.url === str);
-
-			if (index === -1) return;
-			else setDownloadingList(remove(downloadingList, index));
 			break;
 		}
 
 		case ERROR_KIND.DOWNLOAD_TO_BE_CONFIRMED_NOT_ON_DOWNLOADING_LIST: {
-			const downloadingList = getDownloadingList();
-
-			// If the download is not in the list, handle error:
 			console.error(
-				"There should be a download to be confirmed on `downloadingList`, but there is none!"
+				"There should be a download to be confirmed on `downloadingList`, but there is none!",
+				{
+					downloadsToBeConfirmed: downloadsToBeConfirmed(),
+					downloadingList: downloadingList(),
+				}
 			);
-
-			// On the possibility that the download is on the `downloadingList`, let's remove it:
-			const index = downloadingList.findIndex(download => download.url === str);
-
-			if (index === -1) return;
-			else setDownloadingList(remove(downloadingList, index));
 			break;
 		}
 
 		case ERROR_KIND.CONVERTION_TO_BE_CONFIRMED_NOT_ON_CONVERTING_LIST: {
-			const convertingList = getConvertingList();
-
-			// If the conversion is not in the list, handle error:
 			console.error(
-				"There should be a convertion to be confirmed on `convertingList`, but there is none!"
+				"There should be a convertion to be confirmed on `convertingList`, but there is none!",
+				{
+					convertsToBeConfirmed: convertsToBeConfirmed(),
+					convertingList: convertingList(),
+				}
 			);
-
-			// On the possibility that the conversion is on the `convertingList`, let's remove it:
-			const index = convertingList.findIndex(
-				convertingMedia => convertingMedia.path === str
-			);
-
-			if (index === -1) return;
-			else setConvertingList(remove(convertingList, index));
 			break;
 		}
 
 		case ERROR_KIND.CONVERTION_TO_BE_CONFIRMED_NOT_ON_CONVERTS_TO_BE_CONFIRMED_LIST: {
-			const convertingList = getConvertingList();
-
-			// If the download is not in the `downloadsToBeConfirmed` list, handle error:
 			console.error(
-				"There should be a conversion to be confirmed on `convertsToBeConfirmed`, but there is none!"
+				"There should be a conversion to be confirmed on `convertsToBeConfirmed`, but there is none!",
+				{
+					convertsToBeConfirmed: convertsToBeConfirmed(),
+					convertingList: convertingList(),
+				}
 			);
-
-			// On the possibility that the download is on the `downloadingList`, let's remove it:
-			const index = convertingList.findIndex(
-				convertingMedia => convertingMedia.path === str
-			);
-
-			if (index === -1) return;
-			else setConvertingList(remove(convertingList, index));
 			break;
 		}
 
 		case ERROR_KIND.CREATE_DOWNLOAD_FAILED: {
 			console.error("I wasn't able to create a download for this media: ", str);
 
+			downloadsToBeConfirmed().delete(str);
 			break;
 		}
 
@@ -464,6 +418,7 @@ function handleErrors(error: ERROR_KIND, str: MediaUrl | Path) {
 				str
 			);
 
+			convertsToBeConfirmed().delete(str);
 			break;
 		}
 

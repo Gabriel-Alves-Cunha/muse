@@ -1,5 +1,5 @@
 import type { State, StateCreator } from "zustand";
-import type { Path, ConvertInfo } from "@common/@types/typesAndEnums";
+import type { ConvertInfo, Path } from "@common/@types/typesAndEnums";
 import type { ProgressProps } from "@components/Progress";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
@@ -8,15 +8,10 @@ import create from "zustand";
 import { type AllowedMedias, getBasename, dbg } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
-import { remove, replace } from "@utils/array";
+import { convertingList } from "@contexts";
 import { ProgressStatus } from "@common/@types/typesAndEnums";
 import { prettyBytes } from "@common/prettyBytes";
 import { Tooltip } from "@components";
-import {
-	getConvertingList,
-	setConvertingList,
-	useConvertingList,
-} from "@contexts";
 
 import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -64,13 +59,13 @@ export const useConvertInfoList = create<ConvertInfoList>(
 export const { setState: setConvertInfoList } = useConvertInfoList;
 
 export const Popup = () => {
-	const convertingList = useConvertingList();
+	const convertingList_ = convertingList();
 
 	return (
 		<>
-			{convertingList.length > 0 ? (
-				convertingList.map(m => (
-					<ConvertBox mediaBeingConverted={m} key={m.path} />
+			{convertingList_.size > 0 ? (
+				Array.from(convertingList_.entries()).map(([path, m]) => (
+					<ConvertBox mediaBeingConverted={{ ...m, path }} key={path} />
 				))
 			) : (
 				<p>No conversions in progress!</p>
@@ -106,24 +101,17 @@ export const ConvertBox = ({
 ///////////////////////////////////////////////////////////////////////////
 
 export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
-	dbg("Trying to create a new conversion...");
+	const convertingList_ = convertingList();
 
-	const convertingList = getConvertingList();
+	dbg("Trying to create a new conversion...", { convertingList_ });
 
-	dbg({ convertingList });
+	if (convertingList_.has(convertInfo.path)) {
+		const info = `There is already one convert of "${convertInfo.path}"!`;
 
-	{
-		const indexIfThereIsOneAlready = convertingList.findIndex(
-			c => c.path === convertInfo.path
-		);
-		if (indexIfThereIsOneAlready !== -1) {
-			const info = `There is already one convert of "${convertInfo.path}"!`;
+		infoToast(info);
 
-			infoToast(info);
-
-			console.error(info, convertingList);
-			throw new Error(info);
-		}
+		console.error(info, convertingList_);
+		throw new Error(info);
 	}
 
 	// MessageChannels are lightweight, it's cheap to create
@@ -133,46 +121,40 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 	const convertStatus: MediaBeingConverted = {
 		toExtension: convertInfo.toExtension,
 		status: ProgressStatus.WAITING,
-		path: convertInfo.path,
 		isConverting: true,
 		timeConverted: "",
 		sizeConverted: 0,
 		port: myPort,
 	};
 
-	setConvertingList(prev => [...prev, convertStatus]);
+	convertingList_.set(convertInfo.path, convertStatus);
 
 	myPort.postMessage({
 		toExtension: convertStatus.toExtension,
-		path: convertStatus.path,
+		path: convertInfo.path,
 		// ^ On every `postMessage` you have to send the path (as an ID)!
 		canStartConvert: true,
 	});
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
-		dbg(
-			`Received a message from Electron on port for "${convertInfo.path}":`,
-			data
-		);
+		const convertingList_ = convertingList();
 
-		const convertingList = getConvertingList();
-
-		dbg({ convertingList });
+		dbg(`Received a message from Electron on port for "${convertInfo.path}":`, {
+			convertingList_,
+			data,
+		});
 
 		// Assert that the download exists:
-		const index = convertingList.findIndex(d => d.path === convertStatus.path);
-
-		if (index === -1)
+		if (!convertingList_.has(convertInfo.path)) {
 			return console.error(
 				"Received a message from Electron but the path is not in the list!"
 			);
+		}
 
-		setConvertingList(
-			replace(convertingList, index, {
-				...convertStatus,
-				...data, // new data will override old ones.
-			})
-		);
+		convertingList_.set(convertInfo.path, {
+			...convertStatus,
+			...data,
+		});
 
 		switch (data.status) {
 			case ProgressStatus.FAIL: {
@@ -180,23 +162,23 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
 
-				errorToast(`Download of "${convertStatus.path}" failed!`);
+				errorToast(`Download of "${convertInfo.path}" failed!`);
 
-				cancelDownloadAndOrRemoveItFromList(convertStatus.path);
+				cancelDownloadAndOrRemoveItFromList(convertInfo.path);
 				break;
 			}
 
 			case ProgressStatus.SUCCESS: {
-				successToast(`Download of "${convertStatus.path}" succeded!`);
+				successToast(`Download of "${convertInfo.path}" succeded!`);
 
-				cancelDownloadAndOrRemoveItFromList(convertStatus.path);
+				cancelDownloadAndOrRemoveItFromList(convertInfo.path);
 				break;
 			}
 
 			case ProgressStatus.CANCEL: {
-				infoToast(`Download of "${convertStatus.path}" was cancelled!`);
+				infoToast(`Download of "${convertInfo.path}" was cancelled!`);
 
-				cancelDownloadAndOrRemoveItFromList(convertStatus.path);
+				cancelDownloadAndOrRemoveItFromList(convertInfo.path);
 				break;
 			}
 
@@ -227,30 +209,27 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 	return electronPort;
 }
 
-const cancelDownloadAndOrRemoveItFromList = (mediaPath: string) => {
-	const convertingList = getConvertingList();
+const cancelDownloadAndOrRemoveItFromList = (path: string) => {
+	const convertingList_ = convertingList();
 
-	const mediaBeingConvertedIndex = convertingList.findIndex(
-		c => c.path === mediaPath
-	);
+	const mediaBeingConverted = convertingList_.get(path);
 
-	if (mediaBeingConvertedIndex === -1)
+	if (!mediaBeingConverted) {
 		return console.error(
-			`There should be a conversion with path "${mediaPath}"!\nconvertList =`,
-			convertingList
+			`There should be a conversion with path "${path}"!\nconvertList =`,
+			convertingList_
 		);
-
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const mediaBeingConverted = convertingList[mediaBeingConvertedIndex]!;
+	}
 
 	// Cancel conversion
-	if (mediaBeingConverted.isConverting)
+	if (mediaBeingConverted.isConverting) {
 		mediaBeingConverted.port.postMessage({
-			path: mediaBeingConverted.path,
 			destroy: true,
+			path,
 		});
+	}
 
-	setConvertingList(remove(convertingList, mediaBeingConvertedIndex));
+	convertingList_.delete(path);
 };
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
@@ -264,11 +243,10 @@ export type MediaBeingConverted = Readonly<{
 	timeConverted: string;
 	isConverting: boolean;
 	port: MessagePort;
-	path: Path;
 }>;
 
 type ConvertBoxProps = Readonly<{
-	mediaBeingConverted: MediaBeingConverted;
+	mediaBeingConverted: MediaBeingConverted & { path: Path };
 }>;
 
 type ConvertInfoList = readonly ConvertInfo[];

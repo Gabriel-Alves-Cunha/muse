@@ -2,15 +2,17 @@ import type { MediaBeingDownloaded } from "@modules/Downloading";
 
 import create from "zustand";
 
-export const useDownloadingList = create<DownloadingList>(() => []);
+export const useDownloadingList = create<DownloadingList>(() => new Map());
+export const { getState: downloadingList } = useDownloadingList;
 
-export const { setState: setDownloadingList, getState: getDownloadingList } =
-	useDownloadingList;
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
-///////////////////////////////////////////
-///////////////////////////////////////////
+export const useDownloadsToBeConfirmed = create<SetDownloadingList>(
+	() => new Map()
+);
+export const { getState: downloadsToBeConfirmed } = useDownloadsToBeConfirmed;
 
-export const downloadsToBeConfirmed: Map<MediaUrl, boolean> = new Map();
-
-type DownloadingList = readonly MediaBeingDownloaded[];
+type DownloadingList = Map<MediaUrl, MediaBeingDownloaded>;
+type SetDownloadingList = Map<MediaUrl, boolean>;
 export type MediaUrl = string;

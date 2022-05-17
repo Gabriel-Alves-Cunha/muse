@@ -16,15 +16,16 @@ import create from "zustand";
 // 	port: testPort,
 // } as const);
 
-export const useConvertingList = create<ConvertList>(
-	() => []
-	// () => new Array(10).fill(testConvertingMedia)
+export const useConvertingList = create<ConvertingList>(() => new Map());
+export const { getState: convertingList } = useConvertingList;
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+
+export const useConvertsToBeConfirmed = create<ConvertsToBeConfirmed>(
+	() => new Map()
 );
-export const { setState: setConvertingList, getState: getConvertingList } =
-	useConvertingList;
+export const { getState: convertsToBeConfirmed } = useConvertsToBeConfirmed;
 
-////////////////////////////////////////////////
-
-export const convertsToBeConfirmed: Map<Path, boolean> = new Map();
-
-type ConvertList = readonly MediaBeingConverted[];
+type ConvertingList = Map<Path, MediaBeingConverted>;
+type ConvertsToBeConfirmed = Map<Path, boolean>;
