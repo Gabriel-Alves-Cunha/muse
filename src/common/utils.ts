@@ -47,8 +47,10 @@ export const formatDuration = (time: number | undefined) => {
 	);
 };
 
-// These are not a bulletproof fns, but for the purpose of
-// getting the allowedMedias, it is ok, faster than NodeJS's.
+/**
+ * These are not a bulletproof fns, but for the purpose of
+ * getting the allowedMedias, it is ok, faster than NodeJS's.
+ */
 export const getBasename = (filename: string) =>
 	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
 

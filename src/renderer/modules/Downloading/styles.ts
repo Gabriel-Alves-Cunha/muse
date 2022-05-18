@@ -1,4 +1,5 @@
 import { Trigger } from "@radix-ui/react-popover";
+
 import { styled } from "@styles/global";
 
 export const Wrapper = styled("div", {
@@ -50,11 +51,12 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			background: "#5cb85c",
 			border: "1px solid #fff",
 			borderRadius: "50%",
-			mx: "auto",
+			px: "auto",
 
 			letterSpacing: "0.03rem",
 			fontFamily: "$primary",
 			fontStyle: "normal",
+			textAlign: "center",
 			fontWeight: 500,
 			color: "black",
 			fontSize: 10,
@@ -95,7 +97,7 @@ export const TitleAndCancelWrapper = styled("div", {
 		textAlign: "left",
 
 		overflow: "hidden",
-		width: "100%",
+		width: "90%",
 	},
 
 	button: {

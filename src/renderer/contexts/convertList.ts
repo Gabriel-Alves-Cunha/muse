@@ -1,5 +1,5 @@
 import type { MediaBeingConverted } from "@modules/Converting/helper";
-import type { Path } from "@common/@types/typesAndEnums";
+import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
@@ -19,13 +19,4 @@ import create from "zustand";
 export const useConvertingList = create<ConvertingList>(() => new Map());
 export const { getState: convertingList } = useConvertingList;
 
-///////////////////////////////////////////
-///////////////////////////////////////////
-
-export const useConvertsToBeConfirmed = create<ConvertsToBeConfirmed>(
-	() => new Map()
-);
-export const { getState: convertsToBeConfirmed } = useConvertsToBeConfirmed;
-
 type ConvertingList = Map<Path, MediaBeingConverted>;
-type ConvertsToBeConfirmed = Map<Path, boolean>;

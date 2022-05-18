@@ -1,6 +1,7 @@
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/generalTypes";
 
 import { BiDotsVerticalRounded as Dots } from "react-icons/bi";
+import { useCallback, useMemo, useRef } from "react";
 import {
 	IoPlayBackSharp as Previous,
 	IoPlayForwardSharp as Next,
@@ -16,23 +17,25 @@ import {
 	MdRepeat as Repeat,
 } from "react-icons/md";
 
-import { useCallback, useMemo, useRef } from "react";
-
 import { formatDuration } from "@common/utils";
 import { useProgress } from ".";
-import { Tooltip } from "@components";
+import { Tooltip } from "@components/Tooltip";
+import {
+	PlayOptionsType,
+	getPlayOptions,
+	setPlayOptions,
+	usePlayOptions,
+} from "@contexts/mediaHandler/usePlayOptions";
 import {
 	CurrentPlayingEnum,
 	getCurrentPlaying,
 	setCurrentPlaying,
-	PlayOptionsType,
-	usePlayOptions,
-	setPlayOptions,
-	getPlayOptions,
-	setPlaylists,
+} from "@contexts/mediaHandler/useCurrentPlaying";
+import {
 	PlaylistActions,
 	PlaylistEnum,
-} from "@contexts";
+	setPlaylists,
+} from "@contexts/mediaHandler/usePlaylists";
 
 import {
 	ControlsAndSeekerContainer,

@@ -1,3 +1,5 @@
+import type { ImgString } from "@common/@types/electron-window";
+
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
@@ -5,12 +7,10 @@ mockElectronPlusNodeGlobalsBeforeTests();
 import { mockGlobalsBeforeTests } from "../../renderer/mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
-import type { ImgString } from "@common/@types/electron-window";
-
-import { readFile, rename as renameFile } from "fs/promises";
+import { readFile, rename as renameFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 import { writeTags } from "@main/preload/media";
 
@@ -21,21 +21,8 @@ const mediaPath = resolve(
 	"..",
 	"..",
 	"test_assets",
-	`${originalTitle}.mp3`,
+	`${originalTitle}.mp3`
 );
-
-// console.log({ mediaPath });
-
-// data: Readonly<Readonly<{
-//     albumArtists?: readonly string[];
-//     genres?: readonly string[];
-//     imageURL?: string;
-//     album?: string;
-//     title?: string;
-// }> & {
-//     downloadImg?: boolean;
-//     isNewMedia?: boolean;
-// }>
 
 /////////////////////////////////////////////////////////
 // Testing #writeTags()
@@ -52,7 +39,7 @@ describe("It should account for the switch possibilities and the message sending
 			"..",
 			"..",
 			"test_assets",
-			`${changedData.title}.mp3`,
+			`${changedData.title}.mp3`
 		);
 
 		try {
@@ -109,7 +96,7 @@ describe("It should account for the switch possibilities and the message sending
 			"..",
 			"..",
 			"test_assets",
-			"img for tests.png",
+			"img for tests.png"
 		);
 		const imgContents = await readFile(imgPath, {
 			encoding: "base64",

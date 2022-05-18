@@ -1,9 +1,4 @@
-import type {
-	MediaID,
-	Mutable,
-	Media,
-	Path,
-} from "@common/@types/typesAndEnums";
+import type { Mutable, Media, Path } from "@common/@types/generalTypes";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
 import { sort, unshift } from "@utils/array";
@@ -16,15 +11,15 @@ const {
 // fns
 export const maxSizeOfHistory = 100;
 export function returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
-	previousHistory: readonly MediaID[],
-	newMediaID: MediaID,
-): readonly MediaID[] {
+	previousHistory: readonly Media["id"][],
+	newMediaID: Media["id"]
+): readonly Media["id"][] {
 	// if the newMedia is the same as the first media in the list, don't add it again:
 	if (newMediaID === previousHistory[0]) return previousHistory;
 
 	// add newMedia to the start of array:
-	const newHistory: MediaID[] = unshift(previousHistory, newMediaID) as Mutable<
-		MediaID[]
+	const newHistory: Media["id"][] = unshift(previousHistory, newMediaID) as Mutable<
+		Media["id"][]
 	>;
 
 	// history has a max size of maxSizeOfHistory:
@@ -66,7 +61,10 @@ export async function searchDirectoryResult() {
 	const ret = Object.freeze(fullPaths.flat());
 
 	const end = performance.now();
-	console.log(`%csearchDirectoryResult took: ${end - start} ms.`, "color:brown");
+	console.log(
+		`%csearchDirectoryResult took: ${end - start} ms.`,
+		"color:brown"
+	);
 
 	return ret;
 }
@@ -75,12 +73,12 @@ export const searchDirectoryForMedias = async (directory: Path) =>
 	getAllowedMedias(await readdir(directory));
 
 export const getAllowedMedias = (
-	filenames: readonly string[],
+	filenames: readonly string[]
 ): readonly string[] =>
 	Object.freeze(
 		filenames.filter(filename =>
-			allowedMedias.some(extension => extension === getLastExtension(filename)),
-		),
+			allowedMedias.some(extension => extension === getLastExtension(filename))
+		)
 	);
 
 export const sortByDate = (newList: readonly Media[]) =>
@@ -90,7 +88,7 @@ export const sortByDate = (newList: readonly Media[]) =>
 			if (a.dateOfArival < b.dateOfArival) return -1;
 			// a must be equal to b:
 			return 0;
-		}).map(media => media.id),
+		}).map(media => media.id)
 	);
 
 export const sortByName = (list: readonly Media[]) =>
@@ -100,7 +98,7 @@ export const sortByName = (list: readonly Media[]) =>
 			if (a.title < b.title) return -1;
 			// a must be equal to b:
 			return 0;
-		}).map(media => media.id),
+		}).map(media => media.id)
 	);
 
 export const SORTED_BY_DATE = "sorted by date";

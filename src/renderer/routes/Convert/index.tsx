@@ -1,10 +1,10 @@
 import type { AllowedMedias } from "@common/utils";
-import type { Path } from "@common/@types/typesAndEnums";
+import type { Path } from "@common/@types/generalTypes";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { setConvertInfoList } from "@modules/Converting/helper";
-import { MainArea } from "@components";
+import { MainArea } from "@components/MainArea";
 
 import { BorderedButton } from "./styles";
 

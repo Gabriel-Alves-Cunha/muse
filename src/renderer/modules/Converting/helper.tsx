@@ -1,17 +1,17 @@
 import type { State, StateCreator } from "zustand";
-import type { ConvertInfo, Path } from "@common/@types/typesAndEnums";
 import type { ProgressProps } from "@components/Progress";
+import type { Path } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
 import { type AllowedMedias, getBasename, dbg } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
+import { ConvertInfo, ProgressStatus } from "@common/enums";
 import { assertUnreachable } from "@utils/utils";
-import { convertingList } from "@contexts";
-import { ProgressStatus } from "@common/@types/typesAndEnums";
+import { convertingList } from "@contexts/convertList";
 import { prettyBytes } from "@common/prettyBytes";
-import { Tooltip } from "@components";
+import { Tooltip } from "@components/Tooltip";
 
 import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -119,8 +119,8 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 	const convertStatus: MediaBeingConverted = {
+		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		toExtension: convertInfo.toExtension,
-		status: ProgressStatus.WAITING,
 		isConverting: true,
 		timeConverted: "",
 		sizeConverted: 0,
@@ -157,7 +157,7 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 		});
 
 		switch (data.status) {
-			case ProgressStatus.FAIL: {
+			case ProgressStatus.FAILED: {
 				// @ts-ignore ^ In this case, `data` include an `error: Error` key.
 				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
@@ -188,10 +188,7 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 			case undefined:
 				break;
 
-			case ProgressStatus.CONVERT:
-				break;
-
-			case ProgressStatus.WAITING:
+			case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
 				break;
 
 			default: {

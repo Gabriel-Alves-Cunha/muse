@@ -3,8 +3,9 @@ import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { ControlsAndSeeker, Header, playNextMedia } from "./helpers";
-import { useCurrentPlaying, usePlaylists } from "@contexts";
-import { ImgWithFallback } from "@components";
+import { useCurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
+import { ImgWithFallback } from "@components/ImgWithFallback";
+import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
 
 import { SquareImage, Wrapper, Info } from "./styles";
 

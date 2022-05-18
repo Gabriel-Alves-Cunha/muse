@@ -34,17 +34,13 @@
 		"pretty": true,
 		"strict": true,
 		"paths": {
-			"@components": ["renderer/components/index"],
 			"@components/*": ["renderer/components/*"],
-			"@contexts": ["renderer/contexts/index"],
 			"@contexts/*": ["renderer/contexts/*"],
-			"@modules": ["renderer/modules/index"],
 			"@modules/*": ["renderer/modules/*"],
-			"@routes": ["renderer/routes/index"],
-			"@hooks": ["renderer/hooks/index"],
 			"@styles/*": ["renderer/styles/*"],
 			"@routes/*": ["renderer/routes/*"],
 			"@utils/*": ["renderer/utils/*"],
+			"@hooks/*": ["renderer/hooks/*"],
 			"@renderer/*": ["renderer/*"],
 			"@common/*": ["common/*"],
 			"@main/*": ["main/*"]

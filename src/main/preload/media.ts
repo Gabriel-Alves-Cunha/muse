@@ -3,10 +3,10 @@
 
 import type { ImgString, WriteTag } from "@common/@types/electron-window";
 import type { AllowedMedias } from "@common/utils";
-import type { Media, Path } from "@common/@types/typesAndEnums";
+import type { Media, Path } from "@common/@types/generalTypes";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "node:stream";
-import type { MediaUrl } from "@contexts";
+import type { MediaUrl } from "@contexts/downloadList";
 
 import { rename as renameFile, access } from "node:fs/promises";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
@@ -29,11 +29,12 @@ import { getLastExtension, formatDuration, getBasename } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { dbg, isDevelopment } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { ProgressStatus } from "@common/@types/typesAndEnums";
+import { ProgressStatus } from "@common/enums";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
 import { hash } from "@common/hash";
 import { dirs } from "../utils";
+import { time } from "@utils/utils";
 
 const { log, error } = console;
 
@@ -54,78 +55,72 @@ const createMedia = async (
 	ignoreMediaWithLessThan60Seconds: boolean
 ): Promise<Media> =>
 	new Promise((resolve, reject) => {
-		const start = performance.now();
-
-		const {
-			fileAbstraction: {
-				readStream: { length },
-			},
-			tag: { pictures, title, album, genres, albumArtists },
-			properties: { durationMilliseconds },
-		} = MediaFile.createFromPath(path);
-
-		const duration = durationMilliseconds / 1_000;
 		const basename = getBasename(path);
 
-		if (ignoreMediaWithLessThan60Seconds && duration < 60) {
-			log(
-				`Skipping "${path}" because the duration is ${duration.toPrecision(
-					3
-				)} s (less than 60 s)!`
-			);
-			const end = performance.now();
-			log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
-			return reject();
-		}
+		time(() => {
+			const {
+				fileAbstraction: {
+					readStream: { length },
+				},
+				tag: { pictures, title, album, genres, albumArtists },
+				properties: { durationMilliseconds },
+			} = MediaFile.createFromPath(path);
 
-		const size = prettyBytes(length);
+			const duration = durationMilliseconds / 1_000;
 
-		if (assureMediaSizeIsGreaterThan60KB && length < 60_000) {
-			log(`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`);
-			const end = performance.now();
-			log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
-			return reject();
-		}
+			if (ignoreMediaWithLessThan60Seconds && duration < 60) {
+				log(
+					`Skipping "${path}" because the duration is ${duration.toPrecision(
+						3
+					)} s (less than 60 s)!`
+				);
+				return reject();
+			}
 
-		const picture: IPicture | undefined = pictures[0];
-		const mimeType = picture?.mimeType;
-		let img = "";
-		if (picture && mimeType) {
-			const str =
-				// If the picture wasn't made by us. (That's the only way I found to
-				// make this work, cause, when we didn't make the picture in
-				// `writeTag`, we can't decode it!):
-				picture.type === PictureType.NotAPicture ||
-				picture.type === PictureType.Other
-					? Buffer.from(picture.data.data).toString("base64")
-					: picture.data.toString();
-			img = `data:${mimeType};base64,${str}`;
-		}
+			const size = prettyBytes(length);
 
-		const media: Media = Object.freeze({
-			duration: formatDuration(duration),
-			artist: albumArtists[0] ?? "",
-			dateOfArival: Date.now(),
-			title: title ?? basename,
-			selected: false,
-			favorite: false,
-			id: hash(path),
-			genres,
-			album,
-			size,
-			path,
-			img,
-		});
+			if (assureMediaSizeIsGreaterThan60KB && length < 60_000) {
+				log(`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`);
+				return reject();
+			}
 
-		dbg(basename, {
-			tag: { pictures, album, genres, albumArtists },
-			properties: { durationMilliseconds },
-		});
+			const picture: IPicture | undefined = pictures[0];
+			const mimeType = picture?.mimeType;
+			let img = "";
+			if (picture && mimeType) {
+				const str =
+					// If the picture wasn't made by us. (That's the only way I found to
+					// make this work, cause, when we didn't make the picture in
+					// `writeTag`, we can't decode it!):
+					picture.type === PictureType.NotAPicture ||
+					picture.type === PictureType.Other
+						? Buffer.from(picture.data.data).toString("base64")
+						: picture.data.toString();
+				img = `data:${mimeType};base64,${str}`;
+			}
 
-		const end = performance.now();
-		log(`%c"${basename}" took: ${end - start} ms.`, "color:brown");
+			const media: Media = {
+				duration: formatDuration(duration),
+				artist: albumArtists[0] ?? "",
+				dateOfArival: Date.now(),
+				title: title ?? basename,
+				selected: false,
+				favorite: false,
+				id: hash(path),
+				genres,
+				album,
+				size,
+				path,
+				img,
+			};
 
-		return resolve(media);
+			dbg(basename, {
+				tag: { pictures, album, genres, albumArtists },
+				properties: { durationMilliseconds },
+			});
+
+			return resolve(media);
+		}, `createMedia("${basename}")`);
 	});
 
 export async function transformPathsToMedias(
@@ -133,8 +128,6 @@ export async function transformPathsToMedias(
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true
 ): Promise<readonly Media[]> {
-	const start = performance.now();
-
 	const medias: Media[] = [];
 
 	console.groupCollapsed("Creating medias...");
@@ -150,9 +143,6 @@ export async function transformPathsToMedias(
 		if (p.status === "fulfilled") medias.push(p.value);
 	});
 	console.groupEnd();
-
-	const end = performance.now();
-	log(`%cReading all medias took: ${end - start} ms.`, "color:brown");
 
 	return medias;
 }
@@ -197,7 +187,6 @@ export async function makeStream({
 
 	const startTime = performance.now();
 	let interval: NodeJS.Timer | undefined = undefined;
-	let percentageStr = "";
 	let prettyTotal = "";
 
 	// ytdl will 'end' the stream for me.
@@ -207,13 +196,12 @@ export async function makeStream({
 	})
 		.on("progress", (_, downloaded, total) => {
 			const percentage = (downloaded / total) * 100;
-			percentageStr = percentage.toFixed(2);
 
 			// To react:
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
-					() => electronPort.postMessage({ percentage: percentageStr }),
+					() => electronPort.postMessage({ percentage }),
 					2_000
 				);
 				prettyTotal = prettyBytes(total);
@@ -236,7 +224,7 @@ export async function makeStream({
 				readline.cursorTo(process.stdout, 0);
 				readline.clearLine(process.stdout, 0);
 				process.stdout.write(
-					`${percentageStr}% downloaded, (${prettyBytes(
+					`${percentage.toFixed(2)}% downloaded, (${prettyBytes(
 						downloaded
 					)} / ${prettyTotal}). Running for: ${secondsDownloading.toFixed(
 						2
@@ -305,7 +293,7 @@ export async function makeStream({
 
 			// To react
 			electronPort.postMessage({
-				status: ProgressStatus.FAIL,
+				status: ProgressStatus.FAILED,
 				isDownloading: false,
 				error: err,
 			});
@@ -414,7 +402,7 @@ export async function convertToAudio({
 
 			// To react:
 			electronPort.postMessage({
-				status: ProgressStatus.FAIL,
+				status: ProgressStatus.FAILED,
 				isConverting: false,
 				error: err,
 			});
@@ -674,8 +662,8 @@ export async function writeTags(
 	}
 
 	{
-		// Testing if new tags are present:
 		const file = MediaFile.createFromPath(mediaPath);
+		dbg("Testing if new tags are present:", file.tag.pictures);
 
 		Object.keys(data).forEach(key => {
 			switch (key) {
@@ -711,18 +699,17 @@ function createImage(imgAsString: ImgString, file: MediaFile) {
 		imgAsString.indexOf(";")
 	);
 
-	const picture = Picture.fromData(
-		ByteVector.fromString(txtForByteVector, StringType.Latin1)
+	const picture = Picture.fromFullData(
+		ByteVector.fromString(txtForByteVector, StringType.Latin1),
+		PictureType.Media,
+		mimeType,
+		"This image was download when this media was downloaded."
 	);
-	picture.description =
-		"This image was download when this media was downloaded.";
-	picture.type = PictureType.Media;
 	picture.filename = "thumbnail";
-	picture.mimeType = mimeType;
 
 	file.tag.pictures = [picture];
 
-	log({ fileTagPictures: file.tag.pictures, picture });
+	dbg("At createImage():", { "file.tag.pictures": file.tag.pictures, picture });
 }
 
 export const getThumbnail = async (url: string): Promise<ImgString> =>

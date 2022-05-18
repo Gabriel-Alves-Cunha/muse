@@ -1,5 +1,5 @@
 import type { MediaListKindProps } from "@components/MediaListKind";
-import type { Media, MediaID } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/generalTypes";
 
 import { useEffect, useRef, useTransition } from "react";
 import { FiTrash as Clean } from "react-icons/fi";
@@ -9,24 +9,23 @@ import {
 } from "react-icons/md";
 import create from "zustand";
 
+import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { constRefToEmptyArray } from "@utils/array";
-import { useOnClickOutside } from "@hooks";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
+import { ImgWithFallback } from "@components/ImgWithFallback";
+import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { Tooltip } from "@components/Tooltip";
 import {
 	searchLocalComputerForMedias,
 	searchForMediaFromList,
-	CurrentPlayingEnum,
-	setCurrentPlaying,
 	PlaylistActions,
 	PlaylistEnum,
 	setPlaylists,
-	MAIN_LIST,
-} from "@contexts";
+} from "@contexts/mediaHandler/usePlaylists";
 import {
-	ImgWithFallback,
-	PopoverContent,
-	PopoverRoot,
-	Tooltip,
-} from "@components";
+	CurrentPlayingEnum,
+	setCurrentPlaying,
+} from "@contexts/mediaHandler/useCurrentPlaying";
 
 import { ImgWrapper } from "../MediaListKind/styles";
 import {
@@ -104,7 +103,7 @@ const reload = async () => {
 export const setSearchTerm = (e: InputChange) =>
 	setSearcher({ searchTerm: e.target.value.toLowerCase() });
 
-const playMedia = (mediaID: MediaID) =>
+const playMedia = (mediaID: Media["id"]) =>
 	setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
 		playlistName: MAIN_LIST,
@@ -145,9 +144,7 @@ export function Input() {
 	const [, startTransition] = useTransition();
 	const { searchTerm } = useSearcher();
 
-	useOnClickOutside(inputRef, () =>
-		setSearcher(prev => (prev !== defaultSearcher ? defaultSearcher : prev))
-	);
+	useOnClickOutside(inputRef, () => searchTerm && setSearcher(defaultSearcher));
 
 	useEffect(() => {
 		setSearcher({
@@ -193,7 +190,9 @@ export function Results() {
 
 			<PopoverContent
 				size={
-					nothingFound ? "nothingFoundForSearchMedia" : "searchMediaResults"
+					nothingFound
+						? "nothing-found-for-search-media"
+						: "search-media-results"
 				}
 			>
 				{nothingFound ? (

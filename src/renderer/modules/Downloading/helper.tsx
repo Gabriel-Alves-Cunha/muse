@@ -1,17 +1,16 @@
-import { type MediaBeingDownloaded } from ".";
+import type { MediaBeingDownloaded } from ".";
+import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 
-import { useDownloadingList, downloadingList } from "@contexts";
+import { useDownloadingList, downloadingList } from "@contexts/downloadList";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
-import { Progress, Tooltip } from "@components";
+import { ProgressStatus } from "@common/enums";
 import { handleOnClose } from "@modules/Converting/helper";
+import { Progress } from "@components/Progress";
+import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
-import {
-	type DownloadInfo,
-	ProgressStatus,
-} from "@common/@types/typesAndEnums";
 
 import { Content, TitleAndCancelWrapper } from "./styles";
 
@@ -78,8 +77,8 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 	// Creating a new DownloadingMedia:
 	const downloadStatus: MediaBeingDownloaded = {
+		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		imageURL: downloadInfo.imageURL,
-		status: ProgressStatus.WAITING,
 		title: downloadInfo.title,
 		isDownloading: true,
 		percentage: 0,
@@ -97,14 +96,12 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
-		dbg(
-			`Received a message from Electron on port for "${downloadInfo.title}":`,
-			data
-		);
-
 		const downloadingList_ = downloadingList();
 
-		dbg({ downloadingList });
+		dbg(
+			`Received a message from Electron on port for "${downloadInfo.title}":`,
+			{ data, downloadingList_ }
+		);
 
 		// Assert that the download exists:
 		if (!downloadingList_.has(downloadInfo.url))
@@ -112,12 +109,14 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 				"Received a message from Electron but the url is not in the list!"
 			);
 
+		dbg("downloadStatus:", downloadingList_.get(downloadInfo.url));
+
 		// Update React's information about this DownloadingMedia:
 		downloadingList_.set(downloadInfo.url, { ...downloadStatus, ...data });
 
 		// Handle ProgressStatus's cases:
 		switch (data.status) {
-			case ProgressStatus.FAIL: {
+			case ProgressStatus.FAILED: {
 				// @ts-ignore In this case, `data` include an `error: Error` key.
 				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
@@ -148,10 +147,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			case undefined:
 				break;
 
-			case ProgressStatus.CONVERT:
-				break;
-
-			case ProgressStatus.WAITING:
+			case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
 				break;
 
 			default: {

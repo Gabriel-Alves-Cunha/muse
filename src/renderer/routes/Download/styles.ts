@@ -1,4 +1,4 @@
-import { MainArea } from "@components";
+import { MainArea } from "@components/MainArea";
 import { styled } from "@styles/global";
 
 export const Wrapper = styled(MainArea, {

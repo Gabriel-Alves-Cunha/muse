@@ -1,4 +1,4 @@
-import type { DownloadInfo } from "@common/@types/typesAndEnums.js";
+import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
 import { pathToFileURL } from "node:url";
@@ -15,8 +15,8 @@ import {
 } from "electron";
 
 import { capitalizedAppName, dbg, isDevelopment } from "@common/utils";
-import { assertUnreachable } from "@utils/utils.js";
-import { logoPath } from "./utils.js";
+import { assertUnreachable } from "@utils/utils";
+import { logoPath } from "./utils";
 import {
 	ElectronIpcMainProcessNotificationEnum,
 	ElectronToReactMessageEnum,

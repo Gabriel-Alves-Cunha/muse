@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
-import { getPlayOptions, PlayOptionsType, setPlayOptions } from "@contexts";
+import {
+	PlayOptionsType,
+	getPlayOptions,
+	setPlayOptions,
+} from "@contexts/mediaHandler/usePlayOptions";
 
 describe("Testing usePlayOptions", () => {
 	it("should get a new playOptions with .loopThisMedia set", () => {

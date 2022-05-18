@@ -1,6 +1,7 @@
-import { isDevelopment } from "@common/utils";
 import { homedir } from "node:os";
 import { join } from "node:path";
+
+import { isDevelopment } from "@common/utils";
 
 const rootDirectory = isDevelopment
 	? join(__dirname, "..", "..", "..")

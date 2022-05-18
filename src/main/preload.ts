@@ -6,8 +6,10 @@ import { assertUnreachable } from "@utils/utils";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
 import {
+	type MsgObjectReactToElectron,
 	type VisibleElectron,
 	ReactToElectronMessageEnum,
+	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
 import {
 	type MsgWithSource,
@@ -28,10 +30,6 @@ import {
 	readFile,
 	readdir,
 } from "./preload/file";
-import {
-	type MsgObjectReactToElectron,
-	ElectronToReactMessageEnum,
-} from "@common/@types/electron-window";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object

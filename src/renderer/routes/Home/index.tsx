@@ -1,6 +1,8 @@
-import { MediaListKind, SearchMedia, MainArea } from "@components";
 import { ButtonToTheSideEnum } from "@components/SearchMedia/helper";
-import { MAIN_LIST } from "@contexts";
+import { MediaListKind } from "@components/MediaListKind";
+import { SearchMedia } from "@components/SearchMedia";
+import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MainArea } from "@components/MainArea";
 
 export function Home() {
 	return (

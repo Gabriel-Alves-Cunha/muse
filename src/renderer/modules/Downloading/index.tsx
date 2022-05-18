@@ -1,17 +1,17 @@
+import type { DownloadInfo } from "@common/@types/generalTypes";
+
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import create from "zustand";
 
-import { PopoverRoot, PopoverContent, Tooltip } from "@components";
+import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { createNewDownload, Popup } from "./helper";
-import { useDownloadingList } from "@contexts";
+import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { ProgressStatus } from "@common/enums";
 import { errorToast } from "@styles/global";
-import {
-	type DownloadInfo,
-	ProgressStatus,
-} from "@common/@types/typesAndEnums";
+import { Tooltip } from "@components/Tooltip";
 
 import { StyledPopoverTrigger, Wrapper } from "./styles";
 import { PopoverAnchor } from "@modules/Converting/styles";

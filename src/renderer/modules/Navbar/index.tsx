@@ -1,4 +1,4 @@
-import type { Page } from "@common/@types/typesAndEnums";
+import type { Page } from "@common/@types/generalTypes";
 
 import {
 	MdOutlineVideoLibrary as Home,
@@ -9,10 +9,11 @@ import {
 	MdHistory as History,
 } from "react-icons/md";
 
-import { Downloading, Converting } from "@modules";
 import { ThemeToggler } from "@modules/ThemeToggler";
-import { Tooltip } from "@components";
-import { usePage } from "@contexts";
+import { Downloading } from "@modules/Downloading";
+import { Converting } from "@modules/Converting";
+import { Tooltip } from "@components/Tooltip";
+import { usePage } from "@contexts/page";
 import { pages } from "@utils/app";
 
 import { ScaleUpIconButton, Nav, Buttons, Popups } from "./styles";

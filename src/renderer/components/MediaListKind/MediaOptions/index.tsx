@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/generalTypes";
 
 import { type RefObject, useEffect, useRef } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
@@ -8,9 +8,9 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { deleteMedia } from "@contexts";
+import { deleteMedia } from "@contexts/mediaHandler/usePlaylists";
 import { capitalize } from "@utils/utils";
-import { Tooltip } from "@components";
+import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
 
 import {
@@ -187,6 +187,7 @@ function changePropsIfAllowed(
 								// handle splitting the string, so just continue the
 								// rest of the function.
 							}
+
 							dbg({ id, newValue, key, oldValue });
 
 							const whatToSend: ChangeOptionsToSend = allowedOptionToChange[id];

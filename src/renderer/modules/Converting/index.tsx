@@ -1,13 +1,14 @@
 import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
 
-import { PopoverRoot, PopoverContent, Tooltip } from "@components";
+import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 // This `constRefToEmptyArray` prevents an infinite loop:
 import { constRefToEmptyArray } from "@utils/array";
-import { useConvertingList } from "@contexts";
+import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
+import { Tooltip } from "@components/Tooltip";
 import {
 	useConvertInfoList,
 	setConvertInfoList,

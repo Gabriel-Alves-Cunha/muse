@@ -1,4 +1,4 @@
-import type { DownloadInfo, Media, Path } from "./typesAndEnums";
+import type { DownloadInfo, Media, Path } from "./generalTypes";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
 
@@ -11,10 +11,7 @@ declare global {
 export type VisibleElectron = Readonly<{
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess(
-			object: Readonly<{
-				type: ElectronIpcMainProcessNotificationEnum;
-				msg?: string;
-			}>
+			type: ElectronIpcMainProcessNotificationEnum
 		): void;
 	};
 	fs: {

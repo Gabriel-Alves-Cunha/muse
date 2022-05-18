@@ -28,7 +28,7 @@ it("should return a new joined array. The first array will be fully copied, the 
 	const joinedArray = concatFromIndex(
 		fstArray,
 		scdArray.indexOf(".") + 1,
-		scdArray,
+		scdArray
 	);
 
 	expect(joinedArray).toStrictEqual([

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { MediaID } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/generalTypes";
 
 import { persist, subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
@@ -32,7 +32,7 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 
 export type CurrentPlaying = Readonly<{
 	playlistName: Playlist["name"];
-	mediaID: MediaID | undefined;
+	mediaID: Media["id"] | undefined;
 	currentTime: number;
 }>;
 
@@ -452,7 +452,7 @@ export type currentPlayingReducer_Action =
 	| Readonly<{
 			type: CurrentPlayingEnum.PLAY_THIS_MEDIA;
 			playlistName: Playlist["name"];
-			mediaID: MediaID;
+			mediaID: Media["id"];
 	  }>
 	| Readonly<{
 			type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST;

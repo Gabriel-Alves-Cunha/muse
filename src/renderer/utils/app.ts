@@ -8,6 +8,4 @@ export const pages = Object.freeze([
 	"Convert",
 ] as const);
 
-export function resetAllAppData() {
-	localStorage.clear();
-}
+export const resetAllAppData = () => localStorage.clear();

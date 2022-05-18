@@ -6,7 +6,7 @@ const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
 const toggleDeveloperTools = () =>
-	notify({ type: ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS });
+	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS);
 
 export const MainCtxMenu = () => {
 	return (

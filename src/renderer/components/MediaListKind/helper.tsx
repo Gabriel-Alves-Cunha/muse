@@ -1,4 +1,4 @@
-import type { Media, MediaID, Mutable } from "@common/@types/typesAndEnums";
+import type { Media, Mutable } from "@common/@types/generalTypes";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
@@ -6,10 +6,14 @@ import { memo, useRef } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import create from "zustand";
 
-import { CurrentPlayingEnum, setCurrentPlaying } from "@contexts";
-import { ImgWithFallback, Tooltip } from "@components";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaOptionsModal } from "./MediaOptions";
-import { useOnClickOutside } from "@hooks";
+import { ImgWithFallback } from "@components/ImgWithFallback";
+import { Tooltip } from "@components/Tooltip";
+import {
+	CurrentPlayingEnum,
+	setCurrentPlaying,
+} from "@contexts/mediaHandler/useCurrentPlaying";
 
 import { StyledOverlay } from "./MediaOptions/styles";
 import {
@@ -22,7 +26,7 @@ import {
 	Info,
 } from "./styles";
 
-const allSelectedMedias: Set<MediaID> = new Set();
+const allSelectedMedias: Set<Media["id"]> = new Set();
 export const playlistName = create(() => ({ playlistName: "" }));
 
 const Row = memo(
@@ -76,7 +80,7 @@ const Row = memo(
 );
 Row.displayName = "Row";
 
-const playMedia = (mediaID: MediaID) =>
+const playMedia = (mediaID: Media["id"]) =>
 	setCurrentPlaying({
 		playlistName: playlistName.getState().playlistName,
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
@@ -86,7 +90,7 @@ const playMedia = (mediaID: MediaID) =>
 const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e: Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>,
 	isSelected: Mutable<boolean>,
-	mediaID: Readonly<MediaID>
+	mediaID: Readonly<Media["id"]>
 ) => {
 	// `e.button === 0` is left click
 	if (!e.ctrlKey || e.button !== 0) return;

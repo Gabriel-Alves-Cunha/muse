@@ -1,4 +1,4 @@
-import type { Path } from "@common/@types/typesAndEnums";
+import type { Path } from "@common/@types/generalTypes";
 
 import { join } from "node:path";
 import {

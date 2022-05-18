@@ -1,28 +1,28 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { Media } from "@common/@types/generalTypes";
+
 import { describe, expect, it } from "vitest";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
-import { testList } from "./fakeTestList";
-
 mockGlobalsBeforeTests();
 
-import { MediaID } from "@common/@types/typesAndEnums";
+import { testList } from "./fakeTestList";
 import {
 	returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia,
 	maxSizeOfHistory,
-} from "@contexts";
+} from "@contexts/mediaHandler/usePlaylistsHelper";
 
 describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 	it("should return a NEW array with new item(s) at the start of the array", () => {
 		testList.forEach(newMediaToAdd => {
-			const prevHistory: readonly MediaID[] = Object.freeze([]);
+			const prevHistory: readonly Media["id"][] = Object.freeze([]);
 
 			const newList = [newMediaToAdd.id, ...prevHistory];
 			const expectedNewList =
 				returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
 					prevHistory,
-					newMediaToAdd.id,
+					newMediaToAdd.id
 				);
 
 			expect(expectedNewList).not.toBe(prevHistory);
@@ -51,7 +51,7 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 		const expectedNewList_1 =
 			returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
 				prevHistory,
-				newMediaIdToAdd_1,
+				newMediaIdToAdd_1
 			);
 
 		expect(expectedNewList_1).not.toBe(prevHistory);
@@ -61,7 +61,7 @@ describe("returnNewArrayWithNewMediaOnHistoryOfPlayedMedia", () => {
 		const expectedNewList_2 =
 			returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
 				prevHistory,
-				newMediaIdToAdd_2,
+				newMediaIdToAdd_2
 			);
 
 		expect(expectedNewList_2).not.toBe(expectedNewList_1);

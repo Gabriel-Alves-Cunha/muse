@@ -1,6 +1,8 @@
-import { SearchMedia, MediaListKind, MainArea } from "@components";
 import { ButtonToTheSideEnum } from "@components/SearchMedia/helper";
-import { FAVORITES } from "@contexts";
+import { MediaListKind } from "@components/MediaListKind";
+import { SearchMedia } from "@components/SearchMedia";
+import { FAVORITES } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { MainArea } from "@components/MainArea";
 
 export function Favorites() {
 	return (

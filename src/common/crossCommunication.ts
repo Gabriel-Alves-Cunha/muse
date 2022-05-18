@@ -3,12 +3,7 @@ import type {
 	MsgObjectReactToElectron,
 } from "@common/@types/electron-window";
 
-import { dbg as dbg_, dbgTests } from "@common/utils";
-
-const dbg = (...args: unknown[]) => {
-	dbgTests(args);
-	dbg_(args);
-};
+import { dbg } from "@common/utils";
 
 export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
@@ -22,7 +17,7 @@ export const sendMsgToBackend = (
 };
 
 export const sendMsgToClient = (msg: MsgObjectElectronToReact) => {
-	dbg_("Sending message to client:", msg);
+	dbg("Sending message to client:", msg);
 
 	window.postMessage({ msg, source: electronSource }, "*");
 };

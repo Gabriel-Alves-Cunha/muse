@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
 
-import { BorderedButton } from "@routes/Convert/styles";
+import { BorderedButton } from "../Convert/styles";
 import { Loading } from "@styles/appStyles";
 import {
 	ResultContainer,

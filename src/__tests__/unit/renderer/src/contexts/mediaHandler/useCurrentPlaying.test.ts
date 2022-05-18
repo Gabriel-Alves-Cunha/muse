@@ -3,22 +3,23 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
-import { testList } from "./fakeTestList";
-
 mockGlobalsBeforeTests();
 
-import { MAIN_LIST, HISTORY } from "@contexts";
+import { HISTORY, MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { testList } from "./fakeTestList";
 import {
 	CurrentPlayingEnum,
-	setCurrentPlaying,
 	getCurrentPlaying,
-	PlaylistActions,
+	setCurrentPlaying,
 	CurrentPlaying,
-	DefaultLists,
-	PlaylistEnum,
-	setPlaylists,
+} from "@contexts/mediaHandler/useCurrentPlaying";
+import {
+	type DefaultLists,
+	PlaylistActions,
 	getPlaylists,
-} from "@contexts";
+	setPlaylists,
+	PlaylistEnum,
+} from "@contexts/mediaHandler/usePlaylists";
 
 const getPlaylist = (listName: DefaultLists) =>
 	getPlaylists().playlists.find(p => p.name === listName)!;

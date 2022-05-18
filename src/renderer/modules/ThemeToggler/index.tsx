@@ -4,9 +4,9 @@ import {
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
-import { useLocalStorage } from "@hooks";
+import { useLocalStorage } from "@hooks/useLocalStorage";
 import { keyPrefix } from "@utils/app";
-import { Tooltip } from "@components";
+import { Tooltip } from "@components/Tooltip";
 
 import { styled, darkTheme, lightTheme } from "@styles/global";
 

@@ -2,6 +2,29 @@ import { vi } from "vitest";
 
 export const mockElectronPlusNodeGlobalsBeforeTests = () => {
 	// Mocking window
+	vi.stubGlobal("electron", {
+		notificationApi: {
+			sendNotificationToElectronIpcMainProcess: vi.fn(),
+		},
+		fs: {
+			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
+			deleteFile: vi.fn(),
+			readFile: vi.fn(),
+			readdir: vi.fn(),
+		},
+		os: {
+			dirs: {
+				documents: "test/documents",
+				downloads: "test/downloads",
+				music: "test/music",
+			},
+		},
+		media: {
+			transformPathsToMedias: vi.fn(),
+			getBasicInfo: vi.fn(),
+		},
+	});
+
 	vi.stubGlobal("window", {
 		postMessage: vi
 			.fn()

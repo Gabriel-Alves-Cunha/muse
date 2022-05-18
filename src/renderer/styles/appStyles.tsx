@@ -1,5 +1,5 @@
 import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
-import { styled, keyframes } from "@styles/global";
+import { styled, keyframes } from "./global";
 
 export const Content = styled("div", {
 	display: "grid",

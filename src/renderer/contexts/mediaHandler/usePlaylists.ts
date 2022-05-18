@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Media, MediaID, Mutable } from "@common/@types/typesAndEnums";
+import type { Media, Mutable } from "@common/@types/generalTypes";
 
 import { persist } from "zustand/middleware";
 import create from "zustand";
@@ -458,24 +458,24 @@ export type DefaultLists =
 
 export type Playlist = Readonly<{
 	name: DefaultLists | string;
-	list: readonly MediaID[];
+	list: readonly Media["id"][];
 }>;
 
 export type PlaylistsReducer_Action =
 	| Readonly<{
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID;
 			type: PlaylistEnum.UPDATE_FAVORITES;
-			mediaID: MediaID;
+			mediaID: Media["id"];
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA;
 			type: PlaylistEnum.UPDATE_FAVORITES;
-			mediaID: MediaID;
+			mediaID: Media["id"];
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID;
 			type: PlaylistEnum.UPDATE_FAVORITES;
-			mediaID: MediaID;
+			mediaID: Media["id"];
 	  }>
 	| Readonly<{
 			type: PlaylistEnum.UPDATE_FAVORITES;
@@ -485,7 +485,7 @@ export type PlaylistsReducer_Action =
 	| Readonly<{
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID;
 			type: PlaylistEnum.UPDATE_HISTORY;
-			mediaID: MediaID;
+			mediaID: Media["id"];
 	  }>
 	| Readonly<{
 			type: PlaylistEnum.UPDATE_HISTORY;
@@ -502,7 +502,7 @@ export type PlaylistsReducer_Action =
 	| Readonly<{
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID;
 			type: PlaylistEnum.UPDATE_MAIN_LIST;
-			mediaID: MediaID;
+			mediaID: Media["id"];
 	  }>
 	| Readonly<{
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST;

@@ -5,8 +5,8 @@ import {
 } from "react-icons/vsc";
 
 import { capitalizedAppName } from "@common/utils";
-import { Tooltip } from "@components";
-import { usePage } from "@contexts";
+import { usePage } from "@contexts/page";
+import { Tooltip } from "../Tooltip";
 import {
 	toggleMaximize,
 	minimizeWindow,

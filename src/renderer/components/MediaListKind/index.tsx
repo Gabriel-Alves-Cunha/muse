@@ -2,13 +2,17 @@ import { useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
-import { type Playlist, usePlaylists, MAIN_LIST } from "@contexts";
 import { resetAllAppData } from "@utils/app";
+import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import {
 	playlistName as playlistNameToSet,
 	computeItemKey,
 	itemContent,
 } from "./helper";
+import {
+	type Playlist,
+	usePlaylists,
+} from "@contexts/mediaHandler/usePlaylists";
 
 import {
 	ResetAllAppDataButton,

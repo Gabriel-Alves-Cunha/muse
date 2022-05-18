@@ -1,29 +1,35 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { Media } from "@common/@types/generalTypes";
+
 import { beforeEach, describe, expect, it } from "vitest";
 import { faker } from "@faker-js/faker";
 
-import { numberOfMedias, testList } from "./fakeTestList";
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
-
 mockGlobalsBeforeTests();
 
-import { MAIN_LIST, FAVORITES, HISTORY } from "@contexts";
+import { numberOfMedias, testList } from "./fakeTestList";
 import { formatDuration } from "@common/utils";
 import { getRandomInt } from "@utils/utils";
-import { Media } from "@common/@types/typesAndEnums";
 import { hash } from "@common/hash";
 import {
+	type DefaultLists,
 	searchForMediaFromList,
-	CurrentPlayingEnum,
-	setCurrentPlaying,
-	getCurrentPlaying,
 	PlaylistActions,
-	PlaylistEnum,
-	DefaultLists,
-	setPlaylists,
 	getPlaylists,
-} from "@contexts";
+	setPlaylists,
+	PlaylistEnum,
+} from "@contexts/mediaHandler/usePlaylists";
+import {
+	FAVORITES,
+	MAIN_LIST,
+	HISTORY,
+} from "@contexts/mediaHandler/usePlaylistsHelper";
+import {
+	CurrentPlayingEnum,
+	getCurrentPlaying,
+	setCurrentPlaying,
+} from "@contexts/mediaHandler/useCurrentPlaying";
 
 const getPlaylist = (listName: DefaultLists | string) =>
 	getPlaylists().playlists.find(p => p.name === listName)!;
@@ -115,7 +121,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	it("should play a chosen media", () => {
 		const currMainList = getPlaylists().mainList;
 		const randomMediaIndexes = testList.map(() =>
-			getRandomInt(0, numberOfMedias),
+			getRandomInt(0, numberOfMedias)
 		);
 
 		testList.forEach((_, index) => {
@@ -181,7 +187,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 		it(
 			"(PlaylistActions.ADD_ONE_MEDIA) should add one media to favorites",
-			addOneMediaToFavorites,
+			addOneMediaToFavorites
 		);
 
 		it("(PlaylistActions.REMOVE_ONE_MEDIA) should remove one media of favorites", () => {
@@ -299,7 +305,7 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 
 describe("Testing the other fns of getPlaylistsFuncs()", () => {
 	it("(getPlaylistsFuncs().searchForMedia()) should return a searched media", () => {
-		const results = searchForMediaFromList("es", MAIN_LIST);
+		const results = searchForMediaFromList("es");
 
 		expect(results.length).toBeGreaterThan(0);
 	});

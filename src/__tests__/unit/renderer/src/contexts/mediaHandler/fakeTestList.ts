@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/typesAndEnums";
+import type { Media } from "@common/@types/generalTypes";
 
 import { faker } from "@faker-js/faker";
 
