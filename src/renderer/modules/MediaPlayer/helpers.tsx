@@ -47,6 +47,7 @@ import {
 	ProgressThumb,
 	IconButton,
 	Album,
+	Duration,
 } from "./styles";
 
 const toggleRepeatThisMedia = () =>
@@ -127,7 +128,7 @@ export const Header = ({ media }: RefToMedia) => (
 				onClick={() => toggleFavorite(media?.id)}
 				style={{ width: 30 }}
 			>
-				{media?.favorite ? <Favorite size="17" /> : <AddFavorite size="17" />}
+				{media?.favorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
 			</IconButton>
 		</Tooltip>
 	</OptionsAndAlbum>
@@ -226,8 +227,6 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 	return (
 		<SeekerContainer>
-			<span>{formatDuration(currentTime)}</span>
-
 			<ProgressWrapper
 				style={{ cursor: isDurationValid ? "pointer" : "default" }}
 				onClick={e => seek(e, audio)}
@@ -246,7 +245,11 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 				></ProgressThumb>
 			</ProgressWrapper>
 
-			<span>{formatedDuration}</span>
+			<Duration>
+				<p>{formatDuration(currentTime)}</p>
+
+				<p>{formatedDuration}</p>
+			</Duration>
 		</SeekerContainer>
 	);
 }

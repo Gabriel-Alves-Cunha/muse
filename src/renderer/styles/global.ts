@@ -85,7 +85,13 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			}),
 
 			dflex: (value: string) => ({
+				display: "flex", // row
+				alignItems: value,
+				justifyContent: value,
+			}),
+			dcolumn: (value: string) => ({
 				display: "flex",
+				flexDirection: "column",
 				alignItems: value,
 				justifyContent: value,
 			}),
@@ -103,10 +109,18 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				WebkitBackgroundClip: "text",
 			}),
 
-			bg: (value: string) => ({
-				background: value,
+			ff: (value: string) => ({
+				fontFamily: value,
 			}),
-
+			fw: (value: string | number) => ({
+				flexWeight: value,
+			}),
+			fs: (value: number | string) => ({
+				fontSize: value,
+			}),
+			lh: (value: number | string) => ({
+				lineHeight: value,
+			}),
 			ta: (value: string) => ({
 				textAlign: value,
 			}),
@@ -115,8 +129,8 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			fd: (value: string) => ({
 				flexDirection: value,
 			}),
-			fs: (value: number | string) => ({
-				fontSize: value,
+			b: (value: string | number) => ({
+				border: value,
 			}),
 			br: (value: number | string) => ({
 				borderRadius: value,
@@ -124,8 +138,8 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			bs: (value: number | string) => ({
 				boxShadow: value,
 			}),
-			lh: (value: number | string) => ({
-				lineHeight: value,
+			bg: (value: string) => ({
+				background: value,
 			}),
 			ov: (value: string) => ({ overflow: value }),
 			ox: (value: string) => ({ overflowX: value }),
@@ -267,7 +281,7 @@ export const lightTheme = createTheme({
 
 export const GlobalCSS = globalCss({
 	"*, *:after, *:before": {
-		boxSizing: "inherit",
+		boxSizing: "border-box",
 		padding: 0,
 		margin: 0,
 

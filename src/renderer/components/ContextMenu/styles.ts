@@ -39,7 +39,7 @@ export const itemStyles = styled("div", {
 
 	color: "$ctx-menu-item-text",
 	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	lineHeight: 1,
 	fontSize: 15,
 
@@ -91,7 +91,7 @@ export const TriggerItem = styled(CtxTriggerItem, {
 export const Label = styled(CtxLabel, {
 	pl: 25,
 
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	color: "$ctx-menu-text",
 	lineHeight: "25px",
 	fontSize: 12,

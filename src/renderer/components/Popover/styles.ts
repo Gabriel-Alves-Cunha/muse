@@ -88,8 +88,8 @@ export const StyledContent = styled(Content, {
 
 		color: "$deactivated-icon",
 		letterSpacing: "0.03rem",
-		fontFamily: "$secondary",
-		textAlign: "center",
+		ff: "$secondary",
+		ta: "center",
 		fontSize: "1.05rem",
 		fontWeight: 500,
 	},

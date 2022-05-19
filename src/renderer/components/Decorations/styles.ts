@@ -66,7 +66,7 @@ export const AppName_Folder_Wrapper = styled("div", {
 	border: "none",
 
 	letterSpacing: "0.03rem",
-	fontFamily: "$primary",
+	ff: "$primary",
 	fontSize: "0.93rem",
 	fontWeight: 300,
 	color: "$text",

@@ -5,11 +5,11 @@ import { styled } from "@styles/global";
 export const ConvertionProgress = styled("div", {
 	display: "flex", // row
 
-	fontFamily: "$primary",
+	ff: "$primary",
 	whiteSpace: "nowrap",
 	overflow: "hidden",
 	fontSize: "0.85rem",
-	textAlign: "left",
+	ta: "left",
 	color: "$gray-text",
 
 	gap: 8,

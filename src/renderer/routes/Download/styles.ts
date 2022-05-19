@@ -52,7 +52,7 @@ export const SearchWrapper = styled("div", {
 		marginTop: "4rem",
 
 		letterSpacing: "0.03rem",
-		fontFamily: "$secondary",
+		ff: "$secondary",
 		fontSize: "0.9rem",
 		fontWeight: 300,
 		color: "red",
@@ -92,7 +92,7 @@ export const Searcher = styled("button", {
 
 	input: {
 		letterSpacing: "0.03rem",
-		fontFamily: "$secondary",
+		ff: "$secondary",
 		fontSize: "0.9rem",
 
 		boxSizing: "border-box",
@@ -152,8 +152,8 @@ export const ResultContainer = styled("div", {
 	},
 
 	"& p": {
-		fontFamily: "$primary",
-		textAlign: "center",
+		ff: "$primary",
+		ta: "center",
 		margin: "2rem 1rem",
 		fontSize: "1.1rem",
 		wordWrap: "normal",
@@ -161,8 +161,8 @@ export const ResultContainer = styled("div", {
 	},
 
 	span: {
-		fontFamily: "$primary",
-		textAlign: "center",
+		ff: "$primary",
+		ta: "center",
 		margin: "1rem auto",
 		wordWrap: "normal",
 		fontSize: "1rem",

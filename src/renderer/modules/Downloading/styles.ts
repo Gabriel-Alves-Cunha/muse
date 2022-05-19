@@ -91,10 +91,10 @@ export const TitleAndCancelWrapper = styled("div", {
 
 	"& p": {
 		color: "$alternative-text",
-		fontFamily: "$primary",
+		ff: "$primary",
 		whiteSpace: "nowrap", // keep it one line
 		fontSize: "0.9rem",
-		textAlign: "left",
+		ta: "left",
 
 		overflow: "hidden",
 		width: "90%",

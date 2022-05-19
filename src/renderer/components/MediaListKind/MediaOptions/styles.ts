@@ -71,7 +71,7 @@ export const StyledContent = styled(Content, {
 export const StyledTitle = styled(Title, {
 	margin: 0,
 
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	letterSpacing: "0.05rem",
 	fontSize: "1.1rem",
 	fontWeight: 600,
@@ -81,7 +81,7 @@ export const StyledTitle = styled(Title, {
 export const StyledDescription = styled(Description, {
 	margin: "10px 0 20px",
 
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	letterSpacing: "0.03rem",
 	color: "$gray-text",
 	fontSize: "1rem",
@@ -229,10 +229,10 @@ export const Label = styled("label", {
 	display: "flex",
 	width: 90,
 
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	letterSpacing: "0.03rem",
 	color: "$accent-light",
-	textAlign: "right",
+	ta: "right",
 	fontSize: 15,
 });
 
@@ -251,7 +251,7 @@ export const Input = styled("input", {
 	borderRadius: 4,
 
 	letterSpacing: "0.035rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	color: "$accent-light",
 	fontSize: "1rem",
 	lineHeight: 1,

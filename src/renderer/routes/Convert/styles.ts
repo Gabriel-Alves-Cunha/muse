@@ -12,7 +12,7 @@ export const BorderedButton = styled("button", {
 	mx: "auto",
 
 	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	fontSize: "1.1rem",
 	fontWeight: 500,
 	color: "$text",

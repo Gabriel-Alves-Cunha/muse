@@ -49,7 +49,7 @@ export const Search = styled("div", {
 		boxSizing: "border-box",
 
 		letterSpacing: "0.03rem",
-		fontFamily: "$secondary",
+		ff: "$secondary",
 		fontSize: "0.9rem",
 		color: "$text",
 
@@ -128,9 +128,9 @@ export const Title = styled("p", {
 	color: "$alternative-text",
 	textOverflow: "ellipsis",
 	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	whiteSpace: "nowrap", // make it one-line.
-	textAlign: "left",
+	ta: "left",
 	fontSize: "1rem",
 	fontWeight: 500,
 });
@@ -139,7 +139,7 @@ export const SubTitle = styled("p", {
 	marginLeft: 5,
 
 	letterSpacing: "0.03rem",
-	fontFamily: "$primary",
+	ff: "$primary",
 	color: "$gray-text",
 	fontSize: "0.8rem",
 	fontWeight: 500,
@@ -182,8 +182,8 @@ export const NothingFound = styled("div", {
 
 	color: "$deactivated-icon",
 	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
-	textAlign: "center",
+	ff: "$secondary",
+	ta: "center",
 	fontSize: "1.05rem",
 	fontWeight: 500,
 });

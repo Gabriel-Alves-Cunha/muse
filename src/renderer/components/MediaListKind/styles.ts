@@ -47,7 +47,7 @@ export const Title = styled("p", {
 
 	color: "$alternative-text",
 	letterSpacing: "0.04rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	fontSize: "1rem",
 	fontWeight: 500,
 
@@ -64,7 +64,7 @@ export const SubTitle = styled("p", {
 	margin: "unset", // Virtuoso asks for this for performance reasons
 
 	letterSpacing: "0.03rem",
-	fontFamily: "$primary",
+	ff: "$primary",
 	color: "$gray-text",
 	fontSize: "0.8rem",
 	fontWeight: 500,
@@ -182,7 +182,7 @@ export const Alert = styled("div", {
 export const Msg = styled("pre", {
 	color: "$alternative-text",
 	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	fontSize: "0.8rem",
 	fontWeight: 500,
 });
@@ -218,7 +218,7 @@ export const EmptyList = styled("div", {
 
 	color: "$alternative-text",
 	letterSpacing: "0.04rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	fontSize: "1.1rem",
 	fontWeight: 500,
 

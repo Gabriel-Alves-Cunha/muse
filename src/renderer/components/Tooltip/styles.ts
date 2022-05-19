@@ -33,7 +33,7 @@ export const StyledContent = styled(Content, {
 
 	border: "1px solid lightgray",
 	letterSpacing: "0.03rem",
-	fontFamily: "$secondary",
+	ff: "$secondary",
 	fontWeight: 500,
 	color: "$text",
 	lineHeight: 1,
