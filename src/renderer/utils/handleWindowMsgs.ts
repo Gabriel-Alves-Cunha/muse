@@ -1,18 +1,20 @@
+import type { Media, Path } from "@common/@types/generalTypes";
+
+import { downloadingList, setDownloadingList } from "@contexts/downloadList";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
+import { convertingList, setConvertingList } from "@contexts/convertList";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@modules/Downloading";
-import { downloadingList } from "@contexts/downloadList";
 import { ProgressStatus } from "@common/enums";
-import { convertingList } from "@contexts/convertList";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
 	PlaylistActions,
-	getPlaylists,
-	WhatToDo,
 	setPlaylists,
 	deleteMedia,
+	WhatToDo,
+	mainList,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
 	type MsgObjectElectronToReact,
@@ -68,7 +70,7 @@ export async function handleWindowMsgs(
 
 			const downloadingList_ = downloadingList();
 			// In here, there has to be a download WAITING:
-			const download = downloadingList().get(msg.url);
+			const download = downloadingList_.get(msg.url);
 
 			dbg({ downloadingList_, url: msg.url, download });
 
@@ -79,10 +81,12 @@ export async function handleWindowMsgs(
 				break;
 			}
 
-			downloadingList_.set(msg.url, {
-				...download,
-				status: ProgressStatus.ACTIVE,
-			});
+			setDownloadingList(
+				downloadingList_.set(msg.url, {
+					...download,
+					status: ProgressStatus.ACTIVE,
+				})
+			);
 			break;
 		}
 
@@ -103,10 +107,12 @@ export async function handleWindowMsgs(
 				break;
 			}
 
-			convertingList().set(msg.path, {
-				...convertingMedia,
-				status: ProgressStatus.ACTIVE,
-			});
+			setConvertingList(
+				convertingList_.set(msg.path, {
+					...convertingMedia,
+					status: ProgressStatus.ACTIVE,
+				})
+			);
 			break;
 		}
 
@@ -126,10 +132,12 @@ export async function handleWindowMsgs(
 				break;
 			}
 
-			convertingList().set(msg.path, {
-				...convertingMedia,
-				status: ProgressStatus.FAILED,
-			});
+			setConvertingList(
+				convertingList_.set(msg.path, {
+					...convertingMedia,
+					status: ProgressStatus.FAILED,
+				})
+			);
 			break;
 		}
 
@@ -138,7 +146,7 @@ export async function handleWindowMsgs(
 
 			const downloadingList_ = downloadingList();
 			// In here, there has to be a download WAITING:
-			const download = downloadingList().get(msg.url);
+			const download = downloadingList_.get(msg.url);
 
 			dbg({ downloadingList_, url: msg.url, download });
 
@@ -149,23 +157,28 @@ export async function handleWindowMsgs(
 				break;
 			}
 
-			downloadingList_.set(msg.url, {
-				...download,
-				status: ProgressStatus.FAILED,
-			});
+			setDownloadingList(
+				downloadingList_.set(msg.url, {
+					...download,
+					status: ProgressStatus.FAILED,
+				})
+			);
 			break;
 		}
 
 		case ElectronToReactMessageEnum.ADD_ONE_MEDIA: {
-			dbg("Add one media.");
-
 			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
 
-			const [media] = await transformPathsToMedias([mediaPath]);
+			const newMediaInArray: [Path, Media][] = await transformPathsToMedias([
+				mediaPath,
+			]);
 
-			if (!media) {
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const newMedia = newMediaInArray[0]![1];
+
+			if (!newMedia) {
 				console.error(`Could not transform "${mediaPath}" to media.`);
 				break;
 			}
@@ -173,29 +186,26 @@ export async function handleWindowMsgs(
 			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: WhatToDo.UPDATE_MAIN_LIST,
-				newMedia: media,
+				path: mediaPath,
+				newMedia,
 			});
 			break;
 		}
 
 		case ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER: {
-			dbg("Delete one media from computer.");
-
 			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER:", {
 				mediaPath,
 			});
 
-			const media = getPlaylists().mainList.find(p => p.path === mediaPath);
-
-			if (!media) {
+			if (!mainList().has(mediaPath)) {
 				console.error("Could not find media to delete.");
 				break;
 			}
 
-			deleteMedia(media)
-				.then(() => console.log(`Media "${{ media }}" deleted.`))
+			deleteMedia(mediaPath)
+				.then(() => console.log(`Media "${mediaPath}" deleted.`))
 				.catch(console.error);
 			break;
 		}
@@ -207,17 +217,11 @@ export async function handleWindowMsgs(
 		}
 
 		case ElectronToReactMessageEnum.REFRESH_ONE_MEDIA: {
-			dbg("Refresh one media.");
-
 			const { mediaPath } = msg;
 
-			dbg("At ElectronToReactMessageEnum.REFRESH_MEDIA:", { data: msg });
+			dbg("At ElectronToReactMessageEnum.REFRESH_MEDIA:", { mediaPath });
 
-			const mediaIndex = getPlaylists().mainList.findIndex(
-				m => m.path === mediaPath
-			);
-
-			if (mediaIndex === -1) {
+			if (!mainList().has(mediaPath)) {
 				console.warn(
 					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`
 				);
@@ -225,7 +229,11 @@ export async function handleWindowMsgs(
 				break;
 			}
 
-			const [refreshedMedia] = await transformPathsToMedias([mediaPath]);
+			const refreshedMediaInArray: [Path, Media][] =
+				await transformPathsToMedias([mediaPath]);
+
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const refreshedMedia = refreshedMediaInArray[0]![1];
 
 			if (!refreshedMedia) {
 				console.error(
@@ -239,20 +247,17 @@ export async function handleWindowMsgs(
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 				type: WhatToDo.UPDATE_MAIN_LIST,
 				newMedia: refreshedMedia,
+				path: mediaPath,
 			});
 			break;
 		}
 
 		case ElectronToReactMessageEnum.REMOVE_ONE_MEDIA: {
-			dbg("Remove one media.");
-
 			const { mediaPath } = msg;
 
 			dbg("At ElectronToReactMessageEnum.REMOVE_MEDIA:", { mediaPath });
 
-			const media = getPlaylists().mainList.find(m => m.path === mediaPath);
-
-			if (!media) {
+			if (!mainList().has(mediaPath)) {
 				console.error(
 					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`
 				);
@@ -262,7 +267,7 @@ export async function handleWindowMsgs(
 			setPlaylists({
 				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
 				type: WhatToDo.UPDATE_MAIN_LIST,
-				mediaID: media.id,
+				path: mediaPath,
 			});
 			break;
 		}

@@ -31,12 +31,14 @@ export const assertUnreachable = (received: never): never => {
 	);
 };
 
-export const time = (fn: () => void, fnName: string): void => {
+export const time = <T>(fn: () => T, fnName: string): T => {
 	const start = performance.now();
 
-	fn();
+	const fnReturn = fn();
 
 	const end = performance.now();
 
 	console.log(`Function "${fnName}" took: ${end - start} ms.`);
+
+	return fnReturn;
 };

@@ -40,7 +40,7 @@
 		"@typescript-eslint/eslint-plugin": "^5.25.0",
 		"@typescript-eslint/parser": "^5.25.0",
 		"@vitejs/plugin-react": "^1.3.2",
-		"@vitest/ui": "^0.12.6",
+		"@vitest/ui": "^0.12.7",
 		"@welldone-software/why-did-you-render": "^7.0.1",
 		"c8": "^7.11.3",
 		"cross-env": "^7.0.3",
@@ -64,7 +64,7 @@
 		"tslib": "^2.4.0",
 		"typescript": "^4.6.4",
 		"vite": "^2.9.9",
-		"vitest": "^0.12.6",
+		"vitest": "^0.12.7",
 		"zustand": "4.0.0-rc.1"
 	},
 	"dependencies": {

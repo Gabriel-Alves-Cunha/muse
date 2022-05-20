@@ -14,11 +14,11 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 });
 
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
-export const { setState: setSearchInfo, getState: getSearchInfo } =
+export const { setState: setSearchInfo, getState: searchInfo } =
 	useSearchInfo;
 
 export const downloadMedia = () => {
-	const { result, url } = getSearchInfo();
+	const { result, url } = searchInfo();
 
 	if (!result) return;
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
@@ -36,7 +36,7 @@ export const downloadMedia = () => {
 };
 
 export const search = async () => {
-	const { url } = getSearchInfo();
+	const { url } = searchInfo();
 
 	if (!url || url.length < 10) return;
 

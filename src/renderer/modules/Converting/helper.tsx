@@ -1,4 +1,3 @@
-import type { State, StateCreator } from "zustand";
 import type { ProgressProps } from "@components/Progress";
 import type { Path } from "@common/@types/generalTypes";
 
@@ -7,56 +6,18 @@ import create from "zustand";
 
 import { type AllowedMedias, getBasename, dbg } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
-import { ConvertInfo, ProgressStatus } from "@common/enums";
 import { assertUnreachable } from "@utils/utils";
-import { convertingList } from "@contexts/convertList";
+import { ProgressStatus } from "@common/enums";
+import { convertingList, setConvertingList } from "@contexts/convertList";
 import { prettyBytes } from "@common/prettyBytes";
 import { Tooltip } from "@components/Tooltip";
 
 import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
 
-/**
- * I'm doing all this turnaround because for some reason
- * when I set `useConvertInfoList` to an empty array, it
- * changes it to an Object... I don't know why, maybe it
- * has something to do with the fact that the `set` fn
- * changes it partialy, so much so that the fix is just
- * `set(a[0], true);`, the `true` is to replace it instead
- * of updating.
- */
-type BugFixImpl = <T extends State>(
-	f: PopArgument<StateCreator<T, [], []>>,
-	name?: string
-) => PopArgument<StateCreator<T, [], []>>;
-
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-	...a: [...infer A, infer _]
-) => infer R
-	? (...a: A) => R
-	: never;
-
-const fixBugThatSetsItToAnObject: BugFixImpl =
-	(fn /*, name */) => (set, get, store) => {
-		const fixedSetState: typeof set = (...a) => {
-			// console.log("previous:", ...(name ? [`${name}:`] : []), get());
-			// console.log(a);
-			// This true is to replace it instead of updating:
-			set(a[0], true);
-			// console.log("now:", ...(name ? [`${name}:`] : []), ...a, get());
-			// console.log("isArray:", Array.isArray(get()));
-		};
-
-		store.setState = fixedSetState;
-
-		return fn(fixedSetState, get, store);
-	};
-
-export const useConvertInfoList = create<ConvertInfoList>(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	fixBugThatSetsItToAnObject((_set, _get, _store) => [])
-);
-export const { setState: setConvertInfoList } = useConvertInfoList;
+export const useConvertInfoList = create<ConvertInfoList>(() => new Map());
+export const { setState: setConvertInfoList, getState: convertInfoList } =
+	useConvertInfoList;
 
 export const Popup = () => {
 	const convertingList_ = convertingList();
@@ -64,8 +25,8 @@ export const Popup = () => {
 	return (
 		<>
 			{convertingList_.size > 0 ? (
-				Array.from(convertingList_.entries()).map(([path, m]) => (
-					<ConvertBox mediaBeingConverted={{ ...m, path }} key={path} />
+				Array.from(convertingList_.entries()).map(([path, media]) => (
+					<ConvertBox mediaBeingConverted={media} key={path} path={path} />
 				))
 			) : (
 				<p>No conversions in progress!</p>
@@ -75,7 +36,8 @@ export const Popup = () => {
 };
 
 export const ConvertBox = ({
-	mediaBeingConverted: { path, toExtension, timeConverted, sizeConverted },
+	mediaBeingConverted: { toExtension, timeConverted, sizeConverted },
+	path,
 }: ConvertBoxProps) => (
 	<Content>
 		<TitleAndCancelWrapper>
@@ -100,13 +62,16 @@ export const ConvertBox = ({
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
+export function createNewConvert(
+	convertInfo: ConvertInfo,
+	path: Path
+): MessagePort {
 	const convertingList_ = convertingList();
 
 	dbg("Trying to create a new conversion...", { convertingList_ });
 
-	if (convertingList_.has(convertInfo.path)) {
-		const info = `There is already one convert of "${convertInfo.path}"!`;
+	if (convertingList_.has(path)) {
+		const info = `There is already one convert of "${path}"!`;
 
 		infoToast(info);
 
@@ -127,34 +92,36 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 		port: myPort,
 	};
 
-	convertingList_.set(convertInfo.path, convertStatus);
+	setConvertingList(convertingList_.set(path, convertStatus));
 
 	myPort.postMessage({
 		toExtension: convertStatus.toExtension,
-		path: convertInfo.path,
 		// ^ On every `postMessage` you have to send the path (as an ID)!
 		canStartConvert: true,
+		path,
 	});
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
 		const convertingList_ = convertingList();
 
-		dbg(`Received a message from Electron on port for "${convertInfo.path}":`, {
+		dbg(`Received a message from Electron on port for "${path}":`, {
 			convertingList_,
 			data,
 		});
 
 		// Assert that the download exists:
-		if (!convertingList_.has(convertInfo.path)) {
+		if (!convertingList_.has(path)) {
 			return console.error(
 				"Received a message from Electron but the path is not in the list!"
 			);
 		}
 
-		convertingList_.set(convertInfo.path, {
-			...convertStatus,
-			...data,
-		});
+		setConvertingList(
+			convertingList_.set(path, {
+				...convertStatus,
+				...data,
+			})
+		);
 
 		switch (data.status) {
 			case ProgressStatus.FAILED: {
@@ -162,23 +129,23 @@ export function createNewConvert(convertInfo: ConvertInfo): MessagePort {
 				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
 
-				errorToast(`Download of "${convertInfo.path}" failed!`);
+				errorToast(`Download of "${path}" failed!`);
 
-				cancelDownloadAndOrRemoveItFromList(convertInfo.path);
+				cancelDownloadAndOrRemoveItFromList(path);
 				break;
 			}
 
 			case ProgressStatus.SUCCESS: {
-				successToast(`Download of "${convertInfo.path}" succeded!`);
+				successToast(`Download of "${path}" succeded!`);
 
-				cancelDownloadAndOrRemoveItFromList(convertInfo.path);
+				cancelDownloadAndOrRemoveItFromList(path);
 				break;
 			}
 
 			case ProgressStatus.CANCEL: {
-				infoToast(`Download of "${convertInfo.path}" was cancelled!`);
+				infoToast(`Download of "${path}" was cancelled!`);
 
-				cancelDownloadAndOrRemoveItFromList(convertInfo.path);
+				cancelDownloadAndOrRemoveItFromList(path);
 				break;
 			}
 
@@ -227,6 +194,7 @@ const cancelDownloadAndOrRemoveItFromList = (path: string) => {
 	}
 
 	convertingList_.delete(path);
+	setConvertingList(convertingList_);
 };
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
@@ -243,7 +211,13 @@ export type MediaBeingConverted = Readonly<{
 }>;
 
 type ConvertBoxProps = Readonly<{
-	mediaBeingConverted: MediaBeingConverted & { path: Path };
+	mediaBeingConverted: MediaBeingConverted;
+	path: Path;
 }>;
 
-type ConvertInfoList = readonly ConvertInfo[];
+type ConvertInfo = Readonly<{
+	toExtension: AllowedMedias;
+	canStartConvert: boolean;
+}>;
+
+type ConvertInfoList = Map<Path, ConvertInfo>;

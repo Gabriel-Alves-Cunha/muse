@@ -17,6 +17,7 @@ import create from "zustand";
 // } as const);
 
 export const useConvertingList = create<ConvertingList>(() => new Map());
-export const { getState: convertingList } = useConvertingList;
+export const { getState: convertingList, setState: setConvertingList } =
+	useConvertingList;
 
 type ConvertingList = Map<Path, MediaBeingConverted>;

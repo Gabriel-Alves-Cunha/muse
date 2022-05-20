@@ -1,7 +1,7 @@
 import { ButtonToTheSideEnum } from "@components/SearchMedia/helper";
 import { MediaListKind } from "@components/MediaListKind";
+import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { SearchMedia } from "@components/SearchMedia";
-import { FAVORITES } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { MainArea } from "@components/MainArea";
 
 export function Favorites() {
@@ -9,10 +9,10 @@ export function Favorites() {
 		<MainArea>
 			<SearchMedia
 				buttonToTheSide={ButtonToTheSideEnum.NOTHING}
-				playlistName={FAVORITES}
+				fromList={PlaylistList.FAVORITES}
 			/>
 
-			<MediaListKind playlistName={FAVORITES} />
+			<MediaListKind fromList={PlaylistList.FAVORITES} />
 		</MainArea>
 	);
 }

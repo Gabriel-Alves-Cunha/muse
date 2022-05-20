@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 // This `constRefToEmptyArray` prevents an infinite loop:
-import { constRefToEmptyArray } from "@utils/array";
+// import { constRefToEmptyArray } from "@utils/array";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
 import { Tooltip } from "@components/Tooltip";
+import { dbg } from "@common/utils";
 import {
 	useConvertInfoList,
 	setConvertInfoList,
@@ -27,10 +28,12 @@ export function Converting() {
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
-		convertInfoList.forEach(convertInfo => {
+		dbg("on converting list useEffect");
+
+		convertInfoList.forEach((convertInfo, path) => {
 			if (convertInfo.canStartConvert)
 				try {
-					const electronPort = createNewConvert(convertInfo);
+					const electronPort = createNewConvert(convertInfo, path);
 
 					// Sending port so we can communicate with electron:
 					sendMsgToBackend(
@@ -41,7 +44,7 @@ export function Converting() {
 					);
 				} catch (error) {
 					errorToast(
-						`There was an error trying to download "${convertInfo.path}"! Please, try again later.`
+						`There was an error trying to download "${path}"! Please, try again later.`
 					);
 
 					console.error(error);
@@ -51,7 +54,8 @@ export function Converting() {
 		// Once all downloads are handled, we can remove the values from the list,
 		// this also prevents an infinite loop (when it reaches the end, the comparison
 		// will be true because of the const reference to the empty array):
-		setConvertInfoList(constRefToEmptyArray);
+		convertInfoList.clear();
+		setConvertInfoList(convertInfoList);
 	}, [convertInfoList]);
 
 	return (

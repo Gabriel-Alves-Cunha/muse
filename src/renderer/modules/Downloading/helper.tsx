@@ -3,7 +3,6 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 
-import { useDownloadingList, downloadingList } from "@contexts/downloadList";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
@@ -11,6 +10,11 @@ import { handleOnClose } from "@modules/Converting/helper";
 import { Progress } from "@components/Progress";
 import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
+import {
+	useDownloadingList,
+	setDownloadingList,
+	downloadingList,
+} from "@contexts/downloadList";
 
 import { Content, TitleAndCancelWrapper } from "./styles";
 
@@ -75,18 +79,17 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// download progress between React and Electron:
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
-	// Creating a new DownloadingMedia:
-	const downloadStatus: MediaBeingDownloaded = {
-		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-		imageURL: downloadInfo.imageURL,
-		title: downloadInfo.title,
-		isDownloading: true,
-		percentage: 0,
-		port: myPort,
-	};
-
-	// Add it to the list:
-	downloadingList_.set(downloadInfo.url, downloadStatus);
+	// Creating a new DownloadingMedia and adding it to the list:
+	setDownloadingList(
+		downloadingList_.set(downloadInfo.url, {
+			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			imageURL: downloadInfo.imageURL,
+			title: downloadInfo.title,
+			isDownloading: true,
+			percentage: 0,
+			port: myPort,
+		})
+	);
 
 	dbg("Added download to the list", { downloadingList: downloadingList() });
 
@@ -111,8 +114,13 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		dbg("downloadStatus:", downloadingList_.get(downloadInfo.url));
 
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const thisDownload = downloadingList_.get(downloadInfo.url)!;
+
 		// Update React's information about this DownloadingMedia:
-		downloadingList_.set(downloadInfo.url, { ...downloadStatus, ...data });
+		setDownloadingList(
+			downloadingList_.set(downloadInfo.url, { ...thisDownload, ...data })
+		);
 
 		// Handle ProgressStatus's cases:
 		switch (data.status) {
@@ -121,21 +129,21 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 				console.assert(data.error, "data.error should exist!");
 				console.error((data as typeof data & { error: Error }).error);
 
-				errorToast(`Download of "${downloadStatus.title}" failed!`);
+				errorToast(`Download of "${thisDownload.title}" failed!`);
 
 				cancelDownloadAndOrRemoveItFromList(downloadInfo.url);
 				break;
 			}
 
 			case ProgressStatus.SUCCESS: {
-				successToast(`Download of "${downloadStatus.title}" succeded!`);
+				successToast(`Download of "${thisDownload.title}" succeded!`);
 
 				cancelDownloadAndOrRemoveItFromList(downloadInfo.url);
 				break;
 			}
 
 			case ProgressStatus.CANCEL: {
-				infoToast(`Download of "${downloadStatus.title}" was cancelled!`);
+				infoToast(`Download of "${thisDownload.title}" was cancelled!`);
 
 				cancelDownloadAndOrRemoveItFromList(downloadInfo.url);
 				break;
@@ -157,8 +165,8 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 		}
 	};
 
-	// @ts-ignore: this fn DOES exists
-	myPort.onclose = handleOnClose;
+	myPort.addEventListener("close", handleOnClose);
+	// myPort.onclose = handleOnClose;
 
 	myPort.start();
 
@@ -184,4 +192,5 @@ const cancelDownloadAndOrRemoveItFromList = (url: string) => {
 
 	// Update downloading list:
 	downloadingList_.delete(url);
+	setDownloadingList(downloadingList_);
 };

@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BiDotsVerticalRounded as Dots } from "react-icons/bi";
 import { useCallback, useMemo, useRef } from "react";
@@ -21,20 +21,20 @@ import { formatDuration } from "@common/utils";
 import { useProgress } from ".";
 import { Tooltip } from "@components/Tooltip";
 import {
-	PlayOptionsType,
-	getPlayOptions,
-	setPlayOptions,
+	toggleLoopMedia,
 	usePlayOptions,
+	toggleRandom,
 } from "@contexts/mediaHandler/usePlayOptions";
 import {
-	CurrentPlayingEnum,
-	getCurrentPlaying,
-	setCurrentPlaying,
+	playPreviousMedia,
+	togglePlayPause,
+	playNextMedia,
 } from "@contexts/mediaHandler/useCurrentPlaying";
 import {
 	PlaylistActions,
-	WhatToDo,
 	setPlaylists,
+	favorites,
+	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 
 import {
@@ -46,65 +46,36 @@ import {
 	SeekerContainer,
 	ProgressThumb,
 	IconButton,
-	Album,
 	Duration,
+	Album,
 } from "./styles";
 
-const toggleRepeatThisMedia = () =>
-	setPlayOptions({
-		value: getPlayOptions().playOptions.loopThisMedia ? false : true,
-		type: PlayOptionsType.LOOP_THIS_MEDIA,
-	});
-
-const toggleRandomAndLoop = () =>
-	setPlayOptions({
-		value: getPlayOptions().playOptions.isRandom ? false : true,
-		type: PlayOptionsType.IS_RANDOM,
-	});
-
-const togglePlayOrPauseMedia = () =>
-	setCurrentPlaying({
-		type: CurrentPlayingEnum.TOGGLE_PLAY_PAUSE,
-	});
-
-const playPreviousMedia = () =>
-	setCurrentPlaying({
-		list: getCurrentPlaying().currentPlaying.playlist,
-		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
-	});
-
-const toggleFavorite = (mediaID?: number) =>
-	mediaID &&
+const toggleFavorite = (path?: Path) =>
+	path &&
 	setPlaylists({
 		whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
 		type: WhatToDo.UPDATE_FAVORITES,
-		path: mediaID,
-	});
-
-export const playNextMedia = () =>
-	setCurrentPlaying({
-		list: getCurrentPlaying().currentPlaying.playlist,
-		type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
+		path,
 	});
 
 export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
-	const { isRandom, loopThisMedia } = usePlayOptions().playOptions;
+	const { isRandom, loopThisMedia } = usePlayOptions();
 
 	return (
 		<ControlsAndSeekerContainer>
 			<SeekerWrapper audio={audio} />
 
 			<ControlsButtonsWrapper>
-				<Tooltip text="Toggle repeat this media">
-					<IconButton onClick={toggleRepeatThisMedia} style={{ width: 40 }}>
+				<Tooltip text="Toggle loop this media">
+					<IconButton onClick={toggleLoopMedia} style={{ width: 40 }}>
 						{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
 					</IconButton>
 				</Tooltip>
 
 				<Controls isPaused={audio?.paused} />
 
-				<Tooltip text="Toggle random and loop">
-					<IconButton onClick={toggleRandomAndLoop} style={{ width: 40 }}>
+				<Tooltip text="Toggle random">
+					<IconButton onClick={toggleRandom} style={{ width: 40 }}>
 						{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 					</IconButton>
 				</Tooltip>
@@ -113,7 +84,7 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 	);
 };
 
-export const Header = ({ media }: RefToMedia) => (
+export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
 		<Tooltip text="Media options">
 			<IconButton style={{ width: 30 }}>
@@ -124,11 +95,12 @@ export const Header = ({ media }: RefToMedia) => (
 		<Album>{media?.album}</Album>
 
 		<Tooltip text="Toggle favorite">
-			<IconButton
-				onClick={() => toggleFavorite(media?.id)}
-				style={{ width: 30 }}
-			>
-				{media?.favorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
+			<IconButton onClick={() => toggleFavorite(path)} style={{ width: 30 }}>
+				{favorites().has(path) ? (
+					<Favorite size={17} />
+				) : (
+					<AddFavorite size={17} />
+				)}
 			</IconButton>
 		</Tooltip>
 	</OptionsAndAlbum>
@@ -148,7 +120,7 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 
 		<Tooltip text="Play/pause">
 			<IconButton
-				onClick={togglePlayOrPauseMedia}
+				onClick={togglePlayPause}
 				style={{ width: 49 }}
 				id="play-pause"
 			>
@@ -238,11 +210,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					ref={timeTooltipRef}
 				/>
 
-				<ProgressThumb
-					style={{
-						width: `${percentage}%`,
-					}}
-				></ProgressThumb>
+				<ProgressThumb style={{ width: `${percentage}%` }}></ProgressThumb>
 			</ProgressWrapper>
 
 			<Duration>
@@ -256,6 +224,6 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 type Audio = HTMLAudioElement | null;
 type RefToAudio = Readonly<{ audio: Audio }>;
-type RefToMedia = Readonly<{ media: Media | undefined }>;
 type IsPaused = Readonly<{ isPaused: boolean | undefined }>;
 type SeekEvent = React.MouseEvent<HTMLDivElement, MouseEvent>;
+type RefToMedia = Readonly<{ media: Media | undefined; path: Path }>;

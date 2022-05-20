@@ -1,17 +1,20 @@
+import type { Media, Path } from "@common/@types/generalTypes";
+
 import { useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
 import { resetAllAppData } from "@utils/app";
-import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { time } from "@utils/utils";
 import {
-	playlistName as playlistNameToSet,
+	useFromList as fromListToSet,
 	computeItemKey,
 	itemContent,
 } from "./helper";
 import {
-	type Playlist,
 	usePlaylists,
+	PlaylistList,
+	getPlaylist,
 } from "@contexts/mediaHandler/usePlaylists";
 
 import {
@@ -28,7 +31,7 @@ import {
 // href="https://www.flaticon.com/free-icons/error" =>
 const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
 
-export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
+export const MediaListKind = ({ fromList }: MediaListKindProps) => (
 	<ErrorBoundary
 		FallbackComponent={ErrorFallback}
 		onReset={() => {
@@ -38,38 +41,47 @@ export const MediaListKind = ({ playlistName }: MediaListKindProps) => (
 			);
 		}}
 	>
-		<MediaListKind_ playlistName={playlistName} />
+		<MediaListKind_ fromList={fromList} />
 	</ErrorBoundary>
 );
 
-function MediaListKind_({ playlistName }: MediaListKindProps) {
-	const { playlists, mainList } = usePlaylists();
+function MediaListKind_({ fromList }: MediaListKindProps) {
+	const { mainList, favorites, history, sortedByDate, sortedByName } =
+		usePlaylists();
 
 	useEffect(() => {
-		playlistNameToSet.setState({ playlistName });
-	}, [playlistName]);
+		fromListToSet.setState({ fromList });
+	}, [fromList]);
 
-	const list = useMemo(() => {
-		// Handle when playlistName === MAIN_LIST:
-		const start = performance.now();
+	const listAsArrayOfAMap: [Path, Media][] = useMemo(
+		() =>
+			time(() => {
+				const list = getPlaylist(fromList);
 
-		const data =
-			playlistName === MAIN_LIST
-				? mainList
-				: // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-				  playlists
-						.find(p => p.name === playlistName)!
-						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-						.list.map(mediaID => mainList.find(m => m.id === mediaID)!);
+				if (Array.isArray(list)) {
+					const listAsArrayOfAMap = [];
+					mainList.forEach((media, path) => {
+						if (list.includes(path)) listAsArrayOfAMap.push([path, media]);
+					});
+				} else if (list instanceof Set) {
+					const listAsArrayOfAMap = [];
+					mainList.forEach((media, path) => {
+						if (list.has(path)) listAsArrayOfAMap.push([path, media]);
+					});
+				} else if (list instanceof Map) {
+					const listAsArrayOfAMap = [];
+					mainList.forEach((media, path) => {
+						if (list.has(path)) listAsArrayOfAMap.push([path, media]);
+					});
+				}
 
-		const end = performance.now();
-		console.log(
-			`%cLoop to find all medias by id took: ${end - start} ms.`,
-			"color:brown"
-		);
-
-		return data;
-	}, [mainList, playlistName, playlists]);
+				throw new Error("The list is not an array, a set or a map");
+			}, "listAsArrayOfAMap"),
+		// Disable cause we need to listen to all the lists cause
+		// we don't know wich one it is
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[mainList, favorites, history, sortedByDate, sortedByName, fromList]
+	);
 
 	return (
 		<ListWrapper>
@@ -86,11 +98,10 @@ function MediaListKind_({ playlistName }: MediaListKindProps) {
 				}}
 				computeItemKey={computeItemKey}
 				itemContent={itemContent}
-				totalCount={list.length}
+				data={listAsArrayOfAMap}
 				fixedItemHeight={65}
 				className="list"
 				overscan={10}
-				data={list}
 				noValidate
 			/>
 		</ListWrapper>
@@ -120,5 +131,5 @@ type ErrorBoundaryProps = Readonly<{
 }>;
 
 export type MediaListKindProps = Readonly<{
-	playlistName: Playlist["name"];
+	fromList: PlaylistList;
 }>;

@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/generalTypes";
 
 enum Status {
 	FAILURE,
@@ -8,43 +8,47 @@ enum Status {
 
 const { SUCCESS, FAILURE, PENDING } = Status;
 
-const cache: Map<number, Status> = new Map();
+const cache: Map<Path, Status> = new Map();
 
-export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
-	if (!media?.img?.length) return Fallback;
+export function ImgWithFallback({
+	mediaPath,
+	Fallback,
+	mediaImg,
+}: Props): JSX.Element {
+	if (!mediaImg?.length) return Fallback;
 
-	const cacheStatus = cache.get(media.id);
+	const cacheStatus = cache.get(mediaPath);
 
 	if (cacheStatus === FAILURE || cacheStatus === PENDING) return Fallback;
 
 	if (cacheStatus === SUCCESS)
-		return <img src={media.img} loading="lazy" decoding="async" />;
+		return <img src={mediaImg} loading="lazy" decoding="async" />;
 
-	cache.set(media.id, PENDING);
+	cache.set(mediaPath, PENDING);
 
-	let img: HTMLImageElement | null = new Image();
+	let img: HTMLImageElement | undefined = new Image();
 
 	img.onload = () => {
-		cache.set(media.id, SUCCESS);
+		cache.set(mediaPath, SUCCESS);
 		// console.log(
 		// 	`%c"${media.path}" img loaded with success`,
 		// 	"font-weight: bold; color: blue;",
 		// );
-		img = null;
+		img = undefined;
 	};
 
 	img.onerror = ev => {
 		console.error("Failed img, erasing it", ev);
 
 		// await writeTags(media.path, { imageURL: "erase img" });
-		cache.set(media.id, FAILURE);
-		img = null;
+		cache.set(mediaPath, FAILURE);
+		img = undefined;
 	};
 
-	img.src = media.img;
+	img.src = mediaImg;
 
-	return cache.get(media.id) === SUCCESS ? (
-		<img src={media.img} loading="lazy" decoding="async" />
+	return cache.get(mediaPath) === SUCCESS ? (
+		<img src={mediaImg} loading="lazy" decoding="async" />
 	) : (
 		Fallback
 	);
@@ -52,5 +56,6 @@ export function ImgWithFallback({ Fallback, media }: Props): JSX.Element {
 
 type Props = {
 	Fallback: JSX.Element;
-	media?: Media;
+	mediaImg?: string;
+	mediaPath: Path;
 };

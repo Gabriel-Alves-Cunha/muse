@@ -1,5 +1,5 @@
 import type { MediaListKindProps } from "@components/MediaListKind";
-import type { Media } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { useEffect, useRef, useTransition } from "react";
 import { FiTrash as Clean } from "react-icons/fi";
@@ -13,19 +13,16 @@ import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { constRefToEmptyArray } from "@utils/array";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { Tooltip } from "@components/Tooltip";
 import {
 	searchLocalComputerForMedias,
-	searchMedia,
 	PlaylistActions,
-	WhatToDo,
 	setPlaylists,
+	PlaylistList,
+	searchMedia,
+	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
-import {
-	CurrentPlayingEnum,
-	setCurrentPlaying,
-} from "@contexts/mediaHandler/useCurrentPlaying";
 
 import { ImgWrapper } from "../MediaListKind/styles";
 import {
@@ -103,25 +100,22 @@ const reload = async () => {
 export const setSearchTerm = (e: InputChange) =>
 	setSearcher({ searchTerm: e.target.value.toLowerCase() });
 
-const playMedia = (mediaID: Media["id"]) =>
-	setCurrentPlaying({
-		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		list: MAIN_LIST,
-		path: mediaID,
-	});
-
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-const Row = ({ highlight, media }: RowProps) => {
+const Row = ({ highlight, media, path }: RowProps) => {
 	const index = media.title.toLowerCase().indexOf(highlight);
 
 	return (
 		<Tooltip text="Play this media">
-			<Result onClick={() => playMedia(media.id)}>
+			<Result onClick={() => playThisMedia(path, PlaylistList.MAIN_LIST)}>
 				<ImgWrapper>
-					<ImgWithFallback Fallback={<MusicNote size={13} />} media={media} />
+					<ImgWithFallback
+						Fallback={<MusicNote size={13} />}
+						mediaImg={media.img}
+						mediaPath={path}
+					/>
 				</ImgWrapper>
 
 				<Info>
@@ -201,8 +195,13 @@ export function Results() {
 					</NothingFound>
 				) : foundSomething ? (
 					<>
-						{results.map(media => (
-							<Row highlight={searchTerm} key={media.id} media={media} />
+						{results.map(([path, media]) => (
+							<Row
+								highlight={searchTerm}
+								media={media}
+								path={path}
+								key={path}
+							/>
 						))}
 					</>
 				) : undefined}
@@ -243,14 +242,15 @@ export function ButtonToTheSide({ buttonToTheSide }: Props1) {
 ////////////////////////////////////////////////////////
 
 type Searcher = Readonly<{
+	results: readonly [Path, Media][];
 	searchTerm: Lowercase<string>;
 	searchStatus: SearchStatus;
-	results: readonly Media[];
 }>;
 
 type RowProps = Readonly<{
 	highlight: Lowercase<string>;
 	media: Media;
+	path: Path;
 }>;
 
 type Props1 = Readonly<{
@@ -258,7 +258,7 @@ type Props1 = Readonly<{
 }>;
 
 type Props2 = Readonly<{
-	playlistName: MediaListKindProps["playlistName"];
+	fromList: MediaListKindProps["fromList"];
 }>;
 
 type InputChange = React.ChangeEvent<HTMLInputElement>;

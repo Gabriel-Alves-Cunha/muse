@@ -18,11 +18,15 @@ export const usePlayOptions = create<PlayOptions>()(
 	)
 );
 
-export const { getState: getPlayOptions, setState: setPlayOptions } =
+export const { getState: playOptions, setState: setPlayOptions } =
 	usePlayOptions;
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export function toggleLoopMedia() {
-	const newValue = !getPlayOptions().loopThisMedia;
+	const newValue = !playOptions().loopThisMedia;
 
 	setPlayOptions({ loopThisMedia: newValue });
 
@@ -30,8 +34,12 @@ export function toggleLoopMedia() {
 }
 
 export function toggleRandom() {
-	setPlayOptions({ isRandom: !getPlayOptions().isRandom });
+	setPlayOptions({ isRandom: !playOptions().isRandom });
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export type PlayOptions = Readonly<{
 	loopThisMedia: boolean;

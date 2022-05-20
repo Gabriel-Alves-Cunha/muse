@@ -1,6 +1,5 @@
 * TODO: impl select on media
 * TODO: use NextUI instead of radix
-* TODO: use Map instead of array in playlists
 
 NOTES:
 

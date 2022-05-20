@@ -3,29 +3,27 @@ import type { Path } from "@common/@types/generalTypes";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { assertUnreachable, getRandomInt } from "@utils/utils";
 import { formatDuration } from "@common/utils";
-import { getPlayOptions } from "./usePlayOptions";
+import { playOptions } from "./usePlayOptions";
+import { getRandomInt } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
 import { dbg } from "@common/utils";
 import {
 	PlaylistActions,
+	PlaylistList,
 	setPlaylists,
-	getPlaylists,
+	getPlaylist,
 	WhatToDo,
+	mainList,
 } from "./usePlaylists";
 
 const { readFile } = electron.fs;
 
-const currentPlayingKey = `${keyPrefix}current_playing` as const;
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
-export enum PlaylistList {
-	SORTED_BY_DATE,
-	SORTED_BY_NAME,
-	MAIN_LIST,
-	FAVORITES,
-	HISTORY,
-}
+const currentPlayingKey = `${keyPrefix}current_playing` as const;
 
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: PlaylistList.MAIN_LIST,
@@ -42,8 +40,12 @@ export const useCurrentPlaying = create<CurrentPlaying>()(
 	)
 );
 
-export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
+export const { getState: currentPlaying, setState: setCurrentPlaying } =
 	useCurrentPlaying;
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 	dbg("playThisMedia()", { mediaPath, listType });
@@ -62,8 +64,8 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 	});
 }
 
-export function playPreviousFromPlaylist() {
-	const { path, listType } = getCurrentPlaying();
+export function playPreviousMedia() {
+	const { path, listType } = currentPlaying();
 
 	if (!path) {
 		console.error(
@@ -96,7 +98,8 @@ export function playPreviousFromPlaylist() {
 		return;
 	}
 
-	const prevMediaPath = listAsArray.at(currMediaPathIndex - 1);
+	const prevMediaPath =
+		listAsArray.at(currMediaPathIndex - 1) ?? listAsArray[0];
 
 	if (prevMediaPath) {
 		// We need to update history:
@@ -113,10 +116,10 @@ export function playPreviousFromPlaylist() {
 	}
 }
 
-export async function togglePlayPause(): Promise<void> {
+export function togglePlayPause(): void {
 	const audio = document.getElementById("audio") as HTMLAudioElement;
 
-	if (audio.paused) await audio.play();
+	if (audio.paused) (async () => await audio.play())();
 	else {
 		audio.pause();
 
@@ -126,8 +129,9 @@ export async function togglePlayPause(): Promise<void> {
 	}
 }
 
-export async function play(): Promise<void> {
-	await (document.getElementById("audio") as HTMLAudioElement).play();
+export function play(): void {
+	(async () =>
+		await (document.getElementById("audio") as HTMLAudioElement).play())();
 }
 
 export function pause() {
@@ -140,8 +144,8 @@ export function pause() {
 	});
 }
 
-export function playNextFromPlaylist(): void {
-	const { path, listType } = getCurrentPlaying();
+export function playNextMedia(): void {
+	const { path, listType } = currentPlaying();
 
 	if (!path) {
 		console.warn(
@@ -167,7 +171,7 @@ export function playNextFromPlaylist(): void {
 		return;
 	}
 
-	if (getPlayOptions().isRandom) {
+	if (playOptions().isRandom) {
 		const randomMediaPath = listAsArray[getRandomInt(0, listAsArray.length)];
 
 		if (!randomMediaPath) {
@@ -231,6 +235,10 @@ export function playNextFromPlaylist(): void {
 	}
 }
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
 
 if (globalThis.window)
@@ -240,10 +248,10 @@ if (globalThis.window)
 			// @ts-ignore It will just return undefined if `prevMediaTimer` is undefined.
 			clearTimeout(prevMediaTimer);
 
-			const { path, currentTime } = getCurrentPlaying();
+			const { path, currentTime } = currentPlaying();
 			if (!path) return;
 
-			const media = getPlaylists().mainList.get(path);
+			const media = mainList().get(path);
 			if (!media) return console.error("There is no media!", { path });
 
 			const mediaTimer = setTimeout(async () => {
@@ -311,27 +319,9 @@ if (globalThis.window)
 		}
 	);
 
-export const getPlaylist = (list: Readonly<PlaylistList>) => {
-	switch (list) {
-		case PlaylistList.MAIN_LIST:
-			return getPlaylists().mainList;
-
-		case PlaylistList.HISTORY:
-			return getPlaylists().history;
-
-		case PlaylistList.FAVORITES:
-			return getPlaylists().favorites;
-
-		case PlaylistList.SORTED_BY_DATE:
-			return getPlaylists().sortedByDate;
-
-		case PlaylistList.SORTED_BY_NAME:
-			return getPlaylists().sortedByName;
-
-		default:
-			return assertUnreachable(list);
-	}
-};
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export type CurrentPlaying = Readonly<{
 	listType: PlaylistList;

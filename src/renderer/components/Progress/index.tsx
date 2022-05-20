@@ -24,12 +24,14 @@ export const Progress = ({
 	</Component>
 );
 
-const iconObj: Map<ProgressStatus, JSX.Element> = new Map();
-iconObj.set(ProgressStatus.SUCCESS, <Success size={12} color="green" />);
-iconObj.set(ProgressStatus.CANCEL, <Cancel size={12} color="blue" />);
-iconObj.set(ProgressStatus.FAILED, <Fail size={12} color="red" />);
-iconObj.set(ProgressStatus.ACTIVE, <Downloading size={12} />);
-Object.freeze(iconObj);
+const iconObj: ReadonlyMap<ProgressStatus, JSX.Element> = Object.freeze(
+	new Map([
+		[ProgressStatus.SUCCESS, <Success size={12} color="green" key="success" />],
+		[ProgressStatus.CANCEL, <Cancel size={12} color="blue" key="cancel" />],
+		[ProgressStatus.FAILED, <Fail size={12} color="red" key="failed" />],
+		[ProgressStatus.ACTIVE, <Downloading size={12} key="active" />],
+	])
+);
 
 export type ProgressProps = {
 	readonly showStatus: boolean;

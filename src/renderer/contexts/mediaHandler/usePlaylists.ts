@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import create from "zustand";
 
 import { assertUnreachable, time } from "@utils/utils";
-import { dbgPlaylists, dbgTests } from "@common/utils";
+import { dbgPlaylists } from "@common/utils";
 import { keyPrefix } from "@utils/app";
 import {
 	searchDirectoryResult,
@@ -30,6 +30,9 @@ type UsePlaylistsActions = Readonly<{
 	history: Array<Path>;
 	mainList: MainList;
 }>;
+
+// TODO: handle when updating mainList, also check if the new medias
+// are present in the history and favorites
 
 export const usePlaylists = create<UsePlaylistsActions>()(
 	persist(
@@ -119,8 +122,6 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										? set({ favorites })
 										: console.error("Media not found in favorites");
 
-									dbgTests({ favorites });
-
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. new favorites =",
 										get().favorites
@@ -180,18 +181,21 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
 									const mainList = get().mainList;
 
-									mainList.delete(action.path);
+									if (!mainList.delete(action.path)) {
+										console.error(
+											`A media with path "${String(
+												action.path
+											)}" does not exist. Therefore, I'm not gonna remove it.`
+										);
+										break;
+									}
 
 									updateSortedAndMainLists(mainList);
 
 									// If the media is in the favorites, remove it from the favorites
 									const favorites = get().favorites;
 
-									if (favorites.has(action.path)) {
-										favorites.delete(action.path);
-
-										set({ favorites });
-									}
+									if (favorites.delete(action.path)) set({ favorites });
 
 									// If the media is in the history, remove it from the history
 									const history = get().history;
@@ -221,9 +225,10 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								}
 
 								case PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH: {
+									const { newMedia, path, newPath } = action;
 									const mainList = get().mainList;
 
-									const oldMedia = mainList.get(action.path);
+									const oldMedia = mainList.get(path);
 
 									if (!oldMedia) {
 										console.error(
@@ -234,13 +239,25 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										break;
 									}
 
-									updateSortedAndMainLists(
-										mainList.set(action.path, action.newMedia)
-									);
+									if (newPath) {
+										mainList.delete(path);
+										mainList.set(newPath, newMedia);
+										updateSortedAndMainLists(mainList);
+									} else
+										updateSortedAndMainLists(
+											mainList.set(action.path, action.newMedia)
+										);
+
+									if (get().mainList.has(newPath ? newPath : path))
+										console.error(
+											`A media with path "${String(
+												path
+											)}" shouldn't exist, but it does.`
+										);
 
 									dbgPlaylists(
 										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",
-										action.newMedia,
+										get().mainList.get(newPath ? newPath : path),
 										"\nnewMainList =",
 										get().mainList
 									);
@@ -311,8 +328,43 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const { getState: getPlaylists } = usePlaylists;
+const { getState: getPlaylists } = usePlaylists;
+export const sortedByDate = () => getPlaylists().sortedByDate;
+export const sortedByName = () => getPlaylists().sortedByName;
+export const favorites = () => getPlaylists().favorites;
+export const mainList = () => getPlaylists().mainList;
+export const history = () => getPlaylists().history;
 export const { setPlaylists } = getPlaylists();
+
+export enum PlaylistList {
+	SORTED_BY_DATE,
+	SORTED_BY_NAME,
+	MAIN_LIST,
+	FAVORITES,
+	HISTORY,
+}
+
+export const getPlaylist = (list: Readonly<PlaylistList>) => {
+	switch (list) {
+		case PlaylistList.MAIN_LIST:
+			return mainList();
+
+		case PlaylistList.HISTORY:
+			return history();
+
+		case PlaylistList.FAVORITES:
+			return favorites();
+
+		case PlaylistList.SORTED_BY_DATE:
+			return sortedByDate();
+
+		case PlaylistList.SORTED_BY_NAME:
+			return sortedByName();
+
+		default:
+			return assertUnreachable(list);
+	}
+};
 
 export async function searchLocalComputerForMedias(force = false) {
 	time(async () => {
@@ -352,9 +404,9 @@ export async function searchLocalComputerForMedias(force = false) {
 	}, "searchLocalComputerForMedias");
 }
 
-export function searchMedia(searchTerm_: Readonly<string>): MainList {
+export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 	const searchTerm = searchTerm_.toLowerCase();
-	const medias: Array<[Path, Media]> = [];
+	const medias: [Path, Media][] = [];
 
 	getPlaylists().mainList.forEach(
 		(media, path) =>
@@ -362,7 +414,7 @@ export function searchMedia(searchTerm_: Readonly<string>): MainList {
 			medias.push([path, media])
 	);
 
-	return new Map(medias);
+	return medias;
 }
 
 export async function deleteMedia(path: Path) {
@@ -422,6 +474,7 @@ export type PlaylistsReducer_Action =
 				| PlaylistActions.ADD_ONE_MEDIA;
 			type: WhatToDo.UPDATE_MAIN_LIST;
 			newMedia: Media;
+			newPath?: Path;
 			path: Path;
 	  }>
 	| Readonly<{

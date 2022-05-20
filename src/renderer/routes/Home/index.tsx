@@ -1,7 +1,7 @@
 import { ButtonToTheSideEnum } from "@components/SearchMedia/helper";
 import { MediaListKind } from "@components/MediaListKind";
+import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { SearchMedia } from "@components/SearchMedia";
-import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { MainArea } from "@components/MainArea";
 
 export function Home() {
@@ -9,10 +9,10 @@ export function Home() {
 		<MainArea>
 			<SearchMedia
 				buttonToTheSide={ButtonToTheSideEnum.RELOAD_BUTTON}
-				playlistName={MAIN_LIST}
+				fromList={PlaylistList.MAIN_LIST}
 			/>
 
-			<MediaListKind playlistName={MAIN_LIST} />
+			<MediaListKind fromList={PlaylistList.MAIN_LIST} />
 		</MainArea>
 	);
 }

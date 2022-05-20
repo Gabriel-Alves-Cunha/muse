@@ -3,8 +3,11 @@ import type { Path } from "@common/@types/generalTypes";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { setConvertInfoList } from "@modules/Converting/helper";
 import { MainArea } from "@components/MainArea";
+import {
+	setConvertInfoList,
+	convertInfoList,
+} from "@modules/Converting/helper";
 
 import { BorderedButton } from "./styles";
 
@@ -30,14 +33,17 @@ export function Convert() {
 
 	useEffect(() => {
 		const convertTo = () => {
-			const convertInfo = selectedMediasPath.map(path => ({
-				canStartConvert: true,
-				toExtension,
-				path,
-			}));
+			const convertInfoList_ = convertInfoList();
+
+			selectedMediasPath.forEach(path =>
+				convertInfoList_.set(path, {
+					canStartConvert: true,
+					toExtension,
+				})
+			);
 
 			// Start convert:
-			setConvertInfoList(convertInfo);
+			setConvertInfoList(convertInfoList_);
 
 			setSelectedMediasPath([]);
 		};

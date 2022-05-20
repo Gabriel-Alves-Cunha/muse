@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { type RefObject, useEffect, useRef } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
@@ -27,18 +27,19 @@ import {
 	Flex,
 } from "./styles";
 
-export function MediaOptionsModal({ media }: { media: Media }) {
+export function MediaOptionsModal({ media, path }: Props) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
 		const handleKeyUp = ({ key }: KeyboardEvent) =>
-			key === "Enter" && handleChange(contentWrapperRef, closeButtonRef, media);
+			key === "Enter" &&
+			handleChange(contentWrapperRef, closeButtonRef, path, media);
 
 		window.addEventListener("keyup", handleKeyUp);
 
 		return () => window.removeEventListener("keyup", handleKeyUp);
-	}, [media]);
+	}, [media, path]);
 
 	return (
 		<StyledContent ref={contentWrapperRef}>
@@ -81,7 +82,7 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 						</StyledTitle>
 
 						<ButtonToClose
-							onClick={() => handleMediaDeletion(closeButtonRef, media)}
+							onClick={() => handleMediaDeletion(closeButtonRef, path)}
 							id="delete-media"
 						>
 							Confirm
@@ -92,7 +93,9 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 				</Dialog>
 
 				<ButtonToClose
-					onClick={() => handleChange(contentWrapperRef, closeButtonRef, media)}
+					onClick={() =>
+						handleChange(contentWrapperRef, closeButtonRef, path, media)
+					}
 					id="save-changes"
 				>
 					Save changes
@@ -104,12 +107,12 @@ export function MediaOptionsModal({ media }: { media: Media }) {
 
 const handleMediaDeletion = async (
 	closeButtonRef: RefObject<HTMLButtonElement>,
-	media: Media
+	mediaPath: Path
 ) => {
 	if (closeButtonRef.current)
 		try {
-			dbg("Deleting media...", media);
-			await deleteMedia(media);
+			dbg("Deleting media...", mediaPath);
+			await deleteMedia(mediaPath);
 
 			closeEverything(closeButtonRef);
 
@@ -126,11 +129,12 @@ const handleMediaDeletion = async (
 const handleChange = (
 	contentWrapperRef: RefObject<HTMLDivElement>,
 	closeButtonRef: RefObject<HTMLButtonElement>,
+	mediaPath: Path,
 	media: Media
 ) => {
 	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
-			changePropsIfAllowed(contentWrapperRef, media);
+			changePropsIfAllowed(contentWrapperRef, mediaPath, media);
 			closeEverything(closeButtonRef);
 
 			successToast("New media metadata has been saved.");
@@ -145,6 +149,7 @@ const handleChange = (
 
 function changePropsIfAllowed(
 	contentWrapper: RefObject<HTMLDivElement>,
+	mediaPath: Path,
 	media: Media
 ) {
 	if (contentWrapper.current)
@@ -197,7 +202,7 @@ function changePropsIfAllowed(
 								type: ReactToElectronMessageEnum.WRITE_TAG,
 								params: {
 									whatToChange: whatToSend,
-									mediaPath: media.path,
+									mediaPath,
 									newValue,
 								},
 							});
@@ -206,22 +211,13 @@ function changePropsIfAllowed(
 				}
 }
 
-const options = ({
-	duration,
-	artist,
-	album,
-	genres,
-	title,
-	size,
-	path,
-}: Media) =>
+const options = ({ duration, artist, album, genres, title, size }: Media) =>
 	Object.freeze({
 		duration,
 		artist,
 		genres,
 		title,
 		album,
-		path,
 		size,
 	});
 
@@ -247,3 +243,8 @@ export type WhatToChange = Readonly<{
 
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
 type ChangeOptions = keyof typeof allowedOptionToChange;
+
+type Props = {
+	media: Media;
+	path: Path;
+};

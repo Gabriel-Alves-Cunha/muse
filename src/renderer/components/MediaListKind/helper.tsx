@@ -1,4 +1,4 @@
-import type { Media, Mutable } from "@common/@types/generalTypes";
+import type { Media, Mutable, Path } from "@common/@types/generalTypes";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
@@ -9,11 +9,9 @@ import create from "zustand";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
+import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
+import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { Tooltip } from "@components/Tooltip";
-import {
-	CurrentPlayingEnum,
-	setCurrentPlaying,
-} from "@contexts/mediaHandler/useCurrentPlaying";
 
 import { StyledOverlay } from "./MediaOptions/styles";
 import {
@@ -26,32 +24,34 @@ import {
 	Info,
 } from "./styles";
 
-const allSelectedMedias: Set<Media["id"]> = new Set();
-export const playlistName = create(() => ({ playlistName: "" }));
+const allSelectedMedias: Set<Path> = new Set();
+export const useFromList = create(() => ({ fromList: PlaylistList.MAIN_LIST }));
+const fromList = () => useFromList.getState().fromList;
 
 const Row = memo(
-	({ media }: RowProps) => {
+	({ media, path }: RowProps) => {
 		const mediaRowRef = useRef<HTMLDivElement>(null);
 		const isSelected = useRef(false).current;
 
 		useOnClickOutside(
 			mediaRowRef,
-			() => isSelected && allSelectedMedias.delete(media.id)
+			() => isSelected && allSelectedMedias.delete(path)
 		);
 
 		return (
 			<RowWrapper
 				onClick={event =>
-					toggleMediaSelectIfCtrlPlusLeftClick(event, isSelected, media.id)
+					toggleMediaSelectIfCtrlPlusLeftClick(event, isSelected, path)
 				}
 				ref={mediaRowRef}
 			>
 				<Tooltip text="Play this media">
-					<PlayButton onClick={() => playMedia(media.id)}>
+					<PlayButton onClick={() => playThisMedia(path, fromList())}>
 						<ImgWrapper>
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4rem" />}
-								media={media}
+								mediaImg={media.img}
+								mediaPath={path}
 							/>
 						</ImgWrapper>
 
@@ -70,27 +70,20 @@ const Row = memo(
 					</Tooltip>
 
 					<StyledOverlay>
-						<MediaOptionsModal media={media} />
+						<MediaOptionsModal media={media} path={path} />
 					</StyledOverlay>
 				</Dialog>
 			</RowWrapper>
 		);
 	},
-	(prevMedia, nextMedia) => prevMedia.media.id === nextMedia.media.id
+	(prev, next) => prev.path === next.path
 );
 Row.displayName = "Row";
-
-const playMedia = (mediaID: Media["id"]) =>
-	setCurrentPlaying({
-		list: playlistName.getState().playlistName,
-		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		path: mediaID,
-	});
 
 const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e: Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>,
 	isSelected: Mutable<boolean>,
-	mediaID: Readonly<Media["id"]>
+	mediaPath: Readonly<Path>
 ) => {
 	// `e.button === 0` is left click
 	if (!e.ctrlKey || e.button !== 0) return;
@@ -98,14 +91,14 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e.preventDefault();
 	e.stopPropagation();
 
-	if (allSelectedMedias.has(mediaID)) {
+	if (allSelectedMedias.has(mediaPath)) {
 		console.assert(isSelected, "isSelected should be true");
 
 		// Remove className "selected":
 		e.currentTarget.classList.remove("selected");
 
 		// Remove media from the set:
-		allSelectedMedias.delete(mediaID);
+		allSelectedMedias.delete(mediaPath);
 
 		// Set the `isSelected` ref to false:
 		isSelected = false;
@@ -116,16 +109,19 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 		e.currentTarget.classList.add("selected");
 
 		// Add media to the set:
-		allSelectedMedias.add(mediaID);
+		allSelectedMedias.add(mediaPath);
 
 		// Set the `isSelected` ref to false:
 		isSelected = true;
 	}
 };
 
-export const computeItemKey = (_: number, media: Media) => media.id;
-export const itemContent = (_: number, media: Media) => <Row media={media} />;
+export const computeItemKey = (_index: number, [path]: [Path, Media]) => path;
+export const itemContent = (_index: number, [path, media]: [Path, Media]) => (
+	<Row media={media} path={path} />
+);
 
 type RowProps = Readonly<{
 	media: Media;
+	path: Path;
 }>;

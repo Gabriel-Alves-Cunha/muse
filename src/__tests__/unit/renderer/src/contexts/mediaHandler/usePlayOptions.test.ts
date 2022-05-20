@@ -5,48 +5,24 @@ mockGlobalsBeforeTests();
 
 import {
 	toggleLoopMedia,
-	getPlayOptions,
 	setPlayOptions,
+	playOptions,
 } from "@contexts/mediaHandler/usePlayOptions";
 
 describe("Testing usePlayOptions", () => {
 	it("should get a new playOptions with .loopThisMedia set", () => {
-		{
-			setPlayOptions({
-				loopThisMedia: true,
-			});
+		setPlayOptions({ loopThisMedia: true });
+		expect(playOptions()).toHaveProperty("loopThisMedia", true);
 
-			const playOptions = getPlayOptions();
-
-			expect(playOptions).toHaveProperty("loopThisMedia", true);
-		}
-		{
-			toggleLoopMedia();
-
-			const playOptions = getPlayOptions();
-
-			expect(playOptions).toHaveProperty("loopThisMedia", false);
-		}
+		toggleLoopMedia();
+		expect(playOptions()).toHaveProperty("loopThisMedia", false);
 	});
 
 	it("should get a new playOptions with .isRandom set", () => {
-		{
-			setPlayOptions({
-				isRandom: true,
-			});
+		setPlayOptions({ isRandom: true });
+		expect(playOptions()).toHaveProperty("isRandom", true);
 
-			const playOptions = getPlayOptions();
-
-			expect(playOptions).toHaveProperty("isRandom", true);
-		}
-		{
-			setPlayOptions({
-				isRandom: false,
-			});
-
-			const playOptions = getPlayOptions();
-
-			expect(playOptions).toHaveProperty("isRandom", false);
-		}
+		setPlayOptions({ isRandom: false });
+		expect(playOptions()).toHaveProperty("isRandom", false);
 	});
 });
