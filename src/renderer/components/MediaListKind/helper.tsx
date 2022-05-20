@@ -82,9 +82,9 @@ Row.displayName = "Row";
 
 const playMedia = (mediaID: Media["id"]) =>
 	setCurrentPlaying({
-		playlistName: playlistName.getState().playlistName,
+		list: playlistName.getState().playlistName,
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		mediaID,
+		path: mediaID,
 	});
 
 const toggleMediaSelectIfCtrlPlusLeftClick = (

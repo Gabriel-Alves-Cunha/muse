@@ -17,9 +17,9 @@ import { MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { Tooltip } from "@components/Tooltip";
 import {
 	searchLocalComputerForMedias,
-	searchForMediaFromList,
+	searchMedia,
 	PlaylistActions,
-	PlaylistEnum,
+	WhatToDo,
 	setPlaylists,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
@@ -85,7 +85,7 @@ export const { setState: setSearcher } = useSearcher;
 
 const cleanHistory = () =>
 	setPlaylists({
-		type: PlaylistEnum.UPDATE_HISTORY,
+		type: WhatToDo.UPDATE_HISTORY,
 		whatToDo: PlaylistActions.CLEAN,
 	});
 
@@ -106,8 +106,8 @@ export const setSearchTerm = (e: InputChange) =>
 const playMedia = (mediaID: Media["id"]) =>
 	setCurrentPlaying({
 		type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-		playlistName: MAIN_LIST,
-		mediaID,
+		list: MAIN_LIST,
+		path: mediaID,
 	});
 
 ////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ export function Input() {
 		if (searchTerm.length < 2) return;
 
 		startTransition(() => {
-			const results = searchForMediaFromList(searchTerm);
+			const results = searchMedia(searchTerm);
 			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
 			setSearcher({ searchStatus, results });

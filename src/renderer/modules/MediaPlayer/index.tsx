@@ -20,7 +20,7 @@ export function MediaPlayer() {
 	const { currentPlaying } = useCurrentPlaying();
 	const { mainList } = usePlaylists();
 
-	const media = mainList.find(m => m.id === currentPlaying.mediaID);
+	const media = mainList.find(m => m.id === currentPlaying.path);
 	const audio = audioRef.current;
 
 	useEffect(() => {

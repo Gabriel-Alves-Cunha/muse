@@ -4,7 +4,7 @@ import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
 import {
-	PlayOptionsType,
+	toggleLoopMedia,
 	getPlayOptions,
 	setPlayOptions,
 } from "@contexts/mediaHandler/usePlayOptions";
@@ -13,21 +13,17 @@ describe("Testing usePlayOptions", () => {
 	it("should get a new playOptions with .loopThisMedia set", () => {
 		{
 			setPlayOptions({
-				type: PlayOptionsType.LOOP_THIS_MEDIA,
-				value: true,
+				loopThisMedia: true,
 			});
 
-			const playOptions = getPlayOptions().playOptions;
+			const playOptions = getPlayOptions();
 
 			expect(playOptions).toHaveProperty("loopThisMedia", true);
 		}
 		{
-			setPlayOptions({
-				type: PlayOptionsType.LOOP_THIS_MEDIA,
-				value: false,
-			});
+			toggleLoopMedia();
 
-			const playOptions = getPlayOptions().playOptions;
+			const playOptions = getPlayOptions();
 
 			expect(playOptions).toHaveProperty("loopThisMedia", false);
 		}
@@ -36,21 +32,19 @@ describe("Testing usePlayOptions", () => {
 	it("should get a new playOptions with .isRandom set", () => {
 		{
 			setPlayOptions({
-				type: PlayOptionsType.IS_RANDOM,
-				value: true,
+				isRandom: true,
 			});
 
-			const playOptions = getPlayOptions().playOptions;
+			const playOptions = getPlayOptions();
 
 			expect(playOptions).toHaveProperty("isRandom", true);
 		}
 		{
 			setPlayOptions({
-				type: PlayOptionsType.IS_RANDOM,
-				value: false,
+				isRandom: false,
 			});
 
-			const playOptions = getPlayOptions().playOptions;
+			const playOptions = getPlayOptions();
 
 			expect(playOptions).toHaveProperty("isRandom", false);
 		}

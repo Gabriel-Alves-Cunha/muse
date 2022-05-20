@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Media } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
 import { faker } from "@faker-js/faker";
@@ -8,37 +8,29 @@ import { faker } from "@faker-js/faker";
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
-import { numberOfMedias, testList } from "./fakeTestList";
-import { formatDuration } from "@common/utils";
+import { numberOfMedias, testList, testArray } from "./fakeTestList";
+import { dbgTests, formatDuration } from "@common/utils";
 import { getRandomInt } from "@utils/utils";
-import { hash } from "@common/hash";
 import {
-	type DefaultLists,
-	searchForMediaFromList,
 	PlaylistActions,
 	getPlaylists,
 	setPlaylists,
-	PlaylistEnum,
+	searchMedia,
+	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
-	FAVORITES,
-	MAIN_LIST,
-	HISTORY,
-} from "@contexts/mediaHandler/usePlaylistsHelper";
-import {
-	CurrentPlayingEnum,
+	playNextFromPlaylist,
 	getCurrentPlaying,
-	setCurrentPlaying,
+	playThisMedia,
+	PlaylistList,
+	getPlaylist,
 } from "@contexts/mediaHandler/useCurrentPlaying";
-
-const getPlaylist = (listName: DefaultLists | string) =>
-	getPlaylists().playlists.find(p => p.name === listName)!;
 
 describe("Testing list updates", () => {
 	it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
 		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: PlaylistEnum.UPDATE_MAIN_LIST,
+			type: WhatToDo.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 
@@ -53,64 +45,67 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		// (PlaylistActions.REPLACE_ENTIRE_LIST) Set the mediaList to our test list:
 		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: PlaylistEnum.UPDATE_MAIN_LIST,
+			type: WhatToDo.UPDATE_MAIN_LIST,
 			list: testList,
 		});
+		{
+			const mainList = getPlaylists().mainList;
+			expect(mainList.size).toBe(numberOfMedias);
+			expect(mainList).toEqual(testList);
+		}
 
 		// (PlaylistActions.CLEAN) Clean history:
 		setPlaylists({
-			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
+			type: WhatToDo.UPDATE_HISTORY,
 		});
 		{
-			const history = getPlaylist(HISTORY).list;
+			const history = getPlaylist(PlaylistList.HISTORY) as Array<Path>;
+			expect(history).instanceOf(Array);
 			expect(history.length).toBe(0);
 		}
 
 		// (PlaylistActions.CLEAN) Clean favorites:
 		setPlaylists({
-			type: PlaylistEnum.UPDATE_FAVORITES,
+			type: WhatToDo.UPDATE_FAVORITES,
 			whatToDo: PlaylistActions.CLEAN,
 		});
 		{
-			const favorites = getPlaylist(FAVORITES).list;
-			expect(favorites.length).toBe(0);
+			const favorites = getPlaylist(PlaylistList.FAVORITES) as Set<Path>;
+			expect(favorites).instanceOf(Set);
+			expect(favorites.size).toBe(0);
 		}
 
 		// Set currentPlaying to first media:
 		const currMainList = getPlaylists().mainList;
-		const firstMedia = currMainList[0]!;
-		setCurrentPlaying({
-			type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-			playlistName: MAIN_LIST,
-			mediaID: firstMedia.id,
-		});
+		const firstMedia = Array.from(currMainList.keys())[0];
+
+		expect(firstMedia).toBeTruthy();
+
+		playThisMedia(firstMedia!, PlaylistList.MAIN_LIST);
 
 		{
-			const history = getPlaylist(HISTORY).list;
+			const history = getPlaylist(PlaylistList.HISTORY) as Array<Path>;
+			expect(history).instanceOf(Array);
 			expect(history.length).toBe(1);
 		}
 	});
 
 	const playNextMediaFn = () => {
-		const currMainList = getPlaylists().mainList;
-
-		testList.forEach((_, index) => {
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
-				playlistName: MAIN_LIST,
-			});
+		testArray.forEach((_, index) => {
+			playNextFromPlaylist();
 
 			// If is the last media, it is going to go back
 			// to the first one:
-			const expectedMediaID =
-				currMainList[index < numberOfMedias - 1 ? index + 1 : 0]?.id;
-			const currMediaID = getCurrentPlaying().currentPlaying.mediaID;
+			const expectedMediaPath =
+				testArray[index < numberOfMedias - 1 ? index + 1 : 0]![0];
+			const currMediaID = getCurrentPlaying().path;
 
-			expect(currMediaID).toBe(expectedMediaID);
+			expect(currMediaID).toBe(expectedMediaPath);
 		});
 
-		const history = getPlaylist(HISTORY).list;
+		const history = getPlaylist(PlaylistList.HISTORY) as Array<Path>;
+		expect(history).instanceOf(Array);
 		// The extra 1 is the first media that we added when we
 		// 'Set currentPlaying to first media' at `beforeEach` above:
 		expect(history.length).toBe(numberOfMedias + 1);
@@ -119,23 +114,16 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 	it("should play the next media", playNextMediaFn);
 
 	it("should play a chosen media", () => {
-		const currMainList = getPlaylists().mainList;
-		const randomMediaIndexes = testList.map(() =>
-			getRandomInt(0, numberOfMedias)
-		);
+		testArray.forEach(() => {
+			const randomMediaPath = testArray[getRandomInt(0, numberOfMedias)]![0];
 
-		testList.forEach((_, index) => {
-			const randomMediaID = currMainList[randomMediaIndexes[index]!]!.id;
+			expect(randomMediaPath).toBeTruthy();
 
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MAIN_LIST,
-				mediaID: randomMediaID,
-			});
+			playThisMedia(randomMediaPath, PlaylistList.MAIN_LIST);
 
-			const currMediaID = getCurrentPlaying().currentPlaying.mediaID;
+			const currMediaPath = getCurrentPlaying().path;
 
-			expect(currMediaID).toBe(randomMediaID);
+			expect(currMediaPath).toBe(randomMediaPath);
 		});
 	});
 
@@ -143,46 +131,48 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		it("(PlaylistActions.ADD_ONE_MEDIA) should update the history list", () => {
 			playNextMediaFn();
 
-			const history = getPlaylist(HISTORY).list;
+			const history = getPlaylist(PlaylistList.HISTORY) as Array<Path>;
 
+			expect(history).instanceOf(Array);
 			// The extra 1 is the first media that we added when we
 			// 'Set currentPlaying to first media' at `beforeEach` above:
 			expect(history.length).toBe(numberOfMedias + 1);
 		});
 
 		it("(PlaylistActions.ADD_ONE_MEDIA) should add one to the history list", () => {
-			const mediaIdToAdd = getPlaylists().mainList[1]!.id;
+			const mediaPathToAdd = testArray[1]![0];
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_HISTORY,
-				mediaID: mediaIdToAdd,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				type: WhatToDo.UPDATE_HISTORY,
+				path: mediaPathToAdd,
 			});
 
-			const newHistory = getPlaylist(HISTORY)!.list;
+			const newHistory = getPlaylist(PlaylistList.HISTORY) as Array<Path>;
 
+			expect(newHistory).instanceOf(Array);
 			// The extra 1 is the first media that we added when we
 			// 'Set currentPlaying to first media' at `beforeEach` above:
 			expect(newHistory.length).toBe(1 + 1);
-
-			expect(newHistory[0]).toEqual(mediaIdToAdd);
+			expect(newHistory[0]).toBe(mediaPathToAdd);
 		});
 	});
 
 	describe("Testing PlaylistEnum.UPDATE_FAVORITES", () => {
 		const addOneMediaToFavorites = () => {
-			const mediaID = getPlaylists().mainList[1]!.id;
+			const mediaPath = testArray[1]![0];
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_FAVORITES,
-				mediaID,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				type: WhatToDo.UPDATE_FAVORITES,
+				path: mediaPath,
 			});
 
-			const newFavorites = getPlaylist(FAVORITES)!.list;
+			const newFavorites = getPlaylist(PlaylistList.FAVORITES) as Set<Path>;
 
-			expect(newFavorites[0]).toBe(mediaID);
-			expect(newFavorites.length).toBe(1);
+			expect(newFavorites).instanceOf(Set);
+			expect(newFavorites.size).toBe(1);
+			expect(Array.from(newFavorites)[0]).toBe(mediaPath);
 		};
 
 		it(
@@ -193,81 +183,94 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 		it("(PlaylistActions.REMOVE_ONE_MEDIA) should remove one media of favorites", () => {
 			addOneMediaToFavorites();
 
-			const prevFavorites = getPlaylist(FAVORITES).list;
+			const prevFavorites = Array.from(
+				(getPlaylist(PlaylistList.FAVORITES) as Set<Path>).keys()
+			);
 
 			expect(prevFavorites.length).toBe(1);
 
 			setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_FAVORITES,
-				mediaID: prevFavorites[0]!,
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
+				type: WhatToDo.UPDATE_FAVORITES,
+				path: prevFavorites[0]!,
 			});
 
-			const newFavorites = getPlaylist(FAVORITES).list;
+			const newFavorites = getPlaylist(PlaylistList.FAVORITES) as Set<Path>;
 
-			expect(newFavorites.length).toBe(0);
+			expect(newFavorites.size).toBe(0);
 		});
 	});
 
 	describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		it("(!PlaylistActions.ADD_ONE_MEDIA) should NOT add one media to mediaList because there already exists one with the same path", () => {
+			const anyIndex = getRandomInt(0, numberOfMedias);
+			const [path, newMedia] = testArray[anyIndex]!;
+
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				media: testList[0]!,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				newMedia,
+				path,
 			});
 
 			const newMainList = getPlaylists().mainList;
 
-			expect(newMainList).toHaveLength(numberOfMedias);
+			// The extra 1 is the first media that we added when we
+			// 'Set currentPlaying to first media' at `beforeEach` above:
+			expect(newMainList).toHaveLength(numberOfMedias + 1);
 		});
 
 		it("(PlaylistActions.ADD_ONE_MEDIA)should add one media to mediaList", () => {
 			const title = faker.unique(faker.name.jobTitle);
+			const path = `home/Music/test/${title}.mp3`;
 			const newMedia: Media = {
 				dateOfArival: faker.date.past().getTime(),
-				path: `home/Music/test/${title}.mp3`,
 				duration: formatDuration(100 + 10),
-				selected: false,
-				favorite: false,
-				id: hash(title),
 				size: "3.0 MB",
 				title,
 			};
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				media: newMedia,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				newMedia,
+				path,
 			});
 
 			const newMainList = getPlaylists().mainList;
 
 			expect(newMainList).toHaveLength(numberOfMedias + 1);
-			expect(newMainList.slice(-1)[0]).toEqual(newMedia);
+			expect(newMainList.has(path)).toBeTruthy();
 		});
 
-		it("(PlaylistActions.REMOVE_ONE_MEDIA) should remove one media to mediaList", () => {
-			const prevMainList = getPlaylists().mainList;
-			const mediaToBeDeleted = prevMainList[15]!;
+		it("(PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH) should remove one media of mediaList", () => {
+			const path = testArray[15]![0];
+
+			expect(path).toBeTruthy();
+
+			const mainList = getPlaylists().mainList;
+			dbgTests({ mainList });
+			// The extra 1 is the first media that we added when we
+			// 'Set currentPlaying to first media' at `beforeEach` above:
+			expect(mainList.size).toBe(numberOfMedias + 1);
 
 			setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				mediaID: mediaToBeDeleted.id,
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				path,
 			});
 
 			const newMainList = getPlaylists().mainList;
 
-			expect(newMainList).toHaveLength(numberOfMedias - 1);
-
-			const expected = newMainList.find(m => m.path === mediaToBeDeleted.path);
-			expect(expected).toBe(undefined);
+			expect(newMainList.has(path)).toBeFalsy();
+			// The extra 1 is the first media that we added when we
+			// 'Set currentPlaying to first media' at `beforeEach` above:
+			expect(newMainList).toHaveLength(numberOfMedias + 1 - 1);
 		});
 
 		it("(PlaylistActions.CLEAN) should clean mediaList", () => {
 			setPlaylists({
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
+				type: WhatToDo.UPDATE_MAIN_LIST,
 				whatToDo: PlaylistActions.CLEAN,
 			});
 
@@ -276,37 +279,42 @@ describe("Testing functions that depend on `getPlaylistsFuncs().playlists` worki
 			expect(newMainList).toHaveLength(0);
 		});
 
-		it("(PlaylistActions.REFRESH_ONE_MEDIA_BY_ID) should refresh one media (the caller should not update the media id, it will be updated, if needed, when calling PlaylistActions.REFRESH_ONE_MEDIA_BY_ID).", () => {
-			const prevMainList = getPlaylists().mainList;
+		it("(PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH) should refresh one media (the caller should not update the media id, it will be updated, if needed, when calling PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH).", () => {
 			const title = "I'm an updated title";
-			const size = "1.0 MB" as const;
-			const index = 15;
-			const mediaToBeRefreshed: Media = {
-				...prevMainList[index]!,
-				title,
-				size,
-			};
+			const size = "1.0 MB";
+			const [path, oldMedia] = testArray[15]!;
+			const newMedia: Media = { ...oldMedia, title, size };
+
+			const mainList = getPlaylists().mainList;
+			// The extra 1 is the first media that we added when we
+			// 'Set currentPlaying to first media' at `beforeEach` above:
+			expect(mainList.size).toBe(numberOfMedias + 1);
 
 			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				media: mediaToBeRefreshed,
+				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				newMedia,
+				path,
 			});
 
 			const newMainList = getPlaylists().mainList;
-			const refreshedMedia = newMainList[index];
+			const refreshedMedia = newMainList.get(path);
 
+			expect(refreshedMedia).toBeTruthy();
 			expect(refreshedMedia).toHaveProperty("title", title);
 			expect(refreshedMedia).toHaveProperty("size", size);
-			expect(newMainList).toHaveLength(numberOfMedias);
+			// The extra 1 is the first media that we added when we
+			// 'Set currentPlaying to first media' at `beforeEach` above:
+			expect(newMainList).toHaveLength(numberOfMedias + 1);
 		});
 	});
 });
 
 describe("Testing the other fns of getPlaylistsFuncs()", () => {
 	it("(getPlaylistsFuncs().searchForMedia()) should return a searched media", () => {
-		const results = searchForMediaFromList("es");
+		const results = searchMedia("es");
 
-		expect(results.length).toBeGreaterThan(0);
+		expect(results).instanceOf(Map);
+		expect(results.size).toBeGreaterThan(0);
 	});
 });

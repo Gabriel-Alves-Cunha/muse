@@ -33,7 +33,7 @@ import {
 } from "@contexts/mediaHandler/useCurrentPlaying";
 import {
 	PlaylistActions,
-	PlaylistEnum,
+	WhatToDo,
 	setPlaylists,
 } from "@contexts/mediaHandler/usePlaylists";
 
@@ -69,7 +69,7 @@ const togglePlayOrPauseMedia = () =>
 
 const playPreviousMedia = () =>
 	setCurrentPlaying({
-		playlistName: getCurrentPlaying().currentPlaying.playlistName,
+		list: getCurrentPlaying().currentPlaying.playlist,
 		type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
 	});
 
@@ -77,13 +77,13 @@ const toggleFavorite = (mediaID?: number) =>
 	mediaID &&
 	setPlaylists({
 		whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
-		type: PlaylistEnum.UPDATE_FAVORITES,
-		mediaID,
+		type: WhatToDo.UPDATE_FAVORITES,
+		path: mediaID,
 	});
 
 export const playNextMedia = () =>
 	setCurrentPlaying({
-		playlistName: getCurrentPlaying().currentPlaying.playlistName,
+		list: getCurrentPlaying().currentPlaying.playlist,
 		type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
 	});
 

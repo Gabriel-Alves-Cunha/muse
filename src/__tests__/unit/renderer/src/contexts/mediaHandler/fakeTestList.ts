@@ -1,25 +1,22 @@
-import type { Media } from "@common/@types/generalTypes";
+import type { MainList } from "@contexts/mediaHandler/usePlaylists";
 
 import { faker } from "@faker-js/faker";
 
 import { formatDuration } from "@common/utils";
-import { hash } from "@common/hash";
 
 // Make a test list full of fake medias:
 export const numberOfMedias = 30;
-export const testList: readonly Media[] = Object.freeze(
-	Array.from({ length: numberOfMedias }, (_, index) => {
-		const title = faker.unique(faker.name.jobTitle);
+export const testArray = Array.from({ length: numberOfMedias }, (_, index) => {
+	const title = faker.unique(faker.name.jobTitle);
 
-		return {
+	return [
+		`home/Music/test/${title}.mp3`,
+		{
 			dateOfArival: faker.date.past().getTime(),
 			duration: formatDuration(index + 10),
-			path: `home/Music/test/${title}.mp3`,
-			favorite: false,
-			selected: false,
-			id: hash(title),
 			size: "3.0 MB",
 			title,
-		};
-	}),
-);
+		},
+	] as const;
+});
+export const testList: MainList = new Map(testArray);

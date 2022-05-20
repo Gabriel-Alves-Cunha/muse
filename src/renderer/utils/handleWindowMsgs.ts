@@ -10,7 +10,7 @@ import {
 	searchLocalComputerForMedias,
 	PlaylistActions,
 	getPlaylists,
-	PlaylistEnum,
+	WhatToDo,
 	setPlaylists,
 	deleteMedia,
 } from "@contexts/mediaHandler/usePlaylists";
@@ -171,9 +171,9 @@ export async function handleWindowMsgs(
 			}
 
 			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				media,
+				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				newMedia: media,
 			});
 			break;
 		}
@@ -236,9 +236,9 @@ export async function handleWindowMsgs(
 			}
 
 			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
-				media: refreshedMedia,
+				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				newMedia: refreshedMedia,
 			});
 			break;
 		}
@@ -260,8 +260,8 @@ export async function handleWindowMsgs(
 			}
 
 			setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_ID,
-				type: PlaylistEnum.UPDATE_MAIN_LIST,
+				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
+				type: WhatToDo.UPDATE_MAIN_LIST,
 				mediaID: media.id,
 			});
 			break;

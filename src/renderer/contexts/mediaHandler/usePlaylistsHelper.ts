@@ -1,33 +1,12 @@
-import type { Mutable, Media, Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/generalTypes";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
-import { sort, unshift } from "@utils/array";
+import { MainList } from "./usePlaylists";
 
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
 } = electron;
-
-// fns
-export const maxSizeOfHistory = 100;
-export function returnNewArrayWithNewMediaIDOnHistoryOfPlayedMedia(
-	previousHistory: readonly Media["id"][],
-	newMediaID: Media["id"]
-): readonly Media["id"][] {
-	// if the newMedia is the same as the first media in the list, don't add it again:
-	if (newMediaID === previousHistory[0]) return previousHistory;
-
-	// add newMedia to the start of array:
-	const newHistory: Media["id"][] = unshift(previousHistory, newMediaID) as Mutable<
-		Media["id"][]
-	>;
-
-	// history has a max size of maxSizeOfHistory:
-	if (newHistory.length > maxSizeOfHistory)
-		newHistory.length = maxSizeOfHistory;
-
-	return Object.freeze(newHistory);
-}
 
 export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 	const supportedFiles: File[] = [];
@@ -47,18 +26,16 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 export async function searchDirectoryResult() {
 	const start = performance.now();
 
-	const fullPaths: Array<readonly string[]> = [];
-	(
+	const fullPaths = (
 		await Promise.allSettled([
 			getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
 			getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
 			getFullPathOfFilesForFilesInThisDirectory(dirs.music),
 		])
-	).forEach(p => {
-		if (p.status === "fulfilled") fullPaths.push(p.value);
-	});
-
-	const ret = Object.freeze(fullPaths.flat());
+	)
+		.map(p => (p.status === "fulfilled" ? p.value : undefined))
+		.filter(Boolean)
+		.flat() as readonly string[];
 
 	const end = performance.now();
 	console.log(
@@ -66,43 +43,47 @@ export async function searchDirectoryResult() {
 		"color:brown"
 	);
 
-	return ret;
+	return fullPaths;
 }
 
-export const searchDirectoryForMedias = async (directory: Path) =>
+export const searchDirectoryForMedias = async (directory: string) =>
 	getAllowedMedias(await readdir(directory));
 
 export const getAllowedMedias = (
 	filenames: readonly string[]
 ): readonly string[] =>
-	Object.freeze(
-		filenames.filter(filename =>
-			allowedMedias.some(extension => extension === getLastExtension(filename))
-		)
+	filenames.filter(name =>
+		allowedMedias.some(ext => ext === getLastExtension(name))
 	);
 
-export const sortByDate = (newList: readonly Media[]) =>
-	Object.freeze(
-		sort(newList, (a, b) => {
-			if (a.dateOfArival > b.dateOfArival) return 1;
-			if (a.dateOfArival < b.dateOfArival) return -1;
-			// a must be equal to b:
-			return 0;
-		}).map(media => media.id)
+export const sortByDate = (list: MainList): Set<Path> => {
+	const listAsArray: { dateOfArival: number; path: Path }[] = [];
+
+	list.forEach(({ dateOfArival }, path) =>
+		listAsArray.push({ dateOfArival, path })
 	);
 
-export const sortByName = (list: readonly Media[]) =>
-	Object.freeze(
-		sort(list, (a, b) => {
-			if (a.title > b.title) return 1;
-			if (a.title < b.title) return -1;
-			// a must be equal to b:
-			return 0;
-		}).map(media => media.id)
-	);
+	listAsArray.sort((a, b) => {
+		if (a.dateOfArival > b.dateOfArival) return 1;
+		if (a.dateOfArival < b.dateOfArival) return -1;
+		// a must be equal to b:
+		return 0;
+	});
 
-export const SORTED_BY_DATE = "sorted by date";
-export const SORTED_BY_NAME = "sorted by name";
-export const FAVORITES = "favorites";
-export const MAIN_LIST = "main list";
-export const HISTORY = "history";
+	return new Set(listAsArray.map(media => media.path));
+};
+
+export const sortByName = (list: MainList) => {
+	const listAsArray: { title: string; path: Path }[] = [];
+
+	list.forEach(({ title }, path) => listAsArray.push({ title, path }));
+
+	listAsArray.sort((a, b) => {
+		if (a.title > b.title) return 1;
+		if (a.title < b.title) return -1;
+		// a must be equal to b:
+		return 0;
+	});
+
+	return new Set(listAsArray.map(media => media.path));
+};

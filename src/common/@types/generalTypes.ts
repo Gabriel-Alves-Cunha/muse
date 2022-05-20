@@ -4,23 +4,19 @@ import type { PrettyBytes } from "../prettyBytes";
 import { pages } from "@utils/app";
 
 export type Page = Readonly<typeof pages[number]>;
-export type Path = Readonly<string>;
+export type Path = string;
 
 type DateAsNumber = Readonly<number>;
 
 export type Media = Readonly<{
 	dateOfArival: DateAsNumber;
 	genres?: readonly string[];
-	selected: boolean;
 	size: PrettyBytes;
-	favorite: boolean;
 	duration: string;
 	artist?: string;
 	album?: string;
 	title: string;
 	img?: string;
-	id: number;
-	path: Path;
 }>;
 
 export type Mutable<T> = {

@@ -30,7 +30,9 @@ export type VisibleElectron = Readonly<{
 		};
 	};
 	media: {
-		transformPathsToMedias(paths: readonly Path[]): Promise<readonly Media[]>;
+		transformPathsToMedias(
+			paths: readonly Path[]
+		): Promise<Array<[Path, Media]>>;
 		getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
 	};
 }>;

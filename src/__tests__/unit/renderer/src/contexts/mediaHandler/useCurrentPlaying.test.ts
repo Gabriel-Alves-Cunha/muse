@@ -1,34 +1,33 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { Path } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
-import { HISTORY, MAIN_LIST } from "@contexts/mediaHandler/usePlaylistsHelper";
-import { testList } from "./fakeTestList";
+import { testArray, testList } from "./fakeTestList";
 import {
-	CurrentPlayingEnum,
+	playPreviousFromPlaylist,
+	playNextFromPlaylist,
 	getCurrentPlaying,
-	setCurrentPlaying,
 	CurrentPlaying,
+	playThisMedia,
+	PlaylistList,
+	getPlaylist,
 } from "@contexts/mediaHandler/useCurrentPlaying";
 import {
-	type DefaultLists,
 	PlaylistActions,
 	getPlaylists,
 	setPlaylists,
-	PlaylistEnum,
+	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
-
-const getPlaylist = (listName: DefaultLists) =>
-	getPlaylists().playlists.find(p => p.name === listName)!;
 
 describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {
 		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: PlaylistEnum.UPDATE_MAIN_LIST,
+			type: WhatToDo.UPDATE_MAIN_LIST,
 			list: testList,
 		});
 		{
@@ -37,28 +36,24 @@ describe("Testing useCurrentPlaying", () => {
 		}
 
 		setPlaylists({
-			type: PlaylistEnum.UPDATE_HISTORY,
 			whatToDo: PlaylistActions.CLEAN,
+			type: WhatToDo.UPDATE_HISTORY,
 		});
 		{
-			const history = getPlaylist(HISTORY)!.list;
+			const history = getPlaylists().history;
 			expect(history.length).toBe(0);
 		}
 	});
 
 	it("(CurrentPlayingEnum.PLAY_THIS_MEDIA) should set the currentPlaying media", () => {
-		testList.forEach(media => {
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MAIN_LIST,
-				mediaID: media.id,
-			});
+		testList.forEach((_media, path) => {
+			playThisMedia(path, PlaylistList.MAIN_LIST);
 
-			const currentPlaying = getCurrentPlaying().currentPlaying;
+			const currentPlaying = getCurrentPlaying();
 			const expected: CurrentPlaying = {
-				playlistName: MAIN_LIST,
-				mediaID: media.id,
+				listType: PlaylistList.MAIN_LIST,
 				currentTime: 0,
+				path,
 			};
 
 			expect(expected).toEqual(currentPlaying);
@@ -66,54 +61,42 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST) should play the previous media from mediaList  and update history", () => {
-		testList.forEach(({ id }, index) => {
-			if (index === 29) return;
+		testArray.forEach(([path], index) => {
+			if (index === testArray.length - 1) return;
 
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MAIN_LIST,
-				mediaID: id,
-			});
+			playThisMedia(path, PlaylistList.MAIN_LIST);
 
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST,
-				playlistName: MAIN_LIST,
-			});
+			playPreviousFromPlaylist();
 
-			const history = getPlaylist(HISTORY).list;
+			const history = getPlaylist(PlaylistList.HISTORY) as Array<Path>;
 
 			expect(history.length).toBe(index * 2 + 2);
 
-			const currentPlaying = getCurrentPlaying().currentPlaying;
+			const currentPlaying = getCurrentPlaying();
 			const expected: CurrentPlaying = {
-				mediaID: testList.at(index - 1)?.id,
-				playlistName: MAIN_LIST,
+				path: testArray.at(index - 1)![0],
+				listType: PlaylistList.MAIN_LIST,
 				currentTime: 0,
 			};
 
 			expect(expected).toEqual(currentPlaying);
+
+			++index;
 		});
 	});
 
 	it("(CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST) should play the next media from a given playlist", () => {
-		testList.forEach((media, index) => {
-			if (index === 29) return;
+		testArray.forEach(([path], index) => {
+			if (index === testArray.length - 1) return;
 
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_THIS_MEDIA,
-				playlistName: MAIN_LIST,
-				mediaID: media.id,
-			});
+			playThisMedia(path, PlaylistList.MAIN_LIST);
 
-			setCurrentPlaying({
-				type: CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST,
-				playlistName: MAIN_LIST,
-			});
+			playNextFromPlaylist();
 
-			const currMediaID = getCurrentPlaying().currentPlaying.mediaID;
-			const expectedMediaID = testList[index + 1]!.id;
+			const currMediaID = getCurrentPlaying().path;
+			const expectedMediaPath = testArray[index + 1]![0];
 
-			expect(expectedMediaID).toEqual(currMediaID);
+			expect(expectedMediaPath).toEqual(currMediaID);
 		});
 	});
 });

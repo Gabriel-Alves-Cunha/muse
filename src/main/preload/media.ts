@@ -32,7 +32,6 @@ import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
-import { hash } from "@common/hash";
 import { dirs } from "../utils";
 import { time } from "@utils/utils";
 
@@ -53,7 +52,7 @@ const createMedia = async (
 	path: Path,
 	assureMediaSizeIsGreaterThan60KB: boolean,
 	ignoreMediaWithLessThan60Seconds: boolean
-): Promise<Media> =>
+): Promise<[Path, Media]> =>
 	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
@@ -102,15 +101,11 @@ const createMedia = async (
 			const media: Media = {
 				duration: formatDuration(duration),
 				artist: albumArtists[0] ?? "",
-				dateOfArival: Date.now(),
 				title: title ?? basename,
-				selected: false,
-				favorite: false,
-				id: hash(path),
+				dateOfArival: Date.now(),
 				genres,
 				album,
 				size,
-				path,
 				img,
 			};
 
@@ -119,7 +114,7 @@ const createMedia = async (
 				properties: { durationMilliseconds },
 			});
 
-			return resolve(media);
+			return resolve([path, media]);
 		}, `createMedia("${basename}")`);
 	});
 
@@ -127,10 +122,9 @@ export async function transformPathsToMedias(
 	paths: readonly Path[],
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true
-): Promise<readonly Media[]> {
-	const medias: Media[] = [];
-
+): Promise<Array<[Path, Media]>> {
 	console.groupCollapsed("Creating medias...");
+
 	const promises = paths.map(path =>
 		createMedia(
 			path,
@@ -139,9 +133,10 @@ export async function transformPathsToMedias(
 		)
 	);
 
-	(await Promise.allSettled(promises)).forEach(p => {
-		if (p.status === "fulfilled") medias.push(p.value);
-	});
+	const medias = (await Promise.allSettled(promises))
+		.map(p => (p.status === "fulfilled" ? p.value : undefined))
+		.filter(Boolean) as Array<[Path, Media]>;
+
 	console.groupEnd();
 
 	return medias;
