@@ -3,10 +3,17 @@ import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { ControlsAndSeeker, Header } from "./helpers";
+import { dbg, formatDuration } from "@common/utils";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
+import {
+	PlaylistActions,
+	setPlaylists,
+	usePlaylists,
+	WhatToDo,
+} from "@contexts/mediaHandler/usePlaylists";
 import {
 	useCurrentPlaying,
+	currentPlaying,
 	playNextMedia,
 } from "@contexts/mediaHandler/useCurrentPlaying";
 
@@ -31,26 +38,84 @@ export function MediaPlayer() {
 
 		const handleProgress = () => {
 			const { duration, currentTime } = audio;
+			const percentage = (currentTime / duration) * 100;
 
-			setProgress({
-				percentage: (currentTime / duration) * 100,
-				currentTime,
-			});
+			setProgress({ currentTime, percentage });
 		};
 
+		const handleLoadedData = () => {
+			if (!media || !path) return;
+
+			// Updating the duration of media:
+			setPlaylists({
+				newMedia: { ...media, duration: formatDuration(audio.duration) },
+				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
+				type: WhatToDo.UPDATE_MAIN_LIST,
+				path,
+			});
+
+			const lastTime = currentPlaying().currentTime;
+			if (lastTime > 30) {
+				console.log(
+					`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`
+				);
+				audio.currentTime = lastTime;
+			}
+		};
+
+		const handleEnded = () => {
+			dbg(
+				`Audio ended, playing ${
+					audio.loop ? "again because it's on loop." : "next media."
+				}`
+			);
+
+			if (audio.loop) playNextMedia();
+		};
+
+		const handleAudioCanPlay = async () => {
+			dbg("Audio can play.");
+			await audio.play();
+		};
+
+		// Adding event listeners:
+		audio.addEventListener("loadeddata", handleLoadedData);
+		audio.addEventListener("canplay", handleAudioCanPlay);
 		audio.addEventListener("timeupdate", handleProgress);
+		audio.addEventListener("invalid", handleInvalid);
+		audio.addEventListener("stalled", handleStalled);
 		audio.addEventListener("ended", playNextMedia);
+		audio.addEventListener("error", handleError);
+		audio.addEventListener("abort", handleAbort);
+		audio.addEventListener("close", handleClose);
+		audio.addEventListener("ended", handleEnded);
+		audio.addEventListener(
+			"securitypolicyviolation",
+			handleSecurityPolicyViolation
+		);
 
 		return () => {
+			audio.removeEventListener("loadeddata", handleLoadedData);
+			audio.removeEventListener("canplay", handleAudioCanPlay);
 			audio.removeEventListener("timeupdate", handleProgress);
+			audio.removeEventListener("invalid", handleInvalid);
+			audio.removeEventListener("stalled", handleStalled);
 			audio.removeEventListener("ended", playNextMedia);
+			audio.removeEventListener("error", handleError);
+			audio.removeEventListener("abort", handleAbort);
+			audio.removeEventListener("close", handleClose);
+			audio.removeEventListener("ended", handleEnded);
+			audio.removeEventListener(
+				"securitypolicyviolation",
+				handleSecurityPolicyViolation
+			);
 		};
-	}, [audio]);
+	}, [audio, media, path]);
 
 	return (
 		<Wrapper>
 			<>
-				<audio id="audio" preload="none" ref={audioRef} />
+				<audio id="audio" preload="metadata" ref={audioRef} />
 			</>
 
 			<Header media={media} path={path ?? ""} />
@@ -74,6 +139,18 @@ export function MediaPlayer() {
 		</Wrapper>
 	);
 }
+
+const handleInvalid = (e: Event) => dbg("Audio is invalid.", e);
+const handleError = (e: Event) => dbg("Audio error:", e);
+const handleAbort = () => dbg("Audio was aborted.");
+const handleClose = () => dbg("Audio was closed.");
+const handleSecurityPolicyViolation = (e: Event) =>
+	console.error("Audio has a security policy violation:", e);
+const handleStalled = (e: Event) =>
+	dbg(
+		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",
+		e
+	);
 
 type Progress = Readonly<{
 	currentTime: number;

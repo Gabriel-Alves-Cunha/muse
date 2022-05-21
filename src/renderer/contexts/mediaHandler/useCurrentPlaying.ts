@@ -3,7 +3,6 @@ import type { Path } from "@common/@types/generalTypes";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { formatDuration } from "@common/utils";
 import { playOptions } from "./usePlayOptions";
 import { getRandomInt } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
@@ -14,10 +13,7 @@ import {
 	setPlaylists,
 	getPlaylist,
 	WhatToDo,
-	mainList,
 } from "./usePlaylists";
-
-const { readFile } = electron.fs;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -243,77 +239,22 @@ let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
 
 if (globalThis.window)
 	useCurrentPlaying.subscribe(
-		state => state.path,
-		function setAudioToHTMLAudioElement() {
+		({ path }) => path,
+		function setAudioSource() {
 			// @ts-ignore It will just return undefined if `prevMediaTimer` is undefined.
 			clearTimeout(prevMediaTimer);
 
-			const { path, currentTime } = currentPlaying();
+			const { path } = currentPlaying();
 			if (!path) return;
 
-			const media = mainList().get(path);
-			if (!media) return console.error("There is no media!", { path });
+			const pathForElectron = "atom:///" + path;
 
-			const mediaTimer = setTimeout(async () => {
-				const start = performance.now();
-
-				// TODO
-				const url = URL.createObjectURL(new Blob([await readFile(path)]));
-
-				const end = performance.now();
-				console.log(
-					`%cReading <audio> file took: ${end - start} ms.`,
-					"color:brown"
-				);
-
-				const audio = document.getElementById("audio") as HTMLAudioElement;
-				audio.src = url;
-
-				// Adding event listeners:
-				audio.addEventListener("loadeddata", () => {
-					// Updating the duration of media:
-					setPlaylists({
-						newMedia: { ...media, duration: formatDuration(audio.duration) },
-						whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-						type: WhatToDo.UPDATE_MAIN_LIST,
-						path,
-					});
-
-					if (currentTime > 30) {
-						console.log(
-							`Audio has loaded metadata. Setting currentTime to ${currentTime} seconds.`
-						);
-						audio.currentTime = currentTime;
-					}
-				});
-				audio.addEventListener("canplay", () => {
-					console.log("Audio can play.");
-				});
-				audio.addEventListener("invalid", e => {
-					console.error("Audio is invalid:", e);
-				});
-				audio.addEventListener("stalled", e => {
-					console.log(
-						"Audio is stalled (Fires when the browser is trying to get media data, but data is not available):",
-						e
-					);
-				});
-				audio.addEventListener("securitypolicyviolation", e => {
-					console.error("Audio has a security policy violation:", e);
-				});
-				audio.addEventListener("error", e => {
-					console.error("Audio error.", e);
-				});
-				audio.addEventListener("abort", () => {
-					console.log("Audio was aborted.");
-				});
-				audio.addEventListener("close", () => {
-					console.log("Audio was closed.");
-				});
-				audio.addEventListener("ended", () => {
-					console.log("Audio has ended.");
-				});
-			}, 150);
+			const mediaTimer = setTimeout(
+				async () =>
+					((document.getElementById("audio") as HTMLAudioElement).src =
+						pathForElectron),
+				150
+			);
 
 			prevMediaTimer = mediaTimer;
 		}

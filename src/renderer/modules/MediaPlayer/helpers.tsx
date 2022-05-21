@@ -112,7 +112,7 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 			<IconButton
 				className="previous-or-next"
 				onClick={playPreviousMedia}
-				style={{ width: 30 }}
+				style={{ width: 29 }}
 			>
 				<Previous />
 			</IconButton>
@@ -132,7 +132,7 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 			<IconButton
 				className="previous-or-next"
 				onClick={playNextMedia}
-				style={{ width: 30 }}
+				style={{ width: 29 }}
 			>
 				<Next />
 			</IconButton>
@@ -210,7 +210,9 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					ref={timeTooltipRef}
 				/>
 
-				<ProgressThumb style={{ width: `${percentage}%` }}></ProgressThumb>
+				<ProgressThumb
+					style={{ width: `${isNaN(percentage) ? 0 : percentage}%` }}
+				/>
 			</ProgressWrapper>
 
 			<Duration>

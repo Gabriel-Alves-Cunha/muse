@@ -1,8 +1,8 @@
 import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { validateURL, getBasicInfo } from "ytdl-core";
+import { join, normalize } from "node:path";
 import { pathToFileURL } from "node:url";
-import { join } from "node:path";
 import {
 	BrowserWindow,
 	Notification,
@@ -12,6 +12,7 @@ import {
 	Menu,
 	Tray,
 	app,
+	protocol,
 } from "electron";
 
 import { capitalizedAppName, dbg, isDevelopment } from "@common/utils";
@@ -104,6 +105,12 @@ app
 	})
 	.whenReady()
 	.then(async () => {
+		// This is so Electron can load local media files:
+		protocol.registerFileProtocol("atom", (request, callback) => {
+			const url = request.url.substring(7);
+			callback(decodeURI(normalize(url)));
+		});
+
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
 		// Some APIs can only be used after this event occurs.

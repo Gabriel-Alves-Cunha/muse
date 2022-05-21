@@ -1,3 +1,5 @@
+import { dbg } from "@common/utils";
+
 const { random, floor } = Math;
 
 /** [min, max) */
@@ -38,7 +40,7 @@ export const time = <T>(fn: () => T, fnName: string): T => {
 
 	const end = performance.now();
 
-	console.log(`Function "${fnName}" took: ${end - start} ms.`);
+	dbg(`Function "${fnName}" took: ${end - start} ms.`);
 
 	return fnReturn;
 };

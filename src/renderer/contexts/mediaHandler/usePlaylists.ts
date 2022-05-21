@@ -49,7 +49,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						case WhatToDo.UPDATE_HISTORY: {
 							switch (action.whatToDo) {
 								case PlaylistActions.ADD_ONE_MEDIA: {
-									const newHistory = [...get().history];
+									const newHistory = Array.from(get().history);
 
 									// If the new media is the same as the first
 									// media in the list, don't add it again:
@@ -68,6 +68,14 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									);
 
 									set({ history: newHistory });
+									// const start_ = performance.now();
+									// const end_ = performance.now();
+									// console.log(
+									// 	"UPDATE_HISTORY => ADD_ONE_MEDIA set new history took:",
+									// 	end_ - start_,
+									// 	"ms",
+									// 	newHistory
+									// );
 									break;
 								}
 

@@ -1,8 +1,6 @@
 import { ToastContainer } from "react-toastify";
-import { useEffect } from "react";
 
 import { searchLocalComputerForMedias } from "@contexts/mediaHandler/usePlaylists";
-import { assertUnreachable } from "@utils/utils";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { Decorations } from "@components/Decorations";
 import { ContextMenu } from "@components/ContextMenu";
@@ -18,12 +16,9 @@ import { Home } from "@routes/Home";
 import { GlobalCSS } from "@styles/global";
 import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
+import { Page } from "@common/@types/generalTypes";
 
 export function App() {
-	useEffect(() => {
-		(async () => await searchLocalComputerForMedias(true))();
-	}, []);
-
 	GlobalCSS();
 
 	return (
@@ -61,20 +56,17 @@ const Main = () => (
 const PageToShow = () => {
 	const { page } = usePage();
 
-	switch (page) {
-		case "Convert":
-			return <Convert />;
-		case "Download":
-			return <Download />;
-		case "Favorites":
-			return <Favorites />;
-		case "History":
-			return <History />;
-		case "Home":
-			return <Home />;
-		default:
-			return assertUnreachable(page);
-	}
+	return cases[page];
 };
 
+const cases: Readonly<Record<Page, JSX.Element>> = Object.freeze({
+	Favorites: <Favorites />,
+	Download: <Download />,
+	Convert: <Convert />,
+	History: <History />,
+	Home: <Home />,
+});
+
 window.onmessage = handleWindowMsgs;
+
+await searchLocalComputerForMedias(true);
