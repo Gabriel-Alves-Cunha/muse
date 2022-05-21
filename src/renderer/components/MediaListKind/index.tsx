@@ -3,13 +3,15 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
+import { Dialog } from "@radix-ui/react-dialog";
 
 import { resetAllAppData } from "@utils/app";
 import { time } from "@utils/utils";
 import {
-	useFromList as fromListToSet,
 	computeItemKey,
+	reloadWindow,
 	itemContent,
+	useFromList,
 } from "./helper";
 import {
 	usePlaylists,
@@ -18,15 +20,19 @@ import {
 } from "@contexts/mediaHandler/usePlaylists";
 
 import {
-	ResetAllAppDataButton,
 	ListWrapper,
 	EmptyList,
+	ErrorMsg,
 	SubTitle,
 	Footer,
-	Title,
-	Alert,
-	Msg,
+	Center,
 } from "./styles";
+import {
+	ButtonToClose,
+	StyledContent,
+	StyledOverlay,
+	StyledTitle,
+} from "./MediaOptions/styles";
 
 // href="https://www.flaticon.com/free-icons/error" =>
 const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
@@ -35,10 +41,8 @@ export const MediaListKind = ({ fromList }: MediaListKindProps) => (
 	<ErrorBoundary
 		FallbackComponent={ErrorFallback}
 		onReset={() => {
-			// TODO: reset the state of your app so the error doesn't happen again
-			console.error(
-				"This should reset all app data, but it does nothing at the moment"
-			);
+			resetAllAppData();
+			reloadWindow();
 		}}
 	>
 		<MediaListKind_ fromList={fromList} />
@@ -50,7 +54,7 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 		usePlaylists();
 
 	useEffect(() => {
-		fromListToSet.setState({ fromList });
+		useFromList.setState({ fromList });
 	}, [fromList]);
 
 	const listAsArrayOfAMap: [Path, Media][] = useMemo(
@@ -59,23 +63,24 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 				const list = getPlaylist(fromList);
 
 				if (Array.isArray(list)) {
-					const listAsArrayOfAMap = [];
+					const listAsArrayOfAMap: [Path, Media][] = [];
 					mainList.forEach((media, path) => {
 						if (list.includes(path)) listAsArrayOfAMap.push([path, media]);
 					});
+					return listAsArrayOfAMap;
 				} else if (list instanceof Set) {
-					const listAsArrayOfAMap = [];
+					const listAsArrayOfAMap: [Path, Media][] = [];
 					mainList.forEach((media, path) => {
 						if (list.has(path)) listAsArrayOfAMap.push([path, media]);
 					});
+					return listAsArrayOfAMap;
 				} else if (list instanceof Map) {
-					const listAsArrayOfAMap = [];
-					mainList.forEach((media, path) => {
-						if (list.has(path)) listAsArrayOfAMap.push([path, media]);
-					});
+					// Since the only list that is a Map is the
+					// mainList, we can take a shortcut:
+					return Array.from(mainList);
 				}
 
-				throw new Error("The list is not an array, a set or a map");
+				throw new Error("The list is not an Array, a Set or a Map!");
 			}, "listAsArrayOfAMap"),
 		// Disable cause we need to listen to all the lists cause
 		// we don't know wich one it is
@@ -110,19 +115,36 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 
 function ErrorFallback({ error }: ErrorBoundaryProps) {
 	return (
-		<Alert role="alert">
-			<Title>Something went wrong:</Title>
-			<SubTitle>
-				Try closing and opening the app, if the error persists, click on the
-				button below!
-			</SubTitle>
+		<Dialog modal open>
+			<StyledOverlay />
 
-			<Msg>{error.message}</Msg>
+			<StyledContent>
+				<Center>
+					<StyledTitle>Something went wrong</StyledTitle>
+					<SubTitle>
+						Rendering the list threw an error. This is probably a bug. Try
+						closing and opening the app, if the error persists, click on the
+						button below.
+					</SubTitle>
 
-			<ResetAllAppDataButton onClick={resetAllAppData}>
-				Reset all app data!
-			</ResetAllAppDataButton>
-		</Alert>
+					<ErrorMsg>{error.message}</ErrorMsg>
+
+					<ButtonToClose
+						onClick={() => {
+							resetAllAppData();
+							reloadWindow();
+						}}
+						id="reset-app-data"
+					>
+						Reset all app data
+					</ButtonToClose>
+
+					<ButtonToClose id="reload-window" onClick={reloadWindow}>
+						Reload window
+					</ButtonToClose>
+				</Center>
+			</StyledContent>
+		</Dialog>
 	);
 }
 

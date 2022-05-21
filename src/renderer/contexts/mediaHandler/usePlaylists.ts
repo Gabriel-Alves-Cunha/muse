@@ -243,16 +243,17 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										mainList.delete(path);
 										mainList.set(newPath, newMedia);
 										updateSortedAndMainLists(mainList);
+
+										if (get().mainList.has(path))
+											console.error(
+												`A media with path "${String(
+													path
+												)}" should have been deleted, but it wasn't!`,
+												{ newPath, path, newMedia, mainList: get().mainList }
+											);
 									} else
 										updateSortedAndMainLists(
 											mainList.set(action.path, action.newMedia)
-										);
-
-									if (get().mainList.has(newPath ? newPath : path))
-										console.error(
-											`A media with path "${String(
-												path
-											)}" shouldn't exist, but it does.`
 										);
 
 									dbgPlaylists(

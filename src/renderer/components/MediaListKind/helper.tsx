@@ -6,6 +6,7 @@ import { memo, useRef } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import create from "zustand";
 
+import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
@@ -23,6 +24,9 @@ import {
 	Title,
 	Info,
 } from "./styles";
+
+const notify =
+	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
 const allSelectedMedias: Set<Path> = new Set();
 export const useFromList = create(() => ({ fromList: PlaylistList.MAIN_LIST }));
@@ -57,7 +61,7 @@ const Row = memo(
 
 						<Info>
 							<Title>{media.title}</Title>
-							<SubTitle>{media.duration}</SubTitle>
+							<SubTitle className="row">{media.duration}</SubTitle>
 						</Info>
 					</PlayButton>
 				</Tooltip>
@@ -76,7 +80,7 @@ const Row = memo(
 			</RowWrapper>
 		);
 	},
-	(prev, next) => prev.path === next.path
+	(prev, next) => prev.media.duration === next.media.duration
 );
 Row.displayName = "Row";
 
@@ -120,6 +124,9 @@ export const computeItemKey = (_index: number, [path]: [Path, Media]) => path;
 export const itemContent = (_index: number, [path, media]: [Path, Media]) => (
 	<Row media={media} path={path} />
 );
+
+export const reloadWindow = () =>
+	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
 
 type RowProps = Readonly<{
 	media: Media;

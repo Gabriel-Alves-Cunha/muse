@@ -61,13 +61,18 @@ export const Title = styled("p", {
 });
 
 export const SubTitle = styled("p", {
-	margin: "unset", // Virtuoso asks for this for performance reasons
+	margin: "20px 0",
 
+	color: "$alternative-text",
 	letterSpacing: "0.03rem",
-	ff: "$primary",
-	color: "$gray-text",
-	fontSize: "0.8rem",
+	fontSize: "0.9rem",
 	fontWeight: 500,
+	ff: "$primary",
+
+	"&.row": {
+		color: "$gray-text",
+		margin: "unset",
+	},
 });
 
 /** You need to set the width! */
@@ -171,35 +176,14 @@ export const PlayButton = styled("button", {
 	border: "none",
 });
 
-export const Alert = styled("div", {
-	position: "absolute",
-	top: 0,
-	left: 0,
-	width: "100%",
-	height: "100%",
-});
+export const ErrorMsg = styled("pre", {
+	margin: "20px 0",
 
-export const Msg = styled("pre", {
-	color: "$alternative-text",
-	letterSpacing: "0.03rem",
-	ff: "$secondary",
+	letterSpacing: "0.035rem",
 	fontSize: "0.8rem",
+	ff: "$secondary",
 	fontWeight: 500,
-});
-
-export const ResetAllAppDataButton = styled("button", {
-	position: "relative",
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-
-	height: 40,
-	width: 200,
-
-	border: "1px solid lightgray",
-	background: "transparent",
-	cursor: "pointer",
-	borderRadius: 7,
+	color: "red",
 });
 
 export const Footer = styled("div", {
@@ -226,4 +210,9 @@ export const EmptyList = styled("div", {
 		size: 52,
 		mr: 20,
 	},
+});
+
+export const Center = styled("div", {
+	position: "relative",
+	dcolumn: "center",
 });

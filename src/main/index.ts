@@ -201,53 +201,49 @@ ipcMain.on(
 	}
 );
 
-ipcMain.on(
-	"notify",
-	(
-		event,
-		msg: Readonly<{
-			type: ElectronIpcMainProcessNotificationEnum;
-			msg?: string;
-		}>
-	) => {
-		switch (msg.type) {
-			case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
-				app.quit();
-				break;
-			}
+ipcMain.on("notify", (event, type: ElectronIpcMainProcessNotificationEnum) => {
+	switch (type) {
+		case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
+			app.quit();
+			break;
+		}
 
-			case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
-				const focusedWindow = BrowserWindow.getFocusedWindow();
-				if (!focusedWindow) break;
+		case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
+			const focusedWindow = BrowserWindow.getFocusedWindow();
+			if (!focusedWindow) break;
 
-				focusedWindow.isMaximized()
-					? focusedWindow.unmaximize()
-					: focusedWindow.maximize();
-				break;
-			}
+			focusedWindow.isMaximized()
+				? focusedWindow.unmaximize()
+				: focusedWindow.maximize();
+			break;
+		}
 
-			case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
-				BrowserWindow.getFocusedWindow()?.minimize();
-				break;
-			}
+		case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
+			BrowserWindow.getFocusedWindow()?.minimize();
+			break;
+		}
 
-			case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
-				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
-				break;
-			}
+		case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
+			BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
+			break;
+		}
 
-			default: {
-				console.error(
-					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
-					event
-				);
+		case ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW: {
+			BrowserWindow.getFocusedWindow()?.reload();
+			break;
+		}
 
-				assertUnreachable(msg.type);
-				break;
-			}
+		default: {
+			console.error(
+				"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
+				event
+			);
+
+			assertUnreachable(type);
+			break;
 		}
 	}
-);
+});
 
 // Also defining it here with all types required so typescript doesn't complain...
 type ClipboardExtended = Electron.Clipboard & {

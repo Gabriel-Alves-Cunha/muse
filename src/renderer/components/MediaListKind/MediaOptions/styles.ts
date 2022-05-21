@@ -60,6 +60,7 @@ export const StyledContent = styled(Content, {
 
 	background: "$bg-dialog",
 	borderRadius: 4,
+	zIndex: 150,
 
 	boxShadow: "$dialog",
 
@@ -196,6 +197,35 @@ export const ButtonToClose = styled(Close, {
 	"&#save-changes": {
 		background: "#ddf4e5",
 		color: "#2c6e4f",
+
+		"&:focus": {
+			border: "1px solid #c6dbce",
+		},
+
+		"&:hover": {
+			background: "#c6dbce",
+		},
+	},
+
+	"&#reset-app-data": {
+		background: "#94a59b",
+		color: "black",
+		margin: "10px 0",
+		fw: 500,
+
+		"&:focus": {
+			border: "1px solid #c6dbce",
+		},
+
+		"&:hover": {
+			background: "#c6dbce",
+		},
+	},
+
+	"&#reload-window": {
+		background: "#94a59b",
+		color: "black",
+		fw: 500,
 
 		"&:focus": {
 			border: "1px solid #c6dbce",
