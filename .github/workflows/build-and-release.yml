@@ -38,5 +38,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           draft: true # Mark this release as draft (not real)
-          files:
-            - dist/Muse-*
+          files: dist/Muse-*
