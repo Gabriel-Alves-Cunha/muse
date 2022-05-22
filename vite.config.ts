@@ -32,8 +32,9 @@ export default defineConfig({
 	build: {
 		outDir: outDirRenderer,
 		emptyOutDir: true,
-		sourcemap: false,
 		minify: "esbuild",
+		sourcemap: false,
+		target: "esnext",
 		rollupOptions: {
 			output: {
 				entryFileNames: "[name].js",
