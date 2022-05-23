@@ -14,8 +14,7 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 });
 
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
-export const { setState: setSearchInfo, getState: searchInfo } =
-	useSearchInfo;
+export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 
 export const downloadMedia = () => {
 	const { result, url } = searchInfo();

@@ -11,4 +11,5 @@ linux:
   category: AudioVideo
 
 publish:
-  - provider: github
+    provider: github
+    # token: GH_TOKEN

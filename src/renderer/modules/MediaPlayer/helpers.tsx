@@ -144,7 +144,7 @@ const seek = (e: SeekEvent, audio: Audio) => {
 	if (!audio || !audio.duration) return;
 
 	const width = Number(
-		getComputedStyle(e.currentTarget).width.replace("px", "")
+		getComputedStyle(e.currentTarget).width.replace("px", ""),
 	);
 	const clickX = e.nativeEvent.offsetX;
 	const desiredTime = (clickX / width) * audio.duration;
@@ -167,7 +167,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 				typeof duration === "number" && !isNaN(duration) && duration > 0,
 			formatedDuration: formatDuration(duration),
 		}),
-		[duration]
+		[duration],
 	);
 
 	const handleTooltip = useCallback(
@@ -194,7 +194,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			tooltip.textContent = formatDuration(time);
 			tooltip.style.left = `${left}px`;
 		},
-		[duration, isDurationValid]
+		[duration, isDurationValid],
 	);
 
 	return (

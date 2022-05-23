@@ -13,7 +13,7 @@ import { BorderedButton } from "./styles";
 
 export function Convert() {
 	const [selectedMediasPath, setSelectedMediasPath] = useState<readonly Path[]>(
-		[]
+		[],
 	);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +39,7 @@ export function Convert() {
 				convertInfoList_.set(path, {
 					canStartConvert: true,
 					toExtension,
-				})
+				}),
 			);
 
 			// Start convert:

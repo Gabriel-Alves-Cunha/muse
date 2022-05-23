@@ -21,7 +21,7 @@ const mediaPath = resolve(
 	"..",
 	"..",
 	"test_assets",
-	`${originalTitle}.mp3`
+	`${originalTitle}.mp3`,
 );
 
 /////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ describe("It should account for the switch possibilities and the message sending
 			"..",
 			"..",
 			"test_assets",
-			`${changedData.title}.mp3`
+			`${changedData.title}.mp3`,
 		);
 
 		try {
@@ -96,7 +96,7 @@ describe("It should account for the switch possibilities and the message sending
 			"..",
 			"..",
 			"test_assets",
-			"img for tests.png"
+			"img for tests.png",
 		);
 		const imgContents = await readFile(imgPath, {
 			encoding: "base64",

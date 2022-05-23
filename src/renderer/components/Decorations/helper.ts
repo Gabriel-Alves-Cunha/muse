@@ -12,5 +12,5 @@ export const closeWindow = () =>
 
 export const imageUrl = new URL(
 	"../../assets/icons/logo.svg?width=16",
-	import.meta.url
+	import.meta.url,
 );

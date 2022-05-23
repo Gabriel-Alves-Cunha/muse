@@ -14,8 +14,8 @@ export const usePlayOptions = create<PlayOptions>()(
 		}),
 		{
 			name: playOptionsKey,
-		}
-	)
+		},
+	),
 );
 
 export const { getState: playOptions, setState: setPlayOptions } =

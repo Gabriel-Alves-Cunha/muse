@@ -34,7 +34,7 @@ export const mockElectronPlusNodeGlobalsBeforeTests = () => {
 					"%cwindow.postMessage arguments =",
 					"color:blue",
 					// eslint-disable-next-line prefer-rest-params
-					JSON.stringify(arguments, null, 2)
+					JSON.stringify(arguments, null, 2),
 				);
 			}),
 	});

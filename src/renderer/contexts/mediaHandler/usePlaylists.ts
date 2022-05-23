@@ -64,7 +64,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
-										newHistory
+										newHistory,
 									);
 
 									set({ history: newHistory });
@@ -81,7 +81,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								case PlaylistActions.CLEAN: {
 									dbgPlaylists(
-										"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. new history = []"
+										"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. new history = []",
 									);
 
 									set({ history: [] });
@@ -108,7 +108,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'TOGGLE_ONE_MEDIA'. new favorites =",
-										get().favorites
+										get().favorites,
 									);
 									break;
 								}
@@ -118,7 +118,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. new favorites =",
-										get().favorites
+										get().favorites,
 									);
 									break;
 								}
@@ -132,14 +132,14 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. new favorites =",
-										get().favorites
+										get().favorites,
 									);
 									break;
 								}
 
 								case PlaylistActions.CLEAN: {
 									dbgPlaylists(
-										"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. new favorites = []"
+										"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. new favorites = []",
 									);
 
 									set({ favorites: new Set() });
@@ -169,8 +169,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									if (mainList.has(action.path)) {
 										console.error(
 											`A media with path "${String(
-												action.path
-											)}" already exists. Therefore, I'm not gonna add it.`
+												action.path,
+											)}" already exists. Therefore, I'm not gonna add it.`,
 										);
 										break;
 									}
@@ -181,7 +181,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
-										get().mainList
+										get().mainList,
 									);
 									break;
 								}
@@ -192,8 +192,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									if (!mainList.delete(action.path)) {
 										console.error(
 											`A media with path "${String(
-												action.path
-											)}" does not exist. Therefore, I'm not gonna remove it.`
+												action.path,
+											)}" does not exist. Therefore, I'm not gonna remove it.`,
 										);
 										break;
 									}
@@ -208,7 +208,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// If the media is in the history, remove it from the history
 									const history = get().history;
 									const mediaIndexInHistory = history.findIndex(
-										path => action.path === path
+										path => action.path === path,
 									);
 									if (mediaIndexInHistory !== -1) {
 										history.splice(mediaIndexInHistory, 1);
@@ -217,7 +217,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA_BY_PATH' (yet to be sorted). newMainList =",
-										get().mainList
+										get().mainList,
 									);
 									break;
 								}
@@ -225,7 +225,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REPLACE_ENTIRE_LIST: {
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
-										action.list
+										action.list,
 									);
 
 									updateSortedAndMainLists(action.list);
@@ -241,8 +241,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									if (!oldMedia) {
 										console.error(
 											`I did not find a media with path = "${String(
-												action.path
-											)}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`
+												action.path,
+											)}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`,
 										);
 										break;
 									}
@@ -255,27 +255,27 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										if (get().mainList.has(path))
 											console.error(
 												`A media with path "${String(
-													path
+													path,
 												)}" should have been deleted, but it wasn't!`,
-												{ newPath, path, newMedia, mainList: get().mainList }
+												{ newPath, path, newMedia, mainList: get().mainList },
 											);
 									} else
 										updateSortedAndMainLists(
-											mainList.set(action.path, action.newMedia)
+											mainList.set(action.path, action.newMedia),
 										);
 
 									dbgPlaylists(
 										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",
 										get().mainList.get(newPath ? newPath : path),
 										"\nnewMainList =",
-										get().mainList
+										get().mainList,
 									);
 									break;
 								}
 
 								case PlaylistActions.CLEAN: {
 									dbgPlaylists(
-										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []"
+										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []",
 									);
 
 									updateSortedAndMainLists(new Map());
@@ -329,8 +329,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 					mainList: Array.from(mainList),
 					history,
 				}),
-		}
-	)
+		},
+	),
 );
 
 ///////////////////////////////////////////////////
@@ -382,7 +382,7 @@ export async function searchLocalComputerForMedias(force = false) {
 			const isThereNewMedia = paths.length !== mainListLength;
 			console.log(
 				`%cmainList.length = ${mainListLength}. Is there new media? ${isThereNewMedia}`,
-				"color:blue"
+				"color:blue",
 			);
 			return isThereNewMedia;
 		};
@@ -420,7 +420,7 @@ export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 	getPlaylists().mainList.forEach(
 		(media, path) =>
 			media.title.toLowerCase().includes(searchTerm) &&
-			medias.push([path, media])
+			medias.push([path, media]),
 	);
 
 	return medias;

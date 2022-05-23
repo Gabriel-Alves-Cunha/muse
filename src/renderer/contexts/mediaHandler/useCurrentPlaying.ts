@@ -31,8 +31,8 @@ export const useCurrentPlaying = create<CurrentPlaying>()(
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		persist((_set, _get) => defaultCurrentPlaying, {
 			name: currentPlayingKey,
-		})
-	)
+		}),
+	),
 );
 
 export const { getState: currentPlaying, setState: setCurrentPlaying } =
@@ -62,7 +62,7 @@ export function playPreviousMedia() {
 
 	if (!path) {
 		console.error(
-			"A media needs to be currently selected to play a previous media!"
+			"A media needs to be currently selected to play a previous media!",
 		);
 		return;
 	}
@@ -86,7 +86,7 @@ export function playPreviousMedia() {
 
 	if (currMediaPathIndex === -1) {
 		console.error(
-			"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!"
+			"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!",
 		);
 		return;
 	}
@@ -142,7 +142,7 @@ export function playNextMedia(): void {
 
 	if (!path) {
 		console.warn(
-			"A media needs to be currently selected to play a next media!"
+			"A media needs to be currently selected to play a next media!",
 		);
 
 		return;
@@ -170,7 +170,7 @@ export function playNextMedia(): void {
 		if (!randomMediaPath) {
 			console.error(
 				"There should be a random media selected, but there isn't!",
-				{ randomMediaPath, listAsArray }
+				{ randomMediaPath, listAsArray },
 			);
 
 			return;
@@ -250,11 +250,11 @@ if (globalThis.window)
 				async () =>
 					((document.getElementById("audio") as HTMLAudioElement).src =
 						pathForElectron),
-				150
+				150,
 			);
 
 			prevMediaTimer = mediaTimer;
-		}
+		},
 	);
 
 ////////////////////////////////////////////////

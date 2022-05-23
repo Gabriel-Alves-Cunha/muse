@@ -85,7 +85,7 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 		// Disable cause we need to listen to all the lists cause
 		// we don't know wich one it is
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[mainList, favorites, history, sortedByDate, sortedByName, fromList]
+		[mainList, favorites, history, sortedByDate, sortedByName, fromList],
 	);
 
 	return (

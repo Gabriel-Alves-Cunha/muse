@@ -147,7 +147,7 @@ describe("Testing PlaylistEnum.UPDATE_FAVORITES", () => {
 
 	it(
 		"(PlaylistActions.ADD_ONE_MEDIA) should add one media to favorites",
-		addOneMediaToFavorites
+		addOneMediaToFavorites,
 	);
 
 	it("(PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH) should remove one media of favorites", () => {

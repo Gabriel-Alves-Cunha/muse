@@ -51,7 +51,7 @@ window.addEventListener("dragover", listenToDragoverEvent);
 window.addEventListener("drop", listenToDropEvent);
 
 export async function handleWindowMsgs(
-	event: MessageEvent<MsgWithSource<MsgObjectElectronToReact>>
+	event: MessageEvent<MsgWithSource<MsgObjectElectronToReact>>,
 ): Promise<void> {
 	if (event.data.source !== electronSource) return;
 
@@ -76,7 +76,7 @@ export async function handleWindowMsgs(
 
 			if (!download) {
 				console.error(
-					"There should be a download to be confirmed on `downloadingList`, but there is none!"
+					"There should be a download to be confirmed on `downloadingList`, but there is none!",
 				);
 				break;
 			}
@@ -85,7 +85,7 @@ export async function handleWindowMsgs(
 				downloadingList_.set(msg.url, {
 					...download,
 					status: ProgressStatus.ACTIVE,
-				})
+				}),
 			);
 			break;
 		}
@@ -102,7 +102,7 @@ export async function handleWindowMsgs(
 			// In here, there has to be a conversion WAITING
 			if (!convertingMedia) {
 				console.error(
-					"There should be a convertion to be confirmed on `convertingList`, but there is none!"
+					"There should be a convertion to be confirmed on `convertingList`, but there is none!",
 				);
 				break;
 			}
@@ -111,7 +111,7 @@ export async function handleWindowMsgs(
 				convertingList_.set(msg.path, {
 					...convertingMedia,
 					status: ProgressStatus.ACTIVE,
-				})
+				}),
 			);
 			break;
 		}
@@ -127,7 +127,7 @@ export async function handleWindowMsgs(
 
 			if (!convertingMedia) {
 				console.error(
-					"There should be a convertion to be confirmed on `convertingList`, but there is none!"
+					"There should be a convertion to be confirmed on `convertingList`, but there is none!",
 				);
 				break;
 			}
@@ -136,7 +136,7 @@ export async function handleWindowMsgs(
 				convertingList_.set(msg.path, {
 					...convertingMedia,
 					status: ProgressStatus.FAILED,
-				})
+				}),
 			);
 			break;
 		}
@@ -152,7 +152,7 @@ export async function handleWindowMsgs(
 
 			if (!download) {
 				console.error(
-					"There should be a download to be confirmed on `downloadingList`, but there is none!"
+					"There should be a download to be confirmed on `downloadingList`, but there is none!",
 				);
 				break;
 			}
@@ -161,7 +161,7 @@ export async function handleWindowMsgs(
 				downloadingList_.set(msg.url, {
 					...download,
 					status: ProgressStatus.FAILED,
-				})
+				}),
 			);
 			break;
 		}
@@ -223,7 +223,7 @@ export async function handleWindowMsgs(
 
 			if (!mainList().has(mediaPath)) {
 				console.warn(
-					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`
+					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`,
 				);
 				await searchLocalComputerForMedias(true);
 				break;
@@ -237,7 +237,7 @@ export async function handleWindowMsgs(
 
 			if (!refreshedMedia) {
 				console.error(
-					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media.`
+					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media.`,
 				);
 				await searchLocalComputerForMedias(true);
 				break;
@@ -259,7 +259,7 @@ export async function handleWindowMsgs(
 
 			if (!mainList().has(mediaPath)) {
 				console.error(
-					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`
+					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
 				);
 				break;
 			}
@@ -283,7 +283,7 @@ export async function handleWindowMsgs(
 				`There is no method to handle this event.data: (${typeof msg}) '`,
 				msg,
 				"'\nEvent =",
-				event
+				event,
 			);
 
 			assertUnreachable(msg);

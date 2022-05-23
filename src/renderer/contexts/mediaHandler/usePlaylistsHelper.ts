@@ -40,7 +40,7 @@ export async function searchDirectoryResult() {
 	const end = performance.now();
 	console.log(
 		`%csearchDirectoryResult took: ${end - start} ms.`,
-		"color:brown"
+		"color:brown",
 	);
 
 	return fullPaths;
@@ -50,17 +50,17 @@ export const searchDirectoryForMedias = async (directory: string) =>
 	getAllowedMedias(await readdir(directory));
 
 export const getAllowedMedias = (
-	filenames: readonly string[]
+	filenames: readonly string[],
 ): readonly string[] =>
 	filenames.filter(name =>
-		allowedMedias.some(ext => ext === getLastExtension(name))
+		allowedMedias.some(ext => ext === getLastExtension(name)),
 	);
 
 export const sortByDate = (list: MainList): Set<Path> => {
 	const listAsArray: { dateOfArival: number; path: Path }[] = [];
 
 	list.forEach(({ dateOfArival }, path) =>
-		listAsArray.push({ dateOfArival, path })
+		listAsArray.push({ dateOfArival, path }),
 	);
 
 	listAsArray.sort((a, b) => {

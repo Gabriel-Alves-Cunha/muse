@@ -58,7 +58,7 @@ export function MediaPlayer() {
 			const lastTime = currentPlaying().currentTime;
 			if (lastTime > 30) {
 				console.log(
-					`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`
+					`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`,
 				);
 				audio.currentTime = lastTime;
 			}
@@ -68,7 +68,7 @@ export function MediaPlayer() {
 			dbg(
 				`Audio ended, playing ${
 					audio.loop ? "again because it's on loop." : "next media."
-				}`
+				}`,
 			);
 
 			if (audio.loop) playNextMedia();
@@ -92,7 +92,7 @@ export function MediaPlayer() {
 		audio.addEventListener("ended", handleEnded);
 		audio.addEventListener(
 			"securitypolicyviolation",
-			handleSecurityPolicyViolation
+			handleSecurityPolicyViolation,
 		);
 
 		return () => {
@@ -108,7 +108,7 @@ export function MediaPlayer() {
 			audio.removeEventListener("ended", handleEnded);
 			audio.removeEventListener(
 				"securitypolicyviolation",
-				handleSecurityPolicyViolation
+				handleSecurityPolicyViolation,
 			);
 		};
 	}, [audio, media, path]);
@@ -150,7 +150,7 @@ const handleSecurityPolicyViolation = (e: Event) =>
 const handleStalled = (e: Event) =>
 	dbg(
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",
-		e
+		e,
 	);
 
 type Progress = Readonly<{

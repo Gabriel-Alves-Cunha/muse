@@ -88,7 +88,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			isDownloading: true,
 			percentage: 0,
 			port: myPort,
-		})
+		}),
 	);
 
 	dbg("Added download to the list", { downloadingList: downloadingList() });
@@ -103,13 +103,13 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		dbg(
 			`Received a message from Electron on port for "${downloadInfo.title}":`,
-			{ data, downloadingList_ }
+			{ data, downloadingList_ },
 		);
 
 		// Assert that the download exists:
 		if (!downloadingList_.has(downloadInfo.url))
 			return console.error(
-				"Received a message from Electron but the url is not in the list!"
+				"Received a message from Electron but the url is not in the list!",
 			);
 
 		dbg("downloadStatus:", downloadingList_.get(downloadInfo.url));
@@ -119,7 +119,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		// Update React's information about this DownloadingMedia:
 		setDownloadingList(
-			downloadingList_.set(downloadInfo.url, { ...thisDownload, ...data })
+			downloadingList_.set(downloadInfo.url, { ...thisDownload, ...data }),
 		);
 
 		// Handle ProgressStatus's cases:
@@ -184,7 +184,7 @@ const cancelDownloadAndOrRemoveItFromList = (url: string) => {
 	if (download === undefined)
 		return console.error(
 			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
-			downloadingList_
+			downloadingList_,
 		);
 
 	// Cancel download:

@@ -19,8 +19,8 @@ export const testArray = Object.freeze(
 				title,
 			},
 		] as const;
-	})
+	}),
 );
 export const testList: ReadonlyMap<string, Media> = Object.freeze(
-	new Map(testArray)
+	new Map(testArray),
 );

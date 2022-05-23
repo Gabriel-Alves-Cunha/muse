@@ -1,6 +1,6 @@
 export const remove = <T>(
 	array: readonly T[],
-	indexToRemove: Readonly<number>
+	indexToRemove: Readonly<number>,
 ): readonly T[] => [
 	...array.slice(0, indexToRemove),
 	...array.slice(indexToRemove + 1),
@@ -9,7 +9,7 @@ export const remove = <T>(
 export const concatFromIndex = <T>(
 	array: readonly T[],
 	indexToConcatFrom: Readonly<number>,
-	arrayToBeAdded: readonly T[]
+	arrayToBeAdded: readonly T[],
 ): readonly T[] => [
 	...array,
 	...arrayToBeAdded.slice(indexToConcatFrom, arrayToBeAdded.length),
@@ -18,7 +18,7 @@ export const concatFromIndex = <T>(
 export const replace = <T>(
 	array: readonly T[],
 	indexToRemove: Readonly<number>,
-	replacement: Readonly<T>
+	replacement: Readonly<T>,
 ): readonly T[] => [
 	...array.slice(0, indexToRemove),
 	replacement,
@@ -28,7 +28,7 @@ export const replace = <T>(
 export const sort = <T>(
 	array: readonly T[],
 	// eslint-disable-next-line no-unused-vars
-	compareFunction?: (a: Readonly<T>, b: Readonly<T>) => Readonly<1 | -1 | 0>
+	compareFunction?: (a: Readonly<T>, b: Readonly<T>) => Readonly<1 | -1 | 0>,
 ): readonly T[] => [...array].sort(compareFunction);
 
 /** Get a new array without the last item. */
@@ -37,7 +37,7 @@ export const pop = <T>(array: readonly T[]): readonly T[] => array.slice(0, -1);
 /** Get a new array with a new item at the beginning. */
 export const push = <T>(
 	array: readonly T[],
-	newEntry: Readonly<T>
+	newEntry: Readonly<T>,
 ): readonly T[] => [...array, newEntry];
 
 /** Get a new array without the first item. */
@@ -56,7 +56,7 @@ export const unshift = <T>(
 /** Get item and its index from array. */
 export const getItemAndIndex = <T>(
 	array: readonly T[],
-	predicate: (value: T, index: number, obj: readonly T[]) => unknown
+	predicate: (value: T, index: number, obj: readonly T[]) => unknown,
 ): Readonly<[T, number]> | Readonly<[undefined, -1]> => {
 	const index = array.findIndex(predicate);
 

@@ -8,13 +8,13 @@ import {
 } from "node:fs/promises";
 
 export async function getFullPathOfFilesForFilesInThisDirectory(
-	dir: Readonly<Path>
+	dir: Readonly<Path>,
 ): Promise<readonly Path[]> {
 	return (await readdir(dir)).map(filename => join(dir, filename));
 }
 
 export async function readFile(
-	path: Readonly<Path>
+	path: Readonly<Path>,
 ): Promise<Readonly<Buffer>> {
 	return await fsReadFile(path);
 }

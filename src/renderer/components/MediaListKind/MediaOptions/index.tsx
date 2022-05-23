@@ -107,7 +107,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 const handleMediaDeletion = async (
 	closeButtonRef: RefObject<HTMLButtonElement>,
-	mediaPath: Path
+	mediaPath: Path,
 ) => {
 	if (closeButtonRef.current)
 		try {
@@ -121,7 +121,7 @@ const handleMediaDeletion = async (
 			console.error(error);
 
 			errorToast(
-				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'."
+				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
 			);
 		}
 };
@@ -130,7 +130,7 @@ const handleChange = (
 	contentWrapperRef: RefObject<HTMLDivElement>,
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	mediaPath: Path,
-	media: Media
+	media: Media,
 ) => {
 	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
@@ -142,7 +142,7 @@ const handleChange = (
 			console.error(error);
 
 			errorToast(
-				"Unable to save new metadata. See console by pressing 'Ctrl' + 'Shift' + 'i'."
+				"Unable to save new metadata. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
 			);
 		}
 };
@@ -150,7 +150,7 @@ const handleChange = (
 function changePropsIfAllowed(
 	contentWrapper: RefObject<HTMLDivElement>,
 	mediaPath: Path,
-	media: Media
+	media: Media,
 ) {
 	if (contentWrapper.current)
 		for (const children of contentWrapper.current.children)

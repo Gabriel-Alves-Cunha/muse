@@ -61,12 +61,12 @@ ipcRenderer.on(
 		sendMsgToClient({
 			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 			downloadInfo: downloadValues,
-		})
+		}),
 );
 
 // Handle messages from the renderer process:
 window.onmessage = async (
-	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>
+	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>,
 ) => {
 	if (event.data.source !== reactSource) return;
 
@@ -127,7 +127,7 @@ window.onmessage = async (
 		case ReactToElectronMessageEnum.ERROR: {
 			console.error(
 				"@TODO: maybe do something with this error...?\n",
-				msg.error
+				msg.error,
 			);
 
 			break;
@@ -138,7 +138,7 @@ window.onmessage = async (
 				`There is no method to handle this event.data: (${typeof event.data}) '`,
 				event.data,
 				"'\nEvent =",
-				event
+				event,
 			);
 
 			assertUnreachable(msg);

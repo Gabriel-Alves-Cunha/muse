@@ -30,7 +30,7 @@ const iconObj: ReadonlyMap<ProgressStatus, JSX.Element> = Object.freeze(
 		[ProgressStatus.CANCEL, <Cancel size={12} color="blue" key="cancel" />],
 		[ProgressStatus.FAILED, <Fail size={12} color="red" key="failed" />],
 		[ProgressStatus.ACTIVE, <Downloading size={12} key="active" />],
-	])
+	]),
 );
 
 export type ProgressProps = {

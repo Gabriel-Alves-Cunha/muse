@@ -6,14 +6,14 @@ const { random, floor } = Math;
 export const getRandomInt = (min: number, max: number): number => {
 	if (!Number.isFinite(min)) {
 		console.error(
-			`Function \`getRandomInt\` received \`min = ${min}\` wich is not a finite number!`
+			`Function \`getRandomInt\` received \`min = ${min}\` wich is not a finite number!`,
 		);
 
 		min = 0;
 	}
 	if (!Number.isFinite(max)) {
 		console.error(
-			`Function \`getRandomInt\` received \`max = ${max}\` wich is not a finite number!`
+			`Function \`getRandomInt\` received \`max = ${max}\` wich is not a finite number!`,
 		);
 
 		max = 1;
@@ -29,7 +29,7 @@ export const assertUnreachable = (received: never): never => {
 	const error = JSON.stringify(received, null, 2) ?? received;
 
 	throw new Error(
-		"I shouldn't get here (on 'assertUnreachable')!\nreceived = " + error
+		"I shouldn't get here (on 'assertUnreachable')!\nreceived = " + error,
 	);
 };
 

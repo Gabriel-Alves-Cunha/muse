@@ -25,7 +25,7 @@ export const PopoverContent = forwardRef(
 		<StyledContent size={size} sideOffset={5} {...props} ref={forwardedRef}>
 			{children}
 		</StyledContent>
-	)
+	),
 );
 PopoverContent.displayName = "PopoverContent";
 

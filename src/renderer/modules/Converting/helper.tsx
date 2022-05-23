@@ -65,7 +65,7 @@ export const ConvertBox = ({
 
 export function createNewConvert(
 	convertInfo: ConvertInfo,
-	path: Path
+	path: Path,
 ): MessagePort {
 	const convertingList_ = convertingList();
 
@@ -113,7 +113,7 @@ export function createNewConvert(
 		// Assert that the download exists:
 		if (!convertingList_.has(path)) {
 			return console.error(
-				"Received a message from Electron but the path is not in the list!"
+				"Received a message from Electron but the path is not in the list!",
 			);
 		}
 
@@ -121,7 +121,7 @@ export function createNewConvert(
 			convertingList_.set(path, {
 				...convertStatus,
 				...data,
-			})
+			}),
 		);
 
 		switch (data.status) {
@@ -182,7 +182,7 @@ const cancelDownloadAndOrRemoveItFromList = (path: string) => {
 	if (!mediaBeingConverted) {
 		return console.error(
 			`There should be a conversion with path "${path}"!\nconvertList =`,
-			convertingList_
+			convertingList_,
 		);
 	}
 

@@ -11,12 +11,12 @@ declare global {
 export type VisibleElectron = Readonly<{
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess(
-			type: ElectronIpcMainProcessNotificationEnum
+			type: ElectronIpcMainProcessNotificationEnum,
 		): void;
 	};
 	fs: {
 		getFullPathOfFilesForFilesInThisDirectory(
-			dir: Path
+			dir: Path,
 		): Promise<readonly Path[]>;
 		readFile(path: Path): Promise<Readonly<Buffer>>;
 		readdir(dir: Path): Promise<readonly Path[]>;
@@ -31,7 +31,7 @@ export type VisibleElectron = Readonly<{
 	};
 	media: {
 		transformPathsToMedias(
-			paths: readonly Path[]
+			paths: readonly Path[],
 		): Promise<Array<[Path, Media]>>;
 		getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
 	};
