@@ -36,6 +36,7 @@ jobs:
         with:
           # This token is provided by Actions, you do not need to create your own token
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: "latest"
+          files: dist/Muse-*
           prerelease: false
           draft: false # Mark this release as draft (not real)
-          files: dist/Muse-*
