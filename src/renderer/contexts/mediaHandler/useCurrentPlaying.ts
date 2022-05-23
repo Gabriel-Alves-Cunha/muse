@@ -6,7 +6,6 @@ import create from "zustand";
 import { playOptions } from "./usePlayOptions";
 import { getRandomInt } from "@utils/utils";
 import { keyPrefix } from "@utils/app";
-import { dbg } from "@common/utils";
 import {
 	PlaylistActions,
 	PlaylistList,
@@ -44,8 +43,6 @@ export const { getState: currentPlaying, setState: setCurrentPlaying } =
 ////////////////////////////////////////////////
 
 export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
-	dbg("playThisMedia()", { mediaPath, listType });
-
 	// We need to update history:
 	setPlaylists({
 		whatToDo: PlaylistActions.ADD_ONE_MEDIA,

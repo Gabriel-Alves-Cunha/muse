@@ -3,8 +3,9 @@ import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { ControlsAndSeeker, Header } from "./helpers";
-import { dbg, formatDuration } from "@common/utils";
 import { ImgWithFallback } from "@components/ImgWithFallback";
+import { formatDuration } from "@common/utils";
+import { dbg } from "@common/utils";
 import {
 	PlaylistActions,
 	setPlaylists,

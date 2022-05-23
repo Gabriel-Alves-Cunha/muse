@@ -4,13 +4,14 @@ import type { Path } from "@common/@types/generalTypes";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
-import { type AllowedMedias, getBasename, dbg } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
+import { convertingList, setConvertingList } from "@contexts/convertList";
+import { type AllowedMedias, getBasename } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
-import { convertingList, setConvertingList } from "@contexts/convertList";
 import { prettyBytes } from "@common/prettyBytes";
 import { Tooltip } from "@components/Tooltip";
+import { dbg } from "@common/utils";
 
 import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";

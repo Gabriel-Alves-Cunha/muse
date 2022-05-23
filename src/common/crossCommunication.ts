@@ -3,7 +3,7 @@ import type {
 	MsgObjectReactToElectron,
 } from "@common/@types/electron-window";
 
-import { dbg } from "@common/utils";
+import { dbg } from "./utils";
 
 export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,

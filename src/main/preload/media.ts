@@ -2,7 +2,6 @@
 /* eslint-disable prefer-rest-params */
 
 import type { ImgString, WriteTag } from "@common/@types/electron-window";
-import type { AllowedMedias } from "@common/utils";
 import type { Media, Path } from "@common/@types/generalTypes";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "node:stream";
@@ -27,9 +26,10 @@ import ytdl from "ytdl-core";
 
 import { getLastExtension, formatDuration, getBasename } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
-import { dbg, isDevelopment } from "@common/utils";
+import { type AllowedMedias, dbg } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
+import { isDevelopment } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
 import { dirs } from "../utils";

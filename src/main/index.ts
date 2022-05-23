@@ -3,16 +3,17 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 import { validateURL, getBasicInfo } from "ytdl-core";
 import { join, normalize } from "node:path";
 import { pathToFileURL } from "node:url";
+import { autoUpdater } from "electron-updater";
 import {
 	BrowserWindow,
 	Notification,
 	nativeImage,
 	MenuItem,
+	protocol,
 	ipcMain,
 	Menu,
 	Tray,
 	app,
-	protocol,
 } from "electron";
 
 import { capitalizedAppName, dbg, isDevelopment } from "@common/utils";
@@ -22,6 +23,30 @@ import {
 	ElectronIpcMainProcessNotificationEnum,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
+
+//------------------------------------------------
+autoUpdater.on("checking-for-update", () => {
+	dbg("Checking for update...");
+});
+autoUpdater.on("update-available", info => {
+	dbg("Update available:", info);
+});
+autoUpdater.on("update-not-available", info => {
+	dbg("Update not available:", info);
+});
+autoUpdater.on("error", err => {
+	dbg("Error in auto-updater. ", err);
+});
+autoUpdater.on("download-progress", progressObj => {
+	dbg({ progressObj });
+	const log_message = `Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
+
+	dbg(log_message);
+});
+autoUpdater.on("update-downloaded", info => {
+	dbg("Update downloaded:", info);
+});
+//-------------------------------------------------
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -105,6 +130,10 @@ app
 	})
 	.whenReady()
 	.then(async () => {
+		// This will immediately download an update,
+		// then install when the app quits.
+		await autoUpdater.checkForUpdatesAndNotify();
+
 		// This is so Electron can load local media files:
 		protocol.registerFileProtocol("atom", (request, callback) => {
 			const url = request.url.substring(7);

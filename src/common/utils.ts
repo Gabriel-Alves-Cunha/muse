@@ -5,7 +5,6 @@ export const isDevelopment = process.env.NODE_ENV === "development";
 
 export const capitalizedAppName = "Muse" as const;
 export const lowercaseAppName = "muse" as const;
-
 export const dbg = debug(lowercaseAppName);
 export const dbgTests = debug(`${lowercaseAppName}:tests`);
 export const dbgPlaylists = debug(`${lowercaseAppName}:playlists`);
