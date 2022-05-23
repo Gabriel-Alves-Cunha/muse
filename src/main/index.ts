@@ -132,14 +132,6 @@ app
 	})
 	.whenReady()
 	.then(async () => {
-		try {
-			// This will immediately download an update,
-			// then install when the app quits.
-			await autoUpdater.checkForUpdatesAndNotify();
-		} catch (error) {
-			console.error(error);
-		}
-
 		// This is so Electron can load local media files:
 		protocol.registerFileProtocol("atom", (request, callback) => {
 			const url = request.url.substring(7);
@@ -225,6 +217,16 @@ app
 		} catch (error) {
 			console.error(error);
 		}
+
+		setTimeout(async () => {
+			try {
+				// This will immediately download an update,
+				// then install when the app quits.
+				await autoUpdater.checkForUpdatesAndNotify();
+			} catch (error) {
+				console.error(error);
+			}
+		}, 3_000);
 	});
 
 // In this file you can include the rest of your app's specific main process

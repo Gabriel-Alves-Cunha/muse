@@ -14,7 +14,7 @@ export const logoPath = isDevelopment
 	? join(rootDirectory, "src", "renderer", "assets", "icons", "logo.png")
 	: join(rootDirectory, "assets", "logo.png");
 
-// console.log({ rootDirectory, logoPath });
+console.log({ rootDirectory, logoPath });
 
 const homeDir = homedir();
 export const dirs = Object.freeze({
