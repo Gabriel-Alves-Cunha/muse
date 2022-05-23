@@ -9,7 +9,7 @@ export const dbg = debug(lowercaseAppName);
 export const dbgTests = debug(`${lowercaseAppName}:tests`);
 export const dbgPlaylists = debug(`${lowercaseAppName}:playlists`);
 
-dbg("\uD834\uDD60 Hello from the muse debug side! \uD834\uDD60");
+dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 export const allowedMedias = Object.freeze(<const>[
 	"vorbis",

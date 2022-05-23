@@ -25,6 +25,8 @@ import {
 } from "@common/@types/electron-window";
 
 //------------------------------------------------
+autoUpdater.autoInstallOnAppQuit = true;
+autoUpdater.autoDownload = true;
 autoUpdater.on("checking-for-update", () => {
 	dbg("Checking for update...");
 });
@@ -89,7 +91,7 @@ async function createWindow() {
 					role: "reload",
 				},
 			],
-		}),
+		})
 	);
 	menu.append(
 		new MenuItem({
@@ -101,14 +103,14 @@ async function createWindow() {
 					role: "toggleDevTools",
 				},
 			],
-		}),
+		})
 	);
 	Menu.setApplicationMenu(menu);
 
 	const url = isDevelopment
 		? "http://localhost:3000"
 		: pathToFileURL(
-				join(__dirname, "vite-renderer-build", "index.html"),
+				join(__dirname, "vite-renderer-build", "index.html")
 		  ).toString();
 
 	await window.loadURL(url);
@@ -130,9 +132,13 @@ app
 	})
 	.whenReady()
 	.then(async () => {
-		// This will immediately download an update,
-		// then install when the app quits.
-		await autoUpdater.checkForUpdatesAndNotify();
+		try {
+			// This will immediately download an update,
+			// then install when the app quits.
+			await autoUpdater.checkForUpdatesAndNotify();
+		} catch (error) {
+			console.error(error);
+		}
 
 		// This is so Electron can load local media files:
 		protocol.registerFileProtocol("atom", (request, callback) => {
@@ -160,7 +166,7 @@ app
 				.then(name => console.log(`Added Extension: ${name}`))
 				// @ts-ignore - this is a workaround for a bug in the lib
 				.catch(err =>
-					console.error("An error occurred while installing extension: ", err),
+					console.error("An error occurred while installing extension: ", err)
 				);
 		}
 
@@ -202,12 +208,12 @@ app
 									// Send msg to ipcMain:
 									electronWindow?.webContents.send(
 										ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
-										downloadInfo,
+										downloadInfo
 									);
 
 									console.log(
 										"Clicked notification and sent data:",
-										downloadInfo,
+										downloadInfo
 									);
 								})
 								.show();
@@ -232,9 +238,9 @@ ipcMain.on(
 
 		ipcMain.emit(
 			ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
-			downloadValues,
+			downloadValues
 		);
-	},
+	}
 );
 
 ipcMain.on("notify", (event, type: ElectronIpcMainProcessNotificationEnum) => {
@@ -272,7 +278,7 @@ ipcMain.on("notify", (event, type: ElectronIpcMainProcessNotificationEnum) => {
 		default: {
 			console.error(
 				"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
-				event,
+				event
 			);
 
 			assertUnreachable(type);
@@ -287,11 +293,11 @@ type ClipboardExtended = Electron.Clipboard & {
 	stopWatching: () => ClipboardExtended;
 	off: <T>(
 		event: string,
-		listener?: (...args: T[]) => void,
+		listener?: (...args: T[]) => void
 	) => ClipboardExtended;
 	on: <T>(event: string, listener: (...args: T[]) => void) => ClipboardExtended;
 	once: <T>(
 		event: string,
-		listener: (...args: T[]) => void,
+		listener: (...args: T[]) => void
 	) => ClipboardExtended;
 };
