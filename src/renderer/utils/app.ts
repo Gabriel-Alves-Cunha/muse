@@ -1,5 +1,4 @@
-export const keyPrefix = "@muse:";
-
+// The order here is the order on the navbar:
 export const pages = Object.freeze([
 	"Home",
 	"Favorites",

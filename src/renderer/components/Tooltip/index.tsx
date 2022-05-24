@@ -32,7 +32,3 @@ type Props = {
 	arrow?: boolean;
 	text: string;
 };
-
-Tooltip.whyDidYouRender = {
-	customName: "Tooltip",
-};

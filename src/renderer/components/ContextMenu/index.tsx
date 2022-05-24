@@ -42,7 +42,3 @@ type Props = {
 	content?: ContentEnum;
 	children: ReactNode;
 };
-
-ContextMenu.whyDidYouRender = {
-	customName: "ContextMenu",
-};

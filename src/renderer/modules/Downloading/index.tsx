@@ -63,13 +63,13 @@ export function Downloading() {
 					{
 						type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
 					},
-					electronPort,
+					electronPort
 				);
 			} catch (error) {
 				console.error(error);
 
 				errorToast(
-					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`,
+					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`
 				);
 			}
 	}, [downloadInfo.canStartDownload, downloadInfo.title, downloadInfo]);
@@ -114,7 +114,3 @@ export type MediaBeingDownloaded = Readonly<{
 	imageURL: string;
 	title: string;
 }>;
-
-Downloading.whyDidYouRender = {
-	customName: "Downloading",
-};

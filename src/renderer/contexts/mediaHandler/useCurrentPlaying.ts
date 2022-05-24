@@ -1,11 +1,11 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { persist, subscribeWithSelector } from "zustand/middleware";
+import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { playOptions } from "./usePlayOptions";
+import { keys, setLocalStorage } from "@utils/localStorage";
 import { getRandomInt } from "@utils/utils";
-import { keyPrefix } from "@utils/app";
+import { playOptions } from "./usePlayOptions";
 import {
 	PlaylistActions,
 	PlaylistList,
@@ -18,8 +18,6 @@ import {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const currentPlayingKey = `${keyPrefix}current_playing` as const;
-
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: PlaylistList.MAIN_LIST,
 	path: undefined,
@@ -27,12 +25,7 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		persist((_set, _get) => defaultCurrentPlaying, {
-			name: currentPlayingKey,
-		}),
-	),
+	subscribeWithSelector(() => defaultCurrentPlaying)
 );
 
 export const { getState: currentPlaying, setState: setCurrentPlaying } =
@@ -50,11 +43,14 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 		path: mediaPath,
 	});
 
-	setCurrentPlaying({
+	const newCurrentPlaying = Object.freeze({
 		path: mediaPath,
 		currentTime: 0,
 		listType,
 	});
+
+	setCurrentPlaying(newCurrentPlaying);
+	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 }
 
 export function playPreviousMedia() {
@@ -62,7 +58,7 @@ export function playPreviousMedia() {
 
 	if (!path) {
 		console.error(
-			"A media needs to be currently selected to play a previous media!",
+			"A media needs to be currently selected to play a previous media!"
 		);
 		return;
 	}
@@ -86,7 +82,7 @@ export function playPreviousMedia() {
 
 	if (currMediaPathIndex === -1) {
 		console.error(
-			"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!",
+			"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!"
 		);
 		return;
 	}
@@ -102,39 +98,39 @@ export function playPreviousMedia() {
 			path: prevMediaPath,
 		});
 
-		setCurrentPlaying({
+		const newCurrentPlaying = Object.freeze({
 			path: prevMediaPath,
 			currentTime: 0,
+			listType,
 		});
+
+		setCurrentPlaying(newCurrentPlaying);
+		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 	}
 }
 
 export function togglePlayPause(): void {
 	const audio = document.getElementById("audio") as HTMLAudioElement;
 
-	if (audio.paused) (async () => await audio.play())();
-	else {
-		audio.pause();
-
-		setCurrentPlaying({
-			currentTime: audio.currentTime,
-		});
-	}
+	audio.paused ? play(audio) : pause(audio);
 }
 
-export function play(): void {
-	(async () =>
-		await (document.getElementById("audio") as HTMLAudioElement).play())();
+export function play(audio?: HTMLAudioElement): void {
+	(async () => {
+		if (audio) await audio.play();
+		else await (document.getElementById("audio") as HTMLAudioElement).play();
+	})();
 }
 
-export function pause() {
-	const audio = document.getElementById("audio") as HTMLAudioElement;
+export function pause(audio?: HTMLAudioElement): void {
+	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 
 	setCurrentPlaying({
 		currentTime: audio.currentTime,
 	});
+	setLocalStorage(keys.currentPlaying, currentPlaying());
 }
 
 export function playNextMedia(): void {
@@ -142,7 +138,7 @@ export function playNextMedia(): void {
 
 	if (!path) {
 		console.warn(
-			"A media needs to be currently selected to play a next media!",
+			"A media needs to be currently selected to play a next media!"
 		);
 
 		return;
@@ -170,7 +166,7 @@ export function playNextMedia(): void {
 		if (!randomMediaPath) {
 			console.error(
 				"There should be a random media selected, but there isn't!",
-				{ randomMediaPath, listAsArray },
+				{ randomMediaPath, listAsArray }
 			);
 
 			return;
@@ -184,10 +180,14 @@ export function playNextMedia(): void {
 		});
 
 		// Setting the current playing media:
-		setCurrentPlaying({
+		const newCurrentPlaying = Object.freeze({
 			path: randomMediaPath,
 			currentTime: 0,
+			listType,
 		});
+
+		setCurrentPlaying(newCurrentPlaying);
+		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 	} else {
 		const prevMediaPathIndex = listAsArray.findIndex(p => p === path);
 
@@ -206,10 +206,14 @@ export function playNextMedia(): void {
 				type: WhatToDo.UPDATE_HISTORY,
 			});
 
-			setCurrentPlaying({
+			const newCurrentPlaying = Object.freeze({
 				path: firstMediaFromTheSameList,
 				currentTime: 0,
+				listType,
 			});
+
+			setCurrentPlaying(newCurrentPlaying);
+			setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 
 			return;
 		}
@@ -221,10 +225,14 @@ export function playNextMedia(): void {
 			type: WhatToDo.UPDATE_HISTORY,
 		});
 
-		setCurrentPlaying({
+		const newCurrentPlaying = Object.freeze({
 			path: nextMediaFromTheSameList,
 			currentTime: 0,
+			listType,
 		});
+
+		setCurrentPlaying(newCurrentPlaying);
+		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 	}
 }
 
@@ -250,11 +258,11 @@ if (globalThis.window)
 				async () =>
 					((document.getElementById("audio") as HTMLAudioElement).src =
 						pathForElectron),
-				150,
+				150
 			);
 
 			prevMediaTimer = mediaTimer;
-		},
+		}
 	);
 
 ////////////////////////////////////////////////

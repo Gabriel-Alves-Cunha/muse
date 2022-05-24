@@ -21,7 +21,3 @@ export function SearchMedia({ buttonToTheSide }: Props) {
 		</Wrapper>
 	);
 }
-
-SearchMedia.whyDidYouRender = {
-	customName: "SearchMedia",
-};

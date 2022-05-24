@@ -17,11 +17,9 @@ import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { Tooltip } from "@components/Tooltip";
 import {
 	searchLocalComputerForMedias,
-	PlaylistActions,
-	setPlaylists,
 	PlaylistList,
+	cleanHistory,
 	searchMedia,
-	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 
 import { ImgWrapper } from "../MediaListKind/styles";
@@ -80,19 +78,13 @@ export const { setState: setSearcher } = useSearcher;
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-const cleanHistory = () =>
-	setPlaylists({
-		type: WhatToDo.UPDATE_HISTORY,
-		whatToDo: PlaylistActions.CLEAN,
-	});
-
 const reload = async () => {
 	setSearcher({
 		...defaultSearcher,
 		searchStatus: RELOADING_ALL_MEDIAS,
 	});
 
-	await searchLocalComputerForMedias(true);
+	await searchLocalComputerForMedias();
 
 	setSearcher({ searchStatus: DOING_NOTHING });
 };
@@ -104,8 +96,12 @@ export const setSearchTerm = (e: InputChange) =>
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-const Row = ({ highlight, media, path }: RowProps) => {
-	const index = media.title.toLowerCase().indexOf(highlight);
+const Row = ({
+	media: { title, img, duration },
+	highlight,
+	path,
+}: RowProps) => {
+	const index = title.toLowerCase().indexOf(highlight);
 
 	return (
 		<Tooltip text="Play this media">
@@ -113,20 +109,20 @@ const Row = ({ highlight, media, path }: RowProps) => {
 				<ImgWrapper>
 					<ImgWithFallback
 						Fallback={<MusicNote size={13} />}
-						mediaImg={media.img}
+						mediaImg={img}
 						mediaPath={path}
 					/>
 				</ImgWrapper>
 
 				<Info>
 					<Title>
-						{media.title.slice(0, index)}
+						{title.slice(0, index)}
 						<Highlight>
-							{media.title.slice(index, index + highlight.length)}
+							{title.slice(index, index + highlight.length)}
 						</Highlight>
-						{media.title.slice(index + highlight.length)}
+						{title.slice(index + highlight.length)}
 					</Title>
-					<SubTitle>{media.duration}</SubTitle>
+					<SubTitle>{duration}</SubTitle>
 				</Info>
 			</Result>
 		</Tooltip>
@@ -139,6 +135,15 @@ export function Input() {
 	const { searchTerm } = useSearcher();
 
 	useOnClickOutside(inputRef, () => searchTerm && setSearcher(defaultSearcher));
+
+	useEffect(() => {
+		const closeOnEsc = (e: KeyboardEvent) =>
+			e.key === "Escape" && setSearcher(defaultSearcher);
+
+		document.addEventListener("keydown", closeOnEsc);
+
+		return () => document.removeEventListener("keydown", closeOnEsc);
+	}, []);
 
 	useEffect(() => {
 		setSearcher({
@@ -264,23 +269,3 @@ type Props2 = Readonly<{
 type InputChange = React.ChangeEvent<HTMLInputElement>;
 
 export type Props = Props1 & Props2;
-
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-
-Row.whyDidYouRender = {
-	customName: "Row",
-};
-
-Input.whyDidYouRender = {
-	customName: "Input",
-};
-
-Results.whyDidYouRender = {
-	customName: "Results",
-};
-
-ButtonToTheSide.whyDidYouRender = {
-	customName: "ButtonToTheSide",
-};

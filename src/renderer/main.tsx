@@ -1,5 +1,3 @@
-import "./wdyr"; // <--- Has to be first import!
-
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
@@ -17,5 +15,5 @@ const root = createRoot(container);
 root.render(
 	<StrictMode>
 		<App />
-	</StrictMode>,
+	</StrictMode>
 );

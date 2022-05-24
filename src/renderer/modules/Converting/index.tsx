@@ -40,11 +40,11 @@ export function Converting() {
 						{
 							type: ReactToElectronMessageEnum.CONVERT_MEDIA,
 						},
-						electronPort,
+						electronPort
 					);
 				} catch (error) {
 					errorToast(
-						`There was an error trying to download "${path}"! Please, try again later.`,
+						`There was an error trying to download "${path}"! Please, try again later.`
 					);
 
 					console.error(error);
@@ -89,7 +89,3 @@ export function Converting() {
 		</Wrapper>
 	);
 }
-
-Converting.whyDidYouRender = {
-	customName: "Converting",
-};

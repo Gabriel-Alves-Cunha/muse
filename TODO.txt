@@ -1,5 +1,5 @@
 * TODO: impl select on media
-* TODO: use NextUI instead of radix
+* TODO: try to get rid of readline with console.stdout
 
 NOTES:
 

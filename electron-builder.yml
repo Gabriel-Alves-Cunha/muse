@@ -11,5 +11,6 @@ linux:
   category: AudioVideo
 
 publish:
+    releaseType: release
     provider: github
-    # token: GH_TOKEN
+    # token: GH_TOKEN # If github is private

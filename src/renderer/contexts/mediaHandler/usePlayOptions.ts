@@ -1,22 +1,11 @@
-import { persist } from "zustand/middleware";
 import create from "zustand";
 
-import { keyPrefix } from "@utils/app";
+import { keys, setLocalStorage } from "@utils/localStorage";
 
-const playOptionsKey = `${keyPrefix}play_options` as const;
-
-export const usePlayOptions = create<PlayOptions>()(
-	persist(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		(_set, _get) => ({
-			loopThisMedia: false,
-			isRandom: false,
-		}),
-		{
-			name: playOptionsKey,
-		},
-	),
-);
+export const usePlayOptions = create<PlayOptions>(() => ({
+	loopThisMedia: false,
+	isRandom: false,
+}));
 
 export const { getState: playOptions, setState: setPlayOptions } =
 	usePlayOptions;
@@ -28,13 +17,15 @@ export const { getState: playOptions, setState: setPlayOptions } =
 export function toggleLoopMedia() {
 	const newValue = !playOptions().loopThisMedia;
 
-	setPlayOptions({ loopThisMedia: newValue });
-
 	(document.getElementById("audio") as HTMLAudioElement).loop = newValue;
+
+	setPlayOptions({ loopThisMedia: newValue });
+	setLocalStorage(keys.playOptions, playOptions());
 }
 
 export function toggleRandom() {
 	setPlayOptions({ isRandom: !playOptions().isRandom });
+	setLocalStorage(keys.playOptions, playOptions());
 }
 
 ////////////////////////////////////////////////

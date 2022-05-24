@@ -66,7 +66,3 @@ const AppName_Folder = () => {
 		</AppName_Folder_Wrapper>
 	);
 };
-
-Decorations.whyDidYouRender = {
-	customName: "Decorations",
-};

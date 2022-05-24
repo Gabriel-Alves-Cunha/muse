@@ -1,3 +1,5 @@
+import type { Page } from "@common/@types/generalTypes";
+
 import { ToastContainer } from "react-toastify";
 
 import { searchLocalComputerForMedias } from "@contexts/mediaHandler/usePlaylists";
@@ -16,7 +18,6 @@ import { Home } from "@routes/Home";
 import { GlobalCSS } from "@styles/global";
 import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
-import { Page } from "@common/@types/generalTypes";
 
 export function App() {
 	GlobalCSS();
@@ -56,10 +57,10 @@ const Main = () => (
 const PageToShow = () => {
 	const { page } = usePage();
 
-	return cases[page];
+	return pages[page];
 };
 
-const cases: Readonly<Record<Page, JSX.Element>> = Object.freeze({
+const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Favorites: <Favorites />,
 	Download: <Download />,
 	Convert: <Convert />,
@@ -69,4 +70,4 @@ const cases: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 
 window.onmessage = handleWindowMsgs;
 
-await searchLocalComputerForMedias(true);
+await searchLocalComputerForMedias();

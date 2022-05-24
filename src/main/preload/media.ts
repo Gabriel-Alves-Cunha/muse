@@ -51,7 +51,7 @@ const pathExists = async (path: Path): Promise<boolean> =>
 const createMedia = async (
 	path: Path,
 	assureMediaSizeIsGreaterThan60KB: boolean,
-	ignoreMediaWithLessThan60Seconds: boolean,
+	ignoreMediaWithLessThan60Seconds: boolean
 ): Promise<[Path, Media]> =>
 	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
@@ -70,8 +70,8 @@ const createMedia = async (
 			if (ignoreMediaWithLessThan60Seconds && duration < 60) {
 				log(
 					`Skipping "${path}" because the duration is ${duration.toPrecision(
-						3,
-					)} s (less than 60 s)!`,
+						3
+					)} s (less than 60 s)!`
 				);
 				return reject();
 			}
@@ -121,25 +121,27 @@ const createMedia = async (
 export async function transformPathsToMedias(
 	paths: readonly Path[],
 	assureMediaSizeIsGreaterThan60KB = true,
-	ignoreMediaWithLessThan60Seconds = true,
+	ignoreMediaWithLessThan60Seconds = true
 ): Promise<Array<[Path, Media]>> {
-	console.groupCollapsed("Creating medias...");
+	return time(async () => {
+		console.groupCollapsed("Creating medias...");
 
-	const promises = paths.map(path =>
-		createMedia(
-			path,
-			assureMediaSizeIsGreaterThan60KB,
-			ignoreMediaWithLessThan60Seconds,
-		),
-	);
+		const promises = paths.map(path =>
+			createMedia(
+				path,
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds
+			)
+		);
 
-	const medias = (await Promise.allSettled(promises))
-		.map(p => (p.status === "fulfilled" ? p.value : undefined))
-		.filter(Boolean) as Array<[Path, Media]>;
+		const medias = (await Promise.allSettled(promises))
+			.map(p => (p.status === "fulfilled" ? p.value : undefined))
+			.filter(Boolean) as Array<[Path, Media]>;
 
-	console.groupEnd();
+		console.groupEnd();
 
-	return medias;
+		return medias;
+	}, "transformPathsToMedias");
 }
 
 export async function handleCreateOrCancelDownload({
@@ -197,7 +199,7 @@ export async function makeStream({
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort.postMessage({ percentage }),
-					2_000,
+					2_000
 				);
 				prettyTotal = prettyBytes(total);
 
@@ -220,17 +222,17 @@ export async function makeStream({
 				readline.clearLine(process.stdout, 0);
 				process.stdout.write(
 					`${percentage.toFixed(2)}% downloaded, (${prettyBytes(
-						downloaded,
+						downloaded
 					)} / ${prettyTotal}). Running for: ${secondsDownloading.toFixed(
-						2,
-					)} seconds. ETA: ${estimatedDownloadTime} seconds.`,
+						2
+					)} seconds. ETA: ${estimatedDownloadTime} seconds.`
 				);
 			}
 		})
 		.on("destroy", async () => {
 			log(
 				"%cDestroy was called on readStream!",
-				"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
+				"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;"
 			);
 
 			// Delete the file if it's not converted successfully:
@@ -248,7 +250,7 @@ export async function makeStream({
 				"Download was destroyed. Deleting stream from currentDownloads:",
 				currentDownloads,
 				"Does the downloaded file still exists?",
-				await pathExists(saveSite),
+				await pathExists(saveSite)
 			);
 
 			sendFailedDownloadMsg(url, electronPort);
@@ -256,7 +258,7 @@ export async function makeStream({
 		.on("end", async () => {
 			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
-				"color: green; font-weight: bold;",
+				"color: green; font-weight: bold;"
 			);
 
 			// To react:
@@ -277,7 +279,7 @@ export async function makeStream({
 			currentDownloads.delete(url);
 			dbg(
 				"Download ended. Deleting stream from currentDownloads:",
-				currentDownloads,
+				currentDownloads
 			);
 		})
 		.on("error", async err => {
@@ -303,7 +305,7 @@ export async function makeStream({
 				"Download threw an error. Deleting stream from currentDownloads:",
 				currentDownloads,
 				"Does the downloaded file still exists?",
-				await pathExists(saveSite),
+				await pathExists(saveSite)
 			);
 
 			sendFailedDownloadMsg(url, electronPort);
@@ -348,7 +350,7 @@ export async function convertToAudio({
 			(await pathExists(pathWithNewExtension))
 		) {
 			error(
-				`File "${path}" already is "${toExtension}"! Canceling conversion.`,
+				`File "${path}" already is "${toExtension}"! Canceling conversion.`
 			);
 
 			// Send a msg saying that conversion failed;
@@ -378,7 +380,7 @@ export async function convertToAudio({
 								sizeConverted: targetSize,
 								timeConverted: timemark,
 							}),
-						2_000,
+						2_000
 					);
 
 					// Send a message to client that we're starting a conversion:
@@ -387,7 +389,7 @@ export async function convertToAudio({
 						path,
 					});
 				}
-			},
+			}
 		)
 		.on("error", async err => {
 			error(`Error converting file: "${titleWithExtension}"!\n\n`, err);
@@ -412,7 +414,7 @@ export async function convertToAudio({
 				"Convertion threw an error. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				await pathExists(saveSite),
+				await pathExists(saveSite)
 			);
 
 			sendFailedConversionMsg(path, electronPort);
@@ -420,7 +422,7 @@ export async function convertToAudio({
 		.on("end", async () => {
 			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
-				"color: green; font-weight: bold;",
+				"color: green; font-weight: bold;"
 			);
 
 			// To react:
@@ -450,13 +452,13 @@ export async function convertToAudio({
 			mediasConverting.delete(path);
 			dbg(
 				"Convertion successfull. Deleting from mediasConverting:",
-				mediasConverting,
+				mediasConverting
 			);
 		})
 		.on("destroy", async () => {
 			log(
 				"%cDestroy was called on readStream for converter!",
-				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
+				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;"
 			);
 
 			// Delete the file if it's not converted successfully:
@@ -472,8 +474,8 @@ export async function convertToAudio({
 			// I only found it to work when I send it with an Error:
 			readStream.destroy(
 				new Error(
-					"This readStream is being destroyed because the ffmpeg is being destroyed.",
-				),
+					"This readStream is being destroyed because the ffmpeg is being destroyed."
+				)
 			);
 
 			mediasConverting.delete(path);
@@ -481,7 +483,7 @@ export async function convertToAudio({
 				"Convertion was destroyed. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				await pathExists(saveSite),
+				await pathExists(saveSite)
 			);
 
 			sendFailedConversionMsg(path, electronPort);
@@ -494,7 +496,7 @@ export async function convertToAudio({
 
 export async function writeTags(
 	mediaPath: Readonly<Path>,
-	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean }>,
+	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean }>
 ): Promise<void> {
 	dbg("Writing tags to file:", { mediaPath, data });
 
@@ -515,7 +517,7 @@ export async function writeTags(
 
 						try {
 							const imgAsString: ImgString = await getThumbnail(
-								data.imageURL as string,
+								data.imageURL as string
 							);
 
 							createImage(imgAsString, file);
@@ -566,7 +568,7 @@ export async function writeTags(
 					const oldPath = mediaPath;
 					const newPath = join(
 						dirname(oldPath),
-						sanitizedTitle + "." + getLastExtension(oldPath),
+						sanitizedTitle + "." + getLastExtension(oldPath)
 					);
 
 					file.tag.title = sanitizedTitle;
@@ -668,7 +670,7 @@ export async function writeTags(
 
 						console.assert(
 							Array.isArray(filePictures),
-							`Invalid pictures = "${filePictures}"!`,
+							`Invalid pictures = "${filePictures}"!`
 						);
 						console.assert(filePictures.length > 0, "No pictures!");
 					}
@@ -687,18 +689,18 @@ export async function writeTags(
 function createImage(imgAsString: ImgString, file: MediaFile) {
 	const txtForByteVector = imgAsString.slice(
 		imgAsString.indexOf(",") + 1,
-		imgAsString.length,
+		imgAsString.length
 	);
 	const mimeType = imgAsString.slice(
 		imgAsString.indexOf(":") + 1,
-		imgAsString.indexOf(";"),
+		imgAsString.indexOf(";")
 	);
 
 	const picture = Picture.fromFullData(
 		ByteVector.fromString(txtForByteVector, StringType.Latin1),
 		PictureType.Media,
 		mimeType,
-		"This image was download when this media was downloaded.",
+		"This image was download when this media was downloaded."
 	);
 	picture.filename = "thumbnail";
 
@@ -719,7 +721,7 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 		}).on("error", e => {
 			error(`Got error getting image on Electron side: ${e.message}`);
 			reject(e);
-		}),
+		})
 	);
 
 const sendFailedConversionMsg = (path: Path, electronPort: MessagePort) => {

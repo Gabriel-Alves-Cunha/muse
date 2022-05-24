@@ -5,7 +5,7 @@ import {
 } from "react-icons/md";
 
 import { useLocalStorage } from "@hooks/useLocalStorage";
-import { keyPrefix } from "@utils/app";
+import { keyPrefix } from "@utils/localStorage";
 import { Tooltip } from "@components/Tooltip";
 
 import { styled, darkTheme, lightTheme } from "@styles/global";

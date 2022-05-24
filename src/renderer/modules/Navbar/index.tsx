@@ -61,7 +61,3 @@ const ButtonsForPages = () => {
 		</Buttons>
 	);
 };
-
-Navbar.whyDidYouRender = {
-	customName: "Navbar",
-};
