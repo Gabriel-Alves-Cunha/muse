@@ -171,9 +171,8 @@ export async function handleWindowMsgs(
 
 			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
 
-			const newMediaInArray: [Path, Media][] = await transformPathsToMedias([
-				mediaPath,
-			]);
+			const newMediaInArray: readonly [Path, Media][] =
+				await transformPathsToMedias([mediaPath]);
 
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const newMedia = newMediaInArray[0]![1];
@@ -229,7 +228,7 @@ export async function handleWindowMsgs(
 				break;
 			}
 
-			const refreshedMediaInArray: [Path, Media][] =
+			const refreshedMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias([mediaPath]);
 
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion

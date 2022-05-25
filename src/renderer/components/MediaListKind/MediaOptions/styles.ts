@@ -276,21 +276,23 @@ export const Input = styled("input", {
 	width: "100%",
 	height: 35,
 
-	border: "2px solid lightgray",
+	border: "2px solid $input-border",
+	borderRadius: "0.75rem",
 	padding: "0 10px",
-	borderRadius: 4,
 
 	letterSpacing: "0.035rem",
+	color: "$input-text",
 	ff: "$secondary",
-	color: "$accent-light",
 	fontSize: "1rem",
 	lineHeight: 1,
 
+	transition: "all 250ms ease",
+
 	"&:focus": {
-		borderColor: "$accent-light",
+		borderColor: "$input-border-active",
 	},
 
-	"&:disabled": {
-		border: "1px solid $input-disabled",
+	"&:readonly": {
+		border: "none",
 	},
 });

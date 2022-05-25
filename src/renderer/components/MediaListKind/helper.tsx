@@ -39,7 +39,7 @@ const Row = memo(
 
 		useOnClickOutside(
 			mediaRowRef,
-			() => isSelected && allSelectedMedias.delete(path),
+			() => isSelected && allSelectedMedias.delete(path)
 		);
 
 		return (
@@ -80,14 +80,14 @@ const Row = memo(
 			</RowWrapper>
 		);
 	},
-	(prev, next) => prev.media.duration === next.media.duration,
+	(prev, curr) => prev.media.duration === curr.media.duration
 );
 Row.displayName = "Row";
 
 const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e: Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>,
 	isSelected: Mutable<boolean>,
-	mediaPath: Readonly<Path>,
+	mediaPath: Readonly<Path>
 ) => {
 	// `e.button === 0` is left click
 	if (!e.ctrlKey || e.button !== 0) return;

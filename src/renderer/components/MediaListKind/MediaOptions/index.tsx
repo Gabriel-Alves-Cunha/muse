@@ -32,13 +32,13 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		const handleKeyUp = ({ key }: KeyboardEvent) =>
-			key === "Enter" &&
+		const handleKeyUp = (e: KeyboardEvent) =>
+			e.key === "Enter" &&
 			handleChange(contentWrapperRef, closeButtonRef, path, media);
 
-		window.addEventListener("keyup", handleKeyUp);
+		document.addEventListener("keyup", handleKeyUp);
 
-		return () => window.removeEventListener("keyup", handleKeyUp);
+		return () => document.removeEventListener("keyup", handleKeyUp);
 	}, [media, path]);
 
 	return (
@@ -60,7 +60,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				<Fieldset key={option}>
 					<Label htmlFor={option}>{capitalize(option)}</Label>
 					<Input
-						disabled={!isChangeable(option)}
+						readOnly={!isChangeable(option)}
 						defaultValue={value}
 						id={option}
 					/>

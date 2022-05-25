@@ -1,10 +1,10 @@
 import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 
-import { type Props, ButtonToTheSide, Results, Input } from "./helper";
+import { Results, Input } from "./helper";
 
 import { SearchWrapper, Wrapper, Search } from "./styles";
 
-export function SearchMedia({ buttonToTheSide }: Props) {
+export function SearchMedia() {
 	return (
 		<Wrapper>
 			<SearchWrapper>
@@ -16,8 +16,6 @@ export function SearchMedia({ buttonToTheSide }: Props) {
 
 				<Results />
 			</SearchWrapper>
-
-			<ButtonToTheSide buttonToTheSide={buttonToTheSide} />
 		</Wrapper>
 	);
 }

@@ -26,7 +26,7 @@ const baseSource = "muse-";
 export const electronSource = `${baseSource}electron`;
 export const reactSource = `${baseSource}react`;
 
-export type MsgWithSource<T> = {
+export type MsgWithSource<T> = Readonly<{
 	source: string;
 	msg: T;
-};
+}>;

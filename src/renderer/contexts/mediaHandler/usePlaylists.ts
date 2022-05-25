@@ -27,6 +27,8 @@ const maxSizeOfHistory = 100;
 type UsePlaylistsActions = Readonly<{
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
 
+	isLoadingMedias: boolean;
+
 	history: ReadonlyArray<Path>;
 	sortedByDate: Set<Path>;
 	sortedByName: Set<Path>;
@@ -42,6 +44,8 @@ export const usePlaylists = create<UsePlaylistsActions>((set, get) => ({
 	favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
 	history: (getFromLocalStorage(keys.history) as Path[]) ?? [],
 	mainList: new Map(),
+
+	isLoadingMedias: false,
 
 	setPlaylists: (action: PlaylistsReducer_Action) => {
 		time(() => {
@@ -398,6 +402,8 @@ export const cleanHistory = () =>
 
 export async function searchLocalComputerForMedias() {
 	time(async () => {
+		usePlaylists.setState({ isLoadingMedias: true });
+
 		try {
 			const paths = getAllowedMedias(await searchDirectoryResult());
 			const newMediaList = await transformPathsToMedias(paths);
@@ -418,6 +424,8 @@ export async function searchLocalComputerForMedias() {
 			});
 		} catch (error) {
 			console.error(error);
+		} finally {
+			usePlaylists.setState({ isLoadingMedias: false });
 		}
 	}, "searchLocalComputerForMedias");
 }

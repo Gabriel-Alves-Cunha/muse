@@ -3,7 +3,7 @@ import { clipboard } from "electron";
 
 const clipboardEmitter = new EventEmitter();
 
-let watcherId: NodeJS.Timer | undefined = undefined;
+let watcherId: NodeJS.Timer | undefined;
 let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).on = <T>(

@@ -3,9 +3,9 @@
 
 import type { ImgString, WriteTag } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
+import type { MediaUrl } from "@contexts/downloadList";
 import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "node:stream";
-import type { MediaUrl } from "@contexts/downloadList";
 
 import { rename as renameFile, access } from "node:fs/promises";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
@@ -32,8 +32,8 @@ import { ProgressStatus } from "@common/enums";
 import { isDevelopment } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
-import { dirs } from "../utils";
 import { time } from "@utils/utils";
+import { dirs } from "../utils";
 
 const { log, error } = console;
 
@@ -43,16 +43,16 @@ fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 const currentDownloads: Map<MediaUrl, Readable> = new Map();
 const mediasConverting: Map<Path, Readable> = new Map();
 
-const pathExists = async (path: Path): Promise<boolean> =>
+const pathExists = async (path: Readonly<Path>): Promise<Readonly<boolean>> =>
 	access(path)
 		.then(() => true)
 		.catch(() => false);
 
 const createMedia = async (
-	path: Path,
-	assureMediaSizeIsGreaterThan60KB: boolean,
-	ignoreMediaWithLessThan60Seconds: boolean
-): Promise<[Path, Media]> =>
+	path: Readonly<Path>,
+	assureMediaSizeIsGreaterThan60KB: Readonly<boolean>,
+	ignoreMediaWithLessThan60Seconds: Readonly<boolean>
+): Promise<readonly [Path, Media]> =>
 	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
@@ -122,7 +122,7 @@ export async function transformPathsToMedias(
 	paths: readonly Path[],
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true
-): Promise<Array<[Path, Media]>> {
+): Promise<readonly [Path, Media][]> {
 	return time(async () => {
 		console.groupCollapsed("Creating medias...");
 
@@ -183,7 +183,7 @@ export async function makeStream({
 	}
 
 	const startTime = performance.now();
-	let interval: NodeJS.Timer | undefined = undefined;
+	let interval: NodeJS.Timer | undefined;
 	let prettyTotal = "";
 
 	// ytdl will 'end' the stream for me.
@@ -191,7 +191,7 @@ export async function makeStream({
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
-		.on("progress", (_, downloaded, total) => {
+		.on("progress", (_, downloaded: number, total: number) => {
 			const percentage = (downloaded / total) * 100;
 
 			// To react:
@@ -527,12 +527,10 @@ export async function writeTags(
 					} else {
 						// Here, assume we received an img as a base64 string
 						// like: `data:${string};base64,${string}`.
-						if (
-							data.imageURL!.includes("data:image/", 0) &&
-							data.imageURL!.includes("base64,")
-						)
-							createImage(data.imageURL as ImgString, file);
-						else error(`Invalid imgAsString = "${data.imageURL}"!`);
+						data.imageURL!.includes("data:image/") &&
+						data.imageURL!.includes(";base64,")
+							? createImage(data.imageURL as ImgString, file)
+							: error(`Invalid imgAsString = "${data.imageURL}"!`);
 					}
 					break;
 				}
@@ -545,7 +543,7 @@ export async function writeTags(
 
 						file.tag.albumArtists = albumArtists;
 
-						log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
+						dbg(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
 							albumArtists,
 						});
 					} else {
@@ -555,7 +553,7 @@ export async function writeTags(
 
 						file.tag.albumArtists = albumArtists;
 
-						log(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
+						dbg(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
 							albumArtists,
 						});
 					}
@@ -573,11 +571,11 @@ export async function writeTags(
 
 					file.tag.title = sanitizedTitle;
 
-					log({ "file.tag.title": file.tag.title, value });
+					dbg({ "file.tag.title": file.tag.title, value });
 
 					if (getBasename(oldPath) === sanitizedTitle) break;
 
-					log({ oldPath, newPath });
+					dbg({ oldPath, newPath });
 
 					fileNewPath = newPath;
 					break;
@@ -593,7 +591,7 @@ export async function writeTags(
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
 					file.tag[tag] = value;
 					// @ts-ignore: tag is one of WriteTag, wich is based on MediaFile.Tag, so it's fine.
-					log(`On default case: file.tag[${tag}] =`, file.tag[tag]);
+					dbg(`On default case: file.tag[${tag}] =`, file.tag[tag]);
 
 					break;
 				}
@@ -640,8 +638,12 @@ export async function writeTags(
 					mediaPath,
 				});
 			} finally {
-				log("Was file renamed?", await pathExists(fileNewPath));
-				log("Does old file remains?", await pathExists(mediaPath));
+				dbg(
+					"Was file renamed?",
+					await pathExists(fileNewPath),
+					"Does old file remains?",
+					await pathExists(mediaPath)
+				);
 			}
 		} else if (data.isNewMedia) {
 			// Add the new media:
@@ -709,7 +711,7 @@ function createImage(imgAsString: ImgString, file: MediaFile) {
 	dbg("At createImage():", { "file.tag.pictures": file.tag.pictures, picture });
 }
 
-export const getThumbnail = async (url: string): Promise<ImgString> =>
+export const getThumbnail = async (url: Readonly<string>): Promise<ImgString> =>
 	new Promise((resolve, reject) =>
 		get(url, res => {
 			res.setEncoding("base64");
@@ -724,7 +726,10 @@ export const getThumbnail = async (url: string): Promise<ImgString> =>
 		})
 	);
 
-const sendFailedConversionMsg = (path: Path, electronPort: MessagePort) => {
+const sendFailedConversionMsg = (
+	path: Path,
+	electronPort: Readonly<MessagePort>
+) => {
 	sendMsgToClient({
 		type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED,
 		path,
@@ -733,7 +738,10 @@ const sendFailedConversionMsg = (path: Path, electronPort: MessagePort) => {
 	electronPort.close();
 };
 
-const sendFailedDownloadMsg = (url: string, electronPort: MessagePort) => {
+const sendFailedDownloadMsg = (
+	url: Readonly<string>,
+	electronPort: Readonly<MessagePort>
+) => {
 	sendMsgToClient({
 		type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED,
 		url,
@@ -743,10 +751,10 @@ const sendFailedDownloadMsg = (url: string, electronPort: MessagePort) => {
 };
 
 export type HandleConversion = Readonly<{
-	electronPort?: Readonly<MessagePort>;
 	toExtension?: AllowedMedias;
-	path: Readonly<Path>;
+	electronPort?: MessagePort;
 	destroy?: boolean;
+	path: Path;
 }>;
 
 export type HandleDownload = Readonly<{

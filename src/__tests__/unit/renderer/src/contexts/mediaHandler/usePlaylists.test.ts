@@ -3,7 +3,6 @@
 import type { Media } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { faker } from "@faker-js/faker";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
@@ -22,8 +21,8 @@ import {
 	history,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
-	playNextMedia,
 	currentPlaying,
+	playNextMedia,
 	playThisMedia,
 } from "@contexts/mediaHandler/useCurrentPlaying";
 
@@ -147,7 +146,7 @@ describe("Testing PlaylistEnum.UPDATE_FAVORITES", () => {
 
 	it(
 		"(PlaylistActions.ADD_ONE_MEDIA) should add one media to favorites",
-		addOneMediaToFavorites,
+		addOneMediaToFavorites
 	);
 
 	it("(PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH) should remove one media of favorites", () => {
@@ -185,11 +184,11 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 	});
 
 	it("(PlaylistActions.ADD_ONE_MEDIA) should add one media to mediaList", () => {
-		const title = faker.unique(faker.name.jobTitle);
+		const title = "Test Title - add one media";
 		const path = `home/Music/test/${title}.mp3`;
 		const newMedia: Media = {
-			dateOfArival: faker.date.past().getTime(),
 			duration: formatDuration(100 + 10),
+			dateOfArival: Date.now(),
 			size: "3.0 MB",
 			title,
 		};

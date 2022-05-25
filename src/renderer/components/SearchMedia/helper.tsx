@@ -1,32 +1,21 @@
-import type { MediaListKindProps } from "@components/MediaListKind";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { useEffect, useRef, useTransition } from "react";
-import { FiTrash as Clean } from "react-icons/fi";
-import {
-	MdMusicNote as MusicNote,
-	MdAutorenew as Reload,
-} from "react-icons/md";
+import { MdMusicNote as MusicNote } from "react-icons/md";
 import create from "zustand";
 
 import { PopoverContent, PopoverRoot } from "@components/Popover";
+import { PlaylistList, searchMedia } from "@contexts/mediaHandler/usePlaylists";
 import { constRefToEmptyArray } from "@utils/array";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { Tooltip } from "@components/Tooltip";
-import {
-	searchLocalComputerForMedias,
-	PlaylistList,
-	cleanHistory,
-	searchMedia,
-} from "@contexts/mediaHandler/usePlaylists";
 
 import { ImgWrapper } from "../MediaListKind/styles";
 import {
 	SearchMediaPopoverAnchor,
 	NothingFound,
-	ReloadButton,
 	Highlight,
 	SubTitle,
 	Result,
@@ -39,27 +28,14 @@ import {
 ////////////////////////////////////////////////////////
 
 export enum SearchStatus {
-	RELOADING_ALL_MEDIAS,
 	FOUND_SOMETHING,
 	DOING_NOTHING,
 	NOTHING_FOUND,
 	SEARCHING,
 }
 
-export enum ButtonToTheSideEnum {
-	RELOAD_BUTTON,
-	NOTHING,
-	CLEAN,
-}
-
-const { CLEAN, RELOAD_BUTTON } = ButtonToTheSideEnum;
-const {
-	RELOADING_ALL_MEDIAS,
-	FOUND_SOMETHING,
-	NOTHING_FOUND,
-	DOING_NOTHING,
-	SEARCHING,
-} = SearchStatus;
+const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING, SEARCHING } =
+	SearchStatus;
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -77,17 +53,6 @@ export const { setState: setSearcher } = useSearcher;
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
-
-const reload = async () => {
-	setSearcher({
-		...defaultSearcher,
-		searchStatus: RELOADING_ALL_MEDIAS,
-	});
-
-	await searchLocalComputerForMedias();
-
-	setSearcher({ searchStatus: DOING_NOTHING });
-};
 
 export const setSearchTerm = (e: InputChange) =>
 	setSearcher({ searchTerm: e.target.value.toLowerCase() });
@@ -165,15 +130,17 @@ export function Input() {
 	}, [searchTerm]);
 
 	return (
-		<input
-			placeholder="Search for songs"
-			onChange={setSearchTerm}
-			value={searchTerm}
-			spellCheck="false"
-			autoCorrect="off"
-			ref={inputRef}
-			type="text"
-		/>
+		<label>
+			Search for songs
+			<input
+				onChange={setSearchTerm}
+				value={searchTerm}
+				spellCheck="false"
+				autoCorrect="off"
+				ref={inputRef}
+				type="text"
+			/>
+		</label>
 	);
 }
 
@@ -215,33 +182,6 @@ export function Results() {
 	);
 }
 
-export function ButtonToTheSide({ buttonToTheSide }: Props1) {
-	const { searchStatus } = useSearcher();
-
-	return (
-		<div>
-			{buttonToTheSide === RELOAD_BUTTON ? (
-				<Tooltip text="Reload all medias">
-					<ReloadButton onClick={reload} className="reload">
-						<Reload
-							className={
-								searchStatus === RELOADING_ALL_MEDIAS ? "reloading" : ""
-							}
-							size={17}
-						/>
-					</ReloadButton>
-				</Tooltip>
-			) : buttonToTheSide === CLEAN ? (
-				<Tooltip text="Clean history">
-					<ReloadButton>
-						<Clean size={15} onClick={cleanHistory} />
-					</ReloadButton>
-				</Tooltip>
-			) : undefined}
-		</div>
-	);
-}
-
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -258,14 +198,4 @@ type RowProps = Readonly<{
 	path: Path;
 }>;
 
-type Props1 = Readonly<{
-	buttonToTheSide: ButtonToTheSideEnum;
-}>;
-
-type Props2 = Readonly<{
-	fromList: MediaListKindProps["fromList"];
-}>;
-
 type InputChange = React.ChangeEvent<HTMLInputElement>;
-
-export type Props = Props1 & Props2;

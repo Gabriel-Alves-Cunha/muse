@@ -165,21 +165,25 @@ export const darkTheme = createTheme({
 		"active-icon": "#4a00e0",
 		"window-buttons": "white",
 
+		"input-placeholder": "#a3a3a3",
 		"alternative-text": "#ccb69b",
+		"input-text": "#f5f5f5",
 		"gray-text": "#828387",
 		text: "#f6f6f6",
 
-		"selected-border-color": "#344880",
-
+		"input-border-active": "#344880",
+		"input-border": "#4d4d4d",
 		"input-disabled": "gray",
 
+		"bg-button-hover": "#005ec9",
 		"bg-selected": "#5b6b99",
 		"bg-tooltip": "#343746",
 		"bg-popover": "#182825",
 		"bg-navbar": "#191a21",
-		"bg-main": "#191a21",
+		"bg-button": "#0072F5",
 		"bg-dialog": "#182825",
 		"bg-media": "#191a21",
+		"bg-main": "#191a21",
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#fff2",
@@ -229,17 +233,21 @@ export const lightTheme = createTheme({
 		"active-icon": "#4a00e0",
 		"window-buttons": "black",
 
+		"input-placeholder": "#a3a3a3",
 		"alternative-text": "#0D1F2D",
+		"input-text": "#111111",
 		"gray-text": "#a8a8a8",
 		text: "#0C0910",
 
-		"selected-border-color": "#344880",
-
+		"input-border-active": "#344880",
 		"input-disabled": "lightgray",
+		"input-border": "#e0e0e0",
 
+		"bg-button-hover": "#005ec9",
 		"bg-selected": "#5b6b99",
 		"bg-tooltip": "#f7f7f7",
 		"bg-popover": "#FAFAC6",
+		"bg-button": "#0072F5",
 		"bg-navbar": "#f9f6f5",
 		"bg-main": "#f9f6f5",
 		"bg-dialog": "white",
@@ -247,7 +255,7 @@ export const lightTheme = createTheme({
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#88888820",
-		"button-hovered": "#dbdadc",
+		"button-hovered": "#dbdadc", // rename these ^ to light and dark
 
 		"accent-light": "#9381FF",
 		accent: "#9882AC",
@@ -281,6 +289,7 @@ export const lightTheme = createTheme({
 
 export const GlobalCSS = globalCss({
 	"*, *:after, *:before": {
+		textRendering: "geometricPrecision",
 		boxSizing: "border-box",
 		padding: 0,
 		margin: 0,

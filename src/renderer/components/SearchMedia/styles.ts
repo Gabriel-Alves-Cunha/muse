@@ -1,6 +1,6 @@
 import { Anchor, Trigger } from "@radix-ui/react-popover";
 
-import { styled, keyframes } from "@styles/global";
+import { styled } from "@styles/global";
 
 export const Wrapper = styled("header", {
 	position: "relative",
@@ -33,82 +33,54 @@ export const Search = styled("div", {
 	maxWidth: 500,
 	height: 30,
 
-	border: "1px solid $input-disabled",
+	border: "2px solid $input-border",
 	background: "transparent",
-	borderRadius: 15, // half of height
+	borderRadius: "0.75rem",
 	cursor: "text",
-
 	color: "$text",
-	opacity: 0.8,
+
+	transition: "all 250ms ease",
 
 	"& svg": {
 		marginLeft: 10,
 	},
 
+	label: {
+		position: "absolute",
+		top: "20%",
+		left: 10,
+
+		zIindex: "var(--nextui-zIndices-1)",
+		padding: 0,
+
+		transition: "left 0.25s ease 0s, color 0.25s ease 0s, top 0.25s ease 0s",
+	},
+
 	input: {
 		boxSizing: "border-box",
-
-		letterSpacing: "0.03rem",
-		ff: "$secondary",
-		fontSize: "0.9rem",
-		color: "$text",
-
-		padding: "0 10px",
 		size: "100%",
 
+		letterSpacing: "0.03rem",
+		color: "$input-text",
+		fontSize: "0.9rem",
+		ff: "$secondary",
+
 		background: "transparent",
+		padding: "0 10px",
 		border: "none",
+	},
 
-		"&::placeholder": {
-			color: "$text",
+	"&:focus": {
+		label: {
+			top: "-72%",
+			left: 5,
+
+			color: "$input-border-active",
+			cursor: "default",
 		},
-
-		"&:hover::placeholder": {
-			transition: "text-decoration 300ms ease-in-out",
-			textDecoration: "underline",
-			textUnderlineOffset: "1px",
+		input: {
+			borderColor: "$input-border-active",
 		},
-	},
-});
-
-const spin = keyframes({
-	from: {
-		transform: "rotate(0deg)",
-	},
-	to: {
-		transform: "rotate(360deg)",
-	},
-});
-
-export const ReloadButton = styled("button", {
-	display: "flex", // row,
-	justifyContent: "center",
-	alignItems: "center",
-	size: 29,
-
-	background: "transparent",
-	borderRadius: "50%",
-	cursor: "pointer",
-	border: "none",
-	marginLeft: 16,
-
-	transition: "$bgc",
-
-	"& svg": {
-		color: "$gray-text",
-	},
-
-	"&:hover": {
-		transition: "$bgc",
-		background: "$icon-button-hovered",
-	},
-
-	"&.reload:hover": {
-		animation: `${spin} 0.5s linear`,
-	},
-
-	"& svg.reloading": {
-		animation: `${spin} infinity linear`,
 	},
 });
 
