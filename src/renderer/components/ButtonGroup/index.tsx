@@ -23,35 +23,32 @@ export function ButtonGroup({ buttons }: Props) {
 						title = "",
 						icon,
 					},
-					index
+					index,
 				) => (
 					<Button
 						className={className + additionalClasses(index)}
-						onMouseMove={waitForTooltip}
 						data-tooltip={tooltip}
-						onClick={onClick}
+						onClick={e => {
+							hideTooltip(e);
+							onClick(e);
+						}}
 						key={title}
 					>
-						<span />
 						{title}
 						{icon}
 					</Button>
-				)
+				),
 			)}
 		</Wrapper>
 	);
 }
 
-async function waitForTooltip(e: React.MouseEvent<HTMLButtonElement>) {
-	const target = e.target as HTMLButtonElement;
-	const tooltip = target.dataset["tooltip"];
+async function hideTooltip(e: React.MouseEvent<HTMLButtonElement>) {
+	const target = e.target as HTMLElement;
 
-	if (!tooltip) return;
+	target.classList.remove("tooltip-able");
 
-	setTimeout(() => {
-		// display tooltip
-		target.setAttribute("title", tooltip);
-	}, 300);
+	setTimeout(() => target.classList.add("tooltip-able"), 0);
 }
 
 type Props = {
@@ -59,8 +56,8 @@ type Props = {
 };
 
 export type GroupButtonProps = {
+	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 	icon?: React.ReactNode;
-	onClick?: () => void;
 	className?: string;
 	tooltip?: string;
 	title?: string;

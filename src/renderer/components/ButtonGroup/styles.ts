@@ -27,7 +27,7 @@ export const Button = styled("button", {
 	background: "$bg-button",
 	cursor: "pointer",
 	border: "none",
-	// px: "1.25rem",
+	// : "1.25rem",
 
 	whiteSpace: "nowrap",
 	lineHeight: "2.5rem",
@@ -61,8 +61,37 @@ export const Button = styled("button", {
 		scale: "0.97",
 	},
 
-	"&:hover :hover": {
+	"&:hover :focus": {
 		background: "$bg-button-hover",
+	},
+
+	"&:hover": {
+		// transitionDelay: "3s",
+
+		"&::before": {
+			position: "absolute",
+			display: "inline-block",
+			height: "auto",
+			width: "auto",
+			left: "90%",
+			top: "50%",
+
+			background: "black",
+			padding: "3px 8px",
+			border: 0,
+
+			clip: "rect(0, 0, 0, 0)",
+			transform: "translateY(-50%)",
+			transitionDelay: "3s",
+
+			whiteSpace: "nowrap",
+			color: "white",
+			lh: "normal",
+			fs: 16,
+
+			visibility: "visible",
+			opacity: 1,
+		},
 	},
 
 	//////////////////////////////////////////

@@ -37,24 +37,24 @@ export const searchDirectoryResult = async () =>
 				.map(p => (p.status === "fulfilled" ? p.value : undefined))
 				.filter(Boolean)
 				.flat() as readonly string[],
-		"searchDirectoryResult"
+		"searchDirectoryResult",
 	);
 
 export const searchDirectoryForMedias = async (directory: string) =>
 	getAllowedMedias(await readdir(directory));
 
 export const getAllowedMedias = (
-	filenames: readonly string[]
+	filenames: readonly string[],
 ): readonly string[] =>
 	filenames.filter(name =>
-		allowedMedias.some(ext => ext === getLastExtension(name))
+		allowedMedias.some(ext => ext === getLastExtension(name)),
 	);
 
 export const sortByDate = (list: MainList): Set<Path> => {
 	const listAsArray: { dateOfArival: number; path: Path }[] = [];
 
 	list.forEach(({ dateOfArival }, path) =>
-		listAsArray.push({ dateOfArival, path })
+		listAsArray.push({ dateOfArival, path }),
 	);
 
 	listAsArray.sort((a, b) => {

@@ -84,14 +84,14 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.sortedByDate: {
 						assert(
 							Array.isArray(item),
-							"sortedByDate must be an array:" + item
+							"sortedByDate must be an array:" + item,
 						);
 
 						const newSortedByDate = new Set(item as Path[]);
 
 						dbgPlaylists(
 							"getFromLocalStorage: newSortedByDate =",
-							newSortedByDate
+							newSortedByDate,
 						);
 
 						return newSortedByDate;
@@ -100,14 +100,14 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.sortedByName: {
 						assert(
 							Array.isArray(item),
-							"sortedByName must be an array:" + item
+							"sortedByName must be an array:" + item,
 						);
 
 						const newSortedByName = new Set(item as Path[]);
 
 						dbgPlaylists(
 							"getFromLocalStorage: newSortedByName =",
-							newSortedByName
+							newSortedByName,
 						);
 
 						return newSortedByName;
@@ -118,7 +118,7 @@ export function getFromLocalStorage(key: Keys) {
 
 						dbgPlaylists(
 							"getFromLocalStorage: newCurrentPlaying =",
-							newCurrentPlaying
+							newCurrentPlaying,
 						);
 
 						return newCurrentPlaying;
@@ -129,7 +129,7 @@ export function getFromLocalStorage(key: Keys) {
 
 						dbgPlaylists(
 							"getFromLocalStorage: newPlayOptions =",
-							newPlayOptions
+							newPlayOptions,
 						);
 
 						return newPlayOptions;

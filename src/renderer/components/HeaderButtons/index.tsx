@@ -7,7 +7,10 @@ import { ButtonGroup, GroupButtonProps } from "@components/ButtonGroup";
 import { assertUnreachable } from "@utils/utils";
 import {
 	searchLocalComputerForMedias,
+	cleanFavorites,
+	PlaylistList,
 	usePlaylists,
+	cleanHistory,
 } from "@contexts/mediaHandler/usePlaylists";
 
 export enum HeaderButtonsEnum {
@@ -18,7 +21,7 @@ export enum HeaderButtonsEnum {
 
 const { CLEAN, RELOAD_BUTTON, FILTER_BY } = HeaderButtonsEnum;
 
-export function HeaderButtons({ buttons }: Props) {
+export function HeaderButtons({ buttons, list }: Props) {
 	const { isLoadingMedias } = usePlaylists();
 
 	return (
@@ -38,6 +41,30 @@ export function HeaderButtons({ buttons }: Props) {
 							return {
 								tooltip: "Clean list",
 								// onClick={cleanHistory}
+								onClick() {
+									switch (list) {
+										case PlaylistList.FAVORITES:
+											cleanFavorites();
+											break;
+
+										case PlaylistList.HISTORY:
+											cleanHistory();
+											break;
+
+										case PlaylistList.MAIN_LIST:
+											break;
+
+										case PlaylistList.SORTED_BY_DATE:
+											break;
+
+										case PlaylistList.SORTED_BY_NAME:
+											break;
+
+										default:
+											assertUnreachable(list);
+											break;
+									}
+								},
 								icon: <Clean size={17} />,
 							};
 
@@ -62,4 +89,5 @@ const Wrapper = styled("div", {
 
 type Props = {
 	buttons: HeaderButtonsEnum[];
+	list: PlaylistList;
 };

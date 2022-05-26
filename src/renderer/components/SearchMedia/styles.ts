@@ -2,85 +2,90 @@ import { Anchor, Trigger } from "@radix-ui/react-popover";
 
 import { styled } from "@styles/global";
 
-export const Wrapper = styled("header", {
-	position: "relative",
-	display: "flex", // row,
-	justifyContent: "space-between",
-	alignItems: "center",
-
-	padding: "0 5%",
-	maxWidth: 500,
-	width: "90%",
-	height: 60,
-});
-
 export const SearchWrapper = styled("div", {
 	position: "relative",
-	display: "flex",
-	flexDirection: "column",
-	justifyContent: "flex-start",
-	alignItems: "flex-start",
-	mx: "auto",
-});
-
-export const Search = styled("div", {
-	position: "relative",
 	display: "flex", // row,
 	justifyContent: "flex-start",
 	alignItems: "center",
 
-	minWidth: "100%",
-	maxWidth: 500,
-	height: 30,
+	width: 300,
+	height: 40,
 
 	border: "2px solid $input-border",
 	background: "transparent",
 	borderRadius: "0.75rem",
-	cursor: "text",
-	color: "$text",
+	cursor: "default",
 
-	transition: "all 250ms ease",
+	transition: "all ease 250ms",
+
+	"&:hover": {
+		transition: "all ease 250ms",
+
+		borderColor: "$input-border-active",
+
+		"& svg": {
+			color: "$input-border-active",
+		},
+	},
 
 	"& svg": {
-		marginLeft: 10,
+		color: "$input-border",
+		cursor: "default",
+		strokeWidth: 30,
+		mx: 10,
 	},
 
 	label: {
 		position: "absolute",
-		top: "20%",
-		left: 10,
+		display: "flex", // row
+		alignItems: "center",
+		height: "2.5rem",
+		width: 250,
+		bottom: 0,
+		right: 0,
+		left: 30,
+		top: 0,
 
-		zIindex: "var(--nextui-zIndices-1)",
+		cursor: "text",
+		margin: "auto",
 		padding: 0,
 
-		transition: "left 0.25s ease 0s, color 0.25s ease 0s, top 0.25s ease 0s",
+		color: "$input-placeholder",
+		whiteSpace: "nowrap",
+		ff: "$secondary",
+		ls: "0.045rem",
+		fs: "0.9rem",
+		fw: 400,
+		lh: 1.5,
+
+		transitionProperty: "color, top, left",
+		transitionTimingFunction: "ease",
+		transitionDuration: "250ms",
+		transitionDelay: 0,
+
+		"&.focus": {
+			top: "-170%",
+			left: -30,
+
+			color: "$input-border-active",
+			cursor: "default",
+		},
 	},
 
 	input: {
 		boxSizing: "border-box",
 		size: "100%",
 
-		letterSpacing: "0.03rem",
 		color: "$input-text",
-		fontSize: "0.9rem",
+		whiteSpace: "nowrap",
 		ff: "$secondary",
+		ls: "0.045rem",
+		fs: "0.9rem",
+		fw: 400,
+		lh: 1.5,
 
 		background: "transparent",
-		padding: "0 10px",
 		border: "none",
-	},
-
-	"&:focus": {
-		label: {
-			top: "-72%",
-			left: 5,
-
-			color: "$input-border-active",
-			cursor: "default",
-		},
-		input: {
-			borderColor: "$input-border-active",
-		},
 	},
 });
 

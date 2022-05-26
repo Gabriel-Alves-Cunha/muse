@@ -121,6 +121,9 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			lh: (value: number | string) => ({
 				lineHeight: value,
 			}),
+			ls: (value: number | string) => ({
+				letterSpacing: value,
+			}),
 			ta: (value: string) => ({
 				textAlign: value,
 			}),
@@ -171,11 +174,11 @@ export const darkTheme = createTheme({
 		"gray-text": "#828387",
 		text: "#f6f6f6",
 
-		"input-border-active": "#344880",
+		"input-border-active": "#0072F5",
 		"input-border": "#4d4d4d",
 		"input-disabled": "gray",
 
-		"bg-button-hover": "#005ec9",
+		"bg-button-hover": "#0072F5",
 		"bg-selected": "#5b6b99",
 		"bg-tooltip": "#343746",
 		"bg-popover": "#182825",

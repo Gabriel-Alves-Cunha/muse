@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { useEffect, useRef, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import create from "zustand";
 
@@ -47,19 +47,90 @@ export const defaultSearcher: Searcher = Object.freeze({
 	searchTerm: "",
 });
 
-export const useSearcher = create(() => defaultSearcher);
-export const { setState: setSearcher } = useSearcher;
+const useSearcher = create(() => defaultSearcher);
+const { setState: setSearcher } = useSearcher;
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-export const setSearchTerm = (e: InputChange) =>
+const updateSearchTerm = (e: InputChange) =>
 	setSearcher({ searchTerm: e.target.value.toLowerCase() });
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
+
+export function Input() {
+	const [isOnFocus, setIsOnFocus] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [, startTransition] = useTransition();
+	const { searchTerm } = useSearcher();
+
+	useOnClickOutside(inputRef, () => {
+		if (isOnFocus) {
+			setSearcher(defaultSearcher);
+			setIsOnFocus(false);
+		}
+	});
+
+	// Close the popover when the user presses Esc:
+	useEffect(() => {
+		const closeOnEsc = (e: KeyboardEvent) => {
+			if (e.key === "Escape" && isOnFocus) {
+				setSearcher(defaultSearcher);
+				inputRef.current?.blur();
+				setIsOnFocus(false);
+			}
+		};
+
+		document.addEventListener("keydown", closeOnEsc);
+
+		return () => document.removeEventListener("keydown", closeOnEsc);
+	}, [isOnFocus]);
+
+	useEffect(
+		function handleOnChange() {
+			setSearcher({
+				results: constRefToEmptyArray,
+				searchStatus: SEARCHING,
+			});
+
+			if (searchTerm.length < 2) return;
+
+			startTransition(() => {
+				const results = searchMedia(searchTerm);
+				const searchStatus =
+					results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+
+				setSearcher({ searchStatus, results });
+
+				// Doing this to keep focus on it...	:|
+				setTimeout(() => inputRef.current?.focus(), 0);
+			});
+		},
+		[searchTerm],
+	);
+
+	return (
+		<>
+			<label htmlFor="search-songs" className={isOnFocus ? "focus" : ""}>
+				Search for songs
+			</label>
+
+			<input
+				onClick={() => setIsOnFocus(true)}
+				onChange={updateSearchTerm}
+				value={searchTerm}
+				spellCheck="false"
+				id="search-songs"
+				autoCorrect="off"
+				ref={inputRef}
+				type="text"
+			/>
+		</>
+	);
+}
 
 const Row = ({
 	media: { title, img, duration },
@@ -74,8 +145,8 @@ const Row = ({
 				<ImgWrapper>
 					<ImgWithFallback
 						Fallback={<MusicNote size={13} />}
-						mediaImg={img}
 						mediaPath={path}
+						mediaImg={img}
 					/>
 				</ImgWrapper>
 
@@ -93,56 +164,6 @@ const Row = ({
 		</Tooltip>
 	);
 };
-
-export function Input() {
-	const inputRef = useRef<HTMLInputElement>(null);
-	const [, startTransition] = useTransition();
-	const { searchTerm } = useSearcher();
-
-	useOnClickOutside(inputRef, () => searchTerm && setSearcher(defaultSearcher));
-
-	useEffect(() => {
-		const closeOnEsc = (e: KeyboardEvent) =>
-			e.key === "Escape" && setSearcher(defaultSearcher);
-
-		document.addEventListener("keydown", closeOnEsc);
-
-		return () => document.removeEventListener("keydown", closeOnEsc);
-	}, []);
-
-	useEffect(() => {
-		setSearcher({
-			results: constRefToEmptyArray,
-			searchStatus: SEARCHING,
-		});
-
-		if (searchTerm.length < 2) return;
-
-		startTransition(() => {
-			const results = searchMedia(searchTerm);
-			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
-
-			setSearcher({ searchStatus, results });
-
-			// Doing this to keep focus on it...	:|
-			setTimeout(() => inputRef.current?.focus(), 0);
-		});
-	}, [searchTerm]);
-
-	return (
-		<label>
-			Search for songs
-			<input
-				onChange={setSearchTerm}
-				value={searchTerm}
-				spellCheck="false"
-				autoCorrect="off"
-				ref={inputRef}
-				type="text"
-			/>
-		</label>
-	);
-}
 
 export function Results() {
 	const { searchStatus, searchTerm, results } = useSearcher();

@@ -43,7 +43,7 @@
 		"cross-env": "^7.0.3",
 		"debug": "^4.3.4",
 		"dprint": "^0.29.1",
-		"electron": "^19.0.0",
+		"electron": "^19.0.1",
 		"electron-builder": "^23.0.3",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-run": "^2.3.1",
@@ -61,7 +61,7 @@
 		"readline": "^1.3.0",
 		"tilg": "^0.1.1",
 		"tslib": "^2.4.0",
-		"typescript": "^4.6.4",
+		"typescript": "^4.7.2",
 		"vite": "^2.9.9",
 		"vitest": "^0.12.9",
 		"zustand": "4.0.0-rc.1"
@@ -73,5 +73,10 @@
 		"node-taglib-sharp": "^4.0.2",
 		"sanitize-filename": "^1.6.3",
 		"ytdl-core": "^4.11.0"
+	},
+	"prettier": {
+		"trailingComma": "all",
+		"arrowParens": "avoid",
+		"useTabs": true
 	}
 }

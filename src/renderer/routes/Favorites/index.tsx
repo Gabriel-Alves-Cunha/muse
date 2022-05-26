@@ -1,16 +1,21 @@
-import { ButtonToTheSideEnum } from "@components/SearchMedia/helper";
+import { HeaderButtons, HeaderButtonsEnum } from "@components/HeaderButtons";
 import { MediaListKind } from "@components/MediaListKind";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { SearchMedia } from "@components/SearchMedia";
 import { MainArea } from "@components/MainArea";
+import { Header } from "@components/Header";
 
 export function Favorites() {
 	return (
 		<MainArea>
-			<SearchMedia
-				buttonToTheSide={ButtonToTheSideEnum.NOTHING}
-				fromList={PlaylistList.FAVORITES}
-			/>
+			<Header>
+				<SearchMedia />
+
+				<HeaderButtons
+					buttons={[HeaderButtonsEnum.CLEAN]}
+					list={PlaylistList.FAVORITES}
+				/>
+			</Header>
 
 			<MediaListKind fromList={PlaylistList.FAVORITES} />
 		</MainArea>
