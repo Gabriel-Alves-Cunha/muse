@@ -4,9 +4,11 @@ import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
-import { getRandomInt } from "@utils/utils";
+import { getRandomInt, time } from "@utils/utils";
 import { playOptions } from "./usePlayOptions";
+import { getFirstKey, getLastKey } from "@utils/map";
 import {
+	type MainList,
 	PlaylistActions,
 	PlaylistList,
 	setPlaylists,
@@ -43,70 +45,14 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 		path: mediaPath,
 	});
 
-	const newCurrentPlaying = Object.freeze({
+	const newCurrentPlaying: CurrentPlaying = {
 		path: mediaPath,
 		currentTime: 0,
 		listType,
-	});
+	};
 
 	setCurrentPlaying(newCurrentPlaying);
 	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
-}
-
-export function playPreviousMedia() {
-	const { path, listType } = currentPlaying();
-
-	if (!path) {
-		console.error(
-			"A media needs to be currently selected to play a previous media!",
-		);
-		return;
-	}
-
-	const list = getPlaylist(listType);
-	let listAsArray: Path[] | undefined;
-
-	if (Array.isArray(list)) listAsArray = list;
-	else if (list instanceof Set) listAsArray = Array.from(list);
-	else if (list instanceof Map) listAsArray = Array.from(list.keys());
-
-	if (!listAsArray) {
-		console.error("`listAsArray` should be an array!", {
-			listAsArray,
-			list,
-		});
-		return;
-	}
-
-	const currMediaPathIndex = listAsArray.findIndex(p => p === path);
-
-	if (currMediaPathIndex === -1) {
-		console.error(
-			"Media not found on CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST!",
-		);
-		return;
-	}
-
-	const prevMediaPath =
-		listAsArray.at(currMediaPathIndex - 1) ?? listAsArray[0];
-
-	if (prevMediaPath) {
-		// We need to update history:
-		setPlaylists({
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-			type: WhatToDo.UPDATE_HISTORY,
-			path: prevMediaPath,
-		});
-
-		const newCurrentPlaying = Object.freeze({
-			path: prevMediaPath,
-			currentTime: 0,
-			listType,
-		});
-
-		setCurrentPlaying(newCurrentPlaying);
-		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
-	}
 }
 
 export function togglePlayPause(): void {
@@ -117,8 +63,9 @@ export function togglePlayPause(): void {
 
 export function play(audio?: HTMLAudioElement): void {
 	(async () => {
-		if (audio) await audio.play();
-		else await (document.getElementById("audio") as HTMLAudioElement).play();
+		audio
+			? await audio.play()
+			: await (document.getElementById("audio") as HTMLAudioElement).play();
 	})();
 }
 
@@ -127,126 +74,161 @@ export function pause(audio?: HTMLAudioElement): void {
 
 	audio.pause();
 
-	setCurrentPlaying({
-		currentTime: audio.currentTime,
-	});
+	setCurrentPlaying({ currentTime: audio.currentTime });
 	setLocalStorage(keys.currentPlaying, currentPlaying());
 }
 
-export function playNextMedia(): void {
-	const { path, listType } = currentPlaying();
+export function playPreviousMedia() {
+	time(() => {
+		const { path, listType } = currentPlaying();
 
-	if (!path) {
-		console.warn(
-			"A media needs to be currently selected to play a next media!",
-		);
-
-		return;
-	}
-
-	const list = getPlaylist(listType);
-	let listAsArray: Path[] | undefined;
-
-	if (Array.isArray(list)) listAsArray = list;
-	else if (list instanceof Set) listAsArray = Array.from(list);
-	else if (list instanceof Map) listAsArray = Array.from(list.keys());
-
-	if (!listAsArray) {
-		console.error("`listAsArray` should be an array!", {
-			listAsArray,
-			list,
-		});
-
-		return;
-	}
-
-	if (playOptions().isRandom) {
-		const randomMediaPath = listAsArray[getRandomInt(0, listAsArray.length)];
-
-		if (!randomMediaPath) {
-			console.error(
-				"There should be a random media selected, but there isn't!",
-				{ randomMediaPath, listAsArray },
+		if (!path)
+			return console.error(
+				"A media needs to be currently selected to play a previous media!",
 			);
 
-			return;
+		const correctListType =
+			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
+
+		const list = getPlaylist(correctListType) as Set<string> | MainList;
+
+		if (!list)
+			return console.error("`list` should not be nullish!", {
+				list,
+			});
+
+		let prevMediaPath: Path | undefined;
+
+		let found = false;
+		let prevPath = "";
+
+		for (const newPath of list.keys()) {
+			if (found) {
+				if (newPath === path) {
+					// The previous media is the current media.
+					// So we are at the beginning of the list.
+					// So we need to play the last media.
+					prevMediaPath = getLastKey(list) as Path;
+					break;
+				}
+
+				prevMediaPath = prevPath;
+			}
+
+			if (newPath === path) found = true;
+
+			prevPath = newPath;
 		}
+
+		// Set newMediaPath as the first path from the list:
+		if (!prevMediaPath) prevMediaPath = getFirstKey(list);
+
+		if (!prevMediaPath)
+			return console.error(
+				"There should be a prevMediaPath, but there isn't!",
+				{ prevMediaPath, list },
+			);
 
 		// We need to update history:
 		setPlaylists({
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 			type: WhatToDo.UPDATE_HISTORY,
-			path: randomMediaPath,
+			path: prevMediaPath,
 		});
 
-		// Setting the current playing media:
 		const newCurrentPlaying = Object.freeze({
-			path: randomMediaPath,
+			path: prevMediaPath,
 			currentTime: 0,
 			listType,
 		});
 
 		setCurrentPlaying(newCurrentPlaying);
 		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
-	} else {
-		const prevMediaPathIndex = listAsArray.findIndex(p => p === path);
+	}, "playPreviousMedia");
+}
 
-		const nextMediaFromTheSameList = listAsArray[prevMediaPathIndex + 1];
+export function playNextMedia(): void {
+	time(() => {
+		const { path, listType } = currentPlaying();
 
-		if (!nextMediaFromTheSameList) {
-			// ^ In case it is in the final of the listAsArray (it would receive undefined):
-			const firstMediaFromTheSameList = listAsArray[0];
+		if (!path)
+			return console.warn(
+				"A media needs to be currently selected to play a next media!",
+			);
 
-			if (!firstMediaFromTheSameList) return;
+		const correctListType =
+			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
 
-			// We need to update history:
-			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-				path: firstMediaFromTheSameList,
-				type: WhatToDo.UPDATE_HISTORY,
+		const list = getPlaylist(correctListType) as Set<string> | MainList;
+
+		if (!list)
+			return console.error("`list` should not be nullish!", {
+				list,
 			});
 
-			const newCurrentPlaying = Object.freeze({
-				path: firstMediaFromTheSameList,
-				currentTime: 0,
-				listType,
-			});
+		let nextMediaPath: Path | undefined;
 
-			setCurrentPlaying(newCurrentPlaying);
-			setLocalStorage(keys.currentPlaying, newCurrentPlaying);
+		if (playOptions().isRandom) {
+			const randomIndex = getRandomInt(0, list.size);
 
-			return;
+			let index = 0;
+			for (const newPath of list.keys()) {
+				if (index === randomIndex) {
+					nextMediaPath = newPath;
+					break;
+				}
+				++index;
+			}
+		} else {
+			let found = false;
+
+			for (const newPath of list.keys()) {
+				if (found) {
+					nextMediaPath = newPath;
+					break;
+				}
+
+				if (newPath === path) found = true;
+			}
+
+			// Set newMediaPath as the first path from the list:
+			if (!nextMediaPath) nextMediaPath = getFirstKey(list);
 		}
+
+		if (!nextMediaPath)
+			return console.error(
+				"There should be a nextMediaPath, but there isn't!",
+				{ nextMediaPath, list },
+			);
 
 		// We need to update history:
 		setPlaylists({
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-			path: nextMediaFromTheSameList,
 			type: WhatToDo.UPDATE_HISTORY,
+			path: nextMediaPath,
 		});
 
-		const newCurrentPlaying = Object.freeze({
-			path: nextMediaFromTheSameList,
+		const newCurrentPlaying: CurrentPlaying = {
+			path: nextMediaPath,
 			currentTime: 0,
 			listType,
-		});
+		};
 
 		setCurrentPlaying(newCurrentPlaying);
 		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
-	}
+	}, "playNextMedia");
 }
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-let prevMediaTimer: NodeJS.Timeout | undefined = undefined;
+let prevMediaTimer: NodeJS.Timeout | undefined;
 
 if (globalThis.window)
 	useCurrentPlaying.subscribe(
 		({ path }) => path,
 		function setAudioSource() {
-			// @ts-ignore It will just return undefined if `prevMediaTimer` is undefined.
 			clearTimeout(prevMediaTimer);
 
 			const { path } = currentPlaying();
@@ -255,7 +237,7 @@ if (globalThis.window)
 			const pathForElectron = "atom:///" + path;
 
 			const mediaTimer = setTimeout(
-				async () =>
+				() =>
 					((document.getElementById("audio") as HTMLAudioElement).src =
 						pathForElectron),
 				150,

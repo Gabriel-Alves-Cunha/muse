@@ -10,19 +10,30 @@ import {
 export async function getFullPathOfFilesForFilesInThisDirectory(
 	dir: Readonly<Path>,
 ): Promise<readonly Path[]> {
-	return (await readdir(dir)).map(filename => join(dir, filename));
+	return (
+		await readdir(dir).catch(err => {
+			console.error(err);
+			return [];
+		})
+	).map(filename => join(dir, filename));
 }
 
 export async function readFile(
 	path: Readonly<Path>,
-): Promise<Readonly<Buffer>> {
-	return await fsReadFile(path);
+): Promise<Readonly<Buffer | undefined>> {
+	return await fsReadFile(path).catch(err => {
+		console.error(err);
+		return undefined;
+	});
 }
 
 export async function readdir(dir: Readonly<Path>): Promise<readonly Path[]> {
-	return await fsReadDir(dir);
+	return await fsReadDir(dir).catch(err => {
+		console.error(err);
+		return [];
+	});
 }
 
 export async function deleteFile(path: Readonly<Path>): Promise<void> {
-	await unlink(path);
+	await unlink(path).catch(console.error);
 }

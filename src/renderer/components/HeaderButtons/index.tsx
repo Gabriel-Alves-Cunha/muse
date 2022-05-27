@@ -1,10 +1,9 @@
 import { MdAutorenew as Reload } from "react-icons/md";
 import { FiTrash as Clean } from "react-icons/fi";
 
-import { styled } from "@styles/global";
-
 import { ButtonGroup, GroupButtonProps } from "@components/ButtonGroup";
 import { assertUnreachable } from "@utils/utils";
+import { styled } from "@styles/global";
 import {
 	searchLocalComputerForMedias,
 	cleanFavorites,
@@ -39,8 +38,8 @@ export function HeaderButtons({ buttons, list }: Props) {
 
 						case CLEAN:
 							return {
+								icon: <Clean size={17} />,
 								tooltip: "Clean list",
-								// onClick={cleanHistory}
 								onClick() {
 									switch (list) {
 										case PlaylistList.FAVORITES:
@@ -65,7 +64,6 @@ export function HeaderButtons({ buttons, list }: Props) {
 											break;
 									}
 								},
-								icon: <Clean size={17} />,
 							};
 
 						case FILTER_BY:

@@ -18,7 +18,7 @@ export type VisibleElectron = Readonly<{
 		getFullPathOfFilesForFilesInThisDirectory(
 			dir: Path,
 		): Promise<readonly Path[]>;
-		readFile(path: Path): Promise<Readonly<Buffer>>;
+		readFile(path: Path): Promise<Readonly<Buffer | undefined>>;
 		readdir(dir: Path): Promise<readonly Path[]>;
 		deleteFile(path: Path): Promise<void>;
 	};

@@ -39,10 +39,11 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 
 				dbgPlaylists({ key, serializedValue, value });
 
-				// @ts-ignore it doesn't matter:
+				// @ts-ignore => It doesn't matter that `serializedValue`,
+				// is of type String or string, they both work:
 				localStorage.setItem(key, serializedValue);
 			} catch (error) {
-				console.error(`Error setting localStorage key: "${key}":`, error);
+				console.error(error);
 			}
 		}, `setLocalStorage(${key})`);
 	});
@@ -62,7 +63,10 @@ export function getFromLocalStorage(key: Keys) {
 
 				switch (key) {
 					case keys.favorites: {
-						assert(Array.isArray(item), "favorites must be an array:" + item);
+						assert(
+							Array.isArray(item),
+							"favorites from storage must be an array:" + item,
+						);
 
 						const newFavorites = new Set(item as Path[]);
 
@@ -72,7 +76,10 @@ export function getFromLocalStorage(key: Keys) {
 					}
 
 					case keys.history: {
-						assert(Array.isArray(item), "history must be an array:" + item);
+						assert(
+							Array.isArray(item),
+							"history from storage must be an array:" + item,
+						);
 
 						const newHistory = Array.from(item as Path[]);
 
@@ -84,10 +91,10 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.sortedByDate: {
 						assert(
 							Array.isArray(item),
-							"sortedByDate must be an array:" + item,
+							"sortedByDate from storage must be an array:" + item,
 						);
 
-						const newSortedByDate = new Set(item as Path[]);
+						const newSortedByDate = item as Path[];
 
 						dbgPlaylists(
 							"getFromLocalStorage: newSortedByDate =",
@@ -100,7 +107,7 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.sortedByName: {
 						assert(
 							Array.isArray(item),
-							"sortedByName must be an array:" + item,
+							"sortedByName from storage must be an array:" + item,
 						);
 
 						const newSortedByName = new Set(item as Path[]);

@@ -56,16 +56,15 @@ export const usePlaylists = create<UsePlaylistsActions>((set, get) => ({
 						case PlaylistActions.ADD_ONE_MEDIA: {
 							const newHistory = [...get().history];
 
-							// If the new media is the same as the first
+							// If the new media is the same as the last
 							// media in the list, don't add it again:
-							if (action.path === newHistory[0]) break;
+							if (action.path === newHistory[newHistory.length - 1]) break;
 
-							// add newMedia to the start of array:
-							newHistory.unshift(action.path);
+							// add newMedia to the end of array:
+							newHistory.push(action.path);
 
 							// history has a max size of maxSizeOfHistory:
-							if (newHistory.length > maxSizeOfHistory)
-								newHistory.length = maxSizeOfHistory;
+							if (newHistory.length > maxSizeOfHistory) newHistory.splice(1, 1);
 
 							dbg(
 								"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
@@ -217,12 +216,11 @@ export const usePlaylists = create<UsePlaylistsActions>((set, get) => ({
 							}
 
 							// If the media is in the history, remove it from the history
-							const history = [...get().history];
-							const mediaIndexInHistory = history.findIndex(
-								path => action.path === path,
+							const history = [...get().history].filter(
+								path => path !== action.path,
 							);
-							if (mediaIndexInHistory !== -1) {
-								history.splice(mediaIndexInHistory, 1);
+
+							if (history.length !== get().history.length) {
 								set({ history });
 								setLocalStorage(keys.history, history);
 							}
@@ -256,15 +254,11 @@ export const usePlaylists = create<UsePlaylistsActions>((set, get) => ({
 
 							// If the media in the history list is not on
 							// action.list, remove it from the favorites:
-							const history = [...get().history];
-							const previousHistorySize = history.length;
-
-							history.forEach(
-								(path, index) =>
-									!action.list.has(path) && history.splice(index, 1),
+							const history = [...get().history].filter(path =>
+								action.list.has(path),
 							);
 
-							if (history.length !== previousHistorySize) {
+							if (history.length !== get().history.length) {
 								set({ history });
 								setLocalStorage(keys.history, history);
 							}

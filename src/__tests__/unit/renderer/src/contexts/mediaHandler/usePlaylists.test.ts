@@ -70,6 +70,7 @@ const playNextMediaFn = () => {
 		// If is the last media, it is going
 		// to go back to the first one:
 		const newIndex = index === numberOfMedias - 1 ? 0 : index + 1;
+
 		const expectedMediaPath = testArray[newIndex]![0];
 
 		playNextMedia();

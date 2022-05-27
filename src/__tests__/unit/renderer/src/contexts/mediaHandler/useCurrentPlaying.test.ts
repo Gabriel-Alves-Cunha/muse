@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { Media, Path } from "@common/@types/generalTypes";
+
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
 
-import { testArray, testList } from "./fakeTestList";
+import { numberOfMedias, testArray, testList } from "./fakeTestList";
 import {
 	playPreviousMedia,
-	playNextMedia,
 	currentPlaying,
 	CurrentPlaying,
 	playThisMedia,
+	playNextMedia,
 } from "@contexts/mediaHandler/useCurrentPlaying";
 import {
 	PlaylistActions,
@@ -22,12 +24,15 @@ import {
 	history,
 } from "@contexts/mediaHandler/usePlaylists";
 
+const firstMediaPath = testArray.at(0)![0];
+const lastMediaPath = testArray.at(numberOfMedias - 1)![0];
+
 describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {
 		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
+			list: testList as Map<Path, Media>,
 			type: WhatToDo.UPDATE_MAIN_LIST,
-			list: testList,
 		});
 		expect(mainList()).toEqual(testList);
 
@@ -38,7 +43,7 @@ describe("Testing useCurrentPlaying", () => {
 		expect(history().length).toBe(0);
 	});
 
-	it("(CurrentPlayingEnum.PLAY_THIS_MEDIA) should set the currentPlaying media", () => {
+	it("should set the currentPlaying media", () => {
 		testList.forEach((_, path) => {
 			playThisMedia(path, PlaylistList.MAIN_LIST);
 
@@ -52,40 +57,42 @@ describe("Testing useCurrentPlaying", () => {
 		});
 	});
 
-	it("(CurrentPlayingEnum.PLAY_PREVIOUS_FROM_PLAYLIST) should play the previous media from mediaList  and update history", () => {
-		testArray.forEach(([path], index) => {
-			if (index === testArray.length - 1) return;
+	it("should play the previous media from mainList and update history", () => {
+		playThisMedia(lastMediaPath, PlaylistList.MAIN_LIST);
 
-			playThisMedia(path, PlaylistList.MAIN_LIST);
-			expect(currentPlaying().path).toBe(path);
+		testArray.forEach((_, index) => {
+			console.log({ currentPlayingPath: currentPlaying().path });
 
 			playPreviousMedia();
 
-			expect(history().length).toBe(index * 2 + 2);
+			expect(history().length, "history.length is wrong!").toBe(index + 2);
+
+			const newPath =  firstMediaPath;
+			console.log({
+				currentPlayingPathAfterPlayPreviousMedia: currentPlaying().path,
+				newPath,
+			});
 
 			const expected: CurrentPlaying = {
-				path: testArray.at(index - 1)![0],
 				listType: PlaylistList.MAIN_LIST,
 				currentTime: 0,
+				path: newPath,
 			};
 
 			expect(expected).toEqual(currentPlaying());
 		});
 	});
 
-	it("(CurrentPlayingEnum.PLAY_NEXT_FROM_PLAYLIST) should play the next media from a given playlist", () => {
-		testArray.forEach(([path], index) => {
-			// TODO: got to the end of the list, and play first media.
-			if (index === testArray.length - 1) return;
+	it("should play the next media from a given playlist and update history", () => {
+		playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);
 
-			playThisMedia(path, PlaylistList.MAIN_LIST);
-
+		testArray.forEach((_, index) => {
 			playNextMedia();
 
-			const currMediaID = currentPlaying().path;
-			const expectedMediaPath = testArray[index + 1]![0];
+			const currMediaPath = currentPlaying().path;
+			const expectedMediaPath = testArray[index + 1]?.[0] ?? firstMediaPath;
 
-			expect(expectedMediaPath).toEqual(currMediaID);
+			expect(expectedMediaPath).toEqual(currMediaPath);
 		});
 	});
 });

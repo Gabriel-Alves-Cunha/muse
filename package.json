@@ -1,14 +1,12 @@
 {
 	"name": "muse",
 	"version": "1.0.0",
+	"repository": "https://github.com/Gabriel-Alves-Cunha/muse.git",
 	"description": "Just an Youtube music downloader and player.",
 	"author": "Gabriel Alves Cunha <gabriel925486@outlook.com>",
-	"license": "MIT",
-	"repository": {
-		"url": "https://github.com/Gabriel-Alves-Cunha/muse.git",
-		"type": "git"
-	},
 	"main": "app/index.js",
+	"type": "module",
+	"license": "MIT",
 	"scripts": {
 		"preview": "yarn build && cross-env NODE_ENV=production electron --trace-warnings --unhandled-rejections=strict --inspect app",
 		"dev:clean": "cross-env DEBUG=muse,muse:playlists NODE_ENV=development elecrun --clean-cache --vite --preload 'preload.ts'",

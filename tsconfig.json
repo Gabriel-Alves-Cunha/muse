@@ -1,6 +1,10 @@
 {
 	"compilerOptions": {
-		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"lib": [
+			"DOM.Iterable",
+			"ESNext",
+			"DOM",
+		],
 		"noPropertyAccessFromIndexSignature": true,
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
@@ -34,17 +38,41 @@
 		"pretty": true,
 		"strict": true,
 		"paths": {
-			"@components/*": ["renderer/components/*"],
-			"@contexts/*": ["renderer/contexts/*"],
-			"@modules/*": ["renderer/modules/*"],
-			"@styles/*": ["renderer/styles/*"],
-			"@routes/*": ["renderer/routes/*"],
-			"@utils/*": ["renderer/utils/*"],
-			"@hooks/*": ["renderer/hooks/*"],
-			"@renderer/*": ["renderer/*"],
-			"@common/*": ["common/*"],
-			"@main/*": ["main/*"]
+			"@components/*": [
+				"renderer/components/*"
+			],
+			"@contexts/*": [
+				"renderer/contexts/*"
+			],
+			"@modules/*": [
+				"renderer/modules/*"
+			],
+			"@styles/*": [
+				"renderer/styles/*"
+			],
+			"@routes/*": [
+				"renderer/routes/*"
+			],
+			"@utils/*": [
+				"renderer/utils/*"
+			],
+			"@hooks/*": [
+				"renderer/hooks/*"
+			],
+			"@renderer/*": [
+				"renderer/*"
+			],
+			"@common/*": [
+				"common/*"
+			],
+			"@main/*": [
+				"main/*"
+			]
 		}
 	},
-	"exclude": ["node_modules", "app", "out"]
+	"exclude": [
+		"node_modules",
+		"app",
+		"out"
+	]
 }
