@@ -1,8 +1,8 @@
+import type { MainList } from "./usePlaylists";
 import type { Path } from "@common/@types/generalTypes";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
 import { time } from "@utils/utils";
-import { MainList } from "./usePlaylists";
 
 const {
 	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
@@ -51,33 +51,27 @@ export const getAllowedMedias = (
 	);
 
 export const sortByDate = (list: MainList): Set<Path> => {
-	const listAsArray: { dateOfArival: number; path: Path }[] = [];
+	const listAsArrayOfPaths = Array.from(list)
+		.sort(([, prevMedia], [, nextMedia]) => {
+			if (prevMedia.dateOfArival > nextMedia.dateOfArival) return 1;
+			if (prevMedia.dateOfArival < nextMedia.dateOfArival) return -1;
+			// a must be equal to b:
+			return 0;
+		})
+		.map(([path]) => path);
 
-	list.forEach(({ dateOfArival }, path) =>
-		listAsArray.push({ dateOfArival, path }),
-	);
-
-	listAsArray.sort((a, b) => {
-		if (a.dateOfArival > b.dateOfArival) return 1;
-		if (a.dateOfArival < b.dateOfArival) return -1;
-		// a must be equal to b:
-		return 0;
-	});
-
-	return new Set(listAsArray.map(media => media.path));
+	return new Set(listAsArrayOfPaths);
 };
 
 export const sortByName = (list: MainList) => {
-	const listAsArray: { title: string; path: Path }[] = [];
+	const listAsArrayOfPaths = Array.from(list)
+		.sort(([, prevMedia], [, nextMedia]) => {
+			if (prevMedia.title > nextMedia.title) return 1;
+			if (prevMedia.title < nextMedia.title) return -1;
+			// a must be equal to b:
+			return 0;
+		})
+		.map(([path]) => path);
 
-	list.forEach(({ title }, path) => listAsArray.push({ title, path }));
-
-	listAsArray.sort((a, b) => {
-		if (a.title > b.title) return 1;
-		if (a.title < b.title) return -1;
-		// a must be equal to b:
-		return 0;
-	});
-
-	return new Set(listAsArray.map(media => media.path));
+	return new Set(listAsArrayOfPaths);
 };

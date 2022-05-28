@@ -3,10 +3,10 @@ import type { Path } from "@common/@types/generalTypes";
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { keys, setLocalStorage } from "@utils/localStorage";
+import { setCurrentPlayingLocalStorage } from "./localStorageHelpers";
+import { getFirstKey, getLastKey } from "@utils/map";
 import { getRandomInt, time } from "@utils/utils";
 import { playOptions } from "./usePlayOptions";
-import { getFirstKey, getLastKey } from "@utils/map";
 import {
 	type MainList,
 	PlaylistActions,
@@ -27,7 +27,13 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(() => defaultCurrentPlaying),
+	subscribeWithSelector(
+		setCurrentPlayingLocalStorage(
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			(_set, _get, _api) => defaultCurrentPlaying,
+			"currentPlaying",
+		),
+	),
 );
 
 export const { getState: currentPlaying, setState: setCurrentPlaying } =
@@ -52,7 +58,6 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 	};
 
 	setCurrentPlaying(newCurrentPlaying);
-	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 }
 
 export function togglePlayPause(): void {
@@ -73,9 +78,9 @@ export function pause(audio?: HTMLAudioElement): void {
 	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
+	const currentTime = audio.currentTime;
 
-	setCurrentPlaying({ currentTime: audio.currentTime });
-	setLocalStorage(keys.currentPlaying, currentPlaying());
+	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
 }
 
 export function playPreviousMedia() {
@@ -97,31 +102,22 @@ export function playPreviousMedia() {
 				list,
 			});
 
+		const firstMediaPath = getFirstKey(list);
 		let prevMediaPath: Path | undefined;
 
-		let found = false;
-		let prevPath = "";
+		if (firstMediaPath === path) prevMediaPath = getLastKey(list) as Path;
+		else {
+			let prevPath = "";
 
-		for (const newPath of list.keys()) {
-			if (found) {
-				if (newPath === path) {
-					// The previous media is the current media.
-					// So we are at the beginning of the list.
-					// So we need to play the last media.
-					prevMediaPath = getLastKey(list) as Path;
+			for (const newPath of list.keys()) {
+				if (path === newPath) {
+					prevMediaPath = prevPath;
 					break;
 				}
 
-				prevMediaPath = prevPath;
+				prevPath = newPath;
 			}
-
-			if (newPath === path) found = true;
-
-			prevPath = newPath;
 		}
-
-		// Set newMediaPath as the first path from the list:
-		if (!prevMediaPath) prevMediaPath = getFirstKey(list);
 
 		if (!prevMediaPath)
 			return console.error(
@@ -143,7 +139,6 @@ export function playPreviousMedia() {
 		});
 
 		setCurrentPlaying(newCurrentPlaying);
-		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 	}, "playPreviousMedia");
 }
 
@@ -168,7 +163,7 @@ export function playNextMedia(): void {
 
 		let nextMediaPath: Path | undefined;
 
-		if (playOptions().isRandom) {
+		if (playOptions().random) {
 			const randomIndex = getRandomInt(0, list.size);
 
 			let index = 0;
@@ -191,7 +186,6 @@ export function playNextMedia(): void {
 				if (newPath === path) found = true;
 			}
 
-			// Set newMediaPath as the first path from the list:
 			if (!nextMediaPath) nextMediaPath = getFirstKey(list);
 		}
 
@@ -215,7 +209,6 @@ export function playNextMedia(): void {
 		};
 
 		setCurrentPlaying(newCurrentPlaying);
-		setLocalStorage(keys.currentPlaying, newCurrentPlaying);
 	}, "playNextMedia");
 }
 

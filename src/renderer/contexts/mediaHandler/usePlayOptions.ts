@@ -1,11 +1,13 @@
 import create from "zustand";
 
-import { keys, setLocalStorage } from "@utils/localStorage";
+import { setPlayOptionsLocalStorage } from "./localStorageHelpers";
 
-export const usePlayOptions = create<PlayOptions>(() => ({
-	loopThisMedia: false,
-	isRandom: false,
-}));
+export const usePlayOptions = create<PlayOptions>()(
+	setPlayOptionsLocalStorage(() => ({
+		random: false,
+		loop: false,
+	})),
+);
 
 export const { getState: playOptions, setState: setPlayOptions } =
 	usePlayOptions;
@@ -14,25 +16,22 @@ export const { getState: playOptions, setState: setPlayOptions } =
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function toggleLoopMedia() {
-	const newValue = !playOptions().loopThisMedia;
+export const toggleLoopMedia = () => {
+	const loop = !playOptions().loop;
 
-	(document.getElementById("audio") as HTMLAudioElement).loop = newValue;
+	(document.getElementById("audio") as HTMLAudioElement).loop = loop;
 
-	setPlayOptions({ loopThisMedia: newValue });
-	setLocalStorage(keys.playOptions, playOptions());
-}
+	setPlayOptions({ loop });
+};
 
-export function toggleRandom() {
-	setPlayOptions({ isRandom: !playOptions().isRandom });
-	setLocalStorage(keys.playOptions, playOptions());
-}
+export const toggleRandom = () =>
+	setPlayOptions({ random: !playOptions().random });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
 export type PlayOptions = Readonly<{
-	loopThisMedia: boolean;
-	isRandom: boolean;
+	random: boolean;
+	loop: boolean;
 }>;

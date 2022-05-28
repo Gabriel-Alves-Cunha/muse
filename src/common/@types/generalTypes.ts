@@ -30,3 +30,5 @@ export type DownloadInfo = Readonly<{
 	title: string;
 	url: string;
 }>;
+
+export type Values<Obj> = Obj[keyof Obj];

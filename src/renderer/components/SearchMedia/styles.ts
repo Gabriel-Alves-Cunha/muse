@@ -18,13 +18,21 @@ export const SearchWrapper = styled("div", {
 
 	transition: "all ease 250ms",
 
-	"&:hover": {
+	"&:hover, &:focus-within": {
 		transition: "all ease 250ms",
 
 		borderColor: "$input-border-active",
 
 		"& svg": {
 			color: "$input-border-active",
+		},
+
+		"& label": {
+			top: "-180%",
+			left: -30,
+
+			color: "$input-border-active",
+			cursor: "default",
 		},
 	},
 
@@ -53,8 +61,8 @@ export const SearchWrapper = styled("div", {
 		color: "$input-placeholder",
 		whiteSpace: "nowrap",
 		ff: "$secondary",
-		ls: "0.045rem",
-		fs: "0.9rem",
+		ls: "0.04rem",
+		fs: "1rem",
 		fw: 400,
 		lh: 1.5,
 
@@ -62,14 +70,6 @@ export const SearchWrapper = styled("div", {
 		transitionTimingFunction: "ease",
 		transitionDuration: "250ms",
 		transitionDelay: 0,
-
-		"&.focus": {
-			top: "-170%",
-			left: -30,
-
-			color: "$input-border-active",
-			cursor: "default",
-		},
 	},
 
 	input: {

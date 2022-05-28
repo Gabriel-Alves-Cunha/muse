@@ -22,18 +22,20 @@ export const keys = Object.freeze({
 
 type Keys = typeof keys[keyof typeof keys];
 type Values =
+	| Readonly<Path[]>
 	| [Path, Media][]
 	| CurrentPlaying
-	| Array<Path>
 	| PlayOptions
-	| Set<Path>;
+	| Set<Path>
+	| Path[];
 
 export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	setTimeout(() => {
 		time(async () => {
 			try {
-				if (value instanceof Map) value = [...value];
-				else if (value instanceof Set) value = [...value];
+				if (value instanceof Map || value instanceof Set)
+					//@ts-ignore - This conversion will work:
+					value = Array.from(value);
 
 				const serializedValue = await stringifyAsync(value);
 

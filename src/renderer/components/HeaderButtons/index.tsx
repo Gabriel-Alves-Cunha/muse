@@ -82,7 +82,7 @@ export function HeaderButtons({ buttons, list }: Props) {
 }
 
 const Wrapper = styled("div", {
-	position: "absolute",
+	position: "relative",
 });
 
 type Props = {

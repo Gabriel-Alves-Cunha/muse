@@ -11,18 +11,18 @@ import {
 
 describe("Testing usePlayOptions", () => {
 	it("should get a new playOptions with .loopThisMedia set", () => {
-		setPlayOptions({ loopThisMedia: true });
-		expect(playOptions()).toHaveProperty("loopThisMedia", true);
+		setPlayOptions({ loop: true });
+		expect(playOptions()).toHaveProperty("loop", true);
 
 		toggleLoopMedia();
-		expect(playOptions()).toHaveProperty("loopThisMedia", false);
+		expect(playOptions()).toHaveProperty("loop", false);
 	});
 
 	it("should get a new playOptions with .isRandom set", () => {
-		setPlayOptions({ isRandom: true });
-		expect(playOptions()).toHaveProperty("isRandom", true);
+		setPlayOptions({ random: true });
+		expect(playOptions()).toHaveProperty("random", true);
 
-		setPlayOptions({ isRandom: false });
-		expect(playOptions()).toHaveProperty("isRandom", false);
+		setPlayOptions({ random: false });
+		expect(playOptions()).toHaveProperty("random", false);
 	});
 });

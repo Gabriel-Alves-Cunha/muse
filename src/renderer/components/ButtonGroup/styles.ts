@@ -27,7 +27,6 @@ export const Button = styled("button", {
 	background: "$bg-button",
 	cursor: "pointer",
 	border: "none",
-	// : "1.25rem",
 
 	whiteSpace: "nowrap",
 	lineHeight: "2.5rem",
@@ -45,6 +44,7 @@ export const Button = styled("button", {
 
 	"&.single-button": {
 		borderRadius: "50%",
+		size: "2.5rem",
 	},
 
 	"&.first": {

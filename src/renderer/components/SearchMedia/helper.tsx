@@ -76,8 +76,8 @@ export function Input() {
 
 	// Close the popover when the user presses Esc:
 	useEffect(() => {
-		const closeOnEsc = (e: KeyboardEvent) => {
-			if (e.key === "Escape" && isOnFocus) {
+		const closeOnEsc = ({ key }: KeyboardEvent) => {
+			if (key === "Escape" && isOnFocus) {
 				setSearcher(defaultSearcher);
 				inputRef.current?.blur();
 				setIsOnFocus(false);
@@ -114,10 +114,7 @@ export function Input() {
 
 	return (
 		<>
-			<label htmlFor="search-songs" className={isOnFocus ? "focus" : ""}>
-				Search for songs
-			</label>
-
+			<label htmlFor="search-songs">Search for songs</label>
 			<input
 				onClick={() => setIsOnFocus(true)}
 				onChange={updateSearchTerm}

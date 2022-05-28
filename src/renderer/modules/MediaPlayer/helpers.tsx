@@ -59,7 +59,7 @@ const toggleFavorite = (path?: Path) =>
 	});
 
 export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
-	const { isRandom, loopThisMedia } = usePlayOptions();
+	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
 
 	return (
 		<ControlsAndSeekerContainer>

@@ -58,25 +58,21 @@ describe("Testing useCurrentPlaying", () => {
 	});
 
 	it("should play the previous media from mainList and update history", () => {
-		playThisMedia(lastMediaPath, PlaylistList.MAIN_LIST);
+		const initialIndex = 15;
+		playThisMedia(testArray[initialIndex]![0], PlaylistList.MAIN_LIST);
 
 		testArray.forEach((_, index) => {
-			console.log({ currentPlayingPath: currentPlaying().path });
+			expect(history().length, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
 
-			expect(history().length, "history.length is wrong!").toBe(index + 2);
-
-			const newPath =  firstMediaPath;
-			console.log({
-				currentPlayingPathAfterPlayPreviousMedia: currentPlaying().path,
-				newPath,
-			});
+			const expectedPath =
+				testArray.at(initialIndex - 1 - index)?.[0] ?? lastMediaPath;
 
 			const expected: CurrentPlaying = {
 				listType: PlaylistList.MAIN_LIST,
 				currentTime: 0,
-				path: newPath,
+				path: expectedPath,
 			};
 
 			expect(expected).toEqual(currentPlaying());

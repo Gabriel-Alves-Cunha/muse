@@ -2,13 +2,10 @@ import type { Media, Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
+import { getFromLocalStorage, keys } from "@utils/localStorage";
+import { setPlaylistsLocalStorage } from "./localStorageHelpers";
 import { assertUnreachable, time } from "@utils/utils";
-import { dbg } from "@common/utils";
-import {
-	getFromLocalStorage,
-	setLocalStorage,
-	keys,
-} from "@utils/localStorage";
+import { dbgPlaylists } from "@common/utils";
 import {
 	searchDirectoryResult,
 	getAllowedMedias,
@@ -24,7 +21,7 @@ const {
 const emptyArray: never[] = [];
 const maxSizeOfHistory = 100;
 
-type UsePlaylistsActions = Readonly<{
+export type UsePlaylistsActions = Readonly<{
 	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
 
 	isLoadingMedias: boolean;
@@ -36,316 +33,300 @@ type UsePlaylistsActions = Readonly<{
 	mainList: MainList;
 }>;
 
-// TODO: see Array.from and localStorage.setItem equality
-export const usePlaylists = create<UsePlaylistsActions>((set, get) => ({
-	sortedByDate:
-		(getFromLocalStorage(keys.sortedByDate) as Set<Path>) ?? new Set(),
-	sortedByName:
-		(getFromLocalStorage(keys.sortedByName) as Set<Path>) ?? new Set(),
-	favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
-	history: (getFromLocalStorage(keys.history) as Path[]) ?? [],
-	mainList: new Map(),
+export const usePlaylists = create<UsePlaylistsActions>()(
+	setPlaylistsLocalStorage((set, get) => ({
+		sortedByDate:
+			(getFromLocalStorage(keys.sortedByDate) as Set<Path>) ?? new Set(),
+		sortedByName:
+			(getFromLocalStorage(keys.sortedByName) as Set<Path>) ?? new Set(),
+		favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
+		history: (getFromLocalStorage(keys.history) as Path[]) ?? [],
+		mainList: new Map(),
 
-	isLoadingMedias: false,
+		isLoadingMedias: false,
 
-	setPlaylists: (action: PlaylistsReducer_Action) => {
-		time(() => {
-			switch (action.type) {
-				case WhatToDo.UPDATE_HISTORY: {
-					switch (action.whatToDo) {
-						case PlaylistActions.ADD_ONE_MEDIA: {
-							const newHistory = [...get().history];
+		setPlaylists: (action: PlaylistsReducer_Action) => {
+			time(() => {
+				switch (action.type) {
+					case WhatToDo.UPDATE_HISTORY: {
+						switch (action.whatToDo) {
+							case PlaylistActions.ADD_ONE_MEDIA: {
+								const newHistory = [...get().history];
 
-							// If the new media is the same as the last
-							// media in the list, don't add it again:
-							if (action.path === newHistory[newHistory.length - 1]) break;
+								// If the new media is the same as the last
+								// one in the list, don't add it again:
+								if (action.path === newHistory.at(-1)) break;
 
-							// add newMedia to the end of array:
-							newHistory.push(action.path);
+								// add newMedia to the end of array:
+								newHistory.push(action.path);
 
-							// history has a max size of maxSizeOfHistory:
-							if (newHistory.length > maxSizeOfHistory) newHistory.splice(1, 1);
+								// history has a max size of maxSizeOfHistory:
+								if (newHistory.length > maxSizeOfHistory)
+									newHistory.splice(1, 1);
 
-							dbg(
-								"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
-								newHistory,
-							);
+								set({ history: newHistory });
 
-							set({ history: newHistory });
-							setLocalStorage(keys.history, newHistory);
-							break;
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
+									get().history,
+								);
+								break;
+							}
+
+							case PlaylistActions.CLEAN: {
+								set({ history: emptyArray });
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. new history =",
+									get().history,
+								);
+								break;
+							}
+
+							default: {
+								assertUnreachable(action);
+								break;
+							}
 						}
-
-						case PlaylistActions.CLEAN: {
-							dbg(
-								"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. new history = []",
-							);
-
-							set({ history: emptyArray });
-							setLocalStorage(keys.history, emptyArray);
-							break;
-						}
-
-						default: {
-							assertUnreachable(action);
-							break;
-						}
+						break;
 					}
-					break;
-				}
 
-				case WhatToDo.UPDATE_FAVORITES: {
-					switch (action.whatToDo) {
-						case PlaylistActions.TOGGLE_ONE_MEDIA: {
-							const favorites = get().favorites;
+					case WhatToDo.UPDATE_FAVORITES: {
+						switch (action.whatToDo) {
+							case PlaylistActions.TOGGLE_ONE_MEDIA: {
+								const favorites = get().favorites;
 
-							if (favorites.has(action.path)) {
-								favorites.delete(action.path);
+								// map.delete() returns true if an element in the Map
+								// object existed and has been removed, or false if
+								// the element does not exist.
+								if (!favorites.delete(action.path)) favorites.add(action.path);
+
 								set({ favorites });
-							} else set({ favorites: favorites.add(action.path) });
 
-							dbg(
-								"setPlaylists on 'UPDATE_FAVORITES'\u279D'TOGGLE_ONE_MEDIA'. new favorites =",
-								get().favorites,
-							);
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_FAVORITES'\u279D'TOGGLE_ONE_MEDIA'. new favorites =",
+									get().favorites,
+								);
+								break;
+							}
 
-							setLocalStorage(keys.favorites, favorites);
-							break;
+							case PlaylistActions.ADD_ONE_MEDIA: {
+								set({ favorites: get().favorites.add(action.path) });
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. new favorites =",
+									get().favorites,
+								);
+								break;
+							}
+
+							case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
+								const favorites = get().favorites;
+
+								favorites.delete(action.path)
+									? set({ favorites })
+									: console.error("Media not found in favorites");
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. new favorites =",
+									get().favorites,
+								);
+								break;
+							}
+
+							case PlaylistActions.CLEAN: {
+								set({ favorites: new Set() });
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. new favorites = ",
+									get().favorites,
+								);
+								break;
+							}
+
+							default: {
+								assertUnreachable(action);
+								break;
+							}
 						}
-
-						case PlaylistActions.ADD_ONE_MEDIA: {
-							set({ favorites: get().favorites.add(action.path) });
-
-							dbg(
-								"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. new favorites =",
-								get().favorites,
-							);
-
-							setLocalStorage(keys.favorites, get().favorites);
-							break;
-						}
-
-						case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
-							const favorites = get().favorites;
-
-							favorites.delete(action.path)
-								? set({ favorites })
-								: console.error("Media not found in favorites");
-
-							dbg(
-								"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. new favorites =",
-								get().favorites,
-							);
-
-							setLocalStorage(keys.favorites, favorites);
-							break;
-						}
-
-						case PlaylistActions.CLEAN: {
-							dbg(
-								"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. new favorites = []",
-							);
-
-							set({ favorites: new Set() });
-							setLocalStorage(keys.favorites, new Set());
-							break;
-						}
-
-						default: {
-							assertUnreachable(action);
-							break;
-						}
+						break;
 					}
-					break;
-				}
 
-				case WhatToDo.UPDATE_MAIN_LIST: {
-					const updateSortedAndMainLists = (newMainList: MainList) => {
-						const sortedByName = sortByName(newMainList);
-						const sortedByDate = sortByDate(newMainList);
-
-						set({ mainList: newMainList, sortedByDate, sortedByName });
-						setLocalStorage(keys.sortedByDate, sortedByDate);
-						setLocalStorage(keys.sortedByName, sortedByName);
-					};
-
-					switch (action.whatToDo) {
-						case PlaylistActions.ADD_ONE_MEDIA: {
-							const mainList = get().mainList;
-
-							if (mainList.has(action.path)) {
-								console.error(
-									`A media with path "${String(
-										action.path,
-									)}" already exists. Therefore, I'm not gonna add it.`,
-								);
-								break;
-							}
-
-							mainList.set(action.path, action.newMedia);
-
-							updateSortedAndMainLists(mainList);
-
-							dbg(
-								"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
-								get().mainList,
-							);
-							break;
-						}
-
-						case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
-							const mainList = get().mainList;
-
-							if (!mainList.delete(action.path)) {
-								console.error(
-									`A media with path "${String(
-										action.path,
-									)}" does not exist. Therefore, I'm not gonna remove it.`,
-								);
-								break;
-							}
-
-							updateSortedAndMainLists(mainList);
-
-							// If the media is in the favorites, remove it from the favorites
-							const favorites = get().favorites;
-
-							if (favorites.delete(action.path)) {
-								set({ favorites });
-								setLocalStorage(keys.favorites, favorites);
-							}
-
-							// If the media is in the history, remove it from the history
-							const history = [...get().history].filter(
-								path => path !== action.path,
-							);
-
-							if (history.length !== get().history.length) {
-								set({ history });
-								setLocalStorage(keys.history, history);
-							}
-
-							dbg(
-								"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA_BY_PATH' (yet to be sorted). newMainList =",
-								get().mainList,
-							);
-							break;
-						}
-
-						case PlaylistActions.REPLACE_ENTIRE_LIST: {
-							dbg(
-								"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
-								action.list,
-							);
-
-							// If the media in the favorites list is not on
-							// action.list, remove it from the favorites:
-							const favorites = get().favorites;
-							const previousFavoritesSize = favorites.size;
-
-							favorites.forEach(
-								path => !action.list.has(path) && favorites.delete(path),
-							);
-
-							if (favorites.size !== previousFavoritesSize) {
-								set({ favorites });
-								setLocalStorage(keys.favorites, favorites);
-							}
-
-							// If the media in the history list is not on
-							// action.list, remove it from the favorites:
-							const history = [...get().history].filter(path =>
-								action.list.has(path),
-							);
-
-							if (history.length !== get().history.length) {
-								set({ history });
-								setLocalStorage(keys.history, history);
-							}
-
-							updateSortedAndMainLists(action.list);
-							break;
-						}
-
-						case PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH: {
-							const { newMedia, path, newPath } = action;
-							const mainList = get().mainList;
-
-							const oldMedia = mainList.get(path);
-
-							if (!oldMedia) {
-								console.error(
-									`I did not find a media with path = "${String(
-										action.path,
-									)}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`,
-								);
-								break;
-							}
-
-							if (newPath) {
-								mainList.delete(path);
-								mainList.set(newPath, newMedia);
-								updateSortedAndMainLists(mainList);
-
-								// Now path is an old, invalid path:
-								if (get().mainList.has(path))
-									console.error(
-										`A media with path "${String(
-											path,
-										)}" should have been deleted, but it wasn't!`,
-										{ newPath, path, newMedia, mainList: get().mainList },
-									);
-							} else
-								updateSortedAndMainLists(
-									mainList.set(action.path, action.newMedia),
-								);
-
-							dbg(
-								"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",
-								get().mainList.get(newPath ? newPath : path),
-								"\nnewMainList =",
-								get().mainList,
-							);
-							break;
-						}
-
-						case PlaylistActions.CLEAN: {
-							dbg(
-								"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList = []",
-							);
-
+					case WhatToDo.UPDATE_MAIN_LIST: {
+						const updateSortedAndMainLists = (newMainList: MainList) =>
 							set({
-								sortedByDate: new Set(),
-								sortedByName: new Set(),
-								favorites: new Set(),
-								mainList: new Map(),
-								history: emptyArray,
+								sortedByDate: sortByDate(newMainList),
+								sortedByName: sortByName(newMainList),
+								mainList: newMainList,
 							});
 
-							setLocalStorage(keys.sortedByDate, emptyArray);
-							setLocalStorage(keys.sortedByName, emptyArray);
-							setLocalStorage(keys.favorites, emptyArray);
-							setLocalStorage(keys.history, emptyArray);
+						switch (action.whatToDo) {
+							case PlaylistActions.ADD_ONE_MEDIA: {
+								const mainList = get().mainList;
 
-							break;
-						}
+								if (mainList.has(action.path)) {
+									console.error(
+										`A media with path "${action.path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
+									);
+									break;
+								}
 
-						default: {
-							assertUnreachable(action);
-							break;
+								mainList.set(action.path, action.newMedia);
+
+								updateSortedAndMainLists(mainList);
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
+									get().mainList,
+								);
+								break;
+							}
+
+							case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
+								const mainList = get().mainList;
+
+								if (!mainList.delete(action.path)) {
+									console.error(
+										`A media with path "${action.path}" does not exist.`,
+									);
+									break;
+								}
+
+								updateSortedAndMainLists(mainList);
+
+								// If the media is in the favorites, remove it from the favorites
+								const favorites = get().favorites;
+								if (favorites.delete(action.path)) set({ favorites });
+
+								// If the media is in the history, remove it from the history
+								const history = [...get().history].filter(
+									path => path !== action.path,
+								);
+
+								if (history.length !== get().history.length) set({ history });
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA_BY_PATH' (yet to be sorted). newMainList =",
+									get().mainList,
+								);
+								break;
+							}
+
+							case PlaylistActions.REPLACE_ENTIRE_LIST: {
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
+									action.list,
+								);
+
+								// If the media in the favorites list is not on
+								// action.list, remove it from the favorites:
+								const favorites = get().favorites;
+								const previousFavoritesSize = favorites.size;
+
+								favorites.forEach(
+									path => !action.list.has(path) && favorites.delete(path),
+								);
+
+								if (favorites.size !== previousFavoritesSize)
+									set({ favorites });
+
+								// If the media in the history list is not on
+								// action.list, remove it from the favorites:
+								const history = [...get().history].filter(path =>
+									action.list.has(path),
+								);
+
+								if (history.length !== get().history.length) set({ history });
+
+								updateSortedAndMainLists(action.list);
+								break;
+							}
+
+							case PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH: {
+								const { newMedia, path, newPath } = action;
+
+								const mainList = get().mainList;
+								const oldMedia = mainList.get(path);
+
+								if (!oldMedia) {
+									console.error(
+										`I did not find a media with path = "${String(
+											action.path,
+										)}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`,
+									);
+									break;
+								}
+
+								if (newPath) {
+									mainList.delete(path);
+									mainList.set(newPath, newMedia);
+
+									if (newMedia.title !== oldMedia.title)
+										updateSortedAndMainLists(mainList);
+									else set({ mainList });
+
+									// Now path is an old, invalid path:
+									if (get().mainList.has(path))
+										console.error(
+											`A media with path "${path}" should have been deleted, but it wasn't!`,
+											{ newPath, path, newMedia, mainList: get().mainList },
+										);
+								} else if (newMedia.title !== oldMedia.title)
+									updateSortedAndMainLists(mainList);
+								else set({ mainList });
+
+								dbgPlaylists(
+									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",
+									get().mainList.get(newPath ? newPath : path),
+									"\nnewMainList =",
+									get().mainList,
+								);
+								break;
+							}
+
+							case PlaylistActions.CLEAN: {
+								const sortedByDate = get().sortedByDate;
+								const sortedByName = get().sortedByName;
+								const favorites = get().favorites;
+								const mainList = get().mainList;
+
+								sortedByDate.clear();
+								sortedByName.clear();
+								favorites.clear();
+								mainList.clear();
+
+								set({
+									history: emptyArray,
+									sortedByDate,
+									sortedByName,
+									favorites,
+									mainList,
+								});
+
+								dbgPlaylists(
+									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList =",
+									get().mainList,
+								);
+								break;
+							}
+
+							default: {
+								assertUnreachable(action);
+								break;
+							}
 						}
+						break;
 					}
-					break;
-				}
 
-				default: {
-					assertUnreachable(action);
-					break;
+					default: {
+						assertUnreachable(action);
+						break;
+					}
 				}
-			}
-		}, "setPlaylists " + JSON.stringify(action, null, 2));
-	},
-}));
+			}, "setPlaylists " + JSON.stringify(action, null, 2));
+		},
+	})),
+);
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
@@ -402,21 +383,21 @@ export const cleanFavorites = () =>
 	});
 
 export async function searchLocalComputerForMedias() {
-	time(async () => {
-		usePlaylists.setState({ isLoadingMedias: true });
+	usePlaylists.setState({ isLoadingMedias: true });
 
+	time(async () => {
 		try {
 			const paths = getAllowedMedias(await searchDirectoryResult());
-			const newMediaList = await transformPathsToMedias(paths);
-
-			dbg(
-				"Finished searching. Paths =",
-				paths,
-				"Finished searching. Medias =",
-				newMediaList,
+			const newMainList: MainList = new Map(
+				await transformPathsToMedias(paths),
 			);
 
-			const newMainList: MainList = new Map(newMediaList);
+			dbgPlaylists(
+				"Finished searching, paths =",
+				paths,
+				"Finished searching, newMainList =",
+				newMainList,
+			);
 
 			setPlaylists({
 				whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
@@ -432,16 +413,18 @@ export async function searchLocalComputerForMedias() {
 }
 
 export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
-	const searchTerm = searchTerm_.toLowerCase();
-	const medias: [Path, Media][] = [];
+	return time(() => {
+		const searchTerm = searchTerm_.toLowerCase();
+		const medias: [Path, Media][] = [];
 
-	getPlaylists().mainList.forEach(
-		(media, path) =>
-			media.title.toLowerCase().includes(searchTerm) &&
-			medias.push([path, media]),
-	);
+		mainList().forEach(
+			(media, path) =>
+				media.title.toLowerCase().includes(searchTerm) &&
+				medias.push([path, media]),
+		);
 
-	return medias;
+		return medias;
+	}, "searchMedia");
 }
 
 export async function deleteMedia(path: Path) {
