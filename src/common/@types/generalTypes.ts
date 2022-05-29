@@ -32,3 +32,5 @@ export type DownloadInfo = Readonly<{
 }>;
 
 export type Values<Obj> = Obj[keyof Obj];
+
+export type OneOf<T> = keyof T;

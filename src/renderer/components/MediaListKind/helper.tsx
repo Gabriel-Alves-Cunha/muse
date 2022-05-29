@@ -29,8 +29,9 @@ const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
 const allSelectedMedias: Set<Path> = new Set();
+
 export const useFromList = create(() => ({ fromList: PlaylistList.MAIN_LIST }));
-const fromList = () => useFromList.getState().fromList;
+export const { getState: getFromList, setState: setFromList } = useFromList;
 
 const Row = memo(
 	({ media, path }: RowProps) => {
@@ -50,7 +51,9 @@ const Row = memo(
 				ref={mediaRowRef}
 			>
 				<Tooltip text="Play this media">
-					<PlayButton onClick={() => playThisMedia(path, fromList())}>
+					<PlayButton
+						onClick={() => playThisMedia(path, getFromList().fromList)}
+					>
 						<ImgWrapper>
 							<ImgWithFallback
 								Fallback={<MusicNote size="1.4rem" />}

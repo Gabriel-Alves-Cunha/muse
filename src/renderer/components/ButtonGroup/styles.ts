@@ -16,6 +16,15 @@ const spin = keyframes({
 	},
 });
 
+const scale = keyframes({
+	"0%, 100%": {
+		transform: "scale(1.0)",
+	},
+	"50%": {
+		transform: "scale(0.95)",
+	},
+});
+
 export const Button = styled("button", {
 	position: "relative",
 	dflex: "center",
@@ -35,8 +44,11 @@ export const Button = styled("button", {
 	ta: "center",
 	fw: 500,
 
-	transition:
-		"background 0.25s ease 0s, color 0.25s ease 0s, border-color 0.25s ease 0s, box-shadow 0.25s ease 0s, transform 0.25s ease 0s, opacity 0.25s ease 0s;",
+	// willChange: "background, color, border-color, transform",
+	transitionProperty: "background, color, border-color, transform",
+	transitionTimingFunction: "ease",
+	transitionDuration: 0.25,
+	transitionDelay: 0,
 
 	"& svg": {
 		color: "$gray-text",
@@ -57,40 +69,90 @@ export const Button = styled("button", {
 		borderTopRightRadius: 12,
 	},
 
-	"&:active": {
-		scale: "0.97",
-	},
-
-	"&:hover :focus": {
+	"&:hover, :focus": {
 		background: "$bg-button-hover",
+
+		"& svg": {
+			color: "white",
+		},
+
+		"&.reload svg": {
+			animation: `${spin} 0.7s linear`,
+		},
 	},
 
-	"&:hover": {
-		// transitionDelay: "3s",
+	//////////////////////////////////////////
+	// Tooltip:
+	"&:active": {
+		"&::before, ::after": {
+			visibility: "hidden",
+		},
 
-		"&::before": {
-			position: "absolute",
-			display: "inline-block",
-			height: "auto",
-			width: "auto",
-			left: "90%",
-			top: "50%",
+		// This is for the button in general:
+		// Let the element get the style values set by the first keyframe before the animation starts (during the animation-delay period):
+		animation: `${scale} 0.25s ease 0s`,
+		animationIterationCount: 1,
+		animationDelay: 0,
+	},
 
-			background: "black",
-			padding: "3px 8px",
-			border: 0,
+	"&:hover::before": {
+		visibility: "visible",
 
-			clip: "rect(0, 0, 0, 0)",
-			transform: "translateY(-50%)",
-			transitionDelay: "3s",
+		transition: "all 0.4s 2s ease ",
+	},
 
-			whiteSpace: "nowrap",
-			color: "white",
-			lh: "normal",
-			fs: 16,
+	"&::before, ::after": {
+		visibility: "hidden",
 
-			visibility: "visible",
-			opacity: 1,
+		content: "attr(data-tooltip)",
+		position: "absolute",
+		height: "auto",
+		width: "auto",
+
+		border: "1px solid white",
+		background: "#181818",
+		padding: "3px 8px",
+		zIndex: 100,
+
+		whiteSpace: "nowrap",
+		lineHeight: "normal",
+		ff: "$primary",
+		color: "#fff",
+		ta: "center",
+		fs: "1rem",
+		fw: 500,
+
+		pointerEvents: "none",
+	},
+
+	variants: {
+		"tooltip-side": {
+			"left-bottom": {
+				"&::before, ::after": {
+					bottom: "110%",
+					right: "110%",
+				},
+			},
+			bottom: {
+				"&::before, ::after": {
+					top: "110%",
+				},
+			},
+			right: {
+				"&::before, ::after": {
+					left: "110%",
+				},
+			},
+			left: {
+				"&::before, ::after": {
+					right: "110%",
+				},
+			},
+			top: {
+				"&::before, ::after": {
+					bottom: "110%",
+				},
+			},
 		},
 	},
 
@@ -98,12 +160,7 @@ export const Button = styled("button", {
 	// styles for possible buttons:
 
 	"&.reloading": {
-		"&:hover": {
-			animation: `${spin} 0.5s linear`,
-		},
-
-		"& svg": {
-			animation: `${spin} infinity linear`,
-		},
+		// willChange: "transform",
+		animation: `${spin} 1s infinite linear`,
 	},
 });

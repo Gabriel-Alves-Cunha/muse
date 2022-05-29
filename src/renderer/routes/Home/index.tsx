@@ -1,9 +1,9 @@
 import { MediaListKind } from "@components/MediaListKind";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
+import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
-import { HeaderButtons, HeaderButtonsEnum } from "@components/HeaderButtons";
 
 export function Home() {
 	return (
@@ -11,9 +11,11 @@ export function Home() {
 			<Header>
 				<SearchMedia />
 
-				<HeaderButtons
-					buttons={[HeaderButtonsEnum.RELOAD_BUTTON]}
-					list={PlaylistList.MAIN_LIST}
+				<ButtonGroup
+					buttons={{
+						reload: true,
+						sortBy: true,
+					}}
 				/>
 			</Header>
 

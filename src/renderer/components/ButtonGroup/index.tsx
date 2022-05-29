@@ -1,64 +1,74 @@
-import { Wrapper, Button } from "./styles";
+import type { OneOf } from "@common/@types/generalTypes";
+
+import { ReloadButton } from "./ReloadButton";
+import { SortBy } from "./SortBy";
+import { Clean } from "./Clean";
+
+import { Wrapper } from "./styles";
 
 export function ButtonGroup({ buttons }: Props) {
-	const isOnlyOneButton = buttons.length === 1;
-	const isFirstButton = (index: number) => index === 0;
-	const isLastButton = (index: number) => index === buttons.length - 1;
+	const { clean, reload, sortBy } = buttons;
 
-	const additionalClasses = (index: number) => {
+	const additionalClasses = (button: OneOf<Buttons>) => {
+		const buttonsKeys = Object.values(buttons);
+
+		const isOnlyOneButton = buttonsKeys.filter(Boolean).length === 1;
+
 		if (isOnlyOneButton) return " single-button";
-		else if (isFirstButton(index)) return " first";
-		else if (isLastButton(index)) return " last";
+
+		const isFirstButton = () => {
+			let isFirst = false;
+
+			// On the order that is inside <Wrapper>, the first one that is true, if equals to the button received on params, it is the first one:
+			const first: OneOf<Buttons> = reload
+				? "reload"
+				: sortBy
+				? "sortBy"
+				: "clean";
+
+			if (button === first) isFirst = true;
+
+			return isFirst;
+		};
+
+		const isLastButton = () => {
+			let isLast = false;
+
+			// On the reverse order that is inside <Wrapper>, the first one that is true, if equals to the button received on params, it is the last one:
+			const last: OneOf<Buttons> = clean
+				? "clean"
+				: sortBy
+				? "sortBy"
+				: "reload";
+
+			if (button === last) isLast = true;
+
+			return isLast;
+		};
+
+		if (isFirstButton()) return " first";
+		else if (isLastButton()) return " last";
 		return "";
 	};
 
 	return (
 		<Wrapper>
-			{buttons.map(
-				(
-					{
-						onClick = () => undefined,
-						className = "",
-						tooltip = "",
-						title = "",
-						icon,
-					},
-					index,
-				) => (
-					<Button
-						className={className + additionalClasses(index)}
-						data-tooltip={tooltip}
-						onClick={e => {
-							hideTooltip(e);
-							onClick(e);
-						}}
-						key={title}
-					>
-						{title}
-						{icon}
-					</Button>
-				),
-			)}
+			{/* Order matters here: */}
+			{reload && <ReloadButton className={additionalClasses("reload")} />}
+
+			{sortBy && <SortBy className={additionalClasses("sortBy")} />}
+
+			{clean && <Clean className={additionalClasses("clean")} />}
 		</Wrapper>
 	);
 }
 
-async function hideTooltip(e: React.MouseEvent<HTMLButtonElement>) {
-	const target = e.target as HTMLElement;
-
-	target.classList.remove("tooltip-able");
-
-	setTimeout(() => target.classList.add("tooltip-able"), 0);
-}
-
-type Props = {
-	buttons: GroupButtonProps[];
+type Buttons = {
+	reload?: boolean;
+	sortBy?: boolean;
+	clean?: boolean;
 };
 
-export type GroupButtonProps = {
-	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-	icon?: React.ReactNode;
-	className?: string;
-	tooltip?: string;
-	title?: string;
+type Props = {
+	buttons: Buttons;
 };

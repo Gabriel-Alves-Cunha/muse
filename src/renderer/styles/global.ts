@@ -147,10 +147,6 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			ov: (value: string) => ({ overflow: value }),
 			ox: (value: string) => ({ overflowX: value }),
 			oy: (value: string) => ({ overflowY: value }),
-
-			scale: (value: number | string) => ({
-				transform: `scale(${value})`,
-			}),
 		},
 	});
 
@@ -178,12 +174,11 @@ export const darkTheme = createTheme({
 		"input-border": "#4d4d4d",
 		"input-disabled": "gray",
 
-		"bg-button-hover": "#0072F5",
+		"bg-button-hover": "#08368D",
 		"bg-selected": "#5b6b99",
-		"bg-tooltip": "#343746",
 		"bg-popover": "#182825",
 		"bg-navbar": "#191a21",
-		"bg-button": "#0072F5",
+		"bg-button": "#191a21",
 		"bg-dialog": "#182825",
 		"bg-media": "#191a21",
 		"bg-main": "#191a21",
@@ -192,8 +187,8 @@ export const darkTheme = createTheme({
 		"icon-button-hovered": "#fff2",
 		"button-hovered": "#dbdadc",
 
-		"accent-light": "#9381FF",
-		accent: "#6B6D76",
+		"accent-light": "#F4A1A9",
+		accent: "#C04569",
 
 		"ctx-menu-item-text-disabled": "#d3d3d5",
 		"ctx-menu-item-bg-focus": "#6c56d0",
@@ -248,7 +243,6 @@ export const lightTheme = createTheme({
 
 		"bg-button-hover": "#005ec9",
 		"bg-selected": "#5b6b99",
-		"bg-tooltip": "#f7f7f7",
 		"bg-popover": "#FAFAC6",
 		"bg-button": "#0072F5",
 		"bg-navbar": "#f9f6f5",

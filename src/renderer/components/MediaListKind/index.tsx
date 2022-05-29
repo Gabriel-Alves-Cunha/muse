@@ -11,7 +11,7 @@ import {
 	computeItemKey,
 	reloadWindow,
 	itemContent,
-	useFromList,
+	setFromList,
 } from "./helper";
 import {
 	usePlaylists,
@@ -54,7 +54,8 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 		usePlaylists();
 
 	useEffect(() => {
-		useFromList.setState({ fromList });
+		setFromList({ fromList });
+		console.log({ fromList });
 	}, [fromList]);
 
 	const listAsArrayOfAMap: [Path, Media][] = useMemo(
