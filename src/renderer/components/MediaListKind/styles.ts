@@ -2,7 +2,7 @@ import { Trigger } from "@radix-ui/react-dialog";
 
 import { styled } from "@styles/global";
 
-export const ImgWrapper = styled("div", {
+export const Img = styled("div", {
 	$$size: "45px",
 
 	display: "flex", // row
@@ -75,7 +75,6 @@ export const SubTitle = styled("p", {
 	},
 });
 
-/** You need to set the width! */
 export const TriggerOptions = styled(Trigger, {
 	position: "relative",
 	display: "flex", // row
@@ -139,9 +138,7 @@ export const ListWrapper = styled("div", {
 
 export const RowWrapper = styled("div", {
 	position: "relative",
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 	width: "98%",
 	height: 65,
 	left: 7,
@@ -160,20 +157,16 @@ export const RowWrapper = styled("div", {
 		background: "$bg-selected",
 		boxShadow: "$bg-selected",
 	},
-});
 
-export const PlayButton = styled("button", {
-	position: "relative",
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	"& button.play": {
+		dflex: "center",
+		height: "100%",
+		width: "90%",
 
-	height: "100%",
-	width: "90%",
-
-	background: "transparent",
-	cursor: "pointer",
-	border: "none",
+		background: "transparent",
+		cursor: "pointer",
+		border: "none",
+	},
 });
 
 export const ErrorMsg = styled("pre", {

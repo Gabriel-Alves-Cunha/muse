@@ -6,7 +6,7 @@ import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
 import { assertUnreachable } from "@utils/utils";
 import { MainCtxMenu } from "./mainCtxMenu";
 
-import { Content, Box } from "./styles";
+import { Content } from "./styles";
 
 export enum ContentEnum {
 	FULL_EXAMPLE,
@@ -16,13 +16,11 @@ export enum ContentEnum {
 const { FULL_EXAMPLE, MAIN } = ContentEnum;
 
 export const ContextMenu = ({ children, content = MAIN }: Props) => (
-	<Box>
-		<Root>
-			<Trigger>{children}</Trigger>
+	<Root>
+		<Trigger>{children}</Trigger>
 
-			<Content sideOffset={5}>{contentToShow(content)}</Content>
-		</Root>
-	</Box>
+		<Content sideOffset={5}>{contentToShow(content)}</Content>
+	</Root>
 );
 
 const contentToShow = (content: NonNullable<Props["content"]>) => {

@@ -1,9 +1,9 @@
-import { Root } from "@radix-ui/react-select";
+import { Root, Value } from "@radix-ui/react-select";
 
 import { assertUnreachable } from "@utils/utils";
 import { HeaderButtons } from "./HeaderButtons";
 
-import { Content, Box, Trigger } from "./styles";
+import { Content, Trigger } from "./styles";
 
 export enum ContentEnum {
 	HEADER_BUTTONS,
@@ -12,19 +12,23 @@ export enum ContentEnum {
 const { HEADER_BUTTONS } = ContentEnum;
 
 export function Select<Options extends string>({
+	"data-tooltip": dataTooltip,
 	content = HEADER_BUTTONS,
+	triggerClassName = "",
+	triggerTitle = "",
 	children,
 	setValue,
 	value,
 }: Props<Options>) {
 	return (
-		<Box>
-			<Root value={value} onValueChange={setValue}>
-				<Trigger>{children}</Trigger>
+		<Root value={value} onValueChange={setValue}>
+			<Trigger className={triggerClassName} data-tooltip={dataTooltip}>
+				<Value>{triggerTitle}</Value>
+				{children}
+			</Trigger>
 
-				<Content>{contentToShow(content)}</Content>
-			</Root>
-		</Box>
+			<Content>{contentToShow(content)}</Content>
+		</Root>
 	);
 }
 
@@ -45,7 +49,10 @@ function contentToShow<Options extends string>(
 
 type Props<Options extends string> = {
 	setValue: (value: Options) => void;
+	triggerClassName?: string;
 	children: React.ReactNode;
+	"data-tooltip": string;
 	content?: ContentEnum;
+	triggerTitle?: string;
 	value: Options;
 };

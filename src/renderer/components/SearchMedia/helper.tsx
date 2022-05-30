@@ -12,7 +12,7 @@ import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { Tooltip } from "@components/Tooltip";
 
-import { ImgWrapper } from "../MediaListKind/styles";
+import { Img } from "../MediaListKind/styles";
 import {
 	SearchMediaPopoverAnchor,
 	NothingFound,
@@ -139,13 +139,13 @@ const Row = ({
 	return (
 		<Tooltip text="Play this media">
 			<Result onClick={() => playThisMedia(path, PlaylistList.MAIN_LIST)}>
-				<ImgWrapper>
+				<Img>
 					<ImgWithFallback
 						Fallback={<MusicNote size={13} />}
 						mediaPath={path}
 						mediaImg={img}
 					/>
-				</ImgWrapper>
+				</Img>
 
 				<Info>
 					<Title>

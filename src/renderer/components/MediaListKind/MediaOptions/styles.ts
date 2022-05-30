@@ -14,17 +14,6 @@ const overlayShow = keyframes({
 	"100%": { opacity: 1 },
 });
 
-const contentShow = keyframes({
-	"0%": {
-		transform: "translate(-50%, -48%) scale(.96)",
-		opacity: 0,
-	},
-	"100%": {
-		transform: "translate(-50%, -50%) scale(1)",
-		opacity: 1,
-	},
-});
-
 export const StyledOverlay = styled(Overlay, {
 	position: "fixed",
 	display: "grid",
@@ -40,18 +29,19 @@ export const StyledOverlay = styled(Overlay, {
 	overflowY: "auto",
 	zIndex: 100,
 
-	"@media (prefers-reduced-motion: no-preference)": {
-		animation: `${overlayShow} 100ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
-	},
+	animation: `${overlayShow} 0.1s linear`,
 });
 
 export const StyledContent = styled(Content, {
+	all: "unset",
+
 	position: "fixed",
+	display: "grid",
 
 	// Center:
-	transform: "translate(-50%, -50%)",
-	left: "50%",
-	top: "50%",
+	// transform: "translate(50%, 25%)",
+	// left: "50%",
+	// top: "50%",
 
 	maxHeight: "85vh",
 	maxWidth: 450,
@@ -62,29 +52,40 @@ export const StyledContent = styled(Content, {
 	borderRadius: 4,
 	zIndex: 150,
 
-	boxShadow: "$dialog",
+	animation: `${overlayShow} 0.1s linear`,
 
-	"@media (prefers-reduced-motion: no-preference)": {
-		animation: `${contentShow} 100ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+	"&#second": {
+		position: "fixed",
+		display: "grid",
+		top: "50%",
+		// transform: "translate(0%, -150%)",
+		height: 100,
+		width: 300,
+
+		padding: 30,
+
+		background: "$bg-dialog",
+		borderRadius: 4,
+		zIndex: 150,
 	},
 });
 
 export const StyledTitle = styled(Title, {
-	margin: 0,
+	all: "unset",
 
 	ff: "$secondary",
-	letterSpacing: "0.05rem",
-	fontSize: "1.1rem",
-	fontWeight: 600,
 	color: "$text",
+	ls: "0.07rem",
+	fs: "1.1rem",
+	fw: 600,
 });
 
 export const StyledDescription = styled(Description, {
 	margin: "10px 0 20px",
 
-	ff: "$secondary",
 	letterSpacing: "0.03rem",
 	color: "$gray-text",
+	ff: "$secondary",
 	fontSize: "1rem",
 	lineHeight: 1.5,
 });
@@ -105,10 +106,10 @@ export const TriggerToRemoveMedia = styled(Trigger, {
 	border: "none",
 	color: "white",
 
-	letterSpacing: "0.04rem",
-	fontSize: "1rem",
-	fontWeight: 600,
-	lineHeight: 1,
+	ls: "0.04rem",
+	fs: "1rem",
+	fw: 600,
+	lh: 1,
 
 	"&:focus": {
 		border: "1px solid #821e20",
@@ -119,43 +120,11 @@ export const TriggerToRemoveMedia = styled(Trigger, {
 	},
 });
 
-export const CloseIcon = styled(Close, {
+export const CloseDialog = styled(Close, {
 	all: "unset",
 
-	position: "absolute",
 	boxSizing: "border-box", // So that border doens't occupy space
-	display: "flex",
-	justifyContent: "center",
-	alignItems: "center",
-	right: 10,
-	size: 26,
-	top: 10,
-
-	borderRadius: "50%",
-	cursor: "pointer",
-
-	"& svg": {
-		fill: "$accent-light",
-	},
-
-	"&:focus": {
-		border: "1px solid $accent-light",
-	},
-
-	"&:hover": {
-		background: "$icon-button-hovered",
-
-		"& svg": {
-			fill: "white",
-		},
-	},
-});
-
-export const ButtonToClose = styled(Close, {
-	display: "inline-flex",
-	boxSizing: "border-box", // So that border doens't occupy space
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 	height: 35,
 
 	padding: "0 15px",
@@ -163,12 +132,18 @@ export const ButtonToClose = styled(Close, {
 	borderRadius: 4,
 	border: "none",
 
-	letterSpacing: "0.04rem",
-	fontSize: "1rem",
-	fontWeight: 600,
-	lineHeight: 1,
+	ff: "$secondary",
+	ls: "0.04rem",
+	fs: "1rem",
+	fw: 600,
+	lh: 1,
 
 	"&#delete-media": {
+		ff: "$secondary",
+		ls: "0.04rem",
+		fs: "1rem",
+		fw: 600,
+
 		background: "#bb2b2e",
 		color: "white",
 
@@ -182,6 +157,11 @@ export const ButtonToClose = styled(Close, {
 	},
 
 	"&#cancel": {
+		ff: "$secondary",
+		ls: "0.04rem",
+		fs: "1rem",
+		fw: 600,
+
 		background: "transparent",
 		color: "#2c6e4f",
 
@@ -194,7 +174,52 @@ export const ButtonToClose = styled(Close, {
 		},
 	},
 
+	"&#reset-app-data": {
+		ff: "$secondary",
+		ls: "0.04rem",
+		fs: "1rem",
+		fw: 600,
+
+		background: "#94a59b",
+		margin: "10px 0",
+		color: "black",
+
+		"&:focus": {
+			border: "1px solid #c6dbce",
+		},
+
+		"&:hover": {
+			background: "#c6dbce",
+		},
+	},
+
+	"&#reload-window": {
+		ff: "$secondary",
+		ls: "0.04rem",
+		fs: "1rem",
+		fw: 600,
+
+		background: "#94a59b",
+		color: "black",
+
+		"&:focus": {
+			border: "1px solid #c6dbce",
+		},
+
+		"&:hover": {
+			background: "#c6dbce",
+		},
+	},
+
 	"&#save-changes": {
+		height: 35,
+
+		ff: "$secondary",
+		lh: "2.1875rem", // same as height (35px)
+		ls: "0.04rem",
+		fs: "1rem",
+		fw: 600,
+
 		background: "#ddf4e5",
 		color: "#2c6e4f",
 
@@ -207,38 +232,42 @@ export const ButtonToClose = styled(Close, {
 		},
 	},
 
-	"&#reset-app-data": {
-		background: "#94a59b",
-		color: "black",
-		margin: "10px 0",
-		fw: 500,
+	"&#close-icon": {
+		all: "unset",
+
+		boxSizing: "border-box", // So that border doens't occupy space
+		position: "absolute",
+		dflex: "center",
+		right: 10,
+		top: 10,
+
+		size: "26px !important",
+
+		borderRadius: "50%",
+		cursor: "pointer",
+
+		"& svg": {
+			fill: "$accent-light",
+		},
 
 		"&:focus": {
-			border: "1px solid #c6dbce",
+			border: "1px solid $accent-light",
 		},
 
 		"&:hover": {
-			background: "#c6dbce",
-		},
-	},
+			background: "$icon-button-hovered",
 
-	"&#reload-window": {
-		background: "#94a59b",
-		color: "black",
-		fw: 500,
-
-		"&:focus": {
-			border: "1px solid #c6dbce",
-		},
-
-		"&:hover": {
-			background: "#c6dbce",
+			"& svg": {
+				fill: "white",
+			},
 		},
 	},
 });
 
-export const Flex = styled("div", {
-	display: "flex",
+export const FlexRow = styled("div", {
+	all: "unset",
+
+	display: "flex", // row
 	justifyContent: "flex-end",
 	marginTop: 25,
 	gap: 20,
@@ -266,6 +295,7 @@ export const Label = styled("label", {
 	fontSize: 15,
 });
 
+// TODO: change to be equal to SearchMedia's
 export const Input = styled("input", {
 	all: "unset",
 

@@ -11,13 +11,11 @@ import {
 
 import { styled } from "@styles/global";
 
-export const Box = styled("div", {});
-
 export const Content = styled(CtxContent, {
 	overflow: "hidden",
 	minWidth: 220,
 
-	background: "white",
+	background: "$bg-ctx-menu",
 	borderRadius: 6,
 	padding: 5,
 
@@ -52,7 +50,7 @@ export const itemStyles = styled("div", {
 
 	"&:focus": {
 		color: "$ctx-menu-item-text-focus",
-		background: "#6c56d0",
+		background: "$ctx-menu-item-bg-focus",
 	},
 });
 
@@ -82,6 +80,7 @@ export const RadioItem = styled(CtxRadioItem, {
 export const TriggerItem = styled(CtxTriggerItem, {
 	"&[data-state='open']": {
 		color: "$ctx-menu-item-text",
+		// TODO: maybe this is $bg-popover:
 		background: "white",
 	},
 
@@ -91,9 +90,9 @@ export const TriggerItem = styled(CtxTriggerItem, {
 export const Label = styled(CtxLabel, {
 	pl: 25,
 
-	ff: "$secondary",
 	color: "$ctx-menu-text",
 	lineHeight: "25px",
+	ff: "$secondary",
 	fontSize: 12,
 });
 

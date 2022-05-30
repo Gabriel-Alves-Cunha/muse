@@ -28,10 +28,10 @@ import {
 	Center,
 } from "./styles";
 import {
-	ButtonToClose,
 	StyledContent,
 	StyledOverlay,
 	StyledTitle,
+	CloseDialog,
 } from "./MediaOptions/styles";
 
 // href="https://www.flaticon.com/free-icons/error" =>
@@ -76,7 +76,7 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 					});
 					return listAsArrayOfAMap;
 				} else if (list instanceof Map) {
-					// Since the only list that is a Map is the
+					// Since the ONLY list that is a Map is the
 					// mainList, we can take a shortcut:
 					return Array.from(mainList);
 				}
@@ -130,7 +130,7 @@ function ErrorFallback({ error }: ErrorBoundaryProps) {
 
 					<ErrorMsg>{error.message}</ErrorMsg>
 
-					<ButtonToClose
+					<CloseDialog
 						onClick={() => {
 							resetAllAppData();
 							reloadWindow();
@@ -138,11 +138,11 @@ function ErrorFallback({ error }: ErrorBoundaryProps) {
 						id="reset-app-data"
 					>
 						Reset all app data
-					</ButtonToClose>
+					</CloseDialog>
 
-					<ButtonToClose id="reload-window" onClick={reloadWindow}>
+					<CloseDialog id="reload-window" onClick={reloadWindow}>
 						Reload window
-					</ButtonToClose>
+					</CloseDialog>
 				</Center>
 			</StyledContent>
 		</Dialog>

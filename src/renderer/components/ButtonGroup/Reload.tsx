@@ -1,23 +1,23 @@
 import { MdAutorenew as ReloadIcon } from "react-icons/md";
 
+import { TooltipButton } from "@components/TooltipButton";
 import {
 	searchLocalComputerForMedias,
 	usePlaylists,
 } from "@contexts/mediaHandler/usePlaylists";
 
-import { Button } from "./styles";
-
-export function ReloadButton({ className }: Props) {
+export function Reload({ className }: Props) {
 	const { isLoadingMedias } = usePlaylists();
 
 	return (
-		<Button
+		<TooltipButton
 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
 			onClick={searchLocalComputerForMedias}
-			data-tooltip="Reaload all medias"
+			tooltip="Reaload all medias"
+			type="button"
 		>
 			<ReloadIcon size={17} />
-		</Button>
+		</TooltipButton>
 	);
 }
 

@@ -9,4 +9,11 @@ export function shallowEqual(object1: Obj, object2: Obj) {
 	return true;
 }
 
+export function objectDeepKeys(obj: Obj): string[] {
+	return Object.keys(obj)
+		.filter(key => obj[key] instanceof Object)
+		.map(key => objectDeepKeys(obj[key] as Obj).map(k => `${key}.${k}`))
+		.reduce((x, y) => x.concat(y), Object.keys(obj));
+}
+
 type Obj = Record<string, unknown>;

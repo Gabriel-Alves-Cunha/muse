@@ -20,7 +20,7 @@ export const useConvertInfoList = create<ConvertInfoList>(() => new Map());
 export const { setState: setConvertInfoList, getState: convertInfoList } =
 	useConvertInfoList;
 
-export const Popup = () => {
+export function Popup() {
 	const convertingList_ = convertingList();
 
 	return (
@@ -34,7 +34,7 @@ export const Popup = () => {
 			)}
 		</>
 	);
-};
+}
 
 export const ConvertBox = ({
 	mediaBeingConverted: { toExtension, timeConverted, sizeConverted },

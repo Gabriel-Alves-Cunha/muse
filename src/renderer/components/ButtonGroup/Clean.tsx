@@ -1,6 +1,7 @@
 import { FiTrash as CleanIcon } from "react-icons/fi";
 
 import { assertUnreachable } from "@utils/utils";
+import { TooltipButton } from "@components/TooltipButton";
 import { getFromList } from "@components/MediaListKind/helper";
 import {
 	cleanFavorites,
@@ -8,24 +9,23 @@ import {
 	PlaylistList,
 } from "@contexts/mediaHandler/usePlaylists";
 
-import { Button } from "./styles";
-
 export function Clean({ className }: Props) {
 	return (
-		<Button
-			data-tooltip="Clean list"
+		<TooltipButton
 			onClick={handleOnClick}
 			className={className}
+			tooltip="Clean list"
+			type="button"
 		>
 			<CleanIcon size={17} />
-		</Button>
+		</TooltipButton>
 	);
 }
 
 const handleOnClick = () => {
-	const list = getFromList().fromList;
+	const { fromList } = getFromList();
 
-	switch (list) {
+	switch (fromList) {
 		case PlaylistList.FAVORITES:
 			cleanFavorites();
 			break;
@@ -44,7 +44,7 @@ const handleOnClick = () => {
 			break;
 
 		default:
-			assertUnreachable(list);
+			assertUnreachable(fromList);
 			break;
 	}
 };

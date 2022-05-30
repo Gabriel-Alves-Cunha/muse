@@ -11,19 +11,12 @@ import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
+import { TooltipButton } from "@components/TooltipButton";
+import { DialogTrigger } from "@components/Dialog";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
-import { Tooltip } from "@components/Tooltip";
 
+import { RowWrapper, SubTitle, Title, Info, Img } from "./styles";
 import { StyledOverlay } from "./MediaOptions/styles";
-import {
-	TriggerOptions,
-	PlayButton,
-	RowWrapper,
-	ImgWrapper,
-	SubTitle,
-	Title,
-	Info,
-} from "./styles";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -50,31 +43,32 @@ const Row = memo(
 				}
 				ref={mediaRowRef}
 			>
-				<Tooltip text="Play this media">
-					<PlayButton
-						onClick={() => playThisMedia(path, getFromList().fromList)}
-					>
-						<ImgWrapper>
-							<ImgWithFallback
-								Fallback={<MusicNote size="1.4rem" />}
-								mediaImg={media.img}
-								mediaPath={path}
-							/>
-						</ImgWrapper>
+				<TooltipButton
+					onClick={() => playThisMedia(path, getFromList().fromList)}
+					tooltip="Play this media"
+					className="play"
+				>
+					<Img>
+						<ImgWithFallback
+							Fallback={<MusicNote size="1.4rem" />}
+							mediaImg={media.img}
+							mediaPath={path}
+						/>
+					</Img>
 
-						<Info>
-							<Title>{media.title}</Title>
-							<SubTitle className="row">{media.duration}</SubTitle>
-						</Info>
-					</PlayButton>
-				</Tooltip>
+					<Info>
+						<Title>{media.title}</Title>
+						<SubTitle className="row">{media.duration}</SubTitle>
+					</Info>
+				</TooltipButton>
 
 				<Dialog modal>
-					<Tooltip text="Open media options">
-						<TriggerOptions style={{ width: 29 }}>
-							<Dots />
-						</TriggerOptions>
-					</Tooltip>
+					<DialogTrigger
+						data-tooltip="Open media options"
+						tooltip-side="left-bottom"
+					>
+						<Dots />
+					</DialogTrigger>
 
 					<StyledOverlay>
 						<MediaOptionsModal media={media} path={path} />
@@ -83,17 +77,18 @@ const Row = memo(
 			</RowWrapper>
 		);
 	},
+	// At the moment, the only that changes is duration, so we can use shallow:
 	(prev, curr) => prev.media.duration === curr.media.duration,
 );
 Row.displayName = "Row";
 
+const leftClick = 0;
 const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e: Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>,
 	isSelected: Mutable<boolean>,
 	mediaPath: Readonly<Path>,
 ) => {
-	// `e.button === 0` is left click
-	if (!e.ctrlKey || e.button !== 0) return;
+	if (!e.ctrlKey || e.button !== leftClick) return;
 
 	e.preventDefault();
 	e.stopPropagation();

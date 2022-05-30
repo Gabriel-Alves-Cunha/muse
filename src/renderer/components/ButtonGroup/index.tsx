@@ -1,6 +1,6 @@
 import type { OneOf } from "@common/@types/generalTypes";
 
-import { ReloadButton } from "./ReloadButton";
+import { Reload } from "./Reload";
 import { SortBy } from "./SortBy";
 import { Clean } from "./Clean";
 
@@ -10,9 +10,7 @@ export function ButtonGroup({ buttons }: Props) {
 	const { clean, reload, sortBy } = buttons;
 
 	const additionalClasses = (button: OneOf<Buttons>) => {
-		const buttonsKeys = Object.values(buttons);
-
-		const isOnlyOneButton = buttonsKeys.filter(Boolean).length === 1;
+		const isOnlyOneButton = Object.keys(buttons).filter(Boolean).length === 1;
 
 		if (isOnlyOneButton) return " single-button";
 
@@ -54,7 +52,7 @@ export function ButtonGroup({ buttons }: Props) {
 	return (
 		<Wrapper>
 			{/* Order matters here: */}
-			{reload && <ReloadButton className={additionalClasses("reload")} />}
+			{reload && <Reload className={additionalClasses("reload")} />}
 
 			{sortBy && <SortBy className={additionalClasses("sortBy")} />}
 

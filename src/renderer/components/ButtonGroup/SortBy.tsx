@@ -1,11 +1,9 @@
-import { BsSortDown as SortIcon } from "react-icons/bs";
+import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { setFromList } from "@components/MediaListKind/helper";
-import { Select } from "@components/SelectButton";
-
-import { Button } from "./styles";
+import { Select } from "@components/Select";
 
 export function SortBy({ className }: Props) {
 	const [selectedList, setSelectedList] = useState<SelectedList>("None");
@@ -22,11 +20,11 @@ export function SortBy({ className }: Props) {
 	return (
 		<Select
 			setValue={setSelectedList as (value: SelectedList) => void}
+			triggerClassName={className}
+			data-tooltip="Sort by"
 			value={selectedList}
 		>
-			<Button className={className}>
-				<SortIcon size={17} />
-			</Button>
+			<SortIcon size={19} />
 		</Select>
 	);
 }

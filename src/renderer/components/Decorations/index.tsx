@@ -5,8 +5,8 @@ import {
 } from "react-icons/vsc";
 
 import { capitalizedAppName } from "@common/utils";
+import { TooltipButton } from "@components/TooltipButton";
 import { usePage } from "@contexts/page";
-import { Tooltip } from "../Tooltip";
 import {
 	toggleMaximize,
 	minimizeWindow,
@@ -17,7 +17,6 @@ import {
 import {
 	AppName_Folder_Wrapper,
 	WindowButtons,
-	WindowButton,
 	AppIcon,
 	Wrapper,
 } from "./styles";
@@ -37,23 +36,32 @@ export const Decorations = () => (
 
 const Buttons = () => (
 	<WindowButtons>
-		<Tooltip text="Close window">
-			<WindowButton onClick={closeWindow} id="close">
-				<Close size={16} />
-			</WindowButton>
-		</Tooltip>
+		<TooltipButton
+			tooltip-side="left-bottom"
+			tooltip="Close window"
+			onClick={closeWindow}
+			type="button"
+			id="close"
+		>
+			<Close size={16} />
+		</TooltipButton>
 
-		<Tooltip text="Toggle maximize window">
-			<WindowButton onClick={toggleMaximize}>
-				<Maximize size={16} />
-			</WindowButton>
-		</Tooltip>
+		<TooltipButton
+			tooltip="Toggle maximize window"
+			tooltip-side="left-bottom"
+			onClick={toggleMaximize}
+			type="button"
+		>
+			<Maximize size={16} />
+		</TooltipButton>
 
-		<Tooltip text="Minimize window">
-			<WindowButton onClick={minimizeWindow}>
-				<Minimize size={16} />
-			</WindowButton>
-		</Tooltip>
+		<TooltipButton
+			tooltip="Minimize window"
+			onClick={minimizeWindow}
+			type="button"
+		>
+			<Minimize size={16} />
+		</TooltipButton>
 	</WindowButtons>
 );
 

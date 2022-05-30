@@ -272,8 +272,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 											{ newPath, path, newMedia, mainList: get().mainList },
 										);
 								} else if (newMedia.title !== oldMedia.title)
-									updateSortedAndMainLists(mainList);
-								else set({ mainList });
+									updateSortedAndMainLists(mainList.set(path, newMedia));
+								else set({ mainList: mainList.set(path, newMedia) });
 
 								dbgPlaylists(
 									"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",

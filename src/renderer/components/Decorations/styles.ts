@@ -14,32 +14,7 @@ export const Wrapper = styled("header", {
 
 	"-webkit-app-region": "drag",
 	// ^ window-draggable-region
-	"user-select": "none",
-});
-
-export const WindowButton = styled("button", {
-	display: "flex", // row
-	justifyContent: "center",
-	alignContent: "center",
-	alignItems: "center",
-
-	color: "$window-buttons",
-	cursor: "pointer",
-	border: "none",
-
-	height: DECORATIONS_HEADER_HEIGHT,
-	width: 48,
-
-	background: "transparent",
-
-	"&:hover": {
-		background: "$icon-button-hovered",
-	},
-
-	"&#close:hover": {
-		background: "#e70000",
-		color: "white",
-	},
+	userSelect: "none",
 });
 
 export const WindowButtons = styled("div", {
@@ -49,6 +24,31 @@ export const WindowButtons = styled("div", {
 	height: "100%",
 
 	background: "transparent",
+
+	button: {
+		display: "flex", // row
+		justifyContent: "center",
+		alignContent: "center",
+		alignItems: "center",
+
+		color: "$window-buttons",
+		cursor: "pointer",
+		border: "none",
+
+		height: DECORATIONS_HEADER_HEIGHT,
+		width: 48,
+
+		background: "transparent",
+
+		"&:hover": {
+			background: "$icon-button-hovered",
+		},
+
+		"&#close:hover": {
+			background: "#e70000",
+			color: "white",
+		},
+	},
 });
 
 export const AppName_Folder_Wrapper = styled("div", {

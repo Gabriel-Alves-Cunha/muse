@@ -1,5 +1,6 @@
 * TODO: impl select on media
 * TODO: try to get rid of readline with console.stdout
+* TODO: change mainList for sortedByName
 
 NOTES:
 

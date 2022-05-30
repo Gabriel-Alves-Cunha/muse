@@ -1,6 +1,10 @@
 import { createStitches } from "@stitches/react";
 import { toast } from "react-toastify";
 
+import { dbg, isDevelopment } from "@common/utils";
+import { objectDeepKeys } from "@utils/object";
+import { arraysEqual } from "@utils/array";
+
 export const { styled, globalCss, keyframes, createTheme, css } =
 	createStitches({
 		media: {
@@ -113,7 +117,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				fontFamily: value,
 			}),
 			fw: (value: string | number) => ({
-				flexWeight: value,
+				fontWeight: value,
 			}),
 			fs: (value: number | string) => ({
 				fontSize: value,
@@ -162,7 +166,7 @@ export const darkTheme = createTheme({
 		"media-player-icons": "#f3f3ee",
 		"deactivated-icon": "#6272a4",
 		"active-icon": "#4a00e0",
-		"window-buttons": "white",
+		"window-buttons": "#fff",
 
 		"input-placeholder": "#a3a3a3",
 		"alternative-text": "#ccb69b",
@@ -182,6 +186,8 @@ export const darkTheme = createTheme({
 		"bg-dialog": "#182825",
 		"bg-media": "#191a21",
 		"bg-main": "#191a21",
+		"bg-ctx-menu": "#fff",
+		"bg-select": "#fff",
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#fff2",
@@ -192,7 +198,7 @@ export const darkTheme = createTheme({
 
 		"ctx-menu-item-text-disabled": "#d3d3d5",
 		"ctx-menu-item-bg-focus": "#6c56d0",
-		"ctx-menu-item-text-focus": "white",
+		"ctx-menu-item-text-focus": "#fff",
 		"ctx-menu-item-text": "#5747a6",
 		"ctx-menu-separator": "#d7d3e2",
 		"ctx-menu-text": "#7a797d",
@@ -213,7 +219,7 @@ export const darkTheme = createTheme({
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 
-		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
+		"#fff-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
 	},
 });
 
@@ -226,7 +232,7 @@ export const lightTheme = createTheme({
 		"lingrad-top": "#8e2de2",
 		"lingrad-bottom": "#4a00e0",
 
-		"media-player-icons": "white",
+		"media-player-icons": "#fff",
 		"deactivated-icon": "dimgray",
 		"active-icon": "#4a00e0",
 		"window-buttons": "black",
@@ -247,8 +253,10 @@ export const lightTheme = createTheme({
 		"bg-button": "#0072F5",
 		"bg-navbar": "#f9f6f5",
 		"bg-main": "#f9f6f5",
-		"bg-dialog": "white",
-		"bg-media": "white",
+		"bg-ctx-menu": "#fff",
+		"bg-dialog": "#fff",
+		"bg-select": "#fff",
+		"bg-media": "#fff",
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#88888820",
@@ -259,7 +267,7 @@ export const lightTheme = createTheme({
 
 		"ctx-menu-item-text-disabled": "#d3d3d5",
 		"ctx-menu-item-bg-focus": "#6c56d0",
-		"ctx-menu-item-text-focus": "white",
+		"ctx-menu-item-text-focus": "#fff",
 		"ctx-menu-item-text": "#5747a6",
 		"ctx-menu-separator": "#d7d3e2",
 		"ctx-menu-text": "#7a797d",
@@ -280,9 +288,29 @@ export const lightTheme = createTheme({
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 
-		"white-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px white",
+		"#fff-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
 	},
 });
+
+// darkTheme and lightTheme must have the same keys
+// (colors, shadows, etc) so that the theme can be
+// switched between them without react rerenders!
+if (isDevelopment) {
+	// @ts-ignore It will work:
+	const lightThemeKeys = objectDeepKeys(lightTheme);
+	// @ts-ignore It will work:
+	const darkThemeKeys = objectDeepKeys(darkTheme);
+	const areEqual = arraysEqual(lightThemeKeys, darkThemeKeys);
+
+	dbg(
+		{
+			lightThemeKeys,
+			darkThemeKeys,
+		},
+		"Are light and dark themes keys the same?",
+		areEqual,
+	);
+}
 
 export const GlobalCSS = globalCss({
 	"*, *:after, *:before": {
@@ -318,7 +346,7 @@ export const GlobalCSS = globalCss({
 
 		"::selection": {
 			background: "$accent",
-			color: "white",
+			color: "#fff",
 		},
 
 		"::-webkit-scrollbar": {

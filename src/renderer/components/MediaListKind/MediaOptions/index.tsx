@@ -18,13 +18,12 @@ import {
 	StyledDescription,
 	StyledContent,
 	StyledOverlay,
-	ButtonToClose,
 	StyledTitle,
-	CloseIcon,
+	CloseDialog,
 	Fieldset,
 	Input,
 	Label,
-	Flex,
+	FlexRow,
 } from "./styles";
 
 export function MediaOptionsModal({ media, path }: Props) {
@@ -32,8 +31,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		const handleKeyUp = (e: KeyboardEvent) =>
-			e.key === "Enter" &&
+		const handleKeyUp = ({ key }: KeyboardEvent) =>
+			key === "Enter" &&
 			handleChange(contentWrapperRef, closeButtonRef, path, media);
 
 		document.addEventListener("keyup", handleKeyUp);
@@ -51,9 +50,9 @@ export function MediaOptionsModal({ media, path }: Props) {
 			</StyledDescription>
 
 			<Tooltip text="Close">
-				<CloseIcon ref={closeButtonRef}>
+				<CloseDialog ref={closeButtonRef} id="close-icon">
 					<Close />
-				</CloseIcon>
+				</CloseDialog>
 			</Tooltip>
 
 			{Object.entries(options(media)).map(([option, value]) => (
@@ -67,7 +66,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				</Fieldset>
 			))}
 
-			<Flex>
+			<FlexRow>
 				<Dialog modal>
 					<TriggerToRemoveMedia>
 						Delete media
@@ -76,31 +75,33 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 					<StyledOverlay />
 
-					<StyledContent>
+					<StyledContent id="second">
 						<StyledTitle>
 							Are you sure you want to delete this media from your computer?
 						</StyledTitle>
 
-						<ButtonToClose
-							onClick={() => handleMediaDeletion(closeButtonRef, path)}
-							id="delete-media"
-						>
-							Confirm
-						</ButtonToClose>
+						<FlexRow>
+							<CloseDialog
+								onClick={() => handleMediaDeletion(closeButtonRef, path)}
+								id="delete-media"
+							>
+								Confirm
+							</CloseDialog>
 
-						<ButtonToClose id="cancel">Cancel</ButtonToClose>
+							<CloseDialog id="cancel">Cancel</CloseDialog>
+						</FlexRow>
 					</StyledContent>
 				</Dialog>
 
-				<ButtonToClose
+				<CloseDialog
 					onClick={() =>
 						handleChange(contentWrapperRef, closeButtonRef, path, media)
 					}
 					id="save-changes"
 				>
 					Save changes
-				</ButtonToClose>
-			</Flex>
+				</CloseDialog>
+			</FlexRow>
 		</StyledContent>
 	);
 }
@@ -132,6 +133,8 @@ const handleChange = (
 	mediaPath: Path,
 	media: Media,
 ) => {
+	dbg("handleChange, MediaOptions.tsx");
+
 	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
 			changePropsIfAllowed(contentWrapperRef, mediaPath, media);
