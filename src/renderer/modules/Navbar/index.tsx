@@ -9,14 +9,14 @@ import {
 	MdHistory as History,
 } from "react-icons/md";
 
+import { TooltipButton } from "@components/TooltipButton";
 import { ThemeToggler } from "@modules/ThemeToggler";
 import { Downloading } from "@modules/Downloading";
 import { Converting } from "@modules/Converting";
-import { Tooltip } from "@components/Tooltip";
 import { usePage } from "@contexts/page";
 import { pages } from "@utils/app";
 
-import { ScaleUpIconButton, Nav, Buttons, Popups } from "./styles";
+import { Nav, Buttons, Popups } from "./styles";
 
 const { setState: setPage } = usePage;
 
@@ -49,14 +49,15 @@ const ButtonsForPages = () => {
 	return (
 		<Buttons>
 			{pages.map(page => (
-				<Tooltip text={`Go to ${page}`} key={page} side="right">
-					<ScaleUpIconButton
-						className={page === currPage ? "active" : ""}
-						onClick={() => setPage({ page })}
-					>
-						{icons[page]}
-					</ScaleUpIconButton>
-				</Tooltip>
+				<TooltipButton
+					className={"scale-up-icon " + (page === currPage ? "active" : "")}
+					onClick={() => setPage({ page })}
+					tooltip={`Go to ${page}`}
+					tooltip-side="right"
+					key={page}
+				>
+					{icons[page]}
+				</TooltipButton>
 			))}
 		</Buttons>
 	);

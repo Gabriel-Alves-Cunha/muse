@@ -1,9 +1,10 @@
-import { VariantProps } from "@stitches/react/types";
+import { VariantProps, CSS } from "@stitches/react/types";
 import { styled } from "@styles/global";
 
 export const TooltipButton = ({
 	"tooltip-side": tooltipSide,
 	className = "",
+	css = {},
 	children,
 	tooltip,
 	...props
@@ -12,6 +13,7 @@ export const TooltipButton = ({
 		tooltip-side={tooltipSide}
 		data-tooltip={tooltip}
 		className={className}
+		css={css}
 		{...props}
 	>
 		{children}
@@ -20,6 +22,10 @@ export const TooltipButton = ({
 
 export const TooltipButton_ = styled("button", {
 	position: "relative",
+
+	background: "none",
+	cursor: "pointer",
+	border: "none",
 
 	"&:active": {
 		"&::before, ::after": {
@@ -98,4 +104,5 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	children: React.ReactNode;
 	className?: string;
 	tooltip: string;
+	css?: CSS;
 };

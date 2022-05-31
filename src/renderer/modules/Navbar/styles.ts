@@ -27,32 +27,21 @@ export const Buttons = styled("div", {
 	justifyContent: "center",
 	alignItems: "center",
 	width: "100%",
-});
 
-export const ScaleUpIconButton = styled("button", {
-	display: "flex", // row,
-	justifyContent: "center",
-	alignItems: "center",
-	size: 45,
+	"& .scale-up-icon": {
+		dflex: "center",
+		size: 45,
 
-	background: "transparent",
-	cursor: "pointer",
-	border: "none",
+		color: "$deactivated-icon",
+		fontSize: "1rem",
 
-	color: "$deactivated-icon",
-	fontSize: "1rem",
+		"&:hover": {
+			color: "$active-icon",
+		},
 
-	willChange: "transform",
-	transition: "$scale",
-
-	"&:hover": {
-		transition: "$scale",
-		transform: "scale(1.4)",
-		color: "$active-icon",
-	},
-
-	"&.active": {
-		color: "$active-icon",
+		"&.active": {
+			color: "$active-icon",
+		},
 	},
 });
 

@@ -150,6 +150,47 @@ export const Result = styled("div", {
 		transition: "all 100ms ease-in-out",
 		borderColor: "$text",
 	},
+
+	////////////////////////////////////////
+	// Tooltip:
+	"&:active": {
+		"&::before, ::after": {
+			visibility: "hidden",
+		},
+	},
+
+	"&:hover::before": {
+		visibility: "visible",
+
+		transition: "all 0.4s 1s ease ",
+	},
+
+	"&::before, ::after": {
+		visibility: "hidden",
+
+		content: "attr(data-tooltip)",
+		position: "absolute",
+		height: "auto",
+		width: "auto",
+
+		top: "110%",
+		left: "30%",
+
+		border: "1px solid white",
+		background: "#181818",
+		padding: "3px 8px",
+		zIndex: 100,
+
+		whiteSpace: "nowrap",
+		lineHeight: "normal",
+		ff: "$primary",
+		color: "#fff",
+		ta: "center",
+		fs: "1rem",
+		fw: 500,
+
+		pointerEvents: "none",
+	},
 });
 
 export const NothingFound = styled("div", {

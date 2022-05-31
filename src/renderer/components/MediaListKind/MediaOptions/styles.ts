@@ -29,7 +29,7 @@ export const StyledOverlay = styled(Overlay, {
 	overflowY: "auto",
 	zIndex: 100,
 
-	animation: `${overlayShow} 0.1s linear`,
+	animation: `${overlayShow} 80ms linear`,
 });
 
 export const StyledContent = styled(Content, {
@@ -38,10 +38,10 @@ export const StyledContent = styled(Content, {
 	position: "fixed",
 	display: "grid",
 
-	// Center:
-	// transform: "translate(50%, 25%)",
-	// left: "50%",
-	// top: "50%",
+	// Centered:
+	transform: "translate(-50%, -50%)",
+	left: "50%",
+	top: "50%",
 
 	maxHeight: "85vh",
 	maxWidth: 450,
@@ -52,15 +52,18 @@ export const StyledContent = styled(Content, {
 	borderRadius: 4,
 	zIndex: 150,
 
-	animation: `${overlayShow} 0.1s linear`,
+	animation: `${overlayShow} 80ms linear`,
 
 	"&#second": {
 		position: "fixed",
 		display: "grid",
-		top: "50%",
-		// transform: "translate(0%, -150%)",
 		height: 100,
 		width: 300,
+
+		// Centered:
+		transform: "translate(-50%, -50%)",
+		left: "50%",
+		top: "50%",
 
 		padding: 30,
 
@@ -122,6 +125,87 @@ export const TriggerToRemoveMedia = styled(Trigger, {
 
 export const CloseDialog = styled(Close, {
 	all: "unset",
+
+	/////////////////////////////////////////
+	// Tooltip:
+	"&.tooltip": {
+		"&:active": {
+			"&::before, ::after": {
+				visibility: "hidden",
+			},
+		},
+
+		"&:hover::before": {
+			visibility: "visible",
+
+			transition: "all 0.4s 1s ease ",
+		},
+
+		"&::before, ::after": {
+			visibility: "hidden",
+
+			content: "attr(data-tooltip)",
+			position: "absolute",
+			height: "auto",
+			width: "auto",
+
+			border: "1px solid white",
+			background: "#181818",
+			padding: "3px 8px",
+			zIndex: 100,
+
+			whiteSpace: "nowrap",
+			lineHeight: "normal",
+			ff: "$primary",
+			color: "#fff",
+			ta: "center",
+			fs: "1rem",
+			fw: 500,
+
+			pointerEvents: "none",
+		},
+	},
+
+	// The variants below are for the tooltip,
+	// they have to be on the outermost side:
+	variants: {
+		"tooltip-side": {
+			"left-bottom": {
+				"&::before, ::after": {
+					right: "50%",
+					top: "110%",
+				},
+			},
+			bottom: {
+				"&::before, ::after": {
+					top: "110%",
+				},
+			},
+			right: {
+				"&::before, ::after": {
+					left: "110%",
+				},
+			},
+			left: {
+				"&::before, ::after": {
+					right: "110%",
+				},
+			},
+			top: {
+				"&::before, ::after": {
+					bottom: "110%",
+				},
+			},
+		},
+	},
+
+	defaultVariants: {
+		"tooltip-side": "bottom",
+	},
+
+	/////////////////////////////////////////
+	/////////////////////////////////////////
+	/////////////////////////////////////////
 
 	boxSizing: "border-box", // So that border doens't occupy space
 	dflex: "center",
@@ -288,11 +372,12 @@ export const Label = styled("label", {
 	display: "flex",
 	width: 90,
 
-	ff: "$secondary",
-	letterSpacing: "0.03rem",
 	color: "$accent-light",
+	ff: "$secondary",
+	ls: "0.03rem",
 	ta: "right",
-	fontSize: 15,
+	fs: "1rem",
+	fw: 500,
 });
 
 // TODO: change to be equal to SearchMedia's

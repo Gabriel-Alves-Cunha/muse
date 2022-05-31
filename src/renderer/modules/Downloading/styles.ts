@@ -69,6 +69,79 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			},
 		},
 	},
+
+	////////////////////////////////////////////////
+	// Tooltip:
+	"&:active": {
+		"&::before, ::after": {
+			visibility: "hidden",
+		},
+	},
+
+	"&:hover::before": {
+		visibility: "visible",
+
+		transition: "all 0.4s 1s ease ",
+	},
+
+	"&::before, ::after": {
+		visibility: "hidden",
+
+		content: "attr(data-tooltip)",
+		position: "absolute",
+		height: "auto",
+		width: "auto",
+
+		border: "1px solid white",
+		background: "#181818",
+		padding: "3px 8px",
+		zIndex: 100,
+
+		whiteSpace: "nowrap",
+		lineHeight: "normal",
+		ff: "$primary",
+		color: "#fff",
+		ta: "center",
+		fs: "1rem",
+		fw: 500,
+
+		pointerEvents: "none",
+	},
+
+	variants: {
+		"tooltip-side": {
+			"left-bottom": {
+				"&::before, ::after": {
+					right: "50%",
+					top: "110%",
+				},
+			},
+			bottom: {
+				"&::before, ::after": {
+					top: "110%",
+				},
+			},
+			right: {
+				"&::before, ::after": {
+					left: "110%",
+				},
+			},
+			left: {
+				"&::before, ::after": {
+					right: "110%",
+				},
+			},
+			top: {
+				"&::before, ::after": {
+					bottom: "110%",
+				},
+			},
+		},
+	},
+
+	defaultVariants: {
+		"tooltip-side": "bottom",
+	},
 });
 
 export const Content = styled("div", {

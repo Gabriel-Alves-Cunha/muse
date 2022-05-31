@@ -33,6 +33,7 @@ const Row = memo(
 
 		useOnClickOutside(
 			mediaRowRef,
+			// Deselect:
 			() => isSelected && allSelectedMedias.delete(path),
 		);
 

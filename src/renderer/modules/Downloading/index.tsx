@@ -11,7 +11,6 @@ import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { errorToast } from "@styles/global";
-import { Tooltip } from "@components/Tooltip";
 
 import { StyledPopoverTrigger, Wrapper } from "./styles";
 import { PopoverAnchor } from "@modules/Converting/styles";
@@ -77,18 +76,18 @@ export function Downloading() {
 	return (
 		<Wrapper>
 			<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
-				<Tooltip text="Show all downloading medias" side="right">
-					<StyledPopoverTrigger
-						className={
-							(downloadingListSize ? "has-items " : "") +
-							(isOpen ? "active " : "")
-						}
-					>
-						<i data-length={downloadingListSize}></i>
+				<StyledPopoverTrigger
+					className={
+						(downloadingListSize ? "has-items " : "") +
+						(isOpen ? "active " : "")
+					}
+					data-tooltip="Show all downloading medias"
+					tooltip-side="right"
+				>
+					<i data-length={downloadingListSize}></i>
 
-						<DownloadingIcon size="20" />
-					</StyledPopoverTrigger>
-				</Tooltip>
+					<DownloadingIcon size="20" />
+				</StyledPopoverTrigger>
 
 				<PopoverAnchor />
 

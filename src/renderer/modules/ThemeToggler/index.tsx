@@ -5,8 +5,8 @@ import {
 } from "react-icons/md";
 
 import { useLocalStorage } from "@hooks/useLocalStorage";
+import { TooltipButton } from "@components/TooltipButton";
 import { keyPrefix } from "@utils/localStorage";
-import { Tooltip } from "@components/Tooltip";
 
 import { styled, darkTheme, lightTheme } from "@styles/global";
 
@@ -38,18 +38,20 @@ export function ThemeToggler() {
 	};
 
 	return (
-		<Tooltip text="Toggle theme" side="right">
-			<Button onClick={toggleTheme}>
+		<Box>
+			<TooltipButton
+				tooltip="Toggle theme"
+				onClick={toggleTheme}
+				tooltip-side="right"
+			>
 				{theme === "light" ? <Dark size="20px" /> : <Light size="20px" />}
-			</Button>
-		</Tooltip>
+			</TooltipButton>
+		</Box>
 	);
 }
 
-const Button = styled("button", {
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+const Box = styled("button", {
+	dflex: "center",
 
 	filter: "drop-shadow(0 0px 5px $lingrad-top)",
 
@@ -57,7 +59,6 @@ const Button = styled("button", {
 	background: "$lingrad-bottom",
 	cursor: "pointer",
 	border: "none",
-	color: "white",
 	size: 40,
 
 	transition: "$scale",
@@ -65,5 +66,11 @@ const Button = styled("button", {
 	"&:hover": {
 		transition: "$scale",
 		transform: "scale(1.2)",
+	},
+
+	button: {
+		background: "none",
+		border: "none",
+		color: "white",
 	},
 });

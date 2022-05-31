@@ -32,6 +32,28 @@ export const Wrapper = styled("div", {
 	"& svg": {
 		color: "$media-player-icons",
 	},
+
+	"& .icon-button": {
+		position: "relative",
+		dflex: "center",
+
+		bg: "transparent",
+		cursor: "pointer",
+		br: "50%",
+		b: "none",
+
+		textAlign: "center",
+		size: 30 ,
+		lh: 30,
+		p: 0,
+
+		transition: "$bgc",
+
+		"&:hover": {
+			transition: "$bgc",
+			bg: "$media-player-icon-button-hovered",
+		},
+	},
 });
 
 export const OptionsAndAlbum = styled("div", {
@@ -41,38 +63,11 @@ export const OptionsAndAlbum = styled("div", {
 });
 
 export const Album = styled("span", {
+	color: "$media-player-icons",
 	letterSpacing: "0.04rem",
 	ff: "$secondary",
 	fs: "1rem",
 	fw: 500,
-	color: "$media-player-icons",
-});
-
-/** You need to set the w! */
-export const IconButton = styled("button", {
-	position: "relative",
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-
-	bg: "transparent",
-	br: "50%",
-	cursor: "pointer",
-	b: "none",
-
-	transition: "$bgc",
-
-	"&:hover": {
-		transition: "$bgc",
-		bg: "$media-player-icon-button-hovered",
-	},
-
-	// Hack to make the h the same size as the w:
-	"&:before": {
-		content: "",
-		float: "left",
-		pt: "100%", // ratio of 1:1
-	},
 });
 
 export const SquareImage = styled("div", {

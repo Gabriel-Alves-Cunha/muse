@@ -8,7 +8,6 @@ import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
-import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
 import {
 	useConvertInfoList,
@@ -61,18 +60,17 @@ export function Converting() {
 	return (
 		<Wrapper>
 			<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
-				<Tooltip text="Show all converting medias" side="right">
-					<StyledPopoverTrigger
-						className={
-							(convertingListSize ? "has-items " : "") +
-							(isOpen ? "active" : "")
-						}
-					>
-						<i data-length={convertingListSize}></i>
+				<StyledPopoverTrigger
+					className={
+						(convertingListSize ? "has-items " : "") + (isOpen ? "active" : "")
+					}
+					data-tooltip="Show all converting medias"
+					tooltip-side="right"
+				>
+					<i data-length={convertingListSize}></i>
 
-						<Convert size={20} />
-					</StyledPopoverTrigger>
-				</Tooltip>
+					<Convert size={20} />
+				</StyledPopoverTrigger>
 
 				<PopoverAnchor />
 

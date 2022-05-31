@@ -10,7 +10,6 @@ import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { deleteMedia } from "@contexts/mediaHandler/usePlaylists";
 import { capitalize } from "@utils/utils";
-import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
 
 import {
@@ -21,9 +20,9 @@ import {
 	StyledTitle,
 	CloseDialog,
 	Fieldset,
+	FlexRow,
 	Input,
 	Label,
-	FlexRow,
 } from "./styles";
 
 export function MediaOptionsModal({ media, path }: Props) {
@@ -49,11 +48,14 @@ export function MediaOptionsModal({ media, path }: Props) {
 				you&apos;re done.
 			</StyledDescription>
 
-			<Tooltip text="Close">
-				<CloseDialog ref={closeButtonRef} id="close-icon">
-					<Close />
-				</CloseDialog>
-			</Tooltip>
+			<CloseDialog
+				ref={closeButtonRef}
+				data-tooltip="Close"
+				className="tooltip"
+				id="close-icon"
+			>
+				<Close />
+			</CloseDialog>
 
 			{Object.entries(options(media)).map(([option, value]) => (
 				<Fieldset key={option}>
@@ -214,15 +216,14 @@ function changePropsIfAllowed(
 				}
 }
 
-const options = ({ duration, artist, album, genres, title, size }: Media) =>
-	Object.freeze({
-		duration,
-		artist,
-		genres,
-		title,
-		album,
-		size,
-	});
+const options = ({ duration, artist, album, genres, title, size }: Media) => ({
+	duration,
+	artist,
+	genres,
+	title,
+	album,
+	size,
+});
 
 const allowedOptionToChange = Object.freeze({
 	artist: "albumArtists",
@@ -233,7 +234,7 @@ const allowedOptionToChange = Object.freeze({
 } as const);
 
 const isChangeable = (option: string): option is ChangeOptions =>
-	Object.keys(allowedOptionToChange).some(opt => opt === option);
+	Object.keys(allowedOptionToChange).includes(option);
 
 const closeEverything = (element: RefObject<HTMLButtonElement>) =>
 	element.current?.click();
@@ -247,7 +248,7 @@ export type WhatToChange = Readonly<{
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
 type ChangeOptions = keyof typeof allowedOptionToChange;
 
-type Props = {
+type Props = Readonly<{
 	media: Media;
 	path: Path;
-};
+}>;

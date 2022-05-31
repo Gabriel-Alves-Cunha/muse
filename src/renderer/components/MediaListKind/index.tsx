@@ -55,7 +55,7 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 
 	useEffect(() => {
 		setFromList({ fromList });
-		console.log({ fromList });
+		console.log("fromList =", fromList);
 	}, [fromList]);
 
 	const listAsArrayOfAMap: [Path, Media][] = useMemo(

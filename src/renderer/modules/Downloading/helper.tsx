@@ -8,7 +8,6 @@ import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { handleOnClose } from "@modules/Converting/helper";
 import { Progress } from "@components/Progress";
-import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
 import {
 	useDownloadingList,
@@ -17,6 +16,7 @@ import {
 } from "@contexts/downloadList";
 
 import { Content, TitleAndCancelWrapper } from "./styles";
+import { TooltipButton } from "@components/TooltipButton";
 
 export const Popup = () => {
 	const downloadingList = useDownloadingList();
@@ -29,13 +29,13 @@ export const Popup = () => {
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>
 
-							<Tooltip text="Cancel/Remove download" side="right">
-								<button
-									onClick={() => cancelDownloadAndOrRemoveItFromList(url)}
-								>
-									<Cancel size={12} />
-								</button>
-							</Tooltip>
+							<TooltipButton
+								onClick={() => cancelDownloadAndOrRemoveItFromList(url)}
+								tooltip="Cancel/Remove download"
+								tooltip-side="right"
+							>
+								<Cancel size={12} />
+							</TooltipButton>
 						</TitleAndCancelWrapper>
 
 						<Progress
@@ -166,7 +166,6 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	};
 
 	myPort.addEventListener("close", handleOnClose);
-	// myPort.onclose = handleOnClose;
 
 	myPort.start();
 

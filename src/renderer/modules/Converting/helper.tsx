@@ -7,14 +7,14 @@ import create from "zustand";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { convertingList, setConvertingList } from "@contexts/convertList";
 import { type AllowedMedias, getBasename } from "@common/utils";
+import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { prettyBytes } from "@common/prettyBytes";
-import { Tooltip } from "@components/Tooltip";
 import { dbg } from "@common/utils";
 
-import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
+import { TooltipButton } from "@components/TooltipButton";
 
 export const useConvertInfoList = create<ConvertInfoList>(() => new Map());
 export const { setState: setConvertInfoList, getState: convertInfoList } =
@@ -44,11 +44,13 @@ export const ConvertBox = ({
 		<TitleAndCancelWrapper>
 			<p>{getBasename(path) + "." + toExtension}</p>
 
-			<Tooltip text="Cancel conversion" side="right">
-				<button onClick={() => cancelDownloadAndOrRemoveItFromList(path)}>
-					<Cancel size={12} />
-				</button>
-			</Tooltip>
+			<TooltipButton
+				onClick={() => cancelDownloadAndOrRemoveItFromList(path)}
+				tooltip="Cancel conversion"
+				tooltip-side="right"
+			>
+				<Cancel size={12} />
+			</TooltipButton>
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>
@@ -166,8 +168,7 @@ export function createNewConvert(
 		}
 	};
 
-	// @ts-ignore: this DOES exists
-	myPort.onclose = handleOnClose;
+	myPort.addEventListener("close", handleOnClose);
 
 	myPort.start();
 
@@ -179,20 +180,18 @@ const cancelDownloadAndOrRemoveItFromList = (path: string) => {
 
 	const mediaBeingConverted = convertingList_.get(path);
 
-	if (!mediaBeingConverted) {
+	if (!mediaBeingConverted)
 		return console.error(
 			`There should be a conversion with path "${path}"!\nconvertList =`,
 			convertingList_,
 		);
-	}
 
 	// Cancel conversion
-	if (mediaBeingConverted.isConverting) {
+	if (mediaBeingConverted.isConverting)
 		mediaBeingConverted.port.postMessage({
 			destroy: true,
 			path,
 		});
-	}
 
 	convertingList_.delete(path);
 	setConvertingList(convertingList_);

@@ -18,8 +18,8 @@ import {
 } from "react-icons/md";
 
 import { formatDuration } from "@common/utils";
+import { TooltipButton } from "@components/TooltipButton";
 import { useProgress } from ".";
-import { Tooltip } from "@components/Tooltip";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
@@ -45,7 +45,6 @@ import {
 	ProgressWrapper,
 	SeekerContainer,
 	ProgressThumb,
-	IconButton,
 	Duration,
 	Album,
 } from "./styles";
@@ -66,19 +65,23 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 			<SeekerWrapper audio={audio} />
 
 			<ControlsButtonsWrapper>
-				<Tooltip text="Toggle loop this media">
-					<IconButton onClick={toggleLoopMedia} style={{ width: 40 }}>
-						{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
-					</IconButton>
-				</Tooltip>
+				<TooltipButton
+					tooltip="Toggle loop this media"
+					onClick={toggleLoopMedia}
+					className="icon-button"
+				>
+					{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
+				</TooltipButton>
 
 				<Controls isPaused={audio?.paused} />
 
-				<Tooltip text="Toggle random">
-					<IconButton onClick={toggleRandom} style={{ width: 40 }}>
-						{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
-					</IconButton>
-				</Tooltip>
+				<TooltipButton
+					className="icon-button"
+					tooltip="Toggle random"
+					onClick={toggleRandom}
+				>
+					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
+				</TooltipButton>
 			</ControlsButtonsWrapper>
 		</ControlsAndSeekerContainer>
 	);
@@ -86,57 +89,56 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
-		<Tooltip text="Media options">
-			<IconButton style={{ width: 30 }}>
-				<Dots size={20} />
-			</IconButton>
-		</Tooltip>
+		<TooltipButton tooltip="Media options" className="icon-button">
+			<Dots size={20} />
+		</TooltipButton>
 
 		<Album>{media?.album}</Album>
 
-		<Tooltip text="Toggle favorite">
-			<IconButton onClick={() => toggleFavorite(path)} style={{ width: 30 }}>
-				{favorites().has(path) ? (
-					<Favorite size={17} />
-				) : (
-					<AddFavorite size={17} />
-				)}
-			</IconButton>
-		</Tooltip>
+		<TooltipButton
+			onClick={() => toggleFavorite(path)}
+			tooltip-side="left-bottom"
+			tooltip="Toggle favorite"
+			className="icon-button"
+		>
+			{favorites().has(path) ? (
+				<Favorite size={17} />
+			) : (
+				<AddFavorite size={17} />
+			)}
+		</TooltipButton>
 	</OptionsAndAlbum>
 );
 
 export const Controls = ({ isPaused = false }: IsPaused) => (
 	<ControlsWrapper>
-		<Tooltip text="Play previous track">
-			<IconButton
-				className="previous-or-next"
-				onClick={playPreviousMedia}
-				style={{ width: 29 }}
-			>
-				<Previous />
-			</IconButton>
-		</Tooltip>
+		<TooltipButton
+			className="previous-or-next icon-button"
+			style={{ width: 29, height: 29, lineHeight: 29 }}
+			tooltip="Play previous track"
+			onClick={playPreviousMedia}
+		>
+			<Previous />
+		</TooltipButton>
 
-		<Tooltip text="Play/pause">
-			<IconButton
-				onClick={togglePlayPause}
-				style={{ width: 49 }}
-				id="play-pause"
-			>
-				{isPaused ? <Play size={25} /> : <Pause size={25} />}
-			</IconButton>
-		</Tooltip>
+		<TooltipButton
+			style={{ width: 49, height: 49, lineHeight: 49 }}
+			onClick={togglePlayPause}
+			className="icon-button"
+			tooltip="Play/pause"
+			tooltip-side="top"
+		>
+			{isPaused ? <Play size={25} /> : <Pause size={25} />}
+		</TooltipButton>
 
-		<Tooltip text="Play next track">
-			<IconButton
-				className="previous-or-next"
-				onClick={playNextMedia}
-				style={{ width: 29 }}
-			>
-				<Next />
-			</IconButton>
-		</Tooltip>
+		<TooltipButton
+			className="previous-or-next icon-button"
+			style={{ width: 29, height: 29, lineHeight: 29 }}
+			tooltip="Play next track"
+			onClick={playNextMedia}
+		>
+			<Next />
+		</TooltipButton>
 	</ControlsWrapper>
 );
 
@@ -200,7 +202,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 	return (
 		<SeekerContainer>
 			<ProgressWrapper
-				style={{ cursor: isDurationValid ? "pointer" : "default" }}
+				css={{ cursor: isDurationValid ? "pointer" : "default" }}
 				onClick={e => seek(e, audio)}
 				onMouseMove={handleTooltip}
 				ref={progressWrapperRef}
@@ -211,7 +213,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 				/>
 
 				<ProgressThumb
-					style={{ width: `${isNaN(percentage) ? 0 : percentage}%` }}
+					css={{ width: `${isNaN(percentage) ? 0 : percentage}%` }}
 				/>
 			</ProgressWrapper>
 

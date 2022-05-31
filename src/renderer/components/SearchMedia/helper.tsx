@@ -10,7 +10,6 @@ import { constRefToEmptyArray } from "@utils/array";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
-import { Tooltip } from "@components/Tooltip";
 
 import { Img } from "../MediaListKind/styles";
 import {
@@ -89,28 +88,26 @@ export function Input() {
 		return () => document.removeEventListener("keydown", closeOnEsc);
 	}, [isOnFocus]);
 
-	useEffect(
-		function handleOnChange() {
-			setSearcher({
-				results: constRefToEmptyArray,
-				searchStatus: SEARCHING,
-			});
+	useEffect(() => {
+		/** Search for media */
 
-			if (searchTerm.length < 2) return;
+		setSearcher({
+			results: constRefToEmptyArray,
+			searchStatus: SEARCHING,
+		});
 
-			startTransition(() => {
-				const results = searchMedia(searchTerm);
-				const searchStatus =
-					results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+		if (searchTerm.length < 2) return;
 
-				setSearcher({ searchStatus, results });
+		startTransition(() => {
+			const results = searchMedia(searchTerm);
+			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
-				// Doing this to keep focus on it...	:|
-				setTimeout(() => inputRef.current?.focus(), 0);
-			});
-		},
-		[searchTerm],
-	);
+			setSearcher({ searchStatus, results });
+
+			// Doing this to keep focus on the input...	:|
+			setTimeout(() => inputRef.current?.focus(), 0);
+		});
+	}, [searchTerm]);
 
 	return (
 		<>
@@ -137,28 +134,27 @@ const Row = ({
 	const index = title.toLowerCase().indexOf(highlight);
 
 	return (
-		<Tooltip text="Play this media">
-			<Result onClick={() => playThisMedia(path, PlaylistList.MAIN_LIST)}>
-				<Img>
-					<ImgWithFallback
-						Fallback={<MusicNote size={13} />}
-						mediaPath={path}
-						mediaImg={img}
-					/>
-				</Img>
+		<Result
+			onClick={() => playThisMedia(path, PlaylistList.MAIN_LIST)}
+			data-tooltip="Play this media"
+		>
+			<Img>
+				<ImgWithFallback
+					Fallback={<MusicNote size={13} />}
+					mediaPath={path}
+					mediaImg={img}
+				/>
+			</Img>
 
-				<Info>
-					<Title>
-						{title.slice(0, index)}
-						<Highlight>
-							{title.slice(index, index + highlight.length)}
-						</Highlight>
-						{title.slice(index + highlight.length)}
-					</Title>
-					<SubTitle>{duration}</SubTitle>
-				</Info>
-			</Result>
-		</Tooltip>
+			<Info>
+				<Title>
+					{title.slice(0, index)}
+					<Highlight>{title.slice(index, index + highlight.length)}</Highlight>
+					{title.slice(index + highlight.length)}
+				</Title>
+				<SubTitle>{duration}</SubTitle>
+			</Info>
+		</Result>
 	);
 };
 
