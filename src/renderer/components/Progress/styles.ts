@@ -1,10 +1,10 @@
 import { styled } from "@styles/global";
 
 export const Component = styled("div", {
-	display: "flex", // row,
+	d: "flex", // row,
 	alignItems: "center",
-	width: "100%",
-	height: 15,
+	w: "100%",
+	h: 15,
 
 	"& svg": {
 		margin: "auto",
@@ -13,17 +13,17 @@ export const Component = styled("div", {
 
 export const Bar = styled("progress", {
 	appearance: "none",
-	border: "none",
+	b: "none",
 
 	transition: "width 0.3s linear",
-	width: "90%",
-	height: 3,
+	w: "90%",
+	h: 3,
 
 	"&[value]::-webkit-progress-value": {
-		background: "$accent",
+		bg: "$accent",
 	},
 
 	"&[value]::-webkit-progress-bar": {
-		background: "#a8a8a880",
+		bg: "#a8a8a880",
 	},
 });

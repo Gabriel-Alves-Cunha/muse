@@ -12,7 +12,7 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { errorToast } from "@styles/global";
 
-import { StyledPopoverTrigger, Wrapper } from "./styles";
+import { StyledPopoverTrigger } from "./styles";
 import { PopoverAnchor } from "@modules/Converting/styles";
 
 // const { port1: testPort } = new MessageChannel();
@@ -74,34 +74,31 @@ export function Downloading() {
 	}, [downloadInfo.canStartDownload, downloadInfo.title, downloadInfo]);
 
 	return (
-		<Wrapper>
-			<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
-				<StyledPopoverTrigger
-					className={
-						(downloadingListSize ? "has-items " : "") +
-						(isOpen ? "active " : "")
-					}
-					data-tooltip="Show all downloading medias"
-					tooltip-side="right"
-				>
-					<i data-length={downloadingListSize}></i>
+		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
+			<StyledPopoverTrigger
+				className={
+					(downloadingListSize ? "has-items " : "") + (isOpen ? "active " : "")
+				}
+				data-tooltip="Show all downloading medias"
+				tooltip-side="right"
+			>
+				<i data-length={downloadingListSize}></i>
 
-					<DownloadingIcon size="20" />
-				</StyledPopoverTrigger>
+				<DownloadingIcon size="20" />
+			</StyledPopoverTrigger>
 
-				<PopoverAnchor />
+			<PopoverAnchor />
 
-				<PopoverContent
-					size={
-						downloadingListSize === 0
-							? "nothing-found-for-convertions-or-downloads"
-							: "convertions-or-downloads"
-					}
-				>
-					<Popup />
-				</PopoverContent>
-			</PopoverRoot>
-		</Wrapper>
+			<PopoverContent
+				size={
+					downloadingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}
+			>
+				<Popup />
+			</PopoverContent>
+		</PopoverRoot>
 	);
 }
 

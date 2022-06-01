@@ -2,75 +2,75 @@ import { MainArea } from "@components/MainArea";
 import { styled } from "@styles/global";
 
 export const Wrapper = styled(MainArea, {
-	position: "relative",
-	display: "flex",
-	flexDirection: "column",
-	height: "100vh",
-	width: "100%",
+	pos: "relative",
+	d: "flex",
+	fd: "column",
+	h: "100vh",
+	w: "100%",
 
 	overflowY: "auto",
 
 	/* width */
 	"&::-webkit-scrollbar": {
-		display: "block",
+		d: "block",
 		size: 5,
 	},
 
 	/* Track */
 	"&::-webkit-scrollbar-track": {
-		background: "$scrollbar",
+		bg: "$scrollbar",
 	},
 
 	/* Handle */
 	"&::-webkit-scrollbar-thumb": {
-		background: "$scrollbar-thumb",
+		bg: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	"&::-webkit-scrollbar-thumb:hover": {
-		background: "$scrollbar-thumb-hover",
+		bg: "$scrollbar-thumb-hover",
 	},
 });
 
 export const Box = styled("div", {
-	display: "flex", // row
+	d: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-	width: "100%",
+	w: "100%",
 });
 
 export const SearchWrapper = styled("div", {
-	position: "relative",
-	display: "flex", // row
+	pos: "relative",
+	d: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
-	width: "80%",
-	height: 60,
+	w: "80%",
+	h: 60,
 
 	"& p": {
-		position: "absolute",
-		marginTop: "4rem",
+		pos: "absolute",
+		mt: "4rem",
 
-		letterSpacing: "0.03rem",
+		ls: "0.03rem",
 		ff: "$secondary",
-		fontSize: "0.9rem",
-		fontWeight: 300,
-		color: "red",
+		fs: "0.9rem",
+		fw: 300,
+		c: "red",
 	},
 });
 
 export const Searcher = styled("button", {
-	position: "relative",
-	display: "flex", // row
+	pos: "relative",
+	d: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
 
-	background: "transparent",
-	width: "100%",
-	height: 40,
+	bg: "transparent",
+	w: "100%",
+	h: 40,
 
-	border: "1px solid lightgray",
-	borderRadius: 20,
+	b: "1px solid lightgray",
+	br: 20,
 	cursor: "text",
 
 	transition: "$opacity",
@@ -81,8 +81,8 @@ export const Searcher = styled("button", {
 	},
 
 	"& svg": {
-		marginLeft: 10,
-		color: "$text",
+		ml: 10,
+		c: "$text",
 		opacity: 0.8,
 	},
 
@@ -91,23 +91,23 @@ export const Searcher = styled("button", {
 	},
 
 	input: {
-		letterSpacing: "0.03rem",
+		ls: "0.03rem",
 		ff: "$secondary",
-		fontSize: "0.9rem",
+		fs: "0.9rem",
 
 		boxSizing: "border-box",
 		size: "100%",
 
-		background: "transparent",
-		borderRadius: 15,
-		border: "none",
+		bg: "transparent",
+		br: 15,
+		b: "none",
 
-		color: "$text",
+		c: "$text",
 		opacity: 0.8,
 		px: 10,
 
 		"&::placeholder": {
-			color: "$text",
+			c: "$text",
 		},
 
 		"&:hover": {
@@ -118,8 +118,8 @@ export const Searcher = styled("button", {
 });
 
 export const ResultContainer = styled("div", {
-	display: "flex",
-	flexDirection: "column",
+	d: "flex",
+	fd: "column",
 	justifyContent: "center",
 	alignItems: "center",
 	mb: "1.3rem",
@@ -127,9 +127,9 @@ export const ResultContainer = styled("div", {
 
 	img: {
 		objectFit: "cover",
-		display: "flex",
-		height: 168.75,
-		width: 300,
+		d: "flex",
+		h: 168.75,
+		w: 300,
 
 		maxHeight: 300,
 		maxWidth: 300,
@@ -155,9 +155,9 @@ export const ResultContainer = styled("div", {
 		ff: "$primary",
 		ta: "center",
 		margin: "2rem 1rem",
-		fontSize: "1.1rem",
+		fs: "1.1rem",
 		wordWrap: "normal",
-		color: "$text",
+		c: "$text",
 	},
 
 	span: {
@@ -165,12 +165,12 @@ export const ResultContainer = styled("div", {
 		ta: "center",
 		margin: "1rem auto",
 		wordWrap: "normal",
-		fontSize: "1rem",
+		fs: "1rem",
 		color: "$text",
 	},
 });
 
 export const LoadingWrapper = styled("div", {
-	marginLeft: 10,
+	ml: 10,
 	size: 25,
 });

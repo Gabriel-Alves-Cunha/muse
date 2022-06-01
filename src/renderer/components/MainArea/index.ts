@@ -4,7 +4,7 @@ export const MainArea = styled("div", {
 	gridArea: "main-area",
 
 	position: "relative",
-	display: "inline-block",
+	d: "inline-block",
 	alignSelf: "stretch", // for grid: column
 
 	size: "100%",
@@ -12,7 +12,7 @@ export const MainArea = styled("div", {
 	"@sm": {
 		header: {
 			justifyContent: "center",
-			marginLeft: 0,
+			ml: 0,
 		},
 	},
 });

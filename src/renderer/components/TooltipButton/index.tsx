@@ -21,11 +21,13 @@ export const TooltipButton = ({
 );
 
 export const TooltipButton_ = styled("button", {
-	position: "relative",
+	pos: "relative",
 
-	background: "none",
 	cursor: "pointer",
-	border: "none",
+	bg: "none",
+	b: "none",
+
+	transition: "none",
 
 	"&:active": {
 		"&::before, ::after": {
@@ -43,21 +45,21 @@ export const TooltipButton_ = styled("button", {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
-		position: "absolute",
-		height: "auto",
-		width: "auto",
+		pos: "absolute",
+		h: "auto",
+		w: "auto",
 
-		border: "1px solid white",
-		background: "#181818",
-		padding: "3px 8px",
+		b: "1px solid white",
+		bg: "#181818",
+		p: "3px 8px",
 		zIndex: 100,
 
 		whiteSpace: "nowrap",
-		lineHeight: "normal",
 		ff: "$primary",
-		color: "#fff",
+		lh: "normal",
 		ta: "center",
 		fs: "1rem",
+		c: "#fff",
 		fw: 500,
 
 		pointerEvents: "none",
@@ -67,28 +69,28 @@ export const TooltipButton_ = styled("button", {
 		"tooltip-side": {
 			"left-bottom": {
 				"&::before, ::after": {
-					right: "50%",
-					top: "110%",
+					t: "110%",
+					r: "50%",
 				},
 			},
 			bottom: {
 				"&::before, ::after": {
-					top: "110%",
+					t: "110%",
 				},
 			},
 			right: {
 				"&::before, ::after": {
-					left: "110%",
+					l: "110%",
 				},
 			},
 			left: {
 				"&::before, ::after": {
-					right: "110%",
+					r: "110%",
 				},
 			},
 			top: {
 				"&::before, ::after": {
-					bottom: "110%",
+					b: "110%",
 				},
 			},
 		},

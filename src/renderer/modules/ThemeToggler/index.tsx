@@ -50,13 +50,14 @@ export function ThemeToggler() {
 	);
 }
 
-const Box = styled("button", {
+const Box = styled("div", {
+	position: "relative",
 	dflex: "center",
 
 	filter: "drop-shadow(0 0px 5px $lingrad-top)",
 
-	borderRadius: "60% 40% 40% 20% / 70% 50% 30% 25%",
-	background: "$lingrad-bottom",
+	br: "60% 40% 40% 20% / 70% 50% 30% 25%",
+	bg: "$lingrad-bottom",
 	cursor: "pointer",
 	border: "none",
 	size: 40,
@@ -64,13 +65,12 @@ const Box = styled("button", {
 	transition: "$scale",
 
 	"&:hover": {
-		transition: "$scale",
-		transform: "scale(1.2)",
+		transition: "$bgc",
+		bg: "$lingrad-top",
 	},
 
 	button: {
-		background: "none",
-		border: "none",
-		color: "white",
+		c: "white",
+		size: 40,
 	},
 });

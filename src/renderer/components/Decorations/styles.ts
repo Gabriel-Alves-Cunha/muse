@@ -1,16 +1,16 @@
 import { styled } from "@styles/global";
 
-export const DECORATIONS_HEADER_HEIGHT = "27px";
+export const DECORATIONS_HEIGHT = "27px";
 
 export const Wrapper = styled("header", {
-	position: "absolute",
-	display: "flex", // row
+	pos: "absolute",
+	d: "flex", // row
 
-	marginTop: `-${DECORATIONS_HEADER_HEIGHT}`,
-	minHeight: DECORATIONS_HEADER_HEIGHT,
-	width: "100%",
+	mt: `-${DECORATIONS_HEIGHT}`,
+	h: DECORATIONS_HEIGHT,
+	w: "100vw",
 
-	background: "$bg-main",
+	bg: "$bg-main",
 
 	"-webkit-app-region": "drag",
 	// ^ window-draggable-region
@@ -18,68 +18,61 @@ export const Wrapper = styled("header", {
 });
 
 export const WindowButtons = styled("div", {
-	display: "flex",
-	flexDirection: "row-reverse",
-	marginLeft: "auto",
-	height: "100%",
+	d: "flex",
+	fd: "row-reverse",
+	ml: "auto",
+	h: "100%",
 
-	background: "transparent",
+	bg: "transparent",
 
 	button: {
-		display: "flex", // row
-		justifyContent: "center",
-		alignContent: "center",
-		alignItems: "center",
+		dflex: "center",
 
-		color: "$window-buttons",
+		c: "$window-buttons",
 		cursor: "pointer",
-		border: "none",
+		b: "none",
 
-		height: DECORATIONS_HEADER_HEIGHT,
-		width: 48,
+		h: DECORATIONS_HEIGHT,
+		w: 48,
 
-		background: "transparent",
+		bg: "transparent",
 
 		"&:hover": {
-			background: "$icon-button-hovered",
+			bg: "$icon-button-hovered",
 		},
 
 		"&#close:hover": {
-			background: "#e70000",
-			color: "white",
+			bg: "#e70000",
+			c: "white",
 		},
 	},
 });
 
 export const AppName_Folder_Wrapper = styled("div", {
-	position: "absolute",
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-	height: "100%",
-	width: "20%",
-	left: "50%",
+	pos: "absolute",
+	dflex: "center",
+	h: "100%",
+	w: "20%",
 
 	transform: "translate(-50%)",
+	l: "50%",
 
-	background: "transparent",
-	border: "none",
+	bg: "transparent",
+	b: "none",
 
-	letterSpacing: "0.03rem",
 	ff: "$primary",
-	fontSize: "0.93rem",
-	fontWeight: 300,
-	color: "$text",
+	ls: "0.03rem",
+	fs: "0.93rem",
+	c: "$text",
+	fw: 300,
 
 	"@sm": {
-		display: "none",
+		d: "none",
 	},
 });
 
 export const AppIcon = styled("div", {
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 
-	marginLeft: 7,
+	ml: 7,
 });

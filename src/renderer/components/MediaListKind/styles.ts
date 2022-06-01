@@ -5,94 +5,94 @@ import { styled } from "@styles/global";
 export const Img = styled("div", {
 	$$size: "45px",
 
-	display: "flex", // row
+	d: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
 	minWidth: "$$size",
-	height: "$$size",
+	h: "$$size",
 
-	borderRadius: 13,
-	border: "none",
+	br: 13,
+	b: "none",
 	mr: 10,
 
 	"& img": {
 		objectFit: "cover",
 		size: "$$size",
 
-		borderRadius: 13,
+		br: 13,
 
 		"&:before": {
-			display: "none",
+			d: "none",
 		},
 	},
 
 	"& svg": {
-		color: "$deactivated-icon",
+		c: "$deactivated-icon",
 	},
 });
 
 export const Info = styled("div", {
-	display: "flex",
-	flexDirection: "column",
+	d: "flex",
+	fd: "column",
 	justifyContent: "center",
 	alignItems: "flex-start",
 
 	size: "calc(100% - 5px)",
-	overflow: "hidden",
+	ov: "hidden",
 });
 
 export const Title = styled("p", {
 	margin: "unset", // Virtuoso asks for this for performance reasons
 
-	color: "$alternative-text",
-	letterSpacing: "0.04rem",
+	c: "$alternative-text",
+	ls: "0.04rem",
 	ff: "$secondary",
-	fontSize: "1rem",
-	fontWeight: 500,
+	fs: "1rem",
+	fw: 500,
 
 	textOverflow: "ellipsis",
 	whiteSpace: "nowrap", // make it one-line.
-	overflow: "hidden",
+	ov: "hidden",
 
 	"& .highlight": {
-		background: "yellowgreen",
+		bg: "yellowgreen",
 	},
 });
 
 export const SubTitle = styled("p", {
 	margin: "20px 0",
 
-	color: "$alternative-text",
-	letterSpacing: "0.03rem",
-	fontSize: "0.9rem",
-	fontWeight: 500,
+	c: "$alternative-text",
+	ls: "0.03rem",
+	fs: "0.9rem",
+	fw: 500,
 	ff: "$primary",
 
 	"&.row": {
-		color: "$gray-text",
+		c: "$gray-text",
 		margin: "unset",
 	},
 });
 
 export const TriggerOptions = styled(Trigger, {
-	position: "relative",
-	display: "flex", // row
+	pos: "relative",
+	d: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
-	color: "$deactivated-icon",
-	background: "transparent",
-	borderRadius: "50%",
+	c: "$deactivated-icon",
+	bg: "transparent",
+	br: "50%",
 	cursor: "pointer",
-	border: "none",
+	b: "none",
 	margin: 5,
 
 	transition: "$bgc",
 
 	"&:hover": {
 		transition: "$bgc",
-		background: "$icon-button-hovered",
+		bg: "$icon-button-hovered",
 	},
 
 	// Hack to make the height the same size as the width:
@@ -105,7 +105,7 @@ export const TriggerOptions = styled(Trigger, {
 
 export const ListWrapper = styled("div", {
 	margin: "2em 5%",
-	height: "70vh",
+	h: "70vh",
 	maxWidth: 600,
 
 	"@sm": {
@@ -116,36 +116,36 @@ export const ListWrapper = styled("div", {
 
 	/* width */
 	".list::-webkit-scrollbar": {
-		display: "block",
+		d: "block",
 		size: 5,
 	},
 
 	/* Track */
 	".list::-webkit-scrollbar-track": {
-		background: "$scrollbar",
+		bg: "$scrollbar",
 	},
 
 	/* Handle */
 	".list::-webkit-scrollbar-thumb": {
-		background: "$scrollbar-thumb",
+		bg: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	".list::-webkit-scrollbar-thumb:hover": {
-		background: "$scrollbar-thumb-hover",
+		bg: "$scrollbar-thumb-hover",
 	},
 });
 
 export const RowWrapper = styled("div", {
-	position: "relative",
+	pos: "relative",
 	dflex: "center",
-	width: "98%",
-	height: 65,
+	w: "98%",
+	h: 65,
 	left: 7,
 
 	transition: "$boxShadow",
-	borderRadius: 7,
-	padding: 7,
+	br: 7,
+	p: 7,
 
 	"&:hover, &:focus, &.active": {
 		transition: "$boxShadow",
@@ -153,51 +153,51 @@ export const RowWrapper = styled("div", {
 	},
 
 	"&.selected": {
-		border: "2px solid $selected-border-color",
-		background: "$bg-selected",
+		b: "2px solid $selected-border-color",
+		bg: "$bg-selected",
 		boxShadow: "$bg-selected",
 	},
 
 	"& button.play": {
 		dflex: "center",
-		height: "100%",
-		width: "90%",
+		h: "100%",
+		w: "90%",
 
-		background: "transparent",
+		bg: "transparent",
 		cursor: "pointer",
-		border: "none",
+		b: "none",
 	},
 });
 
 export const ErrorMsg = styled("pre", {
 	margin: "20px 0",
 
-	letterSpacing: "0.035rem",
-	fontSize: "0.8rem",
+	ls: "0.035rem",
+	fs: "0.8rem",
 	ff: "$secondary",
-	fontWeight: 500,
-	color: "red",
+	fw: 500,
+	c: "red",
 });
 
 export const Footer = styled("div", {
-	position: "relative",
+	pos: "relative",
 	size: 10,
 
-	background: "transparent",
+	bg: "transparent",
 });
 
 export const EmptyList = styled("div", {
-	position: "relative",
-	display: "flex", // row
+	pos: "relative",
+	d: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 	size: "95%",
 
-	color: "$alternative-text",
-	letterSpacing: "0.04rem",
+	c: "$alternative-text",
+	ls: "0.04rem",
 	ff: "$secondary",
-	fontSize: "1.1rem",
-	fontWeight: 500,
+	fs: "1.1rem",
+	fw: 500,
 
 	img: {
 		size: 52,
@@ -206,6 +206,6 @@ export const EmptyList = styled("div", {
 });
 
 export const Center = styled("div", {
-	position: "relative",
+	pos: "relative",
 	dcolumn: "center",
 });

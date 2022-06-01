@@ -1,17 +1,17 @@
-import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
+import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
 export const Nav = styled("nav", {
 	gridArea: "nav",
 
-	display: "flex", // row
-	flexDirection: "column",
+	d: "flex", // row
+	fd: "column",
 	justifyContent: "space-between",
 	alignItems: "center",
+	w: 65,
 
-	height: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
-	background: "$bg-navbar",
-	width: 65,
+	h: `calc(100vh - ${DECORATIONS_HEIGHT})`,
+	bg: "$bg-navbar",
 
 	"& > :first-child": {
 		mt: 40,
@@ -22,34 +22,30 @@ export const Nav = styled("nav", {
 });
 
 export const Buttons = styled("div", {
-	display: "flex", // row
-	flexDirection: "column",
-	justifyContent: "center",
-	alignItems: "center",
-	width: "100%",
+	fd: "column",
+	dflex: "center",
+	w: "100%",
 
-	"& .scale-up-icon": {
+	button: {
 		dflex: "center",
 		size: 45,
 
-		color: "$deactivated-icon",
-		fontSize: "1rem",
+		c: "$deactivated-icon",
+		fs: "1rem",
 
 		"&:hover": {
-			color: "$active-icon",
+			c: "$active-icon",
 		},
 
 		"&.active": {
-			color: "$active-icon",
+			c: "$active-icon",
 		},
 	},
 });
 
 export const Popups = styled("div", {
-	display: "flex", // row
-	flexDirection: "column",
-	justifyContent: "center",
-	alignItems: "center",
+	fd: "column",
+	dflex: "center",
 
-	width: "100%",
+	w: "100%",
 });

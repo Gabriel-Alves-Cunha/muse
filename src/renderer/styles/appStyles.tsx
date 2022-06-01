@@ -1,15 +1,15 @@
-import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
+import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled, keyframes } from "./global";
 
 export const Content = styled("div", {
-	display: "grid",
+	d: "grid",
 	gridTemplate: `
 		"nav main-area media-player" 100%
 		/ 65px 1fr minmax(186px, 25vw)
 	`,
 
-	marginTop: DECORATIONS_HEADER_HEIGHT,
-	background: "$bg-main",
+	marginTop: DECORATIONS_HEIGHT,
+	bg: "$bg-main",
 
 	"@sm": {
 		gridTemplate: `
@@ -29,8 +29,8 @@ const rotating = keyframes({
 
 export const Loading = styled("div", {
 	animation: `${rotating} 1s infinite`,
-	border: "2px solid #e5e5e5",
+	b: "2px solid #e5e5e5",
 	borderTopColor: "$accent",
-	borderRadius: "50%",
+	br: "50%",
 	size: 25,
 });

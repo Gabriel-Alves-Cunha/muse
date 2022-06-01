@@ -29,32 +29,20 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			},
 		},
 		utils: {
-			size: (value: number | string) => ({
-				height: value,
-				width: value,
-			}),
-			w: (value: number | string) => ({
-				width: value,
-			}),
-			h: (value: number | string) => ({
-				height: value,
-			}),
+			size: (value: number | string) => ({ height: value, width: value }),
+			bo: (bottom: number | string) => ({ bottom }),
+			h: (height: number | string) => ({ height }),
+			w: (width: number | string) => ({ width }),
+			r: (right: number | string) => ({ right }),
+			pos: (position: string) => ({ position }),
+			l: (left: number | string) => ({ left }),
+			t: (top: number | string) => ({ top }),
 
-			p: (value: number | string) => ({
-				padding: value,
-			}),
-			pt: (value: number | string) => ({
-				paddingTop: value,
-			}),
-			pr: (value: number | string) => ({
-				paddingRight: value,
-			}),
-			pb: (value: number | string) => ({
-				paddingBottom: value,
-			}),
-			pl: (value: number | string) => ({
-				paddingLeft: value,
-			}),
+			pb: (paddingBottom: number | string) => ({ paddingBottom }),
+			pr: (paddingRight: number | string) => ({ paddingRight }),
+			pl: (paddingLeft: number | string) => ({ paddingLeft }),
+			pt: (paddingTop: number | string) => ({ paddingTop }),
+			p: (padding: number | string) => ({ padding }),
 			px: (value: number | string) => ({
 				paddingRight: value,
 				paddingLeft: value,
@@ -64,21 +52,11 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				paddingTop: value,
 			}),
 
-			m: (value: number | string) => ({
-				margin: value,
-			}),
-			mt: (value: number | string) => ({
-				marginTop: value,
-			}),
-			mr: (value: number | string) => ({
-				marginRight: value,
-			}),
-			mb: (value: number | string) => ({
-				marginBottom: value,
-			}),
-			ml: (value: number | string) => ({
-				marginLeft: value,
-			}),
+			mb: (marginBottom: number | string) => ({ marginBottom }),
+			mr: (marginRight: number | string) => ({ marginRight }),
+			ml: (marginLeft: number | string) => ({ marginLeft }),
+			mt: (marginTop: number | string) => ({ marginTop }),
+			m: (margin: number | string) => ({ margin }),
 			mx: (value: number | string) => ({
 				marginRight: value,
 				marginLeft: value,
@@ -90,21 +68,21 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 
 			dflex: (value: string) => ({
 				display: "flex", // row
-				alignItems: value,
 				justifyContent: value,
+				alignItems: value,
 			}),
 			dcolumn: (value: string) => ({
 				display: "flex",
 				flexDirection: "column",
-				alignItems: value,
 				justifyContent: value,
+				alignItems: value,
 			}),
 
 			sizeMin: (value: number | string) => ({
-				minWidth: value,
 				minHeight: value,
-				width: value,
+				minWidth: value,
 				height: value,
+				width: value,
 			}),
 
 			textGradient: (value: number | string) => ({
@@ -113,44 +91,23 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				WebkitBackgroundClip: "text",
 			}),
 
-			ff: (value: string) => ({
-				fontFamily: value,
-			}),
-			fw: (value: string | number) => ({
-				fontWeight: value,
-			}),
-			fs: (value: number | string) => ({
-				fontSize: value,
-			}),
-			lh: (value: number | string) => ({
-				lineHeight: value,
-			}),
-			ls: (value: number | string) => ({
-				letterSpacing: value,
-			}),
-			ta: (value: string) => ({
-				textAlign: value,
-			}),
+			ls: (letterSpacing: number | string) => ({ letterSpacing }),
+			fw: (fontWeight: string | number) => ({ fontWeight }),
+			lh: (lineHeight: number | string) => ({ lineHeight }),
+			fs: (fontSize: number | string) => ({ fontSize }),
+			ff: (fontFamily: string) => ({ fontFamily }),
+			ta: (textAlign: string) => ({ textAlign }),
+			c: (color: string) => ({ color }),
 
-			d: (value: string) => ({ display: value }),
-			fd: (value: string) => ({
-				flexDirection: value,
-			}),
-			b: (value: string | number) => ({
-				border: value,
-			}),
-			br: (value: number | string) => ({
-				borderRadius: value,
-			}),
-			bs: (value: number | string) => ({
-				boxShadow: value,
-			}),
-			bg: (value: string) => ({
-				background: value,
-			}),
-			ov: (value: string) => ({ overflow: value }),
-			ox: (value: string) => ({ overflowX: value }),
-			oy: (value: string) => ({ overflowY: value }),
+			br: (borderRadius: number | string) => ({ borderRadius }),
+			bs: (boxShadow: number | string) => ({ boxShadow }),
+			fd: (flexDirection: string) => ({ flexDirection }),
+			b: (border: string | number) => ({ border }),
+			bg: (background: string) => ({ background }),
+			ox: (overflowX: string) => ({ overflowX }),
+			oy: (overflowY: string) => ({ overflowY }),
+			ov: (overflow: string) => ({ overflow }),
+			d: (display: string) => ({ display }),
 		},
 	});
 
@@ -160,8 +117,8 @@ export const darkTheme = createTheme({
 		"scrollbar-thumb": "#454a4d",
 		scrollbar: "#202324",
 
-		"lingrad-top": "#103783",
 		"lingrad-bottom": "#0B3866",
+		"lingrad-top": "#103783",
 
 		"media-player-icons": "#f3f3ee",
 		"deactivated-icon": "#6272a4",
@@ -204,9 +161,6 @@ export const darkTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		tooltip:
-			"rgba(17, 17, 26, 0.1) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 48px",
-
 		popover: "0 0 8px rgba(255, 255, 255, 0.2)",
 
 		dialog: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
@@ -219,7 +173,7 @@ export const darkTheme = createTheme({
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 
-		"#fff-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
+		"glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
 	},
 });
 
@@ -229,8 +183,8 @@ export const lightTheme = createTheme({
 		"scrollbar-thumb": "#888",
 		scrollbar: "#f1f1f1",
 
-		"lingrad-top": "#8e2de2",
 		"lingrad-bottom": "#4a00e0",
+		"lingrad-top": "#8e2de2",
 
 		"media-player-icons": "#fff",
 		"deactivated-icon": "dimgray",
@@ -273,9 +227,6 @@ export const lightTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		tooltip:
-			"rgba(17, 17, 26, 0.1) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 48px",
-
 		popover: "0 0 8px rgba(0, 0, 0, 0.2)",
 
 		dialog: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
@@ -288,7 +239,7 @@ export const lightTheme = createTheme({
 		reflect:
 			"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 
-		"#fff-glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
+		"glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
 	},
 });
 
@@ -341,7 +292,12 @@ export const GlobalCSS = globalCss({
 	},
 
 	html: {
+		transitionProperty:
+			"color, background-color, border-color, box-shadow, caret-color",
+		transition: "ease 250ms",
+
 		boxSizing: "border-box",
+		caretColor: "$accent",
 		overflow: "hidden",
 
 		"::selection": {

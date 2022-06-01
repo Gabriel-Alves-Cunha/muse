@@ -16,7 +16,7 @@ import {
 	Popup,
 } from "./helper";
 
-import { StyledPopoverTrigger, Wrapper } from "../Downloading/styles";
+import { StyledPopoverTrigger } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
 
 export function Converting() {
@@ -58,32 +58,30 @@ export function Converting() {
 	}, [convertInfoList]);
 
 	return (
-		<Wrapper>
-			<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
-				<StyledPopoverTrigger
-					className={
-						(convertingListSize ? "has-items " : "") + (isOpen ? "active" : "")
-					}
-					data-tooltip="Show all converting medias"
-					tooltip-side="right"
-				>
-					<i data-length={convertingListSize}></i>
+		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
+			<StyledPopoverTrigger
+				className={
+					(convertingListSize ? "has-items " : "") + (isOpen ? "active" : "")
+				}
+				data-tooltip="Show all converting medias"
+				tooltip-side="right"
+			>
+				<i data-length={convertingListSize}></i>
 
-					<Convert size={20} />
-				</StyledPopoverTrigger>
+				<Convert size={20} />
+			</StyledPopoverTrigger>
 
-				<PopoverAnchor />
+			<PopoverAnchor />
 
-				<PopoverContent
-					size={
-						convertingListSize === 0
-							? "nothing-found-for-convertions-or-downloads"
-							: "convertions-or-downloads"
-					}
-				>
-					<Popup />
-				</PopoverContent>
-			</PopoverRoot>
-		</Wrapper>
+			<PopoverContent
+				size={
+					convertingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}
+			>
+				<Popup />
+			</PopoverContent>
+		</PopoverRoot>
 	);
 }

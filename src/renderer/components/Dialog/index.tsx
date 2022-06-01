@@ -22,9 +22,9 @@ const StyledTrigger = styled(Trigger, {
 	dflex: "center",
 	size: 29,
 
-	color: "$deactivated-icon",
-	background: "transparent",
-	borderRadius: "50%",
+	c: "$deactivated-icon",
+	bg: "transparent",
+	br: "50%",
 	cursor: "pointer",
 	border: "none",
 	margin: 5,
@@ -33,7 +33,7 @@ const StyledTrigger = styled(Trigger, {
 
 	"&:hover": {
 		transition: "$bgc",
-		background: "$icon-button-hovered",
+		bg: "$icon-button-hovered",
 	},
 
 	// For tooltip, cause I could not make it work
@@ -59,13 +59,13 @@ const StyledTrigger = styled(Trigger, {
 		width: "auto",
 
 		border: "1px solid white",
-		background: "#181818",
-		padding: "3px 8px",
+		bg: "#181818",
+		p: "3px 8px",
 
 		whiteSpace: "nowrap",
-		lineHeight: "normal",
+		lh: "normal",
 		ff: "$primary",
-		color: "#fff",
+		c: "#fff",
 		ta: "center",
 		fs: "1rem",
 		fw: 500,
@@ -77,13 +77,13 @@ const StyledTrigger = styled(Trigger, {
 		"tooltip-side": {
 			"left-bottom": {
 				"&::before, ::after": {
-					right: "50%",
-					top: "110%",
+					r: "50%",
+					t: "110%",
 				},
 			},
 			bottom: {
 				"&::before, ::after": {
-					top: "110%",
+					t: "110%",
 				},
 			},
 			right: {
@@ -93,7 +93,7 @@ const StyledTrigger = styled(Trigger, {
 			},
 			left: {
 				"&::before, ::after": {
-					right: "110%",
+					r: "110%",
 				},
 			},
 			top: {

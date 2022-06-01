@@ -12,12 +12,12 @@ import {
 import { styled } from "@styles/global";
 
 export const Content = styled(CtxContent, {
-	overflow: "hidden",
+	ov: "hidden",
 	minWidth: 220,
 
-	background: "$bg-ctx-menu",
-	borderRadius: 6,
-	padding: 5,
+	bg: "$bg-ctx-menu",
+	br: 6,
+	p: 5,
 
 	boxShadow: `0px 10px 38px -10px rgba(22, 23, 24, 0.35),
 	0px 10px 20px -15px rgba(22, 23, 24, 0.2)`,
@@ -26,31 +26,31 @@ export const Content = styled(CtxContent, {
 export const itemStyles = styled("div", {
 	all: "unset",
 
-	position: "relative",
-	display: "flex",
+	pos: "relative",
+	d: "flex",
 	alignItems: "center",
-	height: 25,
+	h: 25,
 
-	padding: "0 5px",
-	borderRadius: 3,
+	p: "0 5px",
+	br: 3,
 	pl: 25,
 
-	color: "$ctx-menu-item-text",
-	letterSpacing: "0.03rem",
+	c: "$ctx-menu-item-text",
+	ls: "0.03rem",
 	ff: "$secondary",
-	lineHeight: 1,
-	fontSize: 15,
+	lh: 1,
+	fs: 15,
 
 	userSelect: "none",
 
 	"&[data-disabled]": {
-		color: "$ctx-menu-item-text-disabled",
+		c: "$ctx-menu-item-text-disabled",
 		pointerEvents: "none",
 	},
 
 	"&:focus": {
-		color: "$ctx-menu-item-text-focus",
-		background: "$ctx-menu-item-bg-focus",
+		c: "$ctx-menu-item-text-focus",
+		bg: "$ctx-menu-item-bg-focus",
 	},
 });
 
@@ -58,12 +58,12 @@ export const RightSlot = styled("div", {
 	ml: "auto",
 	pl: 20,
 
-	color: "$ctx-menu-text",
+	c: "$ctx-menu-text",
 
-	":focus > &": { color: "$ctx-menu-item-text-focus" },
+	":focus > &": { c: "$ctx-menu-item-text-focus" },
 
 	"[data-disabled] &": {
-		color: "$ctx-menu-item-text-disabled",
+		c: "$ctx-menu-item-text-disabled",
 	},
 });
 
@@ -79,9 +79,9 @@ export const RadioItem = styled(CtxRadioItem, {
 
 export const TriggerItem = styled(CtxTriggerItem, {
 	"&[data-state='open']": {
-		color: "$ctx-menu-item-text",
+		c: "$ctx-menu-item-text",
 		// TODO: maybe this is $bg-popover:
-		background: "white",
+		bg: "white",
 	},
 
 	...itemStyles,
@@ -90,23 +90,23 @@ export const TriggerItem = styled(CtxTriggerItem, {
 export const Label = styled(CtxLabel, {
 	pl: 25,
 
-	color: "$ctx-menu-text",
-	lineHeight: "25px",
+	c: "$ctx-menu-text",
+	lh: "25px",
 	ff: "$secondary",
-	fontSize: 12,
+	fs: 12,
 });
 
 export const Separator = styled(CtxSeparator, {
-	background: "$ctx-menu-separator",
-	height: 1,
+	bg: "$ctx-menu-separator",
+	h: 1,
 	margin: 5,
 });
 
 export const ItemIndicator = styled(CtxItemIndicator, {
-	position: "absolute",
-	display: "inline-flex",
+	pos: "absolute",
+	d: "inline-flex",
 	justifyContent: "center",
 	alignItems: "center",
-	width: 25,
+	w: 25,
 	left: 0,
 });

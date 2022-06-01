@@ -23,45 +23,45 @@ const slideLeftAndFade = keyframes({
 });
 
 export const StyledContent = styled(Content, {
-	position: "relative", // to the popover anchor
-	display: "flex",
-	flexDirection: "column",
+	pos: "relative", // to the popover anchor
+	d: "flex",
+	fd: "column",
 
 	variants: {
 		size: {
 			"nothing-found-for-search-media": {
 				maxHeight: 100,
 				minHeight: 50,
-				width: 350,
+				w: 350,
 
-				overflow: "auto",
+				ov: "auto",
 			},
 			"nothing-found-for-convertions-or-downloads": {
-				height: 100,
-				width: 260,
+				h: 100,
+				w: 260,
 
-				overflow: "hidden",
+				ov: "hidden",
 			},
 			"search-media-results": {
-				height: 250,
-				width: 350,
+				h: 250,
+				w: 350,
 
-				overflow: "auto",
+				ov: "auto",
 			},
 			"convertions-or-downloads": {
-				height: 300,
-				width: 260,
+				h: 300,
+				w: 260,
 
-				overflow: "auto",
+				ov: "auto",
 			},
 		},
 	},
 
-	background: "$bg-popover",
-	borderRadius: 10,
-	padding: 10,
+	bg: "$bg-popover",
+	br: 10,
+	p: 10,
 
-	border: "1px solid lightgrey",
+	b: "1px solid lightgrey",
 	boxShadow: "$popover",
 	gap: 10,
 
@@ -81,17 +81,17 @@ export const StyledContent = styled(Content, {
 	},
 
 	"& > p": {
-		position: "relative",
-		top: "50%", // position the top  edge of the element at the middle of the parent
+		pos: "relative",
+		t: "50%", // position the top  edge of the element at the middle of the parent
 		left: "50%", // position the left edge of the element at the middle of the parent
 		transform: "translate(-50%, -50%)",
 
-		color: "$deactivated-icon",
-		letterSpacing: "0.03rem",
+		c: "$deactivated-icon",
+		ls: "0.03rem",
 		ff: "$secondary",
 		ta: "center",
-		fontSize: "1.05rem",
-		fontWeight: 500,
+		fs: "1.05rem",
+		fw: 500,
 	},
 
 	"&:focus": {
@@ -101,22 +101,22 @@ export const StyledContent = styled(Content, {
 
 	/* width */
 	"&::-webkit-scrollbar": {
-		display: "block",
+		d: "block",
 		size: 2,
 	},
 
 	/* Track */
 	"&::-webkit-scrollbar-track": {
-		background: "$scrollbar",
+		bg: "$scrollbar",
 	},
 
 	/* Handle */
 	"&::-webkit-scrollbar-thumb": {
-		background: "$scrollbar-thumb",
+		bg: "$scrollbar-thumb",
 	},
 
 	/* Handle on hover */
 	"&::-webkit-scrollbar-thumb:hover": {
-		background: "$scrollbar-thumb-hover",
+		bg: "$scrollbar-thumb-hover",
 	},
 });

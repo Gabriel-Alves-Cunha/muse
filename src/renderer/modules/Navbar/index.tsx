@@ -50,7 +50,7 @@ const ButtonsForPages = () => {
 		<Buttons>
 			{pages.map(page => (
 				<TooltipButton
-					className={"scale-up-icon " + (page === currPage ? "active" : "")}
+					className={page === currPage ? "active" : ""}
 					onClick={() => setPage({ page })}
 					tooltip={`Go to ${page}`}
 					tooltip-side="right"

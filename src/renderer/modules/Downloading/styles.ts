@@ -2,25 +2,17 @@ import { Trigger } from "@radix-ui/react-popover";
 
 import { styled } from "@styles/global";
 
-export const Wrapper = styled("div", {
-	position: "relative",
-	display: "flex", // row,
-	justifyContent: "center",
-	width: "100%",
-});
-
 export const StyledPopoverTrigger = styled(Trigger, {
-	display: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	pos: "relative",
+	dflex: "center",
 	size: 40,
 
-	background: "transparent",
+	bg: "transparent",
 	cursor: "pointer",
-	border: "none",
+	b: "none",
 
-	color: "$deactivated-icon",
-	fontSize: "1rem",
+	c: "$deactivated-icon",
+	fs: "1rem",
 
 	willChange: "transform",
 	transition: "$scale",
@@ -28,44 +20,44 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	"&:hover": {
 		transition: "$scale",
 		transform: "scale(1.4)",
-		color: "$active-icon",
+		c: "$active-icon",
 	},
 
 	"&.active": {
 		transform: "scale(1.4)",
-		color: "$active-icon",
+		c: "$active-icon",
 	},
 
 	"&.has-items": {
-		position: "relative",
-		display: "inline-block",
+		pos: "relative",
+		d: "inline-block",
 
 		i: {
-			position: "absolute",
+			pos: "absolute",
 			boxSizing: "content-box",
-			width: "100%",
-			right: -5,
+			w: "100%",
 			size: 16,
-			top: 0,
+			r: -5,
+			t: 0,
 
-			background: "#5cb85c",
-			border: "1px solid #fff",
-			borderRadius: "50%",
+			b: "1px solid #fff",
+			bg: "#5cb85c",
 			px: "auto",
+			br: "50%",
 
-			letterSpacing: "0.03rem",
-			fontFamily: "$primary",
 			fontStyle: "normal",
-			textAlign: "center",
-			fontWeight: 500,
-			color: "black",
-			fontSize: 10,
+			ff: "$primary",
+			ls: "0.03rem",
+			ta: "center",
+			c: "black",
+			fw: 500,
+			fs: 10,
 
 			"&:before": {
 				content: "attr(data-length)",
-				position: "absolute",
-				right: 2,
-				top: 1,
+				pos: "absolute",
+				r: 2,
+				t: 1,
 			},
 		},
 	},
@@ -88,21 +80,21 @@ export const StyledPopoverTrigger = styled(Trigger, {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
-		position: "absolute",
-		height: "auto",
-		width: "auto",
+		pos: "absolute",
+		h: "auto",
+		w: "auto",
 
-		border: "1px solid white",
-		background: "#181818",
-		padding: "3px 8px",
+		b: "1px solid white",
+		bg: "#181818",
+		p: "3px 8px",
 		zIndex: 100,
 
 		whiteSpace: "nowrap",
-		lineHeight: "normal",
 		ff: "$primary",
-		color: "#fff",
+		lh: "normal",
 		ta: "center",
 		fs: "1rem",
+		c: "#fff",
 		fw: 500,
 
 		pointerEvents: "none",
@@ -112,13 +104,13 @@ export const StyledPopoverTrigger = styled(Trigger, {
 		"tooltip-side": {
 			"left-bottom": {
 				"&::before, ::after": {
-					right: "50%",
-					top: "110%",
+					r: "50%",
+					t: "110%",
 				},
 			},
 			bottom: {
 				"&::before, ::after": {
-					top: "110%",
+					t: "110%",
 				},
 			},
 			right: {
@@ -128,7 +120,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			},
 			left: {
 				"&::before, ::after": {
-					right: "110%",
+					r: "110%",
 				},
 			},
 			top: {
@@ -145,49 +137,47 @@ export const StyledPopoverTrigger = styled(Trigger, {
 });
 
 export const Content = styled("div", {
-	display: "flex",
-	flexDirection: "column",
+	d: "flex",
+	fd: "column",
 
-	border: "1px solid lightgray",
-	borderRadius: 5,
-	padding: 10,
+	b: "1px solid lightgray",
+	br: 5,
+	p: 10,
 });
 
 export const TitleAndCancelWrapper = styled("div", {
-	position: "relative",
-	display: "flex", // row
+	pos: "relative",
+	d: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
-	marginBottom: 10,
-	width: "90%",
-	height: 16,
+	mb: 10,
+	w: "90%",
+	h: 16,
 
 	"& p": {
-		color: "$alternative-text",
-		ff: "$primary",
+		c: "$alternative-text",
 		whiteSpace: "nowrap", // keep it one line
-		fontSize: "0.9rem",
+		fs: "0.9rem",
+		ff: "$primary",
 		ta: "left",
 
-		overflow: "hidden",
-		width: "90%",
+		ov: "hidden",
+		w: "90%",
 	},
 
 	button: {
-		position: "absolute",
-		display: "flex", // row
-		justifyContent: "center",
-		alignItems: "center",
-		right: -21,
+		pos: "absolute",
+		dflex: "center",
 		size: 20,
+		r: -21,
 
-		background: "transparent",
-		borderRadius: "50%",
+		bg: "transparent",
 		cursor: "pointer",
-		border: "none",
+		br: "50%",
+		b: "none",
 
 		"&:focus, &:hover": {
-			background: "$button-hovered",
+			bg: "$button-hovered",
 
 			"& svg": {
 				fill: "red",

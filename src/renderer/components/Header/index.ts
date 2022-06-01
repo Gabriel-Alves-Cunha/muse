@@ -6,7 +6,7 @@ export const Header = styled("header", {
 	justifyContent: "space-between",
 	alignItems: "center",
 
-	padding: "0 5%",
+	p: "0 5%",
 	height: 60,
 	mt: 10,
 });

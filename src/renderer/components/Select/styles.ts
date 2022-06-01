@@ -11,9 +11,9 @@ import { TooltipButton_ } from "@components/TooltipButton";
 import { styled } from "@styles/global";
 
 export const Content = styled(RadixContent, {
-	background: "$bg-select",
-	overflow: "hidden",
-	borderRadius: 6,
+	bg: "$bg-select",
+	ov: "hidden",
+	br: 6,
 
 	boxShadow: `0px 10px 38px -10px rgba(22, 23, 24, 0.35),
 		0px 10px 20px -15px rgba(22, 23, 24, 0.2)`,
@@ -24,54 +24,54 @@ export const Trigger = styled(RadixTrigger, {
 });
 
 export const Viewport = styled(RadixViewport, {
-	padding: 5,
+	p: 5,
 });
 
 export const Item = styled(RadixItem, {
 	all: "unset",
 
-	position: "relative",
-	display: "flex",
+	pos: "relative",
+	d: "flex",
 	alignItems: "center",
-	height: 25,
+	h: 25,
 
-	padding: "0 35px 0 25px",
-	borderRadius: 3,
+	p: "0 35px 0 25px",
+	br: 3,
 	cursor: "pointer",
 
-	color: "$ctx-menu-item-text",
-	letterSpacing: "0.03rem",
+	c: "$ctx-menu-item-text",
+	ls: "0.03rem",
 	ff: "$secondary",
-	lineHeight: 1,
-	fontSize: 15,
+	lh: 1,
+	fs: 15,
 
 	userSelect: "none",
 
 	"&[data-disabled]": {
-		color: "$ctx-menu-item-text-disabled",
+		c: "$ctx-menu-item-text-disabled",
 		pointerEvents: "none",
 	},
 
 	"&:focus": {
-		color: "$ctx-menu-item-text-focus",
-		background: "$ctx-menu-item-bg-focus",
+		c: "$ctx-menu-item-text-focus",
+		bg: "$ctx-menu-item-bg-focus",
 	},
 });
 
 export const Label = styled(RadixLabel, {
 	pl: 25,
 
-	color: "$ctx-menu-text",
-	lineHeight: "25px",
+	c: "$ctx-menu-text",
+	lh: "25px",
 	ff: "$secondary",
-	fontSize: 12,
+	fs: 12,
 });
 
 export const ItemIndicator = styled(RadixItemIndicator, {
-	position: "absolute",
-	display: "inline-flex",
+	pos: "absolute",
+	d: "inline-flex",
 	justifyContent: "center",
 	alignItems: "center",
-	width: 25,
+	w: 25,
 	left: 0,
 });

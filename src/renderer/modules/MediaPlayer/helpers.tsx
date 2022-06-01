@@ -3,12 +3,6 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { BiDotsVerticalRounded as Dots } from "react-icons/bi";
 import { useCallback, useMemo, useRef } from "react";
 import {
-	IoPlayBackSharp as Previous,
-	IoPlayForwardSharp as Next,
-	IoPauseSharp as Pause,
-	IoPlaySharp as Play,
-} from "react-icons/io5";
-import {
 	MdFavoriteBorder as AddFavorite,
 	MdRepeatOne as RepeatOne,
 	MdShuffleOn as RandomOn,
@@ -16,9 +10,14 @@ import {
 	MdShuffle as RandomOff,
 	MdRepeat as Repeat,
 } from "react-icons/md";
+import {
+	IoPlayBackSharp as Previous,
+	IoPlayForwardSharp as Next,
+	IoPauseSharp as Pause,
+	IoPlaySharp as Play,
+} from "react-icons/io5";
 
 import { formatDuration } from "@common/utils";
-import { TooltipButton } from "@components/TooltipButton";
 import { useProgress } from ".";
 import {
 	toggleLoopMedia,
@@ -39,6 +38,7 @@ import {
 
 import {
 	ControlsAndSeekerContainer,
+	TooltipCircleIconButton,
 	ControlsButtonsWrapper,
 	ControlsWrapper,
 	OptionsAndAlbum,
@@ -65,23 +65,22 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 			<SeekerWrapper audio={audio} />
 
 			<ControlsButtonsWrapper>
-				<TooltipButton
-					tooltip="Toggle loop this media"
+				<TooltipCircleIconButton
+					data-tooltip="Toggle loop this media"
 					onClick={toggleLoopMedia}
-					className="icon-button"
 				>
 					{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
-				</TooltipButton>
+				</TooltipCircleIconButton>
 
 				<Controls isPaused={audio?.paused} />
 
-				<TooltipButton
-					className="icon-button"
-					tooltip="Toggle random"
+				<TooltipCircleIconButton
+					data-tooltip="Toggle random"
+					tooltip-side="left-bottom"
 					onClick={toggleRandom}
 				>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
-				</TooltipButton>
+				</TooltipCircleIconButton>
 			</ControlsButtonsWrapper>
 		</ControlsAndSeekerContainer>
 	);
@@ -89,56 +88,52 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
-		<TooltipButton tooltip="Media options" className="icon-button">
+		<TooltipCircleIconButton data-tooltip="Media options">
 			<Dots size={20} />
-		</TooltipButton>
+		</TooltipCircleIconButton>
 
 		<Album>{media?.album}</Album>
 
-		<TooltipButton
+		<TooltipCircleIconButton
 			onClick={() => toggleFavorite(path)}
+			data-tooltip="Toggle favorite"
 			tooltip-side="left-bottom"
-			tooltip="Toggle favorite"
-			className="icon-button"
 		>
 			{favorites().has(path) ? (
 				<Favorite size={17} />
 			) : (
 				<AddFavorite size={17} />
 			)}
-		</TooltipButton>
+		</TooltipCircleIconButton>
 	</OptionsAndAlbum>
 );
 
 export const Controls = ({ isPaused = false }: IsPaused) => (
 	<ControlsWrapper>
-		<TooltipButton
-			className="previous-or-next icon-button"
-			style={{ width: 29, height: 29, lineHeight: 29 }}
-			tooltip="Play previous track"
+		<TooltipCircleIconButton
+			data-tooltip="Play previous track"
 			onClick={playPreviousMedia}
-		>
-			<Previous />
-		</TooltipButton>
-
-		<TooltipButton
-			style={{ width: 49, height: 49, lineHeight: 49 }}
-			onClick={togglePlayPause}
-			className="icon-button"
-			tooltip="Play/pause"
 			tooltip-side="top"
 		>
-			{isPaused ? <Play size={25} /> : <Pause size={25} />}
-		</TooltipButton>
+			<Previous />
+		</TooltipCircleIconButton>
 
-		<TooltipButton
-			className="previous-or-next icon-button"
-			style={{ width: 29, height: 29, lineHeight: 29 }}
-			tooltip="Play next track"
+		<TooltipCircleIconButton
+			onClick={togglePlayPause}
+			data-tooltip="Play/pause"
+			tooltip-side="top"
+			size="large"
+		>
+			{isPaused ? <Play size={25} /> : <Pause size={25} />}
+		</TooltipCircleIconButton>
+
+		<TooltipCircleIconButton
+			data-tooltip="Play next track"
 			onClick={playNextMedia}
+			tooltip-side="top"
 		>
 			<Next />
-		</TooltipButton>
+		</TooltipCircleIconButton>
 	</ControlsWrapper>
 );
 
@@ -187,7 +182,9 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			const { width } = div.getBoundingClientRect();
 			const progressBarWidth = floor(width);
 
+			mouseX = mouseX < 0 ? 0 : mouseX;
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
+
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const time = (mouseXPercentage / 100) * duration!;
 			const left = mouseX - (35 >> 1); // 35 is the width of the tooltip.

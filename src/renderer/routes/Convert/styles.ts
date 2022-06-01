@@ -1,35 +1,35 @@
 import { styled } from "@styles/global";
 
 export const BorderedButton = styled("button", {
-	display: "flex", // row
+	d: "flex", // row
 	justifyContent: "center",
 	alignItems: "center",
 
-	marginTop: 40,
-	padding: 16,
-	width: 200,
-	height: 50,
+	mt: 40,
+	p: 16,
+	w: 200,
+	h: 50,
 	mx: "auto",
 
-	letterSpacing: "0.03rem",
+	ls: "0.03rem",
 	ff: "$secondary",
-	fontSize: "1.1rem",
-	fontWeight: 500,
-	color: "$text",
+	fs: "1.1rem",
+	fw: 500,
+	c: "$text",
 
-	border: "1px solid $accent",
-	background: "transparent",
+	b: "1px solid $accent",
+	bg: "transparent",
 	cursor: "pointer",
-	borderRadius: 7,
+	br: 7,
 
 	"&:hover": {
 		transition: "$bgc",
-		background: "$accent",
+		bg: "$accent",
 
-		color: "white",
+		c: "white",
 	},
 
 	input: {
-		display: "none",
+		d: "none",
 	},
 });

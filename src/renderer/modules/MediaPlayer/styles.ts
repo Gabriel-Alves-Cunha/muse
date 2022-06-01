@@ -1,4 +1,4 @@
-import { DECORATIONS_HEADER_HEIGHT } from "@components/Decorations/styles";
+import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
 const padding = "10px";
@@ -6,7 +6,7 @@ const padding = "10px";
 export const Wrapper = styled("div", {
 	gridArea: "media-player",
 
-	position: "relative",
+	pos: "relative",
 	d: "inline-block",
 
 	justifyItems: "center", // for grid: row
@@ -15,7 +15,7 @@ export const Wrapper = styled("div", {
 	justifySelf: "center", // for grid: row
 	alignSelf: "start", // for grid: column
 
-	h: `calc(100vh - ${DECORATIONS_HEADER_HEIGHT})`,
+	h: `calc(100vh - ${DECORATIONS_HEIGHT})`,
 	w: "100%",
 	padding,
 
@@ -30,29 +30,7 @@ export const Wrapper = styled("div", {
 	},
 
 	"& svg": {
-		color: "$media-player-icons",
-	},
-
-	"& .icon-button": {
-		position: "relative",
-		dflex: "center",
-
-		bg: "transparent",
-		cursor: "pointer",
-		br: "50%",
-		b: "none",
-
-		textAlign: "center",
-		size: 30 ,
-		lh: 30,
-		p: 0,
-
-		transition: "$bgc",
-
-		"&:hover": {
-			transition: "$bgc",
-			bg: "$media-player-icon-button-hovered",
-		},
+		c: "$media-player-icons",
 	},
 });
 
@@ -63,15 +41,15 @@ export const OptionsAndAlbum = styled("div", {
 });
 
 export const Album = styled("span", {
-	color: "$media-player-icons",
-	letterSpacing: "0.04rem",
+	c: "$media-player-icons",
+	ls: "0.04rem",
 	ff: "$secondary",
 	fs: "1rem",
 	fw: 500,
 });
 
 export const SquareImage = styled("div", {
-	position: "relative",
+	pos: "relative",
 	alignSelf: "center",
 
 	mt: "25%",
@@ -89,7 +67,7 @@ export const SquareImage = styled("div", {
 	},
 
 	div: {
-		position: "absolute",
+		pos: "absolute",
 		dcolumn: "center",
 		size: "100%",
 	},
@@ -114,8 +92,8 @@ export const Info = styled("div", {
 		dflex: "center",
 		w: "100%",
 
-		color: "$media-player-icons",
-		letterSpacing: "0.03rem",
+		c: "$media-player-icons",
+		ls: "0.03rem",
 		flexWrap: "wrap",
 		ff: "$secondary",
 		ta: "center",
@@ -135,7 +113,7 @@ export const Info = styled("div", {
 });
 
 export const ControlsAndSeekerContainer = styled("div", {
-	position: "absolute",
+	pos: "absolute",
 	d: "flex",
 	fd: "column",
 	bottom: 40,
@@ -144,8 +122,8 @@ export const ControlsAndSeekerContainer = styled("div", {
 });
 
 export const SeekerContainer = styled("div", {
-	display: "flex",
-	flexDirection: "column",
+	d: "flex",
+	fd: "column",
 	w: "100%",
 
 	px: 10,
@@ -158,8 +136,8 @@ export const Duration = styled("div", {
 	alignItems: "center",
 
 	"& p": {
-		color: "$media-player-icons",
-		letterSpacing: "0.03em",
+		c: "$media-player-icons",
+		ls: "0.03em",
 		ff: "$primary",
 		ta: "center",
 		fs: "1rem",
@@ -177,12 +155,112 @@ export const ControlsButtonsWrapper = styled("div", {
 });
 
 export const ControlsWrapper = styled("div", {
-	d: "inline-flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-	w: "100%",
+	pos: "relative",
+	dflex: "center",
+	// Accounting for all the buttons:
+	w: "calc(30px + 5px + 50px + 5px + 30px)",
+});
 
-	gap: "5%",
+export const TooltipCircleIconButton = styled("button", {
+	pos: "relative",
+	dflex: "center",
+
+	c: "$media-player-icons",
+	cursor: "pointer",
+	bg: "none",
+	br: "50%",
+	b: "none",
+
+	transition: "$bgc",
+
+	"&:hover": {
+		transition: "$bgc",
+		bg: "$media-player-icon-button-hovered",
+	},
+
+	variants: {
+		size: {
+			small: {
+				size: 30,
+			},
+			large: {
+				size: 50,
+				mx: 5,
+			},
+		},
+
+		"tooltip-side": {
+			"left-bottom": {
+				"&::before, ::after": {
+					r: "50%",
+					t: "110%",
+				},
+			},
+			bottom: {
+				"&::before, ::after": {
+					t: "110%",
+				},
+			},
+			r: {
+				"&::before, ::after": {
+					left: "110%",
+				},
+			},
+			left: {
+				"&::before, ::after": {
+					r: "110%",
+				},
+			},
+			top: {
+				"&::before, ::after": {
+					bottom: "110%",
+				},
+			},
+		},
+	},
+
+	defaultVariants: {
+		"tooltip-side": "bottom",
+		size: "small",
+	},
+
+	////////////////////////////////////////////////
+	// Tooltip:
+	"&:active": {
+		"&::before, ::after": {
+			visibility: "hidden",
+		},
+	},
+
+	"&:hover::before": {
+		visibility: "visible",
+
+		transition: "all 0.4s 1s ease ",
+	},
+
+	"&::before, ::after": {
+		visibility: "hidden",
+
+		content: "attr(data-tooltip)",
+		pos: "absolute",
+		h: "auto",
+		w: "auto",
+
+		b: "1px solid white",
+		bg: "#181818",
+		p: "3px 8px",
+		zIndex: 100,
+
+		whiteSpace: "nowrap",
+		lh: "normal",
+		ff: "$primary",
+		c: "#fff",
+		ta: "center",
+		fs: "1rem",
+		fw: 500,
+
+		pointerEvents: "none",
+	},
 });
 
 export const ButtonForRandomAndLoop = styled("button", {
@@ -203,7 +281,7 @@ export const ButtonForRandomAndLoop = styled("button", {
 });
 
 export const ProgressWrapper = styled("div", {
-	position: "relative",
+	pos: "relative",
 	d: "block",
 	w: "100%",
 	h: 3,
@@ -212,20 +290,21 @@ export const ProgressWrapper = styled("div", {
 	bg: "$bg-main",
 
 	"& span": {
-		display: "none",
+		d: "none",
 	},
 
 	"&:hover span": {
-		position: "absolute",
-		display: "block",
+		pos: "absolute",
+		dflex: "center",
 		bottom: 10,
 		h: 20,
 		w: 35,
 
+		transition: "none",
 		bg: "$bg-main",
 		br: 2,
 
-		color: "$text",
+		c: "$text",
 		ff: "$primary",
 		ta: "center",
 		fs: "0.8rem",
@@ -234,7 +313,7 @@ export const ProgressWrapper = styled("div", {
 });
 
 export const ProgressThumb = styled("div", {
-	position: "relative",
+	pos: "relative",
 	bg: "$accent",
 	h: "100%",
 });

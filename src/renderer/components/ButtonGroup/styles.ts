@@ -19,26 +19,26 @@ const scale = keyframes({
 });
 
 export const Wrapper = styled("div", {
-	display: "inline-flex",
-	height: "min-content",
+	d: "inline-flex",
+	h: "min-content",
 
-	background: "transparent",
+	bg: "transparent",
 
 	button: {
-		position: "relative",
+		pos: "relative",
 		dflex: "center",
 
-		height: "2.5rem",
+		h: "2.5rem",
 		px: 20,
 
-		background: "$bg-button",
+		bg: "$bg-button",
 		cursor: "pointer",
-		border: "none",
+		b: "none",
 
 		whiteSpace: "nowrap",
-		lineHeight: "2.5rem",
+		lh: "2.5rem",
 		ff: "$primary",
-		color: "$text",
+		c: "$text",
 		ta: "center",
 		fw: 500,
 
@@ -50,11 +50,11 @@ export const Wrapper = styled("div", {
 
 		"& svg": {
 			// all: "unset",
-			color: "$gray-text",
+			c: "$gray-text",
 		},
 
 		"&.single-button": {
-			borderRadius: "50%",
+			br: "50%",
 			size: "2.5rem",
 		},
 
@@ -69,10 +69,10 @@ export const Wrapper = styled("div", {
 		},
 
 		"&:hover, :focus": {
-			background: "$bg-button-hover",
+			bg: "$bg-button-hover",
 
 			"& svg": {
-				color: "white",
+				c: "white",
 			},
 
 			"&.reload svg": {
