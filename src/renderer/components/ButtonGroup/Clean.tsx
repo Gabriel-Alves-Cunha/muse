@@ -40,9 +40,6 @@ const handleOnClick = () => {
 		case PlaylistList.SORTED_BY_DATE:
 			break;
 
-		case PlaylistList.SORTED_BY_NAME:
-			break;
-
 		default:
 			assertUnreachable(fromList);
 			break;

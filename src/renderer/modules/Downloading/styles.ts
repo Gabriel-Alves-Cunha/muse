@@ -14,17 +14,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	c: "$deactivated-icon",
 	fs: "1rem",
 
-	willChange: "transform",
-	transition: "$scale",
-
 	"&:hover": {
-		transition: "$scale",
-		transform: "scale(1.4)",
-		c: "$active-icon",
-	},
-
-	"&.active": {
-		transform: "scale(1.4)",
 		c: "$active-icon",
 	},
 
@@ -115,7 +105,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			},
 			right: {
 				"&::before, ::after": {
-					left: "110%",
+					l: "110%",
 				},
 			},
 			left: {
@@ -150,15 +140,16 @@ export const TitleAndCancelWrapper = styled("div", {
 	d: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
-	mb: 10,
 	w: "90%",
 	h: 16,
+
+	mb: 10,
 
 	"& p": {
 		c: "$alternative-text",
 		whiteSpace: "nowrap", // keep it one line
-		fs: "0.9rem",
 		ff: "$primary",
+		fs: "0.9rem",
 		ta: "left",
 
 		ov: "hidden",

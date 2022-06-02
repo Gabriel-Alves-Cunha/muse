@@ -4,7 +4,7 @@ import { styled } from "@styles/global";
 export const Nav = styled("nav", {
 	gridArea: "nav",
 
-	d: "flex", // row
+	d: "flex",
 	fd: "column",
 	justifyContent: "space-between",
 	alignItems: "center",
@@ -44,8 +44,6 @@ export const Buttons = styled("div", {
 });
 
 export const Popups = styled("div", {
-	fd: "column",
-	dflex: "center",
-
+	dcolumn: "center",
 	w: "100%",
 });

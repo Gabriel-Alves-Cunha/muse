@@ -5,12 +5,12 @@ import { styled } from "@styles/global";
 export const ConvertionProgress = styled("div", {
 	d: "flex", // row
 
-	ff: "$primary",
 	whiteSpace: "nowrap",
-	ov: "hidden",
-	fs: "0.85rem",
-	ta: "left",
 	c: "$gray-text",
+	ff: "$primary",
+	fs: "0.85rem",
+	ov: "hidden",
+	ta: "left",
 
 	gap: 8,
 
@@ -20,14 +20,12 @@ export const ConvertionProgress = styled("div", {
 
 	"td:nth-of-type(2)": {
 		borderRight: "1px solid $text",
-		// mt: 5,
 		w: 15,
 	},
 });
 
 export const PopoverAnchor = styled(Anchor, {
 	pos: "relative",
-
 	left: 10,
 	t: 10,
 });

@@ -5,9 +5,9 @@ import react from "@vitejs/plugin-react";
 
 const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
+// // @ts-ignore For some reason, I can't get the type of 'test' to work:
 
 export default defineConfig({
-	// @ts-ignore For some reason, I can't get the type of 'test' to work:
 	test: {
 		dir: "../__tests__",
 		coverage: {
@@ -16,7 +16,7 @@ export default defineConfig({
 			all: true,
 		},
 		exclude: [
-			...(configDefaults.exclude as string[]),
+			...configDefaults.exclude,
 			"**/seeLeakedVariables.ts",
 			"**/.eslintrc.{js,cjs}",
 			"**/styles.ts",

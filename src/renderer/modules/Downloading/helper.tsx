@@ -24,7 +24,7 @@ export const Popup = () => {
 	return (
 		<>
 			{downloadingList.size > 0 ? (
-				Array.from(downloadingList.entries()).map(([url, download]) => (
+				[...downloadingList.entries()].map(([url, download]) => (
 					<Content key={url}>
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>
@@ -91,7 +91,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 		}),
 	);
 
-	dbg("Added download to the list", { downloadingList: downloadingList() });
+	dbg("Added download to the list:", downloadingList().get(downloadInfo.url));
 
 	// Send msg to electronPort to download:
 	myPort.postMessage(downloadInfo);
@@ -107,15 +107,13 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 		);
 
 		// Assert that the download exists:
-		if (!downloadingList_.has(downloadInfo.url))
+		const thisDownload = downloadingList_.get(downloadInfo.url);
+		if (!thisDownload)
 			return console.error(
 				"Received a message from Electron but the url is not in the list!",
 			);
 
 		dbg("downloadStatus:", downloadingList_.get(downloadInfo.url));
-
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const thisDownload = downloadingList_.get(downloadInfo.url)!;
 
 		// Update React's information about this DownloadingMedia:
 		setDownloadingList(
@@ -158,10 +156,9 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
 				break;
 
-			default: {
+			default:
 				assertUnreachable(data.status);
 				break;
-			}
 		}
 	};
 
@@ -180,7 +177,7 @@ const cancelDownloadAndOrRemoveItFromList = (url: string) => {
 	// Assert that the download exists:
 	const download = downloadingList_.get(url);
 
-	if (download === undefined)
+	if (!download)
 		return console.error(
 			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
 			downloadingList_,

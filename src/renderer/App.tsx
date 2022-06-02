@@ -8,15 +8,15 @@ import { Decorations } from "@components/Decorations";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@modules/MediaPlayer";
 import { Favorites } from "@routes/Favorites";
+import { GlobalCSS } from "@styles/global";
 import { Download } from "@routes/Download";
+import { Content } from "@styles/appStyles";
 import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
 import { Navbar } from "@modules/Navbar";
 import { Home } from "@routes/Home";
 
-import { GlobalCSS } from "@styles/global";
-import { Content } from "@styles/appStyles";
 import "react-toastify/dist/ReactToastify.min.css";
 
 export function App() {

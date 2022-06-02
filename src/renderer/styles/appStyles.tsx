@@ -8,7 +8,7 @@ export const Content = styled("div", {
 		/ 65px 1fr minmax(186px, 25vw)
 	`,
 
-	marginTop: DECORATIONS_HEIGHT,
+	mt: DECORATIONS_HEIGHT,
 	bg: "$bg-main",
 
 	"@sm": {
@@ -28,9 +28,11 @@ const rotating = keyframes({
 });
 
 export const Loading = styled("div", {
-	animation: `${rotating} 1s infinite`,
-	b: "2px solid #e5e5e5",
-	borderTopColor: "$accent",
-	br: "50%",
 	size: 25,
+
+	borderTopColor: "$accent",
+	b: "2px solid #e5e5e5",
+	br: "50%",
+
+	animation: `${rotating} 1s infinite`,
 });

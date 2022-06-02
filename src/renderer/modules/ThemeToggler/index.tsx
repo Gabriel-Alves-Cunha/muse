@@ -4,15 +4,16 @@ import {
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
+import { styled, darkTheme, lightTheme } from "@styles/global";
 import { useLocalStorage } from "@hooks/useLocalStorage";
 import { TooltipButton } from "@components/TooltipButton";
 import { keyPrefix } from "@utils/localStorage";
 
-import { styled, darkTheme, lightTheme } from "@styles/global";
-
 const themeKey = `${keyPrefix}theme` as const;
-
-type Themes = "light" | "dark";
+const html = document.documentElement;
+// Themes:
+const light = "light";
+const dark = "dark";
 
 const availableThemes: Record<Themes, string> = Object.freeze({
 	light: lightTheme.className,
@@ -20,9 +21,8 @@ const availableThemes: Record<Themes, string> = Object.freeze({
 } as const);
 
 export function ThemeToggler() {
-	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, "light");
-	const nextTheme: Themes = theme === "light" ? "dark" : "light";
-	const html = document.documentElement;
+	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, light);
+	const nextTheme: Themes = theme === light ? dark : light;
 
 	// Only run on firt render
 	useEffect(() => {
@@ -44,14 +44,14 @@ export function ThemeToggler() {
 				onClick={toggleTheme}
 				tooltip-side="right"
 			>
-				{theme === "light" ? <Dark size="20px" /> : <Light size="20px" />}
+				{theme === light ? <Dark size="20px" /> : <Light size="20px" />}
 			</TooltipButton>
 		</Box>
 	);
 }
 
 const Box = styled("div", {
-	position: "relative",
+	pos: "relative",
 	dflex: "center",
 
 	filter: "drop-shadow(0 0px 5px $lingrad-top)",
@@ -62,10 +62,7 @@ const Box = styled("div", {
 	border: "none",
 	size: 40,
 
-	transition: "$scale",
-
 	"&:hover": {
-		transition: "$bgc",
 		bg: "$lingrad-top",
 	},
 
@@ -74,3 +71,5 @@ const Box = styled("div", {
 		size: 40,
 	},
 });
+
+type Themes = "light" | "dark";

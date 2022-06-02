@@ -11,7 +11,7 @@ export function SortBy({ className }: Props) {
 	useEffect(() => {
 		let fromList = PlaylistList.MAIN_LIST;
 
-		if (selectedList === "Name") fromList = PlaylistList.SORTED_BY_NAME;
+		if (selectedList === "Name") fromList = PlaylistList.MAIN_LIST;
 		else if (selectedList === "Date") fromList = PlaylistList.SORTED_BY_DATE;
 
 		setFromList({ fromList });

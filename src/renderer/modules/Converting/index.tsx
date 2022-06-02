@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
-// This `constRefToEmptyArray` prevents an infinite loop:
-// import { constRefToEmptyArray } from "@utils/array";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
@@ -50,19 +48,16 @@ export function Converting() {
 				}
 		});
 
-		// Once all downloads are handled, we can remove the values from the list,
-		// this also prevents an infinite loop (when it reaches the end, the comparison
-		// will be true because of the const reference to the empty array):
-		convertInfoList.clear();
-		setConvertInfoList(convertInfoList);
+		if (convertInfoList.size !== 0) {
+			convertInfoList.clear();
+			setConvertInfoList(convertInfoList);
+		}
 	}, [convertInfoList]);
 
 	return (
 		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
 			<StyledPopoverTrigger
-				className={
-					(convertingListSize ? "has-items " : "") + (isOpen ? "active" : "")
-				}
+				className={convertingListSize ? "has-items " : ""}
 				data-tooltip="Show all converting medias"
 				tooltip-side="right"
 			>

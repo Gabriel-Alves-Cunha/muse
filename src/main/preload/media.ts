@@ -58,11 +58,11 @@ const createMedia = async (
 
 		time(() => {
 			const {
+				tag: { pictures, title, album, genres, albumArtists },
+				properties: { durationMilliseconds },
 				fileAbstraction: {
 					readStream: { length },
 				},
-				tag: { pictures, title, album, genres, albumArtists },
-				properties: { durationMilliseconds },
 			} = MediaFile.createFromPath(path);
 
 			const duration = durationMilliseconds / 1_000;
@@ -95,7 +95,7 @@ const createMedia = async (
 					picture.type === PictureType.Other
 						? Buffer.from(picture.data.data).toString("base64")
 						: picture.data.toString();
-				img = `data:${mimeType};base64,${str}`;
+				img = `data:${mimeType};base64,${str}` as ImgString;
 			}
 
 			const media: Media = {
@@ -136,7 +136,7 @@ export async function transformPathsToMedias(
 
 		const medias = (await Promise.allSettled(promises))
 			.map(p => (p.status === "fulfilled" ? p.value : undefined))
-			.filter(Boolean) as Array<[Path, Media]>;
+			.filter(Boolean) as [Path, Media][];
 
 		console.groupEnd();
 
@@ -182,7 +182,7 @@ export async function makeStream({
 		return sendFailedDownloadMsg(url, electronPort);
 	}
 
-	const startTime = performance.now();
+	const startTime = Date.now();
 	let interval: NodeJS.Timer | undefined;
 	let prettyTotal = "";
 
@@ -212,7 +212,7 @@ export async function makeStream({
 
 			// To node console if is in development:
 			if (isDevelopment) {
-				const secondsDownloading = (performance.now() - startTime) / 1_000;
+				const secondsDownloading = (Date.now() - startTime) / 1_000;
 				const estimatedDownloadTime = (
 					secondsDownloading / (percentage / 100) -
 					secondsDownloading

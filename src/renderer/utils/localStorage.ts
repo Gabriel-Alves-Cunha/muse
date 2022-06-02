@@ -34,8 +34,8 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 		time(async () => {
 			try {
 				if (value instanceof Map || value instanceof Set)
-					//@ts-ignore - This conversion will work:
-					value = Array.from(value);
+					//@ts-ignore => This conversion will work:
+					value = [...value];
 
 				const serializedValue = await stringifyAsync(value);
 
@@ -56,7 +56,7 @@ export function getFromLocalStorage(key: Keys) {
 		try {
 			{
 				const value = localStorage.getItem(key);
-				// @ts-ignore this is the only that it works:
+				// @ts-ignore => `?? "";` does not work :|
 				const item: unknown = JSON.parse(value);
 
 				dbgPlaylists(`getFromLocalStorage(${key})`, item);
@@ -112,7 +112,7 @@ export function getFromLocalStorage(key: Keys) {
 							"sortedByName from storage must be an array:" + item,
 						);
 
-						const newSortedByName = new Set(item as Path[]);
+						const newSortedByName = new Map(item as [Path, Media][]);
 
 						dbgPlaylists(
 							"getFromLocalStorage: newSortedByName =",
@@ -144,9 +144,8 @@ export function getFromLocalStorage(key: Keys) {
 						return newPlayOptions;
 					}
 
-					default: {
+					default:
 						return assertUnreachable(key);
-					}
 				}
 			}
 		} catch (error) {

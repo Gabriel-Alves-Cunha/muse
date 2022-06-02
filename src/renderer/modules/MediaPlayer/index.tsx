@@ -28,8 +28,8 @@ const { setState: setProgress } = useProgress;
 
 export function MediaPlayer() {
 	const audioRef = useRef<HTMLAudioElement>(null);
+	const { sortedByName: mainList } = usePlaylists();
 	const { path } = useCurrentPlaying();
-	const { mainList } = usePlaylists();
 
 	const media = mainList.get(path ?? "");
 	const audio = audioRef.current;
@@ -56,7 +56,7 @@ export function MediaPlayer() {
 			});
 
 			const lastTime = currentPlaying().currentTime;
-			if (lastTime > 30) {
+			if (lastTime > 30 /* seconds */) {
 				console.log(
 					`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`,
 				);

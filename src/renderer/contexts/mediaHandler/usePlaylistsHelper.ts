@@ -51,7 +51,7 @@ export const getAllowedMedias = (
 	);
 
 export const sortByDate = (list: MainList): Set<Path> => {
-	const listAsArrayOfPaths = Array.from(list)
+	const listAsArrayOfPaths = [...list]
 		.sort(([, prevMedia], [, nextMedia]) => {
 			if (prevMedia.dateOfArival > nextMedia.dateOfArival) return 1;
 			if (prevMedia.dateOfArival < nextMedia.dateOfArival) return -1;
@@ -64,14 +64,12 @@ export const sortByDate = (list: MainList): Set<Path> => {
 };
 
 export const sortByName = (list: MainList) => {
-	const listAsArrayOfPaths = Array.from(list)
-		.sort(([, prevMedia], [, nextMedia]) => {
-			if (prevMedia.title > nextMedia.title) return 1;
-			if (prevMedia.title < nextMedia.title) return -1;
-			// a must be equal to b:
-			return 0;
-		})
-		.map(([path]) => path);
+	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {
+		if (prevMedia.title > nextMedia.title) return 1;
+		if (prevMedia.title < nextMedia.title) return -1;
+		// a must be equal to b:
+		return 0;
+	});
 
-	return new Set(listAsArrayOfPaths);
+	return new Map(listAsArrayOfPaths);
 };

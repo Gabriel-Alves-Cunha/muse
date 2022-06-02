@@ -50,8 +50,12 @@ export const MediaListKind = ({ fromList }: MediaListKindProps) => (
 );
 
 function MediaListKind_({ fromList }: MediaListKindProps) {
-	const { mainList, favorites, history, sortedByDate, sortedByName } =
-		usePlaylists();
+	const {
+		sortedByName: mainList,
+		sortedByDate,
+		favorites,
+		history,
+	} = usePlaylists();
 
 	useEffect(() => {
 		setFromList({ fromList });
@@ -65,20 +69,24 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 
 				if (Array.isArray(list)) {
 					const listAsArrayOfAMap: [Path, Media][] = [];
-					mainList.forEach((media, path) => {
-						if (list.includes(path)) listAsArrayOfAMap.push([path, media]);
-					});
+
+					mainList.forEach(
+						(media, path) =>
+							list.includes(path) && listAsArrayOfAMap.push([path, media]),
+					);
 					return listAsArrayOfAMap;
 				} else if (list instanceof Set) {
 					const listAsArrayOfAMap: [Path, Media][] = [];
-					mainList.forEach((media, path) => {
-						if (list.has(path)) listAsArrayOfAMap.push([path, media]);
-					});
+
+					mainList.forEach(
+						(media, path) =>
+							list.has(path) && listAsArrayOfAMap.push([path, media]),
+					);
 					return listAsArrayOfAMap;
 				} else if (list instanceof Map) {
 					// Since the ONLY list that is a Map is the
 					// mainList, we can take a shortcut:
-					return Array.from(mainList);
+					return [...mainList];
 				}
 
 				throw new Error("The list is not an Array, a Set or a Map!");
@@ -86,7 +94,7 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 		// Disable cause we need to listen to all the lists cause
 		// we don't know wich one it is
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[mainList, favorites, history, sortedByDate, sortedByName, fromList],
+		[mainList, favorites, history, sortedByDate, fromList],
 	);
 
 	return (

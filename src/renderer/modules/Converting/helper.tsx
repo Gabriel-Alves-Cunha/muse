@@ -23,12 +23,21 @@ export const { setState: setConvertInfoList, getState: convertInfoList } =
 export function Popup() {
 	const convertingList_ = convertingList();
 
+	const convertBoxes = () => {
+		const list = [];
+
+		for (const [path, media] of convertingList_)
+			list.push(
+				<ConvertBox mediaBeingConverted={media} key={path} path={path} />,
+			);
+
+		return list;
+	};
+
 	return (
 		<>
 			{convertingList_.size > 0 ? (
-				Array.from(convertingList_.entries()).map(([path, media]) => (
-					<ConvertBox mediaBeingConverted={media} key={path} path={path} />
-				))
+				convertBoxes()
 			) : (
 				<p>No conversions in progress!</p>
 			)}
@@ -97,9 +106,9 @@ export function createNewConvert(
 
 	setConvertingList(convertingList_.set(path, convertStatus));
 
+	// On every `postMessage` you have to send the path (as an ID)!
 	myPort.postMessage({
 		toExtension: convertStatus.toExtension,
-		// ^ On every `postMessage` you have to send the path (as an ID)!
 		canStartConvert: true,
 		path,
 	});
@@ -113,11 +122,10 @@ export function createNewConvert(
 		});
 
 		// Assert that the download exists:
-		if (!convertingList_.has(path)) {
+		if (!convertingList_.has(path))
 			return console.error(
 				"Received a message from Electron but the path is not in the list!",
 			);
-		}
 
 		setConvertingList(
 			convertingList_.set(path, {
@@ -161,10 +169,9 @@ export function createNewConvert(
 			case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
 				break;
 
-			default: {
+			default:
 				assertUnreachable(data.status);
 				break;
-			}
 		}
 	};
 
@@ -199,7 +206,7 @@ const cancelDownloadAndOrRemoveItFromList = (path: string) => {
 
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
 
-export const handleOnClose = () => console.log("Closing ports (react port).");
+export const handleOnClose = () => dbg("Closing ports (react port).");
 
 export type MediaBeingConverted = Readonly<{
 	status: ProgressProps["status"];
