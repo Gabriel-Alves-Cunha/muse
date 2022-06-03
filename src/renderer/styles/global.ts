@@ -2,7 +2,7 @@ import { createStitches } from "@stitches/react";
 import { toast } from "react-toastify";
 
 import { dbg, isDevelopment } from "@common/utils";
-import { objectDeepKeys } from "@utils/object";
+import { getObjectDeepKeys } from "@utils/object";
 import { arraysEqual } from "@utils/array";
 
 export const { styled, globalCss, keyframes, createTheme, css } =
@@ -248,9 +248,9 @@ export const lightTheme = createTheme({
 // switched between them without react rerenders!
 if (isDevelopment) {
 	// @ts-ignore It will work:
-	const lightThemeKeys = objectDeepKeys(lightTheme);
+	const lightThemeKeys = getObjectDeepKeys(lightTheme);
 	// @ts-ignore It will work:
-	const darkThemeKeys = objectDeepKeys(darkTheme);
+	const darkThemeKeys = getObjectDeepKeys(darkTheme);
 	const areEqual = arraysEqual(lightThemeKeys, darkThemeKeys);
 
 	dbg(
@@ -274,6 +274,38 @@ export const GlobalCSS = globalCss({
 			outline: "none !important",
 		},
 	},
+
+	"@font-face": [
+		/* assistant-300 - latin */
+		{
+			fontFamily: "Assistant",
+			fontStyle: "normal",
+			fontWeight: 300,
+			src: "local(''), url('./assets/fonts/assistant-v16-latin-300.woff2') format('woff2')",
+		},
+		/* assistant-regular-400 - latin */
+		{
+			fontFamily: "Assistant",
+			fontStyle: "normal",
+			fontWeight: 400,
+			src: "local(''), url('./assets/fonts/assistant-v16-latin-regular.woff2') format('woff2')",
+		},
+		/* assistant-500 - latin */
+		{
+			fontFamily: "Assistant",
+			fontStyle: "normal",
+			fontWeight: 500,
+			src: "local(''), url('./assets/fonts/assistant-v16-latin-500.woff2') format('woff2')",
+		},
+
+		/* source-sans-pro-regular-400 - latin */
+		{
+			fontFamily: "Source Sans Pro",
+			fontStyle: "normal",
+			fontWeight: 400,
+			src: "local(''), url('./assets/fonts/source-sans-pro-v21-latin-regular.woff2') format('woff2')",
+		},
+	],
 
 	input: {
 		"&:focus-visible": {

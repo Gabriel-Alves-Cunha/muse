@@ -1,6 +1,4 @@
 * TODO: impl select on media
-* TODO: change mainList for sortedByName
-* TODO: make fonts local
 
 NOTES:
 

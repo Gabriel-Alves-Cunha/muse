@@ -17,7 +17,7 @@ export function Clean({ className }: Props) {
 			tooltip="Clean list"
 			type="button"
 		>
-			<CleanIcon size={17} />
+			<CleanIcon height={17} width="17px !important" fill="white" />
 		</TooltipButton>
 	);
 }

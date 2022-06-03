@@ -5,15 +5,13 @@ import { styled } from "@styles/global";
 export const Img = styled("div", {
 	$$size: "45px",
 
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 
 	minWidth: "$$size",
 	h: "$$size",
 
-	br: 13,
 	b: "none",
+	br: 13,
 	mr: 10,
 
 	"& img": {
@@ -22,7 +20,7 @@ export const Img = styled("div", {
 
 		br: 13,
 
-		"&:before": {
+		"&::before": {
 			d: "none",
 		},
 	},
@@ -104,9 +102,9 @@ export const TriggerOptions = styled(Trigger, {
 });
 
 export const ListWrapper = styled("div", {
-	margin: "2em 5%",
-	h: "70vh",
+	margin: "2rem 5%",
 	maxWidth: 600,
+	h: "70vh",
 
 	"@sm": {
 		margin: "0.5em 5%",
@@ -141,7 +139,7 @@ export const RowWrapper = styled("div", {
 	dflex: "center",
 	w: "98%",
 	h: 65,
-	left: 7,
+	l: 7,
 
 	transition: "$boxShadow",
 	br: 7,
@@ -154,8 +152,8 @@ export const RowWrapper = styled("div", {
 
 	"&.selected": {
 		b: "2px solid $selected-border-color",
-		bg: "$bg-selected",
 		boxShadow: "$bg-selected",
+		bg: "$bg-selected",
 	},
 
 	"& button.play": {
@@ -172,11 +170,11 @@ export const RowWrapper = styled("div", {
 export const ErrorMsg = styled("pre", {
 	margin: "20px 0",
 
+	ff: "$secondary",
 	ls: "0.035rem",
 	fs: "0.8rem",
-	ff: "$secondary",
-	fw: 500,
 	c: "red",
+	fw: 500,
 });
 
 export const Footer = styled("div", {
@@ -188,19 +186,17 @@ export const Footer = styled("div", {
 
 export const EmptyList = styled("div", {
 	pos: "relative",
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 	size: "95%",
 
 	c: "$alternative-text",
-	ls: "0.04rem",
 	ff: "$secondary",
+	ls: "0.04rem",
 	fs: "1.1rem",
 	fw: 500,
 
 	img: {
-		size: 52,
+		size: 50,
 		mr: 20,
 	},
 });

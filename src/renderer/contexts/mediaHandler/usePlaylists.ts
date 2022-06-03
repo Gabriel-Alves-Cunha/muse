@@ -26,7 +26,7 @@ export type UsePlaylistsActions = Readonly<{
 
 	isLoadingMedias: boolean;
 
-	history: ReadonlyArray<Path>;
+	history: readonly Path[];
 	sortedByDate: Set<Path>;
 	sortedByName: MainList;
 	favorites: Set<Path>;
@@ -34,14 +34,13 @@ export type UsePlaylistsActions = Readonly<{
 
 export const usePlaylists = create<UsePlaylistsActions>()(
 	setPlaylistsLocalStorage((set, get) => ({
+		isLoadingMedias: false,
+
 		sortedByDate:
 			(getFromLocalStorage(keys.sortedByDate) as Set<Path>) ?? new Set(),
-		sortedByName:
-			(getFromLocalStorage(keys.sortedByName) as MainList) ?? new Map(),
 		favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
 		history: (getFromLocalStorage(keys.history) as Path[]) ?? [],
-
-		isLoadingMedias: false,
+		sortedByName: new Map(),
 
 		setPlaylists: (action: PlaylistsReducer_Action) => {
 			time(() => {
@@ -60,6 +59,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								// history has a max size of maxSizeOfHistory:
 								if (newHistory.length > maxSizeOfHistory)
+									// remove the first element:
 									newHistory.splice(1, 1);
 
 								set({ history: newHistory });
@@ -71,20 +71,13 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								break;
 							}
 
-							case PlaylistActions.CLEAN: {
+							case PlaylistActions.CLEAN:
 								set({ history: emptyArray });
-
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_HISTORY'\u279D'CLEAN'. new history =",
-									get().history,
-								);
 								break;
-							}
 
-							default: {
+							default:
 								assertUnreachable(action);
 								break;
-							}
 						}
 						break;
 					}
@@ -92,7 +85,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 					case WhatToDo.UPDATE_FAVORITES: {
 						switch (action.whatToDo) {
 							case PlaylistActions.TOGGLE_ONE_MEDIA: {
-								const favorites = get().favorites;
+								const { favorites } = get();
 
 								// map.delete() returns true if an element in the Map
 								// object existed and has been removed, or false if
@@ -119,7 +112,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
-								const favorites = get().favorites;
+								const { favorites } = get();
 
 								favorites.delete(action.path)
 									? set({ favorites })
@@ -133,19 +126,16 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.CLEAN: {
-								set({ favorites: new Set() });
+								const { favorites } = get();
+								favorites.clear();
 
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_FAVORITES'\u279D'CLEAN'. new favorites = ",
-									get().favorites,
-								);
+								set({ favorites });
 								break;
 							}
 
-							default: {
+							default:
 								assertUnreachable(action);
 								break;
-							}
 						}
 						break;
 					}
@@ -163,14 +153,14 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								if (mainList.has(action.path)) {
 									console.error(
-										`A media with path "${action.path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
+										`A media with path "${action.path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call this function with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
 									);
 									break;
 								}
 
-								mainList.set(action.path, action.newMedia);
-
-								updateAndSortSortedAndMainLists(mainList);
+								updateAndSortSortedAndMainLists(
+									mainList.set(action.path, action.newMedia),
+								);
 
 								dbgPlaylists(
 									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'ADD_ONE_MEDIA' (yet to be sorted). newMainList =",
@@ -180,8 +170,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
-								const mainList = get().sortedByName;
-								const sortedByDate = get().sortedByDate;
+								const {
+									sortedByName: mainList,
+									sortedByDate,
+									favorites,
+									history,
+								} = get();
 
 								if (!mainList.delete(action.path)) {
 									console.error(
@@ -202,15 +196,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								});
 
 								// If the media is in the favorites, remove it from the favorites
-								const favorites = get().favorites;
 								if (favorites.delete(action.path)) set({ favorites });
 
 								// If the media is in the history, remove it from the history
-								const history = get().history.filter(
-									path => path !== action.path,
-								);
-
-								if (history.length !== get().history.length) set({ history });
+								const newHistory = history.filter(path => path !== action.path);
+								if (newHistory.length !== history.length)
+									set({ history: newHistory });
 
 								dbgPlaylists(
 									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA_BY_PATH' (yet to be sorted). newMainList =",
@@ -220,32 +211,31 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.REPLACE_ENTIRE_LIST: {
-								dbgPlaylists(
-									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). newMainList =",
-									action.list,
-								);
+								const { favorites, history } = get();
 
 								// If the media in the favorites list is not on
 								// action.list, remove it from the favorites:
-								const favorites = get().favorites;
 								const previousFavoritesSize = favorites.size;
-
 								favorites.forEach(
 									path => !action.list.has(path) && favorites.delete(path),
 								);
-
 								if (favorites.size !== previousFavoritesSize)
 									set({ favorites });
 
 								// If the media in the history list is not on
 								// action.list, remove it from the favorites:
-								const history = get().history.filter(path =>
+								const newHistory = history.filter(path =>
 									action.list.has(path),
 								);
-
-								if (history.length !== get().history.length) set({ history });
+								if (newHistory.length !== history.length)
+									set({ history: newHistory });
 
 								updateAndSortSortedAndMainLists(action.list);
+
+								dbgPlaylists(
+									"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REPLACE_ENTIRE_LIST' (yet to be sorted). action.list =",
+									action.list,
+								);
 								break;
 							}
 
@@ -257,9 +247,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								if (!oldMedia) {
 									console.error(
-										`I did not find a media with path = "${String(
-											action.path,
-										)}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`,
+										`I did not find a media with path = "${action.path}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`,
 									);
 									break;
 								}
@@ -268,16 +256,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									mainList.delete(path);
 									mainList.set(newPath, newMedia);
 
+									// Only sort if the their titles are different:
 									if (newMedia.title !== oldMedia.title)
 										updateAndSortSortedAndMainLists(mainList);
-									else set({ sortedByName: mainList });
-
-									// Now path is an old, invalid path:
-									if (get().sortedByName.has(path))
-										console.error(
-											`A media with path "${path}" should have been deleted, but it wasn't!`,
-											{ newPath, path, newMedia, mainList: get().sortedByName },
-										);
+									/* Else, just update the media in the main list,
+									 * cause the title is the same, so no need to sort:
+									 */ else set({ sortedByName: mainList });
 								} else if (newMedia.title !== oldMedia.title)
 									updateAndSortSortedAndMainLists(mainList.set(path, newMedia));
 								else set({ sortedByName: mainList.set(path, newMedia) });
@@ -292,18 +276,16 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 							}
 
 							case PlaylistActions.CLEAN: {
-								const sortedByDate = get().sortedByDate;
-								const mainList = get().sortedByName;
-								const favorites = get().favorites;
+								const { favorites, sortedByDate, sortedByName } = get();
 
 								sortedByDate.clear();
+								sortedByName.clear();
 								favorites.clear();
-								mainList.clear();
 
 								set({
-									sortedByName: mainList,
 									history: emptyArray,
 									sortedByDate,
+									sortedByName,
 									favorites,
 								});
 
@@ -314,18 +296,16 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								break;
 							}
 
-							default: {
+							default:
 								assertUnreachable(action);
 								break;
-							}
 						}
 						break;
 					}
 
-					default: {
+					default:
 						assertUnreachable(action);
 						break;
-					}
 				}
 			}, "setPlaylists " + JSON.stringify(action, null, 2));
 		},

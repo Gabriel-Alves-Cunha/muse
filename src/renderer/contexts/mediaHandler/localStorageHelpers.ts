@@ -4,7 +4,7 @@ import type { CurrentPlaying } from "./useCurrentPlaying";
 import type { PlayOptions } from "./usePlayOptions";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
-import { shallowEqual } from "@utils/object";
+import { areObjectKeysEqual } from "@utils/object";
 
 export const setCurrentPlayingLocalStorage: LoggerImpl<CurrentPlaying> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -14,7 +14,7 @@ export const setCurrentPlayingLocalStorage: LoggerImpl<CurrentPlaying> =
 			replace,
 		) => {
 			const previousState = get();
-			const areStatesEqual = shallowEqual(newCurrentPlaying, previousState);
+			const areStatesEqual = areObjectKeysEqual(newCurrentPlaying, previousState);
 
 			set(newCurrentPlaying, replace);
 
@@ -34,7 +34,7 @@ export const setPlayOptionsLocalStorage: LoggerImpl<PlayOptions> =
 			replace,
 		) => {
 			const previousState = get();
-			const areStatesEqual = shallowEqual(previousState, newPlayOptions);
+			const areStatesEqual = areObjectKeysEqual(previousState, newPlayOptions);
 
 			set(newPlayOptions, replace);
 

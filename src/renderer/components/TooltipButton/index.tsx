@@ -29,8 +29,12 @@ export const TooltipButton_ = styled("button", {
 
 	transition: "none",
 
+	"& svg": {
+		size: "17px !important",
+	},
+
 	"&:active": {
-		"&::before, ::after": {
+		"&::before, &::after": {
 			visibility: "hidden",
 		},
 	},
@@ -41,7 +45,7 @@ export const TooltipButton_ = styled("button", {
 		transition: "all 0.4s 1s ease ",
 	},
 
-	"&::before, ::after": {
+	"&::before, &::after": {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
@@ -90,7 +94,7 @@ export const TooltipButton_ = styled("button", {
 			},
 			top: {
 				"&::before, ::after": {
-					b: "110%",
+					bottom: "110%",
 				},
 			},
 		},

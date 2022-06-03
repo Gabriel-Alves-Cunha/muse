@@ -1,6 +1,6 @@
 import type { CurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
-import type { Media, Path } from "@common/@types/generalTypes";
 import type { PlayOptions } from "@contexts/mediaHandler/usePlayOptions";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { stringifyAsync } from "js-coroutines";
 
@@ -12,7 +12,6 @@ const { assert } = console;
 export const keyPrefix = "@muse:";
 
 export const keys = Object.freeze({
-	sortedByName: `${keyPrefix}playlist:sortedByName`,
 	sortedByDate: `${keyPrefix}playlist:sortedByDate`,
 	currentPlaying: `${keyPrefix}current_playing`,
 	favorites: `${keyPrefix}playlist:favorites`,
@@ -22,19 +21,18 @@ export const keys = Object.freeze({
 
 type Keys = typeof keys[keyof typeof keys];
 type Values =
-	| Readonly<Path[]>
-	| [Path, Media][]
+	| readonly [Path, Media][]
+	| readonly Path[]
 	| CurrentPlaying
 	| PlayOptions
-	| Set<Path>
-	| Path[];
+	| Set<Path>;
 
 export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	setTimeout(() => {
 		time(async () => {
 			try {
 				if (value instanceof Map || value instanceof Set)
-					//@ts-ignore => This conversion will work:
+					//@ts-ignore => This conversion will work with either Map or Set:
 					value = [...value];
 
 				const serializedValue = await stringifyAsync(value);
@@ -42,7 +40,7 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 				dbgPlaylists({ key, serializedValue, value });
 
 				// @ts-ignore => It doesn't matter that `serializedValue`,
-				// is of type String or string, they both work:
+				// is of type `String` or `string`, they both work:
 				localStorage.setItem(key, serializedValue);
 			} catch (error) {
 				console.error(error);
@@ -56,10 +54,10 @@ export function getFromLocalStorage(key: Keys) {
 		try {
 			{
 				const value = localStorage.getItem(key);
-				// @ts-ignore => `?? "";` does not work :|
+				// @ts-ignore => ^ `?? "";` does not work :|
 				const item: unknown = JSON.parse(value);
 
-				dbgPlaylists(`getFromLocalStorage(${key})`, item);
+				dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
 
 				if (!item) return undefined;
 
@@ -67,7 +65,8 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.favorites: {
 						assert(
 							Array.isArray(item),
-							"favorites from storage must be an array:" + item,
+							"favorites from storage must be an array:",
+							item,
 						);
 
 						const newFavorites = new Set(item as Path[]);
@@ -80,10 +79,11 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.history: {
 						assert(
 							Array.isArray(item),
-							"history from storage must be an array:" + item,
+							"history from storage must be an array:",
+							item,
 						);
 
-						const newHistory = Array.from(item as Path[]);
+						const newHistory = item as Path[];
 
 						dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
 
@@ -93,7 +93,8 @@ export function getFromLocalStorage(key: Keys) {
 					case keys.sortedByDate: {
 						assert(
 							Array.isArray(item),
-							"sortedByDate from storage must be an array:" + item,
+							"sortedByDate from storage must be an array:",
+							item,
 						);
 
 						const newSortedByDate = item as Path[];
@@ -104,22 +105,6 @@ export function getFromLocalStorage(key: Keys) {
 						);
 
 						return newSortedByDate;
-					}
-
-					case keys.sortedByName: {
-						assert(
-							Array.isArray(item),
-							"sortedByName from storage must be an array:" + item,
-						);
-
-						const newSortedByName = new Map(item as [Path, Media][]);
-
-						dbgPlaylists(
-							"getFromLocalStorage: newSortedByName =",
-							newSortedByName,
-						);
-
-						return newSortedByName;
 					}
 
 					case keys.currentPlaying: {
