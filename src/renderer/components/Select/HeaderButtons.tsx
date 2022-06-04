@@ -6,14 +6,6 @@ import { Viewport, Item, ItemIndicator } from "./styles";
 export function HeaderButtons() {
 	return (
 		<Viewport>
-			<Item value="None">
-				<ItemText>None</ItemText>
-
-				<ItemIndicator>
-					<CheckIcon />
-				</ItemIndicator>
-			</Item>
-
 			<Item value="Name">
 				<ItemText>Name</ItemText>
 

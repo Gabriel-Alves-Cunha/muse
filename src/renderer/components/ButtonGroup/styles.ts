@@ -19,43 +19,36 @@ const scale = keyframes({
 });
 
 export const Wrapper = styled("div", {
-	d: "inline-flex",
-	h: "min-content",
+	position: "relative",
+	dflex: "center",
 
-	bg: "transparent",
+	bg: "none",
 
 	button: {
+		$$height: "40px",
+
 		pos: "relative",
 		dflex: "center",
+		h: "$$height",
 
-		h: "2.5rem",
+		cursor: "pointer",
+		bg: "$bg-button",
+		b: "none",
 		px: 20,
 
-		bg: "$bg-button",
-		cursor: "pointer",
-		b: "none",
-
-		whiteSpace: "nowrap",
-		lh: "2.5rem",
-		ff: "$primary",
-		c: "$text",
-		ta: "center",
-		fw: 500,
-
-		// willChange: "background, color, border-color, transform",
-		transitionProperty: "background, color, border-color, transform",
+		transitionProperty: "background, color",
 		transitionTimingFunction: "ease",
 		transitionDuration: 0.25,
 		transitionDelay: 0,
 
 		"& svg": {
-			// all: "unset",
 			c: "$gray-text",
 		},
 
 		"&.single-button": {
+			size: "$$height",
 			br: "50%",
-			size: "2.5rem",
+			p: 0,
 		},
 
 		"&.first": {
@@ -68,7 +61,7 @@ export const Wrapper = styled("div", {
 			borderTopRightRadius: 12,
 		},
 
-		"&:hover, :focus": {
+		"&:hover, &:focus": {
 			bg: "$bg-button-hover",
 
 			"& svg": {
@@ -82,13 +75,11 @@ export const Wrapper = styled("div", {
 
 		"&:active": {
 			// This is for the button in general:
-			// Let the element get the style values set by the first keyframe before the animation starts (during the animation-delay period):
 			animation: `${scale} 0.25s ease 0s`,
 		},
 
 		//////////////////////////////////////////
 		"&.reloading": {
-			// willChange: "transform",
 			animation: `${spin} 1s infinite linear`,
 		},
 	},

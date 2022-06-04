@@ -189,7 +189,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		const path = `home/Music/test/${title}.mp3`;
 		const newMedia: Media = {
 			duration: formatDuration(100 + 10),
-			dateOfArival: Date.now(),
+			birthTime: Date.now(),
 			size: "3.0 MB",
 			title,
 		};

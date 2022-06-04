@@ -1,5 +1,3 @@
-import { Trigger } from "@radix-ui/react-dialog";
-
 import { styled } from "@styles/global";
 
 export const Img = styled("div", {
@@ -30,6 +28,21 @@ export const Img = styled("div", {
 	},
 });
 
+export const SubTitle = styled("p", {
+	margin: "20px 0",
+
+	c: "$alternative-text",
+	ls: "0.03rem",
+	fs: "0.9rem",
+	fw: 500,
+	ff: "$primary",
+
+	"&.row": {
+		c: "$gray-text",
+		margin: "unset",
+	},
+});
+
 export const Info = styled("div", {
 	d: "flex",
 	fd: "column",
@@ -55,49 +68,6 @@ export const Title = styled("p", {
 
 	"& .highlight": {
 		bg: "yellowgreen",
-	},
-});
-
-export const SubTitle = styled("p", {
-	margin: "20px 0",
-
-	c: "$alternative-text",
-	ls: "0.03rem",
-	fs: "0.9rem",
-	fw: 500,
-	ff: "$primary",
-
-	"&.row": {
-		c: "$gray-text",
-		margin: "unset",
-	},
-});
-
-export const TriggerOptions = styled(Trigger, {
-	pos: "relative",
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-
-	c: "$deactivated-icon",
-	bg: "transparent",
-	br: "50%",
-	cursor: "pointer",
-	b: "none",
-	margin: 5,
-
-	transition: "$bgc",
-
-	"&:hover": {
-		transition: "$bgc",
-		bg: "$icon-button-hovered",
-	},
-
-	// Hack to make the height the same size as the width:
-	"&:before": {
-		content: "",
-		float: "left",
-		pt: "100%", // ratio of 1:1
 	},
 });
 
@@ -167,16 +137,6 @@ export const RowWrapper = styled("div", {
 	},
 });
 
-export const ErrorMsg = styled("pre", {
-	margin: "20px 0",
-
-	ff: "$secondary",
-	ls: "0.035rem",
-	fs: "0.8rem",
-	c: "red",
-	fw: 500,
-});
-
 export const Footer = styled("div", {
 	pos: "relative",
 	size: 10,
@@ -199,9 +159,4 @@ export const EmptyList = styled("div", {
 		size: 50,
 		mr: 20,
 	},
-});
-
-export const Center = styled("div", {
-	pos: "relative",
-	dcolumn: "center",
 });

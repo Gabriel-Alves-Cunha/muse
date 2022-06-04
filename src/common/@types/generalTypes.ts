@@ -9,8 +9,8 @@ export type Path = Readonly<string>;
 type DateAsNumber = Readonly<number>;
 
 export type Media = Readonly<{
-	dateOfArival: DateAsNumber;
 	genres?: readonly string[];
+	birthTime: DateAsNumber;
 	size: PrettyBytes;
 	duration: string;
 	artist?: string;

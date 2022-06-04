@@ -1,55 +1,41 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
-import { Dialog } from "@radix-ui/react-dialog";
+import { useMemo } from "react";
 
+import { usePlaylists, getPlaylist } from "@contexts/mediaHandler/usePlaylists";
 import { resetAllAppData } from "@utils/app";
 import { time } from "@utils/utils";
 import {
 	computeItemKey,
 	reloadWindow,
 	itemContent,
-	setFromList,
+	useFromList,
 } from "./helper";
-import {
-	usePlaylists,
-	PlaylistList,
-	getPlaylist,
-} from "@contexts/mediaHandler/usePlaylists";
 
-import {
-	ListWrapper,
-	EmptyList,
-	ErrorMsg,
-	SubTitle,
-	Footer,
-	Center,
-} from "./styles";
-import {
-	StyledContent,
-	StyledOverlay,
-	StyledTitle,
-	CloseDialog,
-} from "./MediaOptions/styles";
+import { ListWrapper, EmptyList, Footer } from "./styles";
+import { ErrorFallback } from "@components/ErrorFallback";
 
 // href="https://www.flaticon.com/free-icons/error" =>
 const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
 
-export const MediaListKind = ({ fromList }: MediaListKindProps) => (
+export const MediaListKind = ({ isHome }: Props) => (
 	<ErrorBoundary
-		FallbackComponent={ErrorFallback}
+		FallbackComponent={() => (
+			<ErrorFallback description="Rendering the list threw an error. This is probably a bug. Try	closing and opening the app, if the error persists, click on the button below." />
+		)}
 		onReset={() => {
 			resetAllAppData();
 			reloadWindow();
 		}}
 	>
-		<MediaListKind_ fromList={fromList} />
+		<MediaListKind_ isHome={isHome} />
 	</ErrorBoundary>
 );
 
-function MediaListKind_({ fromList }: MediaListKindProps) {
+function MediaListKind_({ isHome = false }: Props) {
+	const { fromList, homeList } = useFromList();
 	const {
 		sortedByName: mainList,
 		sortedByDate,
@@ -57,44 +43,30 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 		history,
 	} = usePlaylists();
 
-	useEffect(() => {
-		setFromList({ fromList });
-		console.log("fromList =", fromList);
-	}, [fromList]);
-
 	const listAsArrayOfAMap: [Path, Media][] = useMemo(
 		() =>
 			time(() => {
-				const list = getPlaylist(fromList);
+				const list = getPlaylist(isHome ? homeList : fromList);
 
-				if (Array.isArray(list)) {
-					const listAsArrayOfAMap: [Path, Media][] = [];
+				// Since the ONLY list that is a Map is
+				// the mainList, we can take a shortcut:
+				if (list instanceof Map) return [...mainList];
 
-					mainList.forEach(
-						(media, path) =>
-							list.includes(path) && listAsArrayOfAMap.push([path, media]),
-					);
-					return listAsArrayOfAMap;
-				} else if (list instanceof Set) {
-					const listAsArrayOfAMap: [Path, Media][] = [];
+				const listAsArrayOfAMap: [Path, Media][] = [];
 
-					mainList.forEach(
-						(media, path) =>
-							list.has(path) && listAsArrayOfAMap.push([path, media]),
-					);
-					return listAsArrayOfAMap;
-				} else if (list instanceof Map) {
-					// Since the ONLY list that is a Map is the
-					// mainList, we can take a shortcut:
-					return [...mainList];
-				}
+				list.forEach(path => {
+					const media = mainList.get(path);
 
-				throw new Error("The list is not an Array, a Set or a Map!");
+					media && listAsArrayOfAMap.push([path, media]);
+				});
+
+				return listAsArrayOfAMap;
 			}, "listAsArrayOfAMap"),
 		// Disable cause we need to listen to all the lists cause
-		// we don't know wich one it is
+		// we don't know wich one it is; wish I'd find a better
+		// way to make it dynamic...
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[mainList, favorites, history, sortedByDate, fromList],
+		[mainList, favorites, history, sortedByDate, fromList, isHome, homeList],
 	);
 
 	return (
@@ -122,45 +94,6 @@ function MediaListKind_({ fromList }: MediaListKindProps) {
 	);
 }
 
-function ErrorFallback({ error }: ErrorBoundaryProps) {
-	return (
-		<Dialog modal open>
-			<StyledOverlay />
-
-			<StyledContent>
-				<Center>
-					<StyledTitle>Something went wrong</StyledTitle>
-					<SubTitle>
-						Rendering the list threw an error. This is probably a bug. Try
-						closing and opening the app, if the error persists, click on the
-						button below.
-					</SubTitle>
-
-					<ErrorMsg>{error.message}</ErrorMsg>
-
-					<CloseDialog
-						onClick={() => {
-							resetAllAppData();
-							reloadWindow();
-						}}
-						id="reset-app-data"
-					>
-						Reset all app data
-					</CloseDialog>
-
-					<CloseDialog id="reload-window" onClick={reloadWindow}>
-						Reload window
-					</CloseDialog>
-				</Center>
-			</StyledContent>
-		</Dialog>
-	);
-}
-
-type ErrorBoundaryProps = Readonly<{
-	error: Error;
-}>;
-
-export type MediaListKindProps = Readonly<{
-	fromList: PlaylistList;
-}>;
+type Props = {
+	isHome?: boolean;
+};

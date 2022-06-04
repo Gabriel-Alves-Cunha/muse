@@ -8,8 +8,8 @@ import type { IPicture } from "node-taglib-sharp";
 import type { Readable } from "node:stream";
 
 import { rename as renameFile, access } from "node:fs/promises";
+import { createReadStream, lstatSync } from "node:fs";
 import { path as _ffmpeg_path_ } from "@ffmpeg-installer/ffmpeg";
-import { createReadStream } from "node:fs";
 import { dirname, join } from "node:path";
 import { get } from "node:https";
 import {
@@ -99,10 +99,10 @@ const createMedia = async (
 			}
 
 			const media: Media = {
+				birthTime: lstatSync(path).birthtimeMs,
 				duration: formatDuration(duration),
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
-				dateOfArival: Date.now(),
 				genres,
 				album,
 				size,

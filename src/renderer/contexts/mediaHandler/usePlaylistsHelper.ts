@@ -53,8 +53,8 @@ export const getAllowedMedias = (
 export const sortByDate = (list: MainList): Set<Path> => {
 	const listAsArrayOfPaths = [...list]
 		.sort(([, prevMedia], [, nextMedia]) => {
-			if (prevMedia.dateOfArival > nextMedia.dateOfArival) return 1;
-			if (prevMedia.dateOfArival < nextMedia.dateOfArival) return -1;
+			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
+			if (prevMedia.birthTime < nextMedia.birthTime) return -1;
 			// a must be equal to b:
 			return 0;
 		})

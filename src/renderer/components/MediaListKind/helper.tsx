@@ -23,7 +23,10 @@ const notify =
 
 const allSelectedMedias: Set<Path> = new Set();
 
-export const useFromList = create(() => ({ fromList: PlaylistList.MAIN_LIST }));
+export const useFromList = create(() => ({
+	fromList: PlaylistList.MAIN_LIST,
+	homeList: PlaylistList.MAIN_LIST,
+}));
 export const { getState: getFromList, setState: setFromList } = useFromList;
 
 const Row = memo(

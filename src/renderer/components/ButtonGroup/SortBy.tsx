@@ -1,20 +1,32 @@
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
+import { assertUnreachable } from "@utils/utils";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { setFromList } from "@components/MediaListKind/helper";
 import { Select } from "@components/Select";
 
 export function SortBy({ className }: Props) {
-	const [selectedList, setSelectedList] = useState<SelectedList>("None");
+	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
 
 	useEffect(() => {
-		let fromList = PlaylistList.MAIN_LIST;
+		let homeList = PlaylistList.MAIN_LIST;
 
-		if (selectedList === "Name") fromList = PlaylistList.MAIN_LIST;
-		else if (selectedList === "Date") fromList = PlaylistList.SORTED_BY_DATE;
+		switch (selectedList) {
+			case "Name":
+				homeList = PlaylistList.MAIN_LIST;
+				break;
 
-		setFromList({ fromList });
+			case "Date":
+				homeList = PlaylistList.SORTED_BY_DATE;
+				break;
+
+			default:
+				assertUnreachable(selectedList);
+				break;
+		}
+
+		setFromList({ homeList });
 	}, [selectedList]);
 
 	return (
@@ -31,4 +43,4 @@ export function SortBy({ className }: Props) {
 
 type Props = { className?: string };
 
-type SelectedList = "Name" | "Date" | "None";
+type SelectedList = "Name" | "Date";

@@ -22,6 +22,7 @@ export const TooltipButton = ({
 
 export const TooltipButton_ = styled("button", {
 	pos: "relative",
+	dflex: "center",
 
 	cursor: "pointer",
 	bg: "none",
@@ -29,8 +30,8 @@ export const TooltipButton_ = styled("button", {
 
 	transition: "none",
 
-	"& svg": {
-		size: "17px !important",
+	svg: {
+		// all: "unset",
 	},
 
 	"&:active": {
@@ -50,8 +51,7 @@ export const TooltipButton_ = styled("button", {
 
 		content: "attr(data-tooltip)",
 		pos: "absolute",
-		h: "auto",
-		w: "auto",
+		size: "auto",
 
 		b: "1px solid white",
 		bg: "#181818",

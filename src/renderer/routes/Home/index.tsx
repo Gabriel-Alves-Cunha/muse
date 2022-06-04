@@ -1,5 +1,4 @@
 import { MediaListKind } from "@components/MediaListKind";
-import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
 import { MainArea } from "@components/MainArea";
@@ -19,7 +18,7 @@ export function Home() {
 				/>
 			</Header>
 
-			<MediaListKind fromList={PlaylistList.MAIN_LIST} />
+			<MediaListKind isHome />
 		</MainArea>
 	);
 }
