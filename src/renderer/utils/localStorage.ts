@@ -49,89 +49,84 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	});
 }
 
-export function getFromLocalStorage(key: Keys) {
+export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 	return time(() => {
 		try {
-			{
-				const value = localStorage.getItem(key);
-				// @ts-ignore => ^ `?? "";` does not work :|
-				const item: unknown = JSON.parse(value);
+			const value = localStorage.getItem(key);
+			// @ts-ignore => ^ `?? "";` does not work :|
+			const item: unknown = JSON.parse(value);
 
-				dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
+			dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
 
-				if (!item) return undefined;
+			if (!item) return undefined;
 
-				switch (key) {
-					case keys.favorites: {
-						assert(
-							Array.isArray(item),
-							"favorites from storage must be an array:",
-							item,
-						);
+			switch (key) {
+				case keys.favorites: {
+					assert(
+						Array.isArray(item),
+						"favorites from storage must be an array:",
+						item,
+					);
 
-						const newFavorites = new Set(item as Path[]);
+					const newFavorites = new Set(item as Path[]);
 
-						dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
+					dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
 
-						return newFavorites;
-					}
-
-					case keys.history: {
-						assert(
-							Array.isArray(item),
-							"history from storage must be an array:",
-							item,
-						);
-
-						const newHistory = item as Path[];
-
-						dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
-
-						return newHistory;
-					}
-
-					case keys.sortedByDate: {
-						assert(
-							Array.isArray(item),
-							"sortedByDate from storage must be an array:",
-							item,
-						);
-
-						const newSortedByDate = item as Path[];
-
-						dbgPlaylists(
-							"getFromLocalStorage: newSortedByDate =",
-							newSortedByDate,
-						);
-
-						return newSortedByDate;
-					}
-
-					case keys.currentPlaying: {
-						const newCurrentPlaying = item as CurrentPlaying;
-
-						dbgPlaylists(
-							"getFromLocalStorage: newCurrentPlaying =",
-							newCurrentPlaying,
-						);
-
-						return newCurrentPlaying;
-					}
-
-					case keys.playOptions: {
-						const newPlayOptions = item as PlayOptions;
-
-						dbgPlaylists(
-							"getFromLocalStorage: newPlayOptions =",
-							newPlayOptions,
-						);
-
-						return newPlayOptions;
-					}
-
-					default:
-						return assertUnreachable(key);
+					return newFavorites;
 				}
+
+				case keys.history: {
+					assert(
+						Array.isArray(item),
+						"history from storage must be an array:",
+						item,
+					);
+
+					const newHistory = item as Path[];
+
+					dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
+
+					return newHistory;
+				}
+
+				case keys.sortedByDate: {
+					assert(
+						Array.isArray(item),
+						"sortedByDate from storage must be an array:",
+						item,
+					);
+
+					const newSortedByDate = item as Path[];
+
+					dbgPlaylists(
+						"getFromLocalStorage: newSortedByDate =",
+						newSortedByDate,
+					);
+
+					return newSortedByDate;
+				}
+
+				case keys.currentPlaying: {
+					const newCurrentPlaying = item as CurrentPlaying;
+
+					dbgPlaylists(
+						"getFromLocalStorage: newCurrentPlaying =",
+						newCurrentPlaying,
+					);
+
+					return newCurrentPlaying;
+				}
+
+				case keys.playOptions: {
+					const newPlayOptions = item as PlayOptions;
+
+					dbgPlaylists("getFromLocalStorage: newPlayOptions =", newPlayOptions);
+
+					return newPlayOptions;
+				}
+
+				default:
+					return assertUnreachable(key);
 			}
 		} catch (error) {
 			console.error(error);

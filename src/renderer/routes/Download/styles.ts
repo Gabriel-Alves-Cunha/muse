@@ -8,42 +8,18 @@ export const Wrapper = styled(MainArea, {
 	h: "100vh",
 	w: "100%",
 
-	overflowY: "auto",
-
-	/* width */
-	"&::-webkit-scrollbar": {
-		d: "block",
-		size: 5,
-	},
-
-	/* Track */
-	"&::-webkit-scrollbar-track": {
-		bg: "$scrollbar",
-	},
-
-	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
-		bg: "$scrollbar-thumb",
-	},
-
-	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
-		bg: "$scrollbar-thumb-hover",
-	},
+	oy: "auto",
+	scroll: 5,
 });
 
 export const Box = styled("div", {
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 	w: "100%",
 });
 
 export const SearchWrapper = styled("div", {
 	pos: "relative",
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 	w: "80%",
 	h: 60,
 
@@ -51,11 +27,11 @@ export const SearchWrapper = styled("div", {
 		pos: "absolute",
 		mt: "4rem",
 
-		ls: "0.03rem",
 		ff: "$secondary",
+		ls: "0.03rem",
 		fs: "0.9rem",
-		fw: 300,
 		c: "red",
+		fw: 300,
 	},
 });
 
@@ -64,75 +40,45 @@ export const Searcher = styled("button", {
 	d: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
-
-	bg: "transparent",
 	w: "100%",
 	h: 40,
 
 	b: "1px solid lightgray",
-	br: 20,
 	cursor: "text",
-
-	transition: "$opacity",
-	opacity: 0.8,
-
-	"&:hover": {
-		opacity: 1,
-	},
+	bg: "none",
+	br: 20,
 
 	"& svg": {
-		ml: 10,
 		c: "$text",
-		opacity: 0.8,
-	},
-
-	"&:hover svg": {
-		opacity: 1,
+		ml: 10,
 	},
 
 	input: {
-		ls: "0.03rem",
 		ff: "$secondary",
+		ls: "0.03rem",
 		fs: "0.9rem",
+		c: "$text",
 
 		boxSizing: "border-box",
 		size: "100%",
 
-		bg: "transparent",
-		br: 15,
+		bg: "none",
 		b: "none",
-
-		c: "$text",
-		opacity: 0.8,
+		br: 15,
 		px: 10,
-
-		"&::placeholder": {
-			c: "$text",
-		},
-
-		"&:hover": {
-			transition: "$opacity",
-			opacity: 1,
-		},
 	},
 });
 
 export const ResultContainer = styled("div", {
-	d: "flex",
-	fd: "column",
-	justifyContent: "center",
-	alignItems: "center",
+	dcolumn: "center",
 	mb: "1.3rem",
 	mt: 30,
 
 	img: {
 		objectFit: "cover",
 		d: "flex",
-		h: 168.75,
+		h: 168,
 		w: 300,
-
-		maxHeight: 300,
-		maxWidth: 300,
 
 		"-webkit-box-reflect": `below 0px
 			-webkit-gradient(linear, right top, right	bottom,
@@ -152,25 +98,27 @@ export const ResultContainer = styled("div", {
 	},
 
 	"& p": {
+		m: "2rem 1rem",
+
+		wordWrap: "normal",
 		ff: "$primary",
 		ta: "center",
-		margin: "2rem 1rem",
 		fs: "1.1rem",
-		wordWrap: "normal",
 		c: "$text",
 	},
 
 	span: {
-		ff: "$primary",
-		ta: "center",
-		margin: "1rem auto",
+		m: "1rem auto",
+
 		wordWrap: "normal",
-		fs: "1rem",
+		ff: "$primary",
 		color: "$text",
+		ta: "center",
+		fs: "1rem",
 	},
 });
 
 export const LoadingWrapper = styled("div", {
-	ml: 10,
 	size: 25,
+	ml: 10,
 });

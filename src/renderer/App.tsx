@@ -68,6 +68,6 @@ const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Home: <Home />,
 });
 
-window.onmessage = handleWindowMsgs;
+window.addEventListener("message", handleWindowMsgs);
 
 await searchLocalComputerForMedias();

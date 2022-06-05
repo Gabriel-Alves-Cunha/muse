@@ -42,8 +42,8 @@ export const OptionsAndAlbum = styled("div", {
 
 export const Album = styled("span", {
 	c: "$media-player-icons",
-	ls: "0.04rem",
 	ff: "$secondary",
+	ls: "0.04rem",
 	fs: "1rem",
 	fw: 500,
 });
@@ -52,15 +52,13 @@ export const SquareImage = styled("div", {
 	pos: "relative",
 	alignSelf: "center",
 
-	mt: "25%",
-	mx: "10%",
-
 	bs: "$media-player-img",
-	bg: "transparent",
+	m: "25% 10% 0",
+	bg: "none",
 	b: "none",
 	br: 17,
 
-	"&:after": {
+	"&::after": {
 		content: "",
 		d: "block",
 		pb: "100%",
@@ -81,7 +79,6 @@ export const SquareImage = styled("div", {
 });
 
 export const Info = styled("div", {
-	d: "flex",
 	dcolumn: "center",
 	h: "10vh",
 	w: "100%",
@@ -93,9 +90,9 @@ export const Info = styled("div", {
 		w: "100%",
 
 		c: "$media-player-icons",
-		ls: "0.03rem",
 		flexWrap: "wrap",
 		ff: "$secondary",
+		ls: "0.03rem",
 		ta: "center",
 
 		oy: "hidden",
@@ -137,8 +134,8 @@ export const Duration = styled("div", {
 
 	"& p": {
 		c: "$media-player-icons",
-		ls: "0.03em",
 		ff: "$primary",
+		ls: "0.03em",
 		ta: "center",
 		fs: "1rem",
 
@@ -191,28 +188,28 @@ export const TooltipCircleIconButton = styled("button", {
 
 		"tooltip-side": {
 			"left-bottom": {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "50%",
 					t: "110%",
 				},
 			},
 			bottom: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					t: "110%",
 				},
 			},
-			r: {
-				"&::before, ::after": {
+			right: {
+				"&::before, &::after": {
 					left: "110%",
 				},
 			},
 			left: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "110%",
 				},
 			},
 			top: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					bottom: "110%",
 				},
 			},
@@ -227,7 +224,7 @@ export const TooltipCircleIconButton = styled("button", {
 	////////////////////////////////////////////////
 	// Tooltip:
 	"&:active": {
-		"&::before, ::after": {
+		"&::before, &::after": {
 			visibility: "hidden",
 		},
 	},
@@ -238,13 +235,12 @@ export const TooltipCircleIconButton = styled("button", {
 		transition: "all 0.4s 1s ease ",
 	},
 
-	"&::before, ::after": {
+	"&::before, &::after": {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
 		pos: "absolute",
-		h: "auto",
-		w: "auto",
+		size: "auto",
 
 		b: "1px solid white",
 		bg: "#181818",
@@ -252,31 +248,14 @@ export const TooltipCircleIconButton = styled("button", {
 		zIndex: 100,
 
 		whiteSpace: "nowrap",
-		lh: "normal",
 		ff: "$primary",
-		c: "#fff",
+		lh: "normal",
 		ta: "center",
 		fs: "1rem",
+		c: "#fff",
 		fw: 500,
 
 		pointerEvents: "none",
-	},
-});
-
-export const ButtonForRandomAndLoop = styled("button", {
-	dflex: "center",
-	size: 25,
-
-	bg: "transparent",
-	cursor: "pointer",
-	b: "none",
-
-	willChange: "transform",
-	transition: "$scale",
-
-	"&:hover": {
-		transition: "$scale",
-		transform: "scale(1.5)",
 	},
 });
 
@@ -304,10 +283,10 @@ export const ProgressWrapper = styled("div", {
 		bg: "$bg-main",
 		br: 2,
 
-		c: "$text",
 		ff: "$primary",
 		ta: "center",
 		fs: "0.8rem",
+		c: "$text",
 		fw: 500,
 	},
 });

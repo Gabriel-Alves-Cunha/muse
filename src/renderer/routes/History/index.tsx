@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { MediaListKind } from "@components/MediaListKind";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { ButtonGroup } from "@components/ButtonGroup";
@@ -7,7 +9,9 @@ import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
 export function History() {
-	setFromList({ fromList: PlaylistList.HISTORY });
+	useEffect(() => {
+		setFromList({ fromList: PlaylistList.HISTORY });
+	}, []);
 
 	return (
 		<MainArea>

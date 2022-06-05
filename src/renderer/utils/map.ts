@@ -15,10 +15,10 @@ const getLastIn =
 	(iteratorFn: "entries" | "keys" | "values") =>
 	<K, V>(map: Map<K, V> | Set<K>) => {
 		const mapIterator = map[iteratorFn]();
-		let cur;
+		let curr;
 		let last;
 
-		while (!(cur = mapIterator.next()).done) last = cur.value;
+		while (!(curr = mapIterator.next()).done) last = curr.value;
 
 		return last;
 	};

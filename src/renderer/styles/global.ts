@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 import { dbg, isDevelopment } from "@common/utils";
 import { getObjectDeepKeys } from "@utils/object";
-import { arraysEqual } from "@utils/array";
+import { areArraysEqual } from "@utils/array";
 
 export const { styled, globalCss, keyframes, createTheme, css } =
 	createStitches({
@@ -108,6 +108,29 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			oy: (overflowY: string) => ({ overflowY }),
 			ov: (overflow: string) => ({ overflow }),
 			d: (display: string) => ({ display }),
+
+			scroll: (size: string | number) => ({
+				/* width */
+				"&::-webkit-scrollbar": {
+					d: "block",
+					size,
+				},
+
+				/* Track */
+				"&::-webkit-scrollbar-track": {
+					bg: "$scrollbar",
+				},
+
+				/* Handle */
+				"&::-webkit-scrollbar-thumb": {
+					bg: "$scrollbar-thumb",
+				},
+
+				/* Handle on hover */
+				"&::-webkit-scrollbar-thumb:hover": {
+					bg: "$scrollbar-thumb-hover",
+				},
+			}),
 		},
 	});
 
@@ -136,6 +159,7 @@ export const darkTheme = createTheme({
 		"input-disabled": "gray",
 
 		"bg-button-hover": "#08368D",
+		"bg-highlight": "#C04569",
 		"bg-selected": "#5b6b99",
 		"bg-popover": "#182825",
 		"bg-navbar": "#191a21",
@@ -201,16 +225,17 @@ export const lightTheme = createTheme({
 		"input-disabled": "lightgray",
 		"input-border": "#e0e0e0",
 
-		"bg-button-hover": "#005ec9",
+		"bg-button-hover": "#8e2de2",
+		"bg-highlight": "#9882AC",
 		"bg-selected": "#5b6b99",
-		"bg-popover": "#FAFAC6",
-		"bg-button": "#0072F5",
+		"bg-popover": "#f9f6f5",
+		"bg-button": "#f9f6f5",
 		"bg-navbar": "#f9f6f5",
+		"bg-media": "#f9f6f5",
 		"bg-main": "#f9f6f5",
 		"bg-ctx-menu": "#fff",
 		"bg-dialog": "#fff",
 		"bg-select": "#fff",
-		"bg-media": "#fff",
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#88888820",
@@ -251,7 +276,7 @@ if (isDevelopment) {
 	const lightThemeKeys = getObjectDeepKeys(lightTheme);
 	// @ts-ignore It will work:
 	const darkThemeKeys = getObjectDeepKeys(darkTheme);
-	const areEqual = arraysEqual(lightThemeKeys, darkThemeKeys);
+	const areEqual = areArraysEqual(lightThemeKeys, darkThemeKeys);
 
 	dbg(
 		{
@@ -264,15 +289,19 @@ if (isDevelopment) {
 }
 
 export const GlobalCSS = globalCss({
-	"*, *:after, *:before": {
+	"*, *::after, *::before": {
 		textRendering: "geometricPrecision",
 		boxSizing: "border-box",
 		padding: 0,
 		margin: 0,
 
-		"&:focus": {
-			outline: "none !important",
-		},
+		outline: "none !important",
+	},
+
+	"*": {
+		transitionProperty:
+			"color, background-color, border-color, box-shadow, -webkit-scrollbar-track, -webkit-scrollbar-thumb",
+		transition: "ease 250ms",
 	},
 
 	"@font-face": [
@@ -307,12 +336,6 @@ export const GlobalCSS = globalCss({
 		},
 	],
 
-	input: {
-		"&:focus-visible": {
-			outline: "none",
-		},
-	},
-
 	button: {
 		"-webkit-app-region": "no-drag",
 	},
@@ -324,11 +347,6 @@ export const GlobalCSS = globalCss({
 	},
 
 	html: {
-		transitionProperty:
-			"color, background-color, border-color, box-shadow, caret-color",
-		transition: "ease 250ms",
-
-		boxSizing: "border-box",
 		caretColor: "$accent",
 		overflow: "hidden",
 

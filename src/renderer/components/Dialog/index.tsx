@@ -39,7 +39,7 @@ const StyledTrigger = styled(Trigger, {
 	// For tooltip, cause I could not make it work
 	// with the TooltipButton_ component:
 	"&:active": {
-		"&::before, ::after": {
+		"&::before, &::after": {
 			visibility: "hidden",
 		},
 	},
@@ -50,7 +50,7 @@ const StyledTrigger = styled(Trigger, {
 		transition: "all 0.4s 1s ease ",
 	},
 
-	"&::before, ::after": {
+	"&::before, &::after": {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
@@ -63,11 +63,11 @@ const StyledTrigger = styled(Trigger, {
 		p: "3px 8px",
 
 		whiteSpace: "nowrap",
-		lh: "normal",
 		ff: "$primary",
-		c: "#fff",
 		ta: "center",
+		lh: "normal",
 		fs: "1rem",
+		c: "#fff",
 		fw: 500,
 
 		pointerEvents: "none",
@@ -76,28 +76,28 @@ const StyledTrigger = styled(Trigger, {
 	variants: {
 		"tooltip-side": {
 			"left-bottom": {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "50%",
 					t: "110%",
 				},
 			},
 			bottom: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					t: "110%",
 				},
 			},
 			right: {
-				"&::before, ::after": {
-					left: "110%",
+				"&::before, &::after": {
+					l: "110%",
 				},
 			},
 			left: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "110%",
 				},
 			},
 			top: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					bottom: "110%",
 				},
 			},

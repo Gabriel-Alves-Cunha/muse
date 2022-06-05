@@ -6,7 +6,6 @@ import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
-import { dbg } from "@common/utils";
 import {
 	useConvertInfoList,
 	setConvertInfoList,
@@ -25,8 +24,6 @@ export function Converting() {
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
-		dbg("on converting list useEffect");
-
 		convertInfoList.forEach((convertInfo, path) => {
 			if (convertInfo.canStartConvert)
 				try {
@@ -41,13 +38,14 @@ export function Converting() {
 					);
 				} catch (error) {
 					errorToast(
-						`There was an error trying to download "${path}"! Please, try again later.`,
+						`There was an error trying to convert "${path}"! Please, try again later.`,
 					);
 
 					console.error(error);
 				}
 		});
 
+		// In here, we've already handled all the files, so we can clear the list:
 		if (convertInfoList.size !== 0) {
 			convertInfoList.clear();
 			setConvertInfoList(convertInfoList);
@@ -61,7 +59,7 @@ export function Converting() {
 				data-tooltip="Show all converting medias"
 				tooltip-side="right"
 			>
-				<i data-length={convertingListSize}></i>
+				<p data-length={convertingListSize}></p>
 
 				<Convert size={20} />
 			</StyledPopoverTrigger>

@@ -28,12 +28,6 @@ export const TooltipButton_ = styled("button", {
 	bg: "none",
 	b: "none",
 
-	transition: "none",
-
-	svg: {
-		// all: "unset",
-	},
-
 	"&:active": {
 		"&::before, &::after": {
 			visibility: "hidden",
@@ -72,28 +66,28 @@ export const TooltipButton_ = styled("button", {
 	variants: {
 		"tooltip-side": {
 			"left-bottom": {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					t: "110%",
 					r: "50%",
 				},
 			},
 			bottom: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					t: "110%",
 				},
 			},
 			right: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					l: "110%",
 				},
 			},
 			left: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "110%",
 				},
 			},
 			top: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					bottom: "110%",
 				},
 			},

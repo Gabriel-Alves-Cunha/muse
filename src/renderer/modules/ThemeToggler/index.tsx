@@ -53,22 +53,19 @@ export function ThemeToggler() {
 const Box = styled("div", {
 	pos: "relative",
 	dflex: "center",
+	size: 50,
 
-	filter: "drop-shadow(0 0px 5px $lingrad-top)",
-
-	br: "60% 40% 40% 20% / 70% 50% 30% 25%",
-	bg: "$lingrad-bottom",
 	cursor: "pointer",
-	border: "none",
-	size: 40,
-
-	"&:hover": {
-		bg: "$lingrad-top",
-	},
+	bg: "none",
+	b: "none",
 
 	button: {
-		c: "white",
-		size: 40,
+		c: "$deactivated-icon",
+		size: "100%",
+
+		"&:hover": {
+			c: "$active-icon",
+		},
 	},
 });
 

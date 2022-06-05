@@ -7,8 +7,8 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	dflex: "center",
 	size: 40,
 
-	bg: "transparent",
 	cursor: "pointer",
+	bg: "none",
 	b: "none",
 
 	c: "$deactivated-icon",
@@ -19,35 +19,32 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	},
 
 	"&.has-items": {
-		pos: "relative",
-		d: "inline-block",
-
-		i: {
+		"& p": {
+			// I can't get this shit to center properly
+			boxSizing: "border-box",
 			pos: "absolute",
-			boxSizing: "content-box",
-			w: "100%",
-			size: 16,
-			r: -5,
+			display: "flex",
+			alignItems: "center",
+			size: 18,
+			r: -8,
 			t: 0,
 
 			b: "1px solid #fff",
 			bg: "#5cb85c",
-			px: "auto",
 			br: "50%",
 
-			fontStyle: "normal",
-			ff: "$primary",
-			ls: "0.03rem",
-			ta: "center",
-			c: "black",
-			fw: 500,
-			fs: 10,
-
-			"&:before": {
+			"&::before": {
 				content: "attr(data-length)",
-				pos: "absolute",
-				r: 2,
-				t: 1,
+				pos: "relative",
+				dflex: "center",
+				size: "100%",
+
+				fontStyle: "normal",
+				ff: "'Assistant'",
+				ls: "0.03rem",
+				c: "black",
+				fw: 500,
+				fs: 11,
 			},
 		},
 	},
@@ -55,7 +52,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	////////////////////////////////////////////////
 	// Tooltip:
 	"&:active": {
-		"&::before, ::after": {
+		"&::before, &::after": {
 			visibility: "hidden",
 		},
 	},
@@ -66,7 +63,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 		transition: "all 0.4s 1s ease ",
 	},
 
-	"&::before, ::after": {
+	"&::before, &::after": {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
@@ -93,28 +90,28 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	variants: {
 		"tooltip-side": {
 			"left-bottom": {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "50%",
 					t: "110%",
 				},
 			},
 			bottom: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					t: "110%",
 				},
 			},
 			right: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					l: "110%",
 				},
 			},
 			left: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					r: "110%",
 				},
 			},
 			top: {
-				"&::before, ::after": {
+				"&::before, &::after": {
 					bottom: "110%",
 				},
 			},
@@ -162,8 +159,8 @@ export const TitleAndCancelWrapper = styled("div", {
 		size: 20,
 		r: -21,
 
-		bg: "transparent",
 		cursor: "pointer",
+		bg: "none",
 		br: "50%",
 		b: "none",
 

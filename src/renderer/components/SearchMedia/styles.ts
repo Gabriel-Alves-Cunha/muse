@@ -12,9 +12,9 @@ export const SearchWrapper = styled("div", {
 	h: 40,
 
 	b: "2px solid $input-border",
+	cursor: "default",
 	bg: "transparent",
 	br: "0.75rem",
-	cursor: "default",
 
 	transition: "all ease 250ms",
 
@@ -29,7 +29,7 @@ export const SearchWrapper = styled("div", {
 
 		"& label": {
 			t: "-180%",
-			left: -30,
+			l: -30,
 
 			c: "$input-border-active",
 			cursor: "default",
@@ -49,9 +49,10 @@ export const SearchWrapper = styled("div", {
 		alignItems: "center",
 		h: "2.5rem",
 		w: 250,
+
 		bottom: 0,
+		l: 30,
 		r: 0,
-		left: 30,
 		t: 0,
 
 		cursor: "text",
@@ -73,18 +74,17 @@ export const SearchWrapper = styled("div", {
 	},
 
 	input: {
-		boxSizing: "border-box",
 		size: "100%",
 
-		c: "$input-text",
 		whiteSpace: "nowrap",
+		c: "$input-text",
 		ff: "$secondary",
 		ls: "0.045rem",
 		fs: "0.9rem",
 		fw: 400,
 		lh: 1.5,
 
-		bg: "transparent",
+		bg: "none",
 		b: "none",
 	},
 });
@@ -102,11 +102,11 @@ export const Info = styled("div", {
 export const Title = styled("p", {
 	ml: 5,
 
-	c: "$alternative-text",
 	textOverflow: "ellipsis",
-	ls: "0.03rem",
-	ff: "$secondary",
+	c: "$alternative-text",
 	whiteSpace: "nowrap", // make it one-line.
+	ff: "$secondary",
+	ls: "0.03rem",
 	ta: "left",
 	fs: "1rem",
 	fw: 500,
@@ -115,21 +115,21 @@ export const Title = styled("p", {
 export const SubTitle = styled("p", {
 	ml: 5,
 
-	ls: "0.03rem",
-	ff: "$primary",
 	c: "$gray-text",
+	ff: "$primary",
+	ls: "0.03rem",
 	fs: "0.8rem",
 	fw: 500,
 });
 
 export const Highlight = styled("span", {
-	bg: "yellowgreen",
+	bg: "$bg-highlight",
 	c: "white",
 });
 
 export const SearchMediaPopoverAnchor = styled(Anchor, {
 	pos: "absolute",
-	left: "50%",
+	l: "50%",
 	t: 30,
 });
 
@@ -140,21 +140,20 @@ export const Result = styled("div", {
 	w: "100%",
 	h: 60,
 
-	b: "1px solid $gray-text",
-	bg: "$bg-media",
 	cursor: "pointer",
+	bg: "$bg-media",
+	b: "none",
 	br: 7,
 	p: 7,
 
 	"&:hover": {
-		transition: "all 100ms ease-in-out",
-		borderColor: "$text",
+		boxShadow: "0 0 1px 1px rgba(0, 0, 0, 0.1)",
 	},
 
 	////////////////////////////////////////
 	// Tooltip:
 	"&:active": {
-		"&::before, ::after": {
+		"&::before, &::after": {
 			visibility: "hidden",
 		},
 	},
@@ -165,7 +164,7 @@ export const Result = styled("div", {
 		transition: "all 0.4s 1s ease ",
 	},
 
-	"&::before, ::after": {
+	"&::before, &::after": {
 		visibility: "hidden",
 
 		content: "attr(data-tooltip)",
@@ -174,7 +173,7 @@ export const Result = styled("div", {
 		w: "auto",
 
 		t: "110%",
-		left: "30%",
+		l: "30%",
 
 		b: "1px solid white",
 		bg: "#181818",
@@ -182,11 +181,11 @@ export const Result = styled("div", {
 		zIndex: 100,
 
 		whiteSpace: "nowrap",
-		lh: "normal",
 		ff: "$primary",
-		c: "#fff",
+		lh: "normal",
 		ta: "center",
 		fs: "1rem",
+		c: "#fff",
 		fw: 500,
 
 		pointerEvents: "none",
@@ -194,15 +193,13 @@ export const Result = styled("div", {
 });
 
 export const NothingFound = styled("div", {
-	d: "flex", // row,
-	justifyContent: "center",
-	alignItems: "center",
+	dflex: "center",
 
 	c: "$deactivated-icon",
-	ls: "0.03rem",
 	ff: "$secondary",
-	ta: "center",
+	ls: "0.03rem",
 	fs: "1.05rem",
+	ta: "center",
 	fw: 500,
 });
 

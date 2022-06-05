@@ -60,18 +60,29 @@ const updateSearchTerm = (e: InputChange) =>
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-export function Input() {
-	const [isOnFocus, setIsOnFocus] = useState(false);
+type InputProps = {
+	isResultsOpen: boolean;
+	setIsResultsOpen: (isResultsOpen: boolean) => void;
+};
+
+export function Input({ isResultsOpen, setIsResultsOpen }: InputProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [, startTransition] = useTransition();
 	const { searchTerm } = useSearcher();
 
-	useOnClickOutside(inputRef, () => {
-		if (isOnFocus) {
-			setSearcher(defaultSearcher);
-			setIsOnFocus(false);
-		}
-	});
+	const isOnFocus = document.activeElement === inputRef.current;
+
+	useOnClickOutside(
+		inputRef,
+		() =>
+			!isResultsOpen &&
+			setTimeout(() => {
+				setSearcher(defaultSearcher);
+				inputRef.current?.blur();
+				setIsResultsOpen(false);
+				console.log("clicked outside. searchTerm =", searchTerm);
+			}),
+	);
 
 	// Close the popover when the user presses Esc:
 	useEffect(() => {
@@ -79,18 +90,17 @@ export function Input() {
 			if (key === "Escape" && isOnFocus) {
 				setSearcher(defaultSearcher);
 				inputRef.current?.blur();
-				setIsOnFocus(false);
+				setIsResultsOpen(false);
 			}
 		};
 
 		document.addEventListener("keydown", closeOnEsc);
 
 		return () => document.removeEventListener("keydown", closeOnEsc);
-	}, [isOnFocus]);
+	}, [isOnFocus, isResultsOpen, setIsResultsOpen]);
 
+	// Search for media:
 	useEffect(() => {
-		/** Search for media */
-
 		setSearcher({
 			results: constRefToEmptyArray,
 			searchStatus: SEARCHING,
@@ -105,7 +115,7 @@ export function Input() {
 			setSearcher({ searchStatus, results });
 
 			// Doing this to keep focus on the input...	:|
-			setTimeout(() => inputRef.current?.focus(), 0);
+			setTimeout(() => inputRef.current?.focus());
 		});
 	}, [searchTerm]);
 
@@ -113,11 +123,12 @@ export function Input() {
 		<>
 			<label htmlFor="search-songs">Search for songs</label>
 			<input
-				onClick={() => setIsOnFocus(true)}
+				className={isResultsOpen ? "active" : ""}
+				onClick={() => setIsResultsOpen(true)}
 				onChange={updateSearchTerm}
 				value={searchTerm}
+				key="search-songs"
 				spellCheck="false"
-				id="search-songs"
 				autoCorrect="off"
 				ref={inputRef}
 				type="text"
@@ -169,6 +180,7 @@ export function Results() {
 			<SearchMediaPopoverAnchor />
 
 			<PopoverContent
+				style={{ transition: "none", transform: "none" }}
 				size={
 					nothingFound
 						? "nothing-found-for-search-media"

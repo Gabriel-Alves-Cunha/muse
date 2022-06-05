@@ -14,7 +14,10 @@ export const setCurrentPlayingLocalStorage: LoggerImpl<CurrentPlaying> =
 			replace,
 		) => {
 			const previousState = get();
-			const areStatesEqual = areObjectKeysEqual(newCurrentPlaying, previousState);
+			const areStatesEqual = areObjectKeysEqual(
+				newCurrentPlaying,
+				previousState,
+			);
 
 			set(newCurrentPlaying, replace);
 

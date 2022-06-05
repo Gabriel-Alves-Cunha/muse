@@ -24,7 +24,7 @@ export const Popup = () => {
 	return (
 		<>
 			{downloadingList.size > 0 ? (
-				[...downloadingList.entries()].map(([url, download]) => (
+				[...downloadingList].map(([url, download]) => (
 					<Content key={url}>
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>

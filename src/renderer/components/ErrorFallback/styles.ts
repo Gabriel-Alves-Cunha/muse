@@ -24,11 +24,11 @@ export const TriggerOptions = styled(Trigger, {
 	alignItems: "center",
 
 	c: "$deactivated-icon",
-	bg: "transparent",
-	br: "50%",
 	cursor: "pointer",
+	bg: "none",
+	br: "50%",
 	b: "none",
-	margin: 5,
+	m: 5,
 
 	transition: "$bgc",
 
@@ -38,7 +38,7 @@ export const TriggerOptions = styled(Trigger, {
 	},
 
 	// Hack to make the height the same size as the width:
-	"&:before": {
+	"&::before": {
 		content: "",
 		float: "left",
 		pt: "100%", // ratio of 1:1

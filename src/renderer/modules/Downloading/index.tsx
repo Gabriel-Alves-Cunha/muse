@@ -15,18 +15,6 @@ import { errorToast } from "@styles/global";
 import { StyledPopoverTrigger } from "./styles";
 import { PopoverAnchor } from "@modules/Converting/styles";
 
-// const { port1: testPort } = new MessageChannel();
-// const testDownloadingMedias: MediaBeingDownloaded[] = new Array.fill(Object.freeze({
-// 	status: ProgressStatus.ACTIVE,
-// 	url: "http://test.com",
-// 	isDownloading: true,
-// 	percentage: 50,
-// 	port: testPort,
-// 	title: "test",
-// 	imageURL: "",
-// 	index: 0,
-// }));
-
 const defaultDownloadInfo: DownloadInfo = Object.freeze({
 	canStartDownload: false,
 	extension: "mp3",
@@ -82,9 +70,9 @@ export function Downloading() {
 				data-tooltip="Show all downloading medias"
 				tooltip-side="right"
 			>
-				<i data-length={downloadingListSize}></i>
+				<p data-length={downloadingListSize}></p>
 
-				<DownloadingIcon size="20" />
+				<DownloadingIcon size={20} />
 			</StyledPopoverTrigger>
 
 			<PopoverAnchor />

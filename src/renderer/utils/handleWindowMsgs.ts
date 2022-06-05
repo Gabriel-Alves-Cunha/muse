@@ -50,9 +50,7 @@ function listenToDropEvent(event: DragEvent) {
 window.addEventListener("dragover", listenToDragoverEvent);
 window.addEventListener("drop", listenToDropEvent);
 
-export async function handleWindowMsgs(
-	event: MessageEvent<MsgWithSource<MsgObjectElectronToReact>>,
-): Promise<void> {
+export async function handleWindowMsgs(event: Event): Promise<void> {
 	if (event.data.source !== electronSource) return;
 
 	dbg("Received message from Electron.\ndata =", event.data);
@@ -174,11 +172,10 @@ export async function handleWindowMsgs(
 			const newMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias([mediaPath]);
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const newMedia = newMediaInArray[0]![1];
+			const newMedia = newMediaInArray[0]?.[1];
 
 			if (!newMedia) {
-				console.error(`Could not transform "${mediaPath}" to media.`);
+				console.error(`Could not transform "${mediaPath}" to a media.`);
 				break;
 			}
 
@@ -231,12 +228,11 @@ export async function handleWindowMsgs(
 			const refreshedMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias([mediaPath]);
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const refreshedMedia = refreshedMediaInArray[0]![1];
+			const refreshedMedia = refreshedMediaInArray[0]?.[1];
 
 			if (!refreshedMedia) {
 				console.error(
-					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media.`,
+					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media instead.`,
 				);
 				await searchLocalComputerForMedias();
 				break;
@@ -290,3 +286,5 @@ export async function handleWindowMsgs(
 		}
 	}
 }
+
+type Event = Readonly<MessageEvent<MsgWithSource<MsgObjectElectronToReact>>>;

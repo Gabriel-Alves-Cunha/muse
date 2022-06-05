@@ -70,7 +70,8 @@ export const getItemAndIndex = <T>(
 
 export const constRefToEmptyArray = Object.freeze([]);
 
-export function arraysEqual<T>(a: T[], b: T[]) {
+export function areArraysEqual<T>(a: T[], b: T[]) {
+	// Are references equal?
 	if (a === b) return true;
 	if (a == null || b == null) return false;
 	if (a.length !== b.length) return false;

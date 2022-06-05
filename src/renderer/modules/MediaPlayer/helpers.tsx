@@ -149,7 +149,6 @@ const seek = (e: SeekEvent, audio: Audio) => {
 	audio.currentTime = desiredTime;
 };
 
-const { isNaN } = Number;
 const { floor } = Math;
 
 export function SeekerWrapper({ audio }: RefToAudio) {
@@ -160,8 +159,8 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 	const { formatedDuration, isDurationValid } = useMemo(
 		() => ({
-			isDurationValid:
-				typeof duration === "number" && !isNaN(duration) && duration > 0,
+			// @ts-ignore => It will give false if duration is undefined:
+			isDurationValid: duration > 0 && typeof duration === "number",
 			formatedDuration: formatDuration(duration),
 		}),
 		[duration],
@@ -209,9 +208,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					ref={timeTooltipRef}
 				/>
 
-				<ProgressThumb
-					css={{ width: `${isNaN(percentage) ? 0 : percentage}%` }}
-				/>
+				<ProgressThumb css={{ width: `${!percentage ? 0 : percentage}%` }} />
 			</ProgressWrapper>
 
 			<Duration>

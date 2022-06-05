@@ -1,25 +1,22 @@
 import { styled } from "@styles/global";
 
 export const BorderedButton = styled("button", {
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-
-	mt: 40,
-	p: 16,
+	dflex: "center",
 	w: 200,
 	h: 50,
-	mx: "auto",
 
-	ls: "0.03rem",
+	m: "40 auto 0",
+	p: 16,
+
 	ff: "$secondary",
+	ls: "0.03rem",
 	fs: "1.1rem",
-	fw: 500,
 	c: "$text",
+	fw: 500,
 
 	b: "1px solid $accent",
-	bg: "transparent",
 	cursor: "pointer",
+	bg: "none",
 	br: 7,
 
 	"&:hover": {

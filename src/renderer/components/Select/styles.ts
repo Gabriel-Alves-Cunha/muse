@@ -36,14 +36,14 @@ export const Item = styled(RadixItem, {
 	h: 25,
 
 	p: "0 35px 0 25px",
-	br: 3,
 	cursor: "pointer",
+	br: 3,
 
 	c: "$ctx-menu-item-text",
-	ls: "0.03rem",
 	ff: "$secondary",
-	lh: 1,
+	ls: "0.03rem",
 	fs: 15,
+	lh: 1,
 
 	userSelect: "none",
 
@@ -62,8 +62,8 @@ export const Label = styled(RadixLabel, {
 	pl: 25,
 
 	c: "$ctx-menu-text",
-	lh: "25px",
 	ff: "$secondary",
+	lh: 25,
 	fs: 12,
 });
 
@@ -73,5 +73,5 @@ export const ItemIndicator = styled(RadixItemIndicator, {
 	justifyContent: "center",
 	alignItems: "center",
 	w: 25,
-	left: 0,
+	l: 0,
 });

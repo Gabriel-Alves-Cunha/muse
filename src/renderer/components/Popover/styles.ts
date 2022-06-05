@@ -26,6 +26,50 @@ export const StyledContent = styled(Content, {
 	pos: "relative", // to the popover anchor
 	d: "flex",
 	fd: "column",
+	gap: 10,
+
+	bg: "$bg-popover",
+	br: 10,
+	p: 10,
+
+	b: "1px solid lightgrey",
+	boxShadow: "$popover",
+
+	"@media (prefers-reduced-motion: no-preference)": {
+		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+		animationFillMode: "forwards",
+		animationDuration: "400ms",
+
+		"&[data-state='open']": {
+			"&[data-side='right']": { animationName: slideLeftAndFade },
+			"&[data-side='left']": { animationName: slideRightAndFade },
+			"&[data-side='bottom']": { animationName: slideUpAndFade },
+			"&[data-side='top']": { animationName: slideDownAndFade },
+		},
+	},
+
+	"& > p": {
+		pos: "relative",
+
+		// Center:
+		t: "50%", // position the top  edge of the element at the middle of the parent
+		l: "50%", // position the left edge of the element at the middle of the parent
+		transform: "translate(-50%, -50%)",
+
+		c: "$deactivated-icon",
+		ff: "$secondary",
+		ls: "0.03rem",
+		fs: "1.05rem",
+		ta: "center",
+		fw: 500,
+	},
+
+	"&:focus": {
+		boxShadow: "$popover",
+		outline: "none",
+	},
+
+	scroll: 2,
 
 	variants: {
 		size: {
@@ -55,68 +99,5 @@ export const StyledContent = styled(Content, {
 				ov: "auto",
 			},
 		},
-	},
-
-	bg: "$bg-popover",
-	br: 10,
-	p: 10,
-
-	b: "1px solid lightgrey",
-	boxShadow: "$popover",
-	gap: 10,
-
-	"@media (prefers-reduced-motion: no-preference)": {
-		willChange: "transform, opacity",
-
-		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-		animationFillMode: "forwards",
-		animationDuration: "400ms",
-
-		"&[data-state='open']": {
-			"&[data-side='right']": { animationName: slideLeftAndFade },
-			"&[data-side='left']": { animationName: slideRightAndFade },
-			"&[data-side='bottom']": { animationName: slideUpAndFade },
-			"&[data-side='top']": { animationName: slideDownAndFade },
-		},
-	},
-
-	"& > p": {
-		pos: "relative",
-		t: "50%", // position the top  edge of the element at the middle of the parent
-		left: "50%", // position the left edge of the element at the middle of the parent
-		transform: "translate(-50%, -50%)",
-
-		c: "$deactivated-icon",
-		ls: "0.03rem",
-		ff: "$secondary",
-		ta: "center",
-		fs: "1.05rem",
-		fw: 500,
-	},
-
-	"&:focus": {
-		boxShadow: "$popover",
-		outline: "none",
-	},
-
-	/* width */
-	"&::-webkit-scrollbar": {
-		d: "block",
-		size: 2,
-	},
-
-	/* Track */
-	"&::-webkit-scrollbar-track": {
-		bg: "$scrollbar",
-	},
-
-	/* Handle */
-	"&::-webkit-scrollbar-thumb": {
-		bg: "$scrollbar-thumb",
-	},
-
-	/* Handle on hover */
-	"&::-webkit-scrollbar-thumb:hover": {
-		bg: "$scrollbar-thumb-hover",
 	},
 });

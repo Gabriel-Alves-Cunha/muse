@@ -51,13 +51,11 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 		path: mediaPath,
 	});
 
-	const newCurrentPlaying: CurrentPlaying = {
+	setCurrentPlaying({
 		path: mediaPath,
 		currentTime: 0,
 		listType,
-	};
-
-	setCurrentPlaying(newCurrentPlaying);
+	});
 }
 
 export function togglePlayPause(): void {
@@ -92,15 +90,11 @@ export function playPreviousMedia() {
 				"A media needs to be currently selected to play a previous media!",
 			);
 
+		// We don't play previous media if it's the history list:
 		const correctListType =
 			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
 
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
-
-		if (!list)
-			return console.error("`list` should not be nullish!", {
-				list,
-			});
 
 		const firstMediaPath = getFirstKey(list);
 		let prevMediaPath: Path | undefined;
@@ -132,13 +126,7 @@ export function playPreviousMedia() {
 			path: prevMediaPath,
 		});
 
-		const newCurrentPlaying = Object.freeze({
-			path: prevMediaPath,
-			currentTime: 0,
-			listType,
-		});
-
-		setCurrentPlaying(newCurrentPlaying);
+		setCurrentPlaying({ path: prevMediaPath, currentTime: 0 });
 	}, "playPreviousMedia");
 }
 
@@ -151,17 +139,13 @@ export function playNextMedia(): void {
 				"A media needs to be currently selected to play a next media!",
 			);
 
+		// We don't play next media if it's the history list:
 		const correctListType =
 			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
 
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
-		if (!list)
-			return console.error("`list` should not be nullish!", {
-				list,
-			});
-
-		let nextMediaPath: Path | undefined;
+		let nextMediaPath = "";
 
 		if (playOptions().random) {
 			const randomIndex = getRandomInt(0, list.size);
@@ -186,7 +170,7 @@ export function playNextMedia(): void {
 				if (newPath === path) found = true;
 			}
 
-			if (!nextMediaPath) nextMediaPath = getFirstKey(list);
+			if (!nextMediaPath) nextMediaPath = getFirstKey(list) as Path;
 		}
 
 		if (!nextMediaPath)
@@ -202,13 +186,7 @@ export function playNextMedia(): void {
 			path: nextMediaPath,
 		});
 
-		const newCurrentPlaying: CurrentPlaying = {
-			path: nextMediaPath,
-			currentTime: 0,
-			listType,
-		};
-
-		setCurrentPlaying(newCurrentPlaying);
+		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
 	}, "playNextMedia");
 }
 
@@ -227,7 +205,7 @@ if (globalThis.window)
 			const { path } = currentPlaying();
 			if (!path) return;
 
-			const pathForElectron = "atom:///" + path;
+			const pathForElectron = `atom:///${path}`;
 
 			const mediaTimer = setTimeout(
 				() =>

@@ -29,7 +29,7 @@ const { setState: setProgress } = useProgress;
 export function MediaPlayer() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const { sortedByName: mainList } = usePlaylists();
-	const { path } = useCurrentPlaying();
+	const path = useCurrentPlaying().path ?? "";
 
 	const media = mainList.get(path ?? "");
 	const audio = audioRef.current;
@@ -71,7 +71,7 @@ export function MediaPlayer() {
 				}`,
 			);
 
-			if (audio.loop) playNextMedia();
+			if (!audio.loop) playNextMedia();
 		};
 
 		const handleAudioCanPlay = async () => {
@@ -119,14 +119,14 @@ export function MediaPlayer() {
 				<audio id="audio" preload="metadata" ref={audioRef} />
 			</>
 
-			<Header media={media} path={path ?? ""} />
+			<Header media={media} path={path} />
 
 			<SquareImage>
 				<div>
 					<ImgWithFallback
 						Fallback={<MusicNote size={13} />}
-						mediaPath={path ?? ""}
 						mediaImg={media?.img}
+						mediaPath={path}
 					/>
 				</div>
 			</SquareImage>
