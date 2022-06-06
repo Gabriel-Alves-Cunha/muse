@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import create from "zustand";
 
@@ -60,44 +60,51 @@ const updateSearchTerm = (e: InputChange) =>
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-type InputProps = {
-	isResultsOpen: boolean;
-	setIsResultsOpen: (isResultsOpen: boolean) => void;
-};
-
-export function Input({ isResultsOpen, setIsResultsOpen }: InputProps) {
+// I know this function is ugly as hell... I wanted to have specific
+// abilities wich made me make this beaultiful component...
+export function InputAndResults() {
+	const { searchStatus, searchTerm, results } = useSearcher();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [, startTransition] = useTransition();
-	const { searchTerm } = useSearcher();
+	const isOnFocusRef = useRef(false);
 
-	const isOnFocus = document.activeElement === inputRef.current;
+	const foundSomething = searchStatus === FOUND_SOMETHING;
+	const nothingFound = searchStatus === NOTHING_FOUND;
+	const isOpen = foundSomething || nothingFound;
 
+	// Close everything when the user clicks outside of the input,
+	// but only if the input is not focused so it doesn't fire
+	// everytime the user clicks outside of the input;
+	// But if the user clicked on a media, we must play it,
+	// so the only I found this to work was to wait a bit,
+	// I found that such time had to be high, I settled on
+	// a time of 200ms, but maybe on a slow machine it could
+	// be need a higher time for the event to bubble...
 	useOnClickOutside(
 		inputRef,
 		() =>
-			!isResultsOpen &&
+			isOnFocusRef.current &&
 			setTimeout(() => {
 				setSearcher(defaultSearcher);
+				isOnFocusRef.current = false;
 				inputRef.current?.blur();
-				setIsResultsOpen(false);
-				console.log("clicked outside. searchTerm =", searchTerm);
-			}),
+			}, 200),
 	);
 
 	// Close the popover when the user presses Esc:
 	useEffect(() => {
 		const closeOnEsc = ({ key }: KeyboardEvent) => {
-			if (key === "Escape" && isOnFocus) {
+			if (key === "Escape" && isOnFocusRef.current) {
 				setSearcher(defaultSearcher);
+				isOnFocusRef.current = false;
 				inputRef.current?.blur();
-				setIsResultsOpen(false);
 			}
 		};
 
 		document.addEventListener("keydown", closeOnEsc);
 
 		return () => document.removeEventListener("keydown", closeOnEsc);
-	}, [isOnFocus, isResultsOpen, setIsResultsOpen]);
+	}, [isOnFocusRef]);
 
 	// Search for media:
 	useEffect(() => {
@@ -108,13 +115,15 @@ export function Input({ isResultsOpen, setIsResultsOpen }: InputProps) {
 
 		if (searchTerm.length < 2) return;
 
+		// Using startTransition in case the search takes too long:
 		startTransition(() => {
 			const results = searchMedia(searchTerm);
 			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
 			setSearcher({ searchStatus, results });
 
-			// Doing this to keep focus on the input...	:|
+			// Doing this hack to keep focus on the input cause
+			// it is lost when the popover opens...	:(
 			setTimeout(() => inputRef.current?.focus());
 		});
 	}, [searchTerm]);
@@ -123,8 +132,9 @@ export function Input({ isResultsOpen, setIsResultsOpen }: InputProps) {
 		<>
 			<label htmlFor="search-songs">Search for songs</label>
 			<input
-				className={isResultsOpen ? "active" : ""}
-				onClick={() => setIsResultsOpen(true)}
+				onClick={() => {
+					isOnFocusRef.current = true;
+				}}
 				onChange={updateSearchTerm}
 				value={searchTerm}
 				key="search-songs"
@@ -133,6 +143,35 @@ export function Input({ isResultsOpen, setIsResultsOpen }: InputProps) {
 				ref={inputRef}
 				type="text"
 			/>
+
+			<PopoverRoot open={isOpen}>
+				<SearchMediaPopoverAnchor />
+
+				<PopoverContent
+					size={
+						nothingFound
+							? "nothing-found-for-search-media"
+							: "search-media-results"
+					}
+				>
+					{nothingFound ? (
+						<NothingFound>
+							Nothing was found for &quot;{searchTerm}&quot;
+						</NothingFound>
+					) : foundSomething ? (
+						<>
+							{results.map(([path, media]) => (
+								<Row
+									highlight={searchTerm}
+									media={media}
+									path={path}
+									key={path}
+								/>
+							))}
+						</>
+					) : undefined}
+				</PopoverContent>
+			</PopoverRoot>
 		</>
 	);
 }
@@ -168,45 +207,6 @@ const Row = ({
 		</Result>
 	);
 };
-
-export function Results() {
-	const { searchStatus, searchTerm, results } = useSearcher();
-	const foundSomething = searchStatus === FOUND_SOMETHING;
-	const nothingFound = searchStatus === NOTHING_FOUND;
-	const shouldOpen = foundSomething || nothingFound;
-
-	return (
-		<PopoverRoot open={shouldOpen}>
-			<SearchMediaPopoverAnchor />
-
-			<PopoverContent
-				style={{ transition: "none", transform: "none" }}
-				size={
-					nothingFound
-						? "nothing-found-for-search-media"
-						: "search-media-results"
-				}
-			>
-				{nothingFound ? (
-					<NothingFound>
-						Nothing was found for &quot;{searchTerm}&quot;
-					</NothingFound>
-				) : foundSomething ? (
-					<>
-						{results.map(([path, media]) => (
-							<Row
-								highlight={searchTerm}
-								media={media}
-								path={path}
-								key={path}
-							/>
-						))}
-					</>
-				) : undefined}
-			</PopoverContent>
-		</PopoverRoot>
-	);
-}
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////

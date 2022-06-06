@@ -2,6 +2,7 @@ import { Anchor, Trigger } from "@radix-ui/react-popover";
 
 import { styled } from "@styles/global";
 
+const height = "40px";
 export const SearchWrapper = styled("div", {
 	pos: "relative",
 	d: "flex", // row,
@@ -9,7 +10,7 @@ export const SearchWrapper = styled("div", {
 	alignItems: "center",
 
 	w: 300,
-	h: 40,
+	height,
 
 	b: "2px solid $input-border",
 	cursor: "default",
@@ -74,7 +75,8 @@ export const SearchWrapper = styled("div", {
 	},
 
 	input: {
-		size: "100%",
+		width: "100%",
+		height,
 
 		whiteSpace: "nowrap",
 		c: "$input-text",

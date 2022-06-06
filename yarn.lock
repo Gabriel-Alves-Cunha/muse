@@ -943,10 +943,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.27.tgz#5da19383bdbeda99bc0d09cfbb88cab7297ebc51"
   integrity sha512-C1pD3kgLoZ56Uuy5lhfOxie4aZlA3UMGLX9rXteq4WitEZH6Rl80mwactt9QG0w0gLFlN/kLBTFnGXtDVWvWQw==
 
-"@types/node@^17.0.39":
-  version "17.0.39"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.39.tgz#3652d82e2a16b4ea679d5ea3143b816c91b7e113"
-  integrity sha512-JDU3YLlnPK3WDao6/DlXLOgSNpG13ct+CwIO17V8q0/9fWJyeMJJ/VyZ1lv8kDprihvZMydzVwf0tQOqGiY2Nw==
+"@types/node@^17.0.40":
+  version "17.0.40"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.40.tgz#76ee88ae03650de8064a6cf75b8d95f9f4a16090"
+  integrity sha512-UXdBxNGqTMtm7hCwh9HtncFVLrXoqA3oJW30j6XWp5BH/wu3mVeaxo7cq5benFdBw34HB3XDT2TRPI7rXZ+mDg==
 
 "@types/plist@^3.0.1":
   version "3.0.2"
@@ -977,10 +977,10 @@
     "@types/scheduler" "*"
     csstype "^3.0.2"
 
-"@types/react@^18.0.10":
-  version "18.0.10"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.10.tgz#5692944d4a45e204fb7a981eb1388afe919cf4d0"
-  integrity sha512-dIugadZuIPrRzvIEevIu7A1smqOAjkSMv8qOfwPt9Ve6i6JT/FQcCHyk2qIAxwsQNKZt5/oGR0T4z9h2dXRAkg==
+"@types/react@^18.0.12":
+  version "18.0.12"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.12.tgz#cdaa209d0a542b3fcf69cf31a03976ec4cdd8840"
+  integrity sha512-duF1OTASSBQtcigUvhuiTB1Ya3OvSy+xORCiEf20H0P0lzx+/KeVsA99U5UjLXSbyo1DRJDlLKqTeM1ngosqtg==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -1119,10 +1119,10 @@
     react-refresh "^0.13.0"
     resolve "^1.22.0"
 
-"@vitest/ui@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.13.1.tgz#ddccb60e9493a9ac27a92994be711dc8aebdaab3"
-  integrity sha512-o/xpr6yuS+4qS384BFZp1pDJ3ihWfS4U2t5sjN1CHVvKM9QzdPszp99kF9bbyxIzjCHy36NuspYbqLexqRARvg==
+"@vitest/ui@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.14.0.tgz#5b714cc34b9ee2b924784aea1dde46c4261286d1"
+  integrity sha512-YJW8NxRm1zKuoCik8+khqyaLvydNqCLqd6AwxaJ47anCFWrYmMRul5uClHlmZuggRni8Gl0N/QcRgsMVjQwIvQ==
   dependencies:
     sirv "^2.0.2"
 
@@ -3901,10 +3901,10 @@ react-toastify@^9.0.3:
   dependencies:
     clsx "^1.1.1"
 
-react-virtuoso@^2.12.1:
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-2.12.1.tgz#00aa5b4ac8704c446dff113c07f495e92cba62c6"
-  integrity sha512-Q+5Tklsvbl81uUU40iOAjT5oLdVv9nIQMhWmWkcdDlCy86tGTUQZfjTOW/ZydFrUcXrdta0IfvUD2U03xneAhg==
+react-virtuoso@^2.13.0:
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-2.13.0.tgz#8b8302c98b3597fbfd6c57f348a573e252aeb002"
+  integrity sha512-c4b4p/uIQVk2+oQ0jNguZ4pMdEJdqtHlxtSBr5hOSCtS9Ci34R3N3iYaEAc/xctk0iKIBkXj+wgTUkw1mHZbow==
   dependencies:
     "@virtuoso.dev/react-urx" "^0.2.12"
     "@virtuoso.dev/urx" "^0.2.12"
@@ -4634,10 +4634,10 @@ vite@^2.9.9:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.13.1:
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.13.1.tgz#4b857c6ca0a9a1a2340dc8a1d9991b1f75934220"
-  integrity sha512-CfSBf7YFw/i8HumSUQRtZKs0aV91DC9WU8nAgIJAlawKHaFuPHQohDwOTPIFgrxySiuFYUa0Yohf9gDFfBwjxA==
+vitest@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.14.0.tgz#8fe92608d5379972b8f5a2424187fc4a3e453cd5"
+  integrity sha512-3Ns7c6TindS6OmweY4dU7sWT7g/YJBenwsMdUMEO/oS81bzoCEaA58vlg/9U1WRjrNFwQYsuyISehAvCKwoMZQ==
   dependencies:
     "@types/chai" "^4.3.1"
     "@types/chai-subset" "^1.3.3"
