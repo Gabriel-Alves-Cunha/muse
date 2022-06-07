@@ -48,16 +48,15 @@ export const SearchWrapper = styled("div", {
 		pos: "absolute",
 		d: "flex", // row
 		alignItems: "center",
-		h: "2.5rem",
-		w: 250,
+		width: "90%",
+		height,
 
 		bottom: 0,
 		l: 30,
 		r: 0,
 		t: 0,
 
-		cursor: "text",
-		margin: "auto",
+		m: "auto",
 		p: 0,
 
 		c: "$input-placeholder",
@@ -81,6 +80,7 @@ export const SearchWrapper = styled("div", {
 		whiteSpace: "nowrap",
 		c: "$input-text",
 		ff: "$secondary",
+		cursor: "text",
 		ls: "0.045rem",
 		fs: "0.9rem",
 		fw: 400,

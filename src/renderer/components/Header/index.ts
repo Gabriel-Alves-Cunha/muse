@@ -5,8 +5,8 @@ export const Header = styled("header", {
 	display: "flex", // row,
 	justifyContent: "space-between",
 	alignItems: "center",
+	h: 60,
 
 	p: "0 5%",
-	height: 60,
 	mt: 10,
 });

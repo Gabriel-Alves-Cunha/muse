@@ -13,7 +13,7 @@ import { ProgressStatus } from "@common/enums";
 import { errorToast } from "@styles/global";
 
 import { StyledPopoverTrigger } from "./styles";
-import { PopoverAnchor } from "@modules/Converting/styles";
+import { PopoverAnchor } from "../Converting/styles";
 
 const defaultDownloadInfo: DownloadInfo = Object.freeze({
 	canStartDownload: false,
@@ -27,8 +27,8 @@ export const useDownloadInfo = create<DownloadInfo>(() => defaultDownloadInfo);
 export const { setState: setDownloadInfo } = useDownloadInfo;
 
 export function Downloading() {
+	const downloadingListSize = useDownloadingList().downloadingList.size;
 	const [isOpen, setIsOpen] = useState(false);
-	const downloadingListSize = useDownloadingList().size;
 	const downloadInfo = useDownloadInfo();
 
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
@@ -83,6 +83,7 @@ export function Downloading() {
 						? "nothing-found-for-convertions-or-downloads"
 						: "convertions-or-downloads"
 				}
+				alignOffset={14}
 			>
 				<Popup />
 			</PopoverContent>

@@ -178,8 +178,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			const div = progressWrapperRef.current;
 			if (!div || !tooltip) return;
 
-			const { width } = div.getBoundingClientRect();
-			const progressBarWidth = floor(width);
+			const progressBarWidth = floor(div.getBoundingClientRect().width);
 
 			mouseX = mouseX < 0 ? 0 : mouseX;
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;

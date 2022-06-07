@@ -1,6 +1,6 @@
 import { Trigger } from "@radix-ui/react-popover";
 
-import { styled } from "@styles/global";
+import { keyframes, styled } from "@styles/global";
 
 export const StyledPopoverTrigger = styled(Trigger, {
 	pos: "relative",
@@ -123,13 +123,53 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	},
 });
 
-export const Content = styled("div", {
+const fallAway = keyframes({
+	"0%": {
+		transform: "rotateZ(0deg)",
+		opacity: 1,
+		top: 0,
+	},
+	"25%": {
+		transform: "rotateZ(-15deg)",
+	},
+	"100%": {
+		transform: "rotateZ(-5deg)",
+		opacity: 0,
+		top: 200,
+	},
+});
+
+const moveUp = keyframes({
+	"0%": {
+		transform: "translateY(0px)",
+	},
+	"100%": {
+		// -73 is the (height + 1 * gap):
+		transform: "translateY(-73px)",
+	},
+});
+
+const fallAwayDuration = 1;
+const moveUpDelay = 0.2;
+const moveUpDuration = fallAwayDuration / 2;
+export const ItemWrapper = styled("div", {
+	pos: "relative",
 	d: "flex",
 	fd: "column",
+	w: 236,
+	h: 63,
 
 	b: "1px solid lightgray",
 	br: 5,
 	p: 10,
+
+	"&.delete": {
+		animation: `${fallAway} forwards ${fallAwayDuration}s ease-out`,
+	},
+
+	"&.move-up": {
+		animation: `${moveUp} forwards ${moveUpDuration}s ease ${moveUpDelay}s`,
+	},
 });
 
 export const TitleAndCancelWrapper = styled("div", {

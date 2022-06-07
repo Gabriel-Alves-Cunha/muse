@@ -6,7 +6,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { MainArea } from "@components/MainArea";
 import {
 	setConvertInfoList,
-	convertInfoList,
+	getConvertInfoList,
 } from "@modules/Converting/helper";
 
 import { BorderedButton } from "./styles";
@@ -33,7 +33,7 @@ export function Convert() {
 
 	useEffect(() => {
 		const convertTo = () => {
-			const convertInfoList_ = convertInfoList();
+			const convertInfoList_ = getConvertInfoList();
 
 			selectedMediasPath.forEach(path =>
 				convertInfoList_.set(path, {

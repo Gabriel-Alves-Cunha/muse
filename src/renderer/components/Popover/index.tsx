@@ -22,7 +22,7 @@ export const PopoverRoot = Root;
  */
 export const PopoverContent = forwardRef(
 	({ children, size, ...props }: Props, forwardedRef: Ref<HTMLDivElement>) => (
-		<StyledContent size={size} sideOffset={5} {...props} ref={forwardedRef}>
+		<StyledContent size={size} sideOffset={10} {...props} ref={forwardedRef}>
 			{children}
 		</StyledContent>
 	),

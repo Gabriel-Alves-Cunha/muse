@@ -17,13 +17,15 @@ import { StyledPopoverTrigger } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
 
 export function Converting() {
+	const convertingListSize = useConvertingList().convertingList.size;
+	const { convertInfoList } = useConvertInfoList();
 	const [isOpen, setIsOpen] = useState(false);
-	const convertingListSize = useConvertingList().size;
-	const convertInfoList = useConvertInfoList();
 
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
+		console.log("inside Converting useEffect");
+
 		convertInfoList.forEach((convertInfo, path) => {
 			if (convertInfo.canStartConvert)
 				try {
@@ -48,7 +50,7 @@ export function Converting() {
 		// In here, we've already handled all the files, so we can clear the list:
 		if (convertInfoList.size !== 0) {
 			convertInfoList.clear();
-			setConvertInfoList(convertInfoList);
+			setConvertInfoList({ convertInfoList });
 		}
 	}, [convertInfoList]);
 
@@ -72,6 +74,7 @@ export function Converting() {
 						? "nothing-found-for-convertions-or-downloads"
 						: "convertions-or-downloads"
 				}
+				alignOffset={14}
 			>
 				<Popup />
 			</PopoverContent>

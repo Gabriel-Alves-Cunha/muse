@@ -29,7 +29,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			},
 		},
 		utils: {
-			size: (value: number | string) => ({ height: value, width: value }),
+			size: (width: number | string) => ({ height: width, width }),
 			bo: (bottom: number | string) => ({ bottom }),
 			h: (height: number | string) => ({ height }),
 			w: (width: number | string) => ({ width }),
@@ -78,11 +78,11 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				alignItems: value,
 			}),
 
-			sizeMin: (value: number | string) => ({
-				minHeight: value,
-				minWidth: value,
-				height: value,
-				width: value,
+			sizeMin: (width: number | string) => ({
+				minHeight: width,
+				minWidth: width,
+				height: width,
+				width,
 			}),
 
 			textGradient: (value: number | string) => ({
@@ -300,8 +300,9 @@ export const GlobalCSS = globalCss({
 
 	"*": {
 		transitionProperty:
-			"color, background-color, border-color, box-shadow, -webkit-scrollbar-track, -webkit-scrollbar-thumb",
-		transition: "ease 250ms",
+			"color, background-color, border-color, box-shadow, -webkit-scrollbar-track, -webkit-scrollbar-thumb, caret-color",
+		transitionTimingFunction: "ease",
+		transitionDuration: "0.25s",
 	},
 
 	"@font-face": [
@@ -344,6 +345,9 @@ export const GlobalCSS = globalCss({
 		overflow: "hidden !important",
 		position: "fixed",
 		size: "100%",
+
+		containIntrinsicSize: "1px 5000px",
+		contentVisibility: "auto",
 	},
 
 	html: {
@@ -358,6 +362,10 @@ export const GlobalCSS = globalCss({
 		"::-webkit-scrollbar": {
 			display: "none",
 		},
+	},
+
+	"& .notransition *": {
+		transition: "none !important",
 	},
 });
 

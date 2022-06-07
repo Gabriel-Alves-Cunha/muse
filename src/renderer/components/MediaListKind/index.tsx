@@ -15,7 +15,7 @@ import {
 } from "./helper";
 
 import { ListWrapper, EmptyList, Footer } from "./styles";
-import { ErrorFallback } from "@components/ErrorFallback";
+import { ErrorFallback } from "../ErrorFallback";
 
 // href="https://www.flaticon.com/free-icons/error" =>
 const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
@@ -46,6 +46,10 @@ function MediaListKind_({ isHome = false }: Props) {
 	const listAsArrayOfAMap: [Path, Media][] = useMemo(
 		() =>
 			time(() => {
+				// isHome is used to determine which list to use
+				// when the user is at the home page, the homeList is used
+				// then, cause it will have what the user has last set as the main list:
+				// either sortedByDate or sortedByName, in our current case.
 				const list = getPlaylist(isHome ? homeList : fromList);
 
 				// Since the ONLY list that is a Map is

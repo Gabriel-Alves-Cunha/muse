@@ -22,8 +22,7 @@ export const Nav = styled("nav", {
 });
 
 export const Buttons = styled("div", {
-	fd: "column",
-	dflex: "center",
+	dcolumn: "center",
 	w: "100%",
 
 	button: {

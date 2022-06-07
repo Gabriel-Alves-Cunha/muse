@@ -139,6 +139,7 @@ export function InputAndResults() {
 				value={searchTerm}
 				key="search-songs"
 				spellCheck="false"
+				id="search-songs"
 				autoCorrect="off"
 				ref={inputRef}
 				type="text"

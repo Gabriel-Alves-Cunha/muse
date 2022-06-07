@@ -1,8 +1,8 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { downloadingList, setDownloadingList } from "@contexts/downloadList";
+import { getDownloadingList, setDownloadingList } from "@contexts/downloadList";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
-import { convertingList, setConvertingList } from "@contexts/convertList";
+import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@modules/Downloading";
 import { ProgressStatus } from "@common/enums";
@@ -66,7 +66,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED: {
 			dbg("New download created.");
 
-			const downloadingList_ = downloadingList();
+			const downloadingList_ = getDownloadingList();
 			// In here, there has to be a download WAITING:
 			const download = downloadingList_.get(msg.url);
 
@@ -91,7 +91,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case ElectronToReactMessageEnum.NEW_COVERSION_CREATED: {
 			dbg("New conversion created.");
 
-			const convertingList_ = convertingList();
+			const convertingList_ = getConvertingList();
 			// In here, there has to be a conversion WAITING:
 			const convertingMedia = convertingList_.get(msg.path);
 
@@ -117,7 +117,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED: {
 			console.error("Create conversion failed!");
 
-			const convertingList_ = convertingList();
+			const convertingList_ = getConvertingList();
 			// In here, there has to be a conversion WAITING
 			const convertingMedia = convertingList_.get(msg.path);
 
@@ -142,7 +142,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED: {
 			console.error("Download failed!");
 
-			const downloadingList_ = downloadingList();
+			const downloadingList_ = getDownloadingList();
 			// In here, there has to be a download WAITING:
 			const download = downloadingList_.get(msg.url);
 

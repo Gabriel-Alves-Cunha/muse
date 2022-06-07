@@ -21,8 +21,7 @@ export function ImgWithFallback({
 
 	if (cacheStatus === FAILURE || cacheStatus === PENDING) return Fallback;
 
-	if (cacheStatus === SUCCESS)
-		return <img src={mediaImg} loading="lazy" decoding="async" />;
+	if (cacheStatus === SUCCESS) return <img src={mediaImg} />;
 
 	cache.set(mediaPath, PENDING);
 

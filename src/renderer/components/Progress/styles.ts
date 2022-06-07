@@ -3,11 +3,11 @@ import { styled } from "@styles/global";
 export const Component = styled("div", {
 	d: "flex", // row,
 	alignItems: "center",
-	w: "100%",
+	w: "98%",
 	h: 15,
 
 	"& svg": {
-		margin: "auto",
+		ml: "auto",
 	},
 });
 

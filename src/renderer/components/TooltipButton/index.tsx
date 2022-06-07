@@ -28,6 +28,8 @@ export const TooltipButton_ = styled("button", {
 	bg: "none",
 	b: "none",
 
+	transition: "none !important",
+
 	"&:active": {
 		"&::before, &::after": {
 			visibility: "hidden",

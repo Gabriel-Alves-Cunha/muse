@@ -4,39 +4,53 @@ import type { Path } from "@common/@types/generalTypes";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
+import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { errorToast, infoToast, successToast } from "@styles/global";
-import { convertingList, setConvertingList } from "@contexts/convertList";
 import { type AllowedMedias, getBasename } from "@common/utils";
-import { TitleAndCancelWrapper, Content } from "../Downloading/styles";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
+import { TooltipButton } from "@components/TooltipButton";
 import { prettyBytes } from "@common/prettyBytes";
 import { dbg } from "@common/utils";
+import {
+	cancelConvertionAndOrRemoveItFromList,
+	handleDeleteAnimation,
+} from "@modules/Downloading/helper";
 
+import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
-import { TooltipButton } from "@components/TooltipButton";
 
-export const useConvertInfoList = create<ConvertInfoList>(() => new Map());
-export const { setState: setConvertInfoList, getState: convertInfoList } =
+export const useConvertInfoList = create<ConvertInfoList>(() => ({
+	convertInfoList: new Map(),
+}));
+export const { setState: setConvertInfoList, getState: getConvertInfoList } =
 	useConvertInfoList;
 
 export function Popup() {
-	const convertingList_ = convertingList();
+	const { convertingList } = getConvertingList();
 
 	const convertBoxes = () => {
 		const list = [];
 
-		for (const [path, media] of convertingList_)
+		let convertionIndex = 0;
+		for (const [path, media] of convertingList) {
 			list.push(
-				<ConvertBox mediaBeingConverted={media} key={path} path={path} />,
+				<ConvertBox
+					convertionIndex={convertionIndex}
+					mediaBeingConverted={media}
+					path={path}
+					key={path}
+				/>,
 			);
+			++convertionIndex;
+		}
 
 		return list;
 	};
 
 	return (
 		<>
-			{convertingList_.size > 0 ? (
+			{convertingList.size > 0 ? (
 				convertBoxes()
 			) : (
 				<p>No conversions in progress!</p>
@@ -47,18 +61,19 @@ export function Popup() {
 
 export const ConvertBox = ({
 	mediaBeingConverted: { toExtension, timeConverted, sizeConverted },
+	convertionIndex,
 	path,
 }: ConvertBoxProps) => (
-	<Content>
+	<ItemWrapper className="item">
 		<TitleAndCancelWrapper>
 			<p>{getBasename(path) + "." + toExtension}</p>
 
 			<TooltipButton
-				onClick={() => cancelDownloadAndOrRemoveItFromList(path)}
+				onClick={e => handleDeleteAnimation(e, convertionIndex, false, path)}
 				tooltip="Cancel conversion"
-				tooltip-side="right"
+				tooltip-side="left"
 			>
-				<Cancel size={12} />
+				<Cancel size={12} className="notransition" />
 			</TooltipButton>
 		</TitleAndCancelWrapper>
 
@@ -67,7 +82,7 @@ export const ConvertBox = ({
 			<div>{format(timeConverted)}s</div>
 			<div>{prettyBytes(sizeConverted)}</div>
 		</ConvertionProgress>
-	</Content>
+	</ItemWrapper>
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -78,16 +93,18 @@ export function createNewConvert(
 	convertInfo: ConvertInfo,
 	path: Path,
 ): MessagePort {
-	const convertingList_ = convertingList();
+	const { convertingList } = getConvertingList();
 
-	dbg("Trying to create a new conversion...", { convertingList_ });
+	dbg("Trying to create a new conversion...", {
+		convertingList,
+	});
 
-	if (convertingList_.has(path)) {
+	if (convertingList.has(path)) {
 		const info = `There is already one convert of "${path}"!`;
 
 		infoToast(info);
 
-		console.error(info, convertingList_);
+		console.error(info, convertingList);
 		throw new Error(info);
 	}
 
@@ -104,7 +121,9 @@ export function createNewConvert(
 		port: myPort,
 	};
 
-	setConvertingList(convertingList_.set(path, convertStatus));
+	setConvertingList({
+		convertingList: convertingList.set(path, convertStatus),
+	});
 
 	// On every `postMessage` you have to send the path (as an ID)!
 	myPort.postMessage({
@@ -114,25 +133,25 @@ export function createNewConvert(
 	});
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
-		const convertingList_ = convertingList();
+		const { convertingList } = getConvertingList();
 
 		dbg(`Received a message from Electron on port for "${path}":`, {
-			convertingList_,
+			convertingList,
 			data,
 		});
 
 		// Assert that the download exists:
-		if (!convertingList_.has(path))
+		if (!convertingList.has(path))
 			return console.error(
 				"Received a message from Electron but the path is not in the list!",
 			);
 
-		setConvertingList(
-			convertingList_.set(path, {
+		setConvertingList({
+			convertingList: convertingList.set(path, {
 				...convertStatus,
 				...data,
 			}),
-		);
+		});
 
 		switch (data.status) {
 			case ProgressStatus.FAILED: {
@@ -142,21 +161,21 @@ export function createNewConvert(
 
 				errorToast(`Download of "${path}" failed!`);
 
-				cancelDownloadAndOrRemoveItFromList(path);
+				cancelConvertionAndOrRemoveItFromList(path);
 				break;
 			}
 
 			case ProgressStatus.SUCCESS: {
 				successToast(`Download of "${path}" succeded!`);
 
-				cancelDownloadAndOrRemoveItFromList(path);
+				cancelConvertionAndOrRemoveItFromList(path);
 				break;
 			}
 
 			case ProgressStatus.CANCEL: {
 				infoToast(`Download of "${path}" was cancelled!`);
 
-				cancelDownloadAndOrRemoveItFromList(path);
+				cancelConvertionAndOrRemoveItFromList(path);
 				break;
 			}
 
@@ -182,28 +201,6 @@ export function createNewConvert(
 	return electronPort;
 }
 
-const cancelDownloadAndOrRemoveItFromList = (path: string) => {
-	const convertingList_ = convertingList();
-
-	const mediaBeingConverted = convertingList_.get(path);
-
-	if (!mediaBeingConverted)
-		return console.error(
-			`There should be a conversion with path "${path}"!\nconvertList =`,
-			convertingList_,
-		);
-
-	// Cancel conversion
-	if (mediaBeingConverted.isConverting)
-		mediaBeingConverted.port.postMessage({
-			destroy: true,
-			path,
-		});
-
-	convertingList_.delete(path);
-	setConvertingList(convertingList_);
-};
-
 const format = (str: string) => str.slice(0, str.lastIndexOf("."));
 
 export const handleOnClose = () => dbg("Closing ports (react port).");
@@ -219,6 +216,7 @@ export type MediaBeingConverted = Readonly<{
 
 type ConvertBoxProps = Readonly<{
 	mediaBeingConverted: MediaBeingConverted;
+	convertionIndex: number;
 	path: Path;
 }>;
 
@@ -227,4 +225,4 @@ type ConvertInfo = Readonly<{
 	canStartConvert: boolean;
 }>;
 
-type ConvertInfoList = Map<Path, ConvertInfo>;
+type ConvertInfoList = { convertInfoList: Map<Path, ConvertInfo> };

@@ -3,21 +3,30 @@ import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
-/** For in-hand testing porpuses: */
-// const { port1: testPort } = new MessageChannel();
-// const testConvertingMedia: MediaBeingConverted = Object.freeze({
-// 	status: ProgressStatus.ACTIVE,
-// 	path: "/test/fake/path",
-// 	timeConverted: "01:20",
-// 	sizeConverted: 1000,
-// 	isConverting: true,
-// 	toExtension: "mp3",
-// 	percentage: 50,
-// 	port: testPort,
-// } as const);
+import { ProgressStatus } from "@common/enums";
 
-export const useConvertingList = create<ConvertingList>(() => new Map());
-export const { getState: convertingList, setState: setConvertingList } =
+/** For in-hand testing porpuses: */
+const { port1: testPort } = new MessageChannel();
+const testConvertingMedia: [Path, MediaBeingConverted][] = Array(10)
+	.fill(null)
+	.map((_, index) => {
+		const path: Path = `/home/path/convert-test-${index}.mp4`;
+		const media: MediaBeingConverted = {
+			status: ProgressStatus.ACTIVE,
+			timeConverted: "01:20",
+			sizeConverted: 1000,
+			isConverting: true,
+			toExtension: "mp3",
+			port: testPort,
+		};
+
+		return [path, media];
+	});
+
+export const useConvertingList = create<ConvertingList>(() => ({
+	convertingList: new Map(testConvertingMedia),
+}));
+export const { getState: getConvertingList, setState: setConvertingList } =
 	useConvertingList;
 
-type ConvertingList = Map<Path, MediaBeingConverted>;
+type ConvertingList = { convertingList: Map<Path, MediaBeingConverted> };

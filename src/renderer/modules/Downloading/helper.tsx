@@ -3,38 +3,42 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 
+import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { handleOnClose } from "@modules/Converting/helper";
+import { TooltipButton } from "@components/TooltipButton";
 import { Progress } from "@components/Progress";
 import { dbg } from "@common/utils";
 import {
 	useDownloadingList,
 	setDownloadingList,
-	downloadingList,
+	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { Content, TitleAndCancelWrapper } from "./styles";
-import { TooltipButton } from "@components/TooltipButton";
+import { ItemWrapper, TitleAndCancelWrapper } from "./styles";
 
-export const Popup = () => {
-	const downloadingList = useDownloadingList();
+export function Popup() {
+	const { downloadingList } = useDownloadingList();
 
 	return (
 		<>
 			{downloadingList.size > 0 ? (
-				[...downloadingList].map(([url, download]) => (
-					<Content key={url}>
+				[...downloadingList].map(([url, download], downloadingIndex) => (
+					<ItemWrapper key={url}>
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>
 
 							<TooltipButton
-								onClick={() => cancelDownloadAndOrRemoveItFromList(url)}
+								onClick={e =>
+									handleDeleteAnimation(e, downloadingIndex, true, url)
+								}
 								tooltip="Cancel/Remove download"
-								tooltip-side="right"
+								className="cancel-button"
+								tooltip-side="left"
 							>
-								<Cancel size={12} />
+								<Cancel size={12} className="notransition" />
 							</TooltipButton>
 						</TitleAndCancelWrapper>
 
@@ -43,14 +47,14 @@ export const Popup = () => {
 							status={download.status}
 							showStatus
 						/>
-					</Content>
+					</ItemWrapper>
 				))
 			) : (
 				<p>No downloads in progress!</p>
 			)}
 		</>
 	);
-};
+}
 
 /**
  * This function returns a MessagePort that will be send to
@@ -58,18 +62,20 @@ export const Popup = () => {
  * and React.
  */
 export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
-	const downloadingList_ = downloadingList();
+	const { downloadingList } = getDownloadingList();
 
-	dbg("Trying to create a new download...", { downloadingList_ });
+	dbg("Trying to create a new download...", {
+		downloadingList,
+	});
 
 	// First, see if there is another one that has the same url
 	// and quit if true:
-	if (downloadingList_.has(downloadInfo.url)) {
+	if (downloadingList.has(downloadInfo.url)) {
 		const info = `There is already one download of "${downloadInfo.title}"`;
 
 		infoToast(info);
 
-		console.error(info, downloadingList_);
+		console.error(info, downloadingList);
 		throw new Error(info);
 	}
 
@@ -80,8 +86,8 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 	// Creating a new DownloadingMedia and adding it to the list:
-	setDownloadingList(
-		downloadingList_.set(downloadInfo.url, {
+	setDownloadingList({
+		downloadingList: downloadingList.set(downloadInfo.url, {
 			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 			imageURL: downloadInfo.imageURL,
 			title: downloadInfo.title,
@@ -89,9 +95,12 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			percentage: 0,
 			port: myPort,
 		}),
-	);
+	});
 
-	dbg("Added download to the list:", downloadingList().get(downloadInfo.url));
+	dbg(
+		"Added download to the list:",
+		getDownloadingList().downloadingList.get(downloadInfo.url),
+	);
 
 	// Send msg to electronPort to download:
 	myPort.postMessage(downloadInfo);
@@ -99,26 +108,29 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
-		const downloadingList_ = downloadingList();
+		const { downloadingList } = getDownloadingList();
 
 		dbg(
 			`Received a message from Electron on port for "${downloadInfo.title}":`,
-			{ data, downloadingList_ },
+			{ data, downloadingList },
 		);
 
 		// Assert that the download exists:
-		const thisDownload = downloadingList_.get(downloadInfo.url);
+		const thisDownload = downloadingList.get(downloadInfo.url);
 		if (!thisDownload)
 			return console.error(
 				"Received a message from Electron but the url is not in the list!",
 			);
 
-		dbg("downloadStatus:", downloadingList_.get(downloadInfo.url));
+		dbg("downloadStatus:", downloadingList.get(downloadInfo.url));
 
 		// Update React's information about this DownloadingMedia:
-		setDownloadingList(
-			downloadingList_.set(downloadInfo.url, { ...thisDownload, ...data }),
-		);
+		setDownloadingList({
+			downloadingList: downloadingList.set(downloadInfo.url, {
+				...thisDownload,
+				...data,
+			}),
+		});
 
 		// Handle ProgressStatus's cases:
 		switch (data.status) {
@@ -170,23 +182,82 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 }
 
 const cancelDownloadAndOrRemoveItFromList = (url: string) => {
-	const downloadingList_ = downloadingList();
+	const { downloadingList } = getDownloadingList();
 
-	dbg("Trying to cancel download...", { downloadingList_ });
+	{
+		// Assert that the download exists:
+		const download = downloadingList.get(url);
 
-	// Assert that the download exists:
-	const download = downloadingList_.get(url);
+		if (!download)
+			return console.error(
+				`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
+				downloadingList,
+			);
 
-	if (!download)
-		return console.error(
-			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
-			downloadingList_,
-		);
+		// Cancel download:
+		if (download.isDownloading)
+			download.port.postMessage({ destroy: true, url });
 
-	// Cancel download:
-	if (download.isDownloading) download.port.postMessage({ destroy: true, url });
+		// Update downloading list:
+		downloadingList.delete(url);
+	}
 
-	// Update downloading list:
-	downloadingList_.delete(url);
-	setDownloadingList(downloadingList_);
+	// Make React update:
+	setDownloadingList({ downloadingList });
 };
+
+export const cancelConvertionAndOrRemoveItFromList = (path: string) => {
+	const { convertingList } = getConvertingList();
+
+	{
+		const mediaBeingConverted = convertingList.get(path);
+
+		if (!mediaBeingConverted)
+			return console.error(
+				`There should be a convertion with path "${path}"!\nconvertList =`,
+				convertingList,
+			);
+
+		// Cancel conversion
+		if (mediaBeingConverted.isConverting)
+			mediaBeingConverted.port.postMessage({
+				destroy: true,
+				path,
+			});
+
+		// Remove from converting list
+		convertingList.delete(path);
+	}
+
+	// Make React update:
+	setConvertingList({ convertingList });
+};
+
+export function handleDeleteAnimation(
+	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	downloadingOrConvertionIndex: number,
+	isDownloadList: boolean,
+	key: string,
+) {
+	const className = `.${ItemWrapper.className}`;
+	const items = document.querySelectorAll(
+		className,
+	) as NodeListOf<HTMLDivElement>;
+
+	for (const [itemIndex, item] of items.entries()) {
+		if (itemIndex <= downloadingOrConvertionIndex) continue;
+
+		item.classList.add("move-up");
+	}
+
+	const thisItem = (e.target as HTMLElement).closest(
+		className,
+	) as HTMLDivElement;
+	thisItem.classList.add("delete");
+	thisItem.addEventListener("animationend", () => {
+		if (isDownloadList) cancelDownloadAndOrRemoveItFromList(key);
+		else cancelConvertionAndOrRemoveItFromList(key);
+
+		items.forEach(item => item.classList.remove("move-up"));
+	});
+}

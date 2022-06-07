@@ -53,36 +53,6 @@ const cleanFavorites = () => {
 	expect(favorites().size).toBe(0);
 };
 
-const playNextMediaFn = () => {
-	expect(mainList().size).toBe(numberOfMedias);
-	expect(favorites().size).toBe(0);
-	expect(history().length).toBe(0);
-
-	// Set currentPlaying to first media:
-	const firstMediaPath = testArray[0]![0];
-	expect(firstMediaPath).toBeTruthy();
-
-	playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);
-	expect(currentPlaying().path).toBe(firstMediaPath);
-	expect(history().length).toBe(1);
-
-	testArray.forEach((_, index) => {
-		// If is the last media, it is going
-		// to go back to the first one:
-		const newIndex = index === numberOfMedias - 1 ? 0 : index + 1;
-
-		const expectedMediaPath = testArray[newIndex]![0];
-
-		playNextMedia();
-		expect(currentPlaying().path).toBe(expectedMediaPath);
-	});
-
-	// Should update the history list:
-	// The extra 1 is because it's gonna turn back
-	// to the first media when it reachs the end;
-	expect(history().length).toBe(numberOfMedias + 1);
-};
-
 it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
 	setPlaylists({
 		whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
@@ -100,7 +70,64 @@ beforeEach(() => {
 	cleanHistory();
 });
 
-it("should play the next media", playNextMediaFn);
+it("should play the next media", () => {
+	// Start with the first media:
+	{
+		expect(
+			mainList().size,
+			"mainList.size at the start should be equal to numberOfMedias!",
+		).toBe(numberOfMedias);
+		expect(favorites().size, "favorites.size at the start should be 0!").toBe(
+			0,
+		);
+		expect(history().length, "history.length at the start should be 0!").toBe(
+			0,
+		);
+
+		// Set currentPlaying to first media:
+		const firstMediaPath = testArray[0]![0];
+		expect(
+			firstMediaPath,
+			`There should be a firstMediaPath = "${firstMediaPath}"!`,
+		).toBeTruthy();
+
+		playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);
+		expect(
+			currentPlaying().path,
+			"currentPlaying().path should be equal to firstMediaPath!",
+		).toBe(firstMediaPath);
+		expect(history().length, "history().length should be 1 here!").toBe(1);
+	}
+
+	for (let index = 1; index < numberOfMedias; ++index) {
+		// If is the last media, it is going
+		// to go back to the first one:
+		const newIndex = index === numberOfMedias - 1 ? 0 : index + 1;
+
+		const prevMediaPath = testArray[index === 1 ? 0 : index]![0];
+		const expectedMediaPath = testArray[newIndex]![0];
+
+		expect(
+			currentPlaying().path,
+			`\ncurrentPlaying().path before playing the next media should be the prevMediaPath = "${prevMediaPath}"!\n`,
+		).toBe(prevMediaPath);
+
+		playNextMedia();
+
+		expect(
+			currentPlaying().path,
+			`currentPlaying().path after playing the next media should be the expectedMediaPath = "${expectedMediaPath}".\nprevMediaPath = "${prevMediaPath}"!\n`,
+		).toBe(expectedMediaPath);
+	}
+
+	// Should have updated the history list:
+	// The extra 1 is because it's gonna turn back
+	// to the first media when it reachs the end;
+	expect(
+		history().length,
+		`history().length should be ${numberOfMedias + 1}!`,
+	).toBe(numberOfMedias + 1);
+});
 
 it("should play a chosen media", () => {
 	testArray.forEach(() => {

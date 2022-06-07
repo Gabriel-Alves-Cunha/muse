@@ -50,7 +50,7 @@ export function ButtonGroup({ buttons }: Props) {
 	};
 
 	return (
-		<Wrapper>
+		<Wrapper className="notransition">
 			{/* Order matters here: */}
 			{reload && <Reload className={additionalClasses("reload")} />}
 

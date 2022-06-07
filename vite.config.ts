@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import { configDefaults } from "vitest/config";
 import { defineConfig } from "vite";
 import { resolve } from "node:path";
@@ -26,6 +28,7 @@ export default defineConfig({
 		],
 		logHeapUsage: true,
 	},
+
 	plugins: [react()],
 	root: rendererPath,
 	base: "./",

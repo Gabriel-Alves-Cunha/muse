@@ -29,6 +29,7 @@ export const StyledContent = styled(Content, {
 	gap: 10,
 
 	bg: "$bg-popover",
+	ox: "hidden",
 	br: 10,
 	p: 10,
 

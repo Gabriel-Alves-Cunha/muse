@@ -21,12 +21,12 @@ import { Nav, Buttons, Popups } from "./styles";
 const { setState: setPage } = usePage;
 
 export const Navbar = () => (
-	<Nav>
+	<Nav className="notransition">
 		<ThemeToggler />
 
 		<ButtonsForPages />
 
-		<Popups>
+		<Popups >
 			<Converting />
 
 			<Downloading />
@@ -50,7 +50,7 @@ const ButtonsForPages = () => {
 		<Buttons>
 			{pages.map(page => (
 				<TooltipButton
-					className={page === currPage ? "active" : ""}
+					className={(page === currPage ? "active" : "")}
 					onClick={() => setPage({ page })}
 					tooltip={`Go to ${page}`}
 					tooltip-side="right"
