@@ -109,6 +109,18 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			ov: (overflow: string) => ({ overflow }),
 			d: (display: string) => ({ display }),
 
+			boxShadowBorder: ({
+				width,
+				color,
+			}: {
+				color: string;
+				width: number | string;
+			}) => ({
+				boxShadow: `
+					0px 0px 0px ${width}px ${color},
+					0px ${width}px ${width}px ${color}`,
+			}),
+
 			scroll: (size: string | number) => ({
 				/* width */
 				"&::-webkit-scrollbar": {
@@ -155,12 +167,13 @@ export const darkTheme = createTheme({
 		text: "#f6f6f6",
 
 		"input-border-active": "#0072F5",
+		"selected-border": "#4d4d4d",
 		"input-border": "#4d4d4d",
 		"input-disabled": "gray",
 
 		"bg-button-hover": "#08368D",
 		"bg-highlight": "#C04569",
-		"bg-selected": "#5b6b99",
+		"bg-selected": "#252121",
 		"bg-popover": "#182825",
 		"bg-navbar": "#191a21",
 		"bg-button": "#191a21",
@@ -210,8 +223,8 @@ export const lightTheme = createTheme({
 		"lingrad-bottom": "#4a00e0",
 		"lingrad-top": "#8e2de2",
 
-		"media-player-icons": "#fff",
 		"deactivated-icon": "dimgray",
+		"media-player-icons": "#fff",
 		"active-icon": "#4a00e0",
 		"window-buttons": "black",
 
@@ -222,12 +235,13 @@ export const lightTheme = createTheme({
 		text: "#0C0910",
 
 		"input-border-active": "#344880",
+		"selected-border": "#4b00e038",
 		"input-disabled": "lightgray",
 		"input-border": "#e0e0e0",
 
 		"bg-button-hover": "#8e2de2",
 		"bg-highlight": "#9882AC",
-		"bg-selected": "#5b6b99",
+		"bg-selected": "#aac1ff70",
 		"bg-popover": "#f9f6f5",
 		"bg-button": "#f9f6f5",
 		"bg-navbar": "#f9f6f5",
@@ -238,7 +252,7 @@ export const lightTheme = createTheme({
 		"bg-select": "#fff",
 
 		"media-player-icon-button-hovered": "#fff4",
-		"icon-button-hovered": "#88888820",
+		"icon-button-hovered": "#88888857",
 		"button-hovered": "#dbdadc", // rename these ^ to light and dark
 
 		"accent-light": "#9381FF",
@@ -348,6 +362,10 @@ export const GlobalCSS = globalCss({
 
 		containIntrinsicSize: "1px 5000px",
 		contentVisibility: "auto",
+
+		"& .notransition *": {
+			transition: "none !important",
+		},
 	},
 
 	html: {
@@ -362,10 +380,6 @@ export const GlobalCSS = globalCss({
 		"::-webkit-scrollbar": {
 			display: "none",
 		},
-	},
-
-	"& .notransition *": {
-		transition: "none !important",
 	},
 });
 

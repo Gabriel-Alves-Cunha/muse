@@ -34,12 +34,6 @@ const handleOnClick = () => {
 			cleanHistory();
 			break;
 
-		case PlaylistList.MAIN_LIST:
-			break;
-
-		case PlaylistList.SORTED_BY_DATE:
-			break;
-
 		default:
 			assertUnreachable(fromList);
 			break;

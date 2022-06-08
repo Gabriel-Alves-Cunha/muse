@@ -1,24 +1,34 @@
-import { VariantProps, CSS } from "@stitches/react/types";
+import type { VariantProps, CSS } from "@stitches/react/types";
+
+import { type ComponentPropsWithRef, type Ref, forwardRef } from "react";
+
 import { styled } from "@styles/global";
 
-export const TooltipButton = ({
-	"tooltip-side": tooltipSide,
-	className = "",
-	css = {},
-	children,
-	tooltip,
-	...props
-}: Props) => (
-	<TooltipButton_
-		tooltip-side={tooltipSide}
-		data-tooltip={tooltip}
-		className={className}
-		css={css}
-		{...props}
-	>
-		{children}
-	</TooltipButton_>
+export const TooltipButton = forwardRef(
+	(
+		{
+			"tooltip-side": tooltipSide,
+			className = "",
+			css = {},
+			children,
+			tooltip,
+			...props
+		}: Props,
+		forwardedRef: Ref<HTMLButtonElement>,
+	) => (
+		<TooltipButton_
+			tooltip-side={tooltipSide}
+			data-tooltip={tooltip}
+			className={className}
+			ref={forwardedRef}
+			css={css}
+			{...props}
+		>
+			{children}
+		</TooltipButton_>
+	),
 );
+TooltipButton.displayName = "TooltipButton";
 
 export const TooltipButton_ = styled("button", {
 	pos: "relative",
@@ -101,7 +111,7 @@ export const TooltipButton_ = styled("button", {
 	},
 });
 
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type Props = ComponentPropsWithRef<"button"> & {
 	"tooltip-side"?: VariantProps<typeof TooltipButton_>["tooltip-side"];
 	children: React.ReactNode;
 	className?: string;

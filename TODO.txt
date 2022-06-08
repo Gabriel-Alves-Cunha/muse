@@ -1,8 +1,7 @@
-* TODO: impl select on media.
+* TODO: impl select on media WITH context-menu.
 * TODO: see why virtuoso scroll behavior is wrong!
 * TODO: maybe impl fast-check from npm.
-* TODO: fix tests.
-* TODO: theres a problem on MediaListKind when using the history list cause the keys can repeat. Maybe change history to be a Map<Path, lastListened>.
+* TODO: add + tests for history.
 
 NOTES:
 

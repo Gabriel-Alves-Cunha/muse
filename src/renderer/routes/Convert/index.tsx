@@ -33,17 +33,17 @@ export function Convert() {
 
 	useEffect(() => {
 		const convertTo = () => {
-			const convertInfoList_ = getConvertInfoList();
+			const { convertInfoList } = getConvertInfoList();
 
 			selectedMediasPath.forEach(path =>
-				convertInfoList_.set(path, {
+				convertInfoList.set(path, {
 					canStartConvert: true,
 					toExtension,
 				}),
 			);
 
 			// Start convert:
-			setConvertInfoList(convertInfoList_);
+			setConvertInfoList({ convertInfoList });
 
 			setSelectedMediasPath([]);
 		};

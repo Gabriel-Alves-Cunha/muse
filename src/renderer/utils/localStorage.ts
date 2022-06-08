@@ -1,6 +1,7 @@
+import type { Media, Path, TypeOfMap } from "@common/@types/generalTypes";
 import type { CurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
 import type { PlayOptions } from "@contexts/mediaHandler/usePlayOptions";
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { History } from "@contexts/mediaHandler/usePlaylists";
 
 import { stringifyAsync } from "js-coroutines";
 
@@ -13,19 +14,21 @@ export const keyPrefix = "@muse:";
 
 export const keys = Object.freeze({
 	sortedByDate: `${keyPrefix}playlist:sortedByDate`,
-	currentPlaying: `${keyPrefix}current_playing`,
+	currentPlaying: `${keyPrefix}currentPlaying`,
 	favorites: `${keyPrefix}playlist:favorites`,
-	playOptions: `${keyPrefix}play_options`,
 	history: `${keyPrefix}playlist:history`,
+	playOptions: `${keyPrefix}playOptions`,
 } as const);
 
 type Keys = typeof keys[keyof typeof keys];
 type Values =
 	| readonly [Path, Media][]
-	| readonly Path[]
 	| CurrentPlaying
 	| PlayOptions
-	| Set<Path>;
+	| Set<Path>
+	| History;
+
+type HistoryShape = TypeOfMap<History>;
 
 export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	setTimeout(() => {
@@ -58,7 +61,7 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 
 			dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
 
-			if (!item) return undefined;
+			if (!item || !value) return undefined;
 
 			switch (key) {
 				case keys.favorites: {
@@ -82,7 +85,7 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 						item,
 					);
 
-					const newHistory = item as Path[];
+					const newHistory: History = new Map(item as HistoryShape);
 
 					dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
 
@@ -96,7 +99,7 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 						item,
 					);
 
-					const newSortedByDate = item as Path[];
+					const newSortedByDate = new Set(item as Path[]);
 
 					dbgPlaylists(
 						"getFromLocalStorage: newSortedByDate =",

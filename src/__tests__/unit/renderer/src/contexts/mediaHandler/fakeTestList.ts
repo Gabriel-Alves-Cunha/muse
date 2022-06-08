@@ -4,6 +4,8 @@ import { formatDuration } from "@common/utils";
 
 // Make a test list full of fake medias:
 export const numberOfMedias = 30;
+
+// Make a test list full of fake medias sorted by path:
 export const testArray = Object.freeze(
 	Array.from({ length: numberOfMedias }, (_, index) => {
 		const title = `Test Title - ${index}`;
@@ -15,8 +17,12 @@ export const testArray = Object.freeze(
 		};
 
 		return [`home/Music/test/${title}.mp3`, media] as const;
-	}),
+	}).sort((a, b) => a[0].localeCompare(b[0])),
 );
+
 export const testList: ReadonlyMap<string, Media> = Object.freeze(
 	new Map(testArray),
 );
+
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+export const firstMediaPath = testArray[0]![0];

@@ -1,6 +1,8 @@
 import { styled } from "@styles/global";
 
 export const Img = styled("div", {
+	m: "unset", // Virtuoso asks for this for performance reasons
+
 	$$size: "45px",
 
 	dflex: "center",
@@ -28,7 +30,7 @@ export const Img = styled("div", {
 });
 
 export const SubTitle = styled("p", {
-	margin: "20px 0",
+	m: "unset", // Virtuoso asks for this for performance reasons
 
 	c: "$alternative-text",
 	ff: "$primary",
@@ -43,6 +45,8 @@ export const SubTitle = styled("p", {
 });
 
 export const Info = styled("div", {
+	m: "unset", // Virtuoso asks for this for performance reasons
+
 	d: "flex",
 	fd: "column",
 	justifyContent: "center",
@@ -72,45 +76,25 @@ export const Title = styled("p", {
 
 export const ListWrapper = styled("div", {
 	maxWidth: 600,
-	h: "70vh",
+	h: "80vh",
 
-	ox: "hidden !important",
-	m: "2rem 5%",
-
-	"@sm": {
-		margin: "0.5em 5%",
-	},
-
-	/* width */
-	".list::-webkit-scrollbar": {
-		d: "block",
-		size: 5,
-	},
-
-	/* Track */
-	".list::-webkit-scrollbar-track": {
-		bg: "$scrollbar",
-	},
-
-	/* Handle */
-	".list::-webkit-scrollbar-thumb": {
-		bg: "$scrollbar-thumb",
-	},
-
-	/* Handle on hover */
-	".list::-webkit-scrollbar-thumb:hover": {
-		bg: "$scrollbar-thumb-hover",
+	".list": {
+		scroll: 5,
 	},
 });
 
 export const RowWrapper = styled("div", {
+	m: "unset", // Virtuoso asks for this for performance reasons
+
 	pos: "relative",
-	dflex: "center",
+	d: "flex",
+	justifyContent: "flex-start",
+	alignItems: "center",
 	w: "98%",
 	h: 65,
 	l: 7,
 
-	transition: "$boxShadow",
+	transition: "none",
 	br: 7,
 	p: 7,
 
@@ -120,8 +104,8 @@ export const RowWrapper = styled("div", {
 	},
 
 	"&.selected": {
-		b: "2px solid $selected-border-color",
-		boxShadow: "$bg-selected",
+		transition: "none",
+		boxShadowBorder: { color: "$colors$selected-border", width: 2 },
 		bg: "$bg-selected",
 	},
 
@@ -137,6 +121,8 @@ export const RowWrapper = styled("div", {
 });
 
 export const Footer = styled("div", {
+	m: "unset", // Virtuoso asks for this for performance reasons
+
 	pos: "relative",
 	size: 10,
 
@@ -144,6 +130,8 @@ export const Footer = styled("div", {
 });
 
 export const EmptyList = styled("div", {
+	m: "unset", // Virtuoso asks for this for performance reasons
+
 	pos: "relative",
 	dflex: "center",
 	size: "95%",

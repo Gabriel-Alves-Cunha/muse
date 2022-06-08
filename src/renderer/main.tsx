@@ -6,7 +6,9 @@ import { App } from "./App";
 
 globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
 
-// @ts-ignore Setting Virtuoso log level
+// import { isDevelopment } from "@common/utils";
+// import { LogLevel } from "react-virtuoso";
+// // @ts-ignore Setting Virtuoso log level
 // if (isDevelopment) globalThis.VIRTUOSO_LOG_LEVEL = LogLevel.DEBUG;
 
 const container = document.getElementById("root") as HTMLElement;

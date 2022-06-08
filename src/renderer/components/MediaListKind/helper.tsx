@@ -1,4 +1,4 @@
-import type { Media, Mutable, Path } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
@@ -7,13 +7,13 @@ import { Dialog } from "@radix-ui/react-dialog";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
-import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { TooltipButton } from "@components/TooltipButton";
 import { DialogTrigger } from "@components/Dialog";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
+import { dbg } from "@common/utils";
 
 import { RowWrapper, SubTitle, Title, Info, Img } from "./styles";
 import { StyledOverlay } from "./MediaOptions/styles";
@@ -21,34 +21,47 @@ import { StyledOverlay } from "./MediaOptions/styles";
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
-const allSelectedMedias: Set<Path> = new Set();
+export const allSelectedMedias: Set<Path> = new Set();
 
-export const useFromList = create(() => ({
-	fromList: PlaylistList.MAIN_LIST,
+type FromList = {
+	fromList: Exclude<
+		PlaylistList,
+		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+	>;
+	homeList: Extract<
+		PlaylistList,
+		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+	>;
+	isHome: boolean;
+};
+export const useFromList = create<FromList>(() => ({
 	homeList: PlaylistList.MAIN_LIST,
+	fromList: PlaylistList.FAVORITES,
+	isHome: true,
 }));
 export const { getState: getFromList, setState: setFromList } = useFromList;
 
 const Row = memo(
 	({ media, path }: RowProps) => {
 		const mediaRowRef = useRef<HTMLDivElement>(null);
-		const isSelected = useRef(false).current;
-
-		useOnClickOutside(
-			mediaRowRef,
-			// Deselect:
-			() => isSelected && allSelectedMedias.delete(path),
-		);
 
 		return (
-			<RowWrapper
-				onClick={event =>
-					toggleMediaSelectIfCtrlPlusLeftClick(event, isSelected, path)
-				}
-				ref={mediaRowRef}
-			>
+			<RowWrapper ref={mediaRowRef}>
 				<TooltipButton
-					onClick={() => playThisMedia(path, getFromList().fromList)}
+					onClick={e => {
+						const doContinueAndPlay = toggleMediaSelectIfCtrlPlusLeftClick(
+							e,
+							mediaRowRef,
+							path,
+						);
+
+						if (doContinueAndPlay) {
+							const { fromList, homeList, isHome } = getFromList();
+							const list = isHome ? homeList : fromList;
+
+							playThisMedia(path, list);
+						}
+					}}
 					tooltip="Play this media"
 					className="play"
 				>
@@ -88,38 +101,42 @@ Row.displayName = "Row";
 
 const leftClick = 0;
 const toggleMediaSelectIfCtrlPlusLeftClick = (
-	e: Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>,
-	isSelected: Mutable<boolean>,
+	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
+	mediaRowRef: Readonly<React.RefObject<HTMLDivElement>>,
 	mediaPath: Readonly<Path>,
-) => {
-	if (!e.ctrlKey || e.button !== leftClick) return;
+): boolean => {
+	if (!e.ctrlKey || e.button !== leftClick || !mediaRowRef.current) return true;
 
-	e.preventDefault();
-	e.stopPropagation();
+	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cBEFORE", "color:blue", {
+		e,
+		mediaPath,
+		allSelectedMediasSize: allSelectedMedias.size,
+	});
+
+	const rowElement = mediaRowRef.current;
 
 	if (allSelectedMedias.has(mediaPath)) {
-		console.assert(isSelected, "isSelected should be true");
-
 		// Remove className "selected":
-		e.currentTarget.classList.remove("selected");
+		rowElement.classList.remove("selected");
 
 		// Remove media from the set:
 		allSelectedMedias.delete(mediaPath);
-
-		// Set the `isSelected` ref to false:
-		isSelected = false;
 	} else {
-		console.assert(!isSelected, "isSelected should be false");
-
 		// Add className "selected":
-		e.currentTarget.classList.add("selected");
+		rowElement.classList.add("selected");
 
 		// Add media to the set:
 		allSelectedMedias.add(mediaPath);
-
-		// Set the `isSelected` ref to false:
-		isSelected = true;
 	}
+
+	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cAFTER", "color:green", {
+		e,
+		allSelectedMedias,
+		allSelectedMediasSize: allSelectedMedias.size,
+		rowElement,
+	});
+
+	return false;
 };
 
 export const computeItemKey = (_index: number, [path]: [Path, Media]) => path;

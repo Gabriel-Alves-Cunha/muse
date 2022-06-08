@@ -6,13 +6,14 @@ export const MainArea = styled("div", {
 	position: "relative",
 	d: "inline-block",
 	alignSelf: "stretch", // for grid: column
-
 	size: "100%",
+
+	p: "5%",
+	pt: 0,
 
 	"@sm": {
 		header: {
 			justifyContent: "center",
-			ml: 0,
 		},
 	},
 });

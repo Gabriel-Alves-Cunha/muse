@@ -152,6 +152,8 @@ export function playNextMedia(): void {
 
 			let index = 0;
 			for (const newPath of list.keys()) {
+				console.log({ index, randomIndex, newPath });
+
 				if (index === randomIndex) {
 					nextMediaPath = newPath;
 					break;
@@ -162,6 +164,7 @@ export function playNextMedia(): void {
 			let found = false;
 
 			for (const newPath of list.keys()) {
+				console.log({ found, nextMediaPath, newPath });
 				if (found) {
 					nextMediaPath = newPath;
 					break;
@@ -185,6 +188,8 @@ export function playNextMedia(): void {
 			type: WhatToDo.UPDATE_HISTORY,
 			path: nextMediaPath,
 		});
+
+		console.log("nextMediaPath at playNextMedia() =", nextMediaPath);
 
 		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
 	}, "playNextMedia");

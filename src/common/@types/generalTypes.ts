@@ -31,6 +31,10 @@ export type DownloadInfo = Readonly<{
 	url: string;
 }>;
 
+export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
+
+export type TypeOfMap<T> = T extends Map<infer K, infer V> ? [K, V][] : never;
+
 export type Values<Obj> = Obj[keyof Obj];
 
 export type OneOf<T> = keyof T;

@@ -40,7 +40,7 @@ describe("Testing useCurrentPlaying", () => {
 			whatToDo: PlaylistActions.CLEAN,
 			type: WhatToDo.UPDATE_HISTORY,
 		});
-		expect(history().length).toBe(0);
+		expect(history().size).toBe(0);
 	});
 
 	it("should set the currentPlaying media", () => {
@@ -66,7 +66,7 @@ describe("Testing useCurrentPlaying", () => {
 		).toBe(testArray[initialIndex]![0]);
 
 		testArray.forEach((_, index) => {
-			expect(history().length, "history.length is wrong!").toBe(index + 1);
+			expect(history().size, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
 

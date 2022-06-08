@@ -1,20 +1,30 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
+import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
-import { useMemo } from "react";
+import useTilg from "tilg";
 
-import { usePlaylists, getPlaylist } from "@contexts/mediaHandler/usePlaylists";
+import { assertUnreachable, time } from "@utils/utils";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
-import { time } from "@utils/utils";
+import { dbg } from "@common/utils";
+import {
+	usePlaylists,
+	PlaylistList,
+	getPlaylist,
+	MainList,
+	History,
+} from "@contexts/mediaHandler/usePlaylists";
 import {
 	computeItemKey,
 	reloadWindow,
 	itemContent,
 	useFromList,
+	allSelectedMedias,
 } from "./helper";
 
-import { ListWrapper, EmptyList, Footer } from "./styles";
+import { ListWrapper, EmptyList, Footer, RowWrapper } from "./styles";
 import { ErrorFallback } from "../ErrorFallback";
 
 // href="https://www.flaticon.com/free-icons/error" =>
@@ -35,46 +45,85 @@ export const MediaListKind = ({ isHome }: Props) => (
 );
 
 function MediaListKind_({ isHome = false }: Props) {
+	const listRef = useRef<HTMLDivElement>(null);
 	const { fromList, homeList } = useFromList();
-	const {
-		sortedByName: mainList,
-		sortedByDate,
-		favorites,
-		history,
-	} = usePlaylists();
+
+	useTilg(listRef, fromList, homeList);
+
+	useOnClickOutside(
+		listRef,
+		// Deselect all medias:
+		() => {
+			dbg("useOnClickOutside");
+			if (allSelectedMedias.size > 0 && listRef.current) {
+				// mediaRowRef.current?.classList.remove("selected");
+				document
+					.querySelectorAll(`.${RowWrapper.className}`)
+					.forEach(item => item.classList.remove("selected"));
+				allSelectedMedias.clear();
+			}
+		},
+	);
+
+	useEffect(() => {
+		useFromList.setState({ isHome });
+	}, [isHome]);
+
+	// isHome is used to determine which list to use
+	// when the user is at the home page, the homeList is used
+	// then, cause it will have what the user has last set as the main list:
+	// either sortedByDate or sortedByName, in our current case.
+	const listName = isHome ? homeList : fromList;
+	const { [listName]: list } = usePlaylists();
 
 	const listAsArrayOfAMap: [Path, Media][] = useMemo(
 		() =>
 			time(() => {
-				// isHome is used to determine which list to use
-				// when the user is at the home page, the homeList is used
-				// then, cause it will have what the user has last set as the main list:
-				// either sortedByDate or sortedByName, in our current case.
-				const list = getPlaylist(isHome ? homeList : fromList);
+				switch (listName) {
+					case PlaylistList.MAIN_LIST:
+						return [...(list as MainList)];
 
-				// Since the ONLY list that is a Map is
-				// the mainList, we can take a shortcut:
-				if (list instanceof Map) return [...mainList];
+					case PlaylistList.SORTED_BY_DATE:
+					case PlaylistList.FAVORITES: {
+						const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
 
-				const listAsArrayOfAMap: [Path, Media][] = [];
+						const listAsArrayOfAMap: [Path, Media][] = [];
 
-				list.forEach(path => {
-					const media = mainList.get(path);
+						(list as Set<Path>).forEach(path => {
+							const media = mainList.get(path);
 
-					media && listAsArrayOfAMap.push([path, media]);
-				});
+							media && listAsArrayOfAMap.push([path, media]);
+						});
 
-				return listAsArrayOfAMap;
+						return listAsArrayOfAMap;
+					}
+
+					case PlaylistList.HISTORY: {
+						const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
+
+						const listAsArrayOfAMap: [Path, Media][] = [];
+
+						if (fromList === PlaylistList.HISTORY) {
+							(list as History).forEach((_, path) => {
+								// TODO: handle how to show history items:
+								const media = mainList.get(path);
+
+								media && listAsArrayOfAMap.push([path, media]);
+							});
+						}
+
+						return listAsArrayOfAMap;
+					}
+
+					default:
+						return assertUnreachable(listName);
+				}
 			}, "listAsArrayOfAMap"),
-		// Disable cause we need to listen to all the lists cause
-		// we don't know wich one it is; wish I'd find a better
-		// way to make it dynamic...
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[mainList, favorites, history, sortedByDate, fromList, isHome, homeList],
+		[listName, list, fromList],
 	);
 
 	return (
-		<ListWrapper>
+		<ListWrapper ref={listRef}>
 			<Virtuoso
 				components={{
 					EmptyPlaceholder: () => (

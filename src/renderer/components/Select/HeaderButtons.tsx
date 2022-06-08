@@ -5,7 +5,7 @@ import { Viewport, Item, ItemIndicator } from "./styles";
 
 export function HeaderButtons() {
 	return (
-		<Viewport>
+		<Viewport className="notransition">
 			<Item value="Name">
 				<ItemText>Name</ItemText>
 

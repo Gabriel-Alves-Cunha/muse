@@ -1,8 +1,8 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { getDownloadingList, setDownloadingList } from "@contexts/downloadList";
-import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { getConvertingList, setConvertingList } from "@contexts/convertList";
+import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@modules/Downloading";
 import { ProgressStatus } from "@common/enums";
@@ -66,11 +66,11 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED: {
 			dbg("New download created.");
 
-			const downloadingList_ = getDownloadingList();
+			const { downloadingList } = getDownloadingList();
 			// In here, there has to be a download WAITING:
-			const download = downloadingList_.get(msg.url);
+			const download = downloadingList.get(msg.url);
 
-			dbg({ downloadingList_, url: msg.url, download });
+			dbg({ downloadingList_: downloadingList, url: msg.url, download });
 
 			if (!download) {
 				console.error(
@@ -79,23 +79,23 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setDownloadingList(
-				downloadingList_.set(msg.url, {
+			setDownloadingList({
+				downloadingList: downloadingList.set(msg.url, {
 					...download,
 					status: ProgressStatus.ACTIVE,
 				}),
-			);
+			});
 			break;
 		}
 
 		case ElectronToReactMessageEnum.NEW_COVERSION_CREATED: {
 			dbg("New conversion created.");
 
-			const convertingList_ = getConvertingList();
+			const { convertingList } = getConvertingList();
 			// In here, there has to be a conversion WAITING:
-			const convertingMedia = convertingList_.get(msg.path);
+			const convertingMedia = convertingList.get(msg.path);
 
-			dbg({ convertingList_, path: msg.path, convertingMedia });
+			dbg({ convertingList_: convertingList, path: msg.path, convertingMedia });
 
 			// In here, there has to be a conversion WAITING
 			if (!convertingMedia) {
@@ -105,23 +105,23 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setConvertingList(
-				convertingList_.set(msg.path, {
+			setConvertingList({
+				convertingList: convertingList.set(msg.path, {
 					...convertingMedia,
 					status: ProgressStatus.ACTIVE,
 				}),
-			);
+			});
 			break;
 		}
 
 		case ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED: {
 			console.error("Create conversion failed!");
 
-			const convertingList_ = getConvertingList();
+			const { convertingList } = getConvertingList();
 			// In here, there has to be a conversion WAITING
-			const convertingMedia = convertingList_.get(msg.path);
+			const convertingMedia = convertingList.get(msg.path);
 
-			dbg({ convertingList_, path: msg.path, convertingMedia });
+			dbg({ convertingList_: convertingList, path: msg.path, convertingMedia });
 
 			if (!convertingMedia) {
 				console.error(
@@ -130,23 +130,23 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setConvertingList(
-				convertingList_.set(msg.path, {
+			setConvertingList({
+				convertingList: convertingList.set(msg.path, {
 					...convertingMedia,
 					status: ProgressStatus.FAILED,
 				}),
-			);
+			});
 			break;
 		}
 
 		case ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED: {
 			console.error("Download failed!");
 
-			const downloadingList_ = getDownloadingList();
+			const { downloadingList } = getDownloadingList();
 			// In here, there has to be a download WAITING:
-			const download = downloadingList_.get(msg.url);
+			const download = downloadingList.get(msg.url);
 
-			dbg({ downloadingList_, url: msg.url, download });
+			dbg({ downloadingList_: downloadingList, url: msg.url, download });
 
 			if (!download) {
 				console.error(
@@ -155,12 +155,12 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setDownloadingList(
-				downloadingList_.set(msg.url, {
+			setDownloadingList({
+				downloadingList: downloadingList.set(msg.url, {
 					...download,
 					status: ProgressStatus.FAILED,
 				}),
-			);
+			});
 			break;
 		}
 

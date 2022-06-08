@@ -6,10 +6,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
 mockGlobalsBeforeTests();
-
-import { numberOfMedias, testList, testArray } from "./fakeTestList";
 import { formatDuration } from "@common/utils";
 import { getRandomInt } from "@utils/utils";
+import {
+	numberOfMedias,
+	firstMediaPath,
+	testArray,
+	testList,
+} from "./fakeTestList";
 import {
 	PlaylistActions,
 	PlaylistList,
@@ -42,7 +46,7 @@ const cleanHistory = () => {
 		whatToDo: PlaylistActions.CLEAN,
 		type: WhatToDo.UPDATE_HISTORY,
 	});
-	expect(history().length).toBe(0);
+	expect(history().size).toBe(0);
 };
 
 const cleanFavorites = () => {
@@ -80,12 +84,9 @@ it("should play the next media", () => {
 		expect(favorites().size, "favorites.size at the start should be 0!").toBe(
 			0,
 		);
-		expect(history().length, "history.length at the start should be 0!").toBe(
-			0,
-		);
+		expect(history().size, "history.length at the start should be 0!").toBe(0);
 
 		// Set currentPlaying to first media:
-		const firstMediaPath = testArray[0]![0];
 		expect(
 			firstMediaPath,
 			`There should be a firstMediaPath = "${firstMediaPath}"!`,
@@ -96,37 +97,34 @@ it("should play the next media", () => {
 			currentPlaying().path,
 			"currentPlaying().path should be equal to firstMediaPath!",
 		).toBe(firstMediaPath);
-		expect(history().length, "history().length should be 1 here!").toBe(1);
+		expect(history().size, "history().length should be 1 here!").toBe(1);
 	}
 
-	for (let index = 1; index < numberOfMedias; ++index) {
+	// The very firstMediaPath has index = 0.
+	for (let index = 0; index < numberOfMedias; ++index) {
 		// If is the last media, it is going
 		// to go back to the first one:
-		const newIndex = index === numberOfMedias - 1 ? 0 : index + 1;
+		const nextIndex = index === numberOfMedias - 1 ? 0 : index + 1;
 
-		const prevMediaPath = testArray[index === 1 ? 0 : index]![0];
-		const expectedMediaPath = testArray[newIndex]![0];
+		const currMediaPath = testArray[index]![0];
+		const expectedMediaPath = testArray[nextIndex]![0];
 
 		expect(
 			currentPlaying().path,
-			`\ncurrentPlaying().path before playing the next media should be the prevMediaPath = "${prevMediaPath}"!\n`,
-		).toBe(prevMediaPath);
+			`\ncurrentPlaying().path before playing the next media should be the prevMediaPath = "${currMediaPath}"!\n`,
+		).toBe(currMediaPath);
 
 		playNextMedia();
 
 		expect(
 			currentPlaying().path,
-			`currentPlaying().path after playing the next media should be the expectedMediaPath = "${expectedMediaPath}".\nprevMediaPath = "${prevMediaPath}"!\n`,
+			`currentPlaying().path after playing the next media should be the expectedMediaPath = "${expectedMediaPath}".\nprevMediaPath = "${currMediaPath}"!\n`,
 		).toBe(expectedMediaPath);
 	}
 
-	// Should have updated the history list:
-	// The extra 1 is because it's gonna turn back
-	// to the first media when it reachs the end;
-	expect(
-		history().length,
-		`history().length should be ${numberOfMedias + 1}!`,
-	).toBe(numberOfMedias + 1);
+	expect(history().size, `history().length should be ${numberOfMedias}!`).toBe(
+		numberOfMedias,
+	);
 });
 
 it("should play a chosen media", () => {
@@ -151,8 +149,8 @@ describe("Testing PlaylistEnum.UPDATE_HISTORY", () => {
 		});
 
 		const newHistory = history();
-		expect(newHistory[0]).toBe(mediaPathToAdd);
-		expect(newHistory.length).toBe(1);
+		expect([...newHistory][0]?.[0]).toBe(mediaPathToAdd);
+		expect(newHistory.size).toBe(1);
 	});
 });
 
@@ -236,7 +234,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 	it("(PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH) should remove one media of mainList", () => {
 		expect(mainList().size).toBe(numberOfMedias);
 		expect(favorites().size).toBe(0);
-		expect(history().length).toBe(0);
+		expect(history().size).toBe(0);
 
 		const anyIndex = getRandomInt(0, numberOfMedias);
 		const [path] = testArray[anyIndex]!;

@@ -7,6 +7,6 @@ export const Header = styled("header", {
 	alignItems: "center",
 	h: 60,
 
-	p: "0 5%",
+	mb: "5%",
 	mt: 10,
 });
