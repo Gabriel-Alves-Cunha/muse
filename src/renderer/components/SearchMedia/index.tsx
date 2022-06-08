@@ -4,12 +4,10 @@ import { InputAndResults } from "./helper";
 
 import { SearchWrapper } from "./styles";
 
-export function SearchMedia() {
-	return (
-		<SearchWrapper>
-			<SearchIcon size={17} />
+export const SearchMedia = () => (
+	<SearchWrapper>
+		<SearchIcon size={17} />
 
-			<InputAndResults />
-		</SearchWrapper>
-	);
-}
+		<InputAndResults />
+	</SearchWrapper>
+);

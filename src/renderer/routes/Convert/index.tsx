@@ -18,21 +18,22 @@ export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const handleSelectedFiles = ({
+	function handleSelectedFiles({
 		target: { files },
-	}: ChangeEvent<HTMLInputElement>) => {
+	}: ChangeEvent<HTMLInputElement>) {
 		if (!files) return;
 
 		const paths: Path[] = [];
 		for (const file of files) paths.push(file.path);
 
 		setSelectedMediasPath(paths);
-	};
+	}
 
-	const handleClick = () => inputRef.current?.click();
+	const openChooseFilesNativeUI = () => inputRef.current?.click();
 
+	// Start converting
 	useEffect(() => {
-		const convertTo = () => {
+		function convertTo() {
 			const { convertInfoList } = getConvertInfoList();
 
 			selectedMediasPath.forEach(path =>
@@ -42,11 +43,11 @@ export function Convert() {
 				}),
 			);
 
-			// Start convert:
+			// To start convert, add to the convertInfoList:
 			setConvertInfoList({ convertInfoList });
 
 			setSelectedMediasPath([]);
-		};
+		}
 
 		// If there is selected files, convert them:
 		if (selectedMediasPath.length > 0) convertTo();
@@ -54,7 +55,7 @@ export function Convert() {
 
 	return (
 		<MainArea>
-			<BorderedButton onClick={handleClick}>
+			<BorderedButton onClick={openChooseFilesNativeUI}>
 				<input
 					onInput={handleSelectedFiles}
 					accept="video/*,audio/*"

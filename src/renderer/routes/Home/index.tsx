@@ -4,21 +4,19 @@ import { SearchMedia } from "@components/SearchMedia";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
-export function Home() {
-	return (
-		<MainArea>
-			<Header>
-				<SearchMedia />
+export const Home = () => (
+	<MainArea>
+		<Header>
+			<SearchMedia />
 
-				<ButtonGroup
-					buttons={{
-						reload: true,
-						sortBy: true,
-					}}
-				/>
-			</Header>
+			<ButtonGroup
+				buttons={{
+					reload: true,
+					sortBy: true,
+				}}
+			/>
+		</Header>
 
-			<MediaListKind isHome />
-		</MainArea>
-	);
-}
+		<MediaListKind isHome />
+	</MainArea>
+);

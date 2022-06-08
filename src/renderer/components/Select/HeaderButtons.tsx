@@ -3,24 +3,22 @@ import { ItemText } from "@radix-ui/react-select";
 
 import { Viewport, Item, ItemIndicator } from "./styles";
 
-export function HeaderButtons() {
-	return (
-		<Viewport className="notransition">
-			<Item value="Name">
-				<ItemText>Name</ItemText>
+export const HeaderButtons = () => (
+	<Viewport className="notransition">
+		<Item value="Name">
+			<ItemText>Name</ItemText>
 
-				<ItemIndicator>
-					<CheckIcon />
-				</ItemIndicator>
-			</Item>
+			<ItemIndicator>
+				<CheckIcon />
+			</ItemIndicator>
+		</Item>
 
-			<Item value="Date">
-				<ItemText>Date</ItemText>
+		<Item value="Date">
+			<ItemText>Date</ItemText>
 
-				<ItemIndicator>
-					<CheckIcon />
-				</ItemIndicator>
-			</Item>
-		</Viewport>
-	);
-}
+			<ItemIndicator>
+				<CheckIcon />
+			</ItemIndicator>
+		</Item>
+	</Viewport>
+);

@@ -28,7 +28,7 @@ export const Decorations = () => (
 			<img src={imageUrl.href} width={24} height={24} alt="Muse's logo" />
 		</AppIcon>
 
-		<AppName_Folder />
+		<AppNamePlusFolder />
 
 		<Buttons />
 	</Wrapper>
@@ -65,7 +65,7 @@ const Buttons = () => (
 	</WindowButtons>
 );
 
-const AppName_Folder = () => {
+function AppNamePlusFolder() {
 	const { page } = usePage();
 
 	return (
@@ -73,4 +73,4 @@ const AppName_Folder = () => {
 			{capitalizedAppName} • {page}
 		</AppName_Folder_Wrapper>
 	);
-};
+}

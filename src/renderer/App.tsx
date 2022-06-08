@@ -54,11 +54,11 @@ const Main = () => (
 	</Content>
 );
 
-const PageToShow = () => {
+function PageToShow() {
 	const { page } = usePage();
 
 	return pages[page];
-};
+}
 
 const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Favorites: <Favorites />,

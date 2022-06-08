@@ -348,7 +348,9 @@ export enum PlaylistList {
 	HISTORY = "history",
 }
 
-export const getPlaylist = (list: Readonly<PlaylistList>) => {
+export function getPlaylist(
+	list: Readonly<PlaylistList>,
+): Set<string> | MainList | History {
 	switch (list) {
 		case PlaylistList.MAIN_LIST:
 			return mainList();
@@ -365,7 +367,7 @@ export const getPlaylist = (list: Readonly<PlaylistList>) => {
 		default:
 			return assertUnreachable(list);
 	}
-};
+}
 
 export const cleanHistory = () =>
 	setPlaylists({
@@ -381,9 +383,9 @@ export const cleanFavorites = () =>
 
 export async function searchLocalComputerForMedias() {
 	time(async () => {
-		usePlaylists.setState({ isLoadingMedias: true });
-
 		try {
+			usePlaylists.setState({ isLoadingMedias: true });
+
 			const paths = getAllowedMedias(await searchDirectoryResult());
 			const newMainList: MainList = new Map(
 				await transformPathsToMedias(paths),
@@ -409,8 +411,8 @@ export async function searchLocalComputerForMedias() {
 	}, "searchLocalComputerForMedias");
 }
 
-export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
-	return time(() => {
+export const searchMedia = (searchTerm_: Readonly<string>): [Path, Media][] =>
+	time(() => {
 		const searchTerm = searchTerm_.toLowerCase();
 		const medias: [Path, Media][] = [];
 
@@ -422,7 +424,6 @@ export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 
 		return medias;
 	}, `searchMedia(${searchTerm_})`);
-}
 
 export async function deleteMedia(path: Path) {
 	setPlaylists({

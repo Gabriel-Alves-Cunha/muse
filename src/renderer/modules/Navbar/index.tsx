@@ -26,7 +26,7 @@ export const Navbar = () => (
 
 		<ButtonsForPages />
 
-		<Popups >
+		<Popups>
 			<Converting />
 
 			<Downloading />
@@ -43,14 +43,14 @@ const icons: Record<Page, JSX.Element> = Object.freeze({
 	Home: <Home />,
 });
 
-const ButtonsForPages = () => {
+function ButtonsForPages() {
 	const currPage = usePage().page;
 
 	return (
 		<Buttons>
 			{pages.map(page => (
 				<TooltipButton
-					className={(page === currPage ? "active" : "")}
+					className={page === currPage ? "active" : ""}
 					onClick={() => setPage({ page })}
 					tooltip={`Go to ${page}`}
 					tooltip-side="right"
@@ -61,4 +61,4 @@ const ButtonsForPages = () => {
 			))}
 		</Buttons>
 	);
-};
+}

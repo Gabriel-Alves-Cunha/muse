@@ -57,7 +57,7 @@ const toggleFavorite = (path?: Path) =>
 		path,
 	});
 
-export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
+export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
 
 	return (
@@ -84,7 +84,7 @@ export const ControlsAndSeeker = ({ audio }: RefToAudio) => {
 			</ControlsButtonsWrapper>
 		</ControlsAndSeekerContainer>
 	);
-};
+}
 
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
@@ -137,7 +137,7 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 	</ControlsWrapper>
 );
 
-const seek = (e: SeekEvent, audio: Audio) => {
+function seek(e: SeekEvent, audio: Audio): void {
 	if (!audio || !audio.duration) return;
 
 	const width = Number(
@@ -147,7 +147,7 @@ const seek = (e: SeekEvent, audio: Audio) => {
 	const desiredTime = (clickX / width) * audio.duration;
 
 	audio.currentTime = desiredTime;
-};
+}
 
 const { floor } = Math;
 
@@ -155,6 +155,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 	const { percentage, currentTime } = useProgress();
+
 	const duration = audio?.duration;
 
 	const { formatedDuration, isDurationValid } = useMemo(

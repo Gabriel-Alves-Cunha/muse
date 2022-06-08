@@ -1,6 +1,6 @@
-export const getFirstKey = <Key>(
+export function getFirstKey<Key>(
 	mapOrSet: Map<Key, unknown> | Set<Key>,
-): Key | undefined => {
+): Key | undefined {
 	let ret: Key | undefined;
 
 	for (const key of mapOrSet.keys()) {
@@ -9,7 +9,7 @@ export const getFirstKey = <Key>(
 	}
 
 	return ret;
-};
+}
 
 const getLastIn =
 	(iteratorFn: "entries" | "keys" | "values") =>

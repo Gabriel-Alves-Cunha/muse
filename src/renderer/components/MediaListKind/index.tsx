@@ -3,7 +3,6 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
-import useTilg from "tilg";
 
 import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
@@ -17,11 +16,11 @@ import {
 	History,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
+	allSelectedMedias,
 	computeItemKey,
 	reloadWindow,
 	itemContent,
 	useFromList,
-	allSelectedMedias,
 } from "./helper";
 
 import { ListWrapper, EmptyList, Footer, RowWrapper } from "./styles";
@@ -45,29 +44,8 @@ export const MediaListKind = ({ isHome }: Props) => (
 );
 
 function MediaListKind_({ isHome = false }: Props) {
-	const listRef = useRef<HTMLDivElement>(null);
 	const { fromList, homeList } = useFromList();
-
-	useTilg(listRef, fromList, homeList);
-
-	useOnClickOutside(
-		listRef,
-		// Deselect all medias:
-		() => {
-			dbg("useOnClickOutside");
-			if (allSelectedMedias.size > 0 && listRef.current) {
-				// mediaRowRef.current?.classList.remove("selected");
-				document
-					.querySelectorAll(`.${RowWrapper.className}`)
-					.forEach(item => item.classList.remove("selected"));
-				allSelectedMedias.clear();
-			}
-		},
-	);
-
-	useEffect(() => {
-		useFromList.setState({ isHome });
-	}, [isHome]);
+	const listRef = useRef<HTMLDivElement>(null);
 
 	// isHome is used to determine which list to use
 	// when the user is at the home page, the homeList is used
@@ -121,6 +99,25 @@ function MediaListKind_({ isHome = false }: Props) {
 			}, "listAsArrayOfAMap"),
 		[listName, list, fromList],
 	);
+
+	useOnClickOutside(
+		listRef,
+		// Deselect all medias:
+		() => {
+			dbg("useOnClickOutside");
+			if (allSelectedMedias.size > 0 && listRef.current) {
+				// mediaRowRef.current?.classList.remove("selected");
+				document
+					.querySelectorAll(`.${RowWrapper.className}`)
+					.forEach(item => item.classList.remove("selected"));
+				allSelectedMedias.clear();
+			}
+		},
+	);
+
+	useEffect(() => {
+		useFromList.setState({ isHome });
+	}, [isHome]);
 
 	return (
 		<ListWrapper ref={listRef}>

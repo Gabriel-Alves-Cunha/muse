@@ -8,14 +8,12 @@ const notify =
 const toggleDeveloperTools = () =>
 	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS);
 
-export const MainCtxMenu = () => {
-	return (
-		<>
-			<Separator />
+export const MainCtxMenu = () => (
+	<>
+		<Separator />
 
-			<Item onClick={toggleDeveloperTools}>
-				Toggle Developer Tools <RightSlot>Ctrl+Shift+i</RightSlot>
-			</Item>
-		</>
-	);
-};
+		<Item onClick={toggleDeveloperTools}>
+			Toggle Developer Tools <RightSlot>Ctrl+Shift+i</RightSlot>
+		</Item>
+	</>
+);

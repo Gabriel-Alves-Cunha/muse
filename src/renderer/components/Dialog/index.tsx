@@ -5,17 +5,15 @@ import { Trigger, type DialogTriggerProps } from "@radix-ui/react-dialog";
 import { TooltipButton_ } from "@components/TooltipButton";
 import { styled } from "@styles/global";
 
-export function DialogTrigger({
+export const DialogTrigger = ({
 	"data-tooltip": dataTooltip,
-	children,
 	"tooltip-side": tooltipSide,
-}: Props) {
-	return (
-		<StyledTrigger tooltip-side={tooltipSide} data-tooltip={dataTooltip}>
-			{children}
-		</StyledTrigger>
-	);
-}
+	children,
+}: Props) => (
+	<StyledTrigger tooltip-side={tooltipSide} data-tooltip={dataTooltip}>
+		{children}
+	</StyledTrigger>
+);
 
 const StyledTrigger = styled(Trigger, {
 	position: "relative",

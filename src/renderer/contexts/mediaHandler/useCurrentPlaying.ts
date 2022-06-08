@@ -81,7 +81,7 @@ export function pause(audio?: HTMLAudioElement): void {
 	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
 }
 
-export function playPreviousMedia() {
+export function playPreviousMedia(): void {
 	time(() => {
 		const { path, listType } = currentPlaying();
 

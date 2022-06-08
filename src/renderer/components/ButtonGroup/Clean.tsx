@@ -9,20 +9,18 @@ import {
 	PlaylistList,
 } from "@contexts/mediaHandler/usePlaylists";
 
-export function Clean({ className }: Props) {
-	return (
-		<TooltipButton
-			onClick={handleOnClick}
-			className={className}
-			tooltip="Clean list"
-			type="button"
-		>
-			<CleanIcon size={18} />
-		</TooltipButton>
-	);
-}
+export const Clean = ({ className }: Props) => (
+	<TooltipButton
+		onClick={cleanProperList}
+		className={className}
+		tooltip="Clean list"
+		type="button"
+	>
+		<CleanIcon size={18} />
+	</TooltipButton>
+);
 
-const handleOnClick = () => {
+function cleanProperList() {
 	const { fromList } = getFromList();
 
 	switch (fromList) {
@@ -38,7 +36,7 @@ const handleOnClick = () => {
 			assertUnreachable(fromList);
 			break;
 	}
-};
+}
 
 type Props = {
 	className?: string;

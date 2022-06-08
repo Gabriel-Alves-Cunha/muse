@@ -181,7 +181,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	return electronPort;
 }
 
-const cancelDownloadAndOrRemoveItFromList = (url: string) => {
+function cancelDownloadAndOrRemoveItFromList(url: string): void {
 	const { downloadingList } = getDownloadingList();
 
 	{
@@ -204,9 +204,9 @@ const cancelDownloadAndOrRemoveItFromList = (url: string) => {
 
 	// Make React update:
 	setDownloadingList({ downloadingList });
-};
+}
 
-export const cancelConvertionAndOrRemoveItFromList = (path: string) => {
+export function cancelConvertionAndOrRemoveItFromList(path: string): void {
 	const { convertingList } = getConvertingList();
 
 	{
@@ -231,7 +231,7 @@ export const cancelConvertionAndOrRemoveItFromList = (path: string) => {
 
 	// Make React update:
 	setConvertingList({ convertingList });
-};
+}
 
 export function handleDeleteAnimation(
 	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -240,9 +240,12 @@ export function handleDeleteAnimation(
 	key: string,
 ) {
 	const className = `.${ItemWrapper.className}`;
+
 	const items = document.querySelectorAll(
 		className,
 	) as NodeListOf<HTMLDivElement>;
+
+	//////////////////////////////////////////
 
 	for (const [itemIndex, item] of items.entries()) {
 		if (itemIndex <= downloadingOrConvertionIndex) continue;
@@ -250,10 +253,14 @@ export function handleDeleteAnimation(
 		item.classList.add("move-up");
 	}
 
+	//////////////////////////////////////////
+
 	const thisItem = (e.target as HTMLElement).closest(
 		className,
 	) as HTMLDivElement;
+
 	thisItem.classList.add("delete");
+
 	thisItem.addEventListener("animationend", () => {
 		if (isDownloadList) cancelDownloadAndOrRemoveItFromList(key);
 		else cancelConvertionAndOrRemoveItFromList(key);

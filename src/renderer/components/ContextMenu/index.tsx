@@ -23,7 +23,7 @@ export const ContextMenu = ({ children, content = MAIN }: Props) => (
 	</Root>
 );
 
-const contentToShow = (content: NonNullable<Props["content"]>) => {
+function contentToShow(content: NonNullable<Props["content"]>) {
 	switch (content) {
 		case FULL_EXAMPLE:
 			return <FullExampleCtxMenu />;
@@ -34,7 +34,7 @@ const contentToShow = (content: NonNullable<Props["content"]>) => {
 		default:
 			return assertUnreachable(content);
 	}
-};
+}
 
 type Props = {
 	content?: ContentEnum;

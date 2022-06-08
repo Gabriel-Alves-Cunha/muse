@@ -11,7 +11,7 @@ export enum ContentEnum {
 
 const { HEADER_BUTTONS } = ContentEnum;
 
-export function Select<Options extends string>({
+export const Select = <Options extends string>({
 	"data-tooltip": dataTooltip,
 	content = HEADER_BUTTONS,
 	triggerClassName = "",
@@ -19,18 +19,16 @@ export function Select<Options extends string>({
 	children,
 	setValue,
 	value,
-}: Props<Options>) {
-	return (
-		<Root value={value} onValueChange={setValue}>
-			<Trigger className={triggerClassName} data-tooltip={dataTooltip}>
-				<Value>{triggerTitle}</Value>
-				{children}
-			</Trigger>
+}: Props<Options>) => (
+	<Root value={value} onValueChange={setValue}>
+		<Trigger className={triggerClassName} data-tooltip={dataTooltip}>
+			<Value>{triggerTitle}</Value>
+			{children}
+		</Trigger>
 
-			<Content>{contentToShow(content)}</Content>
-		</Root>
-	);
-}
+		<Content>{contentToShow(content)}</Content>
+	</Root>
+);
 
 function contentToShow<Options extends string>(
 	content: NonNullable<Props<Options>["content"]>,

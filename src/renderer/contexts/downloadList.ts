@@ -6,9 +6,9 @@ import { ProgressStatus } from "@common/enums";
 
 // For testing:
 const { port1: testPort } = new MessageChannel();
-const testDownloadingMedias: [MediaUrl, MediaBeingDownloaded][] = Array(10)
-	.fill(null)
-	.map((_, index) => {
+const testDownloadingMedias: [MediaUrl, MediaBeingDownloaded][] = Array.from(
+	{ length: 10 },
+	(_, index) => {
 		const path: MediaUrl = `http://test-${index}.com`;
 		const media: MediaBeingDownloaded = {
 			status: ProgressStatus.ACTIVE,
@@ -20,7 +20,8 @@ const testDownloadingMedias: [MediaUrl, MediaBeingDownloaded][] = Array(10)
 		};
 
 		return [path, media];
-	});
+	},
+);
 
 export const useDownloadingList = create<DownloadingList>(() => ({
 	downloadingList: new Map(testDownloadingMedias),

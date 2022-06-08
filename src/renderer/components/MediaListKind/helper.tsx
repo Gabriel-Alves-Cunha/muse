@@ -21,25 +21,22 @@ import { StyledOverlay } from "./MediaOptions/styles";
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const allSelectedMedias: Set<Path> = new Set();
 
-type FromList = {
-	fromList: Exclude<
-		PlaylistList,
-		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
-	>;
-	homeList: Extract<
-		PlaylistList,
-		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
-	>;
-	isHome: boolean;
-};
 export const useFromList = create<FromList>(() => ({
 	homeList: PlaylistList.MAIN_LIST,
 	fromList: PlaylistList.FAVORITES,
 	isHome: true,
 }));
 export const { getState: getFromList, setState: setFromList } = useFromList;
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 const Row = memo(
 	({ media, path }: RowProps) => {
@@ -108,9 +105,9 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 	if (!e.ctrlKey || e.button !== leftClick || !mediaRowRef.current) return true;
 
 	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cBEFORE", "color:blue", {
-		e,
-		mediaPath,
 		allSelectedMediasSize: allSelectedMedias.size,
+		mediaPath,
+		e,
 	});
 
 	const rowElement = mediaRowRef.current;
@@ -130,10 +127,10 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 	}
 
 	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cAFTER", "color:green", {
-		e,
-		allSelectedMedias,
 		allSelectedMediasSize: allSelectedMedias.size,
+		allSelectedMedias,
 		rowElement,
+		e,
 	});
 
 	return false;
@@ -151,3 +148,15 @@ type RowProps = Readonly<{
 	media: Media;
 	path: Path;
 }>;
+
+type FromList = {
+	fromList: Exclude<
+		PlaylistList,
+		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+	>;
+	homeList: Extract<
+		PlaylistList,
+		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+	>;
+	isHome: boolean;
+};

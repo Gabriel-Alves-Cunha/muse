@@ -32,7 +32,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 	useEffect(() => {
 		const handleKeyUp = ({ key }: KeyboardEvent) =>
 			key === "Enter" &&
-			handleChange(contentWrapperRef, closeButtonRef, path, media);
+			changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
 
 		document.addEventListener("keyup", handleKeyUp);
 
@@ -97,7 +97,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 				<CloseDialog
 					onClick={() =>
-						handleChange(contentWrapperRef, closeButtonRef, path, media)
+						changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media)
 					}
 					id="save-changes"
 				>
@@ -108,10 +108,10 @@ export function MediaOptionsModal({ media, path }: Props) {
 	);
 }
 
-const handleMediaDeletion = async (
+async function handleMediaDeletion(
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	mediaPath: Path,
-) => {
+): Promise<void> {
 	if (closeButtonRef.current)
 		try {
 			dbg("Deleting media...", mediaPath);
@@ -127,19 +127,19 @@ const handleMediaDeletion = async (
 				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
 			);
 		}
-};
+}
 
-const handleChange = (
+function changeMediaMetadata(
 	contentWrapperRef: RefObject<HTMLDivElement>,
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	mediaPath: Path,
 	media: Media,
-) => {
+): void {
 	dbg("handleChange, MediaOptions.tsx");
 
 	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
-			changePropsIfAllowed(contentWrapperRef, mediaPath, media);
+			changeMetadataIfAllowed(contentWrapperRef, mediaPath, media);
 			closeEverything(closeButtonRef);
 
 			successToast("New media metadata has been saved.");
@@ -150,14 +150,15 @@ const handleChange = (
 				"Unable to save new metadata. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
 			);
 		}
-};
+}
 
-function changePropsIfAllowed(
+function changeMetadataIfAllowed(
 	contentWrapper: RefObject<HTMLDivElement>,
 	mediaPath: Path,
 	media: Media,
-) {
+): void {
 	if (contentWrapper.current)
+		// This shit is to get the inputs:
 		for (const children of contentWrapper.current.children)
 			for (const element of children.children)
 				if (element instanceof HTMLInputElement && !element.disabled) {

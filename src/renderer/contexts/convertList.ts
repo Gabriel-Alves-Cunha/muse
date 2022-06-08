@@ -7,9 +7,9 @@ import { ProgressStatus } from "@common/enums";
 
 /** For in-hand testing porpuses: */
 const { port1: testPort } = new MessageChannel();
-const testConvertingMedia: [Path, MediaBeingConverted][] = Array(10)
-	.fill(null)
-	.map((_, index) => {
+const testConvertingMedia: [Path, MediaBeingConverted][] = Array.from(
+	{ length: 10 },
+	(_, index) => {
 		const path: Path = `/home/path/convert-test-${index}.mp4`;
 		const media: MediaBeingConverted = {
 			status: ProgressStatus.ACTIVE,
@@ -21,7 +21,8 @@ const testConvertingMedia: [Path, MediaBeingConverted][] = Array(10)
 		};
 
 		return [path, media];
-	});
+	},
+);
 
 export const useConvertingList = create<ConvertingList>(() => ({
 	convertingList: new Map(testConvertingMedia),

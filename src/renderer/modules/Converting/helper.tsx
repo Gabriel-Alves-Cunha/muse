@@ -29,7 +29,7 @@ export const { setState: setConvertInfoList, getState: getConvertInfoList } =
 export function Popup() {
 	const { convertingList } = getConvertingList();
 
-	const convertBoxes = () => {
+	function convertBoxes(): JSX.Element[] {
 		const list = [];
 
 		let convertionIndex = 0;
@@ -46,7 +46,7 @@ export function Popup() {
 		}
 
 		return list;
-	};
+	}
 
 	return (
 		<>

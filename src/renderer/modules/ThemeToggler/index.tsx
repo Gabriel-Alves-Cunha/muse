@@ -24,18 +24,18 @@ export function ThemeToggler() {
 	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, light);
 	const nextTheme: Themes = theme === light ? dark : light;
 
+	function toggleTheme() {
+		html.classList.remove(availableThemes[theme]);
+		html.classList.add(availableThemes[nextTheme]);
+
+		setTheme(nextTheme);
+	}
+
 	// Only run on firt render
 	useEffect(() => {
 		html.classList.add(availableThemes[theme]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	const toggleTheme = () => {
-		html.classList.remove(availableThemes[theme]);
-		html.classList.add(availableThemes[nextTheme]);
-
-		setTheme(nextTheme);
-	};
 
 	return (
 		<Box>

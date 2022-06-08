@@ -16,13 +16,13 @@ export const { getState: playOptions, setState: setPlayOptions } =
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const toggleLoopMedia = () => {
+export function toggleLoopMedia(): void {
 	const loop = !playOptions().loop;
 
 	(document.getElementById("audio") as HTMLAudioElement).loop = loop;
 
 	setPlayOptions({ loop });
-};
+}
 
 export const toggleRandom = () =>
 	setPlayOptions({ random: !playOptions().random });

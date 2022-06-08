@@ -177,11 +177,7 @@ export function InputAndResults() {
 	);
 }
 
-const Row = ({
-	media: { title, img, duration },
-	highlight,
-	path,
-}: RowProps) => {
+function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
 	const index = title.toLowerCase().indexOf(highlight);
 
 	return (
@@ -207,7 +203,7 @@ const Row = ({
 			</Info>
 		</Result>
 	);
-};
+}
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@ export function ImgWithFallback({
 	Fallback,
 	mediaImg,
 }: Props): JSX.Element {
-	if (!mediaImg?.length) return Fallback;
+	if (!mediaImg || !mediaImg.length) return Fallback;
 
 	const cacheStatus = cache.get(mediaPath);
 

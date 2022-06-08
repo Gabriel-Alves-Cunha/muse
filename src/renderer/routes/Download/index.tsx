@@ -25,7 +25,7 @@ export const Download = () => (
 	</Wrapper>
 );
 
-const SearcherWrapper = () => {
+function SearcherWrapper() {
 	const { error, url } = useSearchInfo();
 
 	useEffect(() => {
@@ -53,15 +53,15 @@ const SearcherWrapper = () => {
 			<p>{error}</p>
 		</SearchWrapper>
 	);
-};
+}
 
-const IsLoading = () => {
+function IsLoading() {
 	const { isLoading } = useSearchInfo();
 
 	return <LoadingWrapper>{isLoading && <Loading />}</LoadingWrapper>;
-};
+}
 
-const Result = () => {
+function Result() {
 	const { result } = useSearchInfo();
 
 	return result ? (
@@ -73,4 +73,4 @@ const Result = () => {
 			<BorderedButton onClick={downloadMedia}>Download</BorderedButton>
 		</ResultContainer>
 	) : null;
-};
+}

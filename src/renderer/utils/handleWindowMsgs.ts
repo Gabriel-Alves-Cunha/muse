@@ -23,6 +23,10 @@ import {
 
 const { transformPathsToMedias } = electron.media;
 
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+
 // listen for files drop
 function listenToDragoverEvent(event: DragEvent) {
 	event.stopPropagation();
@@ -50,6 +54,24 @@ function listenToDropEvent(event: DragEvent) {
 window.addEventListener("dragover", listenToDragoverEvent);
 window.addEventListener("drop", listenToDropEvent);
 
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+
+const {
+	DELETE_ONE_MEDIA_FROM_COMPUTER,
+	CREATE_CONVERSION_FAILED,
+	CREATE_DOWNLOAD_FAILED,
+	CREATE_A_NEW_DOWNLOAD,
+	NEW_COVERSION_CREATED,
+	NEW_DOWNLOAD_CREATED,
+	REFRESH_ALL_MEDIA,
+	REFRESH_ONE_MEDIA,
+	REMOVE_ONE_MEDIA,
+	ADD_ONE_MEDIA,
+	ERROR,
+} = ElectronToReactMessageEnum;
+
 export async function handleWindowMsgs(event: Event): Promise<void> {
 	if (event.data.source !== electronSource) return;
 
@@ -57,13 +79,13 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 	const { msg } = event.data;
 
 	switch (msg.type) {
-		case ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD: {
+		case CREATE_A_NEW_DOWNLOAD: {
 			dbg("Create a new download.");
 			setDownloadInfo(msg.downloadInfo);
 			break;
 		}
 
-		case ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED: {
+		case NEW_DOWNLOAD_CREATED: {
 			dbg("New download created.");
 
 			const { downloadingList } = getDownloadingList();
@@ -88,14 +110,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.NEW_COVERSION_CREATED: {
+		case NEW_COVERSION_CREATED: {
 			dbg("New conversion created.");
 
 			const { convertingList } = getConvertingList();
+			const { path } = msg;
 			// In here, there has to be a conversion WAITING:
-			const convertingMedia = convertingList.get(msg.path);
+			const convertingMedia = convertingList.get(path);
 
-			dbg({ convertingList_: convertingList, path: msg.path, convertingMedia });
+			dbg({ convertingList, path, convertingMedia });
 
 			// In here, there has to be a conversion WAITING
 			if (!convertingMedia) {
@@ -106,7 +129,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setConvertingList({
-				convertingList: convertingList.set(msg.path, {
+				convertingList: convertingList.set(path, {
 					...convertingMedia,
 					status: ProgressStatus.ACTIVE,
 				}),
@@ -114,14 +137,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED: {
+		case CREATE_CONVERSION_FAILED: {
 			console.error("Create conversion failed!");
 
 			const { convertingList } = getConvertingList();
+			const { path } = msg;
 			// In here, there has to be a conversion WAITING
-			const convertingMedia = convertingList.get(msg.path);
+			const convertingMedia = convertingList.get(path);
 
-			dbg({ convertingList_: convertingList, path: msg.path, convertingMedia });
+			dbg({ convertingList, path, convertingMedia });
 
 			if (!convertingMedia) {
 				console.error(
@@ -131,7 +155,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setConvertingList({
-				convertingList: convertingList.set(msg.path, {
+				convertingList: convertingList.set(path, {
 					...convertingMedia,
 					status: ProgressStatus.FAILED,
 				}),
@@ -139,14 +163,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED: {
+		case CREATE_DOWNLOAD_FAILED: {
 			console.error("Download failed!");
 
 			const { downloadingList } = getDownloadingList();
+			const { url } = msg;
 			// In here, there has to be a download WAITING:
-			const download = downloadingList.get(msg.url);
+			const download = downloadingList.get(url);
 
-			dbg({ downloadingList_: downloadingList, url: msg.url, download });
+			dbg({ downloadingList, url, download });
 
 			if (!download) {
 				console.error(
@@ -156,7 +181,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setDownloadingList({
-				downloadingList: downloadingList.set(msg.url, {
+				downloadingList: downloadingList.set(url, {
 					...download,
 					status: ProgressStatus.FAILED,
 				}),
@@ -164,7 +189,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.ADD_ONE_MEDIA: {
+		case ADD_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
@@ -188,7 +213,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER: {
+		case DELETE_ONE_MEDIA_FROM_COMPUTER: {
 			const { mediaPath } = msg;
 
 			dbg("At ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER:", {
@@ -206,16 +231,16 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.REFRESH_ALL_MEDIA: {
+		case REFRESH_ALL_MEDIA: {
 			dbg("Refresh all media.");
 			await searchLocalComputerForMedias();
 			break;
 		}
 
-		case ElectronToReactMessageEnum.REFRESH_ONE_MEDIA: {
+		case REFRESH_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("At ElectronToReactMessageEnum.REFRESH_MEDIA:", { mediaPath });
+			dbg("At REFRESH_ONE_MEDIA:", { mediaPath });
 
 			if (!mainList().has(mediaPath)) {
 				console.warn(
@@ -247,10 +272,10 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.REMOVE_ONE_MEDIA: {
+		case REMOVE_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("At ElectronToReactMessageEnum.REMOVE_MEDIA:", { mediaPath });
+			dbg("At REMOVE_ONE_MEDIA:", { mediaPath });
 
 			if (!mainList().has(mediaPath)) {
 				console.error(
@@ -267,7 +292,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
-		case ElectronToReactMessageEnum.ERROR: {
+		case ERROR: {
 			console.error("@TODO: ERROR", msg.error);
 
 			break;

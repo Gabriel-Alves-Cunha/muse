@@ -16,7 +16,7 @@ import {
 	Item,
 } from "./styles";
 
-export const FullExampleCtxMenu = () => {
+export function FullExampleCtxMenu() {
 	const [bookmarksChecked, setBookmarksChecked] = useState(true);
 	const [urlsChecked, setUrlsChecked] = useState(false);
 	const [person, setPerson] = useState("pedro");
@@ -93,4 +93,4 @@ export const FullExampleCtxMenu = () => {
 			</RadioGroup>
 		</>
 	);
-};
+}

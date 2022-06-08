@@ -27,8 +27,8 @@ export const useProgress = create<Progress>(() => ({
 const { setState: setProgress } = useProgress;
 
 export function MediaPlayer() {
-	const audioRef = useRef<HTMLAudioElement>(null);
 	const { sortedByName: mainList } = usePlaylists();
+	const audioRef = useRef<HTMLAudioElement>(null);
 	const path = useCurrentPlaying().path ?? "";
 
 	const media = mainList.get(path ?? "");
@@ -37,15 +37,17 @@ export function MediaPlayer() {
 	useEffect(() => {
 		if (!audio) return;
 
-		const handleProgress = () => {
+		function handleProgress() {
+			if (!audio) return;
+
 			const { duration, currentTime } = audio;
 			const percentage = (currentTime / duration) * 100;
 
 			setProgress({ currentTime, percentage });
-		};
+		}
 
-		const handleLoadedData = () => {
-			if (!media || !path) return;
+		function handleLoadedData() {
+			if (!media || !path || !audio) return;
 
 			// Updating the duration of media:
 			setPlaylists({
@@ -62,9 +64,11 @@ export function MediaPlayer() {
 				);
 				audio.currentTime = lastTime;
 			}
-		};
+		}
 
-		const handleEnded = () => {
+		function handleEnded() {
+			if (!audio) return;
+
 			dbg(
 				`Audio ended, playing ${
 					audio.loop ? "again because it's on loop." : "next media."
@@ -72,12 +76,15 @@ export function MediaPlayer() {
 			);
 
 			if (!audio.loop) playNextMedia();
-		};
+		}
 
-		const handleAudioCanPlay = async () => {
+		async function handleAudioCanPlay() {
+			if (!audio) return;
+
 			dbg("Audio can play.");
+
 			await audio.play();
-		};
+		}
 
 		// Adding event listeners:
 		audio.addEventListener("loadeddata", handleLoadedData);

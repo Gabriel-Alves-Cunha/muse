@@ -1,5 +1,5 @@
+import type { Media, Path } from "@common/@types/generalTypes";
 import type { MainList } from "./usePlaylists";
-import type { Path } from "@common/@types/generalTypes";
 
 import { allowedMedias, getLastExtension } from "@common/utils";
 import { time } from "@utils/utils";
@@ -50,7 +50,7 @@ export const getAllowedMedias = (
 		allowedMedias.some(ext => ext === getLastExtension(name)),
 	);
 
-export const sortByDate = (list: MainList): Set<Path> => {
+export function sortByDate(list: MainList): Set<Path> {
 	const listAsArrayOfPaths = [...list]
 		.sort(([, prevMedia], [, nextMedia]) => {
 			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
@@ -61,9 +61,9 @@ export const sortByDate = (list: MainList): Set<Path> => {
 		.map(([path]) => path);
 
 	return new Set(listAsArrayOfPaths);
-};
+}
 
-export const sortByName = (list: MainList) => {
+export function sortByName(list: MainList): Map<Path, Media> {
 	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {
 		if (prevMedia.title > nextMedia.title) return 1;
 		if (prevMedia.title < nextMedia.title) return -1;
@@ -72,4 +72,4 @@ export const sortByName = (list: MainList) => {
 	});
 
 	return new Map(listAsArrayOfPaths);
-};
+}
