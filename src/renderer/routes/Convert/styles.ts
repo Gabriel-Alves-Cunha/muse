@@ -19,14 +19,7 @@ export const BorderedButton = styled("button", {
 	bg: "none",
 	br: 7,
 
-	"&:hover": {
-		transition: "$bgc",
-		bg: "$accent",
+	"&:hover": { transition: "$bgc", bg: "$accent", c: "white" },
 
-		c: "white",
-	},
-
-	input: {
-		d: "none",
-	},
+	input: { d: "none" },
 });

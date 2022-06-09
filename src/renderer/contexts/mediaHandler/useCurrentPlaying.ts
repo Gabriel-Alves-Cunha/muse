@@ -27,13 +27,11 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(
-		setCurrentPlayingLocalStorage(
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			(_set, _get, _api) => defaultCurrentPlaying,
-			"currentPlaying",
-		),
-	),
+	subscribeWithSelector(setCurrentPlayingLocalStorage(
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		(_set, _get, _api) => defaultCurrentPlaying,
+		"currentPlaying",
+	)),
 );
 
 export const { getState: currentPlaying, setState: setCurrentPlaying } =
@@ -51,11 +49,7 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 		path: mediaPath,
 	});
 
-	setCurrentPlaying({
-		path: mediaPath,
-		currentTime: 0,
-		listType,
-	});
+	setCurrentPlaying({ path: mediaPath, currentTime: 0, listType });
 }
 
 export function togglePlayPause(): void {
@@ -66,9 +60,9 @@ export function togglePlayPause(): void {
 
 export function play(audio?: HTMLAudioElement): void {
 	(async () => {
-		audio
-			? await audio.play()
-			: await (document.getElementById("audio") as HTMLAudioElement).play();
+		audio ?
+			await audio.play() :
+			await (document.getElementById("audio") as HTMLAudioElement).play();
 	})();
 }
 
@@ -91,8 +85,9 @@ export function playPreviousMedia(): void {
 			);
 
 		// We don't play previous media if it's the history list:
-		const correctListType =
-			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
+		const correctListType = listType === PlaylistList.HISTORY ?
+			PlaylistList.MAIN_LIST :
+			listType;
 
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
@@ -140,8 +135,9 @@ export function playNextMedia(): void {
 			);
 
 		// We don't play next media if it's the history list:
-		const correctListType =
-			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
+		const correctListType = listType === PlaylistList.HISTORY ?
+			PlaylistList.MAIN_LIST :
+			listType;
 
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
@@ -152,8 +148,6 @@ export function playNextMedia(): void {
 
 			let index = 0;
 			for (const newPath of list.keys()) {
-				console.log({ index, randomIndex, newPath });
-
 				if (index === randomIndex) {
 					nextMediaPath = newPath;
 					break;
@@ -164,7 +158,6 @@ export function playNextMedia(): void {
 			let found = false;
 
 			for (const newPath of list.keys()) {
-				console.log({ found, nextMediaPath, newPath });
 				if (found) {
 					nextMediaPath = newPath;
 					break;
@@ -189,8 +182,6 @@ export function playNextMedia(): void {
 			path: nextMediaPath,
 		});
 
-		console.log("nextMediaPath at playNextMedia() =", nextMediaPath);
-
 		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
 	}, "playNextMedia");
 }
@@ -202,33 +193,27 @@ export function playNextMedia(): void {
 let prevMediaTimer: NodeJS.Timeout | undefined;
 
 if (globalThis.window)
-	useCurrentPlaying.subscribe(
-		({ path }) => path,
-		function setAudioSource() {
-			clearTimeout(prevMediaTimer);
+	useCurrentPlaying.subscribe(({ path }) => path, function setAudioSource() {
+		clearTimeout(prevMediaTimer);
 
-			const { path } = currentPlaying();
-			if (!path) return;
+		const { path } = currentPlaying();
+		if (!path) return;
 
-			const pathForElectron = `atom:///${path}`;
+		const pathForElectron = `atom:///${path}`;
 
-			const mediaTimer = setTimeout(
-				() =>
-					((document.getElementById("audio") as HTMLAudioElement).src =
-						pathForElectron),
-				150,
-			);
+		const mediaTimer = setTimeout(
+			() => ((document.getElementById("audio") as HTMLAudioElement).src =
+				pathForElectron),
+			150,
+		);
 
-			prevMediaTimer = mediaTimer;
-		},
-	);
+		prevMediaTimer = mediaTimer;
+	});
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export type CurrentPlaying = Readonly<{
-	listType: PlaylistList;
-	path: Path | undefined;
-	currentTime: number;
-}>;
+export type CurrentPlaying = Readonly<
+	{ listType: PlaylistList; path: Path | undefined; currentTime: number; }
+>;

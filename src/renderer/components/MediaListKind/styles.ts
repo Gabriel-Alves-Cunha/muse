@@ -19,14 +19,10 @@ export const Img = styled("div", {
 
 		br: 13,
 
-		"&::before": {
-			d: "none",
-		},
+		"&::before": { d: "none" },
 	},
 
-	"& svg": {
-		c: "$deactivated-icon",
-	},
+	"& svg": { c: "$deactivated-icon" },
 });
 
 export const SubTitle = styled("p", {
@@ -38,10 +34,7 @@ export const SubTitle = styled("p", {
 	fs: "0.9rem",
 	fw: 500,
 
-	"&.row": {
-		c: "$gray-text",
-		m: "unset",
-	},
+	"&.row": { c: "$gray-text", m: "unset" },
 });
 
 export const Info = styled("div", {
@@ -69,18 +62,14 @@ export const Title = styled("p", {
 	whiteSpace: "nowrap", // make it one-line.
 	ov: "hidden",
 
-	"& .highlight": {
-		bg: "yellowgreen",
-	},
+	"& .highlight": { bg: "yellowgreen" },
 });
 
 export const ListWrapper = styled("div", {
 	maxWidth: 600,
 	h: "80vh",
 
-	".list": {
-		scroll: 5,
-	},
+	".list": { scroll: 5 },
 });
 
 export const RowWrapper = styled("div", {
@@ -142,8 +131,5 @@ export const EmptyList = styled("div", {
 	fs: "1.1rem",
 	fw: 500,
 
-	img: {
-		size: 50,
-		mr: 20,
-	},
+	img: { size: 50, mr: 20 },
 });

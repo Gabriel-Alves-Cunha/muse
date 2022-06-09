@@ -9,10 +9,7 @@ import {
 
 import { styled, keyframes } from "@styles/global";
 
-const overlayShow = keyframes({
-	"0%": { opacity: 0 },
-	"100%": { opacity: 1 },
-});
+const overlayShow = keyframes({ "0%": { opacity: 0 }, "100%": { opacity: 1 } });
 
 export const StyledOverlay = styled(Overlay, {
 	pos: "fixed",
@@ -112,13 +109,9 @@ export const TriggerToRemoveMedia = styled(Trigger, {
 	fw: 600,
 	lh: 1,
 
-	"&:focus": {
-		b: "1px solid #821e20",
-	},
+	"&:focus": { b: "1px solid #821e20" },
 
-	"&:hover": {
-		bg: "#821e20",
-	},
+	"&:hover": { bg: "#821e20" },
 });
 
 export const CloseDialog = styled(Close, {
@@ -127,11 +120,7 @@ export const CloseDialog = styled(Close, {
 	/////////////////////////////////////////
 	// Tooltip:
 	"&.tooltip": {
-		"&:active": {
-			"&::before, &::after": {
-				visibility: "hidden",
-			},
-		},
+		"&:active": { "&::before, &::after": { visibility: "hidden" } },
 
 		"&:hover::before": {
 			visibility: "visible",
@@ -168,38 +157,15 @@ export const CloseDialog = styled(Close, {
 	// they have to be on the outermost side:
 	variants: {
 		"tooltip-side": {
-			"left-bottom": {
-				"&::before, &::after": {
-					r: "50%",
-					t: "110%",
-				},
-			},
-			bottom: {
-				"&::before, &::after": {
-					t: "110%",
-				},
-			},
-			right: {
-				"&::before, &::after": {
-					l: "110%",
-				},
-			},
-			left: {
-				"&::before, &::after": {
-					r: "110%",
-				},
-			},
-			top: {
-				"&::before, &::after": {
-					bottom: "110%",
-				},
-			},
+			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
+			bottom: { "&::before, &::after": { t: "110%" } },
+			right: { "&::before, &::after": { l: "110%" } },
+			left: { "&::before, &::after": { r: "110%" } },
+			top: { "&::before, &::after": { bottom: "110%" } },
 		},
 	},
 
-	defaultVariants: {
-		"tooltip-side": "bottom",
-	},
+	defaultVariants: { "tooltip-side": "bottom" },
 
 	/////////////////////////////////////////
 	/////////////////////////////////////////
@@ -228,13 +194,9 @@ export const CloseDialog = styled(Close, {
 		bg: "#bb2b2e",
 		c: "white",
 
-		"&:focus": {
-			b: "1px solid #821e20",
-		},
+		"&:focus": { b: "1px solid #821e20" },
 
-		"&:hover": {
-			bg: "#821e20",
-		},
+		"&:hover": { bg: "#821e20" },
 	},
 
 	"&#cancel": {
@@ -246,13 +208,9 @@ export const CloseDialog = styled(Close, {
 		bg: "transparent",
 		c: "#2c6e4f",
 
-		"&:focus": {
-			b: "1px solid #c6dbce",
-		},
+		"&:focus": { b: "1px solid #c6dbce" },
 
-		"&:hover": {
-			bg: "#c6dbce",
-		},
+		"&:hover": { bg: "#c6dbce" },
 	},
 
 	"&#reset-app-data": {
@@ -265,13 +223,9 @@ export const CloseDialog = styled(Close, {
 		m: "10px 0",
 		c: "black",
 
-		"&:focus": {
-			b: "1px solid #c6dbce",
-		},
+		"&:focus": { b: "1px solid #c6dbce" },
 
-		"&:hover": {
-			bg: "#c6dbce",
-		},
+		"&:hover": { bg: "#c6dbce" },
 	},
 
 	"&#reload-window": {
@@ -283,13 +237,9 @@ export const CloseDialog = styled(Close, {
 		bg: "#94a59b",
 		c: "black",
 
-		"&:focus": {
-			b: "1px solid #c6dbce",
-		},
+		"&:focus": { b: "1px solid #c6dbce" },
 
-		"&:hover": {
-			bg: "#c6dbce",
-		},
+		"&:hover": { bg: "#c6dbce" },
 	},
 
 	"&#save-changes": {
@@ -304,13 +254,9 @@ export const CloseDialog = styled(Close, {
 		bg: "#ddf4e5",
 		c: "#2c6e4f",
 
-		"&:focus": {
-			b: "1px solid #c6dbce",
-		},
+		"&:focus": { b: "1px solid #c6dbce" },
 
-		"&:hover": {
-			bg: "#c6dbce",
-		},
+		"&:hover": { bg: "#c6dbce" },
 	},
 
 	"&#close-icon": {
@@ -325,13 +271,9 @@ export const CloseDialog = styled(Close, {
 		cursor: "pointer",
 		br: "50%",
 
-		"& svg": {
-			fill: "$accent-light",
-		},
+		"& svg": { fill: "$accent-light" },
 
-		"&:hover": {
-			bg: "$icon-button-hovered",
-		},
+		"&:hover": { bg: "$icon-button-hovered" },
 	},
 });
 
@@ -392,12 +334,7 @@ export const Input = styled("input", {
 
 	transition: "border-color 250ms ease",
 
-	"&:focus, &:hover": {
-		borderColor: "$input-border-active",
-	},
+	"&:focus, &:hover": { borderColor: "$input-border-active" },
 
-	"&:read-only": {
-		c: "$accent-light",
-		b: "none",
-	},
+	"&:read-only": { c: "$accent-light", b: "none" },
 });

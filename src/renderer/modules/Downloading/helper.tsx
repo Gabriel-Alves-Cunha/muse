@@ -24,16 +24,15 @@ export function Popup() {
 
 	return (
 		<>
-			{downloadingList.size > 0 ? (
-				[...downloadingList].map(([url, download], downloadingIndex) => (
+			{downloadingList.size > 0 ?
+				([...downloadingList].map(([url, download], downloadingIndex) => (
 					<ItemWrapper key={url}>
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>
 
 							<TooltipButton
 								onClick={e =>
-									handleDeleteAnimation(e, downloadingIndex, true, url)
-								}
+									handleDeleteAnimation(e, downloadingIndex, true, url)}
 								tooltip="Cancel/Remove download"
 								className="cancel-button"
 								tooltip-side="left"
@@ -48,10 +47,8 @@ export function Popup() {
 							showStatus
 						/>
 					</ItemWrapper>
-				))
-			) : (
-				<p>No downloads in progress!</p>
-			)}
+				))) :
+				<p>No downloads in progress!</p>}
 		</>
 	);
 }
@@ -64,9 +61,7 @@ export function Popup() {
 export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	const { downloadingList } = getDownloadingList();
 
-	dbg("Trying to create a new download...", {
-		downloadingList,
-	});
+	dbg("Trying to create a new download...", { downloadingList });
 
 	// First, see if there is another one that has the same url
 	// and quit if true:
@@ -107,7 +102,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
-	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded> }) => {
+	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded>; }) => {
 		const { downloadingList } = getDownloadingList();
 
 		dbg(
@@ -137,7 +132,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 			case ProgressStatus.FAILED: {
 				// @ts-ignore In this case, `data` include an `error: Error` key.
 				console.assert(data.error, "data.error should exist!");
-				console.error((data as typeof data & { error: Error }).error);
+				console.error((data as typeof data & { error: Error; }).error);
 
 				errorToast(`Download of "${thisDownload.title}" failed!`);
 
@@ -220,10 +215,7 @@ export function cancelConvertionAndOrRemoveItFromList(path: string): void {
 
 		// Cancel conversion
 		if (mediaBeingConverted.isConverting)
-			mediaBeingConverted.port.postMessage({
-				destroy: true,
-				path,
-			});
+			mediaBeingConverted.port.postMessage({ destroy: true, path });
 
 		// Remove from converting list
 		convertingList.delete(path);
@@ -241,9 +233,9 @@ export function handleDeleteAnimation(
 ) {
 	const className = `.${ItemWrapper.className}`;
 
-	const items = document.querySelectorAll(
-		className,
-	) as NodeListOf<HTMLDivElement>;
+	const items = document.querySelectorAll(className) as NodeListOf<
+		HTMLDivElement
+	>;
 
 	//////////////////////////////////////////
 

@@ -12,20 +12,22 @@ export const dbgPlaylists = debug(`${lowercaseAppName}:playlists`);
 
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
-export const allowedMedias = Object.freeze(<const>[
-	"vorbis",
-	"webm",
-	"flac",
-	"opus",
-	"mp3",
-	"pcm",
-	"aac",
-	"m4a",
-	"m4p",
-	"m4b",
-	"m4r",
-	"m4v",
-]);
+export const allowedMedias = Object.freeze(
+	[
+		"vorbis",
+		"webm",
+		"flac",
+		"opus",
+		"mp3",
+		"pcm",
+		"aac",
+		"m4a",
+		"m4p",
+		"m4b",
+		"m4r",
+		"m4v",
+	] as const,
+);
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
 const { trunc, floor } = Math;
@@ -40,11 +42,9 @@ export const formatDuration = (time: number | undefined) => {
 		minutes = ("0" + (floor(time / 60) % 60)).slice(-2),
 		seconds = ("0" + (time % 60)).slice(-2);
 
-	return (
-		(days > 0 ? days + "d " : "") +
+	return ((days > 0 ? days + "d " : "") +
 		(Number(hour) > 0 ? hour + ":" : "") +
-		(minutes + ":" + seconds)
-	);
+		(minutes + ":" + seconds));
 };
 
 /**
@@ -55,8 +55,9 @@ export const getBasename = (filename: string) =>
 	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
 
 export const getPathWithoutExtension = (filename: string) => {
-	const lastIndex =
-		filename.indexOf(".") === -1 ? filename.length : filename.indexOf(".");
+	const lastIndex = filename.indexOf(".") === -1 ?
+		filename.length :
+		filename.indexOf(".");
 
 	return filename.slice(0, lastIndex);
 };

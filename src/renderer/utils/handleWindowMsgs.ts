@@ -225,9 +225,9 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			deleteMedia(mediaPath)
-				.then(() => console.log(`Media "${mediaPath}" deleted.`))
-				.catch(console.error);
+			deleteMedia(mediaPath).then(() =>
+				console.log(`Media "${mediaPath}" deleted.`)
+			).catch(console.error);
 			break;
 		}
 

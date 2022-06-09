@@ -3,9 +3,7 @@ import { vi } from "vitest";
 export const mockGlobalsBeforeTests = () => {
 	// Mocking `window.electron` before importing code that calls it:
 	vi.stubGlobal("electron", {
-		notificationApi: {
-			sendNotificationToElectronIpcMainProcess: vi.fn(),
-		},
+		notificationApi: { sendNotificationToElectronIpcMainProcess: vi.fn() },
 		fs: {
 			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
 			deleteFile: vi.fn(),
@@ -19,10 +17,7 @@ export const mockGlobalsBeforeTests = () => {
 				music: "test/music",
 			},
 		},
-		media: {
-			transformPathsToMedias: vi.fn(),
-			getBasicInfo: vi.fn(),
-		},
+		media: { transformPathsToMedias: vi.fn(), getBasicInfo: vi.fn() },
 	});
 
 	// Mocking window.localStorage

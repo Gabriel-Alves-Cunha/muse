@@ -24,9 +24,7 @@ export const SearchWrapper = styled("div", {
 
 		borderColor: "$input-border-active",
 
-		"& svg": {
-			c: "$input-border-active",
-		},
+		"& svg": { c: "$input-border-active" },
 
 		"& label": {
 			t: "-180%",
@@ -37,12 +35,7 @@ export const SearchWrapper = styled("div", {
 		},
 	},
 
-	"& svg": {
-		c: "$input-border",
-		cursor: "default",
-		strokeWidth: 30,
-		mx: 10,
-	},
+	"& svg": { c: "$input-border", cursor: "default", strokeWidth: 30, mx: 10 },
 
 	label: {
 		pos: "absolute",
@@ -124,10 +117,7 @@ export const SubTitle = styled("p", {
 	fw: 500,
 });
 
-export const Highlight = styled("span", {
-	bg: "$bg-highlight",
-	c: "white",
-});
+export const Highlight = styled("span", { bg: "$bg-highlight", c: "white" });
 
 export const SearchMediaPopoverAnchor = styled(Anchor, {
 	pos: "absolute",
@@ -148,23 +138,13 @@ export const Result = styled("div", {
 	br: 7,
 	p: 7,
 
-	"&:hover": {
-		boxShadow: "0 0 1px 1px rgba(0, 0, 0, 0.1)",
-	},
+	"&:hover": { boxShadow: "0 0 1px 1px rgba(0, 0, 0, 0.1)" },
 
 	////////////////////////////////////////
 	// Tooltip:
-	"&:active": {
-		"&::before, &::after": {
-			visibility: "hidden",
-		},
-	},
+	"&:active": { "&::before, &::after": { visibility: "hidden" } },
 
-	"&:hover::before": {
-		visibility: "visible",
-
-		transition: "all 0.4s 1s ease ",
-	},
+	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
 
 	"&::before, &::after": {
 		visibility: "hidden",
@@ -205,6 +185,4 @@ export const NothingFound = styled("div", {
 	fw: 500,
 });
 
-export const HiddenPopoverTrigger = styled(Trigger, {
-	d: "none",
-});
+export const HiddenPopoverTrigger = styled(Trigger, { d: "none" });

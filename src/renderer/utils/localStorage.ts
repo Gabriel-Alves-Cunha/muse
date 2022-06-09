@@ -12,13 +12,15 @@ const { assert } = console;
 
 export const keyPrefix = "@muse:";
 
-export const keys = Object.freeze({
-	sortedByDate: `${keyPrefix}playlist:sortedByDate`,
-	currentPlaying: `${keyPrefix}currentPlaying`,
-	favorites: `${keyPrefix}playlist:favorites`,
-	history: `${keyPrefix}playlist:history`,
-	playOptions: `${keyPrefix}playOptions`,
-} as const);
+export const keys = Object.freeze(
+	{
+		sortedByDate: `${keyPrefix}playlist:sortedByDate`,
+		currentPlaying: `${keyPrefix}currentPlaying`,
+		favorites: `${keyPrefix}playlist:favorites`,
+		history: `${keyPrefix}playlist:history`,
+		playOptions: `${keyPrefix}playOptions`,
+	} as const,
+);
 
 type Keys = typeof keys[keyof typeof keys];
 type Values =
@@ -35,7 +37,7 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 		time(async () => {
 			try {
 				if (value instanceof Map || value instanceof Set)
-					//@ts-ignore => This conversion will work with either Map or Set:
+					// @ts-ignore => This conversion will work with either Map or Set:
 					value = [...value];
 
 				const serializedValue = await stringifyAsync(value);

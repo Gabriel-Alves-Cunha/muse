@@ -37,14 +37,9 @@ export const WindowButtons = styled("div", {
 
 		bg: "transparent",
 
-		"&:hover": {
-			bg: "$icon-button-hovered",
-		},
+		"&:hover": { bg: "$icon-button-hovered" },
 
-		"&#close:hover": {
-			bg: "#e70000",
-			c: "white",
-		},
+		"&#close:hover": { bg: "#e70000", c: "white" },
 	},
 });
 
@@ -60,19 +55,14 @@ export const AppName_Folder_Wrapper = styled("div", {
 	bg: "transparent",
 	b: "none",
 
+	whiteSpace: "nowrap",
 	ff: "$primary",
 	ls: "0.03rem",
 	fs: "0.93rem",
 	c: "$text",
 	fw: 300,
 
-	"@sm": {
-		d: "none",
-	},
+	"@sm": { d: "none" },
 });
 
-export const AppIcon = styled("div", {
-	dflex: "center",
-
-	ml: 7,
-});
+export const AppIcon = styled("div", { dflex: "center", ml: 7 });

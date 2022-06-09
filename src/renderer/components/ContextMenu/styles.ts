@@ -48,10 +48,7 @@ export const itemStyles = styled("div", {
 		pointerEvents: "none",
 	},
 
-	"&:focus": {
-		c: "$ctx-menu-item-text-focus",
-		bg: "$ctx-menu-item-bg-focus",
-	},
+	"&:focus": { c: "$ctx-menu-item-text-focus", bg: "$ctx-menu-item-bg-focus" },
 });
 
 export const RightSlot = styled("div", {
@@ -62,20 +59,14 @@ export const RightSlot = styled("div", {
 
 	":focus > &": { c: "$ctx-menu-item-text-focus" },
 
-	"[data-disabled] &": {
-		c: "$ctx-menu-item-text-disabled",
-	},
+	"[data-disabled] &": { c: "$ctx-menu-item-text-disabled" },
 });
 
 export const Item = styled(CtxItem, { ...itemStyles });
 
-export const CheckboxItem = styled(CtxCheckboxItem, {
-	...itemStyles,
-});
+export const CheckboxItem = styled(CtxCheckboxItem, { ...itemStyles });
 
-export const RadioItem = styled(CtxRadioItem, {
-	...itemStyles,
-});
+export const RadioItem = styled(CtxRadioItem, { ...itemStyles });
 
 export const TriggerItem = styled(CtxTriggerItem, {
 	"&[data-state='open']": {

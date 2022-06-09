@@ -33,7 +33,7 @@ it("should format duration in seconds to something like: '00:00:00'. #formatDura
 	const durationsInSeconds = [234567, 2345678, 123, 6543, 224, 900, undefined];
 
 	const durationsFormated = durationsInSeconds.map(time =>
-		formatDuration(time),
+		formatDuration(time)
 	);
 
 	expect(durationsFormated).toStrictEqual([

@@ -10,12 +10,10 @@ import {
 export async function getFullPathOfFilesForFilesInThisDirectory(
 	dir: Readonly<Path>,
 ): Promise<readonly Path[]> {
-	return (
-		await readdir(dir).catch(err => {
-			console.error(err);
-			return [];
-		})
-	).map(filename => join(dir, filename));
+	return (await readdir(dir).catch(err => {
+		console.error(err);
+		return [];
+	})).map(filename => join(dir, filename));
 }
 
 export async function readFile(

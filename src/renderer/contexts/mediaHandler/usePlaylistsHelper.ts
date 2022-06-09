@@ -27,16 +27,13 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 export const searchDirectoryResult = async () =>
 	time(
 		async () =>
-			(
-				await Promise.allSettled([
-					getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
-					getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
-					getFullPathOfFilesForFilesInThisDirectory(dirs.music),
-				])
-			)
-				.map(p => (p.status === "fulfilled" ? p.value : undefined))
-				.filter(Boolean)
-				.flat() as readonly string[],
+			(await Promise.allSettled([
+				getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
+				getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
+				getFullPathOfFilesForFilesInThisDirectory(dirs.music),
+			])).map(p => (p.status === "fulfilled" ? p.value : undefined)).filter(
+				Boolean,
+			).flat() as readonly string[],
 		"searchDirectoryResult",
 	);
 
@@ -47,18 +44,16 @@ export const getAllowedMedias = (
 	filenames: readonly string[],
 ): readonly string[] =>
 	filenames.filter(name =>
-		allowedMedias.some(ext => ext === getLastExtension(name)),
+		allowedMedias.some(ext => ext === getLastExtension(name))
 	);
 
 export function sortByDate(list: MainList): Set<Path> {
-	const listAsArrayOfPaths = [...list]
-		.sort(([, prevMedia], [, nextMedia]) => {
-			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
-			if (prevMedia.birthTime < nextMedia.birthTime) return -1;
-			// a must be equal to b:
-			return 0;
-		})
-		.map(([path]) => path);
+	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {
+		if (prevMedia.birthTime > nextMedia.birthTime) return 1;
+		if (prevMedia.birthTime < nextMedia.birthTime) return -1;
+		// a must be equal to b:
+		return 0;
+	}).map(([path]) => path);
 
 	return new Set(listAsArrayOfPaths);
 }

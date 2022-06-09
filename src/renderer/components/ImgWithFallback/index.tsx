@@ -10,11 +10,9 @@ const { SUCCESS, FAILURE, PENDING } = Status;
 
 const cache: Map<Path, Status> = new Map();
 
-export function ImgWithFallback({
-	mediaPath,
-	Fallback,
-	mediaImg,
-}: Props): JSX.Element {
+export function ImgWithFallback(
+	{ mediaPath, Fallback, mediaImg }: Props,
+): JSX.Element {
 	if (!mediaImg || !mediaImg.length) return Fallback;
 
 	const cacheStatus = cache.get(mediaPath);
@@ -46,15 +44,9 @@ export function ImgWithFallback({
 
 	img.src = mediaImg;
 
-	return cache.get(mediaPath) === SUCCESS ? (
-		<img src={mediaImg} loading="lazy" decoding="async" />
-	) : (
-		Fallback
-	);
+	return cache.get(mediaPath) === SUCCESS ?
+		<img src={mediaImg} loading="lazy" decoding="async" /> :
+		(Fallback);
 }
 
-type Props = {
-	Fallback: JSX.Element;
-	mediaImg?: string;
-	mediaPath: Path;
-};
+type Props = { Fallback: JSX.Element; mediaImg?: string; mediaPath: Path; };

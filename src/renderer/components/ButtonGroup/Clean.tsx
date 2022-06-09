@@ -38,6 +38,4 @@ function cleanProperList() {
 	}
 }
 
-type Props = {
-	className?: string;
-};
+type Props = { className?: string; };

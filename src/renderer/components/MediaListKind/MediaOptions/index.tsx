@@ -97,8 +97,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 				<CloseDialog
 					onClick={() =>
-						changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media)
-					}
+						changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media)}
 					id="save-changes"
 				>
 					Save changes
@@ -186,13 +185,7 @@ function changeMetadataIfAllowed(
 								)
 									return;
 
-								dbg({
-									newValueAsArray,
-									oldValue,
-									newValue,
-									key,
-									id,
-								});
+								dbg({ newValueAsArray, oldValue, newValue, key, id });
 
 								// If they are different, the writeTag() function will
 								// handle splitting the string, so just continue the
@@ -206,11 +199,7 @@ function changeMetadataIfAllowed(
 							// Send message to Electron to execute the function writeTag() in the main process:
 							sendMsgToBackend({
 								type: ReactToElectronMessageEnum.WRITE_TAG,
-								params: {
-									whatToChange: whatToSend,
-									mediaPath,
-									newValue,
-								},
+								params: { whatToChange: whatToSend, mediaPath, newValue },
 							});
 						}
 					});
@@ -226,13 +215,15 @@ const options = ({ duration, artist, album, genres, title, size }: Media) => ({
 	size,
 });
 
-const allowedOptionToChange = Object.freeze({
-	artist: "albumArtists",
-	imageURL: "imageURL",
-	genres: "genres",
-	album: "album",
-	title: "title",
-} as const);
+const allowedOptionToChange = Object.freeze(
+	{
+		artist: "albumArtists",
+		imageURL: "imageURL",
+		genres: "genres",
+		album: "album",
+		title: "title",
+	} as const,
+);
 
 const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).includes(option);
@@ -240,16 +231,15 @@ const isChangeable = (option: string): option is ChangeOptions =>
 const closeEverything = (element: RefObject<HTMLButtonElement>) =>
 	element.current?.click();
 
-export type WhatToChange = Readonly<{
-	whatToSend: ChangeOptionsToSend;
-	whatToChange: ChangeOptions;
-	current: string;
-}>;
+export type WhatToChange = Readonly<
+	{
+		whatToSend: ChangeOptionsToSend;
+		whatToChange: ChangeOptions;
+		current: string;
+	}
+>;
 
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
 type ChangeOptions = keyof typeof allowedOptionToChange;
 
-type Props = Readonly<{
-	media: Media;
-	path: Path;
-}>;
+type Props = Readonly<{ media: Media; path: Path; }>;

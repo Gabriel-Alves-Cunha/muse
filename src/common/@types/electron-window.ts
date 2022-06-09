@@ -4,38 +4,34 @@ import type { videoInfo } from "ytdl-core";
 
 declare global {
 	/* eslint-disable no-var */
-	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[] };
+	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[]; };
 	var electron: VisibleElectron;
 }
 
-export type VisibleElectron = Readonly<{
-	notificationApi: {
-		sendNotificationToElectronIpcMainProcess(
-			type: ElectronIpcMainProcessNotificationEnum,
-		): void;
-	};
-	fs: {
-		getFullPathOfFilesForFilesInThisDirectory(
-			dir: Path,
-		): Promise<readonly Path[]>;
-		readFile(path: Path): Promise<Readonly<Buffer | undefined>>;
-		readdir(dir: Path): Promise<readonly Path[]>;
-		deleteFile(path: Path): Promise<void>;
-	};
-	os: {
-		dirs: {
-			documents: Path;
-			downloads: Path;
-			music: Path;
+export type VisibleElectron = Readonly<
+	{
+		notificationApi: {
+			sendNotificationToElectronIpcMainProcess(
+				type: ElectronIpcMainProcessNotificationEnum,
+			): void;
 		};
-	};
-	media: {
-		transformPathsToMedias(
-			paths: readonly Path[],
-		): Promise<readonly [Path, Media][]>;
-		getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
-	};
-}>;
+		fs: {
+			getFullPathOfFilesForFilesInThisDirectory(
+				dir: Path,
+			): Promise<readonly Path[]>;
+			readFile(path: Path): Promise<Readonly<Buffer | undefined>>;
+			readdir(dir: Path): Promise<readonly Path[]>;
+			deleteFile(path: Path): Promise<void>;
+		};
+		os: { dirs: { documents: Path; downloads: Path; music: Path; }; };
+		media: {
+			transformPathsToMedias(
+				paths: readonly Path[],
+			): Promise<readonly [Path, Media][]>;
+			getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
+		};
+	}
+>;
 
 export enum ReactToElectronMessageEnum {
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
@@ -45,24 +41,21 @@ export enum ReactToElectronMessageEnum {
 }
 
 export type MsgObjectReactToElectron =
-	| Readonly<{
-			type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD;
-	  }>
-	| Readonly<{
-			type: ReactToElectronMessageEnum.CONVERT_MEDIA;
-	  }>
-	| Readonly<{
+	| Readonly<{ type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD; }>
+	| Readonly<{ type: ReactToElectronMessageEnum.CONVERT_MEDIA; }>
+	| Readonly<
+		{
 			type: ReactToElectronMessageEnum.WRITE_TAG;
-			params: Readonly<{
-				newValue: string | readonly string[];
-				whatToChange: ChangeOptionsToSend;
-				mediaPath: Path;
-			}>;
-	  }>
-	| Readonly<{
-			type: ReactToElectronMessageEnum.ERROR;
-			error: Error;
-	  }>;
+			params: Readonly<
+				{
+					newValue: string | readonly string[];
+					whatToChange: ChangeOptionsToSend;
+					mediaPath: Path;
+				}
+			>;
+		}
+	>
+	| Readonly<{ type: ReactToElectronMessageEnum.ERROR; error: Error; }>;
 
 export enum ElectronToReactMessageEnum {
 	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer",
@@ -79,57 +72,51 @@ export enum ElectronToReactMessageEnum {
 }
 
 export type MsgObjectElectronToReact =
-	| Readonly<{
+	| Readonly<
+		{
 			type: ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
 			mediaPath: Path;
-	  }>
-	| Readonly<{
+		}
+	>
+	| Readonly<
+		{
 			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD;
 			downloadInfo: DownloadInfo;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA;
-			mediaPath: Path;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA;
-			mediaPath: Path;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.ADD_ONE_MEDIA;
-			mediaPath: Path;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.ERROR;
-			error: Error;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED;
-			url: string;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED;
-			url: string;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED;
-			path: Path;
-	  }>
-	| Readonly<{
-			type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED;
-			path: Path;
-	  }>;
+		}
+	>
+	| Readonly<{ type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA; }>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA; mediaPath: Path; }
+	>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA; mediaPath: Path; }
+	>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.ADD_ONE_MEDIA; mediaPath: Path; }
+	>
+	| Readonly<{ type: ElectronToReactMessageEnum.ERROR; error: Error; }>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED; url: string; }
+	>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED; url: string; }
+	>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED; path: Path; }
+	>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED; path: Path; }
+	>;
 
-export type WriteTag = Readonly<{
-	albumArtists?: readonly string[];
-	genres?: readonly string[];
-	imageURL?: string;
-	album?: string;
-	title?: string;
-}>;
+export type WriteTag = Readonly<
+	{
+		albumArtists?: readonly string[];
+		genres?: readonly string[];
+		imageURL?: string;
+		album?: string;
+		title?: string;
+	}
+>;
 
 export enum ElectronIpcMainProcessNotificationEnum {
 	TOGGLE_DEVELOPER_TOOLS,

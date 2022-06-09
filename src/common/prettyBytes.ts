@@ -1,16 +1,8 @@
 const { log10, floor, abs, min } = Math;
 
-const UNITS = Object.freeze(<const>[
-	"B",
-	"KB",
-	"MB",
-	"GB",
-	"TB",
-	"PB",
-	"EB",
-	"ZB",
-	"YB",
-]);
+const UNITS = Object.freeze(
+	["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"] as const,
+);
 
 export type PrettyBytes = `${"" | "-"}${number} ${typeof UNITS[number]}`;
 

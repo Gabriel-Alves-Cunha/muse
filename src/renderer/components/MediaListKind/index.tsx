@@ -7,7 +7,6 @@ import { Virtuoso } from "react-virtuoso";
 import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
-import { dbg } from "@common/utils";
 import {
 	usePlaylists,
 	PlaylistList,
@@ -54,62 +53,58 @@ function MediaListKind_({ isHome = false }: Props) {
 	const listName = isHome ? homeList : fromList;
 	const { [listName]: list } = usePlaylists();
 
-	const listAsArrayOfAMap: [Path, Media][] = useMemo(
-		() =>
-			time(() => {
-				switch (listName) {
-					case PlaylistList.MAIN_LIST:
-						return [...(list as MainList)];
+	const listAsArrayOfAMap: [Path, Media][] = useMemo(() =>
+		time(() => {
+			switch (listName) {
+				case PlaylistList.MAIN_LIST:
+					return [...(list as MainList)];
 
-					case PlaylistList.SORTED_BY_DATE:
-					case PlaylistList.FAVORITES: {
-						const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
+				case PlaylistList.SORTED_BY_DATE:
+				case PlaylistList.FAVORITES: {
+					const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
 
-						const listAsArrayOfAMap: [Path, Media][] = [];
+					const listAsArrayOfAMap: [Path, Media][] = [];
 
-						(list as Set<Path>).forEach(path => {
+					(list as Set<Path>).forEach(path => {
+						const media = mainList.get(path);
+
+						media && listAsArrayOfAMap.push([path, media]);
+					});
+
+					return listAsArrayOfAMap;
+				}
+
+				case PlaylistList.HISTORY: {
+					const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
+
+					const listAsArrayOfAMap: [Path, Media][] = [];
+
+					if (fromList === PlaylistList.HISTORY) {
+						(list as History).forEach((_, path) => {
+							// TODO: handle how to show history items:
 							const media = mainList.get(path);
 
 							media && listAsArrayOfAMap.push([path, media]);
 						});
-
-						return listAsArrayOfAMap;
 					}
 
-					case PlaylistList.HISTORY: {
-						const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
-
-						const listAsArrayOfAMap: [Path, Media][] = [];
-
-						if (fromList === PlaylistList.HISTORY) {
-							(list as History).forEach((_, path) => {
-								// TODO: handle how to show history items:
-								const media = mainList.get(path);
-
-								media && listAsArrayOfAMap.push([path, media]);
-							});
-						}
-
-						return listAsArrayOfAMap;
-					}
-
-					default:
-						return assertUnreachable(listName);
+					return listAsArrayOfAMap;
 				}
-			}, "listAsArrayOfAMap"),
-		[listName, list, fromList],
-	);
+
+				default:
+					return assertUnreachable(listName);
+			}
+		}, "listAsArrayOfAMap"), [listName, list, fromList]);
 
 	useOnClickOutside(
 		listRef,
 		// Deselect all medias:
 		() => {
-			dbg("useOnClickOutside");
 			if (allSelectedMedias.size > 0 && listRef.current) {
 				// mediaRowRef.current?.classList.remove("selected");
-				document
-					.querySelectorAll(`.${RowWrapper.className}`)
-					.forEach(item => item.classList.remove("selected"));
+				document.querySelectorAll(`.${RowWrapper.className}`).forEach(item =>
+					item.classList.remove("selected")
+				);
 				allSelectedMedias.clear();
 			}
 		},
@@ -144,6 +139,4 @@ function MediaListKind_({ isHome = false }: Props) {
 	);
 }
 
-type Props = {
-	isHome?: boolean;
-};
+type Props = { isHome?: boolean; };

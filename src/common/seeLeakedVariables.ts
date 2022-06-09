@@ -7,7 +7,6 @@
  * to the window object as "_runtimeGlobalsChecker_".
  * You can check the runtime globals programmatically at any time by invoking
  * "window._runtimeGlobalsChecker_.getRuntimeGlobals()".
- *
  */
 export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 	// Globals on the window object set by default by the browser.
@@ -65,7 +64,5 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 		return runtimeGlobals;
 	}
 
-	return {
-		getRuntimeGlobals,
-	};
+	return { getRuntimeGlobals };
 };

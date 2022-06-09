@@ -12,10 +12,7 @@ export const Wrapper = styled(MainArea, {
 	scroll: 5,
 });
 
-export const Box = styled("div", {
-	dflex: "center",
-	w: "100%",
-});
+export const Box = styled("div", { dflex: "center", w: "100%" });
 
 export const SearchWrapper = styled("div", {
 	pos: "relative",
@@ -48,10 +45,7 @@ export const Searcher = styled("button", {
 	bg: "none",
 	br: 20,
 
-	"& svg": {
-		c: "$text",
-		ml: 10,
-	},
+	"& svg": { c: "$text", ml: 10 },
 
 	input: {
 		ff: "$secondary",
@@ -91,10 +85,7 @@ export const ResultContainer = styled("div", {
 
 		transition: "$scale",
 
-		"&:hover": {
-			transition: "$scale",
-			transform: "scale(1.1)",
-		},
+		"&:hover": { transition: "$scale", transform: "scale(1.1)" },
 	},
 
 	"& p": {
@@ -118,7 +109,4 @@ export const ResultContainer = styled("div", {
 	},
 });
 
-export const LoadingWrapper = styled("div", {
-	size: 25,
-	ml: 10,
-});
+export const LoadingWrapper = styled("div", { size: 25, ml: 10 });

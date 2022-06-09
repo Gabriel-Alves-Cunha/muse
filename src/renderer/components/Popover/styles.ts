@@ -65,10 +65,7 @@ export const StyledContent = styled(Content, {
 		fw: 500,
 	},
 
-	"&:focus": {
-		boxShadow: "$popover",
-		outline: "none",
-	},
+	"&:focus": { boxShadow: "$popover", outline: "none" },
 
 	scroll: 2,
 
@@ -87,18 +84,8 @@ export const StyledContent = styled(Content, {
 
 				ov: "hidden",
 			},
-			"search-media-results": {
-				h: 250,
-				w: 350,
-
-				ov: "auto",
-			},
-			"convertions-or-downloads": {
-				h: 300,
-				w: 260,
-
-				ov: "auto",
-			},
+			"search-media-results": { h: 250, w: 350, ov: "auto" },
+			"convertions-or-downloads": { h: 300, w: 260, ov: "auto" },
 		},
 	},
 });

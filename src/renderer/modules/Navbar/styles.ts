@@ -13,12 +13,8 @@ export const Nav = styled("nav", {
 	h: `calc(100vh - ${DECORATIONS_HEIGHT})`,
 	bg: "$bg-navbar",
 
-	"& > :first-child": {
-		mt: 40,
-	},
-	"& > :last-child": {
-		mb: 40,
-	},
+	"& > :first-child": { mt: 40 },
+	"& > :last-child": { mb: 40 },
 });
 
 export const Buttons = styled("div", {
@@ -32,17 +28,10 @@ export const Buttons = styled("div", {
 		c: "$deactivated-icon",
 		fs: "1rem",
 
-		"&:hover": {
-			c: "$active-icon",
-		},
+		"&:hover": { c: "$active-icon" },
 
-		"&.active": {
-			c: "$active-icon",
-		},
+		"&.active": { c: "$active-icon" },
 	},
 });
 
-export const Popups = styled("div", {
-	dcolumn: "center",
-	w: "100%",
-});
+export const Popups = styled("div", { dcolumn: "center", w: "100%" });

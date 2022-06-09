@@ -160,7 +160,4 @@ const handleStalled = (e: Event) =>
 		e,
 	);
 
-type Progress = Readonly<{
-	currentTime: number;
-	percentage: number;
-}>;
+type Progress = Readonly<{ currentTime: number; percentage: number; }>;

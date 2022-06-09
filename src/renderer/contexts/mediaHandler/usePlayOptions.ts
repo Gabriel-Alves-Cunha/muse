@@ -3,10 +3,7 @@ import create from "zustand";
 import { setPlayOptionsLocalStorage } from "./localStorageHelpers";
 
 export const usePlayOptions = create<PlayOptions>()(
-	setPlayOptionsLocalStorage(() => ({
-		random: false,
-		loop: false,
-	})),
+	setPlayOptionsLocalStorage(() => ({ random: false, loop: false })),
 );
 
 export const { getState: playOptions, setState: setPlayOptions } =
@@ -31,7 +28,4 @@ export const toggleRandom = () =>
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export type PlayOptions = Readonly<{
-	random: boolean;
-	loop: boolean;
-}>;
+export type PlayOptions = Readonly<{ random: boolean; loop: boolean; }>;

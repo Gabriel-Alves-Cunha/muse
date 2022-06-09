@@ -46,12 +46,9 @@ export function Downloading() {
 				setDownloadInfo(defaultDownloadInfo);
 
 				// Sending port so we can communicate with Electron:
-				sendMsgToBackend(
-					{
-						type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
-					},
-					electronPort,
-				);
+				sendMsgToBackend({
+					type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
+				}, electronPort);
 			} catch (error) {
 				console.error(error);
 
@@ -64,9 +61,8 @@ export function Downloading() {
 	return (
 		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
 			<StyledPopoverTrigger
-				className={
-					(downloadingListSize ? "has-items " : "") + (isOpen ? "active " : "")
-				}
+				className={(downloadingListSize ? "has-items " : "") +
+					(isOpen ? "active " : "")}
 				data-tooltip="Show all downloading medias"
 				tooltip-side="right"
 			>
@@ -78,11 +74,9 @@ export function Downloading() {
 			<PopoverAnchor />
 
 			<PopoverContent
-				size={
-					downloadingListSize === 0
-						? "nothing-found-for-convertions-or-downloads"
-						: "convertions-or-downloads"
-				}
+				size={downloadingListSize === 0 ?
+					"nothing-found-for-convertions-or-downloads" :
+					"convertions-or-downloads"}
 				alignOffset={14}
 			>
 				<Popup />
@@ -91,11 +85,13 @@ export function Downloading() {
 	);
 }
 
-export type MediaBeingDownloaded = Readonly<{
-	status: ProgressStatus;
-	isDownloading: boolean;
-	percentage: number;
-	port: MessagePort;
-	imageURL: string;
-	title: string;
-}>;
+export type MediaBeingDownloaded = Readonly<
+	{
+		status: ProgressStatus;
+		isDownloading: boolean;
+		percentage: number;
+		port: MessagePort;
+		imageURL: string;
+		title: string;
+	}
+>;

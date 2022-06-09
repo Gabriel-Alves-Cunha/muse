@@ -98,9 +98,7 @@ describe("It should account for the switch possibilities and the message sending
 			"test_assets",
 			"img for tests.png",
 		);
-		const imgContents = await readFile(imgPath, {
-			encoding: "base64",
-		});
+		const imgContents = await readFile(imgPath, { encoding: "base64" });
 		const imgAsString: ImgString = `data:image/png;base64,${imgContents}`;
 
 		const data = Object.freeze({ imageURL: imgAsString });

@@ -70,8 +70,8 @@ describe("Testing useCurrentPlaying", () => {
 
 			playPreviousMedia();
 
-			const expectedPath =
-				testArray.at(initialIndex - 1 - index)?.[0] ?? lastMediaPath;
+			const expectedPath = testArray.at(initialIndex - 1 - index)?.[0] ??
+				lastMediaPath;
 
 			const expected: CurrentPlaying = {
 				listType: PlaylistList.MAIN_LIST,
@@ -100,9 +100,8 @@ describe("Testing useCurrentPlaying", () => {
 
 			expect(
 				expectedMediaPath,
-				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${
-					testArray.at(index)?.[0]
-				}
+				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${testArray
+					.at(index)?.[0]}
 				`,
 			).toEqual(currMediaPath);
 		});

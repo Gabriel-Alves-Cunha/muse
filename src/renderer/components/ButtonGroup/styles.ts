@@ -1,21 +1,13 @@
 import { styled, keyframes } from "@styles/global";
 
 const spin = keyframes({
-	from: {
-		transform: "rotate(0deg)",
-	},
-	to: {
-		transform: "rotate(360deg)",
-	},
+	from: { transform: "rotate(0deg)" },
+	to: { transform: "rotate(360deg)" },
 });
 
 const scale = keyframes({
-	"0%, 100%": {
-		transform: "scale(1.0)",
-	},
-	"50%": {
-		transform: "scale(0.95)",
-	},
+	"0%, 100%": { transform: "scale(1.0)" },
+	"50%": { transform: "scale(0.95)" },
 });
 
 export const Wrapper = styled("div", {
@@ -41,36 +33,20 @@ export const Wrapper = styled("div", {
 		transitionDuration: 0.25,
 		transitionDelay: 0,
 
-		"& svg": {
-			c: "$gray-text",
-		},
+		"& svg": { c: "$gray-text" },
 
-		"&.single-button": {
-			size: "$$height",
-			br: "50%",
-			p: 0,
-		},
+		"&.single-button": { size: "$$height", br: "50%", p: 0 },
 
-		"&.first": {
-			borderBottomLeftRadius: 12,
-			borderTopLeftRadius: 12,
-		},
+		"&.first": { borderBottomLeftRadius: 12, borderTopLeftRadius: 12 },
 
-		"&.last": {
-			borderBottomRightRadius: 12,
-			borderTopRightRadius: 12,
-		},
+		"&.last": { borderBottomRightRadius: 12, borderTopRightRadius: 12 },
 
 		"&:hover, &:focus": {
 			bg: "$bg-button-hover",
 
-			"& svg": {
-				c: "white",
-			},
+			"& svg": { c: "white" },
 
-			"&.reload svg": {
-				animation: `${spin} 0.7s linear`,
-			},
+			"&.reload svg": { animation: `${spin} 0.7s linear` },
 		},
 
 		"&:active": {
@@ -79,8 +55,6 @@ export const Wrapper = styled("div", {
 		},
 
 		//////////////////////////////////////////
-		"&.reloading": {
-			animation: `${spin} 1s infinite linear`,
-		},
+		"&.reloading": { animation: `${spin} 1s infinite linear` },
 	},
 });

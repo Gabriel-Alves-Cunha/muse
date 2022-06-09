@@ -11,9 +11,5 @@ export const MainArea = styled("div", {
 	p: "5%",
 	pt: 0,
 
-	"@sm": {
-		header: {
-			justifyContent: "center",
-		},
-	},
+	"@sm": { header: { justifyContent: "center" } },
 });

@@ -80,16 +80,12 @@ export function InputAndResults() {
 	// I found that such time had to be high, I settled on
 	// a time of 200ms, but maybe on a slow machine it could
 	// be need a higher time for the event to bubble...
-	useOnClickOutside(
-		inputRef,
-		() =>
-			isOnFocusRef.current &&
-			setTimeout(() => {
-				setSearcher(defaultSearcher);
-				isOnFocusRef.current = false;
-				inputRef.current?.blur();
-			}, 200),
-	);
+	useOnClickOutside(inputRef, () =>
+		isOnFocusRef.current && setTimeout(() => {
+			setSearcher(defaultSearcher);
+			isOnFocusRef.current = false;
+			inputRef.current?.blur();
+		}, 200));
 
 	// Close the popover when the user presses Esc:
 	useEffect(() => {
@@ -108,10 +104,7 @@ export function InputAndResults() {
 
 	// Search for media:
 	useEffect(() => {
-		setSearcher({
-			results: constRefToEmptyArray,
-			searchStatus: SEARCHING,
-		});
+		setSearcher({ results: constRefToEmptyArray, searchStatus: SEARCHING });
 
 		if (searchTerm.length < 2) return;
 
@@ -149,28 +142,30 @@ export function InputAndResults() {
 				<SearchMediaPopoverAnchor />
 
 				<PopoverContent
-					size={
-						nothingFound
-							? "nothing-found-for-search-media"
-							: "search-media-results"
-					}
+					size={nothingFound ?
+						"nothing-found-for-search-media" :
+						"search-media-results"}
 				>
-					{nothingFound ? (
-						<NothingFound>
-							Nothing was found for &quot;{searchTerm}&quot;
-						</NothingFound>
-					) : foundSomething ? (
-						<>
-							{results.map(([path, media]) => (
-								<Row
-									highlight={searchTerm}
-									media={media}
-									path={path}
-									key={path}
-								/>
-							))}
-						</>
-					) : undefined}
+					{nothingFound ?
+						(
+							<NothingFound>
+								Nothing was found for &quot;{searchTerm}&quot;
+							</NothingFound>
+						) :
+						foundSomething ?
+						(
+							<>
+								{results.map(([path, media]) => (
+									<Row
+										highlight={searchTerm}
+										media={media}
+										path={path}
+										key={path}
+									/>
+								))}
+							</>
+						) :
+						undefined}
 				</PopoverContent>
 			</PopoverRoot>
 		</>
@@ -209,16 +204,16 @@ function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-type Searcher = Readonly<{
-	results: readonly [Path, Media][];
-	searchTerm: Lowercase<string>;
-	searchStatus: SearchStatus;
-}>;
+type Searcher = Readonly<
+	{
+		results: readonly [Path, Media][];
+		searchTerm: Lowercase<string>;
+		searchStatus: SearchStatus;
+	}
+>;
 
-type RowProps = Readonly<{
-	highlight: Lowercase<string>;
-	media: Media;
-	path: Path;
-}>;
+type RowProps = Readonly<
+	{ highlight: Lowercase<string>; media: Media; path: Path; }
+>;
 
 type InputChange = React.ChangeEvent<HTMLInputElement>;

@@ -4,30 +4,28 @@ import { type ComponentPropsWithRef, type Ref, forwardRef } from "react";
 
 import { styled } from "@styles/global";
 
-export const TooltipButton = forwardRef(
-	(
-		{
-			"tooltip-side": tooltipSide,
-			className = "",
-			css = {},
-			children,
-			tooltip,
-			...props
-		}: Props,
-		forwardedRef: Ref<HTMLButtonElement>,
-	) => (
-		<TooltipButton_
-			tooltip-side={tooltipSide}
-			data-tooltip={tooltip}
-			className={className}
-			ref={forwardedRef}
-			css={css}
-			{...props}
-		>
-			{children}
-		</TooltipButton_>
-	),
-);
+export const TooltipButton = forwardRef((
+	{
+		"tooltip-side": tooltipSide,
+		className = "",
+		css = {},
+		children,
+		tooltip,
+		...props
+	}: Props,
+	forwardedRef: Ref<HTMLButtonElement>,
+) => (
+	<TooltipButton_
+		tooltip-side={tooltipSide}
+		data-tooltip={tooltip}
+		className={className}
+		ref={forwardedRef}
+		css={css}
+		{...props}
+	>
+		{children}
+	</TooltipButton_>
+));
 TooltipButton.displayName = "TooltipButton";
 
 export const TooltipButton_ = styled("button", {
@@ -40,17 +38,9 @@ export const TooltipButton_ = styled("button", {
 
 	transition: "none !important",
 
-	"&:active": {
-		"&::before, &::after": {
-			visibility: "hidden",
-		},
-	},
+	"&:active": { "&::before, &::after": { visibility: "hidden" } },
 
-	"&:hover::before": {
-		visibility: "visible",
-
-		transition: "all 0.4s 1s ease ",
-	},
+	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
 
 	"&::before, &::after": {
 		visibility: "hidden",
@@ -77,38 +67,15 @@ export const TooltipButton_ = styled("button", {
 
 	variants: {
 		"tooltip-side": {
-			"left-bottom": {
-				"&::before, &::after": {
-					t: "110%",
-					r: "50%",
-				},
-			},
-			bottom: {
-				"&::before, &::after": {
-					t: "110%",
-				},
-			},
-			right: {
-				"&::before, &::after": {
-					l: "110%",
-				},
-			},
-			left: {
-				"&::before, &::after": {
-					r: "110%",
-				},
-			},
-			top: {
-				"&::before, &::after": {
-					bottom: "110%",
-				},
-			},
+			"left-bottom": { "&::before, &::after": { t: "110%", r: "50%" } },
+			bottom: { "&::before, &::after": { t: "110%" } },
+			right: { "&::before, &::after": { l: "110%" } },
+			left: { "&::before, &::after": { r: "110%" } },
+			top: { "&::before, &::after": { bottom: "110%" } },
 		},
 	},
 
-	defaultVariants: {
-		"tooltip-side": "bottom",
-	},
+	defaultVariants: { "tooltip-side": "bottom" },
 });
 
 type Props = ComponentPropsWithRef<"button"> & {

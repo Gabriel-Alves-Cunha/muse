@@ -20,13 +20,14 @@ export const PopoverRoot = Root;
  * );
  * ```
  */
-export const PopoverContent = forwardRef(
-	({ children, size, ...props }: Props, forwardedRef: Ref<HTMLDivElement>) => (
-		<StyledContent size={size} sideOffset={10} {...props} ref={forwardedRef}>
-			{children}
-		</StyledContent>
-	),
-);
+export const PopoverContent = forwardRef((
+	{ children, size, ...props }: Props,
+	forwardedRef: Ref<HTMLDivElement>,
+) => (
+	<StyledContent size={size} sideOffset={10} {...props} ref={forwardedRef}>
+		{children}
+	</StyledContent>
+));
 PopoverContent.displayName = "PopoverContent";
 
 type Props = PopperContentProps & {

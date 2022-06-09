@@ -11,9 +11,9 @@ export const sendMsgToBackend = (
 ) => {
 	dbg("Sending message to backend:", { msg, electronPort });
 
-	electronPort
-		? window.postMessage({ msg, source: reactSource }, "*", [electronPort])
-		: window.postMessage({ msg, source: reactSource }, "*");
+	electronPort ?
+		window.postMessage({ msg, source: reactSource }, "*", [electronPort]) :
+		window.postMessage({ msg, source: reactSource }, "*");
 };
 
 export const sendMsgToClient = (msg: MsgObjectElectronToReact) => {
@@ -26,7 +26,4 @@ const baseSource = "muse-";
 export const electronSource = `${baseSource}electron`;
 export const reactSource = `${baseSource}react`;
 
-export type MsgWithSource<T> = Readonly<{
-	source: string;
-	msg: T;
-}>;
+export type MsgWithSource<T> = Readonly<{ source: string; msg: T; }>;

@@ -15,10 +15,9 @@ const html = document.documentElement;
 const light = "light";
 const dark = "dark";
 
-const availableThemes: Record<Themes, string> = Object.freeze({
-	light: lightTheme.className,
-	dark: darkTheme.className,
-} as const);
+const availableThemes: Record<Themes, string> = Object.freeze(
+	{ light: lightTheme.className, dark: darkTheme.className } as const,
+);
 
 export function ThemeToggler() {
 	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, light);
@@ -63,9 +62,7 @@ const Box = styled("div", {
 		c: "$deactivated-icon",
 		size: "100%",
 
-		"&:hover": {
-			c: "$active-icon",
-		},
+		"&:hover": { c: "$active-icon" },
 	},
 });
 

@@ -37,7 +37,7 @@ let previousText = clipboard.readText();
 (clipboard as ClipboardExtended).startWatching = () => {
 	if (!watcherId)
 		watcherId = setInterval(() => {
-			if (isTextDiff(previousText, (previousText = clipboard.readText())))
+			if (isTextDiff(previousText, previousText = clipboard.readText()))
 				clipboardEmitter.emit("text-changed");
 		}, 500);
 
@@ -56,20 +56,23 @@ const isTextDiff = (str1: string, str2: string) => str2 && str1 !== str2;
 export { clipboard as ExtendedClipboard };
 
 // Doing this Partial<{}> so typescript doesn't complain...
-type ClipboardExtended = Electron.Clipboard &
-	Partial<{
-		startWatching: () => ClipboardExtended;
-		stopWatching: () => ClipboardExtended;
-		off: <T>(
-			event: string,
-			listener?: (...args: T[]) => void,
-		) => ClipboardExtended;
-		on: <T>(
-			event: string,
-			listener: (...args: T[]) => void,
-		) => ClipboardExtended;
-		once: <T>(
-			event: string,
-			listener: (...args: T[]) => void,
-		) => ClipboardExtended;
-	}>;
+type ClipboardExtended =
+	& Electron.Clipboard
+	& Partial<
+		{
+			startWatching: () => ClipboardExtended;
+			stopWatching: () => ClipboardExtended;
+			off: <T>(
+				event: string,
+				listener?: (...args: T[]) => void,
+			) => ClipboardExtended;
+			on: <T>(
+				event: string,
+				listener: (...args: T[]) => void,
+			) => ClipboardExtended;
+			once: <T>(
+				event: string,
+				listener: (...args: T[]) => void,
+			) => ClipboardExtended;
+		}
+	>;

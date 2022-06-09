@@ -1,12 +1,27 @@
 {
-	"includes": ["src/**/*.*"],
-	"excludes": [],
 	"plugins": [
-		"https://plugins.dprint.dev/prettier-0.7.0.json@4e846f43b32981258cef5095b3d732522947592e090ef52333801f9d6e8adb33"
+		"https://plugins.dprint.dev/typescript-0.69.1.wasm",
+		"https://plugins.dprint.dev/json-0.15.3.wasm"
 	],
-	"prettier": {
-		"trailingComma": "all",
-		"arrowParens": "avoid",
-		"useTabs": true
+	"includes": ["src/**/*.{ts,tsx,js,jsx,json}"],
+	"excludes": ["**/node_modules", "**/*-lock.json"],
+	"lineWidth": 80,
+	"useTabs": true,
+	"indentWidth": 2,
+	"typescript": {
+		"exportDeclaration.sortNamedExports": "maintain",
+		"importDeclaration.sortNamedImports": "maintain",
+		"arrowFunction.useParentheses": "preferNone",
+		"module.sortImportDeclarations": "maintain",
+		"memberExpression.linePerExpression": false,
+		"binaryExpression.linePerExpression": false,
+		"trailingCommas": "onlyMultiLine",
+		"singleBodyPosition": "maintain",
+		"operatorPosition": "sameLine",
+		"bracePosition": "maintain",
+		"preferSingleLine": true,
+		"quoteProps": "asNeeded",
+		"useBraces": "maintain",
+		"semiColons": "always"
 	}
 }

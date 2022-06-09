@@ -1,10 +1,5 @@
 {
 	"compilerOptions": {
-		"lib": [
-			"DOM.Iterable",
-			"ESNext",
-			"DOM",
-		],
 		"noPropertyAccessFromIndexSignature": true,
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
@@ -16,7 +11,8 @@
 		"strictBindCallApply": true,
 		"preserveConstEnums": true,
 		"noUnusedParameters": true,
-		"moduleResolution": "node",
+		"moduleResolution": "Node",
+		"resolveJsonModule": true,
 		"noImplicitReturns": true,
 		"noErrorTruncation": true,
 		"strictNullChecks": true,
@@ -28,11 +24,11 @@
 		"importHelpers": true,
 		"alwaysStrict": true,
 		"skipLibCheck": true,
-		"target": "esnext",
+		"target": "ESNext",
 		"jsx": "react-jsx",
-		"module": "es2022",
+		"module": "ESNext",
 		"baseUrl": "./src",
-		"sourceMap": true,
+		"sourceMap": false,
 		"allowJs": true,
 		"checkJs": true,
 		"pretty": true,
@@ -68,11 +64,16 @@
 			"@main/*": [
 				"main/*"
 			]
-		}
+		},
+		"lib": [
+			"DOM.Iterable",
+			"ESNext",
+			"DOM",
+		],
 	},
 	"exclude": [
 		"node_modules",
 		"app",
 		"out"
-	]
+	],
 }

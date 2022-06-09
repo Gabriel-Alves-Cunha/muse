@@ -36,7 +36,4 @@ function contentToShow(content: NonNullable<Props["content"]>) {
 	}
 }
 
-type Props = {
-	content?: ContentEnum;
-	children: ReactNode;
-};
+type Props = { content?: ContentEnum; children: ReactNode; };

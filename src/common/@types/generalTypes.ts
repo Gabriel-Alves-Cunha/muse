@@ -8,28 +8,32 @@ export type Path = Readonly<string>;
 
 type DateAsNumber = Readonly<number>;
 
-export type Media = Readonly<{
-	genres?: readonly string[];
-	birthTime: DateAsNumber;
-	size: PrettyBytes;
-	duration: string;
-	artist?: string;
-	album?: string;
-	title: string;
-	img?: string;
-}>;
+export type Media = Readonly<
+	{
+		genres?: readonly string[];
+		birthTime: DateAsNumber;
+		size: PrettyBytes;
+		duration: string;
+		artist?: string;
+		album?: string;
+		title: string;
+		img?: string;
+	}
+>;
 
 export type Mutable<T> = {
 	-readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P];
 };
 
-export type DownloadInfo = Readonly<{
-	canStartDownload: boolean;
-	extension: AllowedMedias;
-	imageURL: string;
-	title: string;
-	url: string;
-}>;
+export type DownloadInfo = Readonly<
+	{
+		canStartDownload: boolean;
+		extension: AllowedMedias;
+		imageURL: string;
+		title: string;
+		url: string;
+	}
+>;
 
 export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
 

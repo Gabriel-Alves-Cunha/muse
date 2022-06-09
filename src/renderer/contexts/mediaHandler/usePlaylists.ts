@@ -14,30 +14,29 @@ import {
 	sortByName,
 } from "./usePlaylistsHelper";
 
-const {
-	media: { transformPathsToMedias },
-	fs: { deleteFile },
-} = electron;
+const { media: { transformPathsToMedias }, fs: { deleteFile } } = electron;
 
 const maxSizeOfHistory = 100;
 
-export type UsePlaylistsActions = Readonly<{
-	setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
+export type UsePlaylistsActions = Readonly<
+	{
+		setPlaylists: (action: Readonly<PlaylistsReducer_Action>) => void;
 
-	isLoadingMedias: boolean;
+		isLoadingMedias: boolean;
 
-	sortedByDate: Set<Path>;
-	sortedByName: MainList;
-	favorites: Set<Path>;
-	history: History;
-}>;
+		sortedByDate: Set<Path>;
+		sortedByName: MainList;
+		favorites: Set<Path>;
+		history: History;
+	}
+>;
 
 export const usePlaylists = create<UsePlaylistsActions>()(
 	setPlaylistsLocalStorage((set, get) => ({
 		isLoadingMedias: false,
 
-		sortedByDate:
-			(getFromLocalStorage(keys.sortedByDate) as Set<Path>) ?? new Set(),
+		sortedByDate: (getFromLocalStorage(keys.sortedByDate) as Set<Path>) ??
+			new Set(),
 		favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
 		history: (getFromLocalStorage(keys.history) as History) ?? new Map(),
 		sortedByName: new Map(),
@@ -132,9 +131,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
 									const { favorites } = get();
 
-									favorites.delete(action.path)
-										? set({ favorites })
-										: console.error("Media not found in favorites");
+									favorites.delete(action.path) ?
+										set({ favorites }) :
+										console.error("Media not found in favorites");
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. new favorites =",
@@ -210,10 +209,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										break;
 									}
 
-									set({
-										sortedByName: mainList,
-										sortedByDate,
-									});
+									set({ sortedByName: mainList, sortedByDate });
 
 									// If the media is in the favorites, remove it from the favorites
 									if (favorites.delete(action.path)) set({ favorites });
@@ -234,8 +230,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// If the media in the favorites list is not on
 									// action.list, remove it from the favorites:
 									const previousFavoritesSize = favorites.size;
-									favorites.forEach(
-										path => !action.list.has(path) && favorites.delete(path),
+									favorites.forEach(path =>
+										!action.list.has(path) && favorites.delete(path)
 									);
 									if (favorites.size !== previousFavoritesSize)
 										set({ favorites });
@@ -243,8 +239,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// If the media in the history list is not on
 									// action.list, remove it from the favorites:
 									const previousHistorySize = history.size;
-									history.forEach(
-										(_, path) => !action.list.has(path) && history.delete(path),
+									history.forEach((_, path) =>
+										!action.list.has(path) && history.delete(path)
 									);
 									if (history.size !== previousHistorySize) set({ history });
 
@@ -416,10 +412,9 @@ export const searchMedia = (searchTerm_: Readonly<string>): [Path, Media][] =>
 		const searchTerm = searchTerm_.toLowerCase();
 		const medias: [Path, Media][] = [];
 
-		mainList().forEach(
-			(media, path) =>
-				media.title.toLowerCase().includes(searchTerm) &&
-				medias.push([path, media]),
+		mainList().forEach((media, path) =>
+			media.title.toLowerCase().includes(searchTerm) &&
+			medias.push([path, media])
 		);
 
 		return medias;
@@ -439,42 +434,49 @@ export async function deleteMedia(path: Path) {
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export type History = Map<Path, { timesPlayed: number; playedAt: number[] }>;
+export type History = Map<Path, { timesPlayed: number; playedAt: number[]; }>;
 export type MainList = Map<Path, Media>;
 
 export type PlaylistsReducer_Action =
 	// ---------------------------------------- favorites:
-	| Readonly<{
+	| Readonly<
+		{
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
 			type: WhatToDo.UPDATE_FAVORITES;
 			path: Path;
-	  }>
-	| Readonly<{
+		}
+	>
+	| Readonly<
+		{
 			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA;
 			type: WhatToDo.UPDATE_FAVORITES;
 			path: Path;
-	  }>
-	| Readonly<{
+		}
+	>
+	| Readonly<
+		{
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH;
 			type: WhatToDo.UPDATE_FAVORITES;
 			path: Path;
-	  }>
-	| Readonly<{
-			type: WhatToDo.UPDATE_FAVORITES;
-			whatToDo: PlaylistActions.CLEAN;
-	  }>
+		}
+	>
+	| Readonly<
+		{ type: WhatToDo.UPDATE_FAVORITES; whatToDo: PlaylistActions.CLEAN; }
+	>
 	// ---------------------------------------- history:
-	| Readonly<{
+	| Readonly<
+		{
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
 			type: WhatToDo.UPDATE_HISTORY;
 			path: Path;
-	  }>
-	| Readonly<{
-			type: WhatToDo.UPDATE_HISTORY;
-			whatToDo: PlaylistActions.CLEAN;
-	  }>
+		}
+	>
+	| Readonly<
+		{ type: WhatToDo.UPDATE_HISTORY; whatToDo: PlaylistActions.CLEAN; }
+	>
 	// ---------------------------------------- main list:
-	| Readonly<{
+	| Readonly<
+		{
 			whatToDo:
 				| PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH
 				| PlaylistActions.ADD_ONE_MEDIA;
@@ -482,21 +484,25 @@ export type PlaylistsReducer_Action =
 			newMedia: Media;
 			newPath?: Path;
 			path: Path;
-	  }>
-	| Readonly<{
+		}
+	>
+	| Readonly<
+		{
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH;
 			type: WhatToDo.UPDATE_MAIN_LIST;
 			path: Path;
-	  }>
-	| Readonly<{
+		}
+	>
+	| Readonly<
+		{
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST;
 			type: WhatToDo.UPDATE_MAIN_LIST;
 			list: MainList;
-	  }>
-	| Readonly<{
-			type: WhatToDo.UPDATE_MAIN_LIST;
-			whatToDo: PlaylistActions.CLEAN;
-	  }>;
+		}
+	>
+	| Readonly<
+		{ type: WhatToDo.UPDATE_MAIN_LIST; whatToDo: PlaylistActions.CLEAN; }
+	>;
 
 export enum PlaylistActions {
 	REFRESH_ONE_MEDIA_BY_PATH = "REFRESH_ONE_MEDIA_BY_PATH",

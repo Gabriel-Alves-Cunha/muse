@@ -29,9 +29,7 @@ export const Wrapper = styled("div", {
 		h: 70,
 	},
 
-	"& svg": {
-		c: "$media-player-icons",
-	},
+	"& svg": { c: "$media-player-icons" },
 });
 
 export const OptionsAndAlbum = styled("div", {
@@ -58,24 +56,11 @@ export const SquareImage = styled("div", {
 	b: "none",
 	br: 17,
 
-	"&::after": {
-		content: "",
-		d: "block",
-		pb: "100%",
-	},
+	"&::after": { content: "", d: "block", pb: "100%" },
 
-	div: {
-		pos: "absolute",
-		dcolumn: "center",
-		size: "100%",
-	},
+	div: { pos: "absolute", dcolumn: "center", size: "100%" },
 
-	img: {
-		objectFit: "cover",
-		size: "100%",
-
-		br: 17,
-	},
+	img: { objectFit: "cover", size: "100%", br: 17 },
 });
 
 export const Info = styled("div", {
@@ -97,15 +82,9 @@ export const Info = styled("div", {
 
 		oy: "hidden",
 
-		"&#title": {
-			fs: "1.2rem",
-			fw: 500,
-		},
+		"&#title": { fs: "1.2rem", fw: 500 },
 
-		"&#subtitle": {
-			fs: "0.9rem",
-			fw: 400,
-		},
+		"&#subtitle": { fs: "0.9rem", fw: 400 },
 	},
 });
 
@@ -170,70 +149,27 @@ export const TooltipCircleIconButton = styled("button", {
 
 	transition: "$bgc",
 
-	"&:hover": {
-		transition: "$bgc",
-		bg: "$media-player-icon-button-hovered",
-	},
+	"&:hover": { transition: "$bgc", bg: "$media-player-icon-button-hovered" },
 
 	variants: {
-		size: {
-			small: {
-				size: 30,
-			},
-			large: {
-				size: 50,
-				mx: 5,
-			},
-		},
+		size: { small: { size: 30 }, large: { size: 50, mx: 5 } },
 
 		"tooltip-side": {
-			"left-bottom": {
-				"&::before, &::after": {
-					r: "50%",
-					t: "110%",
-				},
-			},
-			bottom: {
-				"&::before, &::after": {
-					t: "110%",
-				},
-			},
-			right: {
-				"&::before, &::after": {
-					left: "110%",
-				},
-			},
-			left: {
-				"&::before, &::after": {
-					r: "110%",
-				},
-			},
-			top: {
-				"&::before, &::after": {
-					bottom: "110%",
-				},
-			},
+			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
+			bottom: { "&::before, &::after": { t: "110%" } },
+			right: { "&::before, &::after": { left: "110%" } },
+			left: { "&::before, &::after": { r: "110%" } },
+			top: { "&::before, &::after": { bottom: "110%" } },
 		},
 	},
 
-	defaultVariants: {
-		"tooltip-side": "bottom",
-		size: "small",
-	},
+	defaultVariants: { "tooltip-side": "bottom", size: "small" },
 
 	////////////////////////////////////////////////
 	// Tooltip:
-	"&:active": {
-		"&::before, &::after": {
-			visibility: "hidden",
-		},
-	},
+	"&:active": { "&::before, &::after": { visibility: "hidden" } },
 
-	"&:hover::before": {
-		visibility: "visible",
-
-		transition: "all 0.4s 1s ease ",
-	},
+	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
 
 	"&::before, &::after": {
 		visibility: "hidden",
@@ -268,9 +204,7 @@ export const ProgressWrapper = styled("div", {
 	cursor: "pointer",
 	bg: "$bg-main",
 
-	"& span": {
-		d: "none",
-	},
+	"& span": { d: "none" },
 
 	"&:hover span": {
 		pos: "absolute",

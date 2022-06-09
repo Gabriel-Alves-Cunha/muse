@@ -18,11 +18,11 @@ export function ButtonGroup({ buttons }: Props) {
 			let isFirst = false;
 
 			// On the order that is inside <Wrapper>, the first one that is true, if equals to the button received on params, it is the first one:
-			const first: OneOf<Buttons> = reload
-				? "reload"
-				: sortBy
-				? "sortBy"
-				: "clean";
+			const first: OneOf<Buttons> = reload ?
+				"reload" :
+				sortBy ?
+				"sortBy" :
+				"clean";
 
 			if (button === first) isFirst = true;
 
@@ -33,11 +33,11 @@ export function ButtonGroup({ buttons }: Props) {
 			let isLast = false;
 
 			// On the reverse order that is inside <Wrapper>, the first one that is true, if equals to the button received on params, it is the last one:
-			const last: OneOf<Buttons> = clean
-				? "clean"
-				: sortBy
-				? "sortBy"
-				: "reload";
+			const last: OneOf<Buttons> = clean ?
+				"clean" :
+				sortBy ?
+				"sortBy" :
+				"reload";
 
 			if (button === last) isLast = true;
 
@@ -61,12 +61,6 @@ export function ButtonGroup({ buttons }: Props) {
 	);
 }
 
-type Buttons = {
-	reload?: boolean;
-	sortBy?: boolean;
-	clean?: boolean;
-};
+type Buttons = { reload?: boolean; sortBy?: boolean; clean?: boolean; };
 
-type Props = {
-	buttons: Buttons;
-};
+type Props = { buttons: Buttons; };

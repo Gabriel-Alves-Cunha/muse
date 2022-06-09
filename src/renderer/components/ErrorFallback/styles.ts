@@ -12,10 +12,7 @@ export const ErrorMsg = styled("pre", {
 	fw: 500,
 });
 
-export const Center = styled("div", {
-	pos: "relative",
-	dcolumn: "center",
-});
+export const Center = styled("div", { pos: "relative", dcolumn: "center" });
 
 export const TriggerOptions = styled(Trigger, {
 	pos: "relative",
@@ -32,10 +29,7 @@ export const TriggerOptions = styled(Trigger, {
 
 	transition: "$bgc",
 
-	"&:hover": {
-		transition: "$bgc",
-		bg: "$icon-button-hovered",
-	},
+	"&:hover": { transition: "$bgc", bg: "$icon-button-hovered" },
 
 	// Hack to make the height the same size as the width:
 	"&::before": {

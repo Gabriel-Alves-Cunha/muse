@@ -5,11 +5,9 @@ import { Trigger, type DialogTriggerProps } from "@radix-ui/react-dialog";
 import { TooltipButton_ } from "@components/TooltipButton";
 import { styled } from "@styles/global";
 
-export const DialogTrigger = ({
-	"data-tooltip": dataTooltip,
-	"tooltip-side": tooltipSide,
-	children,
-}: Props) => (
+export const DialogTrigger = (
+	{ "data-tooltip": dataTooltip, "tooltip-side": tooltipSide, children }: Props,
+) => (
 	<StyledTrigger tooltip-side={tooltipSide} data-tooltip={dataTooltip}>
 		{children}
 	</StyledTrigger>
@@ -29,24 +27,13 @@ const StyledTrigger = styled(Trigger, {
 
 	transition: "$bgc",
 
-	"&:hover": {
-		transition: "$bgc",
-		bg: "$icon-button-hovered",
-	},
+	"&:hover": { transition: "$bgc", bg: "$icon-button-hovered" },
 
 	// For tooltip, cause I could not make it work
 	// with the TooltipButton_ component:
-	"&:active": {
-		"&::before, &::after": {
-			visibility: "hidden",
-		},
-	},
+	"&:active": { "&::before, &::after": { visibility: "hidden" } },
 
-	"&:hover::before": {
-		visibility: "visible",
-
-		transition: "all 0.4s 1s ease ",
-	},
+	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
 
 	"&::before, &::after": {
 		visibility: "hidden",
@@ -73,38 +60,15 @@ const StyledTrigger = styled(Trigger, {
 
 	variants: {
 		"tooltip-side": {
-			"left-bottom": {
-				"&::before, &::after": {
-					r: "50%",
-					t: "110%",
-				},
-			},
-			bottom: {
-				"&::before, &::after": {
-					t: "110%",
-				},
-			},
-			right: {
-				"&::before, &::after": {
-					l: "110%",
-				},
-			},
-			left: {
-				"&::before, &::after": {
-					r: "110%",
-				},
-			},
-			top: {
-				"&::before, &::after": {
-					bottom: "110%",
-				},
-			},
+			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
+			bottom: { "&::before, &::after": { t: "110%" } },
+			right: { "&::before, &::after": { l: "110%" } },
+			left: { "&::before, &::after": { r: "110%" } },
+			top: { "&::before, &::after": { bottom: "110%" } },
 		},
 	},
 
-	defaultVariants: {
-		"tooltip-side": "bottom",
-	},
+	defaultVariants: { "tooltip-side": "bottom" },
 });
 
 type Props = DialogTriggerProps & {

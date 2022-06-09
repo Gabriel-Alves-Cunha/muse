@@ -14,9 +14,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	c: "$deactivated-icon",
 	fs: "1rem",
 
-	"&:hover": {
-		c: "$active-icon",
-	},
+	"&:hover": { c: "$active-icon" },
 
 	"&.has-items": {
 		"& p": {
@@ -51,17 +49,9 @@ export const StyledPopoverTrigger = styled(Trigger, {
 
 	////////////////////////////////////////////////
 	// Tooltip:
-	"&:active": {
-		"&::before, &::after": {
-			visibility: "hidden",
-		},
-	},
+	"&:active": { "&::before, &::after": { visibility: "hidden" } },
 
-	"&:hover::before": {
-		visibility: "visible",
-
-		transition: "all 0.4s 1s ease ",
-	},
+	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
 
 	"&::before, &::after": {
 		visibility: "hidden",
@@ -89,60 +79,25 @@ export const StyledPopoverTrigger = styled(Trigger, {
 
 	variants: {
 		"tooltip-side": {
-			"left-bottom": {
-				"&::before, &::after": {
-					r: "50%",
-					t: "110%",
-				},
-			},
-			bottom: {
-				"&::before, &::after": {
-					t: "110%",
-				},
-			},
-			right: {
-				"&::before, &::after": {
-					l: "110%",
-				},
-			},
-			left: {
-				"&::before, &::after": {
-					r: "110%",
-				},
-			},
-			top: {
-				"&::before, &::after": {
-					bottom: "110%",
-				},
-			},
+			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
+			bottom: { "&::before, &::after": { t: "110%" } },
+			right: { "&::before, &::after": { l: "110%" } },
+			left: { "&::before, &::after": { r: "110%" } },
+			top: { "&::before, &::after": { bottom: "110%" } },
 		},
 	},
 
-	defaultVariants: {
-		"tooltip-side": "bottom",
-	},
+	defaultVariants: { "tooltip-side": "bottom" },
 });
 
 const fallAway = keyframes({
-	"0%": {
-		transform: "rotateZ(0deg)",
-		opacity: 1,
-		top: 0,
-	},
-	"25%": {
-		transform: "rotateZ(-15deg)",
-	},
-	"100%": {
-		transform: "rotateZ(-5deg)",
-		opacity: 0,
-		top: 200,
-	},
+	"0%": { transform: "rotateZ(0deg)", opacity: 1, top: 0 },
+	"25%": { transform: "rotateZ(-15deg)" },
+	"100%": { transform: "rotateZ(-5deg)", opacity: 0, top: 200 },
 });
 
 const moveUp = keyframes({
-	"0%": {
-		transform: "translateY(0px)",
-	},
+	"0%": { transform: "translateY(0px)" },
 	"100%": {
 		// -73 is the (height + 1 * gap):
 		transform: "translateY(-73px)",
@@ -204,12 +159,6 @@ export const TitleAndCancelWrapper = styled("div", {
 		br: "50%",
 		b: "none",
 
-		"&:focus, &:hover": {
-			bg: "$button-hovered",
-
-			"& svg": {
-				fill: "red",
-			},
-		},
+		"&:focus, &:hover": { bg: "$button-hovered", "& svg": { fill: "red" } },
 	},
 });

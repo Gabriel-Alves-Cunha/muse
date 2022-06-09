@@ -40,16 +40,9 @@ const electron: VisibleElectron = Object.freeze({
 		readFile,
 		readdir,
 	},
-	media: {
-		transformPathsToMedias,
-		getBasicInfo,
-	},
-	notificationApi: {
-		sendNotificationToElectronIpcMainProcess,
-	},
-	os: {
-		dirs,
-	},
+	media: { transformPathsToMedias, getBasicInfo },
+	notificationApi: { sendNotificationToElectronIpcMainProcess },
+	os: { dirs },
 });
 
 contextBridge.exposeInMainWorld("electron", electron);
@@ -82,7 +75,7 @@ window.onmessage = async (
 				break;
 			}
 
-			electronPort.onmessage = async ({ data }: { data: HandleDownload }) =>
+			electronPort.onmessage = async ({ data }: { data: HandleDownload; }) =>
 				await handleCreateOrCancelDownload({ ...data, electronPort });
 
 			electronPort.addEventListener("close", handleClosePort);
@@ -98,7 +91,7 @@ window.onmessage = async (
 				break;
 			}
 
-			electronPort.onmessage = ({ data }: { data: HandleConversion }) =>
+			electronPort.onmessage = ({ data }: { data: HandleConversion; }) =>
 				handleCreateOrCancelConvert({ ...data, electronPort });
 
 			electronPort.addEventListener("close", handleClosePort);
@@ -135,7 +128,8 @@ window.onmessage = async (
 
 		default: {
 			console.error(
-				`There is no method to handle this event.data: (${typeof event.data}) '`,
+				`There is no method to handle this event.data: (${typeof event
+					.data}) '`,
 				event.data,
 				"'\nEvent =",
 				event,

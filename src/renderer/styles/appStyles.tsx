@@ -21,11 +21,7 @@ export const Content = styled("div", {
 	},
 });
 
-const rotating = keyframes({
-	to: {
-		transform: "rotate(1turn)",
-	},
-});
+const rotating = keyframes({ to: { transform: "rotate(1turn)" } });
 
 export const Loading = styled("div", {
 	size: 25,

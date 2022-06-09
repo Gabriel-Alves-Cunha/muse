@@ -18,9 +18,9 @@ export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	function handleSelectedFiles({
-		target: { files },
-	}: ChangeEvent<HTMLInputElement>) {
+	function handleSelectedFiles(
+		{ target: { files } }: ChangeEvent<HTMLInputElement>,
+	) {
 		if (!files) return;
 
 		const paths: Path[] = [];
@@ -37,10 +37,7 @@ export function Convert() {
 			const { convertInfoList } = getConvertInfoList();
 
 			selectedMediasPath.forEach(path =>
-				convertInfoList.set(path, {
-					canStartConvert: true,
-					toExtension,
-				}),
+				convertInfoList.set(path, { canStartConvert: true, toExtension })
 			);
 
 			// To start convert, add to the convertInfoList:

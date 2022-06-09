@@ -144,10 +144,7 @@ export const itemContent = (_index: number, [path, media]: [Path, Media]) => (
 export const reloadWindow = () =>
 	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
 
-type RowProps = Readonly<{
-	media: Media;
-	path: Path;
-}>;
+type RowProps = Readonly<{ media: Media; path: Path; }>;
 
 type FromList = {
 	fromList: Exclude<

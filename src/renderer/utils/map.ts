@@ -11,8 +11,7 @@ export function getFirstKey<Key>(
 	return ret;
 }
 
-const getLastIn =
-	(iteratorFn: "entries" | "keys" | "values") =>
+const getLastIn = (iteratorFn: "entries" | "keys" | "values") =>
 	<K, V>(map: Map<K, V> | Set<K>) => {
 		const mapIterator = map[iteratorFn]();
 		let curr;

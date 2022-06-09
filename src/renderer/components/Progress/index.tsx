@@ -9,11 +9,9 @@ import { ProgressStatus } from "@common/enums";
 
 import { Bar, Component } from "./styles";
 
-export const Progress = ({
-	percent_0_to_100,
-	showStatus,
-	status,
-}: ProgressProps) => (
+export const Progress = (
+	{ percent_0_to_100, showStatus, status }: ProgressProps,
+) => (
 	<Component>
 		<Bar
 			value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}

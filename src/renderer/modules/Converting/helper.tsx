@@ -50,20 +50,20 @@ export function Popup() {
 
 	return (
 		<>
-			{convertingList.size > 0 ? (
-				convertBoxes()
-			) : (
-				<p>No conversions in progress!</p>
-			)}
+			{convertingList.size > 0 ?
+				(convertBoxes()) :
+				<p>No conversions in progress!</p>}
 		</>
 	);
 }
 
-export const ConvertBox = ({
-	mediaBeingConverted: { toExtension, timeConverted, sizeConverted },
-	convertionIndex,
-	path,
-}: ConvertBoxProps) => (
+export const ConvertBox = (
+	{
+		mediaBeingConverted: { toExtension, timeConverted, sizeConverted },
+		convertionIndex,
+		path,
+	}: ConvertBoxProps,
+) => (
 	<ItemWrapper className="item">
 		<TitleAndCancelWrapper>
 			<p>{getBasename(path) + "." + toExtension}</p>
@@ -95,9 +95,7 @@ export function createNewConvert(
 ): MessagePort {
 	const { convertingList } = getConvertingList();
 
-	dbg("Trying to create a new conversion...", {
-		convertingList,
-	});
+	dbg("Trying to create a new conversion...", { convertingList });
 
 	if (convertingList.has(path)) {
 		const info = `There is already one convert of "${path}"!`;
@@ -132,7 +130,7 @@ export function createNewConvert(
 		path,
 	});
 
-	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
+	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted>; }) => {
 		const { convertingList } = getConvertingList();
 
 		dbg(`Received a message from Electron on port for "${path}":`, {
@@ -147,17 +145,14 @@ export function createNewConvert(
 			);
 
 		setConvertingList({
-			convertingList: convertingList.set(path, {
-				...convertStatus,
-				...data,
-			}),
+			convertingList: convertingList.set(path, { ...convertStatus, ...data }),
 		});
 
 		switch (data.status) {
 			case ProgressStatus.FAILED: {
 				// @ts-ignore ^ In this case, `data` include an `error: Error` key.
 				console.assert(data.error, "data.error should exist!");
-				console.error((data as typeof data & { error: Error }).error);
+				console.error((data as typeof data & { error: Error; }).error);
 
 				errorToast(`Download of "${path}" failed!`);
 
@@ -205,24 +200,27 @@ const format = (str: string) => str.slice(0, str.lastIndexOf("."));
 
 export const handleOnClose = () => dbg("Closing ports (react port).");
 
-export type MediaBeingConverted = Readonly<{
-	status: ProgressProps["status"];
-	toExtension: AllowedMedias;
-	sizeConverted: number;
-	timeConverted: string;
-	isConverting: boolean;
-	port: MessagePort;
-}>;
+export type MediaBeingConverted = Readonly<
+	{
+		status: ProgressProps["status"];
+		toExtension: AllowedMedias;
+		sizeConverted: number;
+		timeConverted: string;
+		isConverting: boolean;
+		port: MessagePort;
+	}
+>;
 
-type ConvertBoxProps = Readonly<{
-	mediaBeingConverted: MediaBeingConverted;
-	convertionIndex: number;
-	path: Path;
-}>;
+type ConvertBoxProps = Readonly<
+	{
+		mediaBeingConverted: MediaBeingConverted;
+		convertionIndex: number;
+		path: Path;
+	}
+>;
 
-type ConvertInfo = Readonly<{
-	toExtension: AllowedMedias;
-	canStartConvert: boolean;
-}>;
+type ConvertInfo = Readonly<
+	{ toExtension: AllowedMedias; canStartConvert: boolean; }
+>;
 
-type ConvertInfoList = { convertInfoList: Map<Path, ConvertInfo> };
+type ConvertInfoList = { convertInfoList: Map<Path, ConvertInfo>; };

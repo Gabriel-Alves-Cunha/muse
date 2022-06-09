@@ -9,12 +9,7 @@ export const Home = () => (
 		<Header>
 			<SearchMedia />
 
-			<ButtonGroup
-				buttons={{
-					reload: true,
-					sortBy: true,
-				}}
-			/>
+			<ButtonGroup buttons={{ reload: true, sortBy: true }} />
 		</Header>
 
 		<MediaListKind isHome />

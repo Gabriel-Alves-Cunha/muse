@@ -64,13 +64,15 @@ function IsLoading() {
 function Result() {
 	const { result } = useSearchInfo();
 
-	return result ? (
-		<ResultContainer>
-			<img src={result.imageURL} alt="Video thumbnail" />
+	return result ?
+		(
+			<ResultContainer>
+				<img src={result.imageURL} alt="Video thumbnail" />
 
-			<p>{result.title}</p>
+				<p>{result.title}</p>
 
-			<BorderedButton onClick={downloadMedia}>Download</BorderedButton>
-		</ResultContainer>
-	) : null;
+				<BorderedButton onClick={downloadMedia}>Download</BorderedButton>
+			</ResultContainer>
+		) :
+		null;
 }

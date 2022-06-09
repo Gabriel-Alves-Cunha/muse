@@ -123,25 +123,16 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 
 			scroll: (size: string | number) => ({
 				/* width */
-				"&::-webkit-scrollbar": {
-					d: "block",
-					size,
-				},
+				"&::-webkit-scrollbar": { d: "block", size },
 
 				/* Track */
-				"&::-webkit-scrollbar-track": {
-					bg: "$scrollbar",
-				},
+				"&::-webkit-scrollbar-track": { bg: "$scrollbar" },
 
 				/* Handle */
-				"&::-webkit-scrollbar-thumb": {
-					bg: "$scrollbar-thumb",
-				},
+				"&::-webkit-scrollbar-thumb": { bg: "$scrollbar-thumb" },
 
 				/* Handle on hover */
-				"&::-webkit-scrollbar-thumb:hover": {
-					bg: "$scrollbar-thumb-hover",
-				},
+				"&::-webkit-scrollbar-thumb:hover": { bg: "$scrollbar-thumb-hover" },
 			}),
 		},
 	});
@@ -293,12 +284,9 @@ if (isDevelopment) {
 	const areEqual = areArraysEqual(lightThemeKeys, darkThemeKeys);
 
 	dbg(
-		{
-			lightThemeKeys,
-			darkThemeKeys,
-		},
+		{ lightThemeKeys, darkThemeKeys },
 		"Are light and dark themes keys the same?",
-		areEqual,
+		areEqual
 	);
 }
 
@@ -325,21 +313,29 @@ export const GlobalCSS = globalCss({
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 300,
-			src: "local(''), url('./assets/fonts/assistant-v16-latin-300.woff2') format('woff2')",
+			// This shit is the hacky way I found to get the fonts to load
+			// both on development and production with Vite!
+			src: `local(''), url('./assets/${
+				isDevelopment ? "fonts/" : ""
+			}assistant-v16-latin-300.woff2') format('woff2')`,
 		},
 		/* assistant-regular-400 - latin */
 		{
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 400,
-			src: "local(''), url('./assets/fonts/assistant-v16-latin-regular.woff2') format('woff2')",
+			src: `local(''), url('./assets/${
+				isDevelopment ? "fonts/" : ""
+			}assistant-v16-latin-regular.woff2') format('woff2')`,
 		},
 		/* assistant-500 - latin */
 		{
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 500,
-			src: "local(''), url('./assets/fonts/assistant-v16-latin-500.woff2') format('woff2')",
+			src: `local(''), url('./assets/${
+				isDevelopment ? "fonts/" : ""
+			}assistant-v16-latin-500.woff2') format('woff2')`,
 		},
 
 		/* source-sans-pro-regular-400 - latin */
@@ -347,13 +343,13 @@ export const GlobalCSS = globalCss({
 			fontFamily: "Source Sans Pro",
 			fontStyle: "normal",
 			fontWeight: 400,
-			src: "local(''), url('./assets/fonts/source-sans-pro-v21-latin-regular.woff2') format('woff2')",
+			src: `local(''), url('./assets/${
+				isDevelopment ? "fonts/" : ""
+			}source-sans-pro-v21-latin-regular.woff2') format('woff2')`,
 		},
 	],
 
-	button: {
-		"-webkit-app-region": "no-drag",
-	},
+	button: { "-webkit-app-region": "no-drag" },
 
 	body: {
 		overflow: "hidden !important",
@@ -363,23 +359,16 @@ export const GlobalCSS = globalCss({
 		containIntrinsicSize: "1px 5000px",
 		contentVisibility: "auto",
 
-		"& .notransition *": {
-			transition: "none !important",
-		},
+		"& .notransition *": { transition: "none !important" },
 	},
 
 	html: {
 		caretColor: "$accent",
 		overflow: "hidden",
 
-		"::selection": {
-			background: "$accent",
-			color: "#fff",
-		},
+		"::selection": { background: "$accent", color: "#fff" },
 
-		"::-webkit-scrollbar": {
-			display: "none",
-		},
+		"::-webkit-scrollbar": { display: "none" },
 	},
 });
 

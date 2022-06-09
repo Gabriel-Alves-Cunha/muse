@@ -5,7 +5,7 @@
 	"description": "Just an Youtube music downloader and player.",
 	"author": "Gabriel Alves Cunha <gabriel925486@outlook.com>",
 	"main": "app/index.js",
-	"type": "module",
+	"type": "commonjs",
 	"license": "MIT",
 	"scripts": {
 		"preview": "yarn build && cross-env NODE_ENV=production electron --trace-warnings --unhandled-rejections=strict --inspect app",
@@ -16,8 +16,9 @@
 		"build": "elecrun build --preload 'preload.ts' && vite build",
 		"postinstall": "electron-builder install-app-deps",
 		"lint": "eslint ./ --ext .ts --ext .tsx --ext .js",
-		"test": "cross-env DEBUG=muse:tests vitest",
 		"test_": "cross-env DEBUG=muse:tests vitest --dir './src/__tests__'",
+		"test": "cross-env DEBUG=muse:tests vitest",
+		"ts:check": "tsc --noEmit --pretty",
 		"coverage": "vitest run --coverage",
 		"fmt:check": "dprint check",
 		"clean": "elecrun clean",
@@ -72,10 +73,5 @@
 		"node-taglib-sharp": "^4.0.2",
 		"sanitize-filename": "^1.6.3",
 		"ytdl-core": "^4.11.0"
-	},
-	"prettier": {
-		"trailingComma": "all",
-		"arrowParens": "avoid",
-		"useTabs": true
 	}
 }

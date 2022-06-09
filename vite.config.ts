@@ -36,10 +36,11 @@ export default defineConfig({
 		outDir: outDirRenderer,
 		emptyOutDir: true,
 		minify: "esbuild",
-		sourcemap: false,
 		target: "esnext",
+		sourcemap: false,
 		rollupOptions: {
 			output: {
+				format: "esm",
 				entryFileNames: "[name].js",
 				chunkFileNames: "[name].js",
 				assetFileNames: "assets/[name].[ext]",
@@ -47,11 +48,16 @@ export default defineConfig({
 		},
 	},
 	esbuild: {
+		sourcemap: "external",
+		treeShaking: true,
+		target: "esnext",
+		format: "esm",
 		minify: true,
 	},
 	css: {
 		devSourcemap: true,
 	},
+	assetsInclude: ["**/*.woff2"],
 	resolve: {
 		alias: [
 			{

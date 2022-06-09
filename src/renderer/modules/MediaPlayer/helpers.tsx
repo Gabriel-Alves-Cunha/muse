@@ -69,7 +69,7 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 					data-tooltip="Toggle loop this media"
 					onClick={toggleLoopMedia}
 				>
-					{loopThisMedia ? <Repeat size="18" /> : <RepeatOne size="18" />}
+					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
 				</TooltipCircleIconButton>
 
 				<Controls isPaused={audio?.paused} />
@@ -99,11 +99,9 @@ export const Header = ({ media, path }: RefToMedia) => (
 			data-tooltip="Toggle favorite"
 			tooltip-side="left-bottom"
 		>
-			{favorites().has(path) ? (
-				<Favorite size={17} />
-			) : (
-				<AddFavorite size={17} />
-			)}
+			{favorites().has(path) ?
+				<Favorite size={17} /> :
+				<AddFavorite size={17} />}
 		</TooltipCircleIconButton>
 	</OptionsAndAlbum>
 );
@@ -158,14 +156,11 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 	const duration = audio?.duration;
 
-	const { formatedDuration, isDurationValid } = useMemo(
-		() => ({
-			// @ts-ignore => It will give false if duration is undefined:
-			isDurationValid: duration > 0 && typeof duration === "number",
-			formatedDuration: formatDuration(duration),
-		}),
-		[duration],
-	);
+	const { formatedDuration, isDurationValid } = useMemo(() => ({
+		// @ts-ignore => It will give false if duration is undefined:
+		isDurationValid: duration > 0 && typeof duration === "number",
+		formatedDuration: formatDuration(duration),
+	}), [duration]);
 
 	const handleTooltip = useCallback(
 		({ nativeEvent: { offsetX: mouseX } }: SeekEvent) => {
@@ -221,7 +216,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 }
 
 type Audio = HTMLAudioElement | null;
-type RefToAudio = Readonly<{ audio: Audio }>;
-type IsPaused = Readonly<{ isPaused: boolean | undefined }>;
+type RefToAudio = Readonly<{ audio: Audio; }>;
+type IsPaused = Readonly<{ isPaused: boolean | undefined; }>;
 type SeekEvent = React.MouseEvent<HTMLDivElement, MouseEvent>;
-type RefToMedia = Readonly<{ media: Media | undefined; path: Path }>;
+type RefToMedia = Readonly<{ media: Media | undefined; path: Path; }>;

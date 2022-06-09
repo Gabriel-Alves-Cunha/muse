@@ -1,4 +1,4 @@
-type ErrorWithMessage = { message: string };
+type ErrorWithMessage = { message: string; };
 
 const isErrorWithMessage = (error: unknown): error is ErrorWithMessage =>
 	typeof error === "object" && error !== null && "message" in error;

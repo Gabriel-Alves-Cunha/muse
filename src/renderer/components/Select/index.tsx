@@ -11,15 +11,17 @@ export enum ContentEnum {
 
 const { HEADER_BUTTONS } = ContentEnum;
 
-export const Select = <Options extends string>({
-	"data-tooltip": dataTooltip,
-	content = HEADER_BUTTONS,
-	triggerClassName = "",
-	triggerTitle = "",
-	children,
-	setValue,
-	value,
-}: Props<Options>) => (
+export const Select = <Options extends string>(
+	{
+		"data-tooltip": dataTooltip,
+		content = HEADER_BUTTONS,
+		triggerClassName = "",
+		triggerTitle = "",
+		children,
+		setValue,
+		value,
+	}: Props<Options>,
+) => (
 	<Root value={value} onValueChange={setValue}>
 		<Trigger className={triggerClassName} data-tooltip={dataTooltip}>
 			<Value>{triggerTitle}</Value>

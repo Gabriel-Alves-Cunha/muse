@@ -19,13 +19,9 @@ export const Content = styled(RadixContent, {
 		0px 10px 20px -15px rgba(22, 23, 24, 0.2)`,
 });
 
-export const Trigger = styled(RadixTrigger, {
-	...TooltipButton_,
-});
+export const Trigger = styled(RadixTrigger, { ...TooltipButton_ });
 
-export const Viewport = styled(RadixViewport, {
-	p: 5,
-});
+export const Viewport = styled(RadixViewport, { p: 5 });
 
 export const Item = styled(RadixItem, {
 	all: "unset",
@@ -52,10 +48,7 @@ export const Item = styled(RadixItem, {
 		pointerEvents: "none",
 	},
 
-	"&:focus": {
-		c: "$ctx-menu-item-text-focus",
-		bg: "$ctx-menu-item-bg-focus",
-	},
+	"&:focus": { c: "$ctx-menu-item-text-focus", bg: "$ctx-menu-item-bg-focus" },
 });
 
 export const Label = styled(RadixLabel, {

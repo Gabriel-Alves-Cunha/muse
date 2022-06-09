@@ -41,11 +41,7 @@ export const search = async () => {
 
 	dbg(`Searching for "${url}".`);
 
-	setSearchInfo({
-		result: undefined,
-		isLoading: true,
-		error: "",
-	});
+	setSearchInfo({ result: undefined, isLoading: true, error: "" });
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -62,24 +58,24 @@ export const search = async () => {
 		setSearchInfo({
 			isLoading: false,
 			result: undefined,
-			error: getErrorMessage(error).includes("No video id found")
-				? "No video ID found!"
-				: "There was an error getting media information!",
+			error: getErrorMessage(error).includes("No video id found") ?
+				"No video ID found!" :
+				"There was an error getting media information!",
 		});
 
 		console.error(error);
 	}
 };
 
-type UrlMediaMetadata = Readonly<{
-	imageURL: string;
-	artist: string;
-	title: string;
-}>;
+type UrlMediaMetadata = Readonly<
+	{ imageURL: string; artist: string; title: string; }
+>;
 
-type SearcherInfo = Readonly<{
-	result: UrlMediaMetadata | undefined;
-	isLoading: boolean;
-	error: string;
-	url: string;
-}>;
+type SearcherInfo = Readonly<
+	{
+		result: UrlMediaMetadata | undefined;
+		isLoading: boolean;
+		error: string;
+		url: string;
+	}
+>;

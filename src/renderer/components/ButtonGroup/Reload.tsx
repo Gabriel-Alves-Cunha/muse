@@ -21,4 +21,4 @@ export function Reload({ className }: Props) {
 	);
 }
 
-type Props = { className?: string };
+type Props = { className?: string; };
