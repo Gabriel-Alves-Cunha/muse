@@ -21,6 +21,8 @@ export function Converting() {
 	const { convertInfoList } = useConvertInfoList();
 	const [isOpen, setIsOpen] = useState(false);
 
+	console.log({ convertInfoList });
+
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
@@ -59,7 +61,7 @@ export function Converting() {
 				data-tooltip="Show all converting medias"
 				tooltip-side="right"
 			>
-				<p data-length={convertingListSize}></p>
+				<span data-length={convertingListSize}></span>
 
 				<Convert size={20} />
 			</StyledPopoverTrigger>

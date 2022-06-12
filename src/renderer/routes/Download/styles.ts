@@ -1,65 +1,123 @@
 import { MainArea } from "@components/MainArea";
 import { styled } from "@styles/global";
 
-export const Wrapper = styled(MainArea, {
+export const GridWrapper = styled(MainArea, {
 	pos: "relative",
 	d: "flex",
 	fd: "column",
-	h: "100vh",
-	w: "100%",
+	size: "100%",
 
 	oy: "auto",
 	scroll: 5,
 });
 
-export const Box = styled("div", { dflex: "center", w: "100%" });
-
 export const SearchWrapper = styled("div", {
 	pos: "relative",
-	dflex: "center",
+	d: "flex",
+	justifyContent: "flex-start",
+	alignItems: "center",
 	w: "80%",
 	h: 60,
 
 	"& p": {
 		pos: "absolute",
-		mt: "4rem",
+		bottom: -10,
+		l: "25%",
 
-		ff: "$secondary",
+		ff: "$primary",
 		ls: "0.03rem",
-		fs: "0.9rem",
+		fs: "0.92rem",
 		c: "red",
-		fw: 300,
+		fw: 400,
 	},
 });
 
-export const Searcher = styled("button", {
+const height = "40px";
+export const Searcher = styled("div", {
 	pos: "relative",
 	d: "flex", // row
 	justifyContent: "flex-start",
 	alignItems: "center",
-	w: "100%",
-	h: 40,
+	w: 300,
+	height,
 
-	b: "1px solid lightgray",
-	cursor: "text",
+	b: "2px solid $input-border",
+	cursor: "default",
+	br: "0.75rem",
 	bg: "none",
-	br: 20,
 
-	"& svg": { c: "$text", ml: 10 },
+	transition: "all ease 250ms",
+
+	"&:hover, &:focus-within": {
+		transition: "all ease 250ms",
+
+		borderColor: "$input-border-active",
+
+		"& svg": { c: "$input-border-active" },
+
+		"& label": {
+			t: "-180%",
+			l: -30,
+
+			c: "$input-border-active",
+			cursor: "default",
+		},
+	},
+
+	"& svg": { c: "$input-border", cursor: "default", mx: 10 },
+
+	label: {
+		pos: "absolute",
+		d: "flex", // row
+		alignItems: "center",
+		width: "90%",
+		height,
+
+		bottom: 0,
+		l: 35,
+		r: 0,
+		t: 0,
+
+		m: "auto",
+		p: 0,
+
+		c: "$input-placeholder",
+		whiteSpace: "nowrap",
+		ff: "$secondary",
+		ls: "0.04rem",
+		fs: "1rem",
+		fw: 400,
+		lh: 1.5,
+
+		transitionProperty: "color, top, left",
+		transitionTimingFunction: "ease",
+		transitionDuration: "250ms",
+		transitionDelay: 0,
+
+		"&.active": {
+			t: "-180%",
+			l: -30,
+
+			c: "$input-border-active",
+			cursor: "default",
+		},
+	},
 
 	input: {
-		ff: "$secondary",
-		ls: "0.03rem",
-		fs: "0.9rem",
-		c: "$text",
+		width: "100%",
+		height,
 
-		boxSizing: "border-box",
-		size: "100%",
+		whiteSpace: "nowrap",
+		c: "$input-text",
+		ff: "$secondary",
+		cursor: "text",
+		ls: "0.045rem",
+		fs: "0.9rem",
+		fw: 400,
+		lh: 1.5,
 
 		bg: "none",
 		b: "none",
-		br: 15,
-		px: 10,
 	},
 });
 

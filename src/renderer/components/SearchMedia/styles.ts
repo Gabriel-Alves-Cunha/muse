@@ -8,14 +8,13 @@ export const SearchWrapper = styled("div", {
 	d: "flex", // row,
 	justifyContent: "flex-start",
 	alignItems: "center",
-
 	w: 300,
 	height,
 
 	b: "2px solid $input-border",
 	cursor: "default",
-	bg: "transparent",
 	br: "0.75rem",
+	bg: "none",
 
 	transition: "all ease 250ms",
 
@@ -35,7 +34,7 @@ export const SearchWrapper = styled("div", {
 		},
 	},
 
-	"& svg": { c: "$input-border", cursor: "default", strokeWidth: 30, mx: 10 },
+	"& svg": { c: "$input-border", cursor: "default", mx: 10 },
 
 	label: {
 		pos: "absolute",
@@ -45,7 +44,7 @@ export const SearchWrapper = styled("div", {
 		height,
 
 		bottom: 0,
-		l: 30,
+		l: 35,
 		r: 0,
 		t: 0,
 
@@ -64,6 +63,14 @@ export const SearchWrapper = styled("div", {
 		transitionTimingFunction: "ease",
 		transitionDuration: "250ms",
 		transitionDelay: 0,
+
+		"&.active": {
+			t: "-180%",
+			l: -30,
+
+			c: "$input-border-active",
+			cursor: "default",
+		},
 	},
 
 	input: {
@@ -85,12 +92,9 @@ export const SearchWrapper = styled("div", {
 });
 
 export const Info = styled("div", {
-	d: "flex",
-	fd: "column",
-	justifyContent: "flex-start",
-	alignItems: "flex-start",
-
+	dcolumn: "flex-start",
 	size: "calc(100% - 5px)",
+
 	ov: "hidden",
 });
 
@@ -112,7 +116,7 @@ export const SubTitle = styled("p", {
 
 	c: "$gray-text",
 	ff: "$primary",
-	ls: "0.03rem",
+	ls: "0.035rem",
 	fs: "0.8rem",
 	fw: 500,
 });
@@ -133,12 +137,14 @@ export const Result = styled("div", {
 	h: 60,
 
 	cursor: "pointer",
-	bg: "$bg-media",
-	b: "none",
+	bg: "none",
 	br: 7,
 	p: 7,
 
-	"&:hover": { boxShadow: "0 0 1px 1px rgba(0, 0, 0, 0.1)" },
+	"&:hover": {
+		boxShadowBorder: { color: "$colors$icon-button-hovered", width: 2 },
+		transition: "none",
+	},
 
 	////////////////////////////////////////
 	// Tooltip:

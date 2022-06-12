@@ -66,7 +66,7 @@ export function Downloading() {
 				data-tooltip="Show all downloading medias"
 				tooltip-side="right"
 			>
-				<p data-length={downloadingListSize}></p>
+				<span data-length={downloadingListSize}></span>
 
 				<DownloadingIcon size={20} />
 			</StyledPopoverTrigger>

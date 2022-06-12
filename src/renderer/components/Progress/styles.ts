@@ -6,7 +6,7 @@ export const Component = styled("div", {
 	w: "98%",
 	h: 15,
 
-	"& svg": { ml: "auto" },
+	"& svg": { ml: 9, fill: "$text" },
 });
 
 export const Bar = styled("progress", {
@@ -14,7 +14,7 @@ export const Bar = styled("progress", {
 	b: "none",
 
 	transition: "width 0.3s linear",
-	w: "90%",
+	w: 188,
 	h: 3,
 
 	"&[value]::-webkit-progress-value": { bg: "$accent" },

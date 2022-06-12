@@ -4,20 +4,50 @@ import type { Path } from "@common/@types/generalTypes";
 import create from "zustand";
 
 import { ProgressStatus } from "@common/enums";
+import { getRandomInt } from "@utils/utils";
 
 /** For in-hand testing porpuses: */
 const { port1: testPort } = new MessageChannel();
 const testConvertingMedia: [Path, MediaBeingConverted][] = Array.from({
 	length: 10,
 }, (_, index) => {
+	const random = getRandomInt(0, 10) <= 5 ? false : true;
+	let status = ProgressStatus.ACTIVE;
+	{
+		const random1_5 = getRandomInt(0, 5);
+		switch (random1_5) {
+			case 0:
+				status = ProgressStatus.ACTIVE;
+				break;
+
+			case 1:
+				status = ProgressStatus.CANCEL;
+				break;
+
+			case 2:
+				status = ProgressStatus.FAILED;
+				break;
+
+			case 3:
+				status = ProgressStatus.SUCCESS;
+				break;
+
+			case 4:
+				status = ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON;
+				break;
+
+			default:
+				break;
+		}
+	}
 	const path: Path = `/home/path/convert-test-${index}.mp4`;
 	const media: MediaBeingConverted = {
-		status: ProgressStatus.ACTIVE,
-		timeConverted: "01:20",
+		timeConverted: 50 + index * 2,
+		isConverting: random,
 		sizeConverted: 1000,
-		isConverting: true,
 		toExtension: "mp3",
 		port: testPort,
+		status,
 	};
 
 	return [path, media];

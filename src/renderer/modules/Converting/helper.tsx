@@ -4,9 +4,8 @@ import type { Path } from "@common/@types/generalTypes";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
-import { getConvertingList, setConvertingList } from "@contexts/convertList";
+import { type AllowedMedias, getBasename, formatDuration } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
-import { type AllowedMedias, getBasename } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { TooltipButton } from "@components/TooltipButton";
@@ -16,6 +15,11 @@ import {
 	cancelConvertionAndOrRemoveItFromList,
 	handleDeleteAnimation,
 } from "@modules/Downloading/helper";
+import {
+	getConvertingList,
+	setConvertingList,
+	useConvertingList,
+} from "@contexts/convertList";
 
 import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
@@ -27,7 +31,7 @@ export const { setState: setConvertInfoList, getState: getConvertInfoList } =
 	useConvertInfoList;
 
 export function Popup() {
-	const { convertingList } = getConvertingList();
+	const { convertingList } = useConvertingList();
 
 	function convertBoxes(): JSX.Element[] {
 		const list = [];
@@ -78,9 +82,8 @@ export const ConvertBox = (
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>
-			Seconds/size converted:
-			<div>{format(timeConverted)}s</div>
-			<div>{prettyBytes(sizeConverted)}</div>
+			Converted: {formatDuration(timeConverted)} s /{" "}
+			{prettyBytes(sizeConverted)}
 		</ConvertionProgress>
 	</ItemWrapper>
 );
@@ -114,7 +117,7 @@ export function createNewConvert(
 		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		toExtension: convertInfo.toExtension,
 		isConverting: true,
-		timeConverted: "",
+		timeConverted: 0,
 		sizeConverted: 0,
 		port: myPort,
 	};
@@ -196,8 +199,6 @@ export function createNewConvert(
 	return electronPort;
 }
 
-const format = (str: string) => str.slice(0, str.lastIndexOf("."));
-
 export const handleOnClose = () => dbg("Closing ports (react port).");
 
 export type MediaBeingConverted = Readonly<
@@ -205,7 +206,7 @@ export type MediaBeingConverted = Readonly<
 		status: ProgressProps["status"];
 		toExtension: AllowedMedias;
 		sizeConverted: number;
-		timeConverted: string;
+		timeConverted: number;
 		isConverting: boolean;
 		port: MessagePort;
 	}

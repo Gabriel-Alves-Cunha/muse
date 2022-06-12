@@ -2,6 +2,7 @@ import type { AllowedMedias } from "@common/utils";
 import type { Path } from "@common/@types/generalTypes";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { SiConvertio as ConvertIcon } from "react-icons/si";
 
 import { MainArea } from "@components/MainArea";
 import {
@@ -9,7 +10,7 @@ import {
 	getConvertInfoList,
 } from "@modules/Converting/helper";
 
-import { BorderedButton } from "./styles";
+import { OpenFilePickerButton, Box } from "./styles";
 
 export function Convert() {
 	const [selectedMediasPath, setSelectedMediasPath] = useState<readonly Path[]>(
@@ -18,13 +19,17 @@ export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	console.log({ selectedMediasPath });
+
 	function handleSelectedFiles(
 		{ target: { files } }: ChangeEvent<HTMLInputElement>,
 	) {
-		if (!files) return;
+		console.log({ files });
+		if (!files?.length) return;
 
 		const paths: Path[] = [];
 		for (const file of files) paths.push(file.path);
+		console.log({ paths });
 
 		setSelectedMediasPath(paths);
 	}
@@ -52,16 +57,23 @@ export function Convert() {
 
 	return (
 		<MainArea>
-			<BorderedButton onClick={openChooseFilesNativeUI}>
-				<input
-					onInput={handleSelectedFiles}
-					accept="video/*,audio/*"
-					ref={inputRef}
-					type="file"
-					multiple
-				/>
-				Select media(s)
-			</BorderedButton>
+			<Box>
+				<OpenFilePickerButton
+					onClick={openChooseFilesNativeUI}
+					className="notransition"
+				>
+					<ConvertIcon size={18} />
+
+					<input
+						onChange={handleSelectedFiles}
+						accept="video/*,audio/*"
+						ref={inputRef}
+						type="file"
+						multiple
+					/>
+					Select media(s) to convert
+				</OpenFilePickerButton>
+			</Box>
 		</MainArea>
 	);
 }

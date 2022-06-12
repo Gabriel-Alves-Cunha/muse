@@ -24,16 +24,26 @@ import sanitize from "sanitize-filename";
 import readline from "readline";
 import ytdl from "ytdl-core";
 
-import { getLastExtension, formatDuration, getBasename } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
-import { type AllowedMedias, dbg } from "@common/utils";
+import {
+	type AllowedMedias,
+	dbg,
+	separatedByCommaOrSemiColon,
+} from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
+import { areArraysEqual } from "@utils/array";
 import { isDevelopment } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
 import { time } from "@utils/utils";
 import { dirs } from "../utils";
+import {
+	separatedByCommaOrSemiColorOrSpace,
+	getLastExtension,
+	formatDuration,
+	getBasename,
+} from "@common/utils";
 
 const { log, error } = console;
 
@@ -46,12 +56,12 @@ const mediasConverting: Map<Path, Readable> = new Map();
 const pathExists = async (path: Readonly<Path>): Promise<Readonly<boolean>> =>
 	access(path).then(() => true).catch(() => false);
 
-const createMedia = async (
+async function createMedia(
 	path: Readonly<Path>,
 	assureMediaSizeIsGreaterThan60KB: Readonly<boolean>,
 	ignoreMediaWithLessThan60Seconds: Readonly<boolean>,
-): Promise<readonly [Path, Media]> =>
-	new Promise((resolve, reject) => {
+): Promise<readonly [Path, Media]> {
+	return new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
 		time(() => {
@@ -113,6 +123,7 @@ const createMedia = async (
 			return resolve([path, media]);
 		}, `createMedia("${basename}")`);
 	});
+}
 
 export async function transformPathsToMedias(
 	paths: readonly Path[],
@@ -499,7 +510,7 @@ export async function writeTags(
 						}
 					} else {
 						// Here, assume we received an img as a base64 string
-						// like: `data:${string};base64,${string}`.
+						// as in: `data:${string};base64,${string}`.
 						data.imageURL!.includes("data:image/") &&
 							data.imageURL!.includes(";base64,") ?
 							createImage(data.imageURL as ImgString, file) :
@@ -511,25 +522,36 @@ export async function writeTags(
 				case "albumArtists": {
 					dbg("On 'albumArtists' branch.", { value });
 
-					if (Array.isArray(value)) {
-						const albumArtists = value as string[];
+					if (value instanceof Array)
+						file.tag.albumArtists = value as string[];
+					else {
+						const albumArtists = (value as string).split(
+							separatedByCommaOrSemiColon,
+						).filter(Boolean).map(v => v.trim());
 
 						file.tag.albumArtists = albumArtists;
-
-						dbg(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
-							albumArtists,
-						});
-					} else {
-						const albumArtists = (value as string).split(",").map(v =>
-							v.trim()
-						);
-
-						file.tag.albumArtists = albumArtists;
-
-						dbg(`file.tag.albumArtists = "${file.tag.albumArtists}";`, {
-							albumArtists,
-						});
 					}
+
+					dbg(`file.tag.albumArtists = "${file.tag.albumArtists}";`);
+
+					break;
+				}
+
+				case "genres": {
+					dbg("On 'genres' branch.", { value });
+
+					if (value instanceof Array)
+						file.tag.genres = value as string[];
+					else {
+						const genres = (value as string).split(
+							separatedByCommaOrSemiColorOrSpace,
+						).filter(Boolean).map(v => v.trim());
+
+						file.tag.genres = genres;
+					}
+
+					dbg(`file.tag.genres = "${file.tag.genres}";`);
+
 					break;
 				}
 
@@ -633,11 +655,13 @@ export async function writeTags(
 		}
 	}
 
-	{
-		const file = MediaFile.createFromPath(mediaPath);
-		dbg("Testing if new tags are present:", file.tag.pictures);
+	if (isDevelopment) {
+		const file = MediaFile.createFromPath(
+			fileNewPath ? fileNewPath : mediaPath,
+		);
+		dbg("Testing if new tags are present:", file.tag);
 
-		Object.keys(data).forEach(key => {
+		Object.entries(data).forEach(([key, value]) => {
 			switch (key) {
 				case "pictures": {
 					if (data.isNewMedia || data.downloadImg) {
@@ -652,8 +676,51 @@ export async function writeTags(
 					break;
 				}
 
-				default:
+				case "genres": {
+					dbg("Testing if new value for \"genres\" is present:", file.tag[key]);
+					const genres = (value as string).split(
+						separatedByCommaOrSemiColorOrSpace,
+					).filter(Boolean).map(v => v.trim());
+					console.assert(
+						areArraysEqual(file.tag.genres, genres),
+						"Invalid value for \"genres\".",
+						{ data, "file.tag.genres": file.tag.genres },
+					);
 					break;
+				}
+
+				case "albumArtists": {
+					dbg(
+						"Testing if new value for \"albumArtists\" is present:",
+						file.tag[key],
+					);
+					const albumArtists = (value as string).split(
+						separatedByCommaOrSemiColon,
+					).filter(Boolean).map(v => v.trim());
+					console.assert(
+						areArraysEqual(file.tag.albumArtists, albumArtists),
+						"Invalid value for \"albumArtists\".",
+						{
+							"file.tag.albumArtists": file.tag.albumArtists,
+							albumArtists,
+							data,
+						},
+					);
+					break;
+				}
+
+				default: {
+					// @ts-ignore => If you find this is actually wrong, fix by creating a new case:
+					dbg(`Testing if new value for "${key}" is present:`, file.tag[key]);
+					console.assert(
+						// @ts-ignore => If you find this is actually wrong, fix by creating a new case:
+						file.tag[key] === data[key],
+						`Invalid value for "${key}".`,
+						// @ts-ignore => If you find this is actually wrong, fix by creating a new case:
+						{ data, fileTag: file.tag[key] },
+					);
+					break;
+				}
 			}
 		});
 
@@ -684,8 +751,8 @@ function createImage(imgAsString: ImgString, file: MediaFile) {
 	dbg("At createImage():", { "file.tag.pictures": file.tag.pictures, picture });
 }
 
-export const getThumbnail = async (url: Readonly<string>): Promise<ImgString> =>
-	new Promise((resolve, reject) =>
+export async function getThumbnail(url: Readonly<string>): Promise<ImgString> {
+	return new Promise((resolve, reject) =>
 		get(url, res => {
 			res.setEncoding("base64");
 
@@ -698,30 +765,31 @@ export const getThumbnail = async (url: Readonly<string>): Promise<ImgString> =>
 			reject(e);
 		})
 	);
+}
 
-const sendFailedConversionMsg = (
+function sendFailedConversionMsg(
 	path: Path,
 	electronPort: Readonly<MessagePort>,
-) => {
+) {
 	sendMsgToClient({
 		type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED,
 		path,
 	});
 
 	electronPort.close();
-};
+}
 
-const sendFailedDownloadMsg = (
+function sendFailedDownloadMsg(
 	url: Readonly<string>,
 	electronPort: Readonly<MessagePort>,
-) => {
+) {
 	sendMsgToClient({
 		type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED,
 		url,
 	});
 
 	electronPort.close();
-};
+}
 
 export type HandleConversion = Readonly<
 	{

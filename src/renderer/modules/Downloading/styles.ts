@@ -16,34 +16,31 @@ export const StyledPopoverTrigger = styled(Trigger, {
 
 	"&:hover": { c: "$active-icon" },
 
-	"&.has-items": {
-		"& p": {
-			// I can't get this shit to center properly
-			boxSizing: "border-box",
-			pos: "absolute",
-			display: "flex",
+	"&.has-items span": {
+		pos: "absolute",
+		size: 18,
+		r: -8,
+		t: 0,
+
+		bg: "#007200",
+		br: "50%",
+
+		"&::before": {
+			// This shit was hard to center properly
+			content: "attr(data-length)",
+			pos: "relative",
+			justifyContent: "center",
 			alignItems: "center",
-			size: 18,
-			r: -8,
-			t: 0,
+			dflex: "center",
+			size: "100%",
+			r: -1,
 
-			b: "1px solid #fff",
-			bg: "#5cb85c",
-			br: "50%",
-
-			"&::before": {
-				content: "attr(data-length)",
-				pos: "relative",
-				dflex: "center",
-				size: "100%",
-
-				fontStyle: "normal",
-				ff: "'Assistant'",
-				ls: "0.03rem",
-				c: "black",
-				fw: 500,
-				fs: 11,
-			},
+			fontStyle: "normal",
+			ff: "$secondary",
+			ls: "0.03rem",
+			c: "white",
+			fw: 500,
+			fs: 11,
 		},
 	},
 
@@ -114,7 +111,7 @@ export const ItemWrapper = styled("div", {
 	w: 236,
 	h: 63,
 
-	b: "1px solid lightgray",
+	b: "1px solid $icon-button-hovered",
 	br: 5,
 	p: 10,
 
@@ -152,13 +149,15 @@ export const TitleAndCancelWrapper = styled("div", {
 		pos: "absolute",
 		dflex: "center",
 		size: 20,
-		r: -21,
+		r: -19,
 
 		cursor: "pointer",
 		bg: "none",
 		br: "50%",
 		b: "none",
 
-		"&:focus, &:hover": { bg: "$button-hovered", "& svg": { fill: "red" } },
+		"&:focus, &:hover": { bg: "$icon-button-hovered" },
+
+		"& svg": { fill: "$text" },
 	},
 });

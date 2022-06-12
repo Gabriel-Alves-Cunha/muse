@@ -1,11 +1,17 @@
 import { styled } from "@styles/global";
 
-export const BorderedButton = styled("button", {
+export const Box = styled("div", {
 	dflex: "center",
-	w: 200,
+	mt: 30,
+});
+
+export const OpenFilePickerButton = styled("button", {
+	dflex: "center",
+	w: 300,
 	h: 50,
 
 	m: "40 auto 0",
+	gap: 16,
 	p: 16,
 
 	ff: "$secondary",
@@ -14,12 +20,12 @@ export const BorderedButton = styled("button", {
 	c: "$text",
 	fw: 500,
 
-	b: "1px solid $accent",
+	b: "2px solid $accent",
 	cursor: "pointer",
 	bg: "none",
 	br: 7,
 
-	"&:hover": { transition: "$bgc", bg: "$accent", c: "white" },
+	"&:hover": { bg: "$accent", c: "white" },
 
 	input: { d: "none" },
 });

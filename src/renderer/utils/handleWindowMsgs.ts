@@ -20,6 +20,7 @@ import {
 	type MsgObjectElectronToReact,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
+import { getSettings } from "@contexts/settings";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -192,10 +193,18 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case ADD_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("At ListenToNotification.ADD_MEDIA:", { mediaPath });
+			dbg("At ListenToNotification.ADD_ONE_MEDIA:", { mediaPath });
 
+			const {
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			} = getSettings();
 			const newMediaInArray: readonly [Path, Media][] =
-				await transformPathsToMedias([mediaPath]);
+				await transformPathsToMedias(
+					[mediaPath],
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				);
 
 			const newMedia = newMediaInArray[0]?.[1];
 
@@ -250,8 +259,16 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
+			const {
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			} = getSettings();
 			const refreshedMediaInArray: readonly [Path, Media][] =
-				await transformPathsToMedias([mediaPath]);
+				await transformPathsToMedias(
+					[mediaPath],
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				);
 
 			const refreshedMedia = refreshedMediaInArray[0]?.[1];
 

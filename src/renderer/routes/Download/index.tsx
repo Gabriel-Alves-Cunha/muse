@@ -2,34 +2,34 @@ import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect } from "react";
 
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
+import { Header } from "@components/Header";
 
-import { BorderedButton } from "../Convert/styles";
+import { OpenFilePickerButton } from "../Convert/styles";
 import { Loading } from "@styles/appStyles";
 import {
 	ResultContainer,
 	LoadingWrapper,
 	SearchWrapper,
+	GridWrapper,
 	Searcher,
-	Wrapper,
-	Box,
 } from "./styles";
 
 export const Download = () => (
-	<Wrapper>
-		<Box>
+	<GridWrapper>
+		<Header>
 			<SearcherWrapper />
 			<IsLoading />
-		</Box>
+		</Header>
 
 		<Result />
-	</Wrapper>
+	</GridWrapper>
 );
 
 function SearcherWrapper() {
 	const { error, url } = useSearchInfo();
 
 	useEffect(() => {
-		const searchTimeout = setTimeout(async () => await search(), 400);
+		const searchTimeout = setTimeout(async () => await search(url), 400);
 
 		return () => clearTimeout(searchTimeout);
 	}, [url]);
@@ -37,14 +37,17 @@ function SearcherWrapper() {
 	return (
 		<SearchWrapper>
 			<Searcher>
-				<SearchIcon size="1.2rem" />
+				<SearchIcon size={18} />
 
+				<label className={url ? "active" : ""} htmlFor="search-url">
+					Paste Youtube url here
+				</label>
 				<input
 					onChange={e => setSearchInfo({ url: e.target.value })}
-					placeholder="Paste Youtube url here"
 					autoCapitalize="off"
 					spellCheck="false"
 					autoCorrect="off"
+					id="search-url"
 					value={url}
 					type="text"
 				/>
@@ -71,7 +74,9 @@ function Result() {
 
 				<p>{result.title}</p>
 
-				<BorderedButton onClick={downloadMedia}>Download</BorderedButton>
+				<OpenFilePickerButton onClick={downloadMedia}>
+					Download
+				</OpenFilePickerButton>
 			</ResultContainer>
 		) :
 		null;

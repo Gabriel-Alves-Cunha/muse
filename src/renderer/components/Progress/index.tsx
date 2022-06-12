@@ -1,9 +1,7 @@
 import { RiDownloadFill as Downloading } from "react-icons/ri";
-import {
-	MdOutlineFileDownloadDone as Success,
-	MdOutlineClose as Cancel,
-	MdOutlineClose as Fail,
-} from "react-icons/md";
+import { AiOutlineCheck as Success } from "react-icons/ai";
+import { TiCancel as Canceled } from "react-icons/ti";
+import { MdError as Failed } from "react-icons/md";
 
 import { ProgressStatus } from "@common/enums";
 
@@ -24,10 +22,10 @@ export const Progress = (
 
 const iconObj: ReadonlyMap<ProgressStatus, JSX.Element> = Object.freeze(
 	new Map([
-		[ProgressStatus.SUCCESS, <Success size={12} color="green" key="success" />],
-		[ProgressStatus.CANCEL, <Cancel size={12} color="blue" key="cancel" />],
-		[ProgressStatus.FAILED, <Fail size={12} color="red" key="failed" />],
-		[ProgressStatus.ACTIVE, <Downloading size={12} key="active" />],
+		[ProgressStatus.ACTIVE, <Downloading size={15} key="active" />],
+		[ProgressStatus.CANCEL, <Canceled size={15} key="canceled" />],
+		[ProgressStatus.SUCCESS, <Success size={15} key="success" />],
+		[ProgressStatus.FAILED, <Failed size={15} key="failed" />],
 	]),
 );
 

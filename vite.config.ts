@@ -7,7 +7,6 @@ import react from "@vitejs/plugin-react";
 
 const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
 const rendererPath = resolve(__dirname, "./src/renderer");
-// // @ts-ignore For some reason, I can't get the type of 'test' to work:
 
 export default defineConfig({
 	test: {
@@ -103,3 +102,4 @@ export default defineConfig({
 		],
 	},
 });
+

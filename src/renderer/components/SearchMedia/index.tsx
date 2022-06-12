@@ -6,7 +6,7 @@ import { SearchWrapper } from "./styles";
 
 export const SearchMedia = () => (
 	<SearchWrapper>
-		<SearchIcon size={17} />
+		<SearchIcon size={18} />
 
 		<InputAndResults />
 	</SearchWrapper>

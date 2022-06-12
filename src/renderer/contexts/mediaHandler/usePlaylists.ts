@@ -13,6 +13,7 @@ import {
 	sortByDate,
 	sortByName,
 } from "./usePlaylistsHelper";
+import { getSettings } from "@contexts/settings";
 
 const { media: { transformPathsToMedias }, fs: { deleteFile } } = electron;
 
@@ -383,8 +384,18 @@ export async function searchLocalComputerForMedias() {
 			usePlaylists.setState({ isLoadingMedias: true });
 
 			const paths = getAllowedMedias(await searchDirectoryResult());
+
+			const {
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			} = getSettings();
+
 			const newMainList: MainList = new Map(
-				await transformPathsToMedias(paths),
+				await transformPathsToMedias(
+					paths,
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				),
 			);
 
 			dbgPlaylists(

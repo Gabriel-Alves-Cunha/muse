@@ -253,10 +253,16 @@ export function handleDeleteAnimation(
 
 	thisItem.classList.add("delete");
 
-	thisItem.addEventListener("animationend", () => {
+	setTimeout(() => {
 		if (isDownloadList) cancelDownloadAndOrRemoveItFromList(key);
 		else cancelConvertionAndOrRemoveItFromList(key);
+	}, 200); // wait for animation to finish but don't put on
+	// the event listener below so that users can just click
+	// the cancel button and imediately leave the popup, wich
+	// cancels the animation!
 
-		items.forEach(item => item.classList.remove("move-up"));
-	});
+	thisItem.addEventListener(
+		"animationend",
+		() => items.forEach(item => item.classList.remove("move-up")),
+	);
 }

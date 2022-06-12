@@ -33,7 +33,6 @@ export const StyledContent = styled(Content, {
 	br: 10,
 	p: 10,
 
-	b: "1px solid lightgrey",
 	boxShadow: "$popover",
 
 	"@media (prefers-reduced-motion: no-preference)": {

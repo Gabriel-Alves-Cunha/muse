@@ -16,7 +16,7 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
 export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 
-export const downloadMedia = () => {
+export function downloadMedia() {
 	const { result, url } = searchInfo();
 
 	if (!result) return;
@@ -32,12 +32,10 @@ export const downloadMedia = () => {
 
 	// Reset values:
 	setSearchInfo(defaultSearchInfo);
-};
+}
 
-export const search = async () => {
-	const { url } = searchInfo();
-
-	if (!url || url.length < 10) return;
+export async function search(url: string): Promise<void> {
+	if (!url || url.length < 8) return;
 
 	dbg(`Searching for "${url}".`);
 
@@ -58,24 +56,24 @@ export const search = async () => {
 		setSearchInfo({
 			isLoading: false,
 			result: undefined,
-			error: getErrorMessage(error).includes("No video id found") ?
-				"No video ID found!" :
-				"There was an error getting media information!",
+			error: getErrorMessage(error).includes("No video id found")
+				? "No video ID found!"
+				: "There was an error getting media information!",
 		});
 
 		console.error(error);
 	}
-};
+}
 
-type UrlMediaMetadata = Readonly<
-	{ imageURL: string; artist: string; title: string; }
->;
+type UrlMediaMetadata = Readonly<{
+	imageURL: string;
+	artist: string;
+	title: string;
+}>;
 
-type SearcherInfo = Readonly<
-	{
-		result: UrlMediaMetadata | undefined;
-		isLoading: boolean;
-		error: string;
-		url: string;
-	}
->;
+type SearcherInfo = Readonly<{
+	result: UrlMediaMetadata | undefined;
+	isLoading: boolean;
+	error: string;
+	url: string;
+}>;

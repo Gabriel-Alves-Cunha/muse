@@ -38,62 +38,58 @@ export const { getState: getFromList, setState: setFromList } = useFromList;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const Row = memo(
-	({ media, path }: RowProps) => {
-		const mediaRowRef = useRef<HTMLDivElement>(null);
+const Row = memo(({ media, path }: RowProps) => {
+	const mediaRowRef = useRef<HTMLDivElement>(null);
 
-		return (
-			<RowWrapper ref={mediaRowRef}>
-				<TooltipButton
-					onClick={e => {
-						const doContinueAndPlay = toggleMediaSelectIfCtrlPlusLeftClick(
-							e,
-							mediaRowRef,
-							path,
-						);
+	return (
+		<RowWrapper ref={mediaRowRef}>
+			<TooltipButton
+				onClick={e => {
+					const doContinueAndPlay = toggleMediaSelectIfCtrlPlusLeftClick(
+						e,
+						mediaRowRef,
+						path,
+					);
 
-						if (doContinueAndPlay) {
-							const { fromList, homeList, isHome } = getFromList();
-							const list = isHome ? homeList : fromList;
+					if (doContinueAndPlay) {
+						const { fromList, homeList, isHome } = getFromList();
+						const list = isHome ? homeList : fromList;
 
-							playThisMedia(path, list);
-						}
-					}}
-					tooltip="Play this media"
-					className="play"
+						playThisMedia(path, list);
+					}
+				}}
+				tooltip="Play this media"
+				className="play"
+			>
+				<Img>
+					<ImgWithFallback
+						Fallback={<MusicNote size="1.4rem" />}
+						mediaImg={media.img}
+						mediaPath={path}
+					/>
+				</Img>
+
+				<Info>
+					<Title>{media.title}</Title>
+					<SubTitle className="row">{media.duration}</SubTitle>
+				</Info>
+			</TooltipButton>
+
+			<Dialog modal>
+				<DialogTrigger
+					data-tooltip="Open media options"
+					tooltip-side="left-bottom"
 				>
-					<Img>
-						<ImgWithFallback
-							Fallback={<MusicNote size="1.4rem" />}
-							mediaImg={media.img}
-							mediaPath={path}
-						/>
-					</Img>
+					<Dots />
+				</DialogTrigger>
 
-					<Info>
-						<Title>{media.title}</Title>
-						<SubTitle className="row">{media.duration}</SubTitle>
-					</Info>
-				</TooltipButton>
-
-				<Dialog modal>
-					<DialogTrigger
-						data-tooltip="Open media options"
-						tooltip-side="left-bottom"
-					>
-						<Dots />
-					</DialogTrigger>
-
-					<StyledOverlay>
-						<MediaOptionsModal media={media} path={path} />
-					</StyledOverlay>
-				</Dialog>
-			</RowWrapper>
-		);
-	},
-	// At the moment, the only that changes is duration, so we can use shallow:
-	(prev, curr) => prev.media.duration === curr.media.duration,
-);
+				<StyledOverlay>
+					<MediaOptionsModal media={media} path={path} />
+				</StyledOverlay>
+			</Dialog>
+		</RowWrapper>
+	);
+});
 Row.displayName = "Row";
 
 const leftClick = 0;

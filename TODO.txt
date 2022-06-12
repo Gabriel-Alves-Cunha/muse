@@ -2,6 +2,7 @@
 * TODO: see why virtuoso scroll behavior is wrong!
 * TODO: maybe impl fast-check from npm.
 * TODO: add + tests for history.
+* TODO: test convertion
 
 NOTES:
 

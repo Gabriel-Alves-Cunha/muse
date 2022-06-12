@@ -5,12 +5,15 @@ import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import {
+	MetadataToChange,
+	ReactToElectronMessageEnum,
+} from "@common/@types/electron-window";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { deleteMedia } from "@contexts/mediaHandler/usePlaylists";
 import { capitalize } from "@utils/utils";
-import { dbg } from "@common/utils";
+import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 
 import {
 	TriggerToRemoveMedia,
@@ -62,7 +65,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 					<Label htmlFor={option}>{capitalize(option)}</Label>
 					<Input
 						readOnly={!isChangeable(option)}
-						defaultValue={value}
+						defaultValue={format(value)}
 						id={option}
 					/>
 				</Fieldset>
@@ -156,54 +159,77 @@ function changeMetadataIfAllowed(
 	mediaPath: Path,
 	media: Media,
 ): void {
-	if (contentWrapper.current)
-		// This shit is to get the inputs:
-		for (const children of contentWrapper.current.children)
-			for (const element of children.children)
-				if (element instanceof HTMLInputElement && !element.disabled) {
-					const id = element.id as ChangeOptions;
-					const newValue = element.value.trim();
+	if (!contentWrapper.current) return;
 
-					Object.entries(media).forEach(([key, oldValue]) => {
-						if (key === id && oldValue !== newValue) {
-							// If `oldValue` is undefined AND `newValue` is
-							// empty, there's nothing to do, so just return:
-							if (oldValue === undefined && newValue === "") return;
+	const thingsToChange: MetadataToChange = [];
 
-							// We need to handle the case where the key is an array, as in "genres":
-							if (Array.isArray(oldValue)) {
-								const newValueAsArray = newValue.split(",").map(v => v.trim());
+	// This shit is to get the inputs:
+	for (const children of contentWrapper.current.children)
+		for (const element of children.children)
+			if (element instanceof HTMLInputElement && !element.disabled) {
+				const id = element.id as ChangeOptions;
+				const newValue = element.value.trim();
 
-								// If valueAsArray is `[""]`, then we need to remove the empty string:
-								if (newValueAsArray.length === 1 && newValueAsArray[0] === "")
-									newValueAsArray.pop();
+				Object.entries(media).forEach(([key, oldValue]) => {
+					if (key !== id) return;
+					if (oldValue === newValue) return;
+					// If `oldValue` is falsy AND `newValue` is
+					// empty, there's nothing to do, so just return:
+					if (!oldValue && newValue === "") return;
 
-								// If both arrays are equal by values, we don't need to change anything:
-								if (
-									newValueAsArray.length === oldValue.length &&
-									newValueAsArray.every(v => oldValue.includes(v))
-								)
-									return;
+					// We need to handle the case where the key is an array, as in "genres":
+					if (oldValue instanceof Array) {
+						const newValueAsArray: string[] = newValue.split(
+							separatedByCommaOrSemiColorOrSpace,
+						).map(v => v.trim());
 
-								dbg({ newValueAsArray, oldValue, newValue, key, id });
+						// If newValueAsArray is `[""]`, then we need to remove the empty string:
+						if (newValueAsArray.length === 1 && newValueAsArray[0] === "")
+							newValueAsArray.pop();
 
-								// If they are different, the writeTag() function will
-								// handle splitting the string, so just continue the
-								// rest of the function.
-							}
+						// If both arrays are equal by values, we don't need to change anything:
+						if (
+							newValueAsArray.length === oldValue.length &&
+							newValueAsArray.every(v => oldValue.includes(v))
+						)
+							return console.log(
+								"Values are equal, not gonna change anything:",
+								{ newValueAsArray, oldValue },
+							);
 
-							dbg({ id, newValue, key, oldValue });
+						dbg("Changing metadata from client side (oldValue is an array):", {
+							newValueAsArray,
+							oldValue,
+							newValue,
+							key,
+							id,
+						});
 
-							const whatToSend: ChangeOptionsToSend = allowedOptionToChange[id];
+						// If they are different, the writeTag() function will
+						// handle splitting the string, so just continue the
+						// rest of the function.
+					}
 
-							// Send message to Electron to execute the function writeTag() in the main process:
-							sendMsgToBackend({
-								type: ReactToElectronMessageEnum.WRITE_TAG,
-								params: { whatToChange: whatToSend, mediaPath, newValue },
-							});
-						}
+					const whatToChange: ChangeOptionsToSend = allowedOptionToChange[id];
+
+					dbg("Changing metadata from client side:", {
+						whatToChange,
+						newValue,
+						oldValue,
+						key,
+						id,
 					});
-				}
+
+					thingsToChange.push({ whatToChange, newValue });
+				});
+			}
+
+	// Send message to Electron to execute the function writeTag() in the main process:
+	sendMsgToBackend({
+		type: ReactToElectronMessageEnum.WRITE_TAG,
+		thingsToChange,
+		mediaPath,
+	});
 }
 
 const options = ({ duration, artist, album, genres, title, size }: Media) => ({
@@ -230,6 +256,10 @@ const isChangeable = (option: string): option is ChangeOptions =>
 
 const closeEverything = (element: RefObject<HTMLButtonElement>) =>
 	element.current?.click();
+
+const format = (
+	value: string | readonly string[] | undefined,
+): string | undefined => value instanceof Array ? value.join(", ") : value;
 
 export type WhatToChange = Readonly<
 	{

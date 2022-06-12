@@ -176,7 +176,6 @@ export const darkTheme = createTheme({
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#fff2",
-		"button-hovered": "#dbdadc",
 
 		"accent-light": "#F4A1A9",
 		accent: "#C04569",
@@ -189,7 +188,7 @@ export const darkTheme = createTheme({
 		"ctx-menu-text": "#7a797d",
 	},
 	shadows: {
-		popover: "0 0 8px rgba(255, 255, 255, 0.2)",
+		popover: "0 0 8px rgba(0, 0, 0, 0.3)",
 
 		dialog: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
 		hsl(206 22% 7% / 20%) 0px 10px 20px -15px`,
@@ -244,7 +243,6 @@ export const lightTheme = createTheme({
 
 		"media-player-icon-button-hovered": "#fff4",
 		"icon-button-hovered": "#88888857",
-		"button-hovered": "#dbdadc", // rename these ^ to light and dark
 
 		"accent-light": "#9381FF",
 		accent: "#9882AC",

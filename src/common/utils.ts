@@ -71,3 +71,6 @@ export const getLastExtension = (filename: string) =>
 
 export const getBasenameAndExtension = (filename: string) =>
 	[getBasename(filename), getLastExtension(filename)] as const;
+
+export const separatedByCommaOrSemiColorOrSpace = /,|;| /gm;
+export const separatedByCommaOrSemiColon = /,|;/gm;

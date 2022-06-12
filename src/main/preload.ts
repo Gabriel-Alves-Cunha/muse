@@ -30,6 +30,7 @@ import {
 	readFile,
 	readdir,
 } from "./preload/file";
+import { Mutable } from "@common/@types/generalTypes";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -40,8 +41,8 @@ const electron: VisibleElectron = Object.freeze({
 		readFile,
 		readdir,
 	},
-	media: { transformPathsToMedias, getBasicInfo },
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
+	media: { transformPathsToMedias, getBasicInfo },
 	os: { dirs },
 });
 
@@ -102,16 +103,17 @@ window.onmessage = async (
 		} // 2
 
 		case ReactToElectronMessageEnum.WRITE_TAG: {
-			const { mediaPath, whatToChange, newValue } = msg.params;
+			const { mediaPath, thingsToChange } = msg;
 
-			const data: Parameters<typeof writeTags>[1] = {
-				[whatToChange]: newValue,
-			};
+			// const data: Parameters<typeof writeTags>[1] = {
+			// 	[whatToChange]: newValue,
+			// };
+			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
+			thingsToChange.forEach(({ whatToChange, newValue }) =>
+				Reflect.set(data, whatToChange, newValue)
+			);
 
-			dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", {
-				params: msg.params,
-				data,
-			});
+			dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", { msg });
 
 			await writeTags(mediaPath, data);
 			break;

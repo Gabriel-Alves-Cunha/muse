@@ -26,7 +26,9 @@ export type VisibleElectron = Readonly<
 		os: { dirs: { documents: Path; downloads: Path; music: Path; }; };
 		media: {
 			transformPathsToMedias(
-				paths: readonly Path[],
+				paths: readonly string[],
+				assureMediaSizeIsGreaterThan60KB?: boolean,
+				ignoreMediaWithLessThan60Seconds?: boolean,
 			): Promise<readonly [Path, Media][]>;
 			getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
 		};
@@ -40,19 +42,18 @@ export enum ReactToElectronMessageEnum {
 	ERROR = "error",
 }
 
+export type MetadataToChange = Readonly<
+	{ newValue: string | readonly string[]; whatToChange: ChangeOptionsToSend; }
+>[];
+
 export type MsgObjectReactToElectron =
 	| Readonly<{ type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD; }>
 	| Readonly<{ type: ReactToElectronMessageEnum.CONVERT_MEDIA; }>
 	| Readonly<
 		{
 			type: ReactToElectronMessageEnum.WRITE_TAG;
-			params: Readonly<
-				{
-					newValue: string | readonly string[];
-					whatToChange: ChangeOptionsToSend;
-					mediaPath: Path;
-				}
-			>;
+			thingsToChange: MetadataToChange;
+			mediaPath: Path;
 		}
 	>
 	| Readonly<{ type: ReactToElectronMessageEnum.ERROR; error: Error; }>;
