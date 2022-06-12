@@ -1,3 +1,5 @@
+export const emptyMap: ReadonlyMap<never, never> = new Map<never, never>();
+
 export function getFirstKey<Key>(
 	mapOrSet: Map<Key, unknown> | Set<Key>,
 ): Key | undefined {

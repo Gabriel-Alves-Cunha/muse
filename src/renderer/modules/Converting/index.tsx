@@ -1,37 +1,35 @@
 import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
+import useTilg from "tilg";
 
+import { useNewConvertions, createNewConvertion, Popup } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
-import {
-	useConvertInfoList,
-	setConvertInfoList,
-	createNewConvert,
-	Popup,
-} from "./helper";
+import { emptyMap } from "@utils/map";
 
 import { StyledPopoverTrigger } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
 
 export function Converting() {
 	const convertingListSize = useConvertingList().convertingList.size;
-	const { convertInfoList } = useConvertInfoList();
+	const { newConvertions } = useNewConvertions();
 	const [isOpen, setIsOpen] = useState(false);
 
-	console.log({ convertInfoList });
+	useTilg()`on Converting - button: ${{ convertingListSize, newConvertions }}`;
 
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
-		console.log("inside Converting useEffect");
+		console.log("inside Converting useEffect", { newConvertions });
 
-		convertInfoList.forEach((convertInfo, path) => {
-			if (convertInfo.canStartConvert)
+		newConvertions.forEach((newConvertion, path) => {
+			console.log("inside forEach newConvertion:", { newConvertion, path });
+			if (newConvertion.canStartConvert)
 				try {
-					const electronPort = createNewConvert(convertInfo, path);
+					const electronPort = createNewConvertion(newConvertion, path);
 
 					// Sending port so we can communicate with electron:
 					sendMsgToBackend(
@@ -48,11 +46,9 @@ export function Converting() {
 		});
 
 		// In here, we've already handled all the files, so we can clear the list:
-		if (convertInfoList.size !== 0) {
-			convertInfoList.clear();
-			setConvertInfoList({ convertInfoList });
-		}
-	}, [convertInfoList]);
+		if (newConvertions.size !== 0)
+			useNewConvertions.setState({ newConvertions: emptyMap });
+	}, [newConvertions]);
 
 	return (
 		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>

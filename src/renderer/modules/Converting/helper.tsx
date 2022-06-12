@@ -10,6 +10,7 @@ import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { TooltipButton } from "@components/TooltipButton";
 import { prettyBytes } from "@common/prettyBytes";
+import { emptyMap } from "@utils/map";
 import { dbg } from "@common/utils";
 import {
 	cancelConvertionAndOrRemoveItFromList,
@@ -24,11 +25,9 @@ import {
 import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
 import { ConvertionProgress } from "./styles";
 
-export const useConvertInfoList = create<ConvertInfoList>(() => ({
-	convertInfoList: new Map(),
+export const useNewConvertions = create<NewConvertions>(() => ({
+	newConvertions: emptyMap,
 }));
-export const { setState: setConvertInfoList, getState: getConvertInfoList } =
-	useConvertInfoList;
 
 export function Popup() {
 	const { convertingList } = useConvertingList();
@@ -92,7 +91,7 @@ export const ConvertBox = (
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export function createNewConvert(
+export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Path,
 ): MessagePort {
@@ -220,8 +219,8 @@ type ConvertBoxProps = Readonly<
 	}
 >;
 
-type ConvertInfo = Readonly<
+export type ConvertInfo = Readonly<
 	{ toExtension: AllowedMedias; canStartConvert: boolean; }
 >;
 
-type ConvertInfoList = { convertInfoList: Map<Path, ConvertInfo>; };
+type NewConvertions = { newConvertions: ReadonlyMap<Path, ConvertInfo>; };
