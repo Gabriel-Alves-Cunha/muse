@@ -1,18 +1,15 @@
 import type { ImgString } from "@common/@types/electron-window";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "../mockElectronPlusNodeGlobalsBeforeTests";
+import { mockElectronPlusNodeGlobalsBeforeTests } from "../../mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
-
-import { mockGlobalsBeforeTests } from "../../renderer/mockGlobalsBeforeTests";
-mockGlobalsBeforeTests();
 
 import { readFile, rename as renameFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
 import { resolve } from "node:path";
 
-import { writeTags } from "@main/preload/media";
+const { writeTags } = await import("@main/preload/media");
 
 const originalTitle = "audio for tests" as const;
 const mediaPath = resolve(

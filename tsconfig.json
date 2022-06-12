@@ -33,6 +33,9 @@
 		"checkJs": true,
 		"pretty": true,
 		"strict": true,
+		"types": [
+			"vitest/importMeta"
+		],
 		"paths": {
 			"@components/*": [
 				"renderer/components/*"

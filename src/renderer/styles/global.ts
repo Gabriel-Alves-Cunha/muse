@@ -109,13 +109,9 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			ov: (overflow: string) => ({ overflow }),
 			d: (display: string) => ({ display }),
 
-			boxShadowBorder: ({
-				width,
-				color,
-			}: {
-				color: string;
-				width: number | string;
-			}) => ({
+			boxShadowBorder: (
+				{ width, color }: { color: string; width: number | string; },
+			) => ({
 				boxShadow: `
 					0px 0px 0px ${width}px ${color},
 					0px ${width}px ${width}px ${color}`,
@@ -284,7 +280,7 @@ if (isDevelopment) {
 	dbg(
 		{ lightThemeKeys, darkThemeKeys },
 		"Are light and dark themes keys the same?",
-		areEqual
+		areEqual,
 	);
 }
 

@@ -1,7 +1,4 @@
-/// <reference types="vitest" />
-
-import { configDefaults } from "vitest/config";
-import { defineConfig } from "vite";
+import { configDefaults, defineConfig} from "vitest/config";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
@@ -10,12 +7,13 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 
 export default defineConfig({
 	test: {
-		dir: "../__tests__",
+		dir: "src/__tests__",
 		coverage: {
 			// reporter: ["html", "text"],
-			// reporter: ["text"],
-			all: true,
+			reporter: ["text"],
+			// all: true,
 		},
+		includeSource: ["src/**/*.{ts,js,tsx,jsx}"],
 		exclude: [
 			...configDefaults.exclude,
 			"**/seeLeakedVariables.ts",
@@ -28,8 +26,12 @@ export default defineConfig({
 		logHeapUsage: true,
 	},
 
+	// @ts-ignore => This shouldn't be giving an error, it works...
 	plugins: [react()],
 	root: rendererPath,
+	define: {
+		"import.meta.vitest": "undefined",
+	},
 	base: "./",
 	build: {
 		outDir: outDirRenderer,
@@ -56,7 +58,6 @@ export default defineConfig({
 	css: {
 		devSourcemap: true,
 	},
-	assetsInclude: ["**/*.woff2"],
 	resolve: {
 		alias: [
 			{

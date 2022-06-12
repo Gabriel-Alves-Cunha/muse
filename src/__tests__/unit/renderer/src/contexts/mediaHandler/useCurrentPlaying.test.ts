@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { CurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
-mockGlobalsBeforeTests();
+// Getting everything ready for the tests...
+import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectronPlusNodeGlobalsBeforeTests";
+mockElectronPlusNodeGlobalsBeforeTests();
 
-import { numberOfMedias, testArray, testList } from "./fakeTestList";
 import {
-	playPreviousMedia,
-	currentPlaying,
-	CurrentPlaying,
-	playThisMedia,
-	playNextMedia,
-} from "@contexts/mediaHandler/useCurrentPlaying";
-import {
+	firstMediaPath,
+	lastMediaPath,
+	testArray,
+	testList,
+} from "./fakeTestList";
+
+const { playPreviousMedia, currentPlaying, playThisMedia, playNextMedia } =
+	await import("@contexts/mediaHandler/useCurrentPlaying");
+const {
 	PlaylistActions,
 	PlaylistList,
 	setPlaylists,
 	mainList,
 	WhatToDo,
 	history,
-} from "@contexts/mediaHandler/usePlaylists";
-
-const firstMediaPath = testArray.at(0)![0];
-const lastMediaPath = testArray.at(numberOfMedias - 1)![0];
+} = await import("@contexts/mediaHandler/usePlaylists");
 
 describe("Testing useCurrentPlaying", () => {
 	beforeEach(() => {

@@ -16,7 +16,6 @@
 		"build": "elecrun build --preload 'preload.ts' && vite build",
 		"postinstall": "electron-builder install-app-deps",
 		"lint": "eslint ./ --ext .ts --ext .tsx --ext .js",
-		"test_": "cross-env DEBUG=muse:tests vitest --dir './src/__tests__'",
 		"test": "cross-env DEBUG=muse:tests vitest",
 		"ts:check": "tsc --noEmit --pretty",
 		"coverage": "vitest run --coverage",

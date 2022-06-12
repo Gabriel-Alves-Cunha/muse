@@ -1,9 +1,6 @@
 import { styled } from "@styles/global";
 
-export const Box = styled("div", {
-	dflex: "center",
-	mt: 30,
-});
+export const Box = styled("div", { dflex: "center", mt: 30 });
 
 export const OpenFilePickerButton = styled("button", {
 	dflex: "center",

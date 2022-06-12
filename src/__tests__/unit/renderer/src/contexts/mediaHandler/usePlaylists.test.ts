@@ -4,17 +4,22 @@ import type { Media } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { mockGlobalsBeforeTests } from "../../../mockGlobalsBeforeTests";
-mockGlobalsBeforeTests();
-import { formatDuration } from "@common/utils";
-import { getRandomInt } from "@utils/utils";
+// Getting everything ready for the tests...
+import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectronPlusNodeGlobalsBeforeTests";
+mockElectronPlusNodeGlobalsBeforeTests();
+
 import {
 	numberOfMedias,
 	firstMediaPath,
 	testArray,
 	testList,
 } from "./fakeTestList";
-import {
+const { currentPlaying, playNextMedia, playThisMedia } = await import(
+	"@contexts/mediaHandler/useCurrentPlaying"
+);
+const { formatDuration } = await import("@common/utils");
+const { getRandomInt } = await import("@utils/utils");
+const {
 	PlaylistActions,
 	PlaylistList,
 	setPlaylists,
@@ -23,39 +28,38 @@ import {
 	WhatToDo,
 	mainList,
 	history,
-} from "@contexts/mediaHandler/usePlaylists";
-import {
-	currentPlaying,
-	playNextMedia,
-	playThisMedia,
-} from "@contexts/mediaHandler/useCurrentPlaying";
+} = await import("@contexts/mediaHandler/usePlaylists");
 
-const setMainListToTestList = () => {
+function setMainListToTestList() {
 	expect(testList.size).toBe(numberOfMedias);
+
 	setPlaylists({
 		whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
 		type: WhatToDo.UPDATE_MAIN_LIST,
 		list: new Map(testList),
 	});
-	expect(mainList()).toEqual(testList);
-	expect(mainList().size).toBe(numberOfMedias);
-};
 
-const cleanHistory = () => {
+	expect(mainList().size).toBe(numberOfMedias);
+	expect(mainList()).toEqual(testList);
+}
+
+function cleanHistory() {
 	setPlaylists({
 		whatToDo: PlaylistActions.CLEAN,
 		type: WhatToDo.UPDATE_HISTORY,
 	});
-	expect(history().size).toBe(0);
-};
 
-const cleanFavorites = () => {
+	expect(history().size).toBe(0);
+}
+
+function cleanFavorites() {
 	setPlaylists({
 		type: WhatToDo.UPDATE_FAVORITES,
 		whatToDo: PlaylistActions.CLEAN,
 	});
+
 	expect(favorites().size).toBe(0);
-};
+}
 
 it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
 	setPlaylists({
@@ -63,6 +67,7 @@ it("(PlaylistActions.REPLACE_ENTIRE_LIST) should update the mediaList", () => {
 		type: WhatToDo.UPDATE_MAIN_LIST,
 		list: new Map(),
 	});
+
 	expect(mainList().size).toEqual(0);
 
 	setMainListToTestList();
@@ -227,6 +232,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		});
 
 		const newMainList = mainList();
+
 		expect(newMainList.size).toBe(numberOfMedias + 1);
 		expect(newMainList.has(path)).toBe(true);
 	});
