@@ -19,6 +19,7 @@ const { currentPlaying, playNextMedia, playThisMedia } = await import(
 );
 const { formatDuration } = await import("@common/utils");
 const { getRandomInt } = await import("@utils/utils");
+import { getFirstKey } from "@utils/map";
 const {
 	PlaylistActions,
 	PlaylistList,
@@ -154,7 +155,7 @@ describe("Testing PlaylistEnum.UPDATE_HISTORY", () => {
 		});
 
 		const newHistory = history();
-		expect([...newHistory][0]?.[0]).toBe(mediaPathToAdd);
+		expect(getFirstKey(newHistory)).toBe(mediaPathToAdd);
 		expect(newHistory.size).toBe(1);
 	});
 });
@@ -291,6 +292,10 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		expect(refreshedMedia).toHaveProperty("size", size);
 		expect(refreshedMedia).toHaveProperty("title", title);
 	});
+
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
 });
 
 it("(getPlaylistsFuncs().searchForMedia()) should return a searched media", () => {

@@ -30,3 +30,6 @@ export function areArraysEqual<T>(a: T[], b: T[]) {
 
 	return true;
 }
+
+export const repeat = <T>(array: T[], length: number) =>
+	Array.from<T, T[]>({ length }, () => array);

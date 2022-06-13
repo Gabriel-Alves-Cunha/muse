@@ -4,6 +4,14 @@
 * TODO: add + tests for history.
 * TODO: add button to clean all done downloads and convertions
 
+Map<Path, {
+    timesPlayed: number;
+    playedAt: number[];
+}>
+
+sort by playedAt:
+
+
 NOTES:
 
 1. `const { getState: getPage } = usePage;

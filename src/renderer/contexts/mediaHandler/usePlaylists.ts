@@ -1,4 +1,4 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
@@ -53,18 +53,11 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									const { path } = action;
 
 									// Add to history if there isn't one yet:
-									const mediaHistory = history.get(path);
-									if (!mediaHistory) {
-										history.set(path, {
-											playedAt: [Date.now()],
-											timesPlayed: 1,
-										});
-									} else {
-										history.set(path, {
-											playedAt: [...mediaHistory.playedAt, Date.now()],
-											timesPlayed: mediaHistory.timesPlayed + 1,
-										});
-									}
+									const historyOfPlayedAt = history.get(path);
+									if (!historyOfPlayedAt)
+										history.set(path, [Date.now()]);
+									else
+										history.set(path, [...historyOfPlayedAt, Date.now()]);
 
 									// history has a max size of maxSizeOfHistory:
 									if (history.size > maxSizeOfHistory) {
@@ -445,7 +438,7 @@ export async function deleteMedia(path: Path) {
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export type History = Map<Path, { timesPlayed: number; playedAt: number[]; }>;
+export type History = Map<Path, DateAsNumber[]>;
 export type MainList = Map<Path, Media>;
 
 export type PlaylistsReducer_Action =

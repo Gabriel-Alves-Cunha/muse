@@ -1,4 +1,4 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -8,11 +8,11 @@ import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import {
+	type MainList,
+	type History,
 	usePlaylists,
 	PlaylistList,
-	getPlaylist,
-	MainList,
-	History,
+	mainList,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
 	allSelectedMedias,
@@ -61,12 +61,12 @@ function MediaListKind_({ isHome = false }: Props) {
 
 				case PlaylistList.SORTED_BY_DATE:
 				case PlaylistList.FAVORITES: {
-					const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
+					const mainList_ = mainList();
 
 					const listAsArrayOfAMap: [Path, Media][] = [];
 
 					(list as Set<Path>).forEach(path => {
-						const media = mainList.get(path);
+						const media = mainList_.get(path);
 
 						media && listAsArrayOfAMap.push([path, media]);
 					});
@@ -75,33 +75,109 @@ function MediaListKind_({ isHome = false }: Props) {
 				}
 
 				case PlaylistList.HISTORY: {
-					const mainList = getPlaylist(PlaylistList.MAIN_LIST) as MainList;
+					const unsortedList: [Path, DateAsNumber][] = [];
 
-					const listAsArrayOfAMap: [Path, Media][] = [];
+					(list as History).forEach((dates, path) =>
+						dates.forEach(date => unsortedList.push([path, date]))
+					);
 
-					if (fromList === PlaylistList.HISTORY) {
-						(list as History).forEach((_, path) => {
-							// TODO: handle how to show history items:
-							const media = mainList.get(path);
+					const sortedByDate = unsortedList.sort((a, b) => a[1] - b[1]);
 
-							media && listAsArrayOfAMap.push([path, media]);
-						});
+					const mainList_ = mainList();
+
+					const listAsArrayOfMap = sortedByDate.map(([path]) => {
+						const media = mainList_.get(path);
+						if (!media) return;
+
+						return [path, media];
+					}).filter(Boolean) as [Path, Media][];
+
+					/////////////////////////////////////////////
+					/////////////////////////////////////////////
+
+					if (import.meta.vitest) {
+						(async () => {
+							// @ts-ignore => these do exist, don't know why ts complains
+							const { it, expect } = import.meta.vitest;
+
+							const { getRandomInt } = await import("@utils/utils");
+							const { playThisMedia, currentPlaying } = await import(
+								"@contexts/mediaHandler/useCurrentPlaying"
+							);
+							const { testArray, numberOfMedias } = await import(
+								"__tests__/unit/renderer/src/contexts/mediaHandler/fakeTestList"
+							);
+
+							it("is testing the above function execution (history list display)", () => {
+								const timesAllMediasWerePlayed = 100; // arbitrary number to make the medias repeat
+
+								{ // first create a history by playing random medias in the main list several times:
+									for (let i = 0; i < timesAllMediasWerePlayed; ++i) {
+										const randomMediaPath =
+											// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+											testArray[getRandomInt(0, numberOfMedias)]![0];
+										expect(randomMediaPath).toBeTruthy();
+
+										playThisMedia(randomMediaPath, PlaylistList.MAIN_LIST);
+										expect(currentPlaying().path).toBe(randomMediaPath);
+									}
+								}
+
+								const unsortedList: [Path, DateAsNumber][] = [];
+
+								(list as History).forEach((dates, path) =>
+									dates.forEach(date => unsortedList.push([path, date]))
+								);
+
+								const sortedByDate = unsortedList.sort((a, b) => a[1] - b[1]);
+
+								const mainList_ = mainList();
+
+								const listAsArrayOfMap = sortedByDate.map(([path]) => {
+									const media = mainList_.get(path);
+									if (!media) return;
+
+									return [path, media];
+								}).filter(Boolean) as [Path, Media][];
+
+								{
+									// console.log("history:", history());
+									console.log("list =", unsortedList, unsortedList.length);
+									console.log(
+										"sortedByDate =",
+										sortedByDate,
+										sortedByDate.length,
+									);
+									console.log(
+										"listAsArrayOfMap =",
+										listAsArrayOfMap,
+										listAsArrayOfMap.length,
+									);
+
+									expect(listAsArrayOfMap.length).toBe(
+										timesAllMediasWerePlayed,
+									);
+								}
+							});
+						})();
 					}
 
-					return listAsArrayOfAMap;
+					/////////////////////////////////////////////
+					/////////////////////////////////////////////
+
+					return listAsArrayOfMap;
 				}
 
 				default:
 					return assertUnreachable(listName);
 			}
-		}, "listAsArrayOfAMap"), [listName, list, fromList]);
+		}, "listAsArrayOfAMap"), [listName, list]);
 
 	useOnClickOutside(
 		listRef,
 		// Deselect all medias:
 		() => {
 			if (allSelectedMedias.size > 0 && listRef.current) {
-				// mediaRowRef.current?.classList.remove("selected");
 				document.querySelectorAll(`.${RowWrapper.className}`).forEach(item =>
 					item.classList.remove("selected")
 				);
