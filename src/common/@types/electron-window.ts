@@ -10,28 +10,34 @@ declare global {
 
 export type VisibleElectron = Readonly<
 	{
-		notificationApi: {
-			sendNotificationToElectronIpcMainProcess(
-				type: ElectronIpcMainProcessNotificationEnum,
-			): void;
-		};
-		fs: {
-			getFullPathOfFilesForFilesInThisDirectory(
-				dir: Path,
-			): Promise<readonly Path[]>;
-			readFile(path: Path): Promise<Readonly<Buffer | undefined>>;
-			readdir(dir: Path): Promise<readonly Path[]>;
-			deleteFile(path: Path): Promise<void>;
-		};
-		os: { dirs: { documents: Path; downloads: Path; music: Path; }; };
-		media: {
-			transformPathsToMedias(
-				paths: readonly string[],
-				assureMediaSizeIsGreaterThan60KB?: boolean,
-				ignoreMediaWithLessThan60Seconds?: boolean,
-			): Promise<readonly [Path, Media][]>;
-			getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
-		};
+		os: { dirs: Readonly<{ documents: Path; downloads: Path; music: Path; }>; };
+		notificationApi: Readonly<
+			{
+				sendNotificationToElectronIpcMainProcess(
+					type: ElectronIpcMainProcessNotificationEnum,
+				): void;
+			}
+		>;
+		fs: Readonly<
+			{
+				getFullPathOfFilesForFilesInThisDirectory(
+					dir: Path,
+				): Promise<readonly Path[]>;
+				readFile(path: Path): Promise<Readonly<Buffer | undefined>>;
+				readdir(dir: Path): Promise<readonly Path[]>;
+				deleteFile(path: Path): Promise<void>;
+			}
+		>;
+		media: Readonly<
+			{
+				transformPathsToMedias(
+					paths: readonly string[],
+					assureMediaSizeIsGreaterThan60KB?: Readonly<boolean>,
+					ignoreMediaWithLessThan60Seconds?: Readonly<boolean>,
+				): Promise<readonly [Path, Media][]>;
+				getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
+			}
+		>;
 	}
 >;
 

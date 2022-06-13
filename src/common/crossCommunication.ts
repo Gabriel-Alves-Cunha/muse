@@ -6,9 +6,9 @@ import type {
 import { dbg } from "./utils";
 
 export const sendMsgToBackend = (
-	msg: MsgObjectReactToElectron,
-	electronPort?: MessagePort,
-) => {
+	msg: Readonly<MsgObjectReactToElectron>,
+	electronPort?: Readonly<MessagePort>,
+): void => {
 	dbg("Sending message to backend:", { msg, electronPort });
 
 	electronPort ?
@@ -16,7 +16,9 @@ export const sendMsgToBackend = (
 		window.postMessage({ msg, source: reactSource }, "*");
 };
 
-export const sendMsgToClient = (msg: MsgObjectElectronToReact) => {
+export const sendMsgToClient = (
+	msg: Readonly<MsgObjectElectronToReact>,
+): void => {
 	dbg("Sending message to client:", msg);
 
 	window.postMessage({ msg, source: electronSource }, "*");

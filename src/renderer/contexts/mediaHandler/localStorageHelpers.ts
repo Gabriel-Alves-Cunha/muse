@@ -40,8 +40,8 @@ export const setPlayOptionsLocalStorage: LoggerImpl<PlayOptions> =
 			) => {
 				const previousState = get();
 				const areStatesEqual = areObjectKeysEqual(
-					previousState,
 					newPlayOptions,
+					previousState,
 				);
 
 				set(newPlayOptions, replace);

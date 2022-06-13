@@ -7,29 +7,29 @@ let watcherId: NodeJS.Timer | undefined;
 let previousText = clipboard.readText();
 
 (clipboard as ClipboardExtended).on = <T>(
-	event: string,
+	eventName: string,
 	listener: (...args: T[]) => void,
 ) => {
-	clipboardEmitter.on(event, listener);
+	clipboardEmitter.on(eventName, listener);
 
 	return clipboard;
 };
 
 (clipboard as ClipboardExtended).once = <T>(
-	event: string,
+	eventName: string,
 	listener: (...args: T[]) => void,
 ) => {
-	clipboardEmitter.once(event, listener);
+	clipboardEmitter.once(eventName, listener);
 
 	return clipboard;
 };
 
 (clipboard as ClipboardExtended).off = <T>(
-	event: string,
+	eventName: string,
 	listener?: (...args: T[]) => void,
 ) => {
-	if (listener) clipboardEmitter.removeListener(event, listener);
-	else clipboardEmitter.removeAllListeners(event);
+	if (listener) clipboardEmitter.removeListener(eventName, listener);
+	else clipboardEmitter.removeAllListeners(eventName);
 
 	return clipboard;
 };
@@ -51,7 +51,7 @@ let previousText = clipboard.readText();
 	return clipboard;
 };
 
-const isTextDiff = (str1: string, str2: string) => str2 && str1 !== str2;
+const isTextDiff = (str1 = "", str2 = "") => str1 !== str2;
 
 export { clipboard as ExtendedClipboard };
 
@@ -63,15 +63,15 @@ type ClipboardExtended =
 			startWatching: () => ClipboardExtended;
 			stopWatching: () => ClipboardExtended;
 			off: <T>(
-				event: string,
+				eventName: string,
 				listener?: (...args: T[]) => void,
 			) => ClipboardExtended;
 			on: <T>(
-				event: string,
+				eventName: string,
 				listener: (...args: T[]) => void,
 			) => ClipboardExtended;
 			once: <T>(
-				event: string,
+				eventName: string,
 				listener: (...args: T[]) => void,
 			) => ClipboardExtended;
 		}

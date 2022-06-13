@@ -4,9 +4,8 @@ import type { PrettyBytes } from "../prettyBytes";
 import { pages } from "@utils/app";
 
 export type Page = Readonly<typeof pages[number]>;
-export type Path = Readonly<string>;
-
 export type DateAsNumber = Readonly<number>;
+export type Path = Readonly<string>;
 
 export type Media = Readonly<
 	{
@@ -37,7 +36,8 @@ export type DownloadInfo = Readonly<
 
 export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
 
-export type TypeOfMap<T> = T extends Map<infer K, infer V> ? [K, V][] : never;
+export type TypeOfMap<T> = T extends ReadonlyMap<infer K, infer V> ? [K, V][]
+	: never;
 
 export type Values<Obj> = Obj[keyof Obj];
 

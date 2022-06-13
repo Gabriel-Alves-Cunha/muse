@@ -25,11 +25,6 @@ import readline from "readline";
 import ytdl from "ytdl-core";
 
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
-import {
-	type AllowedMedias,
-	dbg,
-	separatedByCommaOrSemiColon,
-} from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { areArraysEqual } from "@utils/array";
@@ -38,6 +33,11 @@ import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
 import { time } from "@utils/utils";
 import { dirs } from "../utils";
+import {
+	type AllowedMedias,
+	separatedByCommaOrSemiColon,
+	dbg,
+} from "@common/utils";
 import {
 	separatedByCommaOrSemiColorOrSpace,
 	getLastExtension,
@@ -153,7 +153,7 @@ export async function transformPathsToMedias(
 
 export async function handleCreateOrCancelDownload(
 	{ electronPort, extension, imageURL, destroy, title, url }: HandleDownload,
-) {
+): Promise<void> {
 	if (!url) return error("Missing required param 'url'!", arguments);
 
 	if (!currentDownloads.has(url)) {
@@ -168,7 +168,7 @@ export async function makeStream(
 	{ electronPort, extension, imageURL, title, url }: Required<
 		Omit<HandleDownload, "destroy">
 	>,
-) {
+): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
 
 	const titleWithExtension = sanitize(`${title}.${extension}`);
@@ -315,7 +315,7 @@ export async function makeStream(
 
 export async function handleCreateOrCancelConvert(
 	{ electronPort, toExtension, destroy, path }: HandleConversion,
-) {
+): Promise<void> {
 	if (!path) return error("Missing required param 'path'!", arguments);
 
 	if (!mediasConverting.has(path)) {
@@ -330,7 +330,7 @@ export async function convertToAudio(
 	{ electronPort, toExtension, path }: Required<
 		Omit<HandleConversion, "destroy">
 	>,
-) {
+): Promise<void> {
 	const titleWithExtension = sanitize(`${getBasename(path)}.${toExtension}`);
 
 	{
@@ -728,7 +728,10 @@ export async function writeTags(
 	}
 }
 
-function createImage(imgAsString: ImgString, file: MediaFile) {
+function createImage(
+	imgAsString: Readonly<ImgString>,
+	file: Readonly<MediaFile>,
+): void {
 	const txtForByteVector = imgAsString.slice(
 		imgAsString.indexOf(",") + 1,
 		imgAsString.length,
@@ -751,7 +754,9 @@ function createImage(imgAsString: ImgString, file: MediaFile) {
 	dbg("At createImage():", { "file.tag.pictures": file.tag.pictures, picture });
 }
 
-export async function getThumbnail(url: Readonly<string>): Promise<ImgString> {
+export async function getThumbnail(
+	url: Readonly<string>,
+): Promise<Readonly<ImgString>> {
 	return new Promise((resolve, reject) =>
 		get(url, res => {
 			res.setEncoding("base64");
@@ -768,9 +773,9 @@ export async function getThumbnail(url: Readonly<string>): Promise<ImgString> {
 }
 
 function sendFailedConversionMsg(
-	path: Path,
+	path: Readonly<Path>,
 	electronPort: Readonly<MessagePort>,
-) {
+): void {
 	sendMsgToClient({
 		type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED,
 		path,
@@ -782,7 +787,7 @@ function sendFailedConversionMsg(
 function sendFailedDownloadMsg(
 	url: Readonly<string>,
 	electronPort: Readonly<MessagePort>,
-) {
+): void {
 	sendMsgToClient({
 		type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED,
 		url,

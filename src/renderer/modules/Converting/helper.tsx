@@ -10,7 +10,7 @@ import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { TooltipButton } from "@components/TooltipButton";
 import { prettyBytes } from "@common/prettyBytes";
-import { emptyMap } from "@utils/map";
+import { emptyMap } from "@utils/map-set";
 import { dbg } from "@common/utils";
 import {
 	cancelConvertionAndOrRemoveItFromList,
@@ -92,9 +92,9 @@ export const ConvertBox = (
 ///////////////////////////////////////////////////////////////////////////
 
 export function createNewConvertion(
-	convertInfo: ConvertInfo,
-	path: Path,
-): MessagePort {
+	convertInfo: Readonly<ConvertInfo>,
+	path: Readonly<Path>,
+): Readonly<MessagePort> {
 	const { convertingList } = getConvertingList();
 
 	dbg("Trying to create a new conversion...", { convertingList });
@@ -122,7 +122,7 @@ export function createNewConvertion(
 	};
 
 	setConvertingList({
-		convertingList: convertingList.set(path, convertStatus),
+		convertingList: new Map(convertingList).set(path, convertStatus),
 	});
 
 	// On every `postMessage` you have to send the path (as an ID)!
@@ -147,7 +147,10 @@ export function createNewConvertion(
 			);
 
 		setConvertingList({
-			convertingList: convertingList.set(path, { ...convertStatus, ...data }),
+			convertingList: new Map(convertingList).set(path, {
+				...convertStatus,
+				...data,
+			}),
 		});
 
 		switch (data.status) {
@@ -223,4 +226,6 @@ export type ConvertInfo = Readonly<
 	{ toExtension: AllowedMedias; canStartConvert: boolean; }
 >;
 
-type NewConvertions = { newConvertions: ReadonlyMap<Path, ConvertInfo>; };
+type NewConvertions = Readonly<
+	{ newConvertions: ReadonlyMap<Path, ConvertInfo>; }
+>;

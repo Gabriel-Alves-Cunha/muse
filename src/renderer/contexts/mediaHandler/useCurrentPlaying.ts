@@ -4,7 +4,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { setCurrentPlayingLocalStorage } from "./localStorageHelpers";
-import { getFirstKey, getLastKey } from "@utils/map";
+import { getFirstKey, getLastKey } from "@utils/map-set";
 import { getRandomInt, time } from "@utils/utils";
 import { playOptions } from "./usePlayOptions";
 import {

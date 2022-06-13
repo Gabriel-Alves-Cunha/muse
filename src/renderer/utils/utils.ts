@@ -49,5 +49,3 @@ export function time<T>(fn: () => T, label: string): T {
 
 	return fnReturn;
 }
-
-export const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));

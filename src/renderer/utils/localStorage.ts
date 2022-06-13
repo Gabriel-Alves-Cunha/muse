@@ -25,9 +25,9 @@ export const keys = Object.freeze(
 type Keys = typeof keys[keyof typeof keys];
 type Values =
 	| readonly [Path, Media][]
+	| ReadonlySet<Path>
 	| CurrentPlaying
 	| PlayOptions
-	| Set<Path>
 	| History;
 
 type HistoryShape = TypeOfMap<History>;

@@ -1,6 +1,5 @@
 import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
-import useTilg from "tilg";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
@@ -8,7 +7,7 @@ import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
-import { emptyMap } from "@utils/map";
+import { emptyMap } from "@utils/map-set";
 
 import { StyledPopoverTrigger } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
@@ -18,13 +17,9 @@ export function Converting() {
 	const { newConvertions } = useNewConvertions();
 	const [isOpen, setIsOpen] = useState(false);
 
-	useTilg()`on Converting - button: ${{ convertingListSize, newConvertions }}`;
-
 	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
 	useEffect(() => {
-		console.log("inside Converting useEffect", { newConvertions });
-
 		newConvertions.forEach((newConvertion, path) => {
 			console.log("inside forEach newConvertion:", { newConvertion, path });
 			if (newConvertion.canStartConvert)

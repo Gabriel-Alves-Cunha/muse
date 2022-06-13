@@ -13,7 +13,6 @@ export default defineConfig({
 			reporter: ["text"],
 			// all: true,
 		},
-		includeSource: ["src/**/*.{ts,js,tsx,jsx}"],
 		exclude: [
 			...configDefaults.exclude,
 			"**/seeLeakedVariables.ts",

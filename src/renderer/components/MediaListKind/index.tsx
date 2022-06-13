@@ -87,83 +87,12 @@ function MediaListKind_({ isHome = false }: Props) {
 
 					const listAsArrayOfMap = sortedByDate.map(([path]) => {
 						const media = mainList_.get(path);
-						if (!media) return;
+
+						if (!media)
+							return console.error(`Media not found for path: ${path}`);
 
 						return [path, media];
 					}).filter(Boolean) as [Path, Media][];
-
-					/////////////////////////////////////////////
-					/////////////////////////////////////////////
-
-					if (import.meta.vitest) {
-						(async () => {
-							// @ts-ignore => these do exist, don't know why ts complains
-							const { it, expect } = import.meta.vitest;
-
-							const { getRandomInt } = await import("@utils/utils");
-							const { playThisMedia, currentPlaying } = await import(
-								"@contexts/mediaHandler/useCurrentPlaying"
-							);
-							const { testArray, numberOfMedias } = await import(
-								"__tests__/unit/renderer/src/contexts/mediaHandler/fakeTestList"
-							);
-
-							it("is testing the above function execution (history list display)", () => {
-								const timesAllMediasWerePlayed = 100; // arbitrary number to make the medias repeat
-
-								{ // first create a history by playing random medias in the main list several times:
-									for (let i = 0; i < timesAllMediasWerePlayed; ++i) {
-										const randomMediaPath =
-											// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-											testArray[getRandomInt(0, numberOfMedias)]![0];
-										expect(randomMediaPath).toBeTruthy();
-
-										playThisMedia(randomMediaPath, PlaylistList.MAIN_LIST);
-										expect(currentPlaying().path).toBe(randomMediaPath);
-									}
-								}
-
-								const unsortedList: [Path, DateAsNumber][] = [];
-
-								(list as History).forEach((dates, path) =>
-									dates.forEach(date => unsortedList.push([path, date]))
-								);
-
-								const sortedByDate = unsortedList.sort((a, b) => a[1] - b[1]);
-
-								const mainList_ = mainList();
-
-								const listAsArrayOfMap = sortedByDate.map(([path]) => {
-									const media = mainList_.get(path);
-									if (!media) return;
-
-									return [path, media];
-								}).filter(Boolean) as [Path, Media][];
-
-								{
-									// console.log("history:", history());
-									console.log("list =", unsortedList, unsortedList.length);
-									console.log(
-										"sortedByDate =",
-										sortedByDate,
-										sortedByDate.length,
-									);
-									console.log(
-										"listAsArrayOfMap =",
-										listAsArrayOfMap,
-										listAsArrayOfMap.length,
-									);
-
-									expect(listAsArrayOfMap.length).toBe(
-										timesAllMediasWerePlayed,
-									);
-								}
-							});
-						})();
-					}
-
-					/////////////////////////////////////////////
-					/////////////////////////////////////////////
 
 					return listAsArrayOfMap;
 				}

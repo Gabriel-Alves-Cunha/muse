@@ -54,8 +54,8 @@ export const useDownloadingList = create<DownloadingList>(() => ({
 export const { getState: getDownloadingList, setState: setDownloadingList } =
 	useDownloadingList;
 
-type DownloadingList = {
-	downloadingList: Map<MediaUrl, MediaBeingDownloaded>;
-};
+type DownloadingList = Readonly<
+	{ downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>; }
+>;
 
-export type MediaUrl = string;
+export type MediaUrl = Readonly<string>;

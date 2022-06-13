@@ -54,7 +54,7 @@ autoUpdater.on("update-downloaded", info => {
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
 
-async function createWindow() {
+async function createWindow(): Promise<BrowserWindow> {
 	const window = new BrowserWindow({
 		title: capitalizedAppName,
 		titleBarStyle: "hidden",
@@ -157,6 +157,9 @@ app.on("window-all-closed", () => {
 	tray.setToolTip("Music player and downloader");
 	tray.setTitle("Muse");
 
+	/** This is to make electron show notification when we copy
+	 * a link to the clipboard!
+	 */
 	try {
 		const extendedClipboard = (await import("./clipboardExtended"))
 			.ExtendedClipboard as ClipboardExtended;
@@ -200,15 +203,13 @@ app.on("window-all-closed", () => {
 		console.error(error);
 	}
 
-	setTimeout(async () => {
-		try {
-			// This will immediately download an update,
-			// then install when the app quits.
-			await autoUpdater.checkForUpdatesAndNotify();
-		} catch (error) {
-			console.error(error);
-		}
-	}, 3_000);
+	// This will immediately download an update,
+	// then install when the app quits.
+	setTimeout(
+		async () =>
+			await autoUpdater.checkForUpdatesAndNotify().catch(console.error),
+		5_000,
+	);
 });
 
 // In this file you can include the rest of your app's specific main process
@@ -227,49 +228,52 @@ ipcMain.on(
 	},
 );
 
-ipcMain.on("notify", (event, type: ElectronIpcMainProcessNotificationEnum) => {
-	switch (type) {
-		case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
-			app.quit();
-			break;
+ipcMain.on(
+	"notify",
+	(event, type: ElectronIpcMainProcessNotificationEnum): void => {
+		switch (type) {
+			case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
+				app.quit();
+				break;
+			}
+
+			case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
+				const focusedWindow = BrowserWindow.getFocusedWindow();
+				if (!focusedWindow) break;
+
+				focusedWindow.isMaximized() ?
+					focusedWindow.unmaximize() :
+					focusedWindow.maximize();
+				break;
+			}
+
+			case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
+				BrowserWindow.getFocusedWindow()?.minimize();
+				break;
+			}
+
+			case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
+				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
+				break;
+			}
+
+			case ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW: {
+				BrowserWindow.getFocusedWindow()?.reload();
+				break;
+			}
+
+			default: {
+				console.error(
+					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
+					event,
+				);
+
+				assertUnreachable(type);
+				break;
+			}
 		}
-
-		case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
-			const focusedWindow = BrowserWindow.getFocusedWindow();
-			if (!focusedWindow) break;
-
-			focusedWindow.isMaximized() ?
-				focusedWindow.unmaximize() :
-				focusedWindow.maximize();
-			break;
-		}
-
-		case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
-			BrowserWindow.getFocusedWindow()?.minimize();
-			break;
-		}
-
-		case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
-			BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
-			break;
-		}
-
-		case ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW: {
-			BrowserWindow.getFocusedWindow()?.reload();
-			break;
-		}
-
-		default: {
-			console.error(
-				"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
-				event,
-			);
-
-			assertUnreachable(type);
-			break;
-		}
-	}
-});
+	},
+);
 
 // Also defining it here with all types required so typescript doesn't complain...
 type ClipboardExtended = Electron.Clipboard & {

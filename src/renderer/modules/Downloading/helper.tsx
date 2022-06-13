@@ -58,7 +58,9 @@ export function Popup() {
  * Electron to enable 2 way communication between it
  * and React.
  */
-export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
+export function createNewDownload(
+	downloadInfo: Readonly<DownloadInfo>,
+): Readonly<MessagePort> {
 	const { downloadingList } = getDownloadingList();
 
 	dbg("Trying to create a new download...", { downloadingList });
@@ -82,7 +84,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 	// Creating a new DownloadingMedia and adding it to the list:
 	setDownloadingList({
-		downloadingList: downloadingList.set(downloadInfo.url, {
+		downloadingList: new Map(downloadingList).set(downloadInfo.url, {
 			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 			imageURL: downloadInfo.imageURL,
 			title: downloadInfo.title,
@@ -102,7 +104,9 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
-	myPort.onmessage = ({ data }: { data: Partial<MediaBeingDownloaded>; }) => {
+	myPort.onmessage = (
+		{ data }: { data: Readonly<Partial<MediaBeingDownloaded>>; },
+	): void => {
 		const { downloadingList } = getDownloadingList();
 
 		dbg(
@@ -121,7 +125,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		// Update React's information about this DownloadingMedia:
 		setDownloadingList({
-			downloadingList: downloadingList.set(downloadInfo.url, {
+			downloadingList: new Map(downloadingList).set(downloadInfo.url, {
 				...thisDownload,
 				...data,
 			}),
@@ -176,61 +180,61 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	return electronPort;
 }
 
-function cancelDownloadAndOrRemoveItFromList(url: string): void {
+function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
 	const { downloadingList } = getDownloadingList();
 
-	{
-		// Assert that the download exists:
-		const download = downloadingList.get(url);
+	// Assert that the download exists:
+	const download = downloadingList.get(url);
 
-		if (!download)
-			return console.error(
-				`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
-				downloadingList,
-			);
+	if (!download)
+		return console.error(
+			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
+			downloadingList,
+		);
 
-		// Cancel download:
-		if (download.isDownloading)
-			download.port.postMessage({ destroy: true, url });
+	// Cancel download:
+	if (download.isDownloading)
+		download.port.postMessage({ destroy: true, url });
 
-		// Update downloading list:
-		downloadingList.delete(url);
-	}
+	// Update downloading list:
+	const newDownloadingList = new Map(downloadingList);
+	newDownloadingList.delete(url);
 
 	// Make React update:
-	setDownloadingList({ downloadingList });
+	setDownloadingList({ downloadingList: newDownloadingList });
 }
 
-export function cancelConvertionAndOrRemoveItFromList(path: string): void {
+export function cancelConvertionAndOrRemoveItFromList(
+	path: Readonly<string>,
+): void {
 	const { convertingList } = getConvertingList();
 
-	{
-		const mediaBeingConverted = convertingList.get(path);
+	const mediaBeingConverted = convertingList.get(path);
 
-		if (!mediaBeingConverted)
-			return console.error(
-				`There should be a convertion with path "${path}"!\nconvertList =`,
-				convertingList,
-			);
+	if (!mediaBeingConverted)
+		return console.error(
+			`There should be a convertion with path "${path}"!\nconvertList =`,
+			convertingList,
+		);
 
-		// Cancel conversion
-		if (mediaBeingConverted.isConverting)
-			mediaBeingConverted.port.postMessage({ destroy: true, path });
+	// Cancel conversion
+	if (mediaBeingConverted.isConverting)
+		mediaBeingConverted.port.postMessage({ destroy: true, path });
 
-		// Remove from converting list
-		convertingList.delete(path);
-	}
+	// Remove from converting list
+	const newConvertingList = new Map(convertingList);
+	newConvertingList.delete(path);
 
 	// Make React update:
-	setConvertingList({ convertingList });
+	setConvertingList({ convertingList: newConvertingList });
 }
 
 export function handleDeleteAnimation(
-	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-	downloadingOrConvertionIndex: number,
-	isDownloadList: boolean,
-	key: string,
-) {
+	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
+	downloadingOrConvertionIndex: Readonly<number>,
+	isDownloadList: Readonly<boolean>,
+	key: Readonly<string>,
+): void {
 	const className = `.${ItemWrapper.className}`;
 
 	const items = document.querySelectorAll(className) as NodeListOf<

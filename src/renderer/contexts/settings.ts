@@ -6,7 +6,9 @@ export const useSettings = create<Settings>(() => ({
 }));
 export const { getState: getSettings, setState: setSettings } = useSettings;
 
-type Settings = {
-	assureMediaSizeIsGreaterThan60KB: boolean;
-	ignoreMediaWithLessThan60Seconds: boolean;
-};
+type Settings = Readonly<
+	{
+		assureMediaSizeIsGreaterThan60KB: boolean;
+		ignoreMediaWithLessThan60Seconds: boolean;
+	}
+>;

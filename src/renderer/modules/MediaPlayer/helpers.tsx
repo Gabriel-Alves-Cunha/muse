@@ -49,13 +49,14 @@ import {
 	Album,
 } from "./styles";
 
-const toggleFavorite = (path?: Path) =>
-	path &&
-	setPlaylists({
-		whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
-		type: WhatToDo.UPDATE_FAVORITES,
-		path,
-	});
+const toggleFavorite = (path?: Readonly<Path>): void => {
+	if (path)
+		setPlaylists({
+			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
+			type: WhatToDo.UPDATE_FAVORITES,
+			path,
+		});
+};
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
@@ -218,5 +219,5 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 type Audio = HTMLAudioElement | null;
 type RefToAudio = Readonly<{ audio: Audio; }>;
 type IsPaused = Readonly<{ isPaused: boolean | undefined; }>;
-type SeekEvent = React.MouseEvent<HTMLDivElement, MouseEvent>;
 type RefToMedia = Readonly<{ media: Media | undefined; path: Path; }>;
+type SeekEvent = Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>;

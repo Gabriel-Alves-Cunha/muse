@@ -31,13 +31,13 @@ export function MediaPlayer() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const path = useCurrentPlaying().path ?? "";
 
-	const media = mainList.get(path ?? "");
+	const media = mainList.get(path);
 	const audio = audioRef.current;
 
 	useEffect(() => {
 		if (!audio) return;
 
-		function handleProgress() {
+		function handleProgress(): void {
 			if (!audio) return;
 
 			const { duration, currentTime } = audio;
@@ -46,7 +46,7 @@ export function MediaPlayer() {
 			setProgress({ currentTime, percentage });
 		}
 
-		function handleLoadedData() {
+		function handleLoadedData(): void {
 			if (!media || !path || !audio) return;
 
 			// Updating the duration of media:
@@ -66,7 +66,7 @@ export function MediaPlayer() {
 			}
 		}
 
-		function handleEnded() {
+		function handleEnded(): void {
 			if (!audio) return;
 
 			dbg(
@@ -78,7 +78,7 @@ export function MediaPlayer() {
 			if (!audio.loop) playNextMedia();
 		}
 
-		async function handleAudioCanPlay() {
+		async function handleAudioCanPlay(): Promise<void> {
 			if (!audio) return;
 
 			dbg("Audio can play.");
@@ -148,13 +148,13 @@ export function MediaPlayer() {
 	);
 }
 
-const handleInvalid = (e: Event) => dbg("Audio is invalid.", e);
-const handleError = (e: Event) => dbg("Audio error:", e);
-const handleAbort = () => dbg("Audio was aborted.");
-const handleClose = () => dbg("Audio was closed.");
-const handleSecurityPolicyViolation = (e: Event) =>
+const handleInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
+const handleError = (e: Readonly<Event>): void => dbg("Audio error:", e);
+const handleAbort = (): void => dbg("Audio was aborted.");
+const handleClose = (): void => dbg("Audio was closed.");
+const handleSecurityPolicyViolation = (e: Readonly<Event>): void =>
 	console.error("Audio has a security policy violation:", e);
-const handleStalled = (e: Event) =>
+const handleStalled = (e: Readonly<Event>): void =>
 	dbg(
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",
 		e,

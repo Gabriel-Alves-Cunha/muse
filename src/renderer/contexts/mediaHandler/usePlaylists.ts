@@ -6,14 +6,14 @@ import { getFromLocalStorage, keys } from "@utils/localStorage";
 import { setPlaylistsLocalStorage } from "./localStorageHelpers";
 import { assertUnreachable, time } from "@utils/utils";
 import { dbgPlaylists } from "@common/utils";
-import { getFirstKey } from "@utils/map";
+import { emptyMap, emptySet, getFirstKey } from "@utils/map-set";
+import { getSettings } from "@contexts/settings";
 import {
 	searchDirectoryResult,
 	getAllowedMedias,
 	sortByDate,
 	sortByName,
 } from "./usePlaylistsHelper";
-import { getSettings } from "@contexts/settings";
 
 const { media: { transformPathsToMedias }, fs: { deleteFile } } = electron;
 
@@ -25,9 +25,9 @@ export type UsePlaylistsActions = Readonly<
 
 		isLoadingMedias: boolean;
 
-		sortedByDate: Set<Path>;
+		sortedByDate: ReadonlySet<Path>;
+		favorites: ReadonlySet<Path>;
 		sortedByName: MainList;
-		favorites: Set<Path>;
 		history: History;
 	}
 >;
@@ -52,22 +52,26 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									const { history } = get();
 									const { path } = action;
 
+									const dates: DateAsNumber[] = [];
+
 									// Add to history if there isn't one yet:
-									const historyOfPlayedAt = history.get(path);
-									if (!historyOfPlayedAt)
-										history.set(path, [Date.now()]);
+									const historyOfDates = history.get(path);
+									if (!historyOfDates)
+										dates.push(Date.now());
 									else
-										history.set(path, [...historyOfPlayedAt, Date.now()]);
+										dates.push(...historyOfDates, Date.now());
+
+									const newHistory = new Map(history).set(path, dates);
 
 									// history has a max size of maxSizeOfHistory:
-									if (history.size > maxSizeOfHistory) {
+									if (newHistory.size > maxSizeOfHistory) {
 										// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-										const firstPath = getFirstKey(history)!;
+										const firstPath = getFirstKey(newHistory)!;
 										// remove the first element:
-										history.delete(firstPath);
+										newHistory.delete(firstPath);
 									}
 
-									set({ history });
+									set({ history: newHistory });
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
@@ -77,9 +81,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								}
 
 								case PlaylistActions.CLEAN: {
-									const { history } = get();
-									history.clear();
-									set({ history });
+									set({ history: emptyMap });
 									break;
 								}
 
@@ -95,15 +97,15 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						time(() => {
 							switch (action.whatToDo) {
 								case PlaylistActions.TOGGLE_ONE_MEDIA: {
-									const { favorites } = get();
+									const newFavorites = new Set(get().favorites);
 
 									// map.delete() returns true if an element in the Map
 									// object existed and has been removed, or false if
 									// the element does not exist.
-									if (!favorites.delete(action.path))
-										favorites.add(action.path);
+									if (!newFavorites.delete(action.path))
+										newFavorites.add(action.path);
 
-									set({ favorites });
+									set({ favorites: newFavorites });
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'TOGGLE_ONE_MEDIA'. new favorites =",
@@ -113,7 +115,11 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								}
 
 								case PlaylistActions.ADD_ONE_MEDIA: {
-									set({ favorites: get().favorites.add(action.path) });
+									const newFavorites = new Set(get().favorites).add(
+										action.path,
+									);
+
+									set({ favorites: newFavorites });
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'ADD_ONE_MEDIA'. new favorites =",
@@ -125,8 +131,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
 									const { favorites } = get();
 
-									favorites.delete(action.path) ?
-										set({ favorites }) :
+									if (favorites.has(action.path)) {
+										const newFavorites = new Set(favorites);
+										newFavorites.delete(action.path);
+
+										set({ favorites: newFavorites });
+									} else
 										console.error("Media not found in favorites");
 
 									dbgPlaylists(
@@ -137,10 +147,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								}
 
 								case PlaylistActions.CLEAN: {
-									const { favorites } = get();
-									favorites.clear();
-
-									set({ favorites });
+									set({ favorites: emptySet });
 									break;
 								}
 
@@ -171,8 +178,10 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										break;
 									}
 
+									const newMainList = new Map(mainList);
+
 									updateAndSortSortedAndMainLists(
-										mainList.set(action.path, action.newMedia),
+										newMainList.set(action.path, action.newMedia),
 									);
 
 									dbgPlaylists(
@@ -190,26 +199,36 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										history,
 									} = get();
 
-									if (!mainList.delete(action.path)) {
+									const newSortedByDate = new Set(sortedByDate);
+									const newFavorites = new Set(favorites);
+									const newMainList = new Map(mainList);
+									const newHistory = new Map(history);
+
+									if (!newMainList.delete(action.path)) {
 										console.error(
 											`A media with path "${action.path}" does not exist at sortedByName.`,
 										);
 										break;
 									}
-									if (!sortedByDate.delete(action.path)) {
+									if (!newSortedByDate.delete(action.path)) {
 										console.error(
-											`A media with path "${action.path}" does not exist at sortedByDate.`,
+											`A media with path "${action.path}" does not exist at newSortedByDate.`,
 										);
 										break;
 									}
 
-									set({ sortedByName: mainList, sortedByDate });
+									set({
+										sortedByDate: newSortedByDate,
+										sortedByName: newMainList,
+									});
 
 									// If the media is in the favorites, remove it from the favorites
-									if (favorites.delete(action.path)) set({ favorites });
+									if (newFavorites.delete(action.path))
+										set({ favorites: newFavorites });
 
 									// If the media is in the history, remove it from the history
-									if (history.delete(action.path)) set({ history });
+									if (newHistory.delete(action.path))
+										set({ history: newHistory });
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_MEDIA_LIST'\u279D'REMOVE_ONE_MEDIA_BY_PATH' (yet to be sorted). newMainList =",
@@ -221,22 +240,24 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REPLACE_ENTIRE_LIST: {
 									const { favorites, history } = get();
 
+									const newFavorites = new Set(favorites);
+									const newHistory = new Map(history);
+
 									// If the media in the favorites list is not on
 									// action.list, remove it from the favorites:
-									const previousFavoritesSize = favorites.size;
 									favorites.forEach(path =>
-										!action.list.has(path) && favorites.delete(path)
+										!action.list.has(path) && newFavorites.delete(path)
 									);
-									if (favorites.size !== previousFavoritesSize)
-										set({ favorites });
+									if (favorites.size !== newFavorites.size)
+										set({ favorites: newFavorites });
 
 									// If the media in the history list is not on
 									// action.list, remove it from the favorites:
-									const previousHistorySize = history.size;
 									history.forEach((_, path) =>
-										!action.list.has(path) && history.delete(path)
+										!action.list.has(path) && newHistory.delete(path)
 									);
-									if (history.size !== previousHistorySize) set({ history });
+									if (history.size !== newHistory.size)
+										set({ history: newHistory });
 
 									updateAndSortSortedAndMainLists(action.list);
 
@@ -260,21 +281,24 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 										break;
 									}
 
+									const newMainList = new Map(mainList);
+
 									if (newPath) {
-										mainList.delete(path);
-										mainList.set(newPath, newMedia);
+										newMainList.delete(path);
+										newMainList.set(newPath, newMedia);
 
 										// Only sort if the their titles are different:
 										if (newMedia.title !== oldMedia.title)
-											updateAndSortSortedAndMainLists(mainList);
+											updateAndSortSortedAndMainLists(newMainList);
 										/* Else, just update the media in the main list,
 										 * cause the title is the same, so no need to sort:
-										 */ else set({ sortedByName: mainList });
+										 */ else
+											set({ sortedByName: newMainList });
 									} else if (newMedia.title !== oldMedia.title)
 										updateAndSortSortedAndMainLists(
-											mainList.set(path, newMedia),
+											newMainList.set(path, newMedia),
 										);
-									else set({ sortedByName: mainList.set(path, newMedia) });
+									else set({ sortedByName: newMainList.set(path, newMedia) });
 
 									dbgPlaylists(
 										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",
@@ -286,15 +310,12 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								}
 
 								case PlaylistActions.CLEAN: {
-									const { favorites, sortedByDate, sortedByName, history } =
-										get();
-
-									sortedByDate.clear();
-									sortedByName.clear();
-									favorites.clear();
-									history.clear();
-
-									set({ sortedByDate, sortedByName, favorites, history });
+									set({
+										sortedByDate: emptySet,
+										sortedByName: emptyMap,
+										favorites: emptySet,
+										history: emptyMap,
+									});
 
 									dbgPlaylists(
 										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'CLEAN' (yet to be sorted). newMainList =",
@@ -340,7 +361,7 @@ export enum PlaylistList {
 
 export function getPlaylist(
 	list: Readonly<PlaylistList>,
-): Set<string> | MainList | History {
+): ReadonlySet<string> | MainList | History {
 	switch (list) {
 		case PlaylistList.MAIN_LIST:
 			return mainList();
@@ -438,8 +459,8 @@ export async function deleteMedia(path: Path) {
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export type History = Map<Path, DateAsNumber[]>;
-export type MainList = Map<Path, Media>;
+export type History = ReadonlyMap<Path, DateAsNumber[]>;
+export type MainList = ReadonlyMap<Path, Media>;
 
 export type PlaylistsReducer_Action =
 	// ---------------------------------------- favorites:

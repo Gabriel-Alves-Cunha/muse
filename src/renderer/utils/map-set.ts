@@ -1,8 +1,9 @@
 export const emptyMap: ReadonlyMap<never, never> = new Map<never, never>();
+export const emptySet: ReadonlySet<never> = new Set<never>();
 
 export function getFirstKey<Key>(
-	mapOrSet: Map<Key, unknown> | Set<Key>,
-): Key | undefined {
+	mapOrSet: ReadonlyMap<Key, unknown> | ReadonlySet<Key>,
+): Readonly<Key | undefined> {
 	let ret: Key | undefined;
 
 	for (const key of mapOrSet.keys()) {
@@ -14,7 +15,7 @@ export function getFirstKey<Key>(
 }
 
 const getLastIn = (iteratorFn: "entries" | "keys" | "values") =>
-	<K, V>(map: Map<K, V> | Set<K>) => {
+	<K, V>(map: ReadonlyMap<K, V> | Set<K>) => {
 		const mapIterator = map[iteratorFn]();
 		let curr;
 		let last;

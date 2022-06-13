@@ -58,10 +58,12 @@ ipcRenderer.on(
 		}),
 );
 
+window.addEventListener("message", handleMsgsFromRendererProcess);
+
 // Handle messages from the renderer process:
-window.onmessage = async (
-	event: MessageEvent<MsgWithSource<MsgObjectReactToElectron>>,
-) => {
+async function handleMsgsFromRendererProcess(
+	event: Readonly<MessageEvent<MsgWithSource<MsgObjectReactToElectron>>>,
+): Promise<void> {
 	if (event.data.source !== reactSource) return;
 
 	dbg("Received message from React:", event.data);
@@ -141,6 +143,6 @@ window.onmessage = async (
 			break;
 		}
 	}
-};
+}
 
-const handleClosePort = () => dbg("Closing ports (electronPort).");
+const handleClosePort = (): void => dbg("Closing ports (electronPort).");

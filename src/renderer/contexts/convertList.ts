@@ -59,4 +59,6 @@ export const useConvertingList = create<ConvertingList>(() => ({
 export const { getState: getConvertingList, setState: setConvertingList } =
 	useConvertingList;
 
-type ConvertingList = { convertingList: Map<Path, MediaBeingConverted>; };
+type ConvertingList = Readonly<
+	{ convertingList: ReadonlyMap<Path, MediaBeingConverted>; }
+>;

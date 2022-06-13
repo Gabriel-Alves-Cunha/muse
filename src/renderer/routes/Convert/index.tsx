@@ -19,8 +19,6 @@ export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	console.log({ selectedMediasPath: selectedMedias });
-
 	function handleSelectedFiles(
 		{ target: { files } }: ChangeEvent<HTMLInputElement>,
 	) {

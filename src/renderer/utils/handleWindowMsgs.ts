@@ -29,7 +29,7 @@ const { transformPathsToMedias } = electron.media;
 //////////////////////////////////////////
 
 // listen for files drop
-function listenToDragoverEvent(event: DragEvent) {
+function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
 
@@ -39,7 +39,7 @@ function listenToDragoverEvent(event: DragEvent) {
 	// ^ Style the drag-and-drop as a "copy file" operation.
 }
 
-function listenToDropEvent(event: DragEvent) {
+function listenToDropEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
 
@@ -103,7 +103,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setDownloadingList({
-				downloadingList: downloadingList.set(msg.url, {
+				downloadingList: new Map(downloadingList).set(msg.url, {
 					...download,
 					status: ProgressStatus.ACTIVE,
 				}),
@@ -130,7 +130,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setConvertingList({
-				convertingList: convertingList.set(path, {
+				convertingList: new Map(convertingList).set(path, {
 					...convertingMedia,
 					status: ProgressStatus.ACTIVE,
 				}),
@@ -156,7 +156,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setConvertingList({
-				convertingList: convertingList.set(path, {
+				convertingList: new Map(convertingList).set(path, {
 					...convertingMedia,
 					status: ProgressStatus.FAILED,
 				}),
@@ -182,7 +182,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			}
 
 			setDownloadingList({
-				downloadingList: downloadingList.set(url, {
+				downloadingList: new Map(downloadingList).set(url, {
 					...download,
 					status: ProgressStatus.FAILED,
 				}),

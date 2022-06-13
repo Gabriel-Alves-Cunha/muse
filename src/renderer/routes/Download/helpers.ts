@@ -16,7 +16,7 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
 export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 
-export function downloadMedia() {
+export function downloadMedia(): void {
 	const { result, url } = searchInfo();
 
 	if (!result) return;
@@ -34,7 +34,7 @@ export function downloadMedia() {
 	setSearchInfo(defaultSearchInfo);
 }
 
-export async function search(url: string): Promise<void> {
+export async function search(url: Readonly<string>): Promise<void> {
 	if (!url || url.length < 8) return;
 
 	dbg(`Searching for "${url}".`);

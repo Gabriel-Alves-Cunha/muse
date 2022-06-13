@@ -33,7 +33,7 @@ export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 const { trunc, floor } = Math;
 const { isNaN } = Number;
 
-export const formatDuration = (time: number | undefined) => {
+export function formatDuration(time: number | undefined): Readonly<string> {
 	if (!time || isNaN(time)) return "00:00";
 	time = trunc(time);
 
@@ -45,31 +45,37 @@ export const formatDuration = (time: number | undefined) => {
 	return ((days > 0 ? days + "d " : "") +
 		(Number(hour) > 0 ? hour + ":" : "") +
 		(minutes + ":" + seconds));
-};
+}
 
 /**
  * These are not a bulletproof fns, but for the purpose of
  * getting the allowedMedias, it is ok, faster than NodeJS's.
  */
-export const getBasename = (filename: string) =>
+export const getBasename = (filename: Readonly<string>): Readonly<string> =>
 	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
 
-export const getPathWithoutExtension = (filename: string) => {
+export function getPathWithoutExtension(
+	filename: Readonly<string>,
+): Readonly<string> {
 	const lastIndex = filename.indexOf(".") === -1 ?
 		filename.length :
 		filename.indexOf(".");
 
 	return filename.slice(0, lastIndex);
-};
+}
 
 /**
  * This doesn't handle files with only extensions,
  * e.g.: '.gitignore' will result in ''.
  */
-export const getLastExtension = (filename: string) =>
+export const getLastExtension = (
+	filename: Readonly<string>,
+): Readonly<string> =>
 	filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
 
-export const getBasenameAndExtension = (filename: string) =>
+export const getBasenameAndExtension = (
+	filename: Readonly<string>,
+): Readonly<[string, string]> =>
 	[getBasename(filename), getLastExtension(filename)] as const;
 
 export const separatedByCommaOrSemiColorOrSpace = /,|;| /gm;
