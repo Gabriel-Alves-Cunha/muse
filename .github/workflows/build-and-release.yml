@@ -17,10 +17,14 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: 16.5.0
-          cache: yarn
+
+      - name: Setup yarn cache
+        uses: c-hive/gha-yarn-cache@v2
 
       - name: Install dependencies
         run: yarn
+        with:
+          cache: yarn
 
       - name: Show directory
         run: ls

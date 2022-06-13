@@ -65,12 +65,17 @@ describe("Testing useCurrentPlaying", () => {
 			"currentPlaying().path at the start should be set to the initialIndex path!",
 		).toBe(testArray[initialIndex]![0]);
 
+		// Doing this shit cause at the CI server, the test doesn't
+		// work cause for some reason the testArray does not have the
+		// `.at()` method.
+		const mutableArray = [...testArray];
+
 		testArray.forEach((_, index) => {
 			expect(history().size, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
 
-			const expectedPath = testArray.at(initialIndex - 1 - index)?.[0] ??
+			const expectedPath = mutableArray.at(initialIndex - 1 - index)?.[0] ??
 				lastMediaPath;
 
 			const expected: CurrentPlaying = {
@@ -100,8 +105,9 @@ describe("Testing useCurrentPlaying", () => {
 
 			expect(
 				expectedMediaPath,
-				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${testArray
-					.at(index)?.[0]}
+				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${testArray[
+					index
+				]?.[0]}
 				`,
 			).toEqual(currMediaPath);
 		});
