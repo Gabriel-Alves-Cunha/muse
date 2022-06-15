@@ -17,30 +17,31 @@ export const Wrapper = styled("header", {
 	userSelect: "none",
 });
 
-export const WindowButtons = styled("div", {
+export const WindowButtonsWrapper = styled("div", {
 	d: "flex",
 	fd: "row-reverse",
 	ml: "auto",
 	h: "100%",
 
-	bg: "transparent",
+	bg: "none",
+});
 
-	button: {
-		dflex: "center",
+export const WindowButton = styled("button", {
+	pos: "relative",
+	dflex: "center",
+	h: DECORATIONS_HEIGHT,
+	w: 48,
 
-		c: "$window-buttons",
-		cursor: "pointer",
-		b: "none",
+	c: "$window-buttons",
+	cursor: "pointer",
+	bg: "none",
+	b: "none",
 
-		h: DECORATIONS_HEIGHT,
-		w: 48,
+	transition: "none !important",
 
-		bg: "transparent",
+	"&:hover": { bg: "$icon-button-hovered" },
 
-		"&:hover": { bg: "$icon-button-hovered" },
-
-		"&#close:hover": { bg: "#e70000", c: "white" },
-	},
+	"&#close:hover": { bg: "#e70000", c: "white" },
 });
 
 export const AppName_Folder_Wrapper = styled("div", {

@@ -145,39 +145,6 @@ export const Result = styled("div", {
 		boxShadowBorder: { color: "$colors$icon-button-hovered", width: 2 },
 		transition: "none",
 	},
-
-	////////////////////////////////////////
-	// Tooltip:
-	"&:active": { "&::before, &::after": { visibility: "hidden" } },
-
-	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
-
-	"&::before, &::after": {
-		visibility: "hidden",
-
-		content: "attr(data-tooltip)",
-		pos: "absolute",
-		h: "auto",
-		w: "auto",
-
-		t: "110%",
-		l: "30%",
-
-		b: "1px solid white",
-		bg: "#181818",
-		p: "3px 8px",
-		zIndex: 100,
-
-		whiteSpace: "nowrap",
-		ff: "$primary",
-		lh: "normal",
-		ta: "center",
-		fs: "1rem",
-		c: "#fff",
-		fw: 500,
-
-		pointerEvents: "none",
-	},
 });
 
 export const NothingFound = styled("div", {

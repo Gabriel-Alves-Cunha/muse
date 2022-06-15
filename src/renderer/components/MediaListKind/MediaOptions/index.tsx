@@ -51,12 +51,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				you&apos;re done.
 			</StyledDescription>
 
-			<CloseDialog
-				ref={closeButtonRef}
-				data-tooltip="Close"
-				className="tooltip"
-				id="close-icon"
-			>
+			<CloseDialog ref={closeButtonRef} data-tip="Close" id="close-icon">
 				<Close />
 			</CloseDialog>
 

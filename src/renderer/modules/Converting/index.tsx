@@ -49,8 +49,7 @@ export function Converting() {
 		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
 			<StyledPopoverTrigger
 				className={convertingListSize ? "has-items " : ""}
-				data-tooltip="Show all converting medias"
-				tooltip-side="right"
+				data-tip="Show all converting medias"
 			>
 				<span data-length={convertingListSize}></span>
 

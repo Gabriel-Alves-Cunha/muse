@@ -9,7 +9,6 @@ import {
 	MdHistory as History,
 } from "react-icons/md";
 
-import { TooltipButton } from "@components/TooltipButton";
 import { ThemeToggler } from "@modules/ThemeToggler";
 import { Downloading } from "@modules/Downloading";
 import { Converting } from "@modules/Converting";
@@ -49,15 +48,14 @@ function ButtonsForPages() {
 	return (
 		<Buttons>
 			{pages.map(page => (
-				<TooltipButton
+				<button
 					className={page === currPage ? "active" : ""}
 					onClick={() => setPage({ page })}
-					tooltip={`Go to ${page}`}
-					tooltip-side="right"
+					data-tip={`Go to ${page}`}
 					key={page}
 				>
 					{icons[page]}
-				</TooltipButton>
+				</button>
 			))}
 		</Buttons>
 	);

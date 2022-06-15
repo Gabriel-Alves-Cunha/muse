@@ -13,17 +13,17 @@ const { HEADER_BUTTONS } = ContentEnum;
 
 export const Select = <Options extends string>(
 	{
-		"data-tooltip": dataTooltip,
 		content = HEADER_BUTTONS,
 		triggerClassName = "",
 		triggerTitle = "",
 		children,
 		setValue,
+		tooltip,
 		value,
 	}: Props<Options>,
 ) => (
 	<Root value={value} onValueChange={setValue}>
-		<Trigger className={triggerClassName} data-tooltip={dataTooltip}>
+		<Trigger className={triggerClassName} data-tip={tooltip}>
 			<Value>{triggerTitle}</Value>
 			{children}
 		</Trigger>
@@ -51,8 +51,8 @@ type Props<Options extends string> = {
 	setValue: (value: Options) => void;
 	triggerClassName?: string;
 	children: React.ReactNode;
-	"data-tooltip": string;
 	content?: ContentEnum;
 	triggerTitle?: string;
+	tooltip: string;
 	value: Options;
 };

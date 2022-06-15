@@ -117,60 +117,6 @@ export const TriggerToRemoveMedia = styled(Trigger, {
 export const CloseDialog = styled(Close, {
 	all: "unset",
 
-	/////////////////////////////////////////
-	// Tooltip:
-	"&.tooltip": {
-		"&:active": { "&::before, &::after": { visibility: "hidden" } },
-
-		"&:hover::before": {
-			visibility: "visible",
-
-			transition: "all 0.4s 1s ease ",
-		},
-
-		"&::before, &::after": {
-			visibility: "hidden",
-
-			content: "attr(data-tooltip)",
-			pos: "absolute",
-			h: "auto",
-			w: "auto",
-
-			b: "1px solid white",
-			bg: "#181818",
-			p: "3px 8px",
-			zIndex: 100,
-
-			whiteSpace: "nowrap",
-			ff: "$primary",
-			lh: "normal",
-			ta: "center",
-			fs: "1rem",
-			c: "#fff",
-			fw: 500,
-
-			pointerEvents: "none",
-		},
-	},
-
-	// The variants below are for the tooltip,
-	// they have to be on the outermost side:
-	variants: {
-		"tooltip-side": {
-			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
-			bottom: { "&::before, &::after": { t: "110%" } },
-			right: { "&::before, &::after": { l: "110%" } },
-			left: { "&::before, &::after": { r: "110%" } },
-			top: { "&::before, &::after": { bottom: "110%" } },
-		},
-	},
-
-	defaultVariants: { "tooltip-side": "bottom" },
-
-	/////////////////////////////////////////
-	/////////////////////////////////////////
-	/////////////////////////////////////////
-
 	dflex: "center",
 	h: 35,
 

@@ -7,11 +7,10 @@ export const Img = styled("div", {
 
 	dflex: "center",
 	minWidth: "$$size",
-	h: "$$size",
+	size: "$$size",
 
 	b: "none",
 	br: 13,
-	mr: 10,
 
 	"& img": {
 		objectFit: "cover",
@@ -25,18 +24,6 @@ export const Img = styled("div", {
 	"& svg": { c: "$deactivated-icon" },
 });
 
-export const SubTitle = styled("p", {
-	m: "unset", // Virtuoso asks for this for performance reasons
-
-	c: "$alternative-text",
-	ff: "$primary",
-	ls: "0.03rem",
-	fs: "0.9rem",
-	fw: 500,
-
-	"&.row": { c: "$gray-text", m: "unset" },
-});
-
 export const Info = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons
 
@@ -44,9 +31,10 @@ export const Info = styled("div", {
 	fd: "column",
 	justifyContent: "center",
 	alignItems: "flex-start",
+	size: "95%",
 
-	size: "calc(100% - 5px)",
 	ov: "hidden",
+	pl: 20,
 });
 
 export const Title = styled("p", {
@@ -63,6 +51,18 @@ export const Title = styled("p", {
 	ov: "hidden",
 
 	"& .highlight": { bg: "yellowgreen" },
+});
+
+export const SubTitle = styled("p", {
+	m: "unset", // Virtuoso asks for this for performance reasons
+
+	c: "$alternative-text",
+	ff: "$primary",
+	ls: "0.03rem",
+	fs: "0.9rem",
+	fw: 500,
+
+	"&.row": { c: "$gray-text", m: "unset" },
 });
 
 export const ListWrapper = styled("div", {
@@ -97,16 +97,17 @@ export const RowWrapper = styled("div", {
 		boxShadowBorder: { color: "$colors$selected-border", width: 2 },
 		bg: "$bg-selected",
 	},
+});
 
-	"& button.play": {
-		dflex: "center",
-		h: "100%",
-		w: "90%",
+export const PlayButton = styled("button", {
+	pos: "relative",
+	dflex: "center",
+	h: "100%",
+	w: "90%",
 
-		cursor: "pointer",
-		bg: "none",
-		b: "none",
-	},
+	cursor: "pointer",
+	bg: "none",
+	b: "none",
 });
 
 export const Footer = styled("div", {

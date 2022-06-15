@@ -19,3 +19,19 @@ export const PopoverAnchor = styled(Anchor, {
 	left: 10,
 	t: 10,
 });
+
+export const CancelButton = styled("button", {
+	pos: "absolute",
+	dflex: "center",
+	size: 20,
+	r: -19,
+
+	cursor: "pointer",
+	bg: "none",
+	br: "50%",
+	b: "none",
+
+	"&:focus, &:hover": { bg: "$icon-button-hovered" },
+
+	"& svg": { fill: "$text" },
+});

@@ -5,7 +5,6 @@ import {
 } from "react-icons/vsc";
 
 import { capitalizedAppName } from "@common/utils";
-import { TooltipButton } from "@components/TooltipButton";
 import { usePage } from "@contexts/page";
 import {
 	toggleMaximize,
@@ -16,7 +15,8 @@ import {
 
 import {
 	AppName_Folder_Wrapper,
-	WindowButtons,
+	WindowButtonsWrapper,
+	WindowButton,
 	AppIcon,
 	Wrapper,
 } from "./styles";
@@ -35,34 +35,19 @@ export const Decorations = () => (
 );
 
 const Buttons = () => (
-	<WindowButtons>
-		<TooltipButton
-			tooltip-side="left-bottom"
-			tooltip="Close window"
-			onClick={closeWindow}
-			type="button"
-			id="close"
-		>
+	<WindowButtonsWrapper className="notransition">
+		<WindowButton data-tip="Close window" onClick={closeWindow} id="close">
 			<Close size={16} />
-		</TooltipButton>
+		</WindowButton>
 
-		<TooltipButton
-			tooltip="Toggle maximize window"
-			tooltip-side="left-bottom"
-			onClick={toggleMaximize}
-			type="button"
-		>
+		<WindowButton data-tip="Toggle maximize window" onClick={toggleMaximize}>
 			<Maximize size={16} />
-		</TooltipButton>
+		</WindowButton>
 
-		<TooltipButton
-			tooltip="Minimize window"
-			onClick={minimizeWindow}
-			type="button"
-		>
+		<WindowButton data-tip="Minimize window" onClick={minimizeWindow}>
 			<Minimize size={16} />
-		</TooltipButton>
-	</WindowButtons>
+		</WindowButton>
+	</WindowButtonsWrapper>
 );
 
 function AppNamePlusFolder() {

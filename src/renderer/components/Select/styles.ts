@@ -7,7 +7,6 @@ import {
 	Item as RadixItem,
 } from "@radix-ui/react-select";
 
-import { TooltipButton_ } from "@components/TooltipButton";
 import { styled } from "@styles/global";
 
 export const Content = styled(RadixContent, {
@@ -19,7 +18,16 @@ export const Content = styled(RadixContent, {
 		0px 10px 20px -15px rgba(22, 23, 24, 0.2)`,
 });
 
-export const Trigger = styled(RadixTrigger, { ...TooltipButton_ });
+export const Trigger = styled(RadixTrigger, {
+	pos: "relative",
+	dflex: "center",
+
+	cursor: "pointer",
+	bg: "none",
+	b: "none",
+
+	transition: "none !important",
+});
 
 export const Viewport = styled(RadixViewport, { p: 5 });
 

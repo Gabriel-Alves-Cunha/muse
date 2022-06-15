@@ -2,6 +2,7 @@ import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BiDotsVerticalRounded as Dots } from "react-icons/bi";
 import { useCallback, useMemo, useRef } from "react";
+import { Dialog } from "@radix-ui/react-dialog";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdRepeatOne as RepeatOne,
@@ -17,7 +18,9 @@ import {
 	IoPlaySharp as Play,
 } from "react-icons/io5";
 
+import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { formatDuration } from "@common/utils";
+import { DialogTrigger } from "@components/Dialog";
 import { useProgress } from ".";
 import {
 	toggleLoopMedia,
@@ -36,10 +39,11 @@ import {
 	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 
+import { StyledOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import {
 	ControlsAndSeekerContainer,
-	TooltipCircleIconButton,
 	ControlsButtonsWrapper,
+	CircledIconButton,
 	ControlsWrapper,
 	OptionsAndAlbum,
 	ProgressWrapper,
@@ -49,14 +53,14 @@ import {
 	Album,
 } from "./styles";
 
-const toggleFavorite = (path?: Readonly<Path>): void => {
+function toggleFavorite(path?: Readonly<Path>): void {
 	if (path)
 		setPlaylists({
 			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
 			type: WhatToDo.UPDATE_FAVORITES,
 			path,
 		});
-};
+}
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
@@ -66,22 +70,18 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 			<SeekerWrapper audio={audio} />
 
 			<ControlsButtonsWrapper>
-				<TooltipCircleIconButton
-					data-tooltip="Toggle loop this media"
+				<CircledIconButton
+					data-tip="Toggle loop this media"
 					onClick={toggleLoopMedia}
 				>
 					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
-				</TooltipCircleIconButton>
+				</CircledIconButton>
 
 				<Controls isPaused={audio?.paused} />
 
-				<TooltipCircleIconButton
-					data-tooltip="Toggle random"
-					tooltip-side="left-bottom"
-					onClick={toggleRandom}
-				>
+				<CircledIconButton data-tip="Toggle random" onClick={toggleRandom}>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
-				</TooltipCircleIconButton>
+				</CircledIconButton>
 			</ControlsButtonsWrapper>
 		</ControlsAndSeekerContainer>
 	);
@@ -89,50 +89,52 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
-		<TooltipCircleIconButton data-tooltip="Media options">
-			<Dots size={20} />
-		</TooltipCircleIconButton>
+		<Dialog modal>
+			<DialogTrigger data-tip="Open media options">
+				<Dots size={20} />
+			</DialogTrigger>
+
+			{media && path && (
+				<StyledOverlay>
+					<MediaOptionsModal media={media} path={path} />
+				</StyledOverlay>
+			)}
+		</Dialog>
 
 		<Album>{media?.album}</Album>
 
-		<TooltipCircleIconButton
+		<CircledIconButton
 			onClick={() => toggleFavorite(path)}
-			data-tooltip="Toggle favorite"
-			tooltip-side="left-bottom"
+			data-tip="Toggle favorite"
 		>
 			{favorites().has(path) ?
 				<Favorite size={17} /> :
 				<AddFavorite size={17} />}
-		</TooltipCircleIconButton>
+		</CircledIconButton>
 	</OptionsAndAlbum>
 );
 
 export const Controls = ({ isPaused = false }: IsPaused) => (
 	<ControlsWrapper>
-		<TooltipCircleIconButton
-			data-tooltip="Play previous track"
+		<CircledIconButton
+			data-tip="Play previous track"
 			onClick={playPreviousMedia}
-			tooltip-side="top"
 		>
 			<Previous />
-		</TooltipCircleIconButton>
+		</CircledIconButton>
 
-		<TooltipCircleIconButton
+		<CircledIconButton
 			onClick={togglePlayPause}
-			data-tooltip="Play/pause"
-			tooltip-side="top"
+			data-tip="Play/pause"
 			size="large"
 		>
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
-		</TooltipCircleIconButton>
+		</CircledIconButton>
 
-		<TooltipCircleIconButton
-			data-tooltip="Play next track"
-			onClick={playNextMedia}
-			tooltip-side="top"
+		<CircledIconButton data-tip="Play next track" onClick={playNextMedia} // tooltip-side="top"
 		>
 			<Next />
-		</TooltipCircleIconButton>
+		</CircledIconButton>
 	</ControlsWrapper>
 );
 
@@ -164,7 +166,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 	}), [duration]);
 
 	const handleTooltip = useCallback(
-		({ nativeEvent: { offsetX: mouseX } }: SeekEvent) => {
+		({ nativeEvent: { offsetX: mouseX } }: SeekEvent): void => {
 			/*
 				- event.offsetX, event.offsetY
 					The X and Y coordinates of the mouse relative

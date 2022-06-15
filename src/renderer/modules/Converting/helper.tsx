@@ -8,7 +8,6 @@ import { type AllowedMedias, getBasename, formatDuration } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
-import { TooltipButton } from "@components/TooltipButton";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyMap } from "@utils/map-set";
 import { dbg } from "@common/utils";
@@ -23,7 +22,7 @@ import {
 } from "@contexts/convertList";
 
 import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
-import { ConvertionProgress } from "./styles";
+import { CancelButton, ConvertionProgress } from "./styles";
 
 export const useNewConvertions = create<NewConvertions>(() => ({
 	newConvertions: emptyMap,
@@ -71,13 +70,12 @@ export const ConvertBox = (
 		<TitleAndCancelWrapper>
 			<p>{getBasename(path) + "." + toExtension}</p>
 
-			<TooltipButton
+			<CancelButton
 				onClick={e => handleDeleteAnimation(e, convertionIndex, false, path)}
-				tooltip="Cancel conversion"
-				tooltip-side="left"
+				data-tip="Cancel conversion"
 			>
 				<Cancel size={12} className="notransition" />
-			</TooltipButton>
+			</CancelButton>
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>

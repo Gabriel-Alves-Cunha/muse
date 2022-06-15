@@ -1,7 +1,6 @@
 import { FiTrash as CleanIcon } from "react-icons/fi";
 
 import { assertUnreachable } from "@utils/utils";
-import { TooltipButton } from "@components/TooltipButton";
 import { getFromList } from "@components/MediaListKind/helper";
 import {
 	cleanFavorites,
@@ -9,15 +8,16 @@ import {
 	PlaylistList,
 } from "@contexts/mediaHandler/usePlaylists";
 
+import { Button } from "./styles";
+
 export const Clean = ({ className }: Props) => (
-	<TooltipButton
+	<Button
 		onClick={cleanProperList}
 		className={className}
-		tooltip="Clean list"
-		type="button"
+		data-tip="Clean List"
 	>
 		<CleanIcon size={18} />
-	</TooltipButton>
+	</Button>
 );
 
 function cleanProperList() {

@@ -8,7 +8,6 @@ import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { handleOnClose } from "@modules/Converting/helper";
-import { TooltipButton } from "@components/TooltipButton";
 import { Progress } from "@components/Progress";
 import { dbg } from "@common/utils";
 import {
@@ -17,7 +16,8 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { ItemWrapper, TitleAndCancelWrapper } from "./styles";
+import { TitleAndCancelWrapper, ItemWrapper } from "./styles";
+import { CancelButton } from "@modules/Converting/styles";
 
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
@@ -30,15 +30,14 @@ export function Popup() {
 						<TitleAndCancelWrapper>
 							<p>{download.title}</p>
 
-							<TooltipButton
+							<CancelButton
 								onClick={e =>
 									handleDeleteAnimation(e, downloadingIndex, true, url)}
-								tooltip="Cancel/Remove download"
+								data-tip="Cancel/Remove download"
 								className="cancel-button"
-								tooltip-side="left"
 							>
 								<Cancel size={12} className="notransition" />
-							</TooltipButton>
+							</CancelButton>
 						</TitleAndCancelWrapper>
 
 						<Progress
@@ -233,7 +232,7 @@ export function handleDeleteAnimation(
 	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
 	downloadingOrConvertionIndex: Readonly<number>,
 	isDownloadList: Readonly<boolean>,
-	key: Readonly<string>,
+	url: Readonly<string>,
 ): void {
 	const className = `.${ItemWrapper.className}`;
 
@@ -243,30 +242,39 @@ export function handleDeleteAnimation(
 
 	//////////////////////////////////////////
 
-	for (const [itemIndex, item] of items.entries()) {
-		if (itemIndex <= downloadingOrConvertionIndex) continue;
+	// Only add the animation to the ones below the one that was clicked:
+	for (const [index, item] of items.entries()) {
+		if (index <= downloadingOrConvertionIndex) continue;
 
 		item.classList.add("move-up");
+		item.addEventListener(
+			"animationend",
+			() => item.classList.remove("move-up"),
+			{ once: true },
+		);
 	}
 
 	//////////////////////////////////////////
 
-	const thisItem = (e.target as HTMLElement).closest(
+	const itemClicked = (e.target as HTMLElement).closest(
 		className,
 	) as HTMLDivElement;
 
-	thisItem.classList.add("delete");
+	itemClicked.classList.add("delete");
 
-	setTimeout(() => {
-		if (isDownloadList) cancelDownloadAndOrRemoveItFromList(key);
-		else cancelConvertionAndOrRemoveItFromList(key);
-	}, 200); // wait for animation to finish but don't put on
-	// the event listener below so that users can just click
-	// the cancel button and imediately leave the popup, wich
-	// cancels the animation!
+	// Add event listener to the itemClicked to remove the animation:
+	itemClicked.addEventListener("animationend", () => {
+		isDownloadList ?
+			cancelDownloadAndOrRemoveItFromList(url) :
+			cancelConvertionAndOrRemoveItFromList(url);
+	});
+	itemClicked.addEventListener("animationcancel", () => {
+		// This is so users can just click the cancel
+		// button and imediately leave the popup, wich
+		// cancels the animation!
 
-	thisItem.addEventListener(
-		"animationend",
-		() => items.forEach(item => item.classList.remove("move-up")),
-	);
+		isDownloadList ?
+			cancelDownloadAndOrRemoveItFromList(url) :
+			cancelConvertionAndOrRemoveItFromList(url);
+	});
 }

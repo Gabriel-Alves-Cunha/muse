@@ -43,48 +43,6 @@ export const StyledPopoverTrigger = styled(Trigger, {
 			fs: 11,
 		},
 	},
-
-	////////////////////////////////////////////////
-	// Tooltip:
-	"&:active": { "&::before, &::after": { visibility: "hidden" } },
-
-	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
-
-	"&::before, &::after": {
-		visibility: "hidden",
-
-		content: "attr(data-tooltip)",
-		pos: "absolute",
-		h: "auto",
-		w: "auto",
-
-		b: "1px solid white",
-		bg: "#181818",
-		p: "3px 8px",
-		zIndex: 100,
-
-		whiteSpace: "nowrap",
-		ff: "$primary",
-		lh: "normal",
-		ta: "center",
-		fs: "1rem",
-		c: "#fff",
-		fw: 500,
-
-		pointerEvents: "none",
-	},
-
-	variants: {
-		"tooltip-side": {
-			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
-			bottom: { "&::before, &::after": { t: "110%" } },
-			right: { "&::before, &::after": { l: "110%" } },
-			left: { "&::before, &::after": { r: "110%" } },
-			top: { "&::before, &::after": { bottom: "110%" } },
-		},
-	},
-
-	defaultVariants: { "tooltip-side": "bottom" },
 });
 
 const fallAway = keyframes({
@@ -101,9 +59,9 @@ const moveUp = keyframes({
 	},
 });
 
-const fallAwayDuration = 1;
-const moveUpDelay = 0.2;
-const moveUpDuration = fallAwayDuration / 2;
+const fallAwayAnimationDuration = 600;
+const moveUpDelay = 200;
+const moveUpAnimationDuration = fallAwayAnimationDuration - moveUpDelay;
 export const ItemWrapper = styled("div", {
 	pos: "relative",
 	d: "flex",
@@ -115,12 +73,22 @@ export const ItemWrapper = styled("div", {
 	br: 5,
 	p: 10,
 
+	animation: "none",
+
 	"&.delete": {
-		animation: `${fallAway} forwards ${fallAwayDuration}s ease-out`,
+		animationDuration: `${fallAwayAnimationDuration}ms`,
+		animationTimingFunction: "ease-out",
+		animationFillMode: "forwards",
+		animationName: `${fallAway}`,
+		animationDelay: "0s",
 	},
 
 	"&.move-up": {
-		animation: `${moveUp} forwards ${moveUpDuration}s ease ${moveUpDelay}s`,
+		animationDuration: `${moveUpAnimationDuration}ms`,
+		animationDelay: `${moveUpDelay}ms`,
+		animationTimingFunction: "ease",
+		animationFillMode: "forwards",
+		animationName: `${moveUp}`,
 	},
 });
 
@@ -143,21 +111,5 @@ export const TitleAndCancelWrapper = styled("div", {
 
 		ov: "hidden",
 		w: "90%",
-	},
-
-	button: {
-		pos: "absolute",
-		dflex: "center",
-		size: 20,
-		r: -19,
-
-		cursor: "pointer",
-		bg: "none",
-		br: "50%",
-		b: "none",
-
-		"&:focus, &:hover": { bg: "$icon-button-hovered" },
-
-		"& svg": { fill: "$text" },
 	},
 });

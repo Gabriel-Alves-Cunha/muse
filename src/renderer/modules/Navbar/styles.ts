@@ -25,6 +25,10 @@ export const Buttons = styled("div", {
 		dflex: "center",
 		size: 45,
 
+		cursor: "pointer",
+		bg: "none",
+		b: "none",
+
 		c: "$deactivated-icon",
 		fs: "1rem",
 

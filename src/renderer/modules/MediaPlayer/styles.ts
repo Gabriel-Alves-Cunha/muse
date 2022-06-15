@@ -137,7 +137,7 @@ export const ControlsWrapper = styled("div", {
 	w: "calc(30px + 5px + 50px + 5px + 30px)",
 });
 
-export const TooltipCircleIconButton = styled("button", {
+export const CircledIconButton = styled("button", {
 	pos: "relative",
 	dflex: "center",
 
@@ -151,48 +151,9 @@ export const TooltipCircleIconButton = styled("button", {
 
 	"&:hover": { transition: "$bgc", bg: "$media-player-icon-button-hovered" },
 
-	variants: {
-		size: { small: { size: 30 }, large: { size: 50, mx: 5 } },
+	variants: { size: { small: { size: 30 }, large: { size: 50, mx: 5 } } },
 
-		"tooltip-side": {
-			"left-bottom": { "&::before, &::after": { r: "50%", t: "110%" } },
-			bottom: { "&::before, &::after": { t: "110%" } },
-			right: { "&::before, &::after": { left: "110%" } },
-			left: { "&::before, &::after": { r: "110%" } },
-			top: { "&::before, &::after": { bottom: "110%" } },
-		},
-	},
-
-	defaultVariants: { "tooltip-side": "bottom", size: "small" },
-
-	////////////////////////////////////////////////
-	// Tooltip:
-	"&:active": { "&::before, &::after": { visibility: "hidden" } },
-
-	"&:hover::before": { visibility: "visible", transition: "all 0.4s 1s ease " },
-
-	"&::before, &::after": {
-		visibility: "hidden",
-
-		content: "attr(data-tooltip)",
-		pos: "absolute",
-		size: "auto",
-
-		b: "1px solid white",
-		bg: "#181818",
-		p: "3px 8px",
-		zIndex: 100,
-
-		whiteSpace: "nowrap",
-		ff: "$primary",
-		lh: "normal",
-		ta: "center",
-		fs: "1rem",
-		c: "#fff",
-		fw: 500,
-
-		pointerEvents: "none",
-	},
+	defaultVariants: { size: "small" },
 });
 
 export const ProgressWrapper = styled("div", {

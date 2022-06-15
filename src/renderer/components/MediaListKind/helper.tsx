@@ -10,12 +10,12 @@ import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
-import { TooltipButton } from "@components/TooltipButton";
 import { DialogTrigger } from "@components/Dialog";
+import { getRandomInt } from "@utils/utils";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { dbg } from "@common/utils";
 
-import { RowWrapper, SubTitle, Title, Info, Img } from "./styles";
+import { RowWrapper, SubTitle, Title, Info, Img, PlayButton } from "./styles";
 import { StyledOverlay } from "./MediaOptions/styles";
 
 const notify =
@@ -38,58 +38,61 @@ export const { getState: getFromList, setState: setFromList } = useFromList;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const Row = memo(({ media, path }: RowProps) => {
-	const mediaRowRef = useRef<HTMLDivElement>(null);
+function selectOrPlayMedia(
+	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	mediaRowRef: React.RefObject<HTMLDivElement>,
+	path: Path,
+) {
+	const playMedia = toggleMediaSelectIfCtrlPlusLeftClick(e, mediaRowRef, path);
 
-	return (
-		<RowWrapper ref={mediaRowRef}>
-			<TooltipButton
-				onClick={e => {
-					const doContinueAndPlay = toggleMediaSelectIfCtrlPlusLeftClick(
-						e,
-						mediaRowRef,
-						path,
-					);
+	if (playMedia) {
+		const { fromList, homeList, isHome } = getFromList();
+		const list = isHome ? homeList : fromList;
 
-					if (doContinueAndPlay) {
-						const { fromList, homeList, isHome } = getFromList();
-						const list = isHome ? homeList : fromList;
+		playThisMedia(path, list);
+	}
+}
 
-						playThisMedia(path, list);
-					}
-				}}
-				tooltip="Play this media"
-				className="play"
-			>
-				<Img>
-					<ImgWithFallback
-						Fallback={<MusicNote size="1.4rem" />}
-						mediaImg={media.img}
-						mediaPath={path}
-					/>
-				</Img>
+const Row = memo(
+	({ media, path }: RowProps) => {
+		const mediaRowRef = useRef<HTMLDivElement>(null);
 
-				<Info>
-					<Title>{media.title}</Title>
-					<SubTitle className="row">{media.duration}</SubTitle>
-				</Info>
-			</TooltipButton>
-
-			<Dialog modal>
-				<DialogTrigger
-					data-tooltip="Open media options"
-					tooltip-side="left-bottom"
+		return (
+			<RowWrapper ref={mediaRowRef}>
+				<PlayButton
+					onClick={e => selectOrPlayMedia(e, mediaRowRef, path)}
+					data-tip="Play this media"
 				>
-					<Dots />
-				</DialogTrigger>
+					<Img>
+						<ImgWithFallback
+							Fallback={<MusicNote size="1.4rem" />}
+							mediaImg={media.img}
+							mediaPath={path}
+						/>
+					</Img>
 
-				<StyledOverlay>
-					<MediaOptionsModal media={media} path={path} />
-				</StyledOverlay>
-			</Dialog>
-		</RowWrapper>
-	);
-});
+					<Info>
+						<Title>{media.title}</Title>
+						<SubTitle className="row">{media.duration}</SubTitle>
+					</Info>
+				</PlayButton>
+
+				<Dialog modal>
+					<DialogTrigger data-tip="Open media options">
+						<Dots />
+					</DialogTrigger>
+
+					<StyledOverlay>
+						<MediaOptionsModal media={media} path={path} />
+					</StyledOverlay>
+				</Dialog>
+			</RowWrapper>
+		);
+	},
+	(prev, next) =>
+		prev.media.title === next.media.title &&
+		prev.media.duration === next.media.duration,
+);
 Row.displayName = "Row";
 
 const leftClick = 0;
@@ -97,7 +100,7 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
 	mediaRowRef: Readonly<React.RefObject<HTMLDivElement>>,
 	mediaPath: Readonly<Path>,
-): boolean => {
+): Readonly<boolean> => {
 	if (!e.ctrlKey || e.button !== leftClick || !mediaRowRef.current) return true;
 
 	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cBEFORE", "color:blue", {
@@ -133,11 +136,15 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 };
 
 export const computeItemKey = (_index: number, [path]: [Path, Media]) => path;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const computeHistoryKey = (_index: number, _: [Path, Media]) =>
+	getRandomInt(_index, Number.MAX_SAFE_INTEGER); // I've not thought about this for more than a second tbh
+// ^ I wanted to use the date as key but I can't think of a way to obtain such data...
 export const itemContent = (_index: number, [path, media]: [Path, Media]) => (
 	<Row media={media} path={path} />
 );
 
-export const reloadWindow = () =>
+export const reloadWindow = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
 
 type RowProps = Readonly<{ media: Media; path: Path; }>;

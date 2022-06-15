@@ -178,7 +178,7 @@ function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
 	return (
 		<Result
 			onClick={() => playThisMedia(path, PlaylistList.MAIN_LIST)}
-			data-tooltip="Play this media"
+			data-tip="Play this media"
 		>
 			<Img>
 				<ImgWithFallback

@@ -58,3 +58,14 @@ export const Wrapper = styled("div", {
 		"&.reloading": { animation: `${spin} 1s infinite linear` },
 	},
 });
+
+export const Button = styled("button", {
+	pos: "relative",
+	dflex: "center",
+
+	cursor: "pointer",
+	bg: "none",
+	b: "none",
+
+	transition: "none !important",
+});

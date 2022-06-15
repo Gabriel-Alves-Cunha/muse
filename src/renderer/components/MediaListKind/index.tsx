@@ -20,6 +20,7 @@ import {
 	reloadWindow,
 	itemContent,
 	useFromList,
+	computeHistoryKey,
 } from "./helper";
 
 import { ListWrapper, EmptyList, Footer, RowWrapper } from "./styles";
@@ -132,7 +133,9 @@ function MediaListKind_({ isHome = false }: Props) {
 					Header: () => <Footer />,
 					Footer: () => <Footer />,
 				}}
-				computeItemKey={computeItemKey}
+				computeItemKey={listName === PlaylistList.HISTORY ?
+					computeHistoryKey :
+					computeItemKey}
 				itemContent={itemContent}
 				data={listAsArrayOfAMap}
 				fixedItemHeight={65}

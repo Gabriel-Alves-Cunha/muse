@@ -63,8 +63,7 @@ export function Downloading() {
 			<StyledPopoverTrigger
 				className={(downloadingListSize ? "has-items " : "") +
 					(isOpen ? "active " : "")}
-				data-tooltip="Show all downloading medias"
-				tooltip-side="right"
+				data-tip="Show all downloading medias"
 			>
 				<span data-length={downloadingListSize}></span>
 

@@ -1,6 +1,7 @@
 import type { Page } from "@common/@types/generalTypes";
 
 import { ToastContainer } from "react-toastify";
+import ReactTooltip from "react-tooltip";
 
 import { searchLocalComputerForMedias } from "@contexts/mediaHandler/usePlaylists";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
@@ -28,11 +29,23 @@ export function App() {
 				hideProgressBar={false}
 				position="top-right"
 				pauseOnFocusLoss
-				autoClose={5000}
+				autoClose={5_000}
 				closeOnClick
 				pauseOnHover
 				newestOnTop
 				draggable
+			/>
+
+			<ReactTooltip
+				backgroundColor="#181818"
+				globalEventOff="click"
+				className="tooltip"
+				delayShow={1_000}
+				textColor="white"
+				delayHide={20}
+				effect="solid"
+				multiline
+				border
 			/>
 
 			<Decorations />

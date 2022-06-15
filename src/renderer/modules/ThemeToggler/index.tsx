@@ -6,7 +6,6 @@ import {
 
 import { styled, darkTheme, lightTheme } from "@styles/global";
 import { useLocalStorage } from "@hooks/useLocalStorage";
-import { TooltipButton } from "@components/TooltipButton";
 import { keyPrefix } from "@utils/localStorage";
 
 const themeKey = `${keyPrefix}theme` as const;
@@ -37,19 +36,13 @@ export function ThemeToggler() {
 	}, []);
 
 	return (
-		<Box>
-			<TooltipButton
-				tooltip="Toggle theme"
-				onClick={toggleTheme}
-				tooltip-side="right"
-			>
-				{theme === light ? <Dark size="20px" /> : <Light size="20px" />}
-			</TooltipButton>
-		</Box>
+		<Button data-tip="Toggle theme" onClick={toggleTheme}>
+			{theme === light ? <Dark size="20px" /> : <Light size="20px" />}
+		</Button>
 	);
 }
 
-const Box = styled("div", {
+const Button = styled("button", {
 	pos: "relative",
 	dflex: "center",
 	size: 50,
@@ -58,12 +51,9 @@ const Box = styled("div", {
 	bg: "none",
 	b: "none",
 
-	button: {
-		c: "$deactivated-icon",
-		size: "100%",
+	c: "$deactivated-icon",
 
-		"&:hover": { c: "$active-icon" },
-	},
+	"&:hover": { c: "$active-icon" },
 });
 
 type Themes = "light" | "dark";
