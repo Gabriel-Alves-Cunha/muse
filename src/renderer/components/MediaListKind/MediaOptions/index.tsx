@@ -5,15 +5,15 @@ import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 
-import {
-	MetadataToChange,
-	ReactToElectronMessageEnum,
-} from "@common/@types/electron-window";
+import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { deleteMedia } from "@contexts/mediaHandler/usePlaylists";
 import { capitalize } from "@utils/utils";
-import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
+import {
+	ReactToElectronMessageEnum,
+	MetadataToChange,
+} from "@common/@types/electron-window";
 
 import {
 	TriggerToRemoveMedia,
@@ -109,21 +109,11 @@ async function handleMediaDeletion(
 	closeButtonRef: RefObject<HTMLButtonElement>,
 	mediaPath: Path,
 ): Promise<void> {
-	if (closeButtonRef.current)
-		try {
-			dbg("Deleting media...", mediaPath);
-			await deleteMedia(mediaPath);
+	if (closeButtonRef.current) {
+		closeEverything(closeButtonRef);
 
-			closeEverything(closeButtonRef);
-
-			successToast("Media has been successfully deleted.");
-		} catch (error) {
-			console.error(error);
-
-			errorToast(
-				"Unable to delete media. See console by pressing 'Ctrl' + 'Shift' + 'i'.",
-			);
-		}
+		await deleteMedia(mediaPath);
+	}
 }
 
 function changeMediaMetadata(

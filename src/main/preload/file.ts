@@ -32,6 +32,11 @@ export async function readdir(dir: Readonly<Path>): Promise<readonly Path[]> {
 	});
 }
 
-export async function deleteFile(path: Readonly<Path>): Promise<void> {
-	await unlink(path).catch(console.error);
+export async function deleteFile(
+	path: Readonly<Path>,
+): Promise<Readonly<boolean>> {
+	return unlink(path).then(() => true).catch(err => {
+		console.error(err);
+		return false;
+	});
 }

@@ -1,4 +1,4 @@
-import type { ProgressProps } from "@components/Progress";
+import { progressIcons, ProgressProps } from "@components/Progress";
 import type { Path } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
@@ -13,7 +13,7 @@ import { emptyMap } from "@utils/map-set";
 import { dbg } from "@common/utils";
 import {
 	cancelConvertionAndOrRemoveItFromList,
-	handleDeleteAnimation,
+	handleDeleteAnimation as handleSingleItemDeleteAnimation,
 } from "@modules/Downloading/helper";
 import {
 	getConvertingList,
@@ -21,7 +21,11 @@ import {
 	useConvertingList,
 } from "@contexts/convertList";
 
-import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
+import {
+	TitleAndCancelWrapper,
+	ItemWrapper,
+	CleanAllDoneButton,
+} from "../Downloading/styles";
 import { CancelButton, ConvertionProgress } from "./styles";
 
 export const useNewConvertions = create<NewConvertions>(() => ({
@@ -53,15 +57,34 @@ export function Popup() {
 	return (
 		<>
 			{convertingList.size > 0 ?
-				(convertBoxes()) :
+				(
+					<>
+						<CleanAllDoneButton onClick={cleanAllDoneConvertions}>
+							Clean finished
+						</CleanAllDoneButton>
+
+						{convertBoxes()}
+					</>
+				) :
 				<p>No conversions in progress!</p>}
 		</>
 	);
 }
 
+function cleanAllDoneConvertions(): void {
+	getConvertingList().convertingList.forEach((download, url) => {
+		if (
+			download.status !==
+				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== ProgressStatus.ACTIVE
+		)
+			cancelConvertionAndOrRemoveItFromList(url);
+	});
+}
+
 export const ConvertBox = (
 	{
-		mediaBeingConverted: { toExtension, timeConverted, sizeConverted },
+		mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
 		convertionIndex,
 		path,
 	}: ConvertBoxProps,
@@ -71,16 +94,20 @@ export const ConvertBox = (
 			<p>{getBasename(path) + "." + toExtension}</p>
 
 			<CancelButton
-				onClick={e => handleDeleteAnimation(e, convertionIndex, false, path)}
+				onClick={e =>
+					handleSingleItemDeleteAnimation(e, convertionIndex, false, path)}
 				data-tip="Cancel conversion"
+				className="notransition"
 			>
-				<Cancel size={12} className="notransition" />
+				<Cancel size={12} />
 			</CancelButton>
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>
 			Converted: {formatDuration(timeConverted)} s /{" "}
 			{prettyBytes(sizeConverted)}
+
+			<span>{progressIcons.get(status)}</span>
 		</ConvertionProgress>
 	</ItemWrapper>
 );

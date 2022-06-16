@@ -92,6 +92,30 @@ export const ItemWrapper = styled("div", {
 	},
 });
 
+export const CleanAllDoneButton = styled("button", {
+	pos: "relative",
+	dcolumn: "center",
+	w: "100%",
+	h: 50,
+
+	bg: "$accent",
+	b: "none",
+	br: 5,
+	p: 10,
+
+	animation: "none",
+	cursor: "pointer",
+
+	whiteSpace: "nowrap", // keep it one line
+	ff: "$primary",
+	ls: "0.04rem",
+	ta: "center",
+	fs: "1rem",
+	c: "$text",
+
+	"&:hover": { opacity: 0.8 },
+});
+
 export const TitleAndCancelWrapper = styled("div", {
 	pos: "relative",
 	d: "flex", // row

@@ -43,9 +43,9 @@ function selectOrPlayMedia(
 	mediaRowRef: React.RefObject<HTMLDivElement>,
 	path: Path,
 ) {
-	const playMedia = toggleMediaSelectIfCtrlPlusLeftClick(e, mediaRowRef, path);
+	const goPlayMedia = toggleMediaSelectIfCtrlPlusLeftClick(e, mediaRowRef, path);
 
-	if (playMedia) {
+	if (goPlayMedia) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome ? homeList : fromList;
 

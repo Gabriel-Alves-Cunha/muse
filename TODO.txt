@@ -1,7 +1,5 @@
 * TODO: impl select on media WITH context-menu.
 * TODO: see why virtuoso scroll behavior is wrong!!!!
-* TODO: maybe impl fast-check from npm.
-* TODO: add button to clean all done downloads and convertions
 
 NOTES:
 

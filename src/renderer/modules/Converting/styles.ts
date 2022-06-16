@@ -4,6 +4,7 @@ import { styled } from "@styles/global";
 
 export const ConvertionProgress = styled("div", {
 	d: "flex", // row
+	justifyContent: "space-between",
 
 	whiteSpace: "nowrap", // one line
 	c: "$gray-text",
@@ -12,6 +13,8 @@ export const ConvertionProgress = styled("div", {
 	ls: "0.03rem",
 	ov: "hidden",
 	ta: "left",
+
+	span: { c: "white", mr: 4 },
 });
 
 export const PopoverAnchor = styled(Anchor, {

@@ -2,11 +2,12 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
+import { emptyMap, emptySet, getFirstKey } from "@utils/map-set";
 import { getFromLocalStorage, keys } from "@utils/localStorage";
+import { dbgPlaylists, getBasename } from "@common/utils";
+import { errorToast, successToast } from "@styles/global";
 import { setPlaylistsLocalStorage } from "./localStorageHelpers";
 import { assertUnreachable, time } from "@utils/utils";
-import { dbgPlaylists } from "@common/utils";
-import { emptyMap, emptySet, getFirstKey } from "@utils/map-set";
 import { getSettings } from "@contexts/settings";
 import {
 	searchDirectoryResult,
@@ -446,13 +447,21 @@ export const searchMedia = (searchTerm_: Readonly<string>): [Path, Media][] =>
 	}, `searchMedia(${searchTerm_})`);
 
 export async function deleteMedia(path: Path) {
-	setPlaylists({
-		whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
-		type: WhatToDo.UPDATE_MAIN_LIST,
-		path,
-	});
+	const wasDeleteSuccessfull = await deleteFile(path);
 
-	await deleteFile(path);
+	if (wasDeleteSuccessfull) {
+		successToast(`Deleted ${getBasename(path)}`);
+
+		setPlaylists({
+			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
+			type: WhatToDo.UPDATE_MAIN_LIST,
+			path,
+		});
+	} else {
+		errorToast(
+			`Could not delete ${path}\nSee console by pressing 'Ctrl' + 'Shift' + 'i'.`,
+		);
+	}
 }
 
 ///////////////////////////////////////////////////

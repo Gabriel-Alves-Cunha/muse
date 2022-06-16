@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 
 import { Root, Trigger } from "@radix-ui/react-context-menu";
 
+import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
 import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
 import { assertUnreachable } from "@utils/utils";
 import { MainCtxMenu } from "./mainCtxMenu";
@@ -9,11 +10,12 @@ import { MainCtxMenu } from "./mainCtxMenu";
 import { Content } from "./styles";
 
 export enum ContentEnum {
+	MEDIA_OPTIONS,
 	FULL_EXAMPLE,
 	MAIN,
 }
 
-const { FULL_EXAMPLE, MAIN } = ContentEnum;
+const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
 
 export const ContextMenu = ({ children, content = MAIN }: Props) => (
 	<Root>
@@ -30,6 +32,9 @@ function contentToShow(content: NonNullable<Props["content"]>) {
 
 		case MAIN:
 			return <MainCtxMenu />;
+
+		case MEDIA_OPTIONS:
+			return <MediaOptionsCtxMenu />;
 
 		default:
 			return assertUnreachable(content);

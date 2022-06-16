@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
+import { ContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
@@ -122,27 +123,29 @@ function MediaListKind_({ isHome = false }: Props) {
 
 	return (
 		<ListWrapper ref={listRef}>
-			<Virtuoso
-				components={{
-					EmptyPlaceholder: () => (
-						<EmptyList>
-							<img src={noMediaFoundPng.href} alt="No medias found" />
-							No medias found
-						</EmptyList>
-					),
-					Header: () => <Footer />,
-					Footer: () => <Footer />,
-				}}
-				computeItemKey={listName === PlaylistList.HISTORY ?
-					computeHistoryKey :
-					computeItemKey}
-				itemContent={itemContent}
-				data={listAsArrayOfAMap}
-				fixedItemHeight={65}
-				className="list"
-				overscan={10}
-				noValidate
-			/>
+			<ContextMenu content={ContentEnum.MEDIA_OPTIONS}>
+				<Virtuoso
+					components={{
+						EmptyPlaceholder: () => (
+							<EmptyList>
+								<img src={noMediaFoundPng.href} alt="No medias found" />
+								No medias found
+							</EmptyList>
+						),
+						Header: () => <Footer />,
+						Footer: () => <Footer />,
+					}}
+					computeItemKey={listName === PlaylistList.HISTORY ?
+						computeHistoryKey :
+						computeItemKey}
+					itemContent={itemContent}
+					data={listAsArrayOfAMap}
+					fixedItemHeight={65}
+					className="list"
+					overscan={10}
+					noValidate
+				/>
+			</ContextMenu>
 		</ListWrapper>
 	);
 }

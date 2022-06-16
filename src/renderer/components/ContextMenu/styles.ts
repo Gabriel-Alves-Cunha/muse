@@ -31,15 +31,16 @@ export const itemStyles = styled("div", {
 	alignItems: "center",
 	h: 25,
 
+	cursor: "pointer",
 	p: "0 5px",
-	br: 3,
 	pl: 25,
+	br: 3,
 
 	c: "$ctx-menu-item-text",
-	ls: "0.03rem",
 	ff: "$secondary",
-	lh: 1,
+	ls: "0.03rem",
 	fs: 15,
+	lh: 1,
 
 	userSelect: "none",
 
@@ -71,7 +72,6 @@ export const RadioItem = styled(CtxRadioItem, { ...itemStyles });
 export const TriggerItem = styled(CtxTriggerItem, {
 	"&[data-state='open']": {
 		c: "$ctx-menu-item-text",
-		// TODO: maybe this is $bg-popover:
 		bg: "white",
 	},
 
@@ -82,15 +82,15 @@ export const Label = styled(CtxLabel, {
 	pl: 25,
 
 	c: "$ctx-menu-text",
-	lh: "25px",
 	ff: "$secondary",
+	lh: "25px",
 	fs: 12,
 });
 
 export const Separator = styled(CtxSeparator, {
 	bg: "$ctx-menu-separator",
 	h: 1,
-	margin: 5,
+	m: 5,
 });
 
 export const ItemIndicator = styled(CtxItemIndicator, {
@@ -98,6 +98,6 @@ export const ItemIndicator = styled(CtxItemIndicator, {
 	d: "inline-flex",
 	justifyContent: "center",
 	alignItems: "center",
-	w: 25,
 	left: 0,
+	w: 25,
 });

@@ -16,8 +16,12 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { TitleAndCancelWrapper, ItemWrapper } from "./styles";
 import { CancelButton } from "@modules/Converting/styles";
+import {
+	TitleAndCancelWrapper,
+	CleanAllDoneButton,
+	ItemWrapper,
+} from "./styles";
 
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
@@ -25,31 +29,50 @@ export function Popup() {
 	return (
 		<>
 			{downloadingList.size > 0 ?
-				([...downloadingList].map(([url, download], downloadingIndex) => (
-					<ItemWrapper key={url}>
-						<TitleAndCancelWrapper>
-							<p>{download.title}</p>
+				(
+					<>
+						<CleanAllDoneButton onClick={cleanAllDoneDownloads}>
+							Clean finished
+						</CleanAllDoneButton>
 
-							<CancelButton
-								onClick={e =>
-									handleDeleteAnimation(e, downloadingIndex, true, url)}
-								data-tip="Cancel/Remove download"
-								className="cancel-button"
-							>
-								<Cancel size={12} className="notransition" />
-							</CancelButton>
-						</TitleAndCancelWrapper>
+						{[...downloadingList].map(([url, download], downloadingIndex) => (
+							<ItemWrapper key={url}>
+								<TitleAndCancelWrapper>
+									<p>{download.title}</p>
 
-						<Progress
-							percent_0_to_100={download.percentage}
-							status={download.status}
-							showStatus
-						/>
-					</ItemWrapper>
-				))) :
+									<CancelButton
+										onClick={e =>
+											handleDeleteAnimation(e, downloadingIndex, true, url)}
+										className="cancel-button notransition"
+										data-tip="Cancel/Remove download"
+									>
+										<Cancel size={12} />
+									</CancelButton>
+								</TitleAndCancelWrapper>
+
+								<Progress
+									percent_0_to_100={download.percentage}
+									status={download.status}
+									showStatus
+								/>
+							</ItemWrapper>
+						))}
+					</>
+				) :
 				<p>No downloads in progress!</p>}
 		</>
 	);
+}
+
+function cleanAllDoneDownloads(): void {
+	getDownloadingList().downloadingList.forEach((download, url) => {
+		if (
+			download.status !==
+				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== ProgressStatus.ACTIVE
+		)
+			cancelDownloadAndOrRemoveItFromList(url);
+	});
 }
 
 /**
