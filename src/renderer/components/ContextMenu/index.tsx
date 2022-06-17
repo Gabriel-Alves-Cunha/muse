@@ -17,9 +17,11 @@ export enum ContentEnum {
 
 const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
 
-export const ContextMenu = ({ children, content = MAIN }: Props) => (
-	<Root>
-		<Trigger>{children}</Trigger>
+export const ContextMenu = (
+	{ children, content = MAIN, onContextMenu, setIsOpen }: Props,
+) => (
+	<Root onOpenChange={setIsOpen}>
+		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
 		<Content sideOffset={5}>{contentToShow(content)}</Content>
 	</Root>
@@ -27,18 +29,23 @@ export const ContextMenu = ({ children, content = MAIN }: Props) => (
 
 function contentToShow(content: NonNullable<Props["content"]>) {
 	switch (content) {
+		case MEDIA_OPTIONS:
+			return <MediaOptionsCtxMenu />;
+
 		case FULL_EXAMPLE:
 			return <FullExampleCtxMenu />;
 
 		case MAIN:
 			return <MainCtxMenu />;
 
-		case MEDIA_OPTIONS:
-			return <MediaOptionsCtxMenu />;
-
 		default:
 			return assertUnreachable(content);
 	}
 }
 
-type Props = { content?: ContentEnum; children: ReactNode; };
+type Props = {
+	onContextMenu?: React.MouseEventHandler<HTMLSpanElement>;
+	setIsOpen?: (newIsOpen: boolean) => void;
+	content?: ContentEnum;
+	children: ReactNode;
+};

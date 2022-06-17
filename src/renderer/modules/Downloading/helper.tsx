@@ -251,14 +251,13 @@ export function cancelConvertionAndOrRemoveItFromList(
 	setConvertingList({ convertingList: newConvertingList });
 }
 
+const className = `.${ItemWrapper.className}`;
 export function handleDeleteAnimation(
 	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
 	downloadingOrConvertionIndex: Readonly<number>,
 	isDownloadList: Readonly<boolean>,
 	url: Readonly<string>,
 ): void {
-	const className = `.${ItemWrapper.className}`;
-
 	const items = document.querySelectorAll(className) as NodeListOf<
 		HTMLDivElement
 	>;

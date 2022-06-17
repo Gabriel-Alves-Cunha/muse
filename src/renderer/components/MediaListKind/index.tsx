@@ -1,6 +1,6 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
@@ -8,6 +8,7 @@ import { ContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
+import { emptySet } from "@utils/map-set";
 import {
 	type MainList,
 	type History,
@@ -16,15 +17,17 @@ import {
 	mainList,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
-	allSelectedMedias,
+	getAllSelectedMedias,
+	setAllSelectedMedias,
+	selectMediaOrMedias,
+	computeHistoryKey,
 	computeItemKey,
 	reloadWindow,
 	itemContent,
 	useFromList,
-	computeHistoryKey,
 } from "./helper";
 
-import { ListWrapper, EmptyList, Footer, RowWrapper } from "./styles";
+import { ListWrapper, EmptyList, Footer } from "./styles";
 import { ErrorFallback } from "../ErrorFallback";
 
 // href="https://www.flaticon.com/free-icons/error" =>
@@ -45,6 +48,7 @@ export const MediaListKind = ({ isHome }: Props) => (
 );
 
 function MediaListKind_({ isHome = false }: Props) {
+	const [isCtxMenuOpen, setIsCtxMenuOpen] = useState(false);
 	const { fromList, homeList } = useFromList();
 	const listRef = useRef<HTMLDivElement>(null);
 
@@ -104,18 +108,7 @@ function MediaListKind_({ isHome = false }: Props) {
 			}
 		}, "listAsArrayOfAMap"), [listName, list]);
 
-	useOnClickOutside(
-		listRef,
-		// Deselect all medias:
-		() => {
-			if (allSelectedMedias.size > 0 && listRef.current) {
-				document.querySelectorAll(`.${RowWrapper.className}`).forEach(item =>
-					item.classList.remove("selected")
-				);
-				allSelectedMedias.clear();
-			}
-		},
-	);
+	useOnClickOutside(listRef, () => deselectAllMedias(listRef, isCtxMenuOpen));
 
 	useEffect(() => {
 		useFromList.setState({ isHome });
@@ -123,7 +116,11 @@ function MediaListKind_({ isHome = false }: Props) {
 
 	return (
 		<ListWrapper ref={listRef}>
-			<ContextMenu content={ContentEnum.MEDIA_OPTIONS}>
+			<ContextMenu
+				content={ContentEnum.MEDIA_OPTIONS}
+				onContextMenu={selectMediaOrMedias}
+				setIsOpen={setIsCtxMenuOpen}
+			>
 				<Virtuoso
 					components={{
 						EmptyPlaceholder: () => (
@@ -138,6 +135,7 @@ function MediaListKind_({ isHome = false }: Props) {
 					computeItemKey={listName === PlaylistList.HISTORY ?
 						computeHistoryKey :
 						computeItemKey}
+					totalCount={listAsArrayOfAMap.length}
 					itemContent={itemContent}
 					data={listAsArrayOfAMap}
 					fixedItemHeight={65}
@@ -148,6 +146,16 @@ function MediaListKind_({ isHome = false }: Props) {
 			</ContextMenu>
 		</ListWrapper>
 	);
+}
+
+function deselectAllMedias(
+	listRef: React.RefObject<HTMLDivElement>,
+	isCtxMenuOpen: boolean,
+) {
+	const { allSelectedMedias } = getAllSelectedMedias();
+
+	if (allSelectedMedias.size > 0 && listRef.current && !isCtxMenuOpen)
+		setAllSelectedMedias({ allSelectedMedias: emptySet });
 }
 
 type Props = { isHome?: boolean; };

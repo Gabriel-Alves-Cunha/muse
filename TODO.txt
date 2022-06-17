@@ -1,4 +1,3 @@
-* TODO: impl select on media WITH context-menu.
 * TODO: see why virtuoso scroll behavior is wrong!!!!
 
 NOTES:

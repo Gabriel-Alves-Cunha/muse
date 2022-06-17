@@ -2,6 +2,7 @@ import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
+import { subscribeWithSelector } from "zustand/middleware";
 import { memo, useRef } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import create from "zustand";
@@ -13,7 +14,7 @@ import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { DialogTrigger } from "@components/Dialog";
 import { getRandomInt } from "@utils/utils";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
-import { dbg } from "@common/utils";
+import { emptySet } from "@utils/map-set";
 
 import { RowWrapper, SubTitle, Title, Info, Img, PlayButton } from "./styles";
 import { StyledOverlay } from "./MediaOptions/styles";
@@ -25,7 +26,32 @@ const notify =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const allSelectedMedias: Set<Path> = new Set();
+export const useAllSelectedMedias = create<
+	Readonly<{ allSelectedMedias: ReadonlySet<Path>; }>
+>()(
+	subscribeWithSelector(() => ({
+		allSelectedMedias: emptySet as ReadonlySet<Path>,
+	})),
+);
+export const {
+	setState: setAllSelectedMedias,
+	getState: getAllSelectedMedias,
+} = useAllSelectedMedias;
+
+if (globalThis.window)
+	useAllSelectedMedias.subscribe(
+		({ allSelectedMedias }) => allSelectedMedias,
+		function removeSelectedClassName() {
+			const { allSelectedMedias } = getAllSelectedMedias();
+
+			// if size is 0, then remove all selected classes:
+			if (allSelectedMedias.size === 0) {
+				document.querySelectorAll(`.${RowWrapper.className}`).forEach(item =>
+					item.classList.remove("selected")
+				);
+			}
+		},
+	);
 
 export const useFromList = create<FromList>(() => ({
 	homeList: PlaylistList.MAIN_LIST,
@@ -43,7 +69,11 @@ function selectOrPlayMedia(
 	mediaRowRef: React.RefObject<HTMLDivElement>,
 	path: Path,
 ) {
-	const goPlayMedia = toggleMediaSelectIfCtrlPlusLeftClick(e, mediaRowRef, path);
+	const goPlayMedia = toggleMediaSelectIfCtrlPlusLeftClick(
+		e,
+		mediaRowRef,
+		path,
+	);
 
 	if (goPlayMedia) {
 		const { fromList, homeList, isHome } = getFromList();
@@ -58,7 +88,7 @@ const Row = memo(
 		const mediaRowRef = useRef<HTMLDivElement>(null);
 
 		return (
-			<RowWrapper ref={mediaRowRef}>
+			<RowWrapper data-path={path} ref={mediaRowRef}>
 				<PlayButton
 					onClick={e => selectOrPlayMedia(e, mediaRowRef, path)}
 					data-tip="Play this media"
@@ -95,19 +125,55 @@ const Row = memo(
 );
 Row.displayName = "Row";
 
+const className = `.${RowWrapper.className}`;
+export function selectMediaOrMedias(e: React.MouseEvent<HTMLSpanElement>) {
+	const { allSelectedMedias } = getAllSelectedMedias();
+
+	const itemClicked = (e.nativeEvent.target as HTMLElement).closest(
+		className,
+	) as HTMLDivElement;
+
+	const areThereOtherSelectedMedias = allSelectedMedias.size > 0;
+
+	const allMediaPaths: string[] = [];
+
+	if (areThereOtherSelectedMedias) {
+		const allSelectedMediasElements = document.querySelectorAll(".selected");
+
+		allSelectedMediasElements.forEach(element => {
+			const path = element.getAttribute("data-path");
+
+			path && allMediaPaths.push(path);
+		});
+	}
+
+	const itemClickedMediaPath = itemClicked.getAttribute("data-path") ?? "";
+
+	allMediaPaths.push(itemClickedMediaPath);
+
+	// Clear all selected medias:
+	// const allMedias = document.querySelectorAll(className);
+	// allMedias.forEach(media => media.classList.remove("selected"));
+	// allSelectedMedias.clear();
+
+	// Add className "selected" to the clicked media:
+	itemClicked.classList.add("selected");
+
+	// Add media to the set:
+	setAllSelectedMedias(({ allSelectedMedias }) => ({
+		allSelectedMedias: new Set(allSelectedMedias).add(itemClickedMediaPath),
+	}));
+}
+
 const leftClick = 0;
 const toggleMediaSelectIfCtrlPlusLeftClick = (
 	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
 	mediaRowRef: Readonly<React.RefObject<HTMLDivElement>>,
 	mediaPath: Readonly<Path>,
 ): Readonly<boolean> => {
-	if (!e.ctrlKey || e.button !== leftClick || !mediaRowRef.current) return true;
+	if (e.button !== leftClick || !e.ctrlKey || !mediaRowRef.current) return true;
 
-	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cBEFORE", "color:blue", {
-		allSelectedMediasSize: allSelectedMedias.size,
-		mediaPath,
-		e,
-	});
+	const { allSelectedMedias } = getAllSelectedMedias();
 
 	const rowElement = mediaRowRef.current;
 
@@ -116,21 +182,18 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 		rowElement.classList.remove("selected");
 
 		// Remove media from the set:
-		allSelectedMedias.delete(mediaPath);
+		const newSet = new Set(allSelectedMedias);
+		newSet.delete(mediaPath);
+		setAllSelectedMedias({ allSelectedMedias: newSet });
 	} else {
 		// Add className "selected":
 		rowElement.classList.add("selected");
 
 		// Add media to the set:
-		allSelectedMedias.add(mediaPath);
+		setAllSelectedMedias(({ allSelectedMedias }) => ({
+			allSelectedMedias: new Set(allSelectedMedias).add(mediaPath),
+		}));
 	}
-
-	dbg("toggleMediaSelectIfCtrlPlusLeftClick %cAFTER", "color:green", {
-		allSelectedMediasSize: allSelectedMedias.size,
-		allSelectedMedias,
-		rowElement,
-		e,
-	});
 
 	return false;
 };
