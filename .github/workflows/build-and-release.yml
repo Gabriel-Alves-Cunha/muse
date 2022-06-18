@@ -66,6 +66,6 @@ jobs:
           automatic_release_tag: latest
           prerelease: false
           files: |
-            "latest-linux.yml"
-            "Muse-*"
+            latest-linux.yml
+            Muse-*
             *
