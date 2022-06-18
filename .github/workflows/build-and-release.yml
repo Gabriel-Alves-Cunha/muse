@@ -51,8 +51,8 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           files: |
-            - latest-linux.yml
-            - dist/Muse-*
+            "dist/latest-linux.yml"
+            "dist/Muse-*"
           # This token is provided by Actions, you do not need to create your own token
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: "latest"
