@@ -1,4 +1,4 @@
-* TODO: see why virtuoso scroll behavior is wrong!!!!
+* FIX: get the picture to got to the media file!!!!
 
 NOTES:
 

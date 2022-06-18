@@ -2,8 +2,8 @@ import { Trigger } from "@radix-ui/react-dialog";
 
 import { styled } from "@styles/global";
 
-export const DialogTrigger = ({ children }: Props) => (
-	<StyledTrigger>{children}</StyledTrigger>
+export const DialogTrigger = ({ children, className }: Props) => (
+	<StyledTrigger className={className}>{children}</StyledTrigger>
 );
 
 const StyledTrigger = styled(Trigger, {
@@ -14,17 +14,22 @@ const StyledTrigger = styled(Trigger, {
 	size: 29,
 
 	c: "$deactivated-icon",
-	bg: "transparent",
-	br: "50%",
 	cursor: "pointer",
-	border: "none",
-	// margin: 5,
+	bg: "none",
+	br: "50%",
+	b: "none",
 
 	transition: "$bgc",
 
 	"&:hover": { transition: "$bgc", bg: "$icon-button-hovered" },
 
 	"&.unset-margin": { m: "unset" },
+
+	"&.on-media-player": {
+		c: "$media-player-icons",
+
+		"&:hover": { transition: "$bgc", bg: "$media-player-icon-button-hovered" },
+	},
 });
 
-type Props = { children: React.ReactNode; };
+type Props = { children: React.ReactNode; className?: string; };

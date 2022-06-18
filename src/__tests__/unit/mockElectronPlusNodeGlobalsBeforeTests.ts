@@ -65,6 +65,7 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			(_elementId: string) => ({ loop: true } as HTMLAudioElement),
 		),
+		// createElement: vi.fn(),
 	});
 
 	vi.stubGlobal("window", {

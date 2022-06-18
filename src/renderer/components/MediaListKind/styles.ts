@@ -69,7 +69,7 @@ export const ListWrapper = styled("div", {
 	maxWidth: 600,
 	h: "80vh",
 
-	".list": { scroll: 5 },
+	".list": { scroll: 5, willChange: "transform" },
 });
 
 export const RowWrapper = styled("div", {
@@ -93,8 +93,7 @@ export const RowWrapper = styled("div", {
 	},
 
 	"&.selected": {
-		transition: "none",
-		boxShadowBorder: { color: "$colors$selected-border", width: 2 },
+		b: "2px solid $selected-border",
 		bg: "$bg-selected",
 	},
 });

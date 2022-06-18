@@ -27,7 +27,6 @@ import ytdl from "ytdl-core";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
-import { areArraysEqual } from "@utils/array";
 import { isDevelopment } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "./file";
@@ -185,6 +184,7 @@ export async function makeStream(
 	const startTime = Date.now();
 	let interval: NodeJS.Timer | undefined;
 	let prettyTotal = "";
+	let percentageToSend = 0;
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
@@ -192,12 +192,13 @@ export async function makeStream(
 		quality: "highestaudio",
 	}).on("progress", (_, downloaded: number, total: number) => {
 		const percentage = (downloaded / total) * 100;
+		percentageToSend = percentage;
 
 		// To react:
 		if (!interval) {
 			// ^ Only in the firt time this 'on progress' fn is called!
 			interval = setInterval(
-				() => electronPort.postMessage({ percentage }),
+				() => electronPort.postMessage({ percentage: percentageToSend }),
 				2_000,
 			);
 			prettyTotal = prettyBytes(total);
@@ -504,7 +505,13 @@ export async function writeTags(
 								data.imageURL as string,
 							);
 
-							createImage(imgAsString, file);
+							await createImage(imgAsString, file);
+
+							console.assert(
+								file.tag.pictures.length === 1,
+								"No pictures added!",
+								file.tag.pictures,
+							);
 						} catch (err) {
 							error("There was an error getting the picture data.", err);
 						}
@@ -513,8 +520,14 @@ export async function writeTags(
 						// as in: `data:${string};base64,${string}`.
 						data.imageURL!.includes("data:image/") &&
 							data.imageURL!.includes(";base64,") ?
-							createImage(data.imageURL as ImgString, file) :
+							await createImage(data.imageURL as ImgString, file) :
 							error(`Invalid imgAsString = "${data.imageURL}"!`);
+
+						console.assert(
+							file.tag.pictures.length === 1,
+							"No pictures added!",
+							file.tag.pictures,
+						);
 					}
 					break;
 				}
@@ -654,104 +667,43 @@ export async function writeTags(
 			});
 		}
 	}
-
-	if (isDevelopment) {
-		const file = MediaFile.createFromPath(
-			fileNewPath ? fileNewPath : mediaPath,
-		);
-		dbg("Testing if new tags are present:", file.tag);
-
-		Object.entries(data).forEach(([key, value]) => {
-			switch (key) {
-				case "pictures": {
-					if (data.isNewMedia || data.downloadImg) {
-						const filePictures = file.tag.pictures;
-
-						console.assert(
-							Array.isArray(filePictures),
-							`Invalid pictures = "${filePictures}"!`,
-						);
-						console.assert(filePictures.length > 0, "No pictures!");
-					}
-					break;
-				}
-
-				case "genres": {
-					dbg("Testing if new value for \"genres\" is present:", file.tag[key]);
-					const genres = (value as string).split(
-						separatedByCommaOrSemiColorOrSpace,
-					).filter(Boolean).map(v => v.trim());
-					console.assert(
-						areArraysEqual(file.tag.genres, genres),
-						"Invalid value for \"genres\".",
-						{ data, "file.tag.genres": file.tag.genres },
-					);
-					break;
-				}
-
-				case "albumArtists": {
-					dbg(
-						"Testing if new value for \"albumArtists\" is present:",
-						file.tag[key],
-					);
-					const albumArtists = (value as string).split(
-						separatedByCommaOrSemiColon,
-					).filter(Boolean).map(v => v.trim());
-					console.assert(
-						areArraysEqual(file.tag.albumArtists, albumArtists),
-						"Invalid value for \"albumArtists\".",
-						{
-							"file.tag.albumArtists": file.tag.albumArtists,
-							albumArtists,
-							data,
-						},
-					);
-					break;
-				}
-
-				default: {
-					// @ts-ignore => If you find this is actually wrong, fix by creating a new case:
-					dbg(`Testing if new value for "${key}" is present:`, file.tag[key]);
-					console.assert(
-						// @ts-ignore => If you find this is actually wrong, fix by creating a new case:
-						file.tag[key] === data[key],
-						`Invalid value for "${key}".`,
-						// @ts-ignore => If you find this is actually wrong, fix by creating a new case:
-						{ data, fileTag: file.tag[key] },
-					);
-					break;
-				}
-			}
-		});
-
-		file.dispose();
-	}
 }
 
-function createImage(
+async function createImage(
 	imgAsString: Readonly<ImgString>,
 	file: Readonly<MediaFile>,
-): void {
-	const txtForByteVector = imgAsString.slice(
-		imgAsString.indexOf(",") + 1,
-		imgAsString.length,
-	);
-	const mimeType = imgAsString.slice(
-		imgAsString.indexOf(":") + 1,
-		imgAsString.indexOf(";"),
-	);
+): Promise<void> {
+	try {
+		await new Promise<void>(resolve => {
+			const txtForByteVector = imgAsString.slice(
+				imgAsString.indexOf(",") + 1,
+				imgAsString.length,
+			);
+			const mimeType = imgAsString.slice(
+				imgAsString.indexOf(":") + 1,
+				imgAsString.indexOf(";"),
+			);
 
-	const picture = Picture.fromFullData(
-		ByteVector.fromString(txtForByteVector, StringType.Latin1),
-		PictureType.Media,
-		mimeType,
-		"This image was download when this media was downloaded.",
-	);
-	picture.filename = "thumbnail";
+			const picture = Picture.fromFullData(
+				ByteVector.fromString(txtForByteVector, StringType.Latin1),
+				PictureType.Media,
+				mimeType,
+				"This image was download when this media was downloaded.",
+			);
+			picture.filename = "thumbnail";
 
-	file.tag.pictures = [picture];
+			file.tag.pictures = [picture];
 
-	dbg("At createImage():", { "file.tag.pictures": file.tag.pictures, picture });
+			dbg("At createImage():", {
+				"file.tag.pictures": file.tag.pictures,
+				picture,
+			});
+
+			resolve();
+		});
+	} catch (error) {
+		console.error("Error creating image", error);
+	}
 }
 
 export async function getThumbnail(

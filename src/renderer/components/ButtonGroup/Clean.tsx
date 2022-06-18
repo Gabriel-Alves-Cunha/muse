@@ -11,11 +11,7 @@ import {
 import { Button } from "./styles";
 
 export const Clean = ({ className }: Props) => (
-	<Button
-		onClick={cleanProperList}
-		className={className}
-		data-tip="Clean List"
-	>
+	<Button onClick={cleanProperList} className={className} data-tip="Clean List">
 		<CleanIcon size={18} />
 	</Button>
 );

@@ -70,10 +70,7 @@ export const CheckboxItem = styled(CtxCheckboxItem, { ...itemStyles });
 export const RadioItem = styled(CtxRadioItem, { ...itemStyles });
 
 export const TriggerItem = styled(CtxTriggerItem, {
-	"&[data-state='open']": {
-		c: "$ctx-menu-item-text",
-		bg: "white",
-	},
+	"&[data-state='open']": { c: "$ctx-menu-item-text", bg: "white" },
 
 	...itemStyles,
 });

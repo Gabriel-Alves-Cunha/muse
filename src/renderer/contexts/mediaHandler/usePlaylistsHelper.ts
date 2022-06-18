@@ -60,8 +60,11 @@ export function sortByDate(list: MainList): ReadonlySet<Path> {
 
 export function sortByName(list: MainList): MainList {
 	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {
-		if (prevMedia.title > nextMedia.title) return 1;
-		if (prevMedia.title < nextMedia.title) return -1;
+		const prevTitle = prevMedia.title.toLocaleLowerCase();
+		const nextTitle = nextMedia.title.toLocaleLowerCase();
+
+		if (prevTitle > nextTitle) return 1;
+		if (prevTitle < nextTitle) return -1;
 		// a must be equal to b:
 		return 0;
 	});

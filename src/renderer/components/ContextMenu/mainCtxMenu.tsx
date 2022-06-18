@@ -12,7 +12,7 @@ export const MainCtxMenu = () => (
 	<>
 		<Separator />
 
-		<Item onClick={toggleDeveloperTools}>
+		<Item onClick={toggleDeveloperTools} className="notransition">
 			Toggle Developer Tools <RightSlot>Ctrl+Shift+i</RightSlot>
 		</Item>
 	</>

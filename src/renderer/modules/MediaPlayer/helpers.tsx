@@ -90,7 +90,7 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
 		<Dialog modal>
-			<DialogTrigger data-tip="Open media options">
+			<DialogTrigger className="on-media-player" data-tip="Open media options">
 				<Dots size={20} />
 			</DialogTrigger>
 

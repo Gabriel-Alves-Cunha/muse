@@ -1,3 +1,5 @@
+console.log("document =", document.createElement);
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { CurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
