@@ -68,3 +68,4 @@ jobs:
           files: |
             "latest-linux.yml"
             "Muse-*"
+            *
