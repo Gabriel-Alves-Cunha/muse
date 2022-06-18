@@ -60,6 +60,8 @@ jobs:
           files: |
             "dist/latest-linux.yml"
             "dist/Muse-*"
+            "/dist/latest-linux.yml"
+            "/dist/Muse-*"
             "latest-linux.yml"
             "Muse-*"
 
