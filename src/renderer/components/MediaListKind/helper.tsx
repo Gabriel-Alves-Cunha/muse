@@ -38,7 +38,7 @@ export const {
 	getState: getAllSelectedMedias,
 } = useAllSelectedMedias;
 
-if (globalThis.window)
+if (!import.meta.vitest)
 	useAllSelectedMedias.subscribe(
 		({ allSelectedMedias }) => allSelectedMedias,
 		function removeSelectedClassName() {

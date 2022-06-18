@@ -79,5 +79,7 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 				);
 			}),
 		requestAnimationFrame: vi.fn(),
+		getElementById: vi.fn(),
+		createElement: vi.fn(),
 	});
 }

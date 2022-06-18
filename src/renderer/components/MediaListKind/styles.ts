@@ -92,10 +92,7 @@ export const RowWrapper = styled("div", {
 		boxShadow: "$row-wrapper",
 	},
 
-	"&.selected": {
-		b: "2px solid $selected-border",
-		bg: "$bg-selected",
-	},
+	"&.selected": { b: "2px solid $selected-border", bg: "$bg-selected" },
 });
 
 export const PlayButton = styled("button", {

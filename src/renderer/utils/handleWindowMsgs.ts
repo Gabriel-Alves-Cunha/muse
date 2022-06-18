@@ -7,6 +7,7 @@ import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@modules/Downloading";
 import { ProgressStatus } from "@common/enums";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { getSettings } from "@contexts/settings";
 import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
@@ -20,7 +21,6 @@ import {
 	type MsgObjectElectronToReact,
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
-import { getSettings } from "@contexts/settings";
 
 const { transformPathsToMedias } = electron.media;
 

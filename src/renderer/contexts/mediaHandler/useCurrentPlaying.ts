@@ -192,7 +192,7 @@ export function playNextMedia(): void {
 
 let prevMediaTimer: NodeJS.Timeout | undefined;
 
-if (globalThis.window)
+if (!import.meta.vitest)
 	useCurrentPlaying.subscribe(({ path }) => path, function setAudioSource() {
 		clearTimeout(prevMediaTimer);
 

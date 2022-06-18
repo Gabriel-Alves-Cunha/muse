@@ -25,6 +25,6 @@ export const testList: ReadonlyMap<string, Media> = Object.freeze(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const lastMediaPath = testArray[testArray.length - 1]![0];
+export const lastMediaPath = testArray.at(-1)![0];
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const firstMediaPath = testArray[0]![0];
