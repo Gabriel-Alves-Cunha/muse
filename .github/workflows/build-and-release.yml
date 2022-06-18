@@ -60,3 +60,8 @@ jobs:
           files: |
             "dist/latest-linux.yml"
             "dist/Muse-*"
+            "latest-linux.yml"
+            "Muse-*"
+
+      - name: Show directory of build
+        run: ls dist
