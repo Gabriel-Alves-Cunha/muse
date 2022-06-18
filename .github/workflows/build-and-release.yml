@@ -50,6 +50,14 @@ jobs:
       - name: Show directory
         run: ls
 
+      - name: Move files
+        run: |
+          mv dist/latest-linux.yml .
+          mv dist/Muse-* .
+
+      - name: Show directory
+        run: ls
+
       - name: Release action
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -58,18 +66,5 @@ jobs:
           automatic_release_tag: latest
           prerelease: false
           files: |
-            "dist/latest-linux.yml"
-            "dist/Muse-*"
-            "/dist/latest-linux.yml"
-            "/dist/Muse-*"
             "latest-linux.yml"
             "Muse-*"
-            *
-
-      - name: Show directory of build
-        run: ls dist
-
-      - name: Print files
-        run: |
-          cat dist/latest-linux.yml
-          cat dist/builder-debug.yml
