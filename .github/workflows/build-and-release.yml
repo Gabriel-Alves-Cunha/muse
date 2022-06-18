@@ -1,17 +1,30 @@
+# To make this file run, do this on the terminal:
+
+# Make sure your working tree is in a clean state:
+# > git status
+
+# Check out to the `build` branch:
+# > git checkout build
+
+# Reset that branch to some other branch/commit:
+# > git reset --hard main
+
 name: Build and release
 
 on:
   push:
     branches:
-      # this will run on the 'build' branch
       - build
 
 jobs:
   build_on_linux:
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup NodeJS
         uses: actions/setup-node@master
@@ -37,8 +50,10 @@ jobs:
       # Release
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
+          files:
+            - "dist/Muse-*"
+            - "latest-linux.yml"
           # This token is provided by Actions, you do not need to create your own token
-          files: ["dist/Muse-*", "latest-linux.yml"]
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: "latest"
           prerelease: false
