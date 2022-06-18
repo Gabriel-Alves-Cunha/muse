@@ -55,6 +55,7 @@ jobs:
         with:
           # This token is provided by Actions, you do not need to create your own token
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: latest
           prerelease: false
           files: |
             "dist/latest-linux.yml"
