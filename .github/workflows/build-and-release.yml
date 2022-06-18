@@ -17,44 +17,44 @@ on:
       - build
 
 jobs:
-  build_on_linux:
-    name: Release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+  name: Release
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-      - name: Setup NodeJS
-        uses: actions/setup-node@master
-        with:
-          node-version: 16.5.0
-          cache: yarn
+    - name: Setup NodeJS
+      uses: actions/setup-node@master
+      with:
+        node-version: 16.5.0
+        cache: yarn
 
-      - name: Setup yarn cache
-        uses: c-hive/gha-yarn-cache@v2
+    - name: Setup yarn cache
+      uses: c-hive/gha-yarn-cache@v2
 
-      - name: Install dependencies
-        run: yarn
+    - name: Install dependencies
+      run: yarn
 
-      - name: Show directory
-        run: ls
+    - name: Show directory
+      run: ls
 
-      - name: Build AppImage
-        run: yarn release
+    - name: Build AppImage
+      run: yarn release
 
-      - name: Show directory of build
-        run: ls dist
+    - name: Show directory of build
+      run: ls dist
 
-      # Release
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          files: |
-            "dist/latest-linux.yml"
-            "dist/Muse-*"
-          # This token is provided by Actions, you do not need to create your own token
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: "latest"
-          prerelease: false
-          draft: false # Mark this release as draft (not real)
+    - name: Show directory
+      run: ls
+
+    - name: Release action
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        # This token is provided by Actions, you do not need to create your own token
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        files: |
+          "dist/latest-linux.yml"
+          "dist/Muse-*"
