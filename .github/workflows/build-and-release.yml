@@ -3,16 +3,16 @@
 # Make sure your working tree is in a clean state:
 # > git status
 
-# Check out to the `build` branch:
-# > git checkout build
+# Check out to the `main` branch:
+# > git checkout main
 
-# Reset that branch to some other branch/commit:
-# > git reset --hard main
+# Merge the `build` branch with the `main` branch so they are the same:
+# > git merge build
 
 name: Build and release
 
 on:
-  push:
+  merge:
     branches:
       - build
 
