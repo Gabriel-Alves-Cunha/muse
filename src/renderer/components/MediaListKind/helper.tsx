@@ -1,10 +1,10 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
 import { memo, useRef } from "react";
-import { Dialog } from "@radix-ui/react-dialog";
+import { Dialog, Portal } from "@radix-ui/react-dialog";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
@@ -12,7 +12,6 @@ import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { DialogTrigger } from "@components/Dialog";
-import { getRandomInt } from "@utils/utils";
 import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import { emptySet } from "@utils/map-set";
 
@@ -86,6 +85,7 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => {
 		const mediaRowRef = useRef<HTMLDivElement>(null);
+		const overlayRef = useRef<HTMLDivElement>(null);
 
 		return (
 			<RowWrapper data-path={path} ref={mediaRowRef}>
@@ -112,9 +112,11 @@ const Row = memo(
 						<Dots />
 					</DialogTrigger>
 
-					<StyledOverlay>
-						<MediaOptionsModal media={media} path={path} />
-					</StyledOverlay>
+					<Portal>
+						<StyledOverlay ref={overlayRef}>
+							<MediaOptionsModal media={media} path={path} />
+						</StyledOverlay>
+					</Portal>
 				</Dialog>
 			</RowWrapper>
 		);
@@ -198,28 +200,36 @@ const toggleMediaSelectIfCtrlPlusLeftClick = (
 	return false;
 };
 
-export const computeItemKey = (_index: number, [path]: [Path, Media]) => path;
+export const computeItemKey = (
+	_index: number,
+	[path]: [Path, Media, DateAsNumber],
+) => path;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const computeHistoryKey = (_index: number, _: [Path, Media]) =>
-	getRandomInt(_index, Number.MAX_SAFE_INTEGER); // I've not thought about this for more than a second tbh
-// ^ I wanted to use the date as key but I can't think of a way to obtain such data...
-export const itemContent = (_index: number, [path, media]: [Path, Media]) => (
-	<Row media={media} path={path} />
-);
+export const computeHistoryItemKey = (
+	_index: number,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	[path, _, date]: [Path, Media, DateAsNumber],
+) => path + date;
+export const itemContent = (
+	_index: number,
+	[path, media]: [Path, Media, DateAsNumber],
+) => <Row media={media} path={path} />;
 
 export const reloadWindow = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
 
 type RowProps = Readonly<{ media: Media; path: Path; }>;
 
-type FromList = {
-	fromList: Exclude<
-		PlaylistList,
-		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
-	>;
-	homeList: Extract<
-		PlaylistList,
-		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
-	>;
-	isHome: boolean;
-};
+type FromList = Readonly<
+	{
+		fromList: Exclude<
+			PlaylistList,
+			PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+		>;
+		homeList: Extract<
+			PlaylistList,
+			PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+		>;
+		isHome: boolean;
+	}
+>;

@@ -60,8 +60,8 @@ const updateSearchTerm = (e: InputChange) =>
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-// I know this function is ugly as hell... I wanted to have specific
-// abilities wich made me make this beaultiful component...
+// I know this function is not the prettiest... I wanted to have specific
+// abilities wich made me make this beautiful component...
 export function InputAndResults() {
 	const { searchStatus, searchTerm, results } = useSearcher();
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -89,13 +89,13 @@ export function InputAndResults() {
 
 	// Close the popover when the user presses Esc:
 	useEffect(() => {
-		const closeOnEsc = ({ key }: KeyboardEvent) => {
+		function closeOnEsc({ key }: KeyboardEvent) {
 			if (key === "Escape" && isOnFocusRef.current) {
 				setSearcher(defaultSearcher);
 				isOnFocusRef.current = false;
 				inputRef.current?.blur();
 			}
-		};
+		}
 
 		document.addEventListener("keydown", closeOnEsc);
 

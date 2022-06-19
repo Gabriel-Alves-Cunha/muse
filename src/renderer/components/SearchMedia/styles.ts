@@ -74,16 +74,16 @@ export const SearchWrapper = styled("div", {
 	},
 
 	input: {
-		width: "100%",
+		width: "82%",
 		height,
 
 		whiteSpace: "nowrap",
 		c: "$input-text",
-		ff: "$secondary",
+		ff: "$primary",
 		cursor: "text",
 		ls: "0.045rem",
-		fs: "0.9rem",
-		fw: 400,
+		fs: "1rem",
+		fw: 500,
 		lh: 1.5,
 
 		bg: "none",

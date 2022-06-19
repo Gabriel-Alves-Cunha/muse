@@ -20,7 +20,7 @@ import {
 	getAllSelectedMedias,
 	setAllSelectedMedias,
 	selectMediaOrMedias,
-	computeHistoryKey,
+	computeHistoryItemKey,
 	computeItemKey,
 	reloadWindow,
 	itemContent,
@@ -59,54 +59,60 @@ function MediaListKind_({ isHome = false }: Props) {
 	const listName = isHome ? homeList : fromList;
 	const { [listName]: list } = usePlaylists();
 
-	const listAsArrayOfAMap: [Path, Media][] = useMemo(() =>
-		time(() => {
-			switch (listName) {
-				case PlaylistList.MAIN_LIST:
-					return [...(list as MainList)];
+	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
+		() =>
+			time(() => {
+				switch (listName) {
+					case PlaylistList.MAIN_LIST:
+						return Array.from(
+							list as MainList,
+							([path, media]) => [path, media, 0],
+						);
 
-				case PlaylistList.SORTED_BY_DATE:
-				case PlaylistList.FAVORITES: {
-					const mainList_ = mainList();
+					case PlaylistList.SORTED_BY_DATE:
+					case PlaylistList.FAVORITES: {
+						const mainList_ = mainList();
 
-					const listAsArrayOfAMap: [Path, Media][] = [];
+						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = [];
 
-					(list as Set<Path>).forEach(path => {
-						const media = mainList_.get(path);
+						(list as Set<Path>).forEach(path => {
+							const media = mainList_.get(path);
 
-						media && listAsArrayOfAMap.push([path, media]);
-					});
+							media && listAsArrayOfAMap.push([path, media, 0]);
+						});
 
-					return listAsArrayOfAMap;
+						return listAsArrayOfAMap;
+					}
+
+					case PlaylistList.HISTORY: {
+						const unsortedList: [Path, DateAsNumber][] = [];
+
+						(list as History).forEach((dates, path) =>
+							dates.forEach(date => unsortedList.push([path, date]))
+						);
+
+						const sortedByDate = unsortedList.sort((a, b) => a[1] - b[1]);
+
+						const mainList_ = mainList();
+
+						const listAsArrayOfMap = sortedByDate.map(([path, date]) => {
+							const media = mainList_.get(path);
+
+							if (!media)
+								return console.error(`Media not found for path: ${path}`);
+
+							return [path, media, date];
+						}).filter(Boolean) as [Path, Media, DateAsNumber][];
+
+						return listAsArrayOfMap;
+					}
+
+					default:
+						return assertUnreachable(listName);
 				}
-
-				case PlaylistList.HISTORY: {
-					const unsortedList: [Path, DateAsNumber][] = [];
-
-					(list as History).forEach((dates, path) =>
-						dates.forEach(date => unsortedList.push([path, date]))
-					);
-
-					const sortedByDate = unsortedList.sort((a, b) => a[1] - b[1]);
-
-					const mainList_ = mainList();
-
-					const listAsArrayOfMap = sortedByDate.map(([path]) => {
-						const media = mainList_.get(path);
-
-						if (!media)
-							return console.error(`Media not found for path: ${path}`);
-
-						return [path, media];
-					}).filter(Boolean) as [Path, Media][];
-
-					return listAsArrayOfMap;
-				}
-
-				default:
-					return assertUnreachable(listName);
-			}
-		}, "listAsArrayOfAMap"), [listName, list]);
+			}, "listAsArrayOfAMap"),
+		[listName, list],
+	);
 
 	useOnClickOutside(listRef, () => deselectAllMedias(listRef, isCtxMenuOpen));
 
@@ -133,7 +139,7 @@ function MediaListKind_({ isHome = false }: Props) {
 						Footer: () => <Footer />,
 					}}
 					computeItemKey={listName === PlaylistList.HISTORY ?
-						computeHistoryKey :
+						computeHistoryItemKey :
 						computeItemKey}
 					totalCount={listAsArrayOfAMap.length}
 					itemContent={itemContent}

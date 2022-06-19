@@ -1,4 +1,5 @@
-* FIX: get the picture to got to the media file!!!!
+* FIX: get the picture to go to the media file!!!!
+* TODO: add to README how to install from release tags!!
 
 NOTES:
 

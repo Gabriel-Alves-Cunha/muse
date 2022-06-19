@@ -193,7 +193,7 @@ app.on("window-all-closed", () => {
 							downloadInfo,
 						);
 
-						console.log("Clicked notification and sent data:", downloadInfo);
+						dbg("Clicked notification and sent data:", downloadInfo);
 					}).show();
 				} catch (error) {
 					console.error(error);

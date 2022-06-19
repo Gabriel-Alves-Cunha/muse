@@ -56,6 +56,7 @@ The following tools were used on this project construction:
 - [Vite](https://vitejs.dev/)
 - [Vitest](https://vitest.dev/)
 - [Stitches](https://stitches.dev/)
+- [Radix UI](https://radix-ui.com/)
 - [Node.js](https://nodejs.org/en/)
 - [React](https://pt-br.reactjs.org/)
 - [Electron](https://www.electronjs.org/)
@@ -64,9 +65,18 @@ The following tools were used on this project construction:
 - [Ytdl Core](https://github.com/fent/node-ytdl-core)
 - [React Icons](https://react-icons.github.io/react-icons/)
 - [Node TagLib Sharp](https://github.com/benrr101/node-taglib-sharp)
-- [Fluent Ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
+- [Fluent ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 
 ## 🚀 Installing
+
+To install and run Muse, follow these steps:
+
+* Linux  
+  Download 'Muse-***VERSION***.AppImage' from the releases page;
+  Once downloaded, you need to make it an executable. On your terminal, run: `chmod a+x Muse-*.AppImage`.
+  Now you can run Muse: `./Muse-*.AppImage`
+
+## Develop
 
 To install and run Muse, follow these steps:
 
@@ -75,18 +85,13 @@ git clone https://github.com/Gabriel-Alves-Cunha/muse
 ```
 
 ```bash
+# Install dependencies
 yarn
 ```
 
-```bash
-yarn dist
-```
-
-Then the binary will be inside the `dist/` folder.
-
-To start local development:
 
 ```shell
+# Start app:
 yarn dev
 ```
 
