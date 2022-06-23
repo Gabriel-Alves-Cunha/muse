@@ -5,21 +5,21 @@ import {
 	usePlaylists,
 } from "@contexts/mediaHandler/usePlaylists";
 
-import { Button } from "./styles";
+import { ButtonFromGroup } from "./styles";
 
 export function Reload({ className }: Props) {
 	const { isLoadingMedias } = usePlaylists();
 
 	return (
-		<Button
+		<ButtonFromGroup
 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
 			onClick={searchLocalComputerForMedias}
 			data-tip="Reload all medias"
 			data-place="bottom"
 		>
 			<ReloadIcon size={17} />
-		</Button>
+		</ButtonFromGroup>
 	);
 }
 
-type Props = { className?: string };
+type Props = { className?: string; };

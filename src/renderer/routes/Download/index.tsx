@@ -2,9 +2,9 @@ import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect } from "react";
 
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
+import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 
-import { OpenFilePickerButton } from "../Convert/styles";
 import { Loading } from "@styles/appStyles";
 import {
 	ResultContainer,
@@ -29,7 +29,7 @@ function SearcherWrapper() {
 	const { error, url } = useSearchInfo();
 
 	useEffect(() => {
-		const searchTimeout = setTimeout(async () => await search(url), 400);
+		const searchTimeout = setTimeout(async () => await search(url), 300);
 
 		return () => clearTimeout(searchTimeout);
 	}, [url]);
@@ -74,9 +74,7 @@ function Result() {
 
 				<p>{result.title}</p>
 
-				<OpenFilePickerButton onClick={downloadMedia}>
-					Download
-				</OpenFilePickerButton>
+				<Button variant="large" onClick={downloadMedia}>Download</Button>
 			</ResultContainer>
 		) :
 		null;

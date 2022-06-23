@@ -59,7 +59,7 @@ export const Wrapper = styled("div", {
 	},
 });
 
-export const Button = styled("button", {
+export const ButtonFromGroup = styled("button", {
 	pos: "relative",
 	dflex: "center",
 

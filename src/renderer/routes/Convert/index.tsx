@@ -5,31 +5,30 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { SiConvertio as ConvertIcon } from "react-icons/si";
 
 import { MainArea } from "@components/MainArea";
+import { Button } from "@components/Button";
 import {
 	useNewConvertions,
 	type ConvertInfo,
 } from "@components/Converting/helper";
 
 import { Box } from "./styles";
-import { Button } from "@components/Button";
 
 export function Convert() {
 	const [selectedMedias, setSelectedMedias] = useState<[Path, ConvertInfo][]>(
-		[]
+		[],
 	);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	function handleSelectedFiles({
-		target: { files },
-	}: ChangeEvent<HTMLInputElement>) {
+	function handleSelectedFiles(
+		{ target: { files } }: ChangeEvent<HTMLInputElement>,
+	) {
 		if (!files?.length) return;
 
 		setSelectedMedias(
-			[...files].map(file => [
-				file.path,
-				{ canStartConvert: true, toExtension },
-			])
+			[...files].map(
+				file => [file.path, { canStartConvert: true, toExtension }]
+			),
 		);
 	}
 

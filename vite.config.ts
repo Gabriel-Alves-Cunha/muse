@@ -8,6 +8,7 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 export default defineConfig({
 	test: {
 		dir: "src/__tests__",
+		environment: "happy-dom",
 		coverage: {
 			// reporter: ["html", "text"],
 			reporter: ["text"],

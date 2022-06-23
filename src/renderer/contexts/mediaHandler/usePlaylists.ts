@@ -4,10 +4,9 @@ import create from "zustand";
 
 import { emptyMap, emptySet, getFirstKey } from "@utils/map-set";
 import { getFromLocalStorage, keys } from "@utils/localStorage";
-import { dbgPlaylists, getBasename } from "@common/utils";
-import { errorToast, successToast } from "@styles/global";
 import { setPlaylistsLocalStorage } from "./localStorageHelpers";
 import { assertUnreachable, time } from "@utils/utils";
+import { dbgPlaylists } from "@common/utils";
 import { getSettings } from "@contexts/settings";
 import {
 	searchDirectoryResult,
@@ -16,7 +15,7 @@ import {
 	sortByName,
 } from "./usePlaylistsHelper";
 
-const { media: { transformPathsToMedias }, fs: { deleteFile } } = electron;
+const { transformPathsToMedias } = electron.media;
 
 const maxSizeOfHistory = 100;
 
@@ -445,24 +444,6 @@ export const searchMedia = (searchTerm_: Readonly<string>): [Path, Media][] =>
 
 		return medias;
 	}, `searchMedia(${searchTerm_})`);
-
-export async function deleteMedia(path: Path) {
-	const wasDeleteSuccessfull = await deleteFile(path);
-
-	if (wasDeleteSuccessfull) {
-		successToast(`Deleted ${getBasename(path)}`);
-
-		setPlaylists({
-			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
-			type: WhatToDo.UPDATE_MAIN_LIST,
-			path,
-		});
-	} else {
-		errorToast(
-			`Could not delete ${path}\nSee console by pressing 'Ctrl' + 'Shift' + 'i'.`,
-		);
-	}
-}
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////

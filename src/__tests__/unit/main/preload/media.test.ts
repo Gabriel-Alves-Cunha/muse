@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import type { ImgString } from "@common/@types/electron-window";
 
 // Getting everything ready for the tests...

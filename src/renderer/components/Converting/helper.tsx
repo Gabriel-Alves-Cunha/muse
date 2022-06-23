@@ -10,6 +10,7 @@ import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyMap } from "@utils/map-set";
+import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
 	cancelConvertionAndOrRemoveItFromList,
@@ -21,12 +22,8 @@ import {
 	useConvertingList,
 } from "@contexts/convertList";
 
+import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
 import { CancelButton, ConvertionProgress } from "./styles";
-import {
-	TitleAndCancelWrapper,
-	CleanAllDoneButton,
-	ItemWrapper,
-} from "../Downloading/styles";
 
 export const useNewConvertions = create<NewConvertions>(() => ({
 	newConvertions: emptyMap,
@@ -46,7 +43,7 @@ export function Popup() {
 					mediaBeingConverted={media}
 					path={path}
 					key={path}
-				/>
+				/>,
 			);
 			++convertionIndex;
 		}
@@ -56,17 +53,17 @@ export function Popup() {
 
 	return (
 		<>
-			{convertingList.size > 0 ? (
-				<>
-					<CleanAllDoneButton onClick={cleanAllDoneConvertions}>
-						Clean finished
-					</CleanAllDoneButton>
+			{convertingList.size > 0 ?
+				(
+					<>
+						<Button variant="medium" onClick={cleanAllDoneConvertions}>
+							Clean finished
+						</Button>
 
-					{convertBoxes()}
-				</>
-			) : (
-				<p>No conversions in progress!</p>
-			)}
+						{convertBoxes()}
+					</>
+				) :
+				<p>No conversions in progress!</p>}
 		</>
 	);
 }
@@ -82,33 +79,36 @@ function cleanAllDoneConvertions(): void {
 	});
 }
 
-export const ConvertBox = ({
-	mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
-	convertionIndex,
-	path,
-}: ConvertBoxProps) => (
-	<ItemWrapper className="item">
-		<TitleAndCancelWrapper>
-			<p>{getBasename(path) + "." + toExtension}</p>
+function ConvertBox(
+	{
+		mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
+		convertionIndex,
+		path,
+	}: ConvertBoxProps,
+) {
+	return (
+		<ItemWrapper className="item">
+			<TitleAndCancelWrapper>
+				<p>{getBasename(path) + "." + toExtension}</p>
 
-			<CancelButton
-				onClick={e =>
-					handleSingleItemDeleteAnimation(e, convertionIndex, false, path)
-				}
-				data-tip="Cancel conversion"
-				className="notransition"
-			>
-				<Cancel size={12} />
-			</CancelButton>
-		</TitleAndCancelWrapper>
+				<CancelButton
+					onClick={e =>
+						handleSingleItemDeleteAnimation(e, convertionIndex, false, path)}
+					data-tip="Cancel conversion"
+					className="notransition"
+				>
+					<Cancel size={12} />
+				</CancelButton>
+			</TitleAndCancelWrapper>
 
-		<ConvertionProgress>
-			Converted: {formatDuration(timeConverted)} s /{" "}
-			{prettyBytes(sizeConverted)}
-			<span>{progressIcons.get(status)}</span>
-		</ConvertionProgress>
-	</ItemWrapper>
-);
+			<ConvertionProgress>
+				Converted: {formatDuration(timeConverted)} s /{" "}
+				{prettyBytes(sizeConverted)}
+				<span>{progressIcons.get(status)}</span>
+			</ConvertionProgress>
+		</ItemWrapper>
+	);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ export const ConvertBox = ({
 
 export function createNewConvertion(
 	convertInfo: Readonly<ConvertInfo>,
-	path: Readonly<Path>
+	path: Readonly<Path>,
 ): Readonly<MessagePort> {
 	const { convertingList } = getConvertingList();
 
@@ -155,7 +155,7 @@ export function createNewConvertion(
 		path,
 	});
 
-	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted> }) => {
+	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted>; }) => {
 		const { convertingList } = getConvertingList();
 
 		dbg(`Received a message from Electron on port for "${path}":`, {
@@ -166,7 +166,7 @@ export function createNewConvertion(
 		// Assert that the download exists:
 		if (!convertingList.has(path))
 			return console.error(
-				"Received a message from Electron but the path is not in the list!"
+				"Received a message from Electron but the path is not in the list!",
 			);
 
 		setConvertingList({
@@ -180,7 +180,7 @@ export function createNewConvertion(
 			case ProgressStatus.FAILED: {
 				// @ts-ignore ^ In this case, `data` include an `error: Error` key.
 				console.assert(data.error, "data.error should exist!");
-				console.error((data as typeof data & { error: Error }).error);
+				console.error((data as typeof data & { error: Error; }).error);
 
 				errorToast(`Download of "${path}" failed!`);
 
@@ -226,26 +226,29 @@ export function createNewConvertion(
 
 export const handleOnClose = () => dbg("Closing ports (react port).");
 
-export type MediaBeingConverted = Readonly<{
-	status: ProgressProps["status"];
-	toExtension: AllowedMedias;
-	sizeConverted: number;
-	timeConverted: number;
-	isConverting: boolean;
-	port: MessagePort;
-}>;
+export type MediaBeingConverted = Readonly<
+	{
+		status: ProgressProps["status"];
+		toExtension: AllowedMedias;
+		sizeConverted: number;
+		timeConverted: number;
+		isConverting: boolean;
+		port: MessagePort;
+	}
+>;
 
-type ConvertBoxProps = Readonly<{
-	mediaBeingConverted: MediaBeingConverted;
-	convertionIndex: number;
-	path: Path;
-}>;
+type ConvertBoxProps = Readonly<
+	{
+		mediaBeingConverted: MediaBeingConverted;
+		convertionIndex: number;
+		path: Path;
+	}
+>;
 
-export type ConvertInfo = Readonly<{
-	toExtension: AllowedMedias;
-	canStartConvert: boolean;
-}>;
+export type ConvertInfo = Readonly<
+	{ toExtension: AllowedMedias; canStartConvert: boolean; }
+>;
 
-type NewConvertions = Readonly<{
-	newConvertions: ReadonlyMap<Path, ConvertInfo>;
-}>;
+type NewConvertions = Readonly<
+	{ newConvertions: ReadonlyMap<Path, ConvertInfo>; }
+>;

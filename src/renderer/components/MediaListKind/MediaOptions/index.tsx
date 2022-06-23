@@ -8,7 +8,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { deleteMedia } from "@contexts/mediaHandler/usePlaylists";
+import { deleteMedia } from "@utils/media";
 import { capitalize } from "@utils/utils";
 import {
 	ReactToElectronMessageEnum,
@@ -95,8 +95,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 				<CloseDialog
 					onClick={() =>
-						changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media)
-					}
+						changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media)}
 					id="save-changes"
 				>
 					Save changes
@@ -108,7 +107,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 async function handleMediaDeletion(
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
-	mediaPath: Readonly<Path>
+	mediaPath: Readonly<Path>,
 ): Promise<void> {
 	if (closeButtonRef.current) {
 		closeEverything(closeButtonRef);
@@ -121,7 +120,7 @@ function changeMediaMetadata(
 	contentWrapperRef: Readonly<RefObject<HTMLDivElement>>,
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
-	media: Readonly<Media>
+	media: Readonly<Media>,
 ): void {
 	if (contentWrapperRef.current && closeButtonRef.current)
 		try {
@@ -133,7 +132,7 @@ function changeMediaMetadata(
 			console.error(error);
 
 			errorToast(
-				"Unable to save new metadata. See console by pressing Ctrl+Shift+i."
+				"Unable to save new metadata. See console by pressing Ctrl+Shift+i.",
 			);
 		}
 }
@@ -141,7 +140,7 @@ function changeMediaMetadata(
 function changeMetadataIfAllowed(
 	contentWrapper: Readonly<RefObject<HTMLDivElement>>,
 	mediaPath: Readonly<Path>,
-	media: Readonly<Media>
+	media: Readonly<Media>,
 ): void {
 	if (!contentWrapper.current) return;
 
@@ -163,10 +162,9 @@ function changeMetadataIfAllowed(
 
 					// We need to handle the case where the key is an array, as in "genres":
 					if (oldValue instanceof Array) {
-						const newValueAsArray: string[] = newValue
-							.split(separatedByCommaOrSemiColorOrSpace)
-							.map(v => v.trim())
-							.filter(Boolean);
+						const newValueAsArray: string[] = newValue.split(
+							separatedByCommaOrSemiColorOrSpace,
+						).map(v => v.trim()).filter(Boolean);
 
 						// If newValueAsArray is `[""]`, then we need to remove the empty string:
 						if (newValueAsArray.length === 1 && newValueAsArray[0] === "")
@@ -179,7 +177,7 @@ function changeMetadataIfAllowed(
 						)
 							return console.log(
 								"Values are equal, not gonna change anything:",
-								{ newValueAsArray, oldValue }
+								{ newValueAsArray, oldValue },
 							);
 
 						dbg("Changing metadata from client side (oldValue is an array):", {
@@ -227,13 +225,15 @@ const options = ({ duration, artist, album, genres, title, size }: Media) => ({
 	size,
 });
 
-const allowedOptionToChange = Object.freeze({
-	artist: "albumArtists",
-	imageURL: "imageURL",
-	genres: "genres",
-	album: "album",
-	title: "title",
-} as const);
+const allowedOptionToChange = Object.freeze(
+	{
+		artist: "albumArtists",
+		imageURL: "imageURL",
+		genres: "genres",
+		album: "album",
+		title: "title",
+	} as const,
+);
 
 const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).includes(option);
@@ -242,16 +242,18 @@ const closeEverything = (element: Readonly<RefObject<HTMLButtonElement>>) =>
 	element.current?.click();
 
 const format = (
-	value: string | readonly string[] | undefined
+	value: string | readonly string[] | undefined,
 ): string | undefined => (value instanceof Array ? value.join(", ") : value);
 
-export type WhatToChange = Readonly<{
-	whatToSend: ChangeOptionsToSend;
-	whatToChange: ChangeOptions;
-	current: string;
-}>;
+export type WhatToChange = Readonly<
+	{
+		whatToSend: ChangeOptionsToSend;
+		whatToChange: ChangeOptions;
+		current: string;
+	}
+>;
 
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
 type ChangeOptions = keyof typeof allowedOptionToChange;
 
-type Props = Readonly<{ media: Media; path: Path }>;
+type Props = Readonly<{ media: Media; path: Path; }>;

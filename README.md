@@ -30,25 +30,6 @@
   <img src="screenshots/download.png" />
 </h1>
 
-<!-- ## Features
-
-- [x] Companies or entities can register on the web platform by sending:
-
-  - [x] an image of the collection point
-  - [x] entity name, email and whatsapp
-  - [x] and the address so that it can appear on the map
-  - [x] in addition to selecting one or more collection items:
-    - lamps
-    - Batteries
-    - papers and cardboard
-    - electronic waste
-    - organic waste
-    - kitchen oil
-
-- [x] Users have access to the mobile application, where they can:
-  - [x] browse the map to see the registered institutions
-  - [x] contact the entity via E-mail or WhatsApp -->
-
 ### 🛠 Tecnologies
 
 The following tools were used on this project construction:
@@ -72,7 +53,7 @@ The following tools were used on this project construction:
 To install and run Muse, follow these steps:
 
 * Linux  
-  Download 'Muse-***VERSION***.AppImage' from the releases page;
+  Download 'Muse-***version***.AppImage' from the releases page;
   Once downloaded, you need to make it an executable. On your terminal, run: `chmod a+x Muse-*.AppImage`.
   Now you can run Muse: `./Muse-*.AppImage`
 
@@ -90,7 +71,7 @@ yarn
 ```
 
 
-```shell
+```bash
 # Start app:
 yarn dev
 ```

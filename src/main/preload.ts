@@ -1,3 +1,5 @@
+import type { Mutable } from "@common/@types/generalTypes";
+
 import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
@@ -30,7 +32,6 @@ import {
 	readFile,
 	readdir,
 } from "./preload/file";
-import { Mutable } from "@common/@types/generalTypes";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object

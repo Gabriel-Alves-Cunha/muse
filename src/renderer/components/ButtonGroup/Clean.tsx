@@ -8,17 +8,17 @@ import {
 	PlaylistList,
 } from "@contexts/mediaHandler/usePlaylists";
 
-import { Button } from "./styles";
+import { ButtonFromGroup } from "./styles";
 
 export const Clean = ({ className }: Props) => (
-	<Button
+	<ButtonFromGroup
 		onClick={cleanProperList}
 		className={className}
 		data-tip="Clean List"
 		data-place="bottom"
 	>
 		<CleanIcon size={18} />
-	</Button>
+	</ButtonFromGroup>
 );
 
 function cleanProperList() {
@@ -39,4 +39,4 @@ function cleanProperList() {
 	}
 }
 
-type Props = { className?: string };
+type Props = { className?: string; };

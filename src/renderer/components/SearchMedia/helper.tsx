@@ -81,16 +81,12 @@ export function InputAndResults() {
 	// I found that such time had to be high, I settled on
 	// a time of 200ms, but maybe on a slow machine it could
 	// be need a higher time for the event to bubble...
-	useOnClickOutside(
-		inputRef,
-		() =>
-			isOnFocus &&
-			setTimeout(() => {
-				setSearcher(defaultSearcher);
-				setIsOnFocus(false);
-				inputRef.current?.blur();
-			}, 200)
-	);
+	useOnClickOutside(inputRef, () =>
+		isOnFocus && setTimeout(() => {
+			setSearcher(defaultSearcher);
+			setIsOnFocus(false);
+			inputRef.current?.blur();
+		}, 200));
 
 	useEffect(() => {
 		function closePopoverOnEsc({ key }: KeyboardEvent) {
@@ -106,27 +102,23 @@ export function InputAndResults() {
 		return () => window.removeEventListener("keydown", closePopoverOnEsc);
 	}, [isOnFocus]);
 
-	useEffect(
-		function searchForMedia() {
-			setSearcher({ results: constRefToEmptyArray, searchStatus: SEARCHING });
+	useEffect(function searchForMedia() {
+		setSearcher({ results: constRefToEmptyArray, searchStatus: SEARCHING });
 
-			if (searchTerm.length < 2) return;
+		if (searchTerm.length < 2) return;
 
-			// Using startTransition in case the search takes too long:
-			startTransition(() => {
-				const results = searchMedia(searchTerm);
-				const searchStatus =
-					results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+		// Using startTransition in case the search takes too long:
+		startTransition(() => {
+			const results = searchMedia(searchTerm);
+			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
-				setSearcher({ searchStatus, results });
+			setSearcher({ searchStatus, results });
 
-				// Doing this hack to keep focus on the input cause
-				// it is lost when the popover opens...	:(
-				setTimeout(() => inputRef.current?.focus());
-			});
-		},
-		[searchTerm]
-	);
+			// Doing this hack to keep focus on the input cause
+			// it is lost when the popover opens...	:(
+			setTimeout(() => inputRef.current?.focus());
+		});
+	}, [searchTerm]);
 
 	return (
 		<>
@@ -145,35 +137,37 @@ export function InputAndResults() {
 					type="text"
 				/>
 
-				{!isOnFocus && <RightSlot id="search">Alt+K</RightSlot>}
+				{!isOnFocus && <RightSlot id="search">Alt+k</RightSlot>}
 			</>
 
 			<PopoverRoot open={isOpen}>
 				<SearchMediaPopoverAnchor />
 
 				<PopoverContent
-					size={
-						nothingFound
-							? "nothing-found-for-search-media"
-							: "search-media-results"
-					}
+					size={nothingFound ?
+						"nothing-found-for-search-media" :
+						"search-media-results"}
 				>
-					{nothingFound ? (
-						<NothingFound>
-							Nothing was found for &quot;{searchTerm}&quot;
-						</NothingFound>
-					) : foundSomething ? (
-						<>
-							{results.map(([path, media]) => (
-								<Row
-									highlight={searchTerm}
-									media={media}
-									path={path}
-									key={path}
-								/>
-							))}
-						</>
-					) : undefined}
+					{nothingFound ?
+						(
+							<NothingFound>
+								Nothing was found for &quot;{searchTerm}&quot;
+							</NothingFound>
+						) :
+						foundSomething ?
+						(
+							<>
+								{results.map(([path, media]) => (
+									<Row
+										highlight={searchTerm}
+										media={media}
+										path={path}
+										key={path}
+									/>
+								))}
+							</>
+						) :
+						undefined}
 				</PopoverContent>
 			</PopoverRoot>
 		</>
@@ -212,16 +206,16 @@ function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-type Searcher = Readonly<{
-	results: readonly [Path, Media][];
-	searchTerm: Lowercase<string>;
-	searchStatus: SearchStatus;
-}>;
+type Searcher = Readonly<
+	{
+		results: readonly [Path, Media][];
+		searchTerm: Lowercase<string>;
+		searchStatus: SearchStatus;
+	}
+>;
 
-type RowProps = Readonly<{
-	highlight: Lowercase<string>;
-	media: Media;
-	path: Path;
-}>;
+type RowProps = Readonly<
+	{ highlight: Lowercase<string>; media: Media; path: Path; }
+>;
 
 type InputChange = Readonly<React.ChangeEvent<HTMLInputElement>>;

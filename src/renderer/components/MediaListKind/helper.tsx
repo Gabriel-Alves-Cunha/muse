@@ -108,7 +108,7 @@ const Row = memo(
 				</PlayButton>
 
 				<Dialog modal>
-					<DialogTrigger data-tip="Open media options">
+					<DialogTrigger tooltip="Open media options">
 						<Dots />
 					</DialogTrigger>
 

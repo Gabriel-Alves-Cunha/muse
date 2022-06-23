@@ -2,8 +2,10 @@ import { Trigger } from "@radix-ui/react-dialog";
 
 import { styled } from "@styles/global";
 
-export const DialogTrigger = ({ children, className }: Props) => (
-	<StyledTrigger className={className}>{children}</StyledTrigger>
+export const DialogTrigger = ({ children, className, tooltip }: Props) => (
+	<StyledTrigger className={className} data-tip={tooltip} data-place="bottom">
+		{children}
+	</StyledTrigger>
 );
 
 const StyledTrigger = styled(Trigger, {
@@ -32,4 +34,8 @@ const StyledTrigger = styled(Trigger, {
 	},
 });
 
-type Props = { children: React.ReactNode; className?: string; };
+type Props = {
+	children: React.ReactNode;
+	className?: string;
+	tooltip: string;
+};

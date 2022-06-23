@@ -8,12 +8,12 @@ import { setDownloadInfo } from "@components/Downloading";
 import { ProgressStatus } from "@common/enums";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
+import { deleteMedia } from "./media";
 import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
 	PlaylistActions,
 	setPlaylists,
-	deleteMedia,
 	WhatToDo,
 	mainList,
 } from "@contexts/mediaHandler/usePlaylists";
@@ -234,9 +234,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			deleteMedia(mediaPath).then(() =>
-				console.log(`Media "${mediaPath}" deleted.`)
-			).catch(console.error);
+			await deleteMedia(mediaPath);
 			break;
 		}
 

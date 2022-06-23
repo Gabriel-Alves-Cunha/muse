@@ -9,6 +9,7 @@ import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { handleOnClose } from "@components/Converting/helper";
 import { Progress } from "@components/Progress";
+import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
 	useDownloadingList,
@@ -16,51 +17,72 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
+import { TitleAndCancelWrapper, ItemWrapper } from "./styles";
 import { CancelButton } from "@components/Converting/styles";
-import {
-	TitleAndCancelWrapper,
-	CleanAllDoneButton,
-	ItemWrapper,
-} from "./styles";
 
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
+
+	function downloadingBoxes() {
+		const list = [];
+
+		let downloadingIndex = 0;
+		for (const [url, download] of downloadingList) {
+			list.push(
+				<DownloadingBox
+					downloadingIndex={downloadingIndex}
+					download={download}
+					url={url}
+					key={url}
+				/>,
+			);
+			++downloadingIndex;
+		}
+
+		return list;
+	}
 
 	return (
 		<>
 			{downloadingList.size > 0 ?
 				(
 					<>
-						<CleanAllDoneButton onClick={cleanAllDoneDownloads}>
+						<Button variant="medium" onClick={cleanAllDoneDownloads}>
 							Clean finished
-						</CleanAllDoneButton>
+						</Button>
 
-						{[...downloadingList].map(([url, download], downloadingIndex) => (
-							<ItemWrapper key={url}>
-								<TitleAndCancelWrapper>
-									<p>{download.title}</p>
-
-									<CancelButton
-										onClick={e =>
-											handleSingleItemDeleteAnimation(e, downloadingIndex, true, url)}
-										className="cancel-button notransition"
-										data-tip="Cancel/Remove download"
-									>
-										<Cancel size={12} />
-									</CancelButton>
-								</TitleAndCancelWrapper>
-
-								<Progress
-									percent_0_to_100={download.percentage}
-									status={download.status}
-									showStatus
-								/>
-							</ItemWrapper>
-						))}
+						{downloadingBoxes()}
 					</>
 				) :
 				<p>No downloads in progress!</p>}
 		</>
+	);
+}
+
+function DownloadingBox(
+	{ downloadingIndex, download, url }: DownloadingBoxProps,
+) {
+	return (
+		<ItemWrapper key={url}>
+			<TitleAndCancelWrapper>
+				<p>{download.title}</p>
+
+				<CancelButton
+					onClick={e =>
+						handleSingleItemDeleteAnimation(e, downloadingIndex, true, url)}
+					className="cancel-button notransition"
+					data-tip="Cancel/Remove download"
+				>
+					<Cancel size={12} />
+				</CancelButton>
+			</TitleAndCancelWrapper>
+
+			<Progress
+				percent_0_to_100={download.percentage}
+				status={download.status}
+				showStatus
+			/>
+		</ItemWrapper>
 	);
 }
 
@@ -215,8 +237,7 @@ function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
 		);
 
 	// Cancel download:
-	if (download.isDownloading)
-		download.port.postMessage({ destroy: true, url });
+	if (download.isDownloading) download.port.postMessage({ destroy: true, url });
 
 	// Update downloading list:
 	const newDownloadingList = new Map(downloadingList);
@@ -300,3 +321,9 @@ export function handleSingleItemDeleteAnimation(
 			cancelConvertionAndOrRemoveItFromList(url);
 	});
 }
+
+type DownloadingBoxProps = {
+	download: MediaBeingDownloaded;
+	downloadingIndex: number;
+	url: string;
+};

@@ -26,9 +26,9 @@ const rotating = keyframes({ to: { transform: "rotate(1turn)" } });
 export const Loading = styled("div", {
 	size: 25,
 
-	borderTopColor: "$accent",
-	b: "2px solid #e5e5e5",
+	b: "2px solid transparent",
+	borderTopColor: "$input-border-active",
 	br: "50%",
 
-	animation: `${rotating} 1s infinite`,
+	animation: `${rotating} 1s ease infinite`,
 });

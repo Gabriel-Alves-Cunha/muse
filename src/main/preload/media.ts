@@ -46,14 +46,24 @@ import {
 
 const { log, error } = console;
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 const ffmpegPath = _ffmpeg_path_.replace("app.asar", "app.asar.unpacked");
 fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 
 const currentDownloads: Map<MediaUrl, Readable> = new Map();
 const mediasConverting: Map<Path, Readable> = new Map();
 
-const pathExists = async (path: Readonly<Path>): Promise<Readonly<boolean>> =>
-	access(path).then(() => true).catch(() => false);
+async function pathExists(path: Readonly<Path>): Promise<Readonly<boolean>>
+{
+	return access(path).then(() => true).catch(() => false);
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 async function createMedia(
 	path: Readonly<Path>,
@@ -70,12 +80,12 @@ async function createMedia(
 				fileAbstraction: { readStream: { length } },
 			} = MediaFile.createFromPath(path);
 
-			const duration = durationMilliseconds / 1_000;
+			const durationInSeconds = durationMilliseconds / 1_000;
 
-			if (ignoreMediaWithLessThan60Seconds && duration < 60) {
+			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60) {
 				log(
 					`Skipping "${path}" because the duration is ${
-						duration.toPrecision(3)
+						durationInSeconds.toPrecision(3)
 					} s (less than 60 s)!`,
 				);
 				return reject();
@@ -104,8 +114,8 @@ async function createMedia(
 			}
 
 			const media: Media = {
+				duration: formatDuration(durationInSeconds),
 				birthTime: lstatSync(path).birthtimeMs,
-				duration: formatDuration(duration),
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
 				genres,
@@ -141,7 +151,7 @@ export async function transformPathsToMedias(
 		);
 
 		const medias = (await Promise.allSettled(promises)).map(
-			p => (p.status === "fulfilled" ? p.value : undefined)
+			p => (p.status === "fulfilled" ? p.value : false)
 		).filter(Boolean) as [Path, Media][];
 
 		console.groupEnd();
@@ -159,7 +169,7 @@ export async function handleCreateOrCancelDownload(
 		if (!electronPort || !imageURL || !title || !url || !extension)
 			return error("Missing required params!", arguments);
 
-		await makeStream({ imageURL, url, title, electronPort, extension });
+		return await makeStream({ imageURL, url, title, electronPort, extension });
 	} else if (destroy) currentDownloads.get(url)!.emit("destroy");
 }
 
@@ -181,10 +191,10 @@ export async function makeStream(
 		return sendFailedDownloadMsg(url, electronPort);
 	}
 
-	const startTime = Date.now();
 	let interval: NodeJS.Timer | undefined;
-	let prettyTotal = "";
+	const startTime = Date.now();
 	let percentageToSend = 0;
+	let prettyTotal = "";
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
@@ -242,7 +252,7 @@ export async function makeStream(
 			isDownloading: false,
 		});
 		electronPort.close();
-		clearInterval(interval!);
+		clearInterval(interval);
 
 		currentDownloads.delete(url);
 		dbg(
@@ -265,7 +275,7 @@ export async function makeStream(
 			isDownloading: false,
 		});
 		electronPort.close();
-		clearInterval(interval!);
+		clearInterval(interval);
 
 		// Write media image:
 		await writeTags(saveSite, {
@@ -292,7 +302,7 @@ export async function makeStream(
 			error: err,
 		});
 		electronPort.close();
-		clearInterval(interval!);
+		clearInterval(interval);
 
 		// I only found it to work when I send it with an Error:
 		readStream.destroy(err);
@@ -323,7 +333,7 @@ export async function handleCreateOrCancelConvert(
 		if (!toExtension || !electronPort)
 			return error("Missing required params!", arguments);
 
-		await convertToAudio({ path, toExtension, electronPort });
+		return await convertToAudio({ path, toExtension, electronPort });
 	} else if (destroy) mediasConverting.get(path)!.emit("destroy");
 }
 
@@ -352,8 +362,8 @@ export async function convertToAudio(
 	}
 
 	const saveSite = join(dirs.music, titleWithExtension);
-	const readStream = createReadStream(path);
 	let interval: NodeJS.Timer | undefined = undefined;
+	const readStream = createReadStream(path);
 
 	dbg(`Creating stream for "${path}" to convert to "${toExtension}".`);
 
@@ -392,7 +402,7 @@ export async function convertToAudio(
 			error: err,
 		});
 		electronPort.close();
-		clearInterval(interval!);
+		clearInterval(interval);
 
 		// I only found it to work when I send it with an Error:
 		readStream.destroy(err);
@@ -418,7 +428,7 @@ export async function convertToAudio(
 			isConverting: false,
 		});
 		electronPort.close();
-		clearInterval(interval!);
+		clearInterval(interval);
 
 		// Treat the successfully converted file as a new media...
 		{
@@ -455,7 +465,7 @@ export async function convertToAudio(
 			isConverting: false,
 		});
 		electronPort.close();
-		clearInterval(interval!);
+		clearInterval(interval);
 
 		// I only found it to work when I send it with an Error:
 		readStream.destroy(
@@ -505,7 +515,7 @@ export async function writeTags(
 								data.imageURL as string,
 							);
 
-							await createImage(imgAsString, file);
+							createAndSaveImageOnMedia(imgAsString, file);
 
 							console.assert(
 								file.tag.pictures.length === 1,
@@ -520,7 +530,7 @@ export async function writeTags(
 						// as in: `data:${string};base64,${string}`.
 						data.imageURL!.includes("data:image/") &&
 							data.imageURL!.includes(";base64,") ?
-							await createImage(data.imageURL as ImgString, file) :
+							createAndSaveImageOnMedia(data.imageURL as ImgString, file) :
 							error(`Invalid imgAsString = "${data.imageURL}"!`);
 
 						console.assert(
@@ -606,19 +616,20 @@ export async function writeTags(
 			}
 		});
 
-		file.save();
 		dbg("New file tags =", file.tag);
+
+		// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
+		file.save();
 		file.dispose();
+		//
 	} catch (error) {
 		// Send error to client:
 		sendMsgToClient({
 			type: ElectronToReactMessageEnum.ERROR,
 			error: error as Error,
 		});
-
-		throw error;
 	} finally {
-		if (fileNewPath) {
+		if (fileNewPath)
 			try {
 				await renameFile(mediaPath, fileNewPath);
 
@@ -653,57 +664,47 @@ export async function writeTags(
 					await pathExists(mediaPath),
 				);
 			}
-		} else if (data.isNewMedia) {
+		else if (data.isNewMedia)
 			// Add the new media:
 			sendMsgToClient({
 				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 				mediaPath,
 			});
-		} else {
-			// If everything else fails, refresh media:
+		// If everything else fails, refresh media:
+		else
 			sendMsgToClient({
 				type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
 				mediaPath,
 			});
-		}
 	}
 }
 
-async function createImage(
+export function createAndSaveImageOnMedia(
 	imgAsString: Readonly<ImgString>,
-	file: Readonly<MediaFile>,
-): Promise<void> {
-	try {
-		await new Promise<void>(resolve => {
-			const txtForByteVector = imgAsString.slice(
-				imgAsString.indexOf(",") + 1,
-				imgAsString.length,
-			);
-			const mimeType = imgAsString.slice(
-				imgAsString.indexOf(":") + 1,
-				imgAsString.indexOf(";"),
-			);
+	file: MediaFile,
+): MediaFile {
+	const txtForByteVector = imgAsString.slice(
+		imgAsString.indexOf(",") + 1,
+		imgAsString.length,
+	);
+	const mimeType = imgAsString.slice(
+		imgAsString.indexOf(":") + 1,
+		imgAsString.indexOf(";"),
+	);
 
-			const picture = Picture.fromFullData(
-				ByteVector.fromString(txtForByteVector, StringType.Latin1),
-				PictureType.Media,
-				mimeType,
-				"This image was download when this media was downloaded.",
-			);
-			picture.filename = "thumbnail";
+	const picture = Picture.fromFullData(
+		ByteVector.fromString(txtForByteVector, StringType.Latin1),
+		PictureType.Media,
+		mimeType,
+		"This image was download when this media was downloaded.",
+	);
+	picture.filename = "thumbnail";
 
-			file.tag.pictures = [picture];
+	file.tag.pictures = [picture];
 
-			dbg("At createImage():", {
-				"file.tag.pictures": file.tag.pictures,
-				picture,
-			});
+	dbg("At createImage():", { "file.tag.pictures": file.tag.pictures, picture });
 
-			resolve();
-		});
-	} catch (error) {
-		console.error("Error creating image", error);
-	}
+	return file;
 }
 
 export async function getThumbnail(
@@ -713,13 +714,16 @@ export async function getThumbnail(
 		get(url, res => {
 			res.setEncoding("base64");
 
-			let body = `data:${res.headers["content-type"]};base64,` as const;
+			let body = `data:${res.headers["content-type"]};base64,`;
 
-			res.on("data", chunk => (body += chunk));
+			res.on("data", chunk => {
+				body = body.concat(chunk);
+			});
+
 			res.on("end", () => resolve(body as ImgString));
 		}).on("error", e => {
 			error(`Got error getting image on Electron side: ${e.message}`);
-			reject(e);
+			return reject(e);
 		})
 	);
 }

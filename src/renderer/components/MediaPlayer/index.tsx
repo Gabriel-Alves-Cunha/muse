@@ -20,11 +20,19 @@ import {
 
 import { SquareImage, Wrapper, Info } from "./styles";
 
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+
 export const useProgress = create<Progress>(() => ({
 	currentTime: 0,
 	percentage: 0,
 }));
 const { setState: setProgress } = useProgress;
+
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
 
 export function MediaPlayer() {
 	const { sortedByName: mainList } = usePlaylists();

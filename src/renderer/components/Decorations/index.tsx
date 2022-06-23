@@ -36,11 +36,20 @@ export const Decorations = () => (
 
 const Buttons = () => (
 	<WindowButtonsWrapper className="notransition">
-		<WindowButton data-tip="Close window" onClick={closeWindow} id="close">
+		<WindowButton
+			data-tip="Close window"
+			onClick={closeWindow}
+			data-place="left"
+			id="close"
+		>
 			<Close size={16} />
 		</WindowButton>
 
-		<WindowButton data-tip="Toggle maximize window" onClick={toggleMaximize}>
+		<WindowButton
+			data-tip="Toggle maximize window"
+			onClick={toggleMaximize}
+			data-place="left"
+		>
 			<Maximize size={16} />
 		</WindowButton>
 

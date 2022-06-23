@@ -36,13 +36,13 @@ export function ThemeToggler() {
 	}, []);
 
 	return (
-		<Button data-tip="Toggle theme" onClick={toggleTheme}>
+		<ThemeButton data-tip="Toggle theme" onClick={toggleTheme}>
 			{theme === light ? <Dark size="20px" /> : <Light size="20px" />}
-		</Button>
+		</ThemeButton>
 	);
 }
 
-const Button = styled("button", {
+const ThemeButton = styled("button", {
 	pos: "relative",
 	dflex: "center",
 	size: 50,

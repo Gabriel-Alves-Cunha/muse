@@ -19,7 +19,7 @@ const { currentPlaying, playNextMedia, playThisMedia } = await import(
 );
 const { formatDuration } = await import("@common/utils");
 const { getRandomInt } = await import("@utils/utils");
-import { getFirstKey } from "@utils/map-set";
+const { getFirstKey } = await import("@utils/map-set");
 const {
 	PlaylistActions,
 	PlaylistList,

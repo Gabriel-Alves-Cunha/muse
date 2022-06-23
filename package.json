@@ -1,6 +1,6 @@
 {
 	"name": "muse",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"repository": "https://github.com/Gabriel-Alves-Cunha/muse.git",
 	"description": "Just an Youtube music downloader and player.",
 	"author": "Gabriel Alves Cunha <gabriel925486@outlook.com>",
@@ -48,7 +48,7 @@
 		"electron-run": "^2.3.1",
 		"eslint": "^8.18.0",
 		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-react": "^7.30.0",
+		"eslint-plugin-react": "^7.30.1",
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"happy-dom": "^5.3.1",
 		"js-coroutines": "^2.4.36",

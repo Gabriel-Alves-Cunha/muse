@@ -53,6 +53,12 @@ import {
 	Album,
 } from "./styles";
 
+const { floor } = Math;
+
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+
 function toggleFavorite(path?: Readonly<Path>): void {
 	if (path)
 		setPlaylists({
@@ -61,6 +67,10 @@ function toggleFavorite(path?: Readonly<Path>): void {
 			path,
 		});
 }
+
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
@@ -90,8 +100,8 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
 		<Dialog modal>
-			<DialogTrigger className="on-media-player" data-tip="Open media options">
-				<Dots size={20} />
+			<DialogTrigger className="on-media-player" tooltip="Open media options">
+				<Dots size={19} />
 			</DialogTrigger>
 
 			{media && path && (
@@ -150,28 +160,25 @@ function seek(e: SeekEvent, audio: Audio): void {
 	audio.currentTime = desiredTime;
 }
 
-const { floor } = Math;
-
 export function SeekerWrapper({ audio }: RefToAudio) {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 	const { percentage, currentTime } = useProgress();
 
-	const duration = audio?.duration;
-
 	const { formatedDuration, isDurationValid } = useMemo(() => ({
+		formatedDuration: formatDuration(audio?.duration),
 		// @ts-ignore => It will give false if duration is undefined:
-		isDurationValid: duration > 0 && typeof duration === "number",
-		formatedDuration: formatDuration(duration),
-	}), [duration]);
+		isDurationValid: audio?.duration > 0,
+	}), [audio?.duration]);
 
 	const handleTooltip = useCallback(
 		({ nativeEvent: { offsetX: mouseX } }: SeekEvent): void => {
 			/*
 				- event.offsetX, event.offsetY
-					The X and Y coordinates of the mouse relative
-					to the event source element (srcElement).
+					The X and Y coordinates of the mouse
+					relative to the event source element.
 			*/
+			if (!audio) return;
 			if (!isDurationValid) return;
 			const tooltip = timeTooltipRef.current;
 			const div = progressWrapperRef.current;
@@ -182,15 +189,15 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			mouseX = mouseX < 0 ? 0 : mouseX;
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const time = (mouseXPercentage / 100) * duration!;
+			const time = (mouseXPercentage / 100) * audio.duration;
 			const left = mouseX - (35 >> 1); // 35 is the width of the tooltip.
 			// Also, (35 >> 1) is the half of the width (binary divide by 2).
 
 			tooltip.textContent = formatDuration(time);
 			tooltip.style.left = `${left}px`;
 		},
-		[duration, isDurationValid],
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[isDurationValid],
 	);
 
 	return (

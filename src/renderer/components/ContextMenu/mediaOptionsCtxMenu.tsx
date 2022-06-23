@@ -1,6 +1,6 @@
 import { FiTrash as Trash } from "react-icons/fi";
 
-import { deleteMedia } from "@contexts/mediaHandler/usePlaylists";
+import { deleteMedia } from "@utils/media";
 import { emptySet } from "@utils/map-set";
 import {
 	getAllSelectedMedias,
@@ -32,6 +32,7 @@ async function deleteMedias(): Promise<void> {
 	const promises: Promise<void>[] = [];
 
 	allSelectedMedias.forEach(path => promises.push(deleteMedia(path)));
+
 	setAllSelectedMedias({ allSelectedMedias: emptySet });
 
 	await Promise.all(promises);
