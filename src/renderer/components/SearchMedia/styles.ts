@@ -34,17 +34,17 @@ export const SearchWrapper = styled("div", {
 		},
 	},
 
-	"& svg": { c: "$input-border", cursor: "default", mx: 10 },
+	"& svg": { c: "$input-border", cursor: "default", ml: 10 },
 
 	label: {
 		pos: "absolute",
 		d: "flex", // row
 		alignItems: "center",
-		width: "90%",
+		width: "85%",
 		height,
 
+		l: 10 + 18,
 		bottom: 0,
-		l: 35,
 		r: 0,
 		t: 0,
 
@@ -74,8 +74,16 @@ export const SearchWrapper = styled("div", {
 	},
 
 	input: {
-		width: "82%",
-		height,
+		pos: "absolute",
+		d: "flex", // row
+		alignItems: "center",
+		flex: 1, // occupy all remaining width
+		height: `calc(${height} - 2 * 2px)`, // 2px = border
+
+		l: 10 + 18 + 10,
+		bottom: 0,
+		r: 0,
+		t: 0,
 
 		whiteSpace: "nowrap",
 		c: "$input-text",

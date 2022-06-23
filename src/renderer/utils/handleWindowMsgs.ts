@@ -4,7 +4,7 @@ import { getDownloadingList, setDownloadingList } from "@contexts/downloadList";
 import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { electronSource, type MsgWithSource } from "@common/crossCommunication";
 import { assertUnreachable } from "./utils";
-import { setDownloadInfo } from "@modules/Downloading";
+import { setDownloadInfo } from "@components/Downloading";
 import { ProgressStatus } from "@common/enums";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";

@@ -57,10 +57,16 @@ export const RightSlot = styled("div", {
 	pl: 20,
 
 	c: "$ctx-menu-text",
+	ff: "$secondary",
+	ls: "0.03rem",
+	fs: 15,
+	lh: 1,
 
 	":focus > &": { c: "$ctx-menu-item-text-focus" },
 
 	"[data-disabled] &": { c: "$ctx-menu-item-text-disabled" },
+
+	"&#search": { pr: 10, pl: 0, c: "$input-placeholder" },
 });
 
 export const Item = styled(CtxItem, { ...itemStyles });

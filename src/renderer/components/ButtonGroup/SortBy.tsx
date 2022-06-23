@@ -34,6 +34,7 @@ export function SortBy({ className }: Props) {
 			setValue={setSelectedList as (value: SelectedList) => void}
 			triggerClassName={className}
 			value={selectedList}
+			data-place="bottom"
 			tooltip="Sort by"
 		>
 			<SortIcon size={19} />
@@ -41,6 +42,6 @@ export function SortBy({ className }: Props) {
 	);
 }
 
-type Props = { className?: string; };
+type Props = { className?: string };
 
 type SelectedList = "Name" | "Date";

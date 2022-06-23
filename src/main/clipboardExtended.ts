@@ -4,7 +4,7 @@ import { clipboard } from "electron";
 const clipboardEmitter = new EventEmitter();
 
 let watcherId: NodeJS.Timer | undefined;
-let previousText = clipboard.readText();
+let previousText = "";
 
 (clipboard as ClipboardExtended).on = <T>(
 	eventName: string,
@@ -35,17 +35,16 @@ let previousText = clipboard.readText();
 };
 
 (clipboard as ClipboardExtended).startWatching = () => {
-	if (!watcherId)
-		watcherId = setInterval(() => {
-			if (isTextDiff(previousText, previousText = clipboard.readText()))
-				clipboardEmitter.emit("text-changed");
-		}, 500);
+	watcherId = setInterval(() => {
+		if (isTextDiff(previousText, previousText = clipboard.readText()))
+			clipboardEmitter.emit("text-changed");
+	}, 400);
 
 	return clipboard;
 };
 
 (clipboard as ClipboardExtended).stopWatching = () => {
-	if (watcherId) clearInterval(watcherId);
+	clearInterval(watcherId);
 	watcherId = undefined;
 
 	return clipboard;
@@ -53,7 +52,7 @@ let previousText = clipboard.readText();
 
 const isTextDiff = (str1 = "", str2 = "") => str1 !== str2;
 
-export { clipboard as ExtendedClipboard };
+export { clipboard as extendedClipboard };
 
 // Doing this Partial<{}> so typescript doesn't complain...
 type ClipboardExtended =

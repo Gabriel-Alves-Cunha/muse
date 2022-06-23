@@ -199,7 +199,7 @@ export async function makeStream(
 			// ^ Only in the firt time this 'on progress' fn is called!
 			interval = setInterval(
 				() => electronPort.postMessage({ percentage: percentageToSend }),
-				2_000,
+				1_000,
 			);
 			prettyTotal = prettyBytes(total);
 
@@ -230,7 +230,7 @@ export async function makeStream(
 		}
 	}).on("destroy", async () => {
 		log(
-			"%cDestroy was called on readStream!",
+			`%cDestroy was called on readStream! title: ${title}`,
 			"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
 		);
 
@@ -370,7 +370,7 @@ export async function convertToAudio(
 					electronPort.postMessage({
 						sizeConverted: targetSize,
 						timeConverted: timemark,
-					}), 2_000);
+					}), 1_000);
 
 				// Send a message to client that we're starting a conversion:
 				sendMsgToClient({
@@ -443,7 +443,7 @@ export async function convertToAudio(
 		);
 	}).on("destroy", async () => {
 		log(
-			"%cDestroy was called on readStream for converter!",
+			`%cDestroy was called on readStream for converter! path: ${path}`,
 			"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 		);
 

@@ -6,28 +6,30 @@ import { SiConvertio as ConvertIcon } from "react-icons/si";
 
 import { MainArea } from "@components/MainArea";
 import {
-	type ConvertInfo,
 	useNewConvertions,
-} from "@modules/Converting/helper";
+	type ConvertInfo,
+} from "@components/Converting/helper";
 
-import { OpenFilePickerButton, Box } from "./styles";
+import { Box } from "./styles";
+import { Button } from "@components/Button";
 
 export function Convert() {
 	const [selectedMedias, setSelectedMedias] = useState<[Path, ConvertInfo][]>(
-		[],
+		[]
 	);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	function handleSelectedFiles(
-		{ target: { files } }: ChangeEvent<HTMLInputElement>,
-	) {
+	function handleSelectedFiles({
+		target: { files },
+	}: ChangeEvent<HTMLInputElement>) {
 		if (!files?.length) return;
 
 		setSelectedMedias(
-			[...files].map(
-				file => [file.path, { canStartConvert: true, toExtension }]
-			),
+			[...files].map(file => [
+				file.path,
+				{ canStartConvert: true, toExtension },
+			])
 		);
 	}
 
@@ -47,12 +49,12 @@ export function Convert() {
 	return (
 		<MainArea>
 			<Box>
-				<OpenFilePickerButton
+				<Button
 					onClick={openChooseFilesNativeUI}
 					className="notransition"
+					variant="large"
 				>
 					<ConvertIcon size={18} />
-
 					<input
 						onChange={handleSelectedFiles}
 						accept="video/*,audio/*"
@@ -61,7 +63,7 @@ export function Convert() {
 						multiple
 					/>
 					Select media(s) to convert
-				</OpenFilePickerButton>
+				</Button>
 			</Box>
 		</MainArea>
 	);

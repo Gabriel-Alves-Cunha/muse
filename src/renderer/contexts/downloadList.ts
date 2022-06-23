@@ -1,4 +1,4 @@
-import type { MediaBeingDownloaded } from "@modules/Downloading";
+import type { MediaBeingDownloaded } from "@components/Downloading";
 
 import create from "zustand";
 

@@ -7,7 +7,7 @@ import { searchLocalComputerForMedias } from "@contexts/mediaHandler/usePlaylist
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { Decorations } from "@components/Decorations";
 import { ContextMenu } from "@components/ContextMenu";
-import { MediaPlayer } from "@modules/MediaPlayer";
+import { MediaPlayer } from "@components/MediaPlayer";
 import { Favorites } from "@routes/Favorites";
 import { GlobalCSS } from "@styles/global";
 import { Download } from "@routes/Download";
@@ -15,7 +15,7 @@ import { Content } from "@styles/appStyles";
 import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
-import { Navbar } from "@modules/Navbar";
+import { Navbar } from "@components/Navbar";
 import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";

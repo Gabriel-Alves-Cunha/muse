@@ -18,10 +18,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			transitions: {
 				boxShadow: "box-shadow .2s ease-in-out 20ms",
 				bgc: "background-color .1s ease-in-out 20ms",
-				scale: "transform .2s ease-in-out 20ms",
-				opacity: "opacity .1s ease-in-out 20ms",
 				color: "color .1s ease-in-out 20ms",
-				filter: "filter .2s ease 20ms",
 			},
 			fonts: {
 				primary: "'Assistant', sans-serif",

@@ -17,10 +17,10 @@ import {
 	mainList,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
+	computeHistoryItemKey,
 	getAllSelectedMedias,
 	setAllSelectedMedias,
 	selectMediaOrMedias,
-	computeHistoryItemKey,
 	computeItemKey,
 	reloadWindow,
 	itemContent,

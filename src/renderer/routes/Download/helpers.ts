@@ -1,6 +1,6 @@
 import create from "zustand";
 
-import { setDownloadInfo } from "@modules/Downloading";
+import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
 

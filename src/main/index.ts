@@ -162,7 +162,7 @@ app.on("window-all-closed", () => {
 	 */
 	try {
 		const extendedClipboard = (await import("./clipboardExtended"))
-			.ExtendedClipboard as ClipboardExtended;
+			.extendedClipboard as ClipboardExtended;
 
 		extendedClipboard.on("text-changed", async () => {
 			const url = extendedClipboard.readText("clipboard");

@@ -7,7 +7,7 @@ import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { errorToast, infoToast, successToast } from "@styles/global";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
-import { handleOnClose } from "@modules/Converting/helper";
+import { handleOnClose } from "@components/Converting/helper";
 import { Progress } from "@components/Progress";
 import { dbg } from "@common/utils";
 import {
@@ -16,7 +16,7 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { CancelButton } from "@modules/Converting/styles";
+import { CancelButton } from "@components/Converting/styles";
 import {
 	TitleAndCancelWrapper,
 	CleanAllDoneButton,
@@ -42,7 +42,7 @@ export function Popup() {
 
 									<CancelButton
 										onClick={e =>
-											handleDeleteAnimation(e, downloadingIndex, true, url)}
+											handleSingleItemDeleteAnimation(e, downloadingIndex, true, url)}
 										className="cancel-button notransition"
 										data-tip="Cancel/Remove download"
 									>
@@ -252,7 +252,7 @@ export function cancelConvertionAndOrRemoveItFromList(
 }
 
 const className = `.${ItemWrapper.className}`;
-export function handleDeleteAnimation(
+export function handleSingleItemDeleteAnimation(
 	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
 	downloadingOrConvertionIndex: Readonly<number>,
 	isDownloadList: Readonly<boolean>,

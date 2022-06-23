@@ -9,9 +9,9 @@ import {
 	MdHistory as History,
 } from "react-icons/md";
 
-import { ThemeToggler } from "@modules/ThemeToggler";
-import { Downloading } from "@modules/Downloading";
-import { Converting } from "@modules/Converting";
+import { ThemeToggler } from "@components/ThemeToggler";
+import { Downloading } from "@components/Downloading";
+import { Converting } from "@components/Converting";
 import { usePage } from "@contexts/page";
 import { pages } from "@utils/app";
 

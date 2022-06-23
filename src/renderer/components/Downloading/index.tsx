@@ -23,7 +23,7 @@ const defaultDownloadInfo: DownloadInfo = Object.freeze({
 	url: "",
 });
 
-export const useDownloadInfo = create<DownloadInfo>(() => defaultDownloadInfo);
+export const useDownloadInfo = create(() => defaultDownloadInfo);
 export const { setState: setDownloadInfo } = useDownloadInfo;
 
 export function Downloading() {

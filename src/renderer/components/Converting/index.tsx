@@ -21,7 +21,6 @@ export function Converting() {
 
 	useEffect(() => {
 		newConvertions.forEach((newConvertion, path) => {
-			console.log("inside forEach newConvertion:", { newConvertion, path });
 			if (newConvertion.canStartConvert)
 				try {
 					const electronPort = createNewConvertion(newConvertion, path);
@@ -29,11 +28,11 @@ export function Converting() {
 					// Sending port so we can communicate with electron:
 					sendMsgToBackend(
 						{ type: ReactToElectronMessageEnum.CONVERT_MEDIA },
-						electronPort,
+						electronPort
 					);
 				} catch (error) {
 					errorToast(
-						`There was an error trying to convert "${path}"! Please, try again later.`,
+						`There was an error trying to convert "${path}"! Please, try again later.`
 					);
 
 					console.error(error);
@@ -59,9 +58,11 @@ export function Converting() {
 			<PopoverAnchor />
 
 			<PopoverContent
-				size={convertingListSize === 0 ?
-					"nothing-found-for-convertions-or-downloads" :
-					"convertions-or-downloads"}
+				size={
+					convertingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}
 				alignOffset={14}
 			>
 				<Popup />

@@ -15,10 +15,11 @@ export function Reload({ className }: Props) {
 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
 			onClick={searchLocalComputerForMedias}
 			data-tip="Reload all medias"
+			data-place="bottom"
 		>
 			<ReloadIcon size={17} />
 		</Button>
 	);
 }
 
-type Props = { className?: string; };
+type Props = { className?: string };
