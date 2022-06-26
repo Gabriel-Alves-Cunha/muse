@@ -1,5 +1,6 @@
 import type { Page } from "@common/@types/generalTypes";
 
+import { GrShareOption as Share } from "react-icons/gr";
 import {
 	MdOutlineVideoLibrary as Home,
 	MdOutlineSettings as Settings,
@@ -9,15 +10,13 @@ import {
 	MdHistory as History,
 } from "react-icons/md";
 
+import { setPage, usePage } from "@contexts/page";
 import { ThemeToggler } from "@components/ThemeToggler";
 import { Downloading } from "@components/Downloading";
 import { Converting } from "@components/Converting";
-import { usePage } from "@contexts/page";
 import { pages } from "@utils/app";
 
-import { Nav, Buttons, Popups } from "./styles";
-
-const { setState: setPage } = usePage;
+import { Nav, Buttons, PopupsWrapper } from "./styles";
 
 export const Navbar = () => (
 	<Nav className="notransition">
@@ -25,11 +24,11 @@ export const Navbar = () => (
 
 		<ButtonsForPages />
 
-		<Popups>
+		<PopupsWrapper>
 			<Converting />
 
 			<Downloading />
-		</Popups>
+		</PopupsWrapper>
 	</Nav>
 );
 
@@ -39,6 +38,7 @@ const icons: Record<Page, JSX.Element> = Object.freeze({
 	Settings: <Settings />,
 	History: <History />,
 	Convert: <Convert />,
+	Share: <Share />,
 	Home: <Home />,
 });
 

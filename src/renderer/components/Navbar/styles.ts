@@ -38,4 +38,4 @@ export const Buttons = styled("div", {
 	},
 });
 
-export const Popups = styled("div", { dcolumn: "center", w: "100%" });
+export const PopupsWrapper = styled("div", { dcolumn: "center", w: "100%" });

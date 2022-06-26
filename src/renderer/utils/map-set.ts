@@ -14,7 +14,7 @@ export function getFirstKey<Key>(
 	return ret;
 }
 
-const getLastIn = (iteratorFn: "entries" | "keys" | "values") =>
+const getLastOf = (iteratorFn: "entries" | "keys" | "values") =>
 	<K, V>(map: ReadonlyMap<K, V> | Set<K>) => {
 		const mapIterator = map[iteratorFn]();
 		let curr;
@@ -24,6 +24,6 @@ const getLastIn = (iteratorFn: "entries" | "keys" | "values") =>
 
 		return last;
 	};
-export const getLastItem = getLastIn("entries");
-export const getLastValue = getLastIn("values");
-export const getLastKey = getLastIn("keys");
+export const getLastItem = getLastOf("entries");
+export const getLastValue = getLastOf("values");
+export const getLastKey = getLastOf("keys");
