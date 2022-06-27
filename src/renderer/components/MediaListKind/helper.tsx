@@ -3,8 +3,8 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import { BsThreeDotsVertical as Dots } from "react-icons/bs";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
-import { memo, useRef } from "react";
 import { Dialog, Portal } from "@radix-ui/react-dialog";
+import { memo, useRef } from "react";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";

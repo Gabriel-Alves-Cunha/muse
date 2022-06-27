@@ -4,6 +4,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
+import { turnServerOn, makeItOnlyOneFile } from "./preload/share";
 import { assertUnreachable } from "@utils/utils";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
@@ -44,6 +45,7 @@ const electron: VisibleElectron = Object.freeze({
 	},
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
+	share: { turnServerOn, makeItOnlyOneFile },
 	os: { dirs },
 });
 
@@ -63,7 +65,7 @@ window.addEventListener("message", handleMsgsFromRendererProcess);
 
 // Handle messages from the renderer process:
 async function handleMsgsFromRendererProcess(
-	event: Readonly<MessageEvent<MsgWithSource<MsgObjectReactToElectron>>>,
+	event: CrossWindowEvent,
 ): Promise<void> {
 	if (event.data.source !== reactSource) return;
 
@@ -147,3 +149,7 @@ async function handleMsgsFromRendererProcess(
 }
 
 const handleClosePort = (): void => dbg("Closing ports (electronPort).");
+
+type CrossWindowEvent = Readonly<
+	MessageEvent<MsgWithSource<MsgObjectReactToElectron>>
+>;

@@ -1,9 +1,13 @@
-import type { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Path } from "@common/@types/generalTypes";
 
-import { createServer } from "https";
+import { createServer } from "node:https";
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
 
-const port = 8080;
+import { port } from "@common/crossCommunication";
+
+const execCmd = promisify(exec);
 
 export function turnServerOn(filePath: Path): TurnServerOffFunction {
 	const server = createServer(requestListener);
@@ -23,8 +27,22 @@ export function turnServerOn(filePath: Path): TurnServerOffFunction {
 	return () => server.close();
 }
 
-type TurnServerOffFunction = () => void;
+export async function makeItOnlyOneFile(filepaths: Path[]): Promise<Path> {
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	if (filepaths.length === 1) return filepaths[0]!;
 
-// function fileHandler() {
-// 	server.
-// }
+	const mediasDir = "medias";
+	const zipFile = `${mediasDir}.zip` as const;
+
+	// Else, make a zip file:
+	const { stdout, stderr } = await execCmd(
+		`zip -0 -v ${mediasDir} ${filepaths.join(" ")}`,
+	);
+
+	console.log(stdout);
+	console.log(stderr);
+
+	return zipFile;
+}
+
+export type TurnServerOffFunction = () => void;

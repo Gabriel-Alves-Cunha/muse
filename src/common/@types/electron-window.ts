@@ -1,4 +1,5 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
+import type { TurnServerOffFunction } from "@main/preload/share";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
 
@@ -38,12 +39,19 @@ export type VisibleElectron = Readonly<
 				getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
 			}
 		>;
+		share: Readonly<
+			{
+				turnServerOn(filePath: Path): TurnServerOffFunction;
+				makeItOnlyOneFile(filepaths: Path[]): Promise<Path>;
+			}
+		>;
 	}
 >;
 
 export enum ReactToElectronMessageEnum {
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
 	CONVERT_MEDIA = "convert media",
+	SHARE_MEDIAS = "share medias",
 	WRITE_TAG = "write tag",
 	ERROR = "error",
 }
@@ -53,6 +61,7 @@ export type MetadataToChange = Readonly<
 >[];
 
 export type MsgObjectReactToElectron =
+	| Readonly<{ type: ReactToElectronMessageEnum.SHARE_MEDIAS; files: Path[]; }>
 	| Readonly<{ type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD; }>
 	| Readonly<{ type: ReactToElectronMessageEnum.CONVERT_MEDIA; }>
 	| Readonly<
@@ -69,6 +78,7 @@ export enum ElectronToReactMessageEnum {
 	CREATE_CONVERSION_FAILED = "create conversion failed",
 	CREATE_DOWNLOAD_FAILED = "create download failed",
 	NEW_COVERSION_CREATED = "new conversion created",
+	MAKE_QR_CODE_TO_SHARE = "make QR Code to share",
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
 	NEW_DOWNLOAD_CREATED = "new download created",
 	REFRESH_ALL_MEDIA = "refresh all media",
@@ -84,6 +94,9 @@ export type MsgObjectElectronToReact =
 			type: ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
 			mediaPath: Path;
 		}
+	>
+	| Readonly<
+		{ type: ElectronToReactMessageEnum.MAKE_QR_CODE_TO_SHARE; url: string; }
 	>
 	| Readonly<
 		{

@@ -16,7 +16,6 @@ import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
-import { Share } from "@routes/Share";
 import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";
@@ -79,7 +78,6 @@ const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Download: <Download />,
 	Convert: <Convert />,
 	History: <History />,
-	Share: <Share />,
 	Home: <Home />,
 });
 

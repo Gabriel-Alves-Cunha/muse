@@ -17,8 +17,6 @@ export function Converting() {
 	const { newConvertions } = useNewConvertions();
 	const [isOpen, setIsOpen] = useState(false);
 
-	const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
-
 	useEffect(() => {
 		newConvertions.forEach((newConvertion, path) => {
 			if (newConvertion.canStartConvert)
@@ -45,7 +43,7 @@ export function Converting() {
 	}, [newConvertions]);
 
 	return (
-		<PopoverRoot open={isOpen} onOpenChange={toggleIsOpen}>
+		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
 			<StyledPopoverTrigger
 				className={convertingListSize ? "has-items " : ""}
 				data-tip="Show all converting medias"
@@ -58,9 +56,11 @@ export function Converting() {
 			<PopoverAnchor />
 
 			<PopoverContent
-				size={convertingListSize === 0 ?
-					"nothing-found-for-convertions-or-downloads" :
-					"convertions-or-downloads"}
+				size={
+					convertingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}
 				alignOffset={14}
 			>
 				<Popup />

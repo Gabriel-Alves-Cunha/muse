@@ -1,6 +1,5 @@
 import type { Page } from "@common/@types/generalTypes";
 
-import { GrShareOption as Share } from "react-icons/gr";
 import {
 	MdOutlineVideoLibrary as Home,
 	MdOutlineSettings as Settings,
@@ -38,7 +37,6 @@ const icons: Record<Page, JSX.Element> = Object.freeze({
 	Settings: <Settings />,
 	History: <History />,
 	Convert: <Convert />,
-	Share: <Share />,
 	Home: <Home />,
 });
 
