@@ -56,11 +56,9 @@ export function Converting() {
 			<PopoverAnchor />
 
 			<PopoverContent
-				size={
-					convertingListSize === 0
-						? "nothing-found-for-convertions-or-downloads"
-						: "convertions-or-downloads"
-				}
+				size={convertingListSize === 0 ?
+					"nothing-found-for-convertions-or-downloads" :
+					"convertions-or-downloads"}
 				alignOffset={14}
 			>
 				<Popup />

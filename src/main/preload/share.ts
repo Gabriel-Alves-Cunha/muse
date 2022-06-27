@@ -1,19 +1,21 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Path } from "@common/@types/generalTypes";
 
-import { createServer } from "node:https";
+import { createServer, type Server } from "node:https";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 
 import { port } from "@common/crossCommunication";
+import { time } from "@utils/utils";
 
 const execCmd = promisify(exec);
 
-export function turnServerOn(filePath: Path): TurnServerOffFunction {
+export function turnServerOn(filePath: Path): TurnServerOnResponse {
+	let myIpAddress: string | undefined;
 	const server = createServer(requestListener);
 
 	function requestListener(req: IncomingMessage, res: ServerResponse) {
-		const myIpAddress = req.socket.localAddress;
+		myIpAddress = req.socket.localAddress;
 
 		res.setHeader("Content-Disposition", `attachment;filename=${filePath}`);
 		res.setHeader("Content-Type", "application/octet-stream");
@@ -24,9 +26,17 @@ export function turnServerOn(filePath: Path): TurnServerOffFunction {
 		console.log(`Server is running on port ${port}`);
 	});
 
-	return () => server.close();
+	if (!myIpAddress) {
+		server.close();
+		throw new Error(
+			"No IP address found. Without it, the QR code cannot be made!",
+		);
+	}
+
+	return { turnServerOff: () => server.close(), myIpAddress };
 }
 
+// TODO: if ever to make Muse for Windows, see to make this portable!
 export async function makeItOnlyOneFile(filepaths: Path[]): Promise<Path> {
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	if (filepaths.length === 1) return filepaths[0]!;
@@ -35,14 +45,20 @@ export async function makeItOnlyOneFile(filepaths: Path[]): Promise<Path> {
 	const zipFile = `${mediasDir}.zip` as const;
 
 	// Else, make a zip file:
-	const { stdout, stderr } = await execCmd(
-		`zip -0 -v ${mediasDir} ${filepaths.join(" ")}`,
+	time(
+		() =>
+			execCmd(`zip -0 -v ${mediasDir} ${filepaths.join(" ")}`).then(
+				({ stdout, stderr }) => {
+					console.log(stdout);
+					console.log(stderr);
+				},
+			),
+		"async exec",
 	);
-
-	console.log(stdout);
-	console.log(stderr);
 
 	return zipFile;
 }
 
-export type TurnServerOffFunction = () => void;
+export type TurnServerOnResponse = Readonly<
+	{ turnServerOff(): Server; myIpAddress: string; }
+>;

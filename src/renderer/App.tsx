@@ -16,6 +16,7 @@ import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
+import { Share } from "@components/Share";
 import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";
@@ -47,6 +48,8 @@ export function App() {
 				multiline
 				border
 			/>
+
+			<Share />
 
 			<Decorations />
 

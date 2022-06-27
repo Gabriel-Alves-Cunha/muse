@@ -1,11 +1,14 @@
-import type { TurnServerOffFunction } from "@main/preload/share";
-import type { Path } from "@common/@types/generalTypes";
+import type { TurnServerOnResponse } from "@main/preload/share";
 
 import { Root as PopoverRoot } from "@radix-ui/react-popover";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { MdClose as Close } from "react-icons/md";
 import { toCanvas } from "qrcode";
 
+import { setSettings, useSettings } from "@contexts/settings";
+import { port } from "@common/crossCommunication";
+
+import { Loading } from "@styles/appStyles";
 import {
 	ClosePopoverTrigger,
 	PopoverContent,
@@ -17,28 +20,33 @@ const { turnServerOn, makeItOnlyOneFile } = electron.share;
 
 const qrid = "qrcode-canvas";
 
-export function Share({ files }: Props) {
-	const turnServerOffRef = useRef<TurnServerOffFunction | null>(null);
-	const [isOpen, setIsOpen] = useState(false);
+export function Share() {
+	const serverResponseRef = useRef<TurnServerOnResponse | null>(null);
+	const { files, open } = useSettings().share;
 
 	useEffect(() => {
-		switch (isOpen) {
-			case true: {
-				const onlyOneFile = makeItOnlyOneFile(files);
+		(async () => {
+			if (open) {
+				const onlyOneFile = await makeItOnlyOneFile(files);
 
-				turnServerOffRef.current = turnServerOn(onlyOneFile);
-				break;
-			}
+				if (!onlyOneFile)
+					return console.error("There should be a file to share:", {
+						onlyOneFile,
+					});
 
-			default: {
-				turnServerOffRef.current?.();
-				break;
+				serverResponseRef.current = turnServerOn(onlyOneFile);
+
+				const url = `https://${serverResponseRef.current.myIpAddress}:${port}`;
+
+				await makeQrcode(url);
+			} else {
+				serverResponseRef.current?.turnServerOff();
 			}
-		}
-	}, [files, isOpen]);
+		})();
+	}, [files, open]);
 
 	return (
-		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
+		<PopoverRoot open={open} onOpenChange={openOrCloseSharePopup}>
 			<PopoverAnchor />
 
 			<PopoverContent>
@@ -46,27 +54,29 @@ export function Share({ files }: Props) {
 					<Close />
 				</ClosePopoverTrigger>
 
-				<Canvas id={qrid}></Canvas>
+				<Canvas id={qrid}>
+					<Loading />
+				</Canvas>
 			</PopoverContent>
 		</PopoverRoot>
 	);
 }
 
 async function makeQrcode(url: string) {
-	try {
-		const canvasElement = document.getElementById(qrid) as HTMLCanvasElement;
+	const canvasElement = document.getElementById(qrid) as HTMLCanvasElement;
 
-		const generatedQrcode = await toCanvas(canvasElement, url, {
-			errorCorrectionLevel: "H",
-			width: 400,
-		});
+	const generatedQrcode = await toCanvas(canvasElement, url, {
+		errorCorrectionLevel: "H",
+		width: 400,
+	}).catch(error => console.error("Error making QR Code.", error));
 
-		console.log({ generatedQrcode, canvasElement });
-	} catch (error) {
-		console.error("Error making QR Code.", error);
-	}
+	console.log({ generatedQrcode, canvasElement });
 }
 
-type Props = Readonly<{
-	files: Path[];
-}>;
+function openOrCloseSharePopup(newValue: boolean) {
+	newValue
+		? setSettings(prev => ({
+				share: { open: true, files: prev.share.files },
+		  }))
+		: setSettings({ share: { open: false, files: [] } });
+}

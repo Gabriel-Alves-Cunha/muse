@@ -1,5 +1,5 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
-import type { TurnServerOffFunction } from "@main/preload/share";
+import type { TurnServerOnResponse } from "@main/preload/share";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
 
@@ -41,7 +41,7 @@ export type VisibleElectron = Readonly<
 		>;
 		share: Readonly<
 			{
-				turnServerOn(filePath: Path): TurnServerOffFunction;
+				turnServerOn(filePath: Path): TurnServerOnResponse;
 				makeItOnlyOneFile(filepaths: Path[]): Promise<Path>;
 			}
 		>;
@@ -51,7 +51,6 @@ export type VisibleElectron = Readonly<
 export enum ReactToElectronMessageEnum {
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
 	CONVERT_MEDIA = "convert media",
-	SHARE_MEDIAS = "share medias",
 	WRITE_TAG = "write tag",
 	ERROR = "error",
 }
@@ -61,7 +60,6 @@ export type MetadataToChange = Readonly<
 >[];
 
 export type MsgObjectReactToElectron =
-	| Readonly<{ type: ReactToElectronMessageEnum.SHARE_MEDIAS; files: Path[]; }>
 	| Readonly<{ type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD; }>
 	| Readonly<{ type: ReactToElectronMessageEnum.CONVERT_MEDIA; }>
 	| Readonly<
