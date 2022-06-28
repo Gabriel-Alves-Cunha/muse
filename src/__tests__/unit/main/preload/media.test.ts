@@ -5,23 +5,17 @@ import type { ImgString } from "@common/@types/electron-window";
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../../mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
+//
 
 import { readFile, rename as renameFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
 import { resolve } from "node:path";
 
-const { writeTags } = await import("@main/preload/media");
+import { mediaPath, mediaPicture, test_assets } from "./utils";
+import { dbgTests } from "@common/utils";
 
-const originalTitle = "audio for tests" as const;
-const mediaPath = resolve(
-	__dirname,
-	"..",
-	"..",
-	"..",
-	"test_assets",
-	`${originalTitle}.mp3`,
-);
+const { writeTags } = await import("@main/preload/media");
 
 /////////////////////////////////////////////////////////
 // Testing #writeTags()
@@ -32,14 +26,9 @@ describe("It should account for the switch possibilities and the message sending
 		// This test will change the basename of the file, that's why, at the end, we change it back.
 
 		const changedData = Object.freeze({ title: "test title" as const });
-		const changedPath = resolve(
-			__dirname,
-			"..",
-			"..",
-			"..",
-			"test_assets",
-			`${changedData.title}.mp3`,
-		);
+		const changedPath = resolve(test_assets, `${changedData.title}.mp3`);
+
+		dbgTests({ changedPath });
 
 		try {
 			// Changing the title and basename of the file:
@@ -89,15 +78,7 @@ describe("It should account for the switch possibilities and the message sending
 	});
 
 	it("Should be able to write the tag 'imageURL' to a file.", async () => {
-		const imgPath = resolve(
-			__dirname,
-			"..",
-			"..",
-			"..",
-			"test_assets",
-			"img for tests.png",
-		);
-		const imgContents = await readFile(imgPath, { encoding: "base64" });
+		const imgContents = await readFile(mediaPicture, { encoding: "base64" });
 		const imgAsString: ImgString = `data:image/png;base64,${imgContents}`;
 
 		const data = Object.freeze({ imageURL: imgAsString });
@@ -109,16 +90,3 @@ describe("It should account for the switch possibilities and the message sending
 		expect(pictures[0].data.toString()).toBe(imgContents);
 	});
 });
-
-/////////////////////////////////////////////////////////
-// Testing #getThumbnail()
-/////////////////////////////////////////////////////////
-
-// describe("Testing #getThumbnail()", () => {
-// 	it("should get a response like: 'data:${res.headers['content-type']};base64,'", async () => {
-// 		// const imgAsString = await getThumbnail();
-
-// 		expect(imgAsString).includes("data:image/png");
-// 		expect(imgAsString).includes(";base64,");
-// 	});
-// });
