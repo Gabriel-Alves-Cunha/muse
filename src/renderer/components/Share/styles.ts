@@ -8,12 +8,12 @@ import {
 	slideUpAndFade,
 } from "@components/Popover/styles";
 
-export const Canvas = styled("canvas", { size: 400 });
+export const Canvas = styled("canvas", { size: 300 });
 
 export const PopoverAnchor = styled(Anchor, {
-	pos: "relative",
+	pos: "fixed",
+	bottom: 10,
 	left: 10,
-	t: 10,
 });
 
 export const ClosePopoverTrigger = styled(Close, {
@@ -26,7 +26,6 @@ export const ClosePopoverTrigger = styled(Close, {
 	t: 10,
 
 	cursor: "pointer",
-	p: "0 15px",
 	b: "none",
 	br: "50%",
 
@@ -48,7 +47,6 @@ export const PopoverContent = styled(Content, {
 	bg: "$bg-popover",
 	ox: "hidden",
 	br: 10,
-	p: 10,
 
 	boxShadow: "$popover",
 

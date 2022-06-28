@@ -153,11 +153,6 @@ export function selectMediaOrMedias(e: React.MouseEvent<HTMLSpanElement>) {
 
 	allMediaPaths.push(itemClickedMediaPath);
 
-	// Clear all selected medias:
-	// const allMedias = document.querySelectorAll(className);
-	// allMedias.forEach(media => media.classList.remove("selected"));
-	// allSelectedMedias.clear();
-
 	// Add className "selected" to the clicked media:
 	itemClicked.classList.add("selected");
 
@@ -209,7 +204,7 @@ export const computeHistoryItemKey = (
 	_index: number,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	[path, _, date]: [Path, Media, DateAsNumber],
-) => path + date;
+) => `${path} ${date}`;
 export const itemContent = (
 	_index: number,
 	[path, media]: [Path, Media, DateAsNumber],
@@ -217,6 +212,10 @@ export const itemContent = (
 
 export const reloadWindow = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 type RowProps = Readonly<{ media: Media; path: Path; }>;
 

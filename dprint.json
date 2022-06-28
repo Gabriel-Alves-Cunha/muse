@@ -3,8 +3,8 @@
 		"https://plugins.dprint.dev/typescript-0.69.1.wasm",
 		"https://plugins.dprint.dev/json-0.15.3.wasm"
 	],
-	"includes": ["src/**/*.{ts,tsx,js,jsx,json}"],
-	"excludes": ["**/node_modules", "**/*-lock.json"],
+	"includes": ["*.{ts,tsx,js,jsx,json}"],
+	"excludes": ["node_modules", "*-lock.json", "dist", "app"],
 	"lineWidth": 80,
 	"useTabs": true,
 	"indentWidth": 2,

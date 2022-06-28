@@ -1,5 +1,5 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
-import type { TurnServerOnResponse } from "@main/preload/share";
+import type { TurnServerOffFunction } from "@main/preload/share";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { videoInfo } from "ytdl-core";
 
@@ -15,18 +15,18 @@ export type VisibleElectron = Readonly<
 		notificationApi: Readonly<
 			{
 				sendNotificationToElectronIpcMainProcess(
-					type: ElectronIpcMainProcessNotificationEnum,
+					type: Readonly<ElectronIpcMainProcessNotificationEnum>,
 				): void;
 			}
 		>;
 		fs: Readonly<
 			{
 				getFullPathOfFilesForFilesInThisDirectory(
-					dir: Path,
+					dir: Readonly<Path>,
 				): Promise<readonly Path[]>;
-				readFile(path: Path): Promise<Readonly<Buffer | undefined>>;
-				deleteFile(path: Path): Promise<Readonly<boolean>>;
-				readdir(dir: Path): Promise<readonly Path[]>;
+				readFile(path: Readonly<Path>): Promise<Readonly<Buffer | undefined>>;
+				deleteFile(path: Readonly<Path>): Promise<Readonly<boolean>>;
+				readdir(dir: Readonly<Path>): Promise<readonly Path[]>;
 			}
 		>;
 		media: Readonly<
@@ -36,13 +36,16 @@ export type VisibleElectron = Readonly<
 					assureMediaSizeIsGreaterThan60KB?: Readonly<boolean>,
 					ignoreMediaWithLessThan60Seconds?: Readonly<boolean>,
 				): Promise<readonly [Path, Media][]>;
-				getBasicInfo(url: string): Promise<Readonly<videoInfo>>;
+				getBasicInfo(url: Readonly<string>): Promise<Readonly<videoInfo>>;
 			}
 		>;
 		share: Readonly<
 			{
-				turnServerOn(filePath: Path): TurnServerOnResponse;
-				makeItOnlyOneFile(filepaths: Path[]): Promise<Path>;
+				turnServerOn(filePath: Readonly<Path>): TurnServerOffFunction;
+				getMyIpAddress(): Readonly<string>;
+				makeItOnlyOneFile(
+					filepaths: ReadonlySet<Path>,
+				): Promise<Readonly<Path>>;
 			}
 		>;
 	}
@@ -76,7 +79,6 @@ export enum ElectronToReactMessageEnum {
 	CREATE_CONVERSION_FAILED = "create conversion failed",
 	CREATE_DOWNLOAD_FAILED = "create download failed",
 	NEW_COVERSION_CREATED = "new conversion created",
-	MAKE_QR_CODE_TO_SHARE = "make QR Code to share",
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
 	NEW_DOWNLOAD_CREATED = "new download created",
 	REFRESH_ALL_MEDIA = "refresh all media",
@@ -92,9 +94,6 @@ export type MsgObjectElectronToReact =
 			type: ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
 			mediaPath: Path;
 		}
-	>
-	| Readonly<
-		{ type: ElectronToReactMessageEnum.MAKE_QR_CODE_TO_SHARE; url: string; }
 	>
 	| Readonly<
 		{

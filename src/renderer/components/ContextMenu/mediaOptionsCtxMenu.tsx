@@ -1,6 +1,8 @@
+import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
 
 import { deleteMedia } from "@utils/media";
+import { setSettings } from "@contexts/settings";
 import { emptySet } from "@utils/map-set";
 import {
 	getAllSelectedMedias,
@@ -12,18 +14,31 @@ import { RightSlot, Item } from "./styles";
 
 export function MediaOptionsCtxMenu() {
 	const { allSelectedMedias } = useAllSelectedMedias();
-	const isPlural = allSelectedMedias.size > 1;
+	const plural = allSelectedMedias.size > 1 ? "s" : "";
 
 	return (
 		<>
 			<Item onClick={deleteMedias} className="notransition">
-				Delete media{isPlural ? "s" : ""}
+				Delete media{plural}
 				<RightSlot>
 					<Trash />
 				</RightSlot>
 			</Item>
+
+			<Item onClick={shareMedias} className="notransition">
+				Share media{plural}
+				<RightSlot>
+					<Share />
+				</RightSlot>
+			</Item>
 		</>
 	);
+}
+
+function shareMedias() {
+	const { allSelectedMedias } = getAllSelectedMedias();
+
+	setSettings({ filesToShare: allSelectedMedias });
 }
 
 async function deleteMedias(): Promise<void> {

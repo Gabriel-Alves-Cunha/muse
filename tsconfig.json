@@ -71,12 +71,12 @@
 		"lib": [
 			"DOM.Iterable",
 			"ESNext",
-			"DOM",
-		],
+			"DOM"
+		]
 	},
 	"exclude": [
 		"node_modules",
 		"app",
 		"out"
-	],
+	]
 }

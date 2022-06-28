@@ -4,10 +4,14 @@ import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
-import { turnServerOn, makeItOnlyOneFile } from "./preload/share";
 import { assertUnreachable } from "@utils/utils";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
+import {
+	makeItOnlyOneFile,
+	getMyIpAddress,
+	turnServerOn,
+} from "./preload/share";
 import {
 	type MsgObjectReactToElectron,
 	type VisibleElectron,
@@ -44,8 +48,8 @@ const electron: VisibleElectron = Object.freeze({
 		readdir,
 	},
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
+	share: { turnServerOn, makeItOnlyOneFile, getMyIpAddress },
 	media: { transformPathsToMedias, getBasicInfo },
-	share: { turnServerOn, makeItOnlyOneFile },
 	os: { dirs },
 });
 

@@ -1,4 +1,4 @@
-import { configDefaults, defineConfig} from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
@@ -29,9 +29,7 @@ export default defineConfig({
 	// @ts-ignore => This shouldn't be giving an error, it works...
 	plugins: [react()],
 	root: rendererPath,
-	define: {
-		"import.meta.vitest": "undefined",
-	},
+	define: { "import.meta.vitest": "undefined" },
 	base: "./",
 	build: {
 		outDir: outDirRenderer,
@@ -55,23 +53,12 @@ export default defineConfig({
 		format: "esm",
 		minify: true,
 	},
-	css: {
-		devSourcemap: true,
-	},
+	css: { devSourcemap: true },
 	resolve: {
 		alias: [
-			{
-				find: "@renderer",
-				replacement: resolve(__dirname, "src/renderer"),
-			},
-			{
-				find: "@common",
-				replacement: resolve(__dirname, "src/common"),
-			},
-			{
-				find: "@main",
-				replacement: resolve(__dirname, "src/main"),
-			},
+			{ find: "@renderer", replacement: resolve(__dirname, "src/renderer") },
+			{ find: "@common", replacement: resolve(__dirname, "src/common") },
+			{ find: "@main", replacement: resolve(__dirname, "src/main") },
 			{
 				find: "@contexts",
 				replacement: resolve(__dirname, "src/renderer/contexts"),
@@ -88,14 +75,8 @@ export default defineConfig({
 				find: "@routes",
 				replacement: resolve(__dirname, "src/renderer/routes"),
 			},
-			{
-				find: "@utils",
-				replacement: resolve(__dirname, "src/renderer/utils"),
-			},
-			{
-				find: "@hooks",
-				replacement: resolve(__dirname, "src/renderer/hooks"),
-			},
+			{ find: "@utils", replacement: resolve(__dirname, "src/renderer/utils") },
+			{ find: "@hooks", replacement: resolve(__dirname, "src/renderer/hooks") },
 			{
 				find: "@modules",
 				replacement: resolve(__dirname, "src/renderer/modules"),
@@ -103,4 +84,3 @@ export default defineConfig({
 		],
 	},
 });
-
