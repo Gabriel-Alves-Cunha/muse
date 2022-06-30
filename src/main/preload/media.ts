@@ -150,9 +150,9 @@ export async function transformPathsToMedias(
 			)
 		);
 
-		const medias = (await Promise.allSettled(promises)).map(
-			p => (p.status === "fulfilled" ? p.value : false)
-		).filter(Boolean) as [Path, Media][];
+		const medias = (await Promise.allSettled(promises))
+			.map(p => (p.status === "fulfilled" ? p.value : false))
+			.filter(Boolean) as [Path, Media][];
 
 		console.groupEnd();
 
@@ -200,123 +200,126 @@ export async function makeStream(
 	const readStream = ytdl(url, {
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
-	}).on("progress", (_, downloaded: number, total: number) => {
-		const percentage = (downloaded / total) * 100;
-		percentageToSend = percentage;
+	})
+		.on("progress", (_, downloaded: number, total: number) => {
+			const percentage = (downloaded / total) * 100;
+			percentageToSend = percentage;
 
-		// To react:
-		if (!interval) {
-			// ^ Only in the firt time this 'on progress' fn is called!
-			interval = setInterval(
-				() => electronPort.postMessage({ percentage: percentageToSend }),
-				1_000,
-			);
-			prettyTotal = prettyBytes(total);
-
-			// Send a message to client that we're starting a download:
-			sendMsgToClient({
-				type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED,
-				url,
-			});
-		}
-
-		// To node console if is in development:
-		if (isDevelopment) {
-			const secondsDownloading = (Date.now() - startTime) / 1_000;
-			const estimatedDownloadTime =
-				(secondsDownloading / (percentage / 100) - secondsDownloading).toFixed(
-					2,
+			// To react:
+			if (!interval) {
+				// ^ Only in the firt time this 'on progress' fn is called!
+				interval = setInterval(
+					() => electronPort.postMessage({ percentage: percentageToSend }),
+					1_000,
 				);
+				prettyTotal = prettyBytes(total);
 
-			readline.cursorTo(process.stdout, 0);
-			readline.clearLine(process.stdout, 0);
-			process.stdout.write(
-				`${percentage.toFixed(2)}% downloaded, (${
+				// Send a message to client that we're starting a download:
+				sendMsgToClient({
+					type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED,
+					url,
+				});
+			}
+
+			// To node console if is in development:
+			if (isDevelopment) {
+				const secondsDownloading = (Date.now() - startTime) / 1_000;
+				const estimatedDownloadTime =
+					(secondsDownloading / (percentage / 100) - secondsDownloading)
+						.toFixed(2);
+
+				readline.cursorTo(process.stdout, 0);
+				readline.clearLine(process.stdout, 0);
+				process.stdout.write(`${
+					percentage.toFixed(2)
+				}% downloaded, (${
 					prettyBytes(downloaded)
 				} / ${prettyTotal}). Running for: ${
 					secondsDownloading.toFixed(2)
-				} seconds. ETA: ${estimatedDownloadTime} seconds.`,
+				} seconds. ETA: ${estimatedDownloadTime} seconds.`);
+			}
+		})
+		.on("destroy", async () => {
+			log(
+				`%cDestroy was called on readStream! title: ${title}`,
+				"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
 			);
-		}
-	}).on("destroy", async () => {
-		log(
-			`%cDestroy was called on readStream! title: ${title}`,
-			"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
-		);
 
-		// Delete the file if it's not converted successfully:
-		if (await pathExists(saveSite)) await deleteFile(saveSite);
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
 
-		electronPort.postMessage({
-			status: ProgressStatus.CANCEL,
-			isDownloading: false,
+			electronPort.postMessage({
+				status: ProgressStatus.CANCEL,
+				isDownloading: false,
+			});
+			electronPort.close();
+			clearInterval(interval);
+
+			currentDownloads.delete(url);
+			dbg(
+				"Download was destroyed. Deleting stream from currentDownloads:",
+				currentDownloads,
+				"Does the downloaded file still exists?",
+				await pathExists(saveSite),
+			);
+
+			sendFailedDownloadMsg(url, electronPort);
+		})
+		.on("end", async () => {
+			log(
+				`%cFile "${titleWithExtension}" saved successfully!`,
+				"color: green; font-weight: bold;",
+			);
+
+			// To react:
+			electronPort.postMessage({
+				status: ProgressStatus.SUCCESS,
+				isDownloading: false,
+			});
+			electronPort.close();
+			clearInterval(interval);
+
+			// Write media image:
+			await writeTags(saveSite, {
+				downloadImg: true,
+				isNewMedia: true,
+				imageURL,
+			});
+
+			currentDownloads.delete(url);
+			dbg(
+				"Download ended. Deleting stream from currentDownloads:",
+				currentDownloads,
+			);
+		})
+		.on("error", async err => {
+			error(`Error downloading file: "${titleWithExtension}"!`, err);
+
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
+
+			// To react
+			electronPort.postMessage({
+				status: ProgressStatus.FAILED,
+				isDownloading: false,
+				error: err,
+			});
+			electronPort.close();
+			clearInterval(interval);
+
+			// I only found it to work when I send it with an Error:
+			readStream.destroy(err);
+
+			currentDownloads.delete(url);
+			dbg(
+				"Download threw an error. Deleting stream from currentDownloads:",
+				currentDownloads,
+				"Does the downloaded file still exists?",
+				await pathExists(saveSite),
+			);
+
+			sendFailedDownloadMsg(url, electronPort);
 		});
-		electronPort.close();
-		clearInterval(interval);
-
-		currentDownloads.delete(url);
-		dbg(
-			"Download was destroyed. Deleting stream from currentDownloads:",
-			currentDownloads,
-			"Does the downloaded file still exists?",
-			await pathExists(saveSite),
-		);
-
-		sendFailedDownloadMsg(url, electronPort);
-	}).on("end", async () => {
-		log(
-			`%cFile "${titleWithExtension}" saved successfully!`,
-			"color: green; font-weight: bold;",
-		);
-
-		// To react:
-		electronPort.postMessage({
-			status: ProgressStatus.SUCCESS,
-			isDownloading: false,
-		});
-		electronPort.close();
-		clearInterval(interval);
-
-		// Write media image:
-		await writeTags(saveSite, {
-			downloadImg: true,
-			isNewMedia: true,
-			imageURL,
-		});
-
-		currentDownloads.delete(url);
-		dbg(
-			"Download ended. Deleting stream from currentDownloads:",
-			currentDownloads,
-		);
-	}).on("error", async err => {
-		error(`Error downloading file: "${titleWithExtension}"!`, err);
-
-		// Delete the file if it's not converted successfully:
-		if (await pathExists(saveSite)) await deleteFile(saveSite);
-
-		// To react
-		electronPort.postMessage({
-			status: ProgressStatus.FAILED,
-			isDownloading: false,
-			error: err,
-		});
-		electronPort.close();
-		clearInterval(interval);
-
-		// I only found it to work when I send it with an Error:
-		readStream.destroy(err);
-
-		currentDownloads.delete(url);
-		dbg(
-			"Download threw an error. Deleting stream from currentDownloads:",
-			currentDownloads,
-			"Does the downloaded file still exists?",
-			await pathExists(saveSite),
-		);
-
-		sendFailedDownloadMsg(url, electronPort);
-	});
 
 	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
 
@@ -367,123 +370,128 @@ export async function convertToAudio(
 
 	dbg(`Creating stream for "${path}" to convert to "${toExtension}".`);
 
-	fluent_ffmpeg(readStream).on(
-		"progress",
-		({ targetSize, timemark }: { targetSize: number; timemark: number; }) => {
-			// targetSize: current size of the target file in kilobytes
-			// timemark: the timestamp of the current frame in seconds
+	fluent_ffmpeg(readStream)
+		.on(
+			"progress",
+			({ targetSize, timemark }: { targetSize: number; timemark: number; }) => {
+				// targetSize: current size of the target file in kilobytes
+				// timemark: the timestamp of the current frame in seconds
+
+				// To react:
+				if (!interval) {
+					// ^ Only in the firt time this setInterval is called!
+					interval = setInterval(() =>
+						electronPort.postMessage({
+							sizeConverted: targetSize,
+							timeConverted: timemark,
+						}), 1_000);
+
+					// Send a message to client that we're starting a conversion:
+					sendMsgToClient({
+						type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED,
+						path,
+					});
+				}
+			},
+		)
+		.on("error", async err => {
+			error(`Error converting file: "${titleWithExtension}"!\n\n`, err);
+
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
 
 			// To react:
-			if (!interval) {
-				// ^ Only in the firt time this setInterval is called!
-				interval = setInterval(() =>
-					electronPort.postMessage({
-						sizeConverted: targetSize,
-						timeConverted: timemark,
-					}), 1_000);
+			electronPort.postMessage({
+				status: ProgressStatus.FAILED,
+				isConverting: false,
+				error: err,
+			});
+			electronPort.close();
+			clearInterval(interval);
 
-				// Send a message to client that we're starting a conversion:
+			// I only found it to work when I send it with an Error:
+			readStream.destroy(err);
+
+			mediasConverting.delete(path);
+			dbg(
+				"Convertion threw an error. Deleting from mediasConverting:",
+				mediasConverting,
+				"Was file deleted?",
+				await pathExists(saveSite),
+			);
+
+			sendFailedConversionMsg(path, electronPort);
+		})
+		.on("end", async () => {
+			log(
+				`%cFile "${titleWithExtension}" saved successfully!`,
+				"color: green; font-weight: bold;",
+			);
+
+			// To react:
+			electronPort.postMessage({
+				status: ProgressStatus.SUCCESS,
+				isConverting: false,
+			});
+			electronPort.close();
+			clearInterval(interval);
+
+			// Treat the successfully converted file as a new media...
+			{
 				sendMsgToClient({
-					type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED,
-					path,
+					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+					mediaPath: saveSite,
+				});
+
+				// ...and remove old one
+				sendMsgToClient({
+					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
+					mediaPath: path,
 				});
 			}
-		},
-	).on("error", async err => {
-		error(`Error converting file: "${titleWithExtension}"!\n\n`, err);
 
-		// Delete the file if it's not converted successfully:
-		if (await pathExists(saveSite)) await deleteFile(saveSite);
+			readStream.close();
 
-		// To react:
-		electronPort.postMessage({
-			status: ProgressStatus.FAILED,
-			isConverting: false,
-			error: err,
-		});
-		electronPort.close();
-		clearInterval(interval);
+			mediasConverting.delete(path);
+			dbg(
+				"Convertion successfull. Deleting from mediasConverting:",
+				mediasConverting,
+			);
+		})
+		.on("destroy", async () => {
+			log(
+				`%cDestroy was called on readStream for converter! path: ${path}`,
+				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
+			);
 
-		// I only found it to work when I send it with an Error:
-		readStream.destroy(err);
+			// Delete the file if it's not converted successfully:
+			if (await pathExists(saveSite)) await deleteFile(saveSite);
 
-		mediasConverting.delete(path);
-		dbg(
-			"Convertion threw an error. Deleting from mediasConverting:",
-			mediasConverting,
-			"Was file deleted?",
-			await pathExists(saveSite),
-		);
-
-		sendFailedConversionMsg(path, electronPort);
-	}).on("end", async () => {
-		log(
-			`%cFile "${titleWithExtension}" saved successfully!`,
-			"color: green; font-weight: bold;",
-		);
-
-		// To react:
-		electronPort.postMessage({
-			status: ProgressStatus.SUCCESS,
-			isConverting: false,
-		});
-		electronPort.close();
-		clearInterval(interval);
-
-		// Treat the successfully converted file as a new media...
-		{
-			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
-				mediaPath: saveSite,
+			electronPort.postMessage({
+				status: ProgressStatus.CANCEL,
+				isConverting: false,
 			});
+			electronPort.close();
+			clearInterval(interval);
 
-			// ...and remove old one
-			sendMsgToClient({
-				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
-				mediaPath: path,
-			});
-		}
+			// I only found it to work when I send it with an Error:
+			readStream.destroy(
+				new Error(
+					"This readStream is being destroyed because the ffmpeg is being destroyed.",
+				),
+			);
 
-		readStream.close();
+			mediasConverting.delete(path);
+			dbg(
+				"Convertion was destroyed. Deleting from mediasConverting:",
+				mediasConverting,
+				"Was file deleted?",
+				await pathExists(saveSite),
+			);
 
-		mediasConverting.delete(path);
-		dbg(
-			"Convertion successfull. Deleting from mediasConverting:",
-			mediasConverting,
-		);
-	}).on("destroy", async () => {
-		log(
-			`%cDestroy was called on readStream for converter! path: ${path}`,
-			"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
-		);
-
-		// Delete the file if it's not converted successfully:
-		if (await pathExists(saveSite)) await deleteFile(saveSite);
-
-		electronPort.postMessage({
-			status: ProgressStatus.CANCEL,
-			isConverting: false,
-		});
-		electronPort.close();
-		clearInterval(interval);
-
-		// I only found it to work when I send it with an Error:
-		readStream.destroy(
-			new Error(
-				"This readStream is being destroyed because the ffmpeg is being destroyed.",
-			),
-		);
-
-		mediasConverting.delete(path);
-		dbg(
-			"Convertion was destroyed. Deleting from mediasConverting:",
-			mediasConverting,
-			"Was file deleted?",
-			await pathExists(saveSite),
-		);
-
-		sendFailedConversionMsg(path, electronPort);
-	}).save(saveSite);
+			sendFailedConversionMsg(path, electronPort);
+		})
+		.save(saveSite);
 
 	mediasConverting.set(path, readStream);
 	dbg(`Added "${path}" to mediasConverting:`, mediasConverting);
@@ -548,9 +556,10 @@ export async function writeTags(
 					if (value instanceof Array)
 						file.tag.albumArtists = value as string[];
 					else {
-						const albumArtists = (value as string).split(
-							separatedByCommaOrSemiColon,
-						).filter(Boolean).map(v => v.trim());
+						const albumArtists = (value as string)
+							.split(separatedByCommaOrSemiColon)
+							.filter(Boolean)
+							.map(v => v.trim());
 
 						file.tag.albumArtists = albumArtists;
 					}
@@ -566,9 +575,10 @@ export async function writeTags(
 					if (value instanceof Array)
 						file.tag.genres = value as string[];
 					else {
-						const genres = (value as string).split(
-							separatedByCommaOrSemiColorOrSpace,
-						).filter(Boolean).map(v => v.trim());
+						const genres = (value as string)
+							.split(separatedByCommaOrSemiColorOrSpace)
+							.filter(Boolean)
+							.map(v => v.trim());
 
 						file.tag.genres = genres;
 					}
@@ -721,10 +731,11 @@ export async function getThumbnail(
 			});
 
 			res.on("end", () => resolve(body as ImgString));
-		}).on("error", e => {
-			error(`Got error getting image on Electron side: ${e.message}`);
-			return reject(e);
 		})
+			.on("error", e => {
+				error(`Got error getting image on Electron side: ${e.message}`);
+				return reject(e);
+			})
 	);
 }
 

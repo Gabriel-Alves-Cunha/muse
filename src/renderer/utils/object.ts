@@ -10,9 +10,11 @@ export function areObjectKeysEqual(object1: Obj, object2: Obj) {
 }
 
 export function getObjectDeepKeys(obj: Obj): string[] {
-	return Object.keys(obj).filter(key => obj[key] instanceof Object).map(key =>
-		getObjectDeepKeys(obj[key] as Obj).map(k => `${key}.${k}`)
-	).reduce((x, y) => x.concat(y), Object.keys(obj));
+	return Object
+		.keys(obj)
+		.filter(key => obj[key] instanceof Object)
+		.map(key => getObjectDeepKeys(obj[key] as Obj).map(k => `${key}.${k}`))
+		.reduce((x, y) => x.concat(y), Object.keys(obj));
 }
 
 type Obj = Record<string, unknown>;

@@ -31,7 +31,10 @@ export const progressIcons: ReadonlyMap<ProgressStatus, JSX.Element> = Object
 			[ProgressStatus.ACTIVE, <Downloading size={15} key="active" />],
 			[ProgressStatus.CANCEL, <Canceled size={15} key="canceled" />],
 			[ProgressStatus.SUCCESS, <Success size={15} key="success" />],
-			[ProgressStatus.FAILED, <Failed size={15} key="failed" />],
+			[
+				ProgressStatus.FAILED,
+				<Failed size={15} key="failed" />,
+			],
 		]),
 	);
 

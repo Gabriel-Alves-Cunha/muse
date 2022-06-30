@@ -13,7 +13,8 @@ export async function getFullPathOfFilesForFilesInThisDirectory(
 	return (await readdir(dir).catch(err => {
 		console.error(err);
 		return [];
-	})).map(filename => join(dir, filename));
+	}))
+		.map(filename => join(dir, filename));
 }
 
 export async function readFile(

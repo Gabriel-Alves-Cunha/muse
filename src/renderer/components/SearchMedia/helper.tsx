@@ -89,7 +89,7 @@ export function InputAndResults() {
 		}, 200));
 
 	useEffect(() => {
-		function closePopoverOnEsc({ key }: KeyboardEvent) {
+		function closeSearchMediaPopoverOnEsc({ key }: KeyboardEvent) {
 			if (key === "Escape" && isOnFocus) {
 				setSearcher(defaultSearcher);
 				setIsOnFocus(false);
@@ -97,9 +97,10 @@ export function InputAndResults() {
 			}
 		}
 
-		window.addEventListener("keydown", closePopoverOnEsc);
+		window.addEventListener("keydown", closeSearchMediaPopoverOnEsc);
 
-		return () => window.removeEventListener("keydown", closePopoverOnEsc);
+		return () =>
+			window.removeEventListener("keydown", closeSearchMediaPopoverOnEsc);
 	}, [isOnFocus]);
 
 	useEffect(function searchForMedia() {

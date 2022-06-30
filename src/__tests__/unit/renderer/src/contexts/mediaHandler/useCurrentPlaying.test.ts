@@ -63,7 +63,8 @@ describe("Testing useCurrentPlaying", () => {
 		expect(
 			currentPlaying().path,
 			"currentPlaying().path at the start should be set to the initialIndex path!",
-		).toBe(testArray[initialIndex]![0]);
+		)
+			.toBe(testArray[initialIndex]![0]);
 
 		testArray.forEach((_, index) => {
 			expect(history().size, "history.length is wrong!").toBe(index + 1);
@@ -90,7 +91,8 @@ describe("Testing useCurrentPlaying", () => {
 		expect(
 			currentPlaying().path,
 			"currentPlaying().path at the start should be set to the firstMediaPath!",
-		).toBe(firstMediaPath);
+		)
+			.toBe(firstMediaPath);
 
 		testArray.forEach((_, index) => {
 			playNextMedia();
@@ -101,9 +103,11 @@ describe("Testing useCurrentPlaying", () => {
 			expect(
 				expectedMediaPath,
 				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${testArray
-					.at(index)?.[0]}
+					.at(index)
+					?.[0]}
 				`,
-			).toEqual(currMediaPath);
+			)
+				.toEqual(currMediaPath);
 		});
 	});
 });

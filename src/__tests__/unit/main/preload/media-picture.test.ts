@@ -10,7 +10,7 @@ mockElectronPlusNodeGlobalsBeforeTests();
 import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
 
-import { getThumbnail, mediaPath } from "./utils";
+import { getThumbnail, anotherMediaPath } from "./utils";
 import { dbgTests } from "@common/utils";
 
 const { writeTags, createAndSaveImageOnMedia } = await import(
@@ -35,9 +35,9 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
 		const data = Object.freeze({ albumArtists: ["Test Artist"] as const });
 
-		await writeTags(mediaPath, data);
+		await writeTags(anotherMediaPath, data);
 
-		const { albumArtists } = MediaFile.createFromPath(mediaPath).tag;
+		const { albumArtists } = MediaFile.createFromPath(anotherMediaPath).tag;
 
 		expect(albumArtists).toEqual(data.albumArtists);
 	});
@@ -47,7 +47,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	//////////////////////////////////////
 
 	it("Should be able to write the tag 'picture' to a file.", async () => {
-		const file = MediaFile.createFromPath(mediaPath);
+		const file = MediaFile.createFromPath(anotherMediaPath);
 
 		const imgAsString: ImgString = await getThumbnail();
 
@@ -61,7 +61,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 		file.dispose();
 
 		{
-			const file = MediaFile.createFromPath(mediaPath);
+			const file = MediaFile.createFromPath(anotherMediaPath);
 
 			dbgTests("AFTER: New file pictures =", file.tag.pictures);
 

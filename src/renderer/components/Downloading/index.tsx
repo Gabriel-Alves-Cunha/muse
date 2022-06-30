@@ -44,17 +44,14 @@ export function Downloading() {
 				setDownloadInfo(defaultDownloadInfo);
 
 				// Sending port so we can communicate with Electron:
-				sendMsgToBackend(
-					{
-						type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
-					},
-					electronPort
-				);
+				sendMsgToBackend({
+					type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
+				}, electronPort);
 			} catch (error) {
 				console.error(error);
 
 				errorToast(
-					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`
+					`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`,
 				);
 			}
 	}, [downloadInfo.canStartDownload, downloadInfo.title, downloadInfo]);
@@ -62,9 +59,8 @@ export function Downloading() {
 	return (
 		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
 			<StyledPopoverTrigger
-				className={
-					(downloadingListSize ? "has-items " : "") + (isOpen ? "active " : "")
-				}
+				className={(downloadingListSize ? "has-items " : "") +
+					(isOpen ? "active " : "")}
 				data-tip="Show all downloading medias"
 			>
 				<span data-length={downloadingListSize}></span>
@@ -75,11 +71,9 @@ export function Downloading() {
 			<PopoverAnchor />
 
 			<PopoverContent
-				size={
-					downloadingListSize === 0
-						? "nothing-found-for-convertions-or-downloads"
-						: "convertions-or-downloads"
-				}
+				size={downloadingListSize === 0 ?
+					"nothing-found-for-convertions-or-downloads" :
+					"convertions-or-downloads"}
 				alignOffset={14}
 			>
 				<Popup />
@@ -88,11 +82,13 @@ export function Downloading() {
 	);
 }
 
-export type MediaBeingDownloaded = Readonly<{
-	status: ProgressStatus;
-	isDownloading: boolean;
-	percentage: number;
-	port: MessagePort;
-	imageURL: string;
-	title: string;
-}>;
+export type MediaBeingDownloaded = Readonly<
+	{
+		status: ProgressStatus;
+		isDownloading: boolean;
+		percentage: number;
+		port: MessagePort;
+		imageURL: string;
+		title: string;
+	}
+>;

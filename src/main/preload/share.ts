@@ -10,23 +10,46 @@ import { promisify } from "node:util";
 import { pipeline } from "node:stream/promises";
 
 import { getFirstKey } from "@utils/map-set";
-import { port } from "@common/crossCommunication";
 import { time } from "@utils/utils";
 import { dbg } from "@common/utils";
 
 const exec = promisify(syncExec);
 
-export function turnServerOn(oneFilePath: Path): TurnServerOffFunction {
+export function turnServerOn(oneFilePath: Path): turnServerOnReturn {
 	return time(() => {
-		const server = createServer(requestListener).listen(port, () => {
-			console.log(`Server is running on port ${port}.`);
-		}).on("close", () => console.log("Closing server.")).on("error", err => {
-			console.error("Error at the server. Closing it.", err);
-			server.close();
-		});
+		const hostname = getMyIpAddress();
+		let errorListening = false;
+		let port = 8_000;
 
-		async function requestListener(_req: IncomingMessage, res: ServerResponse) {
-			dbg("on requestListener()");
+		function handleCloseServer(err: Error) {
+			dbg("on handleCloseServer()", { err });
+			console.error("Error listening. Closing server.", err);
+
+			// @ts-ignore => err.code does exists here.
+			if (err.code === "EADDRINUSE") {
+				errorListening = true;
+				port += 10;
+			}
+
+			server.close();
+		}
+
+		function tryToStartServer(server: Server): void {
+			errorListening = false;
+
+			server.listen(
+				port,
+				hostname,
+				() => console.log(`Server is running on https://${hostname}:${port}`),
+			);
+		}
+
+		///////////////////////////////////////////
+		///////////////////////////////////////////
+		///////////////////////////////////////////
+
+		async function downloadMedias(_req: IncomingMessage, res: ServerResponse) {
+			dbg("on downloadMedias()", { _req, res });
 
 			res.setHeader(
 				"Content-Disposition",
@@ -34,21 +57,7 @@ export function turnServerOn(oneFilePath: Path): TurnServerOffFunction {
 			);
 			res.setHeader("Content-Type", "application/octet-stream");
 			res.setHeader("Accept-Encoding", "gzip");
-			res.write("First chunk");
-
-			dbg({ res });
-
-			const readStream: ReadStream = createReadStream(oneFilePath).on(
-				"open",
-				// We replaced all the event handlers with a simple call to readStream.pipe()
-				// This just pipes the read stream to the response object (which goes to the client)
-				() => readStream.pipe(res),
-			).on("error", err => {
-				console.error(err);
-				res.end(err);
-			}).on("end", () => {
-				dbg("Ended reading `oneFilePath`.");
-			});
+			res.write("First message to client!");
 
 			res.on("data", async data => {
 				const output = createWriteStream("medias").on("finish", () => {
@@ -60,12 +69,69 @@ export function turnServerOn(oneFilePath: Path): TurnServerOffFunction {
 				try {
 					await pipeline(data, createGunzip(), output);
 				} catch (error) {
-					console.error("Pipeline failed.", error);
+					console.error("Pipeline failed on res.on('data')!", error);
 				}
 			});
+
+			const readStream: ReadStream = createReadStream(oneFilePath)
+				.on(
+					"open",
+					// We replaced all the event handlers with a simple call to readStream.pipe()
+					// This just pipes the read stream to the response object (which goes to the client)
+					() => readStream.pipe(res),
+				)
+				.on("error", err => {
+					console.error("Error on downloadMedias's readStream.", err);
+					res.end(err);
+					server.close();
+				})
+				.on("end", () => {
+					dbg("Ended reading `oneFilePath`.");
+					res.end();
+				});
 		}
 
-		return () => server.close();
+		///////////////////////////////////////////
+		///////////////////////////////////////////
+		///////////////////////////////////////////
+
+		// We create a new server object via the https module's
+		// createServer() function. This server accepts HTTPS
+		// requests and passes them on to our downloadMedias()
+		// function, a callback function that fires when the
+		// server begins to listen.
+		const server = createServer(downloadMedias)
+			.on("close", () => {
+				console.log("Closing server from NodeJS side.");
+
+				if (errorListening) {
+					dbg("Restarting server because error 'EADDRINUSE' was found!");
+					tryToStartServer(server);
+				}
+			})
+			.on("connection", () => {
+				console.log("Connected to another computer!");
+			})
+			.on("error", handleCloseServer);
+
+		tryToStartServer(server);
+
+		///////////////////////////////////////////
+		///////////////////////////////////////////
+		///////////////////////////////////////////
+
+		const ret: turnServerOnReturn = {
+			addListener: (
+				event: string,
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				listener: (...args: any[]) => void,
+			) => server.addListener(event, listener),
+			close: () => server.close(),
+			hostname,
+			port,
+		};
+
+		return ret;
 	}, `turnServerOn(${oneFilePath})`);
 }
 
@@ -73,36 +139,51 @@ export function turnServerOn(oneFilePath: Path): TurnServerOffFunction {
 export async function makeItOnlyOneFile(
 	filepaths: ReadonlySet<Path>,
 ): Promise<Path> {
-	dbg(`on makeItOnlyOneFile(${[...filepaths].join(" ")})`);
+	return await time(async () => {
+		const mediasSeparatedBySpaceAndSurroundedByQuotationMarks = [...filepaths]
+			.map(filepath => `"${filepath}"`)
+			.join(" ");
 
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	if (filepaths.size === 1) return getFirstKey(filepaths)!;
+		dbg(
+			`on makeItOnlyOneFile(${mediasSeparatedBySpaceAndSurroundedByQuotationMarks})`,
+		);
 
-	const mediasDir = "medias";
-	const zipFile = `${mediasDir}.zip` as const;
-	const cmd = `zip -0 -v ${mediasDir} ${[...filepaths].join(" ")}`;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		if (filepaths.size === 1) return getFirstKey(filepaths)!;
 
-	dbg({ cmd });
+		const mediasDir = "medias";
 
-	// Else, make a zip file:
-	time(() =>
-		exec(cmd).then(({ stdout, stderr }) => {
+		const cmd =
+			`zip -0 -v ${mediasDir} ${mediasSeparatedBySpaceAndSurroundedByQuotationMarks}`;
+
+		dbg({ cmd });
+
+		// Else, make a zip file:
+		try {
+			const { stdout, stderr } = await exec(cmd);
+
 			console.log("zip stdout:\n\n", stdout);
 			console.log("\n\nzip stderr:", stderr);
-		}), "async exec");
+		} catch (error) {
+			throw new Error("Error ziping medias!" + error);
+		}
 
-	return zipFile;
+		return `${mediasDir}.zip` as const;
+	}, "async exec");
 }
 
 let cachedIp = "";
-export function getMyIpAddress(): Readonly<string> {
+function getMyIpAddress(): Readonly<string> {
 	if (cachedIp) return cachedIp;
 
 	const myIp = time(
 		() =>
-			Object.values(networkInterfaces()).flat().filter(item =>
-				!item?.internal && item?.family === "IPv4"
-			).find(Boolean)?.address,
+			Object
+				.values(networkInterfaces())
+				.flat()
+				.filter(item => !item?.internal && item?.family === "IPv4")
+				.find(Boolean)
+				?.address,
 		"myIp",
 	);
 
@@ -113,4 +194,10 @@ export function getMyIpAddress(): Readonly<string> {
 	return cachedIp;
 }
 
-export type TurnServerOffFunction = () => Server;
+export type turnServerOnReturn = Readonly<{
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	addListener(event: string, listener: (...args: any[]) => void): void;
+	hostname: string;
+	close(): void;
+	port: number;
+}>;

@@ -44,7 +44,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 		setPlaylists: (action: PlaylistsReducer_Action) => {
 			time(() => {
-				switch (action.type) {
+				switch (
+					action.type
+				) {
 					case WhatToDo.UPDATE_HISTORY: {
 						time(() => {
 							switch (action.whatToDo) {

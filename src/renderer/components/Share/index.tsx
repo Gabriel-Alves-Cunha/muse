@@ -1,96 +1,102 @@
-import type { TurnServerOffFunction } from "@main/preload/share";
+import type { turnServerOnReturn } from "@main/preload/share";
 
-import { useEffect, useRef, useState } from "react";
-import { Root as PopoverRoot } from "@radix-ui/react-popover";
+import { useEffect, useState } from "react";
 import { MdClose as Close } from "react-icons/md";
 import { toCanvas } from "qrcode";
-import create from "zustand";
 
 import { setSettings, useSettings } from "@contexts/settings";
 import { emptySet } from "@utils/map-set";
-import { port } from "@common/crossCommunication";
 import { dbg } from "@common/utils";
 
+import { ClosePopoverTrigger, PopoverContent, Canvas } from "./styles";
 import { Loading } from "@styles/appStyles";
-import {
-	ClosePopoverTrigger,
-	PopoverContent,
-	PopoverAnchor,
-	Canvas,
-} from "./styles";
 
-const { turnServerOn, makeItOnlyOneFile, getMyIpAddress } = electron.share;
+const { turnServerOn, makeItOnlyOneFile } = electron.share;
 
 const qrid = "qrcode-canvas";
 
-const useIsOpen = create(() => ({ isOpen: false }));
-const setIsOpen = (isOpen: boolean) => useIsOpen.setState({ isOpen });
-
-export function Share() {
-	const serverResponseRef = useRef<TurnServerOffFunction | null>(null);
-	// Using this useState because there is a bug in Radix Popover,
-	// in wich the first time it opens, on the `onOpenChange` function,
-	// the value it receives is the opposite of what it should be.
-	const [isFirstTime, setIsFirstTime] = useState(true);
+export function SharePopover() {
+	const [server, setServer] =
+		useState<Readonly<turnServerOnReturn | null>>(null);
 	const { filesToShare } = useSettings();
-	const { isOpen } = useIsOpen();
 
-	useEffect(() => {
-		dbg("on useEffect. isOpen =", isOpen);
-		filesToShare.size > 0 ? setIsOpen(true) : setIsOpen(false);
-	}, [filesToShare, isOpen]);
+	const isOpen = filesToShare.size > 0;
 
-	async function handleOpenState(newIsOpen: boolean) {
-		if (isFirstTime) {
-			newIsOpen = !newIsOpen;
-			setIsFirstTime(false);
-		}
+	function closePopover() {
+		server?.close();
 
-		dbg("on handleOpenState()", newIsOpen, filesToShare);
-		// This popup for the QR Code will open when `filesToShare.size > 0`.
-		// filesToShare.size > 0 ? setIsOpen(true) : setIsOpen(false);
-
-		// const newIsOpen = filesToShare.size > 0;
-
-		if (newIsOpen) {
-			const onlyOneFile = await makeItOnlyOneFile(filesToShare);
-
-			serverResponseRef.current = turnServerOn(onlyOneFile);
-
-			const url = `https://${getMyIpAddress()}:${port}`;
-
-			dbg({ newIsOpen, serverResponseRef, url });
-
-			await makeQrcode(url);
-		} else {
-			serverResponseRef.current?.();
-
-			setSettings({ filesToShare: emptySet });
-
-			setIsFirstTime(true);
-
-			dbg({ newIsOpen, serverResponseRef });
-		}
+		setSettings({ filesToShare: emptySet });
 	}
 
-	return (
-		<PopoverRoot modal open={isOpen} onOpenChange={handleOpenState}>
-			<PopoverAnchor />
+	useEffect(() => {
+		// When the server closes, get rid of it's reference
+		server?.addListener("close", () => {
+			dbg("Getting rid of the server reference on React.");
+			setServer(null);
+		});
+	}, [server]);
 
-			<PopoverContent>
-				<ClosePopoverTrigger data-tip="Close share screen">
-					<Close />
-				</ClosePopoverTrigger>
+	useEffect(() => {
+		function closeSharePopoverOnEsc({ key }: KeyboardEvent) {
+			if (key === "Escape" && isOpen) {
+				server?.close();
 
-				<Canvas id={qrid}>
-					<Loading />
-				</Canvas>
-			</PopoverContent>
-		</PopoverRoot>
-	);
+				setSettings({ filesToShare: emptySet });
+			}
+		}
+
+		window.addEventListener("keydown", closeSharePopoverOnEsc);
+
+		return () => window.removeEventListener("keydown", closeSharePopoverOnEsc);
+	}, [isOpen, server]);
+
+	useEffect(() => {
+		(async function handleOpenState() {
+			dbg("on handleOpenState()", isOpen, filesToShare);
+
+			if (!isOpen) return;
+
+			try {
+				const onlyOneFile = await makeItOnlyOneFile(filesToShare);
+				const response = turnServerOn(onlyOneFile);
+
+				setServer(response);
+
+				const { port, hostname } = response;
+
+				const url = `https://${hostname}:${port}`;
+
+				dbg("on handleOpenState()", { isOpen, response, url });
+
+				await makeQrcode(url);
+			} catch (error) {
+				console.error(error);
+				// Close popover
+				setSettings({ filesToShare: emptySet });
+			}
+		})();
+	}, [filesToShare, isOpen]);
+
+	return isOpen ? (
+		<PopoverContent
+			className="notransition"
+			data-open={isOpen}
+			data-side="left"
+		>
+			<ClosePopoverTrigger data-tip="Close share screen" onClick={closePopover}>
+				<Close />
+			</ClosePopoverTrigger>
+
+			<Canvas id={qrid}>
+				<Loading />
+			</Canvas>
+		</PopoverContent>
+	) : null;
 }
 
 async function makeQrcode(url: string): Promise<void> {
+	dbg(`Making QR Code for "${url}"`);
+
 	const canvasElement = document.getElementById(qrid) as HTMLCanvasElement;
 
 	await toCanvas(canvasElement, url, {

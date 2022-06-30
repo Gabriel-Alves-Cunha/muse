@@ -5,11 +5,16 @@ import { resolve } from "node:path";
 
 import { dbgTests } from "@common/utils";
 
-const originalTitle = "audio for tests" as const;
-
 export const test_assets = resolve(__dirname, "..", "..", "..", "test_assets");
 
-export const mediaPath = resolve(test_assets, `${originalTitle}.mp3`);
+export const mediaPath = resolve(test_assets, "audio for tests.mp3");
+
+// A duplicate of the media above for testing purposes (if only one media,
+// the threads compete for the entity and an ENOENT error is raised)!
+export const anotherMediaPath = resolve(
+	test_assets,
+	"another audio for tests.mp3",
+);
 
 export const mediaPicture = resolve(test_assets, "img for tests.png");
 

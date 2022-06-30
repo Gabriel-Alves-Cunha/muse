@@ -1,31 +1,17 @@
-import { Anchor, Close, Content } from "@radix-ui/react-popover";
-
+import { slideRightAndFade } from "@components/Popover/styles";
 import { styled } from "@styles/global";
-import {
-	slideRightAndFade,
-	slideDownAndFade,
-	slideLeftAndFade,
-	slideUpAndFade,
-} from "@components/Popover/styles";
 
 export const Canvas = styled("canvas", { size: 300 });
 
-export const PopoverAnchor = styled(Anchor, {
-	pos: "fixed",
-	bottom: 10,
-	left: 10,
-});
-
-export const ClosePopoverTrigger = styled(Close, {
-	all: "unset",
-
+export const ClosePopoverTrigger = styled("button", {
 	pos: "absolute",
 	dflex: "center",
 	size: 26,
-	r: 10,
-	t: 10,
+	r: 1,
+	t: 1,
 
 	cursor: "pointer",
+	bg: "none",
 	b: "none",
 	br: "50%",
 
@@ -35,32 +21,29 @@ export const ClosePopoverTrigger = styled(Close, {
 	fw: 600,
 	lh: 1,
 
-	"& svg": { fill: "$accent-light" },
+	"& svg": { fill: "red" },
 
-	"&:hover": { bg: "$icon-button-hovered" },
+	"&:hover": { bg: "rgba(0, 0, 0, 0.2)" },
 });
 
-export const PopoverContent = styled(Content, {
-	pos: "relative", // to the popover anchor
+export const PopoverContent = styled("div", {
+	pos: "fixed",
 	dflex: "center",
-
-	bg: "$bg-popover",
-	ox: "hidden",
-	br: 10,
+	bottom: 10,
+	left: 10,
 
 	boxShadow: "$popover",
+	bg: "$bg-popover",
+	ox: "hidden",
+	zIndex: 200,
+	br: 13,
 
-	"@media (prefers-reduced-motion: no-preference)": {
-		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-		animationFillMode: "forwards",
-		animationDuration: "400ms",
+	animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+	animationFillMode: "forwards",
+	animationDuration: "400ms",
 
-		"&[data-state='open']": {
-			"&[data-side='right']": { animationName: slideLeftAndFade },
-			"&[data-side='left']": { animationName: slideRightAndFade },
-			"&[data-side='bottom']": { animationName: slideUpAndFade },
-			"&[data-side='top']": { animationName: slideDownAndFade },
-		},
+	"&[data-open='true']": {
+		"&[data-side='left']": { animationName: slideRightAndFade },
 	},
 
 	"& p": {

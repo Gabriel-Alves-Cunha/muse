@@ -1,6 +1,6 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
-import type { TurnServerOffFunction } from "@main/preload/share";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
+import type { turnServerOnReturn } from "@main/preload/share";
 import type { videoInfo } from "ytdl-core";
 
 declare global {
@@ -41,8 +41,7 @@ export type VisibleElectron = Readonly<
 		>;
 		share: Readonly<
 			{
-				turnServerOn(filePath: Readonly<Path>): TurnServerOffFunction;
-				getMyIpAddress(): Readonly<string>;
+				turnServerOn(filePath: Readonly<Path>): Readonly<turnServerOnReturn>;
 				makeItOnlyOneFile(
 					filepaths: ReadonlySet<Path>,
 				): Promise<Readonly<Path>>;

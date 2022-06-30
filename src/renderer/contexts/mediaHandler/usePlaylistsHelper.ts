@@ -31,9 +31,10 @@ export const searchDirectoryResult = async () =>
 				getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
 				getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
 				getFullPathOfFilesForFilesInThisDirectory(dirs.music),
-			])).map(p => (p.status === "fulfilled" ? p.value : undefined)).filter(
-				Boolean,
-			).flat() as readonly string[],
+			]))
+				.map(p => (p.status === "fulfilled" ? p.value : undefined))
+				.filter(Boolean)
+				.flat() as readonly string[],
 		"searchDirectoryResult",
 	);
 
@@ -48,12 +49,14 @@ export const getAllowedMedias = (
 	);
 
 export function sortByDate(list: MainList): ReadonlySet<Path> {
-	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {
-		if (prevMedia.birthTime > nextMedia.birthTime) return 1;
-		if (prevMedia.birthTime < nextMedia.birthTime) return -1;
-		// a must be equal to b:
-		return 0;
-	}).map(([path]) => path);
+	const listAsArrayOfPaths = [...list]
+		.sort(([, prevMedia], [, nextMedia]) => {
+			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
+			if (prevMedia.birthTime < nextMedia.birthTime) return -1;
+			// a must be equal to b:
+			return 0;
+		})
+		.map(([path]) => path);
 
 	return new Set(listAsArrayOfPaths);
 }

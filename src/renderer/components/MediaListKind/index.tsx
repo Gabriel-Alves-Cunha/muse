@@ -95,14 +95,16 @@ function MediaListKind_({ isHome = false }: Props) {
 
 						const mainList_ = mainList();
 
-						const listAsArrayOfMap = sortedByDate.map(([path, date]) => {
-							const media = mainList_.get(path);
+						const listAsArrayOfMap = sortedByDate
+							.map(([path, date]) => {
+								const media = mainList_.get(path);
 
-							if (!media)
-								return console.error(`Media not found for path: ${path}`);
+								if (!media)
+									return console.error(`Media not found for path: ${path}`);
 
-							return [path, media, date];
-						}).filter(Boolean) as [Path, Media, DateAsNumber][];
+								return [path, media, date];
+							})
+							.filter(Boolean) as [Path, Media, DateAsNumber][];
 
 						return listAsArrayOfMap;
 					}

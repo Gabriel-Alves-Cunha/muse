@@ -162,9 +162,10 @@ function changeMetadataIfAllowed(
 
 					// We need to handle the case where the key is an array, as in "genres":
 					if (oldValue instanceof Array) {
-						const newValueAsArray: string[] = newValue.split(
-							separatedByCommaOrSemiColorOrSpace,
-						).map(v => v.trim()).filter(Boolean);
+						const newValueAsArray: string[] = newValue
+							.split(separatedByCommaOrSemiColorOrSpace)
+							.map(v => v.trim())
+							.filter(Boolean);
 
 						// If newValueAsArray is `[""]`, then we need to remove the empty string:
 						if (newValueAsArray.length === 1 && newValueAsArray[0] === "")

@@ -79,7 +79,9 @@ export function MediaPlayer() {
 
 			dbg(
 				`Audio ended, playing ${
-					audio.loop ? "again because it's on loop." : "next media."
+					audio.loop ?
+						"again because it's on loop." :
+						"next media."
 				}`,
 			);
 
