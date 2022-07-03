@@ -1,22 +1,33 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
-import { BsThreeDotsVertical as Dots } from "react-icons/bs";
+import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { subscribeWithSelector } from "zustand/middleware";
 import { Dialog, Portal } from "@radix-ui/react-dialog";
-import { memo, useRef } from "react";
+import { memo } from "react";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
-import { DialogTrigger } from "@components/Dialog";
-import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
-import { emptySet } from "@utils/map-set";
+import { DialogTrigger } from "@components/DialogTrigger";
+import {
+	addToAllSelectedMedias,
+	toggleSelectedMedia,
+	PlaylistList,
+	mainList,
+} from "@contexts/mediaHandler/usePlaylists";
 
-import { RowWrapper, SubTitle, Title, Info, Img, PlayButton } from "./styles";
-import { StyledOverlay } from "./MediaOptions/styles";
+import { StyledDialogBlurOverlay } from "./MediaOptions/styles";
+import {
+	rowWrapperClassName,
+	PlayButton,
+	RowWrapper,
+	SubTitle,
+	Title,
+	Info,
+	Img,
+} from "./styles";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -24,33 +35,6 @@ const notify =
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-
-export const useAllSelectedMedias = create<
-	Readonly<{ allSelectedMedias: ReadonlySet<Path>; }>
->()(
-	subscribeWithSelector(() => ({
-		allSelectedMedias: emptySet as ReadonlySet<Path>,
-	})),
-);
-export const {
-	setState: setAllSelectedMedias,
-	getState: getAllSelectedMedias,
-} = useAllSelectedMedias;
-
-if (!import.meta.vitest)
-	useAllSelectedMedias.subscribe(
-		({ allSelectedMedias }) => allSelectedMedias,
-		function removeSelectedClassName() {
-			const { allSelectedMedias } = getAllSelectedMedias();
-
-			// if size is 0, then remove all selected classes:
-			if (allSelectedMedias.size === 0) {
-				document.querySelectorAll(`.${RowWrapper.className}`).forEach(item =>
-					item.classList.remove("selected")
-				);
-			}
-		},
-	);
 
 export const useFromList = create<FromList>(() => ({
 	homeList: PlaylistList.MAIN_LIST,
@@ -63,137 +47,95 @@ export const { getState: getFromList, setState: setFromList } = useFromList;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function selectOrPlayMedia(
-	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-	mediaRowRef: React.RefObject<HTMLDivElement>,
-	path: Path,
-) {
-	const goPlayMedia = toggleMediaSelectIfCtrlPlusLeftClick(
-		e,
-		mediaRowRef,
-		path,
-	);
-
-	if (goPlayMedia) {
-		const { fromList, homeList, isHome } = getFromList();
-		const list = isHome ? homeList : fromList;
-
-		playThisMedia(path, list);
-	}
-}
-
-const Row = memo(
-	({ media, path }: RowProps) => {
-		const mediaRowRef = useRef<HTMLDivElement>(null);
-		const overlayRef = useRef<HTMLDivElement>(null);
-
-		return (
-			<RowWrapper data-path={path} ref={mediaRowRef}>
-				<PlayButton
-					onClick={e => selectOrPlayMedia(e, mediaRowRef, path)}
-					data-tip="Play this media"
-				>
-					<Img>
-						<ImgWithFallback
-							Fallback={<MusicNote size="1.4rem" />}
-							mediaImg={media.img}
-							mediaPath={path}
-						/>
-					</Img>
-
-					<Info>
-						<Title>{media.title}</Title>
-						<SubTitle className="row">{media.duration}</SubTitle>
-					</Info>
-				</PlayButton>
-
-				<Dialog modal>
-					<DialogTrigger tooltip="Open media options">
-						<Dots />
-					</DialogTrigger>
-
-					<Portal>
-						<StyledOverlay ref={overlayRef}>
-							<MediaOptionsModal media={media} path={path} />
-						</StyledOverlay>
-					</Portal>
-				</Dialog>
-			</RowWrapper>
-		);
-	},
-	(prev, next) =>
-		prev.media.title === next.media.title &&
-		prev.media.duration === next.media.duration,
-);
-Row.displayName = "Row";
-
-const className = `.${RowWrapper.className}`;
-export function selectMediaOrMedias(e: React.MouseEvent<HTMLSpanElement>) {
-	const { allSelectedMedias } = getAllSelectedMedias();
-
+export function selectMedia(e: React.MouseEvent<HTMLSpanElement>): void {
 	const itemClicked = (e.nativeEvent.target as HTMLElement).closest(
-		className,
+		rowWrapperClassName,
 	) as HTMLDivElement;
 
-	const areThereOtherSelectedMedias = allSelectedMedias.size > 0;
+	const itemClickedMediaPath = itemClicked.getAttribute("data-path");
 
-	const allMediaPaths: string[] = [];
+	if (!itemClickedMediaPath) return console.error("No data-path found!");
 
-	if (areThereOtherSelectedMedias) {
-		const allSelectedMediasElements = document.querySelectorAll(".selected");
+	const media = mainList().get(itemClickedMediaPath);
 
-		allSelectedMediasElements.forEach(element => {
-			const path = element.getAttribute("data-path");
+	if (!media)
+		return console.error(`No media found for "${itemClickedMediaPath}"`);
 
-			path && allMediaPaths.push(path);
-		});
-	}
-
-	const itemClickedMediaPath = itemClicked.getAttribute("data-path") ?? "";
-
-	allMediaPaths.push(itemClickedMediaPath);
-
-	// Add className "selected" to the clicked media:
-	itemClicked.classList.add("selected");
-
-	// Add media to the set:
-	setAllSelectedMedias(({ allSelectedMedias }) => ({
-		allSelectedMedias: new Set(allSelectedMedias).add(itemClickedMediaPath),
-	}));
+	addToAllSelectedMedias(media, itemClickedMediaPath);
 }
 
 const leftClick = 0;
-const toggleMediaSelectIfCtrlPlusLeftClick = (
-	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
-	mediaRowRef: Readonly<React.RefObject<HTMLDivElement>>,
-	mediaPath: Readonly<Path>,
-): Readonly<boolean> => {
-	if (e.button !== leftClick || !e.ctrlKey || !mediaRowRef.current) return true;
 
-	const { allSelectedMedias } = getAllSelectedMedias();
+function selectOrPlayMedia(
+	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	mediaPath: Path,
+	media: Media,
+) {
+	if (e.button !== leftClick || !e.ctrlKey) {
+		const { fromList, homeList, isHome } = getFromList();
+		const list = isHome ? homeList : fromList;
 
-	const rowElement = mediaRowRef.current;
-
-	if (allSelectedMedias.has(mediaPath)) {
-		// Remove className "selected":
-		rowElement.classList.remove("selected");
-
-		// Remove media from the set:
-		const newSet = new Set(allSelectedMedias);
-		newSet.delete(mediaPath);
-		setAllSelectedMedias({ allSelectedMedias: newSet });
-	} else {
-		// Add className "selected":
-		rowElement.classList.add("selected");
-
-		// Add media to the set:
-		setAllSelectedMedias(({ allSelectedMedias }) => ({
-			allSelectedMedias: new Set(allSelectedMedias).add(mediaPath),
-		}));
+		return playThisMedia(mediaPath, list);
 	}
 
-	return false;
-};
+	toggleSelectedMedia(media, mediaPath);
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+const Row = memo(
+	({ media, path }: RowProps) => (
+		<RowWrapper
+			data-path={path}
+			className={media.isSelected ?
+				"selected" :
+				""}
+		>
+			<PlayButton
+				onClick={e => selectOrPlayMedia(e, path, media)}
+				data-tip="Play this media"
+			>
+				<Img>
+					<ImgWithFallback
+						Fallback={<MusicNote size="1.4rem" />}
+						mediaImg={media.img}
+						mediaPath={path}
+					/>
+				</Img>
+
+				<Info>
+					<Title>{media.title}</Title>
+					<SubTitle className="row">
+						{media.duration}
+					</SubTitle>
+				</Info>
+			</PlayButton>
+
+			<Dialog modal>
+				<DialogTrigger tooltip="Open media options">
+					<Dots size={17} />
+				</DialogTrigger>
+
+				<Portal>
+					<StyledDialogBlurOverlay>
+						<MediaOptionsModal media={media} path={path} />
+					</StyledDialogBlurOverlay>
+				</Portal>
+			</Dialog>
+		</RowWrapper>
+	),
+	(prev, next) =>
+		prev.media.title === next.media.title &&
+		prev.media.duration === next.media.duration &&
+		prev.media.isSelected === next.media.isSelected,
+);
+Row.displayName = "Row";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export const computeItemKey = (
 	_index: number,

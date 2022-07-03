@@ -8,6 +8,7 @@ import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { Decorations } from "@components/Decorations";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
+import { ShareDialog } from "@components/ShareDialog";
 import { Favorites } from "@routes/Favorites";
 import { GlobalCSS } from "@styles/global";
 import { Download } from "@routes/Download";
@@ -16,7 +17,6 @@ import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
-import { SharePopover } from "@components/Share";
 import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";
@@ -29,8 +29,8 @@ export function App() {
 			<ToastContainer
 				hideProgressBar={false}
 				position="top-right"
-				pauseOnFocusLoss
 				autoClose={5_000}
+				pauseOnFocusLoss
 				closeOnClick
 				pauseOnHover
 				newestOnTop
@@ -49,7 +49,7 @@ export function App() {
 				border
 			/>
 
-			<SharePopover />
+			<ShareDialog />
 
 			<Decorations />
 

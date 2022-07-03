@@ -4,14 +4,17 @@ export const emptySet: ReadonlySet<never> = new Set<never>();
 export function getFirstKey<Key>(
 	mapOrSet: ReadonlyMap<Key, unknown> | ReadonlySet<Key>,
 ): Readonly<Key | undefined> {
-	let ret: Key | undefined;
+	if (mapOrSet instanceof Map) {
+		const [key_] = mapOrSet as ReadonlyMap<Key, unknown>;
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const [key] = key_!;
 
-	for (const key of mapOrSet.keys()) {
-		ret = key;
-		break;
+		return key;
+	} else {
+		const [key] = mapOrSet as ReadonlySet<Key>;
+
+		return key;
 	}
-
-	return ret;
 }
 
 const getLastOf = (iteratorFn: "entries" | "keys" | "values") =>

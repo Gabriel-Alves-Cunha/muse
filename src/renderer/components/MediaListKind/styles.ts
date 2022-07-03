@@ -75,6 +75,7 @@ export const ListWrapper = styled("div", {
 export const RowWrapper = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons
 
+	boxSizing: "border-box",
 	pos: "relative",
 	d: "flex",
 	justifyContent: "flex-start",
@@ -92,8 +93,14 @@ export const RowWrapper = styled("div", {
 		boxShadow: "$row-wrapper",
 	},
 
-	"&.selected": { b: "2px solid $selected-border", bg: "$bg-selected" },
+	"&.selected": {
+		outline: "2px solid $selected-border",
+		outlineOffset: -2,
+
+		bg: "$bg-selected",
+	},
 });
+export const rowWrapperClassName = `.${RowWrapper.className}`;
 
 export const PlayButton = styled("button", {
 	pos: "relative",

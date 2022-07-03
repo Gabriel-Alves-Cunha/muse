@@ -56,7 +56,9 @@ fluent_ffmpeg.setFfmpegPath(ffmpegPath);
 const currentDownloads: Map<MediaUrl, Readable> = new Map();
 const mediasConverting: Map<Path, Readable> = new Map();
 
-async function pathExists(path: Readonly<Path>): Promise<Readonly<boolean>>
+export async function pathExists(
+	path: Readonly<Path>,
+): Promise<Readonly<boolean>>
 {
 	return access(path).then(() => true).catch(() => false);
 }
@@ -118,6 +120,7 @@ async function createMedia(
 				birthTime: lstatSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
+				isSelected: false,
 				genres,
 				album,
 				size,

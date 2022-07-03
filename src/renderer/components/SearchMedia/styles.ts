@@ -94,6 +94,7 @@ export const SearchWrapper = styled("div", {
 		fw: 500,
 		lh: 1.5,
 
+		outline: "none",
 		bg: "none",
 		b: "none",
 	},

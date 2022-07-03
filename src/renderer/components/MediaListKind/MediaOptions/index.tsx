@@ -16,10 +16,10 @@ import {
 } from "@common/@types/electron-window";
 
 import {
-	TriggerToRemoveMedia,
+	DialogTriggerToRemoveMedia,
 	StyledDescription,
-	StyledContent,
-	StyledOverlay,
+	StyledDialogContent,
+	StyledDialogBlurOverlay,
 	StyledTitle,
 	CloseDialog,
 	Fieldset,
@@ -43,7 +43,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 	}, [media, path]);
 
 	return (
-		<StyledContent ref={contentWrapperRef}>
+		<StyledDialogContent ref={contentWrapperRef}>
 			<StyledTitle>Edit/See media information</StyledTitle>
 
 			<StyledDescription>
@@ -68,14 +68,14 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 			<FlexRow>
 				<Dialog modal>
-					<TriggerToRemoveMedia>
+					<DialogTriggerToRemoveMedia>
 						Delete media
 						<Remove />
-					</TriggerToRemoveMedia>
+					</DialogTriggerToRemoveMedia>
 
-					<StyledOverlay />
+					<StyledDialogBlurOverlay />
 
-					<StyledContent id="second">
+					<StyledDialogContent id="second">
 						<StyledTitle>
 							Are you sure you want to delete this media from your computer?
 						</StyledTitle>
@@ -90,7 +90,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 							<CloseDialog id="cancel">Cancel</CloseDialog>
 						</FlexRow>
-					</StyledContent>
+					</StyledDialogContent>
 				</Dialog>
 
 				<CloseDialog
@@ -101,7 +101,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 					Save changes
 				</CloseDialog>
 			</FlexRow>
-		</StyledContent>
+		</StyledDialogContent>
 	);
 }
 

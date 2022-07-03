@@ -8,6 +8,7 @@ export const useSettings = create<Settings>(() => ({
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
 	filesToShare: emptySet,
+	maxSizeOfHistory: 100,
 }));
 
 export const { getState: getSettings, setState: setSettings } = useSettings;
@@ -17,5 +18,6 @@ type Settings = Readonly<
 		assureMediaSizeIsGreaterThan60KB: boolean;
 		ignoreMediaWithLessThan60Seconds: boolean;
 		filesToShare: ReadonlySet<Path>;
+		maxSizeOfHistory: number;
 	}
 >;

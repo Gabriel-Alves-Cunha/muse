@@ -3,18 +3,15 @@ import { FiTrash as Trash } from "react-icons/fi";
 
 import { deleteMedia } from "@utils/media";
 import { setSettings } from "@contexts/settings";
-import { emptySet } from "@utils/map-set";
 import {
-	getAllSelectedMedias,
-	setAllSelectedMedias,
-	useAllSelectedMedias,
-} from "@components/MediaListKind/helper";
+	allSelectedMedias,
+	selectAllMedias,
+} from "@contexts/mediaHandler/usePlaylists";
 
 import { RightSlot, Item } from "./styles";
 
 export function MediaOptionsCtxMenu() {
-	const { allSelectedMedias } = useAllSelectedMedias();
-	const plural = allSelectedMedias.size > 1 ? "s" : "";
+	const plural = allSelectedMedias.length > 1 ? "s" : "";
 
 	return (
 		<>
@@ -31,24 +28,23 @@ export function MediaOptionsCtxMenu() {
 					<Share />
 				</RightSlot>
 			</Item>
+
+			<Item onClick={selectAllMedias} className="notransition">
+				Select all medias
+				<RightSlot>Ctrl+A</RightSlot>
+			</Item>
 		</>
 	);
 }
 
 function shareMedias() {
-	const { allSelectedMedias } = getAllSelectedMedias();
-
-	setSettings({ filesToShare: allSelectedMedias });
+	setSettings({ filesToShare: new Set(allSelectedMedias) });
 }
 
 async function deleteMedias(): Promise<void> {
-	const { allSelectedMedias } = getAllSelectedMedias();
-
 	const promises: Promise<void>[] = [];
 
 	allSelectedMedias.forEach(path => promises.push(deleteMedia(path)));
-
-	setAllSelectedMedias({ allSelectedMedias: emptySet });
 
 	await Promise.all(promises);
 }

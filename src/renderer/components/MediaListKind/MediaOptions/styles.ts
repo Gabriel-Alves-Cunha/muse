@@ -9,9 +9,12 @@ import {
 
 import { styled, keyframes } from "@styles/global";
 
-const overlayShow = keyframes({ "0%": { opacity: 0 }, "100%": { opacity: 1 } });
+export const overlayShow = keyframes({
+	"0%": { opacity: 0 },
+	"100%": { opacity: 1 },
+});
 
-export const StyledOverlay = styled(Overlay, {
+export const StyledDialogBlurOverlay = styled(Overlay, {
 	pos: "fixed",
 	d: "grid",
 	placeItems: "center",
@@ -20,16 +23,16 @@ export const StyledOverlay = styled(Overlay, {
 	left: 0,
 	t: 0,
 
-	bg: "rgba(0, 0, 0, 0.1)",
 	backdropFilter: "blur(2px)",
+	bg: "rgba(0, 0, 0, 0.1)",
 
 	overflowY: "auto",
 	zIndex: 100,
 
-	animation: `${overlayShow} 80ms linear`,
+	animation: `${overlayShow} 90ms linear`,
 });
 
-export const StyledContent = styled(Content, {
+export const StyledDialogContent = styled(Content, {
 	all: "unset",
 
 	pos: "fixed",
@@ -49,7 +52,7 @@ export const StyledContent = styled(Content, {
 	zIndex: 150,
 	br: 4,
 
-	animation: `${overlayShow} 80ms linear`,
+	animation: `${overlayShow} 90ms linear`,
 
 	"&#second": {
 		pos: "fixed",
@@ -73,11 +76,11 @@ export const StyledContent = styled(Content, {
 export const StyledTitle = styled(Title, {
 	all: "unset",
 
-	ff: "$secondary",
-	ls: "0.07rem",
-	fs: "1.1rem",
+	ff: "$primary",
+	ls: "0.03rem",
+	fs: "1.4rem",
 	c: "$text",
-	fw: 600,
+	fw: 550,
 });
 
 export const StyledDescription = styled(Description, {
@@ -90,7 +93,7 @@ export const StyledDescription = styled(Description, {
 	lh: 1.5,
 });
 
-export const TriggerToRemoveMedia = styled(Trigger, {
+export const DialogTriggerToRemoveMedia = styled(Trigger, {
 	d: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",

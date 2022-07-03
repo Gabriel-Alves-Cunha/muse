@@ -8,23 +8,23 @@ import { ContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
-import { emptySet } from "@utils/map-set";
 import {
 	type MainList,
 	type History,
+	deselectAllMedias,
+	allSelectedMedias,
+	selectAllMedias,
 	usePlaylists,
 	PlaylistList,
 	mainList,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
 	computeHistoryItemKey,
-	getAllSelectedMedias,
-	setAllSelectedMedias,
-	selectMediaOrMedias,
 	computeItemKey,
 	reloadWindow,
 	itemContent,
 	useFromList,
+	selectMedia,
 } from "./helper";
 
 import { ListWrapper, EmptyList, Footer } from "./styles";
@@ -91,19 +91,11 @@ function MediaListKind_({ isHome = false }: Props) {
 							dates.forEach(date => unsortedList.push([path, date]))
 						);
 
-						const sortedByDate = unsortedList.sort((a, b) => a[1] - b[1]);
-
 						const mainList_ = mainList();
 
-						const listAsArrayOfMap = sortedByDate
-							.map(([path, date]) => {
-								const media = mainList_.get(path);
-
-								if (!media)
-									return console.error(`Media not found for path: ${path}`);
-
-								return [path, media, date];
-							})
+						const listAsArrayOfMap = unsortedList
+							.sort((a, b) => a[1] - b[1]) // sorted by date
+							.map(([path, date]) => [path, mainList_.get(path), date])
 							.filter(Boolean) as [Path, Media, DateAsNumber][];
 
 						return listAsArrayOfMap;
@@ -116,18 +108,32 @@ function MediaListKind_({ isHome = false }: Props) {
 		[listName, list],
 	);
 
-	useOnClickOutside(listRef, () => deselectAllMedias(listRef, isCtxMenuOpen));
+	useOnClickOutside(
+		listRef,
+		() => handleDeselectAllMedias(listRef, isCtxMenuOpen),
+	);
 
 	useEffect(() => {
 		useFromList.setState({ isHome });
 	}, [isHome]);
 
+	useEffect(() => {
+		function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
+			if (e.ctrlKey && e.key === "a") selectAllMedias();
+		}
+
+		window.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
+
+		return () =>
+			window.removeEventListener("keydown", selectAllMediasOnCtrlPlusA);
+	}, []);
+
 	return (
 		<ListWrapper ref={listRef}>
 			<ContextMenu
 				content={ContentEnum.MEDIA_OPTIONS}
-				onContextMenu={selectMediaOrMedias}
 				setIsOpen={setIsCtxMenuOpen}
+				onContextMenu={selectMedia}
 			>
 				<Virtuoso
 					components={{
@@ -156,14 +162,12 @@ function MediaListKind_({ isHome = false }: Props) {
 	);
 }
 
-function deselectAllMedias(
+function handleDeselectAllMedias(
 	listRef: React.RefObject<HTMLDivElement>,
 	isCtxMenuOpen: boolean,
 ) {
-	const { allSelectedMedias } = getAllSelectedMedias();
-
-	if (allSelectedMedias.size > 0 && listRef.current && !isCtxMenuOpen)
-		setAllSelectedMedias({ allSelectedMedias: emptySet });
+	if (listRef.current && !isCtxMenuOpen && allSelectedMedias.length > 0)
+		deselectAllMedias();
 }
 
-type Props = { isHome?: boolean; };
+type Props = Readonly<{ isHome?: boolean; }>;

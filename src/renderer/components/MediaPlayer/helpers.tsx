@@ -20,7 +20,7 @@ import {
 
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { formatDuration } from "@common/utils";
-import { DialogTrigger } from "@components/Dialog";
+import { DialogTrigger } from "@components/DialogTrigger";
 import { useProgress } from ".";
 import {
 	toggleLoopMedia,
@@ -39,7 +39,7 @@ import {
 	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 
-import { StyledOverlay } from "@components/MediaListKind/MediaOptions/styles";
+import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import {
 	ControlsAndSeekerContainer,
 	ControlsButtonsWrapper,
@@ -105,9 +105,9 @@ export const Header = ({ media, path }: RefToMedia) => (
 			</DialogTrigger>
 
 			{media && path && (
-				<StyledOverlay>
+				<StyledDialogBlurOverlay>
 					<MediaOptionsModal media={media} path={path} />
-				</StyledOverlay>
+				</StyledDialogBlurOverlay>
 			)}
 		</Dialog>
 

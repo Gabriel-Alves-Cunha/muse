@@ -3,12 +3,16 @@ import { Trigger } from "@radix-ui/react-dialog";
 import { styled } from "@styles/global";
 
 export const DialogTrigger = ({ children, className, tooltip }: Props) => (
-	<StyledTrigger className={className} data-tip={tooltip} data-place="bottom">
+	<StyledDialogTrigger
+		className={className + " notransition"}
+		data-place="bottom"
+		data-tip={tooltip}
+	>
 		{children}
-	</StyledTrigger>
+	</StyledDialogTrigger>
 );
 
-const StyledTrigger = styled(Trigger, {
+const StyledDialogTrigger = styled(Trigger, {
 	m: "unset",
 
 	position: "relative",
@@ -21,16 +25,12 @@ const StyledTrigger = styled(Trigger, {
 	br: "50%",
 	b: "none",
 
-	transition: "$bgc",
-
-	"&:hover": { transition: "$bgc", bg: "$icon-button-hovered" },
-
-	"&.unset-margin": { m: "unset" },
+	"&:hover": { bg: "$icon-button-hovered", "& svg": { c: "$text" } },
 
 	"&.on-media-player": {
 		c: "$media-player-icons",
 
-		"&:hover": { transition: "$bgc", bg: "$media-player-icon-button-hovered" },
+		"&:hover": { bg: "$media-player-icon-button-hovered" },
 	},
 });
 

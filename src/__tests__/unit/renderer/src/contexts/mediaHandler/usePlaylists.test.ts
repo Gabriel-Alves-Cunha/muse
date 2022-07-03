@@ -226,6 +226,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		const newMedia: Media = {
 			duration: formatDuration(100 + 10),
 			birthTime: Date.now(),
+			isSelected: false,
 			size: "3.0 MB",
 			title,
 		};

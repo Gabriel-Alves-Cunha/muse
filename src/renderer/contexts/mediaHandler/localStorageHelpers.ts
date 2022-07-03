@@ -65,7 +65,7 @@ export const setPlaylistsLocalStorage: LoggerImpl<UsePlaylistsActions> =
 				replace: boolean,
 			) => {
 				allowedToBeSaved.forEach(key => {
-					if (Object.prototype.hasOwnProperty.call(args, key))
+					if (Object.hasOwn(args, key))
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						setLocalStorage(keys[key], args[key]!);
 				});

@@ -128,7 +128,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				/* Handle on hover */
 				"&::-webkit-scrollbar-thumb:hover": { bg: "$scrollbar-thumb-hover" },
 
-				overflowY: "scroll",
+				overflowY: "auto",
 			}),
 		},
 	});
@@ -292,7 +292,7 @@ export const GlobalCSS = globalCss({
 		margin: 0,
 
 		overscrollBehavior: "none",
-		outline: "none !important",
+		// outline: "none !important",
 	},
 
 	"*": {

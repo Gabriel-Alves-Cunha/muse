@@ -1,4 +1,5 @@
 * FIX: get the picture to go to the media file!!!!
+* TODO: select all medias.
 
 NOTES:
 

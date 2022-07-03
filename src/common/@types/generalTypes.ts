@@ -11,6 +11,7 @@ export type Media = Readonly<
 	{
 		genres?: readonly string[];
 		birthTime: DateAsNumber;
+		isSelected: boolean;
 		size: PrettyBytes;
 		duration: string;
 		artist?: string;
@@ -33,6 +34,8 @@ export type DownloadInfo = Readonly<
 		url: string;
 	}
 >;
+
+export type QRCodeURL = `http://${string}:${number}`;
 
 export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
 
