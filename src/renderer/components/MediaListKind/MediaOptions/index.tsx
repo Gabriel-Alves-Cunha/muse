@@ -17,9 +17,9 @@ import {
 
 import {
 	DialogTriggerToRemoveMedia,
-	StyledDescription,
-	StyledDialogContent,
 	StyledDialogBlurOverlay,
+	StyledDialogContent,
+	StyledDescription,
 	StyledTitle,
 	CloseDialog,
 	Fieldset,
@@ -28,14 +28,20 @@ import {
 	Label,
 } from "./styles";
 
+const warningSvg = new URL(
+	"../../../assets/icons/warning.svg",
+	import.meta.url,
+);
+
 export function MediaOptionsModal({ media, path }: Props) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		const handleKeyUp = ({ key }: KeyboardEvent) =>
-			key === "Enter" &&
-			changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
+		function handleKeyUp({ key }: KeyboardEvent) {
+			if (key === "Enter")
+				changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
+		}
 
 		window.addEventListener("keyup", handleKeyUp);
 
@@ -75,20 +81,23 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 					<StyledDialogBlurOverlay />
 
-					<StyledDialogContent id="second">
-						<StyledTitle>
+					<StyledDialogContent className="delete-media">
+						<StyledTitle className="subtitle">
 							Are you sure you want to delete this media from your computer?
 						</StyledTitle>
 
 						<FlexRow>
+							<img src={warningSvg.href} alt="Warning sign" id="warning" />
+
 							<CloseDialog
 								onClick={() => handleMediaDeletion(closeButtonRef, path)}
-								id="delete-media"
+								className="delete-media"
+								tabIndex={0}
 							>
 								Confirm
 							</CloseDialog>
 
-							<CloseDialog id="cancel">Cancel</CloseDialog>
+							<CloseDialog id="cancel" tabIndex={1}>Cancel</CloseDialog>
 						</FlexRow>
 					</StyledDialogContent>
 				</Dialog>
@@ -109,11 +118,11 @@ async function handleMediaDeletion(
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
 ): Promise<void> {
-	if (closeButtonRef.current) {
-		closeEverything(closeButtonRef);
+	if (!closeButtonRef.current) return;
 
-		await deleteMedia(mediaPath);
-	}
+	closeEverything(closeButtonRef);
+
+	await deleteMedia(mediaPath);
 }
 
 function changeMediaMetadata(
@@ -226,6 +235,8 @@ const options = ({ duration, artist, album, genres, title, size }: Media) => ({
 	size,
 });
 
+// Translating to the names that the library that changes
+// the metadata recognizes:
 const allowedOptionToChange = Object.freeze(
 	{
 		artist: "albumArtists",
@@ -239,8 +250,9 @@ const allowedOptionToChange = Object.freeze(
 const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).includes(option);
 
-const closeEverything = (element: Readonly<RefObject<HTMLButtonElement>>) =>
-	element.current?.click();
+const closeEverything = (
+	element: Readonly<RefObject<HTMLButtonElement>>,
+): void => element.current?.click();
 
 const format = (
 	value: string | readonly string[] | undefined,

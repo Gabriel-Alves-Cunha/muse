@@ -24,7 +24,7 @@ export const CloseDialogTrigger = styled(Close, {
 	fw: 600,
 	lh: 1,
 
-	"& svg": { fill: "red" },
+	"& svg": { fill: "$accent" },
 
 	"&:hover": { bg: "rgba(0, 0, 0, 0.2)" },
 });
@@ -57,6 +57,7 @@ export const StyledDialogShareContent = styled(Content, {
 		animationDuration: "400ms",
 
 		"&[data-state='open']": { animationName: slideUpAndFade },
+		"&[data-state='close']": { animationName: slideUpAndFade },
 	},
 
 	"& div": {
@@ -68,10 +69,10 @@ export const StyledDialogShareContent = styled(Content, {
 			pos: "relative",
 			mt: 8 * 3,
 
-			c: "$alternative-text",
 			ff: "$primary",
 			ls: "0.04rem",
 			fs: "1.3rem",
+			c: "$text",
 			fw: 500,
 
 			textOverflow: "ellipsis",
@@ -79,28 +80,33 @@ export const StyledDialogShareContent = styled(Content, {
 			ov: "hidden",
 		},
 
-		ul: {
-			display: "block",
+		ol: {
+			display: "list-item",
 			pos: "relative",
+			h: 6 * 23,
 
 			mt: 8 * 2,
 
 			ox: "hidden",
-			oy: "auto",
 			scroll: 2,
 
-			"& li": {
+			li: {
+				display: "list-item",
 				pos: "relative",
+				mx: 10,
 
-				c: "$alternative-text",
+				listStyle: "decimal-leading-zero inside",
+				textAlign: "start",
 				ff: "$primary",
 				ls: "0.04rem",
 				fs: "1.1rem",
+				c: "$text",
 				fw: 500,
 
 				textOverflow: "ellipsis",
 				whiteSpace: "nowrap", // make it one-line.
-				ov: "hidden",
+
+				"&::marker": { c: "$accent", fw: 400 },
 			},
 		},
 	},

@@ -48,9 +48,11 @@ export const { getState: getFromList, setState: setFromList } = useFromList;
 /////////////////////////////////////////
 
 export function selectMedia(e: React.MouseEvent<HTMLSpanElement>): void {
-	const itemClicked = (e.nativeEvent.target as HTMLElement).closest(
-		rowWrapperClassName,
-	) as HTMLDivElement;
+	const itemClicked = (e.nativeEvent.target as HTMLElement).closest<
+		HTMLDivElement
+	>(rowWrapperClassName);
+
+	if (!itemClicked) return console.warn("No media row found.");
 
 	const itemClickedMediaPath = itemClicked.getAttribute("data-path");
 
@@ -61,7 +63,8 @@ export function selectMedia(e: React.MouseEvent<HTMLSpanElement>): void {
 	if (!media)
 		return console.error(`No media found for "${itemClickedMediaPath}"`);
 
-	addToAllSelectedMedias(media, itemClickedMediaPath);
+	if (!media.isSelected)
+		addToAllSelectedMedias(media, itemClickedMediaPath);
 }
 
 const leftClick = 0;

@@ -1,9 +1,9 @@
 import { createStitches } from "@stitches/react";
 import { toast } from "react-toastify";
 
-import { dbg, isDevelopment } from "@common/utils";
 import { getObjectDeepKeys } from "@utils/object";
 import { areArraysEqual } from "@utils/array";
+import { isDevelopment } from "@common/utils";
 
 export const { styled, globalCss, keyframes, createTheme, css } =
 	createStitches({
@@ -215,7 +215,7 @@ export const lightTheme = createTheme({
 		"window-buttons": "black",
 
 		"input-placeholder": "#a3a3a3",
-		"alternative-text": "#0D1F2D",
+		"alternative-text": "#113047",
 		"input-text": "#111111",
 		"gray-text": "#a8a8a8",
 		text: "#0C0910",
@@ -277,11 +277,12 @@ if (isDevelopment) {
 	const darkThemeKeys = getObjectDeepKeys(darkTheme);
 	const areEqual = areArraysEqual(lightThemeKeys, darkThemeKeys);
 
-	dbg(
-		{ lightThemeKeys, darkThemeKeys },
-		"Are light and dark themes keys the same?",
-		areEqual,
-	);
+	if (!areEqual)
+		console.error(
+			{ lightThemeKeys, darkThemeKeys },
+			"Are light and dark themes keys the same?",
+			areEqual,
+		);
 }
 
 export const GlobalCSS = globalCss({

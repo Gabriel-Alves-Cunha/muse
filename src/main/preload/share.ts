@@ -20,9 +20,10 @@ const exec = promisify(syncExec);
 const fileLocation = join(tmpdir(), "medias");
 const zipFileLocation = fileLocation + ".zip";
 const cmd = `zip -j -0 -v ${fileLocation} `;
-const hostname = getMyIpAddress();
-let cachedIp = "";
+const myIp = getMyIpAddress();
 let id = 0;
+
+dbg(`My ip address = ${myIp}`);
 
 export function turnServerOn(oneFilePath: Path): TurnServerOnReturn {
 	return time(() => {
@@ -47,8 +48,8 @@ export function turnServerOn(oneFilePath: Path): TurnServerOnReturn {
 
 			server.listen(
 				port,
-				hostname,
-				() => log(`Server '${id}' is running on http://${hostname}:${port}`),
+				myIp,
+				() => log(`Server '${id}' is running on http://${myIp}:${port}`),
 			);
 		}
 
@@ -113,7 +114,7 @@ export function turnServerOn(oneFilePath: Path): TurnServerOnReturn {
 		// server begins to listen.
 		const server = createServer(handleDownloadMedia)
 			.on("close", async () => {
-				dbg(`Closing server from NodeJS side.\nDeleting "${zipFileLocation}".`);
+				dbg("Closing server from NodeJS side.");
 
 				if (await pathExists(zipFileLocation)) {
 					dbg(`Deleting file: "${zipFileLocation}"`);
@@ -144,7 +145,7 @@ export function turnServerOn(oneFilePath: Path): TurnServerOnReturn {
 		const ret: TurnServerOnReturn = {
 			addListener: (event: string, listener: (...args: unknown[]) => void) =>
 				server.addListener(event, listener),
-			url: `http://${hostname}:${port}`,
+			url: `http://${myIp}:${port}`,
 			close: () => server.close(),
 		};
 
@@ -156,50 +157,46 @@ export function turnServerOn(oneFilePath: Path): TurnServerOnReturn {
 export async function makeItOnlyOneFile(
 	filepaths: ReadonlySet<Path>,
 ): Promise<Path> {
-	return await time(async () => {
-		const mediasSeparatedBySpaceAndSurroundedByQuotationMarks = [...filepaths]
-			.map(filepath => `"${filepath}"`)
-			.join(" ");
+	const mediasSeparatedBySpaceAndSurroundedByQuotationMarks = [...filepaths]
+		.map(filepath => `"${filepath}"`)
+		.join(" ");
 
-		// If only one file, send it directly:
-		if (filepaths.size === 1) return getFirstKey(filepaths) as string;
+	// If only one file, send it directly:
+	if (filepaths.size === 1) return getFirstKey(filepaths) as string;
 
-		// Else, make an uncompressed zip file:
-		try {
-			if (await pathExists(zipFileLocation)) {
-				dbg(`Deleting pre existing file: "${zipFileLocation}"`);
-				await unlink(zipFileLocation).catch(error);
-			}
+	// Else, make an uncompressed zip file:
+	try {
+		const start = performance.now();
 
-			const command = cmd + mediasSeparatedBySpaceAndSurroundedByQuotationMarks;
-
-			const { stdout, stderr } = await exec(command);
-
-			dbg("zip stdout:", stdout);
-			dbg("zip stderr:", stderr);
-		} catch (error) {
-			throw new Error("Error ziping medias! " + error);
+		if (await pathExists(zipFileLocation)) {
+			dbg(`Deleting pre existing file: "${zipFileLocation}"`);
+			await unlink(zipFileLocation).catch(error);
 		}
 
-		return zipFileLocation;
-	}, "async exec");
+		const command = cmd + mediasSeparatedBySpaceAndSurroundedByQuotationMarks;
+
+		const { stdout, stderr } = await exec(command);
+
+		dbg("zip stdout:", stdout);
+		dbg("zip stderr:", stderr);
+
+		const time = performance.now() - start;
+
+		dbg("makeItOnlyOneFile took:", time);
+	} catch (error) {
+		throw new Error("Error ziping medias! " + error);
+	}
+
+	return zipFileLocation;
 }
 
 function getMyIpAddress(): Readonly<string> {
-	if (cachedIp) return cachedIp;
-
-	const myIp = Object
+	return Object
 		.values(networkInterfaces())
 		.flat()
 		.filter(item => !item?.internal && item?.family === "IPv4")
 		.find(Boolean)
-		?.address;
-
-	dbg(`My ip address = ${myIp}`);
-
-	cachedIp = myIp ?? "";
-
-	return cachedIp;
+		?.address ?? "";
 }
 
 export type TurnServerOnReturn = Readonly<

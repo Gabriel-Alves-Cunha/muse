@@ -1,4 +1,9 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type {
+	DateAsNumber,
+	Media,
+	Mutable,
+	Path,
+} from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
@@ -389,17 +394,6 @@ if (!import.meta.vitest)
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-// export function allSelectedMedias(): readonly Path[] {
-// 	return time(
-// 		() =>
-// 			Array
-// 				.from(getState().sortedByName)
-// 				.filter(([, { isSelected }]) => isSelected)
-// 				.map(([path]) => path),
-// 		"allSelectedMedias",
-// 	);
-// }
-
 export function toggleSelectedMedia(media: Media, mediaPath: Path): void {
 	time(
 		() =>
@@ -443,10 +437,9 @@ export function deselectAllMedias() {
 	time(() => {
 		if (allSelectedMedias.length === 0) return;
 
-		const prevMediasList = mainList();
-		const newMediasList = new Map<Path, Media>();
+		const newMediasList = mainList() as Map<Path, Mutable<Media>>;
 
-		prevMediasList.forEach((media, path) =>
+		newMediasList.forEach((media, path) =>
 			newMediasList.set(path, { ...media, isSelected: false })
 		);
 
@@ -460,13 +453,11 @@ export function deselectAllMedias() {
 
 export function selectAllMedias() {
 	time(() => {
-		const prevMediasList = mainList();
+		const newMediasList = mainList() as Map<Path, Mutable<Media>>;
 
-		if (allSelectedMedias.length === prevMediasList.size) return;
+		if (allSelectedMedias.length === newMediasList.size) return;
 
-		const newMediasList = new Map<Path, Media>();
-
-		prevMediasList.forEach((media, path) =>
+		newMediasList.forEach((media, path) =>
 			newMediasList.set(path, { ...media, isSelected: true })
 		);
 

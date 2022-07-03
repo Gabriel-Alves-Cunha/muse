@@ -95,8 +95,11 @@ function MediaListKind_({ isHome = false }: Props) {
 
 						const listAsArrayOfMap = unsortedList
 							.sort((a, b) => a[1] - b[1]) // sorted by date
-							.map(([path, date]) => [path, mainList_.get(path), date])
-							.filter(Boolean) as [Path, Media, DateAsNumber][];
+							.map(([path, date]) => [path, mainList_.get(path), date]) as [
+								Path,
+								Media,
+								DateAsNumber,
+							][];
 
 						return listAsArrayOfMap;
 					}
@@ -119,7 +122,10 @@ function MediaListKind_({ isHome = false }: Props) {
 
 	useEffect(() => {
 		function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
-			if (e.ctrlKey && e.key === "a") selectAllMedias();
+			if (e.ctrlKey && e.key === "a") {
+				e.preventDefault();
+				selectAllMedias();
+			}
 		}
 
 		window.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
@@ -164,7 +170,7 @@ function MediaListKind_({ isHome = false }: Props) {
 
 function handleDeselectAllMedias(
 	listRef: React.RefObject<HTMLDivElement>,
-	isCtxMenuOpen: boolean,
+	isCtxMenuOpen: Readonly<boolean>,
 ) {
 	if (listRef.current && !isCtxMenuOpen && allSelectedMedias.length > 0)
 		deselectAllMedias();

@@ -41,12 +41,12 @@ export function ShareDialog() {
 	);
 
 	function handleDialogOpenStates(newValue: boolean) {
-		if (!newValue) server?.close();
+		if (newValue === false) server?.close();
 
 		setIsDialogOpen(newValue);
 	}
 
-	// When the server closes, get rid of it's reference
+	// When the server closes, get rid of it's reference:
 	useEffect(() => {
 		server?.addListener("close", () => {
 			setServer(null);
@@ -102,11 +102,11 @@ export function ShareDialog() {
 					<div>
 						<p>Sharing media{isPlural && "s"}:</p>
 
-						<ul>
+						<ol>
 							{[...filesToShare].map(path => (
 								<li key={path}>{getBasename(path)}</li>
 							))}
-						</ul>
+						</ol>
 					</div>
 
 					<Canvas ref={onCanvasElementMakeQRCode} id={qrid}>

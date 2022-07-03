@@ -20,7 +20,7 @@ export const StyledDialogBlurOverlay = styled(Overlay, {
 	placeItems: "center",
 	bottom: 0,
 	r: 0,
-	left: 0,
+	l: 0,
 	t: 0,
 
 	backdropFilter: "blur(2px)",
@@ -49,15 +49,15 @@ export const StyledDialogContent = styled(Content, {
 	p: 30,
 
 	bg: "$bg-dialog",
+	bs: "$dialog",
 	zIndex: 150,
 	br: 4,
 
 	animation: `${overlayShow} 90ms linear`,
 
-	"&#second": {
+	"&.delete-media": {
 		pos: "fixed",
 		d: "grid",
-		h: 100,
 		w: 300,
 
 		// Centered:
@@ -65,11 +65,13 @@ export const StyledDialogContent = styled(Content, {
 		l: "50%",
 		t: "50%",
 
-		p: 30,
-
 		bg: "$bg-dialog",
+		bs: "$dialog",
 		zIndex: 150,
+		p: 30,
 		br: 4,
+
+		"& #warning": { size: 35, mr: "auto" },
 	},
 });
 
@@ -80,7 +82,9 @@ export const StyledTitle = styled(Title, {
 	ls: "0.03rem",
 	fs: "1.4rem",
 	c: "$text",
-	fw: 550,
+	fw: 500,
+
+	"&.subtitle": { fs: "1.1rem", "&:first-letter": { fs: "1.9rem", fw: 400 } },
 });
 
 export const StyledDescription = styled(Description, {
@@ -112,8 +116,6 @@ export const DialogTriggerToRemoveMedia = styled(Trigger, {
 	fw: 600,
 	lh: 1,
 
-	"&:focus": { b: "1px solid #821e20" },
-
 	"&:hover": { bg: "#821e20" },
 });
 
@@ -134,7 +136,7 @@ export const CloseDialog = styled(Close, {
 	fw: 600,
 	lh: 1,
 
-	"&#delete-media": {
+	"&.delete-media": {
 		ff: "$secondary",
 		ls: "0.04rem",
 		fs: "1rem",
@@ -142,8 +144,6 @@ export const CloseDialog = styled(Close, {
 
 		bg: "#bb2b2e",
 		c: "white",
-
-		"&:focus": { b: "1px solid #821e20" },
 
 		"&:hover": { bg: "#821e20" },
 	},
@@ -156,8 +156,6 @@ export const CloseDialog = styled(Close, {
 
 		bg: "transparent",
 		c: "#2c6e4f",
-
-		"&:focus": { b: "1px solid #c6dbce" },
 
 		"&:hover": { bg: "#c6dbce" },
 	},
@@ -172,8 +170,6 @@ export const CloseDialog = styled(Close, {
 		m: "10px 0",
 		c: "black",
 
-		"&:focus": { b: "1px solid #c6dbce" },
-
 		"&:hover": { bg: "#c6dbce" },
 	},
 
@@ -185,8 +181,6 @@ export const CloseDialog = styled(Close, {
 
 		bg: "#94a59b",
 		c: "black",
-
-		"&:focus": { b: "1px solid #c6dbce" },
 
 		"&:hover": { bg: "#c6dbce" },
 	},
@@ -202,8 +196,6 @@ export const CloseDialog = styled(Close, {
 
 		bg: "#ddf4e5",
 		c: "#2c6e4f",
-
-		"&:focus": { b: "1px solid #c6dbce" },
 
 		"&:hover": { bg: "#c6dbce" },
 	},
@@ -227,8 +219,6 @@ export const CloseDialog = styled(Close, {
 });
 
 export const FlexRow = styled("div", {
-	all: "unset",
-
 	d: "flex", // row
 	justifyContent: "flex-end",
 
