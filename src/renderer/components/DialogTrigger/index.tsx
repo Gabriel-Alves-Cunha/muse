@@ -30,7 +30,11 @@ const StyledDialogTrigger = styled(Trigger, {
 	"&.on-media-player": {
 		c: "$media-player-icons",
 
-		"&:hover": { bg: "$media-player-icon-button-hovered" },
+		"&:hover": {
+			bg: "$media-player-icon-button-hovered",
+
+			"& svg": { c: "inherit" }, // keep same color
+		},
 	},
 });
 

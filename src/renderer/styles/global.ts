@@ -288,7 +288,7 @@ if (isDevelopment) {
 export const GlobalCSS = globalCss({
 	"*, *::after, *::before": {
 		textRendering: "geometricPrecision",
-		boxSizing: "border-box",
+		boxSizing: "inherit",
 		padding: 0,
 		margin: 0,
 
@@ -311,7 +311,7 @@ export const GlobalCSS = globalCss({
 			fontWeight: 300,
 			// This shit is the hacky way I found to get the fonts to load
 			// both on development and production with Vite!
-			src: `local(''), url('./assets/${
+			src: `url('./assets/${
 				isDevelopment ? "fonts/" : ""
 			}assistant-v16-latin-300.woff2') format('woff2')`,
 		},
@@ -320,7 +320,7 @@ export const GlobalCSS = globalCss({
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 400,
-			src: `local(''), url('./assets/${
+			src: `url('./assets/${
 				isDevelopment ? "fonts/" : ""
 			}assistant-v16-latin-regular.woff2') format('woff2')`,
 		},
@@ -329,7 +329,7 @@ export const GlobalCSS = globalCss({
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 500,
-			src: `local(''), url('./assets/${
+			src: `url('./assets/${
 				isDevelopment ? "fonts/" : ""
 			}assistant-v16-latin-500.woff2') format('woff2')`,
 		},
@@ -339,7 +339,7 @@ export const GlobalCSS = globalCss({
 			fontFamily: "Source Sans Pro",
 			fontStyle: "normal",
 			fontWeight: 400,
-			src: `local(''), url('./assets/${
+			src: `url('./assets/${
 				isDevelopment ? "fonts/" : ""
 			}source-sans-pro-v21-latin-regular.woff2') format('woff2')`,
 		},
@@ -350,6 +350,7 @@ export const GlobalCSS = globalCss({
 	body: {
 		overflow: "hidden !important",
 		position: "fixed",
+		lineHeight: 1.5,
 		size: "100%",
 
 		containIntrinsicSize: "1px 5000px",
@@ -359,6 +360,7 @@ export const GlobalCSS = globalCss({
 	},
 
 	html: {
+		boxSizing: "border-box",
 		caretColor: "$accent",
 		overflow: "hidden",
 

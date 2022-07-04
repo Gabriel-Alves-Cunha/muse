@@ -174,7 +174,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 	const handleTooltip = useCallback(
 		({ nativeEvent: { offsetX: mouseX } }: SeekEvent): void => {
 			/*
-				- event.offsetX, event.offsetY
+				- offsetX, offsetY:
 					The X and Y coordinates of the mouse
 					relative to the event source element.
 			*/
@@ -186,6 +186,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 			const progressBarWidth = floor(div.getBoundingClientRect().width);
 
+			// Set lower barier at 0, otherwise, for some reason, it gives < 0 values:
 			mouseX = mouseX < 0 ? 0 : mouseX;
 			const mouseXPercentage = (mouseX / progressBarWidth) * 100;
 
@@ -196,8 +197,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 			tooltip.textContent = formatDuration(time);
 			tooltip.style.left = `${left}px`;
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[isDurationValid],
+		[isDurationValid, audio],
 	);
 
 	return (

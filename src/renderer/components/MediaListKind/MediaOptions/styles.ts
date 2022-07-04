@@ -98,15 +98,16 @@ export const StyledDescription = styled(Description, {
 });
 
 export const DialogTriggerToRemoveMedia = styled(Trigger, {
+	// boxSizing: "revert",
 	d: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",
+	maxHeight: 35,
 	gap: 15,
-	h: 35,
 
 	cursor: "pointer",
 	bg: "#bb2b2e",
-	p: "0.8rem",
+	p: "0 15px",
 	b: "none",
 	br: 4,
 
@@ -114,7 +115,7 @@ export const DialogTriggerToRemoveMedia = styled(Trigger, {
 	fs: "1rem",
 	c: "white",
 	fw: 600,
-	lh: 1,
+	lh: "35px", // same as height
 
 	"&:hover": { bg: "#821e20" },
 });
@@ -137,6 +138,8 @@ export const CloseDialog = styled(Close, {
 	lh: 1,
 
 	"&.delete-media": {
+		h: 35,
+
 		ff: "$secondary",
 		ls: "0.04rem",
 		fs: "1rem",
@@ -149,6 +152,8 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#cancel": {
+		h: 35,
+
 		ff: "$secondary",
 		ls: "0.04rem",
 		fs: "1rem",
@@ -161,6 +166,8 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#reset-app-data": {
+		h: 35,
+
 		ff: "$secondary",
 		ls: "0.04rem",
 		fs: "1rem",
@@ -174,6 +181,8 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#reload-window": {
+		h: 35,
+
 		ff: "$secondary",
 		ls: "0.04rem",
 		fs: "1rem",
