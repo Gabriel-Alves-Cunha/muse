@@ -14,7 +14,7 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	c: "$deactivated-icon",
 	fs: "1rem",
 
-	"&:hover": { c: "$active-icon" },
+	"&:hover, &:focus": { c: "$active-icon" },
 
 	"&.has-items span": {
 		pos: "absolute",

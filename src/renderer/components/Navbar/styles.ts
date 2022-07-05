@@ -32,7 +32,7 @@ export const Buttons = styled("div", {
 		c: "$deactivated-icon",
 		fs: "1rem",
 
-		"&:hover": { c: "$active-icon" },
+		"&:hover, &:focus": { c: "$active-icon" },
 
 		"&.active": { c: "$active-icon" },
 	},

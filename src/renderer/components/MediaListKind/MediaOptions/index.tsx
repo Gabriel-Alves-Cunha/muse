@@ -43,9 +43,9 @@ export function MediaOptionsModal({ media, path }: Props) {
 				changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
 		}
 
-		window.addEventListener("keyup", handleKeyUp);
+		document.addEventListener("keyup", handleKeyUp);
 
-		return () => window.removeEventListener("keyup", handleKeyUp);
+		return () => document.removeEventListener("keyup", handleKeyUp);
 	}, [media, path]);
 
 	return (
@@ -74,7 +74,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 			<FlexRow>
 				<Dialog modal>
-					<DialogTriggerToRemoveMedia>
+					<DialogTriggerToRemoveMedia data-tip="Close dialog">
 						Delete media
 						<Remove />
 					</DialogTriggerToRemoveMedia>
@@ -92,12 +92,11 @@ export function MediaOptionsModal({ media, path }: Props) {
 							<CloseDialog
 								onClick={() => handleMediaDeletion(closeButtonRef, path)}
 								className="delete-media"
-								tabIndex={0}
 							>
 								Confirm
 							</CloseDialog>
 
-							<CloseDialog id="cancel" tabIndex={1}>Cancel</CloseDialog>
+							<CloseDialog id="cancel">Cancel</CloseDialog>
 						</FlexRow>
 					</StyledDialogContent>
 				</Dialog>

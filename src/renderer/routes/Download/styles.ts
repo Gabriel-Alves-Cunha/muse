@@ -48,7 +48,7 @@ export const Searcher = styled("div", {
 
 	transition: "all ease 250ms",
 
-	"&:hover, &:focus-within": {
+	"&:hover, &:focus-within, &:focus": {
 		transition: "all ease 250ms",
 
 		borderColor: "$input-border-active",
@@ -143,7 +143,7 @@ export const ResultContainer = styled("div", {
 
 		transition: "$scale",
 
-		"&:hover": { transition: "$scale", transform: "scale(1.1)" },
+		"&:hover, &:focus": { transition: "$scale", transform: "scale(1.1)" },
 	},
 
 	"& p": {

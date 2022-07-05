@@ -53,7 +53,7 @@ const ThemeButton = styled("button", {
 
 	c: "$deactivated-icon",
 
-	"&:hover": { c: "$active-icon" },
+	"&:hover, &:focus": { c: "$active-icon" },
 });
 
 type Themes = "light" | "dark";

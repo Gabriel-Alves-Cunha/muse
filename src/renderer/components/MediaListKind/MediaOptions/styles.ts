@@ -117,7 +117,7 @@ export const DialogTriggerToRemoveMedia = styled(Trigger, {
 	fw: 600,
 	lh: "35px", // same as height
 
-	"&:hover": { bg: "#821e20" },
+	"&:hover, &:focus": { bg: "#821e20" },
 });
 
 export const CloseDialog = styled(Close, {
@@ -126,6 +126,7 @@ export const CloseDialog = styled(Close, {
 	dflex: "center",
 	h: 35,
 
+	outline: "initial",
 	cursor: "pointer",
 	p: "0 15px",
 	b: "none",
@@ -148,7 +149,7 @@ export const CloseDialog = styled(Close, {
 		bg: "#bb2b2e",
 		c: "white",
 
-		"&:hover": { bg: "#821e20" },
+		"&:hover, &:focus": { bg: "#821e20" },
 	},
 
 	"&#cancel": {
@@ -162,7 +163,7 @@ export const CloseDialog = styled(Close, {
 		bg: "transparent",
 		c: "#2c6e4f",
 
-		"&:hover": { bg: "#c6dbce" },
+		"&:hover, &:focus": { bg: "#c6dbce" },
 	},
 
 	"&#reset-app-data": {
@@ -177,7 +178,7 @@ export const CloseDialog = styled(Close, {
 		m: "10px 0",
 		c: "black",
 
-		"&:hover": { bg: "#c6dbce" },
+		"&:hover, &:focus": { bg: "#c6dbce" },
 	},
 
 	"&#reload-window": {
@@ -191,7 +192,7 @@ export const CloseDialog = styled(Close, {
 		bg: "#94a59b",
 		c: "black",
 
-		"&:hover": { bg: "#c6dbce" },
+		"&:hover, &:focus": { bg: "#c6dbce" },
 	},
 
 	"&#save-changes": {
@@ -206,7 +207,7 @@ export const CloseDialog = styled(Close, {
 		bg: "#ddf4e5",
 		c: "#2c6e4f",
 
-		"&:hover": { bg: "#c6dbce" },
+		"&:hover, &:focus": { bg: "#c6dbce" },
 	},
 
 	"&#close-icon": {
@@ -223,7 +224,7 @@ export const CloseDialog = styled(Close, {
 
 		"& svg": { fill: "$accent-light" },
 
-		"&:hover": { bg: "$icon-button-hovered" },
+		"&:hover, &:focus": { bg: "$icon-button-hovered" },
 	},
 });
 

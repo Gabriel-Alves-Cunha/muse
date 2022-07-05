@@ -29,7 +29,7 @@ export const TriggerOptions = styled(Trigger, {
 
 	transition: "$bgc",
 
-	"&:hover": { transition: "$bgc", bg: "$icon-button-hovered" },
+	"&:hover, &:focus": { transition: "$bgc", bg: "$icon-button-hovered" },
 
 	// Hack to make the height the same size as the width:
 	"&::before": {

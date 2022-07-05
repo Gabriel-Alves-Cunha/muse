@@ -18,7 +18,7 @@ export const SearchWrapper = styled("div", {
 
 	transition: "all ease 250ms",
 
-	"&:hover, &:focus-within": {
+	"&:hover, &:focus-within, &:focus": {
 		transition: "all ease 250ms",
 
 		borderColor: "$input-border-active",
@@ -150,7 +150,7 @@ export const Result = styled("div", {
 	br: 7,
 	p: 7,
 
-	"&:hover": {
+	"&:hover, &:focus": {
 		boxShadowBorder: { color: "$colors$icon-button-hovered", width: 2 },
 		transition: "none",
 	},

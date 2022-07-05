@@ -27,7 +27,7 @@ const Button_ = styled("button", {
 
 	transition: "$bgc",
 
-	"&:hover": { bg: "$accent", c: "white" },
+	"&:hover, &:focus": { bg: "$accent", c: "white" },
 
 	input: { d: "none" },
 });

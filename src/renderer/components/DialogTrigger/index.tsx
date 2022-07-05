@@ -25,12 +25,12 @@ const StyledDialogTrigger = styled(Trigger, {
 	br: "50%",
 	b: "none",
 
-	"&:hover": { bg: "$icon-button-hovered", "& svg": { c: "$text" } },
+	"&:hover, &:focus": { bg: "$icon-button-hovered", "& svg": { c: "$text" } },
 
 	"&.on-media-player": {
 		c: "$media-player-icons",
 
-		"&:hover": {
+		"&:hover, &:focus": {
 			bg: "$media-player-icon-button-hovered",
 
 			"& svg": { c: "inherit" }, // keep same color

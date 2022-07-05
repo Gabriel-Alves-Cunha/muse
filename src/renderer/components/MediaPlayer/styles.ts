@@ -149,7 +149,10 @@ export const CircledIconButton = styled("button", {
 
 	transition: "$bgc",
 
-	"&:hover": { transition: "$bgc", bg: "$media-player-icon-button-hovered" },
+	"&:hover, &:focus": {
+		transition: "$bgc",
+		bg: "$media-player-icon-button-hovered",
+	},
 
 	variants: { size: { small: { size: 30 }, large: { size: 50, mx: 5 } } },
 
@@ -167,7 +170,7 @@ export const ProgressWrapper = styled("div", {
 
 	"& span": { d: "none" },
 
-	"&:hover span": {
+	"&:hover span, &:focus span": {
 		pos: "absolute",
 		dflex: "center",
 		bottom: 10,

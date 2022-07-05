@@ -39,9 +39,9 @@ export const WindowButton = styled("button", {
 
 	transition: "none !important",
 
-	"&:hover": { bg: "$icon-button-hovered" },
+	"&:hover, &:focus": { bg: "$icon-button-hovered" },
 
-	"&#close:hover": { bg: "#e70000", c: "white" },
+	"&#close:hover, &#close:focus": { bg: "#e70000", c: "white" },
 });
 
 export const AppName_Folder_Wrapper = styled("div", {

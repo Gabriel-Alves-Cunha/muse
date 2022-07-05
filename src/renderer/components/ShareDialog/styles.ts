@@ -26,7 +26,7 @@ export const CloseDialogTrigger = styled(Close, {
 
 	"& svg": { fill: "$accent" },
 
-	"&:hover": { bg: "rgba(0, 0, 0, 0.2)" },
+	"&:hover, &:focus": { bg: "rgba(0, 0, 0, 0.2)" },
 });
 
 export const StyledDialogShareContent = styled(Content, {
