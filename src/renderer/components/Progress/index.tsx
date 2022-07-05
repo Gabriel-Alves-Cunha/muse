@@ -38,8 +38,6 @@ export const progressIcons: ReadonlyMap<ProgressStatus, JSX.Element> = Object
 		]),
 	);
 
-export type ProgressProps = {
-	readonly showStatus: boolean;
-	percent_0_to_100: number;
-	status: ProgressStatus;
-};
+export type ProgressProps = Readonly<
+	{ showStatus: boolean; percent_0_to_100: number; status: ProgressStatus; }
+>;

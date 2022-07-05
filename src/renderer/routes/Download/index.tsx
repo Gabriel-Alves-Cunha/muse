@@ -14,16 +14,22 @@ import {
 	Searcher,
 } from "./styles";
 
-export const Download = () => (
-	<GridWrapper>
-		<Header>
-			<SearcherWrapper />
-			<IsLoading />
-		</Header>
+export function Download() {
+	useEffect(() => {
+		document.title = "Download medias files to audio files";
+	}, []);
 
-		<Result />
-	</GridWrapper>
-);
+	return (
+		<GridWrapper>
+			<Header>
+				<SearcherWrapper />
+				<IsLoading />
+			</Header>
+
+			<Result />
+		</GridWrapper>
+	);
+}
 
 function SearcherWrapper() {
 	const { error, url } = useSearchInfo();
@@ -39,7 +45,7 @@ function SearcherWrapper() {
 			<Searcher>
 				<SearchIcon size={18} />
 
-				<label className={url ? "active" : ""} htmlFor="search-url">
+				<label className={url ? "active" : ""} htmlFor="searcher:url">
 					Paste Youtube url here
 				</label>
 				<input
@@ -47,7 +53,7 @@ function SearcherWrapper() {
 					autoCapitalize="off"
 					spellCheck="false"
 					autoCorrect="off"
-					id="search-url"
+					id="searcher:url"
 					value={url}
 					type="text"
 				/>
@@ -70,7 +76,7 @@ function Result() {
 	return result ?
 		(
 			<ResultContainer>
-				<img src={result.imageURL} alt="Video thumbnail" />
+				<img src={result.imageURL} alt="Video thumbnail." />
 
 				<p>{result.title}</p>
 

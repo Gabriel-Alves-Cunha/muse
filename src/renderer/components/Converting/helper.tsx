@@ -33,10 +33,10 @@ export function Popup() {
 	const { convertingList } = useConvertingList();
 
 	function convertBoxes(): JSX.Element[] {
-		const list = [];
+		const list: JSX.Element[] = [];
 
 		let convertionIndex = 0;
-		for (const [path, media] of convertingList) {
+		convertingList.forEach((media, path) => {
 			list.push(
 				<ConvertBox
 					convertionIndex={convertionIndex}
@@ -46,7 +46,7 @@ export function Popup() {
 				/>,
 			);
 			++convertionIndex;
-		}
+		});
 
 		return list;
 	}
@@ -69,7 +69,7 @@ export function Popup() {
 }
 
 function cleanAllDoneConvertions(): void {
-	getConvertingList().convertingList.forEach((download, url) => {
+	getConvertingList().forEach((download, url) => {
 		if (
 			download.status !==
 				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
@@ -79,36 +79,34 @@ function cleanAllDoneConvertions(): void {
 	});
 }
 
-function ConvertBox(
+const ConvertBox = (
 	{
 		mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
 		convertionIndex,
 		path,
 	}: ConvertBoxProps,
-) {
-	return (
-		<ItemWrapper className="item">
-			<TitleAndCancelWrapper>
-				<p>{getBasename(path) + "." + toExtension}</p>
+) => (
+	<ItemWrapper className="item">
+		<TitleAndCancelWrapper>
+			<p>{getBasename(path) + "." + toExtension}</p>
 
-				<CancelButton
-					onClick={e =>
-						handleSingleItemDeleteAnimation(e, convertionIndex, false, path)}
-					data-tip="Cancel conversion"
-					className="notransition"
-				>
-					<Cancel size={12} />
-				</CancelButton>
-			</TitleAndCancelWrapper>
+			<CancelButton
+				onClick={e =>
+					handleSingleItemDeleteAnimation(e, convertionIndex, false, path)}
+				data-tip="Cancel conversion"
+				className="notransition"
+			>
+				<Cancel size={12} />
+			</CancelButton>
+		</TitleAndCancelWrapper>
 
-			<ConvertionProgress>
-				Converted: {formatDuration(timeConverted)} s /{" "}
-				{prettyBytes(sizeConverted)}
-				<span>{progressIcons.get(status)}</span>
-			</ConvertionProgress>
-		</ItemWrapper>
-	);
-}
+		<ConvertionProgress>
+			Converted: {formatDuration(timeConverted)} s /{" "}
+			{prettyBytes(sizeConverted)}
+			<span>{progressIcons.get(status)}</span>
+		</ConvertionProgress>
+	</ItemWrapper>
+);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -118,7 +116,7 @@ export function createNewConvertion(
 	convertInfo: Readonly<ConvertInfo>,
 	path: Readonly<Path>,
 ): Readonly<MessagePort> {
-	const { convertingList } = getConvertingList();
+	const convertingList = getConvertingList();
 
 	dbg("Trying to create a new conversion...", { convertingList });
 
@@ -144,9 +142,7 @@ export function createNewConvertion(
 		port: myPort,
 	};
 
-	setConvertingList({
-		convertingList: new Map(convertingList).set(path, convertStatus),
-	});
+	setConvertingList(new Map(convertingList).set(path, convertStatus));
 
 	// On every `postMessage` you have to send the path (as an ID)!
 	myPort.postMessage({
@@ -156,7 +152,7 @@ export function createNewConvertion(
 	});
 
 	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted>; }) => {
-		const { convertingList } = getConvertingList();
+		const convertingList = getConvertingList();
 
 		dbg(`Received a message from Electron on port for "${path}":`, {
 			convertingList,
@@ -169,12 +165,9 @@ export function createNewConvertion(
 				"Received a message from Electron but the path is not in the list!",
 			);
 
-		setConvertingList({
-			convertingList: new Map(convertingList).set(path, {
-				...convertStatus,
-				...data,
-			}),
-		});
+		setConvertingList(
+			new Map(convertingList).set(path, { ...convertStatus, ...data }),
+		);
 
 		switch (data.status) {
 			case ProgressStatus.FAILED: {

@@ -5,6 +5,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { SiConvertio as ConvertIcon } from "react-icons/si";
 
 import { MainArea } from "@components/MainArea";
+import { emptyMap } from "@utils/map-set";
 import { Button } from "@components/Button";
 import {
 	useNewConvertions,
@@ -14,9 +15,7 @@ import {
 import { Box } from "./styles";
 
 export function Convert() {
-	const [selectedMedias, setSelectedMedias] = useState<[Path, ConvertInfo][]>(
-		[],
-	);
+	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -25,11 +24,12 @@ export function Convert() {
 	) {
 		if (!files?.length) return;
 
-		setSelectedMedias(
-			[...files].map(
-				file => [file.path, { canStartConvert: true, toExtension }]
-			),
-		);
+		const map: Map<Path, ConvertInfo> = new Map();
+
+		for (const file of files)
+			map.set(file.path, { canStartConvert: true, toExtension });
+
+		setSelectedFiles(map);
 	}
 
 	const openChooseFilesNativeUI = () => inputRef.current?.click();
@@ -37,13 +37,17 @@ export function Convert() {
 	// Start converting
 	useEffect(() => {
 		// If there are selected files, convert them:
-		if (selectedMedias.length > 0) {
+		if (selectedFiles.size > 0) {
 			// To start convert, add to the convertInfoList:
-			useNewConvertions.setState({ newConvertions: new Map(selectedMedias) });
+			useNewConvertions.setState({ newConvertions: selectedFiles });
 
-			setSelectedMedias([]);
+			setSelectedFiles(emptyMap);
 		}
-	}, [toExtension, selectedMedias]);
+	}, [toExtension, selectedFiles]);
+
+	useEffect(() => {
+		document.title = "Convert medias files to mp3";
+	}, []);
 
 	return (
 		<MainArea>
@@ -67,3 +71,5 @@ export function Convert() {
 		</MainArea>
 	);
 }
+
+type SelectedFiles = ReadonlyMap<Path, ConvertInfo>;

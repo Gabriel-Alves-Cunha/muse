@@ -38,8 +38,6 @@ const StyledDialogTrigger = styled(Trigger, {
 	},
 });
 
-type Props = {
-	children: React.ReactNode;
-	className?: string;
-	tooltip: string;
-};
+type Props = Readonly<
+	{ children: React.ReactNode; className?: string; tooltip: string; }
+>;

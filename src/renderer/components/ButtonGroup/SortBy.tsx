@@ -41,6 +41,6 @@ export function SortBy({ className }: Props) {
 	);
 }
 
-type Props = { className?: string; };
+type Props = Readonly<{ className?: string; }>;
 
 type SelectedList = "Name" | "Date";

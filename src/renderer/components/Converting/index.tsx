@@ -14,8 +14,8 @@ import { PopoverAnchor } from "./styles";
 
 export function Converting() {
 	const convertingListSize = useConvertingList().convertingList.size;
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
-	const [isOpen, setIsOpen] = useState(false);
 
 	useEffect(() => {
 		newConvertions.forEach((newConvertion, path) => {
@@ -37,13 +37,15 @@ export function Converting() {
 				}
 		});
 
-		// In here, we've already handled all the files, so we can clear the list:
+		// In here, we've already handled all the files,
+		// so we can clear the list;
+		// We need the check to prevent infinite loop.
 		if (newConvertions.size !== 0)
 			useNewConvertions.setState({ newConvertions: emptyMap });
 	}, [newConvertions]);
 
 	return (
-		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
+		<PopoverRoot open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<StyledPopoverTrigger
 				className={convertingListSize ? "has-items " : ""}
 				data-tip="Show all converting medias"

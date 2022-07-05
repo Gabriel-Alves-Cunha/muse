@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { MediaListKind } from "@components/MediaListKind";
 import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
@@ -5,16 +7,22 @@ import { MediasInfo } from "@components/MediasInfo";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
-export const Home = () => (
-	<MainArea>
-		<Header>
-			<SearchMedia />
+export function Home() {
+	useEffect(() => {
+		document.title = "Audio list";
+	}, []);
 
-			<ButtonGroup buttons={{ reload: true, sortBy: true }} />
-		</Header>
+	return (
+		<MainArea>
+			<Header>
+				<SearchMedia />
 
-		<MediasInfo />
+				<ButtonGroup buttons={{ reload: true, sortBy: true }} />
+			</Header>
 
-		<MediaListKind isHome />
-	</MainArea>
-);
+			<MediasInfo />
+
+			<MediaListKind isHome />
+		</MainArea>
+	);
+}

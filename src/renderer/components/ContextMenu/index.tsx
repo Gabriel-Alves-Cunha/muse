@@ -43,9 +43,11 @@ function contentToShow(content: NonNullable<Props["content"]>) {
 	}
 }
 
-type Props = {
-	onContextMenu?: React.MouseEventHandler<HTMLSpanElement>;
-	setIsOpen?: (newIsOpen: boolean) => void;
-	content?: ContentEnum;
-	children: ReactNode;
-};
+type Props = Readonly<
+	{
+		onContextMenu?: React.MouseEventHandler<HTMLSpanElement>;
+		setIsOpen?: (newIsOpen: boolean) => void;
+		content?: ContentEnum;
+		children: ReactNode;
+	}
+>;

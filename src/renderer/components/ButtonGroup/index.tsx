@@ -15,33 +15,38 @@ export function ButtonGroup({ buttons }: Props) {
 		if (isOnlyOneButton) return " single-button";
 
 		function isFirstButton() {
-			let isFirst = false;
+			let isFirstButton = false;
 
-			// On the order that is inside <Wrapper>, the first one that is true, if equals to the button received on params, it is the first one:
-			const first: OneOf<Buttons> = reload ?
+			// On the order that is inside <Wrapper>,
+			// the first one that is true, if equals
+			// to the button received on params,
+			// it is the first one:
+			const firstButton: OneOf<Buttons> = reload ?
 				"reload" :
 				sortBy ?
 				"sortBy" :
 				"clean";
 
-			if (button === first) isFirst = true;
+			if (button === firstButton) isFirstButton = true;
 
-			return isFirst;
+			return isFirstButton;
 		}
 
 		function isLastButton() {
-			let isLast = false;
+			let isLastButton = false;
 
-			// On the reverse order that is inside <Wrapper>, the first one that is true, if equals to the button received on params, it is the last one:
-			const last: OneOf<Buttons> = clean ?
+			// On the reverse order that is inside <Wrapper>,
+			// the first one that is true, if equals to the
+			// button received on params, it is the last one:
+			const lastButton: OneOf<Buttons> = clean ?
 				"clean" :
 				sortBy ?
 				"sortBy" :
 				"reload";
 
-			if (button === last) isLast = true;
+			if (button === lastButton) isLastButton = true;
 
-			return isLast;
+			return isLastButton;
 		}
 
 		if (isFirstButton()) return " first";
@@ -61,6 +66,8 @@ export function ButtonGroup({ buttons }: Props) {
 	);
 }
 
-type Buttons = { reload?: boolean; sortBy?: boolean; clean?: boolean; };
+type Buttons = Readonly<
+	{ reload?: boolean; sortBy?: boolean; clean?: boolean; }
+>;
 
-type Props = { buttons: Buttons; };
+type Props = Readonly<{ buttons: Buttons; }>;

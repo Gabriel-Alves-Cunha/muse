@@ -9,6 +9,9 @@
 # Reset that branch to some other branch/commit:
 # > git reset --hard main
 
+# And push:
+# > git push
+
 name: Build and release
 
 on:

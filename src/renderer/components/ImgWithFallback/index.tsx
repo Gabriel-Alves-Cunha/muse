@@ -13,7 +13,7 @@ const cache: Map<Path, Status> = new Map();
 export function ImgWithFallback(
 	{ mediaPath, Fallback, mediaImg }: Props,
 ): JSX.Element {
-	if (!mediaImg || !mediaImg.length) return Fallback;
+	if (!mediaImg?.length) return Fallback;
 
 	const cacheStatus = cache.get(mediaPath);
 
@@ -49,4 +49,6 @@ export function ImgWithFallback(
 		(Fallback);
 }
 
-type Props = { Fallback: JSX.Element; mediaImg?: string; mediaPath: Path; };
+type Props = Readonly<
+	{ Fallback: JSX.Element; mediaImg?: string; mediaPath: Path; }
+>;

@@ -31,7 +31,7 @@ export const Navbar = () => (
 	</Nav>
 );
 
-const icons: Record<Page, JSX.Element> = Object.freeze({
+const icons: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Favorites: <Favorites />,
 	Download: <Download />,
 	Settings: <Settings />,

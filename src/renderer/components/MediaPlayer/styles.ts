@@ -3,7 +3,7 @@ import { styled } from "@styles/global";
 
 const padding = "10px";
 
-export const Wrapper = styled("div", {
+export const Wrapper = styled("section", {
 	gridArea: "media-player",
 
 	pos: "relative",

@@ -6,8 +6,8 @@ import { reloadWindow } from "@components/MediaListKind/helper";
 import { SubTitle } from "@components/MediaListKind/styles";
 import { Center } from "./styles";
 import {
-	StyledDialogContent,
 	StyledDialogBlurOverlay,
+	StyledDialogContent,
 	CloseDialog,
 	StyledTitle,
 } from "../MediaListKind/MediaOptions/styles";
@@ -21,8 +21,6 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 				<Center>
 					<StyledTitle>Something went wrong</StyledTitle>
 					<SubTitle>{description}</SubTitle>
-
-					{/* <ErrorMsg>{error.message}</ErrorMsg> */}
 
 					<CloseDialog
 						onClick={() => {
@@ -43,7 +41,4 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 	);
 }
 
-type ErrorBoundaryProps = Readonly<{
-	description: string;
-	// error: Error;
-}>;
+type ErrorBoundaryProps = Readonly<{ description: string; }>;

@@ -10,6 +10,8 @@ import { Header } from "@components/Header";
 
 export function Favorites() {
 	useEffect(() => {
+		document.title = "Favorite audios list";
+
 		setFromList({ fromList: PlaylistList.FAVORITES });
 	}, []);
 

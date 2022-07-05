@@ -1,6 +1,6 @@
 import { styled } from "@styles/global";
 
-export const MainArea = styled("div", {
+export const MainArea = styled("main", {
 	gridArea: "main-area",
 
 	position: "relative",

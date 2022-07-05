@@ -47,12 +47,15 @@ export const StyledPopoverTrigger = styled(Trigger, {
 
 const fallAway = keyframes({
 	"0%": { transform: "rotateZ(0deg)", opacity: 1, top: 0 },
+
 	"25%": { transform: "rotateZ(-15deg)" },
+
 	"100%": { transform: "rotateZ(-5deg)", opacity: 0, top: 200 },
 });
 
 const moveUp = keyframes({
 	"0%": { transform: "translateY(0px)" },
+
 	"100%": {
 		// -73 is the (height + 1 * gap):
 		transform: "translateY(-73px)",
@@ -91,6 +94,7 @@ export const ItemWrapper = styled("div", {
 		animationName: `${moveUp}`,
 	},
 });
+export const ItemWrapperClass = `.${ItemWrapper.className}`;
 
 export const TitleAndCancelWrapper = styled("div", {
 	pos: "relative",

@@ -10,6 +10,8 @@ import { Header } from "@components/Header";
 
 export function History() {
 	useEffect(() => {
+		document.title = "History of audios played";
+
 		setFromList({ fromList: PlaylistList.HISTORY });
 	}, []);
 

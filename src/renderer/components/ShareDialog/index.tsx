@@ -93,7 +93,6 @@ export function ShareDialog() {
 					onClick={() =>
 						closePopover(server?.close)}
 					data-tip="Close share screen"
-					tabIndex={0}
 				>
 					<Close />
 				</CloseDialogTrigger>

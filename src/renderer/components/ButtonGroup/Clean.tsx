@@ -14,7 +14,7 @@ export const Clean = ({ className }: Props) => (
 	<ButtonFromGroup
 		onClick={cleanProperList}
 		className={className}
-		data-tip="Clean List"
+		data-tip="Clean list"
 		data-place="bottom"
 	>
 		<CleanIcon size={18} />
@@ -39,4 +39,4 @@ function cleanProperList() {
 	}
 }
 
-type Props = { className?: string; };
+type Props = Readonly<{ className?: string; }>;

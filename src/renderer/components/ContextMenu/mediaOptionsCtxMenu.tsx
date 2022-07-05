@@ -37,7 +37,7 @@ export function MediaOptionsCtxMenu() {
 	);
 }
 
-function shareMedias() {
+export function shareMedias() {
 	setSettings({ filesToShare: new Set(allSelectedMedias) });
 }
 

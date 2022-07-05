@@ -99,6 +99,7 @@ const Row = memo(
 			<PlayButton
 				onClick={e => selectOrPlayMedia(e, path, media)}
 				data-tip="Play this media"
+				data-place="bottom"
 			>
 				<Img>
 					<ImgWithFallback

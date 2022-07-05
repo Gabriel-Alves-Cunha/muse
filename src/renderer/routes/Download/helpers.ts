@@ -19,8 +19,8 @@ export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 export function downloadMedia(): void {
 	const { result, url } = searchInfo();
 
-	if (!result) return;
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
+	if (!result || !url) return;
 
 	// Start download:
 	setDownloadInfo({

@@ -71,7 +71,7 @@ export function InputAndResults() {
 
 	const foundSomething = searchStatus === FOUND_SOMETHING;
 	const nothingFound = searchStatus === NOTHING_FOUND;
-	const isOpen = foundSomething || nothingFound;
+	const shouldPopoverOpen = foundSomething || nothingFound;
 
 	// Close everything when the user clicks outside of the input,
 	// but only if the input is not focused so it doesn't fire
@@ -141,7 +141,7 @@ export function InputAndResults() {
 				{!isOnFocus && <RightSlot id="search">Alt+k</RightSlot>}
 			</>
 
-			<PopoverRoot open={isOpen}>
+			<PopoverRoot open={shouldPopoverOpen}>
 				<SearchMediaPopoverAnchor />
 
 				<PopoverContent
@@ -156,18 +156,14 @@ export function InputAndResults() {
 							</NothingFound>
 						) :
 						foundSomething ?
-						(
-							<>
-								{results.map(([path, media]) => (
-									<Row
-										highlight={searchTerm}
-										media={media}
-										path={path}
-										key={path}
-									/>
-								))}
-							</>
-						) :
+						(results.map(([path, media]) => (
+							<Row
+								highlight={searchTerm}
+								media={media}
+								path={path}
+								key={path}
+							/>
+						))) :
 						undefined}
 				</PopoverContent>
 			</PopoverRoot>

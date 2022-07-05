@@ -25,7 +25,12 @@ export const Decorations = () => (
 	<Wrapper>
 		{/* ^ window-draggable-region */}
 		<AppIcon>
-			<img src={imageUrl.href} width={24} height={24} alt="Muse's logo" />
+			<img
+				alt="Muse's logo, a donut-like circle with shades of blue."
+				src={imageUrl.href}
+				height={24}
+				width={24}
+			/>
 		</AppIcon>
 
 		<AppNamePlusFolder />

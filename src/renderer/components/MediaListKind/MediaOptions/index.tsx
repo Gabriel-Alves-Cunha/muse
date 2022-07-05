@@ -38,6 +38,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
+		// TODO: change this cause if you open the popover by pressing
+		// "Enter", it will just open and close it!
 		function handleKeyUp({ key }: KeyboardEvent) {
 			if (key === "Enter")
 				changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
@@ -57,7 +59,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				you&apos;re done.
 			</StyledDescription>
 
-			<CloseDialog ref={closeButtonRef} data-tip="Close" id="close-icon">
+			<CloseDialog ref={closeButtonRef} data-tip="Close dialog" id="close-icon">
 				<Close />
 			</CloseDialog>
 
@@ -74,7 +76,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 			<FlexRow>
 				<Dialog modal>
-					<DialogTriggerToRemoveMedia data-tip="Close dialog">
+					<DialogTriggerToRemoveMedia data-tip="Close delete's dialog">
 						Delete media
 						<Remove />
 					</DialogTriggerToRemoveMedia>
@@ -87,7 +89,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 						</StyledTitle>
 
 						<FlexRow>
-							<img src={warningSvg.href} alt="Warning sign" id="warning" />
+							<img src={warningSvg.href} alt="Warning sign." id="warning" />
 
 							<CloseDialog
 								onClick={() => handleMediaDeletion(closeButtonRef, path)}

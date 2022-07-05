@@ -145,7 +145,7 @@ function MediaListKind_({ isHome = false }: Props) {
 					components={{
 						EmptyPlaceholder: () => (
 							<EmptyList>
-								<img src={noMediaFoundPng.href} alt="No medias found" />
+								<img src={noMediaFoundPng.href} alt="No medias found." />
 								No medias found
 							</EmptyList>
 						),
@@ -169,7 +169,7 @@ function MediaListKind_({ isHome = false }: Props) {
 }
 
 function handleDeselectAllMedias(
-	listRef: React.RefObject<HTMLDivElement>,
+	listRef: Readonly<React.RefObject<HTMLDivElement>>,
 	isCtxMenuOpen: Readonly<boolean>,
 ) {
 	if (listRef.current && !isCtxMenuOpen && allSelectedMedias.length > 0)

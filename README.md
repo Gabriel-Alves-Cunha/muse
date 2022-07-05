@@ -1,7 +1,7 @@
 # Muse
 
 <h1 align="center">
-	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="Muse's logo">
+	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
 </h1>
 
 > Just a simple Electron-React app to download audio from Youtube and play them.
@@ -23,11 +23,11 @@
 ## Screenshots
 
 <h1 align="center">
-  <img src="screenshots/home.png" />
+  <img src="screenshots/home.png" alt="Muse's home page wich is divide in three main parts, from left to right: the navigation, the main, wich contains the media list, and the media player." />
 </h1>
 
 <h1 align="center">
-  <img src="screenshots/download.png" />
+  <img src="screenshots/download.png" alt="Muse's download page." />
 </h1>
 
 ### 🛠 Tecnologies
@@ -99,12 +99,20 @@ As an alternative, consult the docs from GitHub on [how to create a pull request
 ---
 
 <a href="https://github.com/Gabriel-Alves-Cunha/">
-  <img style="border-radius: 50%;" src="https://github.com/Gabriel-Alves-Cunha.png" width="100px;" alt=""/>
+  <img
+    alt="Gabriel Alves Cunha Github's profile picture."
+    src="https://github.com/Gabriel-Alves-Cunha.png"
+    style="border-radius: 50%;"
+    width="100px"
+  />
+
   <br />
+
   <sub>
     <b>Gabriel Alves Cunha</b>
   </sub>
 </a>
+
 <a href="https://blog.rocketseat.com.br/author/thiago//" title="Rocketseat">🚀</a>
 
 Made with ❤️ by Gabriel Alves Cunha 👋🏽!

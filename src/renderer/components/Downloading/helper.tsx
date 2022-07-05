@@ -17,17 +17,17 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { TitleAndCancelWrapper, ItemWrapper } from "./styles";
+import { TitleAndCancelWrapper, ItemWrapper, ItemWrapperClass } from "./styles";
 import { CancelButton } from "@components/Converting/styles";
 
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
 
 	function downloadingBoxes() {
-		const list = [];
+		const list: JSX.Element[] = [];
 
 		let downloadingIndex = 0;
-		for (const [url, download] of downloadingList) {
+		downloadingList.forEach((download, url) => {
 			list.push(
 				<DownloadingBox
 					downloadingIndex={downloadingIndex}
@@ -37,7 +37,7 @@ export function Popup() {
 				/>,
 			);
 			++downloadingIndex;
-		}
+		});
 
 		return list;
 	}
@@ -59,35 +59,33 @@ export function Popup() {
 	);
 }
 
-function DownloadingBox(
+const DownloadingBox = (
 	{ downloadingIndex, download, url }: DownloadingBoxProps,
-) {
-	return (
-		<ItemWrapper key={url}>
-			<TitleAndCancelWrapper>
-				<p>{download.title}</p>
+) => (
+	<ItemWrapper key={url}>
+		<TitleAndCancelWrapper>
+			<p>{download.title}</p>
 
-				<CancelButton
-					onClick={e =>
-						handleSingleItemDeleteAnimation(e, downloadingIndex, true, url)}
-					className="cancel-button notransition"
-					data-tip="Cancel/Remove download"
-				>
-					<Cancel size={12} />
-				</CancelButton>
-			</TitleAndCancelWrapper>
+			<CancelButton
+				onClick={e =>
+					handleSingleItemDeleteAnimation(e, downloadingIndex, true, url)}
+				className="cancel-button notransition"
+				data-tip="Cancel/Remove download"
+			>
+				<Cancel size={12} />
+			</CancelButton>
+		</TitleAndCancelWrapper>
 
-			<Progress
-				percent_0_to_100={download.percentage}
-				status={download.status}
-				showStatus
-			/>
-		</ItemWrapper>
-	);
-}
+		<Progress
+			percent_0_to_100={download.percentage}
+			status={download.status}
+			showStatus
+		/>
+	</ItemWrapper>
+);
 
 function cleanAllDoneDownloads(): void {
-	getDownloadingList().downloadingList.forEach((download, url) => {
+	getDownloadingList().forEach((download, url) => {
 		if (
 			download.status !==
 				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
@@ -105,7 +103,7 @@ function cleanAllDoneDownloads(): void {
 export function createNewDownload(
 	downloadInfo: Readonly<DownloadInfo>,
 ): Readonly<MessagePort> {
-	const { downloadingList } = getDownloadingList();
+	const downloadingList = getDownloadingList();
 
 	dbg("Trying to create a new download...", { downloadingList });
 
@@ -127,8 +125,8 @@ export function createNewDownload(
 	const { port1: myPort, port2: electronPort } = new MessageChannel();
 
 	// Creating a new DownloadingMedia and adding it to the list:
-	setDownloadingList({
-		downloadingList: new Map(downloadingList).set(downloadInfo.url, {
+	setDownloadingList(
+		new Map(downloadingList).set(downloadInfo.url, {
 			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 			imageURL: downloadInfo.imageURL,
 			title: downloadInfo.title,
@@ -136,11 +134,11 @@ export function createNewDownload(
 			percentage: 0,
 			port: myPort,
 		}),
-	});
+	);
 
 	dbg(
 		"Added download to the list:",
-		getDownloadingList().downloadingList.get(downloadInfo.url),
+		getDownloadingList().get(downloadInfo.url),
 	);
 
 	// Send msg to electronPort to download:
@@ -151,7 +149,7 @@ export function createNewDownload(
 	myPort.onmessage = (
 		{ data }: { data: Readonly<Partial<MediaBeingDownloaded>>; },
 	): void => {
-		const { downloadingList } = getDownloadingList();
+		const downloadingList = getDownloadingList();
 
 		dbg(
 			`Received a message from Electron on port for "${downloadInfo.title}":`,
@@ -168,12 +166,12 @@ export function createNewDownload(
 		dbg("downloadStatus:", downloadingList.get(downloadInfo.url));
 
 		// Update React's information about this DownloadingMedia:
-		setDownloadingList({
-			downloadingList: new Map(downloadingList).set(downloadInfo.url, {
+		setDownloadingList(
+			new Map(downloadingList).set(downloadInfo.url, {
 				...thisDownload,
 				...data,
 			}),
-		});
+		);
 
 		// Handle ProgressStatus's cases:
 		switch (data.status) {
@@ -225,7 +223,7 @@ export function createNewDownload(
 }
 
 function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
-	const { downloadingList } = getDownloadingList();
+	const downloadingList = getDownloadingList();
 
 	// Assert that the download exists:
 	const download = downloadingList.get(url);
@@ -244,13 +242,13 @@ function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
 	newDownloadingList.delete(url);
 
 	// Make React update:
-	setDownloadingList({ downloadingList: newDownloadingList });
+	setDownloadingList(newDownloadingList);
 }
 
 export function cancelConvertionAndOrRemoveItFromList(
 	path: Readonly<string>,
 ): void {
-	const { convertingList } = getConvertingList();
+	const convertingList = getConvertingList();
 
 	const mediaBeingConverted = convertingList.get(path);
 
@@ -269,17 +267,16 @@ export function cancelConvertionAndOrRemoveItFromList(
 	newConvertingList.delete(path);
 
 	// Make React update:
-	setConvertingList({ convertingList: newConvertingList });
+	setConvertingList(newConvertingList);
 }
 
-const className = `.${ItemWrapper.className}`;
 export function handleSingleItemDeleteAnimation(
 	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
 	downloadingOrConvertionIndex: Readonly<number>,
 	isDownloadList: Readonly<boolean>,
 	url: Readonly<string>,
 ): void {
-	const items = document.querySelectorAll(className) as NodeListOf<
+	const items = document.querySelectorAll(ItemWrapperClass) as NodeListOf<
 		HTMLDivElement
 	>;
 
@@ -300,7 +297,7 @@ export function handleSingleItemDeleteAnimation(
 	//////////////////////////////////////////
 
 	const itemClicked = (e.target as HTMLElement).closest(
-		className,
+		ItemWrapperClass,
 	) as HTMLDivElement;
 
 	itemClicked.classList.add("delete");
@@ -322,8 +319,6 @@ export function handleSingleItemDeleteAnimation(
 	});
 }
 
-type DownloadingBoxProps = {
-	download: MediaBeingDownloaded;
-	downloadingIndex: number;
-	url: string;
-};
+type DownloadingBoxProps = Readonly<
+	{ download: MediaBeingDownloaded; downloadingIndex: number; url: string; }
+>;

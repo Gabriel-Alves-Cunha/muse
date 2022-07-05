@@ -141,15 +141,14 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
 		</CircledIconButton>
 
-		<CircledIconButton data-tip="Play next track" onClick={playNextMedia} // tooltip-side="top"
-		>
+		<CircledIconButton data-tip="Play next track" onClick={playNextMedia}>
 			<Next />
 		</CircledIconButton>
 	</ControlsWrapper>
 );
 
 function seek(e: SeekEvent, audio: Audio): void {
-	if (!audio || !audio.duration) return;
+	if (!audio?.duration) return;
 
 	const width = Number(
 		getComputedStyle(e.currentTarget).width.replace("px", ""),
@@ -213,7 +212,10 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					ref={timeTooltipRef}
 				/>
 
-				<ProgressThumb css={{ width: `${!percentage ? 0 : percentage}%` }} />
+				<ProgressThumb
+					// !NaN => true (in case is not present), everything else is false:
+					css={{ width: `${!percentage ? 0 : percentage}%` }}
+				/>
 			</ProgressWrapper>
 
 			<Duration>

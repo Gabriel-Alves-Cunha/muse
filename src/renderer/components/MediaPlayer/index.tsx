@@ -67,7 +67,7 @@ export function MediaPlayer() {
 
 			const lastTime = currentPlaying().currentTime;
 			if (lastTime > 30 /* seconds */) {
-				console.log(
+				dbg(
 					`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`,
 				);
 				audio.currentTime = lastTime;
@@ -131,7 +131,7 @@ export function MediaPlayer() {
 	}, [audio, media, path]);
 
 	return (
-		<Wrapper>
+		<Wrapper aria-label="Media player">
 			<>
 				<audio id="audio" preload="metadata" ref={audioRef} />
 			</>
@@ -159,11 +159,12 @@ export function MediaPlayer() {
 }
 
 const handleInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
-const handleError = (e: Readonly<Event>): void => dbg("Audio error:", e);
 const handleAbort = (): void => dbg("Audio was aborted.");
 const handleClose = (): void => dbg("Audio was closed.");
 const handleSecurityPolicyViolation = (e: Readonly<Event>): void =>
 	console.error("Audio has a security policy violation:", e);
+const handleError = (e: Readonly<Event>): void =>
+	console.error("Audio error:", e);
 const handleStalled = (e: Readonly<Event>): void =>
 	dbg(
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",

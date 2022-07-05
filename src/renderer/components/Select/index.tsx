@@ -51,12 +51,14 @@ function contentToShow<Options extends string>(
 	}
 }
 
-type Props<Options extends string> = {
-	setValue: (value: Options) => void;
-	triggerClassName?: string;
-	children: React.ReactNode;
-	content?: ContentEnum;
-	triggerTitle?: string;
-	tooltip: string;
-	value: Options;
-};
+type Props<Options extends string> = Readonly<
+	{
+		setValue: (value: Options) => void;
+		triggerClassName?: string;
+		children: React.ReactNode;
+		content?: ContentEnum;
+		triggerTitle?: string;
+		tooltip: string;
+		value: Options;
+	}
+>;

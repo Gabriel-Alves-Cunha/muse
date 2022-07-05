@@ -89,7 +89,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case NEW_DOWNLOAD_CREATED: {
 			dbg("New download created.");
 
-			const { downloadingList } = getDownloadingList();
+			const downloadingList = getDownloadingList();
 			// In here, there has to be a download WAITING:
 			const download = downloadingList.get(msg.url);
 
@@ -102,19 +102,19 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setDownloadingList({
-				downloadingList: new Map(downloadingList).set(msg.url, {
+			setDownloadingList(
+				new Map(downloadingList).set(msg.url, {
 					...download,
 					status: ProgressStatus.ACTIVE,
 				}),
-			});
+			);
 			break;
 		}
 
 		case NEW_COVERSION_CREATED: {
 			dbg("New conversion created.");
 
-			const { convertingList } = getConvertingList();
+			const convertingList = getConvertingList();
 			const { path } = msg;
 			// In here, there has to be a conversion WAITING:
 			const convertingMedia = convertingList.get(path);
@@ -129,19 +129,19 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setConvertingList({
-				convertingList: new Map(convertingList).set(path, {
+			setConvertingList(
+				new Map(convertingList).set(path, {
 					...convertingMedia,
 					status: ProgressStatus.ACTIVE,
 				}),
-			});
+			);
 			break;
 		}
 
 		case CREATE_CONVERSION_FAILED: {
 			console.error("Create conversion failed!");
 
-			const { convertingList } = getConvertingList();
+			const convertingList = getConvertingList();
 			const { path } = msg;
 			// In here, there has to be a conversion WAITING
 			const convertingMedia = convertingList.get(path);
@@ -155,19 +155,19 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setConvertingList({
-				convertingList: new Map(convertingList).set(path, {
+			setConvertingList(
+				new Map(convertingList).set(path, {
 					...convertingMedia,
 					status: ProgressStatus.FAILED,
 				}),
-			});
+			);
 			break;
 		}
 
 		case CREATE_DOWNLOAD_FAILED: {
 			console.error("Download failed!");
 
-			const { downloadingList } = getDownloadingList();
+			const downloadingList = getDownloadingList();
 			const { url } = msg;
 			// In here, there has to be a download WAITING:
 			const download = downloadingList.get(url);
@@ -181,12 +181,12 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setDownloadingList({
-				downloadingList: new Map(downloadingList).set(url, {
+			setDownloadingList(
+				new Map(downloadingList).set(url, {
 					...download,
 					status: ProgressStatus.FAILED,
 				}),
-			});
+			);
 			break;
 		}
 
@@ -308,7 +308,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		}
 
 		case ERROR: {
-			console.error("@TODO: ERROR", msg.error);
+			console.error("@TODO: ERROR", { error: msg.error });
 
 			break;
 		}

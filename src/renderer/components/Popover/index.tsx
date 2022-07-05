@@ -30,7 +30,8 @@ export const PopoverContent = forwardRef((
 ));
 PopoverContent.displayName = "PopoverContent";
 
-type Props = PopperContentProps & {
-	size: VariantProps<typeof StyledContent>["size"];
-	children: ReactNode;
-};
+type Props =
+	& PopperContentProps
+	& Readonly<
+		{ size: VariantProps<typeof StyledContent>["size"]; children: ReactNode; }
+	>;

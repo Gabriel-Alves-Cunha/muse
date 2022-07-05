@@ -51,8 +51,13 @@ import create from "zustand";
 export const useDownloadingList = create<DownloadingList>(() => ({
 	downloadingList: new Map(),
 }));
-export const { getState: getDownloadingList, setState: setDownloadingList } =
-	useDownloadingList;
+
+export const getDownloadingList = () =>
+	useDownloadingList.getState().downloadingList;
+
+export const setDownloadingList = (
+	downloadingList: DownloadingList["downloadingList"],
+) => useDownloadingList.setState({ downloadingList });
 
 type DownloadingList = Readonly<
 	{ downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>; }
