@@ -36,7 +36,11 @@ export function assertUnreachable(received: never): never {
 export function time<T>(fn: () => T, label: string): T {
 	const start = performance.now();
 
-	const fnReturn = fn();
+	let fnReturn: T | undefined;
+
+	(async () => {
+		fnReturn = await fn();
+	})();
 
 	const end = performance.now();
 
@@ -47,5 +51,5 @@ export function time<T>(fn: () => T, label: string): T {
 		"color:brown",
 	);
 
-	return fnReturn;
+	return fnReturn as T;
 }

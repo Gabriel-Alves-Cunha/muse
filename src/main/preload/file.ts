@@ -5,6 +5,7 @@ import {
 	readFile as fsReadFile,
 	readdir as fsReadDir,
 	unlink,
+	access,
 } from "node:fs/promises";
 
 export async function getFullPathOfFilesForFilesInThisDirectory(
@@ -40,4 +41,11 @@ export async function deleteFile(
 		console.error(err);
 		return false;
 	});
+}
+
+export async function pathExists(
+	path: Readonly<Path>,
+): Promise<Readonly<boolean>>
+{
+	return access(path).then(() => true).catch(() => false);
 }

@@ -75,6 +75,7 @@ export type MsgObjectReactToElectron =
 
 export enum ElectronToReactMessageEnum {
 	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer",
+	DOWNLOAD_CANCELED_SUCCESSFULLY = "download canceled successfully",
 	CREATE_CONVERSION_FAILED = "create conversion failed",
 	CREATE_DOWNLOAD_FAILED = "create download failed",
 	NEW_COVERSION_CREATED = "new conversion created",
@@ -98,6 +99,12 @@ export type MsgObjectElectronToReact =
 		{
 			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD;
 			downloadInfo: DownloadInfo;
+		}
+	>
+	| Readonly<
+		{
+			type: ElectronToReactMessageEnum.DOWNLOAD_CANCELED_SUCCESSFULLY;
+			url: string;
 		}
 	>
 	| Readonly<{ type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA; }>
@@ -141,5 +148,3 @@ export enum ElectronIpcMainProcessNotificationEnum {
 	MINIMIZE,
 	QUIT_APP,
 }
-
-export type ImgString = Readonly<`data:${string};base64,${string}`>;

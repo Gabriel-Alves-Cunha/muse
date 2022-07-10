@@ -42,6 +42,8 @@ export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
 export type TypeOfMap<T> = T extends ReadonlyMap<infer K, infer V> ? [K, V][]
 	: never;
 
+export type ImgString = Readonly<`data:${string};base64,${string}`>;
+
 export type Values<Obj> = Obj[keyof Obj];
 
 export type OneOf<T> = keyof T;

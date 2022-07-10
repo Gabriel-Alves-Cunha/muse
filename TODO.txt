@@ -1,5 +1,6 @@
 * FIX: get the picture to go to the media file!!!!
-* TODO: select all medias.
+* REFACTOR: media.ts for better readability.
+* ADD: args verifier.
 
 NOTES:
 
