@@ -1,11 +1,12 @@
 import type { MainList } from "./usePlaylists";
 import type { Path } from "@common/@types/generalTypes";
 
-import { allowedMedias, getLastExtension } from "@common/utils";
+import { getLastExtension } from "@common/path";
+import { allowedMedias } from "@common/utils";
 import { time } from "@utils/utils";
 
 const {
-	fs: { readdir, getFullPathOfFilesForFilesInThisDirectory },
+	fs: { readDir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
 } = electron;
 
@@ -39,7 +40,7 @@ export const searchDirectoryResult = async () =>
 	);
 
 export const searchDirectoryForMedias = async (directory: string) =>
-	getAllowedMedias(await readdir(directory));
+	getAllowedMedias(await readDir(directory));
 
 export const getAllowedMedias = (
 	filenames: readonly string[],

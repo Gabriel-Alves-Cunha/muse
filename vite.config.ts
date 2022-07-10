@@ -51,7 +51,6 @@ export default defineConfig({
 		treeShaking: true,
 		target: "esnext",
 		format: "esm",
-		minify: true,
 	},
 	css: { devSourcemap: true },
 	resolve: {

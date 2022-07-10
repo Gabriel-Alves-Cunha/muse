@@ -45,7 +45,6 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 		fs: {
 			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
 			deleteFile: vi.fn(),
-			readFile: vi.fn(),
 			readdir: vi.fn(),
 		},
 		os: {

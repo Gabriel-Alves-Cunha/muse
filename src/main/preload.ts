@@ -5,7 +5,9 @@ import { getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { makeItOnlyOneFile, turnServerOn } from "./preload/share";
+import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
+import { writeTags } from "./preload/media/mutate-metadata";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
 import {
@@ -20,29 +22,27 @@ import {
 	reactSource,
 } from "@common/crossCommunication";
 import {
-	type HandleConversion,
-	type HandleDownload,
-	handleCreateOrCancelDownload,
-	handleCreateOrCancelConvert,
-	transformPathsToMedias,
-	writeTags,
-} from "./preload/media";
+	type CreateConversion,
+	createOrCancelConvert,
+} from "./preload/media/create-conversion";
+import {
+	createOrCancelDownload,
+	type CreateDownload,
+} from "./preload/media/download-media";
 import {
 	getFullPathOfFilesForFilesInThisDirectory,
 	deleteFile,
-	readFile,
-	readdir,
+	readDir,
 } from "./preload/file";
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+// Expose methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object:
 const electron: VisibleElectron = Object.freeze({
-	fs: {
-		getFullPathOfFilesForFilesInThisDirectory,
-		deleteFile,
-		readFile,
-		readdir,
-	},
+	fs: { getFullPathOfFilesForFilesInThisDirectory, deleteFile, readDir },
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
 	share: { turnServerOn, makeItOnlyOneFile },
@@ -50,6 +50,8 @@ const electron: VisibleElectron = Object.freeze({
 });
 
 contextBridge.exposeInMainWorld("electron", electron);
+
+/////////////////////////////////////////////
 
 // Relay messages from the main process to the renderer process:
 ipcRenderer.on(
@@ -60,6 +62,13 @@ ipcRenderer.on(
 			downloadInfo: downloadValues,
 		}),
 );
+
+/////////////////////////////////////////////
+// Helper function:
+
+const logThatPortIsClosing = (): void => dbg("Closing ports (electronPort).");
+
+/////////////////////////////////////////////
 
 window.addEventListener("message", handleMsgsFromRendererProcess);
 
@@ -81,10 +90,10 @@ async function handleMsgsFromRendererProcess(
 				break;
 			}
 
-			electronPort.onmessage = async ({ data }: { data: HandleDownload; }) =>
-				await handleCreateOrCancelDownload({ ...data, electronPort });
+			electronPort.onmessage = async ({ data }: { data: CreateDownload; }) =>
+				await createOrCancelDownload({ ...data, electronPort });
 
-			electronPort.addEventListener("close", handleClosePort);
+			electronPort.addEventListener("close", logThatPortIsClosing);
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
@@ -97,10 +106,10 @@ async function handleMsgsFromRendererProcess(
 				break;
 			}
 
-			electronPort.onmessage = ({ data }: { data: HandleConversion; }) =>
-				handleCreateOrCancelConvert({ ...data, electronPort });
+			electronPort.onmessage = ({ data }: { data: CreateConversion; }) =>
+				createOrCancelConvert({ ...data, electronPort });
 
-			electronPort.addEventListener("close", handleClosePort);
+			electronPort.addEventListener("close", logThatPortIsClosing);
 
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
@@ -110,9 +119,6 @@ async function handleMsgsFromRendererProcess(
 		case ReactToElectronMessageEnum.WRITE_TAG: {
 			const { mediaPath, thingsToChange } = msg;
 
-			// const data: Parameters<typeof writeTags>[1] = {
-			// 	[whatToChange]: newValue,
-			// };
 			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
 			thingsToChange.forEach(({ whatToChange, newValue }) =>
 				Reflect.set(data, whatToChange, newValue)
@@ -148,7 +154,8 @@ async function handleMsgsFromRendererProcess(
 	}
 }
 
-const handleClosePort = (): void => dbg("Closing ports (electronPort).");
+/////////////////////////////////////////////
+// Types:
 
 type CrossWindowEvent = Readonly<
 	MessageEvent<MsgWithSource<MsgObjectReactToElectron>>

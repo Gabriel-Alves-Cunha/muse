@@ -3,12 +3,13 @@ import type { Path } from "@common/@types/generalTypes";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
-import { type AllowedMedias, getBasename, formatDuration } from "@common/utils";
 import { errorToast, infoToast, successToast } from "@styles/global";
-import { progressIcons, type ProgressProps } from "@components/Progress";
+import { type AllowedMedias, formatDuration } from "@common/utils";
+import { type ProgressProps, progressIcons } from "@components/Progress";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { prettyBytes } from "@common/prettyBytes";
+import { getBasename } from "@common/path";
 import { emptyMap } from "@utils/map-set";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";

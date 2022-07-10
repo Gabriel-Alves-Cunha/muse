@@ -1,9 +1,9 @@
-import type { ImgString } from "@common/@types/electron-window";
+import type { ImgString } from "@common/@types/generalTypes";
 
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import { dbgTests } from "@common/utils";
+// import { dbgTests } from "@common/utils";
 
 export const test_assets = resolve(__dirname, "..", "..", "..", "test_assets");
 
@@ -18,12 +18,12 @@ export const anotherMediaPath = resolve(
 
 export const mediaPicture = resolve(test_assets, "img for tests.png");
 
-dbgTests("utils.ts", {
-	mediaPath,
-	mediaPicture,
-	__dirname,
-	import: import.meta,
-});
+// dbgTests("utils.ts", {
+// 	import: import.meta,
+// 	mediaPicture,
+// 	mediaPath,
+// 	__dirname,
+// });
 
 export async function getThumbnail() {
 	const base64 = await readFile(mediaPicture, { encoding: "base64" });

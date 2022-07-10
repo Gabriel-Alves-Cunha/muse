@@ -1,4 +1,6 @@
-import { ValidationError } from "fastest-validator";
+import Validator, { type ValidationError } from "fastest-validator";
+
+export const validator = new Validator();
 
 export function checkOrThrow(
 	result: true | ValidationError[] | Promise<true | ValidationError[]>,

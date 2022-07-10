@@ -1,7 +1,7 @@
 import type { Path } from "@common/@types/generalTypes";
 
 import { errorToast, successToast } from "@styles/global";
-import { getBasename } from "@common/utils";
+import { getBasename } from "@common/path";
 import {
 	PlaylistActions,
 	setPlaylists,

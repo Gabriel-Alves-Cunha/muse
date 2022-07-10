@@ -3,12 +3,21 @@ import { describe, expect, it } from "vitest";
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
+//
 
 const { playOptions, setPlayOptions, toggleLoopMedia } = await import(
 	"@contexts/mediaHandler/usePlayOptions"
 );
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 describe("Testing usePlayOptions", () => {
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
 	it("should get a new playOptions with .loopThisMedia set", () => {
 		setPlayOptions({ loop: true });
 		expect(playOptions(), "playOptions should have { loop: true }!")
@@ -18,6 +27,10 @@ describe("Testing usePlayOptions", () => {
 		expect(playOptions(), "playOptions should have { loop: false }!")
 			.toHaveProperty("loop", false);
 	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
 
 	it("should get a new playOptions with .isRandom set", () => {
 		setPlayOptions({ random: true });

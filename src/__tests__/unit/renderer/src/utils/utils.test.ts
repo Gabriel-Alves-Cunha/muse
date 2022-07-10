@@ -2,6 +2,10 @@ import { assert, expect, it } from "vitest";
 
 import { assertUnreachable, getRandomInt, capitalize } from "@utils/utils";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 it("should capitalize a string", () => {
 	const strings = Object.freeze([
 		"1 cup of water",
@@ -28,6 +32,10 @@ it("should capitalize a string", () => {
 	]);
 });
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 it("should get a random integer between min (included) and max (not included)", () => {
 	const length = 100;
 	const results1 = Array.from({ length }, (_, i) => getRandomInt(i, i + 100));
@@ -49,6 +57,10 @@ it("should get a random integer between min (included) and max (not included)", 
 
 	expect(results1).not.toStrictEqual(results2);
 });
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 it("should log a message that code should not have reached that point", () => {
 	type Option = "foo" | "bar";

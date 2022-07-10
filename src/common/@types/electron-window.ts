@@ -24,9 +24,8 @@ export type VisibleElectron = Readonly<
 				getFullPathOfFilesForFilesInThisDirectory(
 					dir: Readonly<Path>,
 				): Promise<readonly Path[]>;
-				readFile(path: Readonly<Path>): Promise<Readonly<Buffer | undefined>>;
 				deleteFile(path: Readonly<Path>): Promise<Readonly<boolean>>;
-				readdir(dir: Readonly<Path>): Promise<readonly Path[]>;
+				readDir(dir: Readonly<Path>): Promise<readonly Path[]>;
 			}
 		>;
 		media: Readonly<
@@ -74,6 +73,7 @@ export type MsgObjectReactToElectron =
 	| Readonly<{ type: ReactToElectronMessageEnum.ERROR; error: Error; }>;
 
 export enum ElectronToReactMessageEnum {
+	CONVERSION_CANCELED_SUCCESSFULLY = "conversion canceled successfully",
 	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer",
 	DOWNLOAD_CANCELED_SUCCESSFULLY = "download canceled successfully",
 	CREATE_CONVERSION_FAILED = "create conversion failed",
@@ -105,6 +105,12 @@ export type MsgObjectElectronToReact =
 		{
 			type: ElectronToReactMessageEnum.DOWNLOAD_CANCELED_SUCCESSFULLY;
 			url: string;
+		}
+	>
+	| Readonly<
+		{
+			type: ElectronToReactMessageEnum.CONVERSION_CANCELED_SUCCESSFULLY;
+			path: Path;
 		}
 	>
 	| Readonly<{ type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA; }>

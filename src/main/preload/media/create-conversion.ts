@@ -6,26 +6,24 @@ import type { Path } from "@common/@types/generalTypes";
 import { createReadStream } from "node:fs";
 import { dirname, join } from "node:path";
 import { error, log } from "node:console";
-import Validator from "fastest-validator";
 import sanitize from "sanitize-filename";
 
-import { type AllowedMedias, dbg, getBasename } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { checkOrThrow, validator } from "@common/args-validator";
+import { type AllowedMedias, dbg } from "@common/utils";
 import { deleteFile, pathExists } from "../file";
+import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
+import { getBasename } from "@common/path";
 import { dirs } from "@main/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// Schemas for arguments verification
+// Schemas For Arguments Verification
 
-const v = new Validator();
-
-/////////////////////////////////////////////
-
-const checkArgsToConvertToAudio = v.compile<CreateConversion>({
+const checkArgsToConvertToAudio = validator.compile<CreateConversion>({
 	electronPort: { type: "class", instanceof: MessagePort },
 	toExtension: "string", // Required. Not empty.
 	path: "string",
@@ -34,11 +32,12 @@ const checkArgsToConvertToAudio = v.compile<CreateConversion>({
 
 /////////////////////////////////////////////
 
-const checkForURL = v.compile({ url: { type: "url" } });
+const checkForPath = validator.compile({ path: "string" });
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+// Constants:
 
 const mediasConverting: Map<Path, Readable> = new Map();
 
@@ -47,25 +46,27 @@ const mediasConverting: Map<Path, Readable> = new Map();
 /////////////////////////////////////////////
 
 export async function createOrCancelConvert(
-	{ electronPort, toExtension, destroy, path }: CreateConversion,
+	args: CreateConversion,
 ): Promise<void> {
-	if (!path) return error("Missing required param 'path'!", arguments);
+	checkOrThrow(checkForPath(args));
 
-	if (!mediasConverting.has(path)) {
-		if (!toExtension || !electronPort)
-			return error("Missing required params!", arguments);
+	if (!mediasConverting.has(args.path)) {
+		checkOrThrow(checkArgsToConvertToAudio(args));
 
-		return await convertToAudio({ path, toExtension, electronPort });
-	} else if (destroy) mediasConverting.get(path)!.emit("destroy");
+		return await convertToAudio(args);
+	} else if (args.destroy) mediasConverting.get(args.path)!.emit("destroy");
 }
 
 /////////////////////////////////////////////
+// Main function:
 
 export async function convertToAudio(
-	{ electronPort, toExtension, path }: Required<
-		Omit<CreateConversion, "destroy">
-	>,
+	// Treat args as NotNullable cause argument check was
+	// (has to be) done before calling this function.
+	{ electronPort, toExtension, path }: CreateConversion,
 ): Promise<void> {
+	dbg(`Attempting to covert "${path}".`);
+
 	const titleWithExtension = sanitize(`${getBasename(path)}.${toExtension}`);
 
 	{
@@ -74,74 +75,79 @@ export async function convertToAudio(
 
 		// && that there already doesn't exists one:
 		if (
-			path.endsWith(toExtension) || (await pathExists(pathWithNewExtension))
+			path.endsWith(toExtension!) || (await pathExists(pathWithNewExtension))
 		) {
 			error(
 				`File "${path}" already is "${toExtension}"! Canceling conversion.`,
 			);
 
-			// Send a msg saying that conversion failed;
-			return sendFailedConversionMsg(path, electronPort);
+			// Send a msg to the client that the download failed:
+			sendMsgToClient({
+				type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED,
+				path,
+			});
+
+			// Don't forget to throw away the MessagePort (clean up):
+			electronPort!.close();
+
+			return;
 		}
 	}
 
 	const saveSite = join(dirs.music, titleWithExtension);
-	let interval: NodeJS.Timer | undefined = undefined;
 	const readStream = createReadStream(path);
+	let interval: NodeJS.Timer | undefined;
 
 	dbg(`Creating stream for "${path}" to convert to "${toExtension}".`);
 
+	// Receive the readStream of path and act with ffmpeg on it:
 	fluent_ffmpeg(readStream)
-		.on(
-			"progress",
-			({ targetSize, timemark }: { targetSize: number; timemark: number; }) => {
-				// targetSize: current size of the target file in kilobytes
-				// timemark: the timestamp of the current frame in seconds
+		.on("progress", ({ targetSize, timemark }: Progress) => {
+			// targetSize: current size of the target file in kilobytes
+			// timemark: the timestamp of the current frame in seconds
 
-				// To react:
-				if (!interval) {
-					// ^ Only in the firt time this setInterval is called!
-					interval = setInterval(() =>
-						electronPort.postMessage({
+			// To react:
+			if (!interval) {
+				// ^ Only in the firt time this setInterval is called!
+				interval = setInterval(() =>
+					electronPort!
+						.postMessage({
 							sizeConverted: targetSize,
 							timeConverted: timemark,
-						}), 1_000);
+						}), 750);
 
-					// Send a message to client that we're starting a conversion:
-					sendMsgToClient({
-						type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED,
-						path,
-					});
-				}
-			},
-		)
+				// Send a message to client that we're starting a conversion:
+				sendMsgToClient({
+					type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED,
+					path,
+				});
+			}
+		})
 		.on("error", async err => {
 			error(`Error converting file: "${titleWithExtension}"!\n\n`, err);
 
-			// Delete the file if it's not converted successfully:
-			if (await pathExists(saveSite)) await deleteFile(saveSite);
+			// Delete the file since it errored:
+			await deleteFile(saveSite);
 
-			// To react:
-			electronPort.postMessage({
+			// Tell the client the conversion threw an error:
+			electronPort!.postMessage({
 				status: ProgressStatus.FAILED,
 				isConverting: false,
 				error: err,
 			});
-			electronPort.close();
-			clearInterval(interval);
 
-			// I only found it to work when I send it with an Error:
-			readStream.destroy(err);
-
+			// Clean up:
 			mediasConverting.delete(path);
+			readStream.destroy(err); // I only found it to work when I send it with an Error:
+			clearInterval(interval);
+			electronPort!.close();
+
 			dbg(
 				"Convertion threw an error. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
 				await pathExists(saveSite),
 			);
-
-			sendFailedConversionMsg(path, electronPort);
 		})
 		.on("end", async () => {
 			log(
@@ -149,31 +155,30 @@ export async function convertToAudio(
 				"color: green; font-weight: bold;",
 			);
 
-			// To react:
-			electronPort.postMessage({
+			// Tell the client the download was successfull:
+			electronPort!.postMessage({
 				status: ProgressStatus.SUCCESS,
 				isConverting: false,
 			});
-			electronPort.close();
+
+			// Clean up:
+			mediasConverting.delete(path);
 			clearInterval(interval);
-
-			// Treat the successfully converted file as a new media...
-			{
-				sendMsgToClient({
-					type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
-					mediaPath: saveSite,
-				});
-
-				// ...and remove old one
-				sendMsgToClient({
-					type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
-					mediaPath: path,
-				});
-			}
-
+			electronPort!.close();
 			readStream.close();
 
-			mediasConverting.delete(path);
+			// Treat the successfully converted file as a new media...
+			sendMsgToClient({
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+				mediaPath: saveSite,
+			});
+
+			// ...and remove old one
+			sendMsgToClient({
+				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
+				mediaPath: path,
+			});
+
 			dbg(
 				"Convertion successfull. Deleting from mediasConverting:",
 				mediasConverting,
@@ -185,38 +190,46 @@ export async function convertToAudio(
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
 
-			// Delete the file if it's not converted successfully:
-			if (await pathExists(saveSite)) await deleteFile(saveSite);
+			// Delete the file since it was canceled:
+			await deleteFile(saveSite);
 
-			electronPort.postMessage({
+			// TODO: unify these two below:
+			// Tell the client the conversion was successfully canceled:
+			sendMsgToClient({
+				type: ElectronToReactMessageEnum.CONVERSION_CANCELED_SUCCESSFULLY,
+				path,
+			});
+			electronPort!.postMessage({
 				status: ProgressStatus.CANCEL,
 				isConverting: false,
 			});
-			electronPort.close();
-			clearInterval(interval);
 
+			// Clean up:
+			mediasConverting.delete(path);
 			// I only found it to work when I send it with an Error:
 			readStream.destroy(
 				new Error(
 					"This readStream is being destroyed because the ffmpeg is being destroyed.",
 				),
 			);
+			clearInterval(interval);
+			electronPort!.close();
 
-			mediasConverting.delete(path);
 			dbg(
 				"Convertion was destroyed. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
 				await pathExists(saveSite),
 			);
-
-			sendFailedConversionMsg(path, electronPort);
 		})
 		.save(saveSite);
 
 	mediasConverting.set(path, readStream);
 	dbg(`Added "${path}" to mediasConverting:`, mediasConverting);
 }
+
+////////////////////////////////////////////
+// Types:
 
 export type CreateConversion = Readonly<
 	{
@@ -226,3 +239,5 @@ export type CreateConversion = Readonly<
 		path: Path;
 	}
 >;
+
+type Progress = Readonly<{ targetSize: number; timemark: number; }>;

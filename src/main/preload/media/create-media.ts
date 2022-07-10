@@ -4,9 +4,14 @@ import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { lstatSync } from "node:fs";
 import { log } from "node:console";
 
-import { dbg, formatDuration, getBasename } from "@common/utils";
+import { dbg, formatDuration } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
+import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 async function createMedia(
 	path: Readonly<Path>,
@@ -46,7 +51,7 @@ async function createMedia(
 			let img = "";
 			if (picture && mimeType) {
 				const str = picture.data.toBase64String();
-				dbg({ str });
+				dbg({ Base64String: str });
 				// If the picture wasn't made by us. (That's the only way I found to
 				// make this work, cause, when we didn't make the picture in
 				// `writeTag`, we can't decode it!):
@@ -95,6 +100,7 @@ export async function transformPathsToMedias(
 			)
 		);
 
+		// Run promises in parallel:
 		const medias = (await Promise.allSettled(promises))
 			.map(p => (p.status === "fulfilled" ? p.value : false))
 			.filter(Boolean) as [Path, Media][];

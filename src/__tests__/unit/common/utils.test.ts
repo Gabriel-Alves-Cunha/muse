@@ -2,12 +2,16 @@
 
 import { expect, it } from "vitest";
 
+import { formatDuration } from "@common/utils";
 import {
 	getPathWithoutExtension,
 	getLastExtension,
-	formatDuration,
 	getBasename,
-} from "@common/utils";
+} from "@common/path";
+
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
 
 it("should get path without extension. #getPathWithoutExtension", () => {
 	const paths = [
@@ -31,6 +35,10 @@ it("should get path without extension. #getPathWithoutExtension", () => {
 	]);
 });
 
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+
 it("should format duration in seconds to something like: '00:00:00'. #formatDuration", () => {
 	const durationsInSeconds = [234567, 2345678, 123, 6543, 224, 900, undefined];
 
@@ -49,6 +57,10 @@ it("should format duration in seconds to something like: '00:00:00'. #formatDura
 	]);
 });
 
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+
 it("should get the basename of a path. #getBasename", () => {
 	const paths = [
 		"/home/music/hello.mp3",
@@ -63,6 +75,10 @@ it("should get the basename of a path. #getBasename", () => {
 
 	expect(basenames).toStrictEqual(["hello", "how", "are", "you", "bye", ""]);
 });
+
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
 
 it("should get the extension of a file. #getLastExtension", () => {
 	const paths = [

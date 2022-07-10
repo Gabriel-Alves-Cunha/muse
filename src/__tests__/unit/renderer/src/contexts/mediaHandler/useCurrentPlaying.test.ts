@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
+//
 
 import {
 	firstMediaPath,
@@ -27,7 +28,15 @@ const {
 	history,
 } = await import("@contexts/mediaHandler/usePlaylists");
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 describe("Testing useCurrentPlaying", () => {
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
 	beforeEach(() => {
 		setPlaylists({
 			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
@@ -43,6 +52,10 @@ describe("Testing useCurrentPlaying", () => {
 		expect(history().size).toBe(0);
 	});
 
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
 	it("should set the currentPlaying media", () => {
 		testList.forEach((_, path) => {
 			playThisMedia(path, PlaylistList.MAIN_LIST);
@@ -56,6 +69,10 @@ describe("Testing useCurrentPlaying", () => {
 			expect(expected).toEqual(currentPlaying());
 		});
 	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
 
 	it("should play the previous media from mainList and update history", () => {
 		const initialIndex = 15;
@@ -85,6 +102,10 @@ describe("Testing useCurrentPlaying", () => {
 			);
 		});
 	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
 
 	it("should play the next media from a given playlist and update history", () => {
 		playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);

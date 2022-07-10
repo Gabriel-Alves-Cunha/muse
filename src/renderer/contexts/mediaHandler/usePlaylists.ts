@@ -553,18 +553,20 @@ export async function searchLocalComputerForMedias() {
 	}, "searchLocalComputerForMedias");
 }
 
-export const searchMedia = (searchTerm_: Readonly<string>): [Path, Media][] =>
-	time(() => {
+export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
+	return time(() => {
 		const searchTerm = searchTerm_.toLowerCase();
 		const medias: [Path, Media][] = [];
 
 		mainList().forEach((media, path) =>
-			media.title.toLowerCase().includes(searchTerm) &&
-			medias.push([path, media])
-		);
+		{
+			if (media.title.toLowerCase().includes(searchTerm))
+				medias.push([path, media]);
+		});
 
 		return medias;
 	}, `searchMedia(${searchTerm_})`);
+}
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////

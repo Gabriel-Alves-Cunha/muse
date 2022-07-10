@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import type { ImgString } from "@common/@types/electron-window";
+import type { ImgString } from "@common/@types/generalTypes";
 
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../../mockElectronPlusNodeGlobalsBeforeTests";
@@ -13,22 +13,27 @@ import { File as MediaFile } from "node-taglib-sharp";
 import { resolve } from "node:path";
 
 import { mediaPath, mediaPicture, test_assets } from "./utils";
-import { dbgTests } from "@common/utils";
+import { eraseImg, makeRandomString } from "@common/utils";
+import { pathExists } from "@main/preload/file";
 
-const { writeTags } = await import("@main/preload/media");
+const { writeTags } = await import("@main/preload/media/mutate-metadata");
 
-/////////////////////////////////////////////////////////
-// Testing #writeTags()
-/////////////////////////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
+//////////////////////////////////////
 
 describe("It should account for the switch possibilities and the message sending. #writeTags()", () => {
+	//////////////////////////////////////
+	//////////////////////////////////////
+	//////////////////////////////////////
+
 	it("Should be able to write the tag 'title' to a file and change it's basename.", async () => {
 		// This test will change the basename of the file, that's why, at the end, we change it back.
 
-		const changedData = Object.freeze({ title: "test title" as const });
+		const changedData = Object.freeze({ title: makeRandomString() });
 		const changedPath = resolve(test_assets, `${changedData.title}.mp3`);
 
-		dbgTests({ changedPath });
+		// dbgTests({ changedPath });
 
 		try {
 			// Changing the title and basename of the file:
@@ -44,11 +49,21 @@ describe("It should account for the switch possibilities and the message sending
 		} finally {
 			// Changing the title and basename of the file back:
 			await renameFile(changedPath, mediaPath);
+
+			expect(
+				await pathExists(mediaPath),
+				"There should be a mediaPath renamed back to it's original path before tests were run!",
+			)
+				.toBe(true);
 		}
 	});
 
+	//////////////////////////////////////
+	//////////////////////////////////////
+	//////////////////////////////////////
+
 	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
-		const data = Object.freeze({ albumArtists: ["Test Artist"] as const });
+		const data = Object.freeze({ albumArtists: [makeRandomString()] });
 
 		await writeTags(mediaPath, data);
 
@@ -57,8 +72,12 @@ describe("It should account for the switch possibilities and the message sending
 		expect(albumArtists).toEqual(data.albumArtists);
 	});
 
+	//////////////////////////////////////
+	//////////////////////////////////////
+	//////////////////////////////////////
+
 	it("Should be able to write the tag 'album' to a file.", async () => {
-		const data = Object.freeze({ album: "Test Album" as const });
+		const data = Object.freeze({ album: makeRandomString() });
 
 		await writeTags(mediaPath, data);
 
@@ -67,8 +86,12 @@ describe("It should account for the switch possibilities and the message sending
 		expect(album).toBe(data.album);
 	});
 
+	//////////////////////////////////////
+	//////////////////////////////////////
+	//////////////////////////////////////
+
 	it("Should be able erase the tag 'pictures' of file.", async () => {
-		const data = Object.freeze({ imageURL: "erase img" as const });
+		const data = Object.freeze({ imageURL: eraseImg });
 
 		await writeTags(mediaPath, data);
 
@@ -76,6 +99,10 @@ describe("It should account for the switch possibilities and the message sending
 
 		expect(pictures.length).toBe(0);
 	});
+
+	//////////////////////////////////////
+	//////////////////////////////////////
+	//////////////////////////////////////
 
 	it("Should be able to write the tag 'imageURL' to a file.", async () => {
 		const imgContents = await readFile(mediaPicture, { encoding: "base64" });
@@ -87,6 +114,6 @@ describe("It should account for the switch possibilities and the message sending
 
 		const { pictures } = MediaFile.createFromPath(mediaPath).tag;
 
-		expect(pictures[0].data.toString()).toBe(imgContents);
+		expect(pictures[0]?.data.toBase64String()).toBe(imgContents);
 	});
 });

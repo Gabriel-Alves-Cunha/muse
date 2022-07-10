@@ -60,6 +60,8 @@ window.addEventListener("drop", listenToDropEvent);
 //////////////////////////////////////////
 
 const {
+	CONVERSION_CANCELED_SUCCESSFULLY,
+	DOWNLOAD_CANCELED_SUCCESSFULLY,
 	DELETE_ONE_MEDIA_FROM_COMPUTER,
 	CREATE_CONVERSION_FAILED,
 	CREATE_DOWNLOAD_FAILED,
@@ -309,6 +311,18 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		case ERROR: {
 			console.error("@TODO: ERROR", { error: msg.error });
+
+			break;
+		}
+
+		case CONVERSION_CANCELED_SUCCESSFULLY: {
+			console.error("@TODO: CONVERSION_CANCELED_SUCCESSFULLY");
+
+			break;
+		}
+
+		case DOWNLOAD_CANCELED_SUCCESSFULLY: {
+			console.error("@TODO: DOWNLOAD_CANCELED_SUCCESSFULLY");
 
 			break;
 		}

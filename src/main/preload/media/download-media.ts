@@ -6,30 +6,26 @@ import type { Readable } from "node:stream";
 import { cursorTo, clearLine } from "node:readline";
 import { error, log } from "node:console";
 import { join } from "node:path";
-import Validator from "fastest-validator";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { type AllowedMedias, dbg, isDevelopment } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { checkOrThrow, validator } from "@common/args-validator";
 import { deleteFile, pathExists } from "../file";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
-import { checkOrThrow } from "@common/check-for-args";
 import { prettyBytes } from "@common/prettyBytes";
+import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// Schemas for arguments verification
+// Schemas For Arguments Verification
 
-const v = new Validator();
-
-/////////////////////////////////////////////
-
-const checkArgsToCreateDownload = v.compile<CreateDownload>({
+const checkArgsToCreateDownload = validator.compile<CreateDownload>({
 	electronPort: { type: "class", instanceof: MessagePort },
 	extension: "string", // Required. Not empty.
 	imageURL: "string",
@@ -40,11 +36,12 @@ const checkArgsToCreateDownload = v.compile<CreateDownload>({
 
 /////////////////////////////////////////////
 
-const checkForURL = v.compile({ url: { type: "url" } });
+const checkForURL = validator.compile({ url: { type: "url" } });
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+// Constants:
 
 const currentDownloads: Map<MediaUrl, Readable> = new Map();
 
@@ -65,8 +62,11 @@ export async function createOrCancelDownload(
 }
 
 /////////////////////////////////////////////
+// Main function:
 
 export async function createDownload(
+	// Treat args as NotNullable cause argument check was
+	// (has to be) done before calling this function.
 	{ electronPort, extension, imageURL, title, url }: CreateDownload,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
@@ -86,6 +86,8 @@ export async function createDownload(
 
 		// Don't forget to throw away the MessagePort (clean up):
 		electronPort!.close();
+
+		return;
 	}
 
 	let interval: NodeJS.Timer | undefined;
@@ -123,7 +125,7 @@ export async function createDownload(
 				});
 			}
 
-			// Log to node console if in development:
+			// Log progress to node console if in development:
 			if (isDevelopment) {
 				const secondsDownloading = (Date.now() - startTime) / 1_000;
 				const estimatedDownloadTime =
@@ -238,6 +240,7 @@ export async function createDownload(
 }
 
 /////////////////////////////////////////////
+// Types:
 
 export type CreateDownload = Readonly<
 	{

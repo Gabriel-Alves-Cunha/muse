@@ -7,11 +7,12 @@ import { toCanvas } from "qrcode";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { setSettings, useSettings } from "@contexts/settings";
-import { dbg, getBasename } from "@common/utils";
+import { getBasename } from "@common/path";
 import { emptySet } from "@utils/map-set";
+import { dbg } from "@common/utils";
 
 import { CloseDialogTrigger, StyledDialogShareContent, Canvas } from "./styles";
-import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
+import { StyledDialogBlurOverlay } from "../MediaListKind/MediaOptions/styles";
 import { Loading } from "@styles/appStyles";
 
 const { turnServerOn, makeItOnlyOneFile } = electron.share;
