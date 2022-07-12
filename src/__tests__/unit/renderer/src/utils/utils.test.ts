@@ -78,9 +78,8 @@ it("should get a random integer between min (included) and max (not included)", 
 		getRandomInt(10.2427687, 23.24356),
 		getRandomInt(10.31, 23),
 		getRandomInt(10, 23.31),
-		getRandomInt(NaN, NaN),
-		getRandomInt(NaN, 10),
-		getRandomInt(10, NaN),
+		getRandomInt(1043, 234354),
+		getRandomInt(354355454, 5354),
 	];
 
 	results1.push(...additional);
@@ -89,6 +88,16 @@ it("should get a random integer between min (included) and max (not included)", 
 	results1.forEach(result => assert(Number.isInteger(result)));
 
 	expect(results1).not.toStrictEqual(results2);
+});
+
+it("should throw an error when trying to get a random integer between min (included) and max (not included) with not an finite number", () => {
+	const fns = [
+		() => getRandomInt(NaN, NaN),
+		() => getRandomInt(NaN, 10),
+		() => getRandomInt(10, NaN),
+	];
+
+	fns.forEach(fn => expect(fn).toThrowError());
 });
 
 /////////////////////////////////////////////

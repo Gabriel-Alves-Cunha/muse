@@ -4,20 +4,10 @@ const { random, floor } = Math;
 
 /** [min, max) */
 export function getRandomInt(min: number, max: number): number {
-	if (!Number.isFinite(min)) {
-		console.error(
-			`Function \`getRandomInt\` received \`min = ${min}\` wich is not a finite number!`,
+	if (!Number.isFinite(min) || !Number.isFinite(max))
+		throw new Error(
+			`getRandomInt() received \`min = ${min}\` wich is not a finite number!`,
 		);
-
-		min = 0;
-	}
-	if (!Number.isFinite(max)) {
-		console.error(
-			`Function \`getRandomInt\` received \`max = ${max}\` wich is not a finite number!`,
-		);
-
-		max = 1;
-	}
 
 	return floor(min + random() * (max - min));
 }

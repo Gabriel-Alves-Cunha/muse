@@ -19,7 +19,7 @@ import { getBasename, getLastExtension } from "@common/path";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { dbg, eraseImg } from "@common/utils";
+import { dbg, dbgTests, eraseImg } from "@common/utils";
 import { pathExists } from "../file";
 
 /////////////////////////////////////////////
@@ -41,11 +41,10 @@ const checkForMediaPath = validator.compile({
 
 async function handleImageMetadata(
 	file: MediaFile,
-	imageURL: Readonly<typeof eraseImg | ImgString | string> = "",
 	downloadImg: Readonly<boolean> = false,
+	imageURL: Readonly<typeof eraseImg | ImgString | string>,
 ): Promise<void> {
-	if (downloadImg)
-	{
+	if (downloadImg) {
 		try {
 			dbg("Downloading picture...");
 
@@ -75,10 +74,10 @@ async function handleImageMetadata(
 
 	/////////////////////////////////////////////
 
-	// if imageURL === 'erase img' => erase img so we don't keep
-	// getting an error on the browser.
+	// if imageURL === "erase img" => erase img so we
+	// don't keep getting an error on the browser.
 	if (imageURL === eraseImg) {
-		dbg("Erasing picture...");
+		dbgTests("Erasing picture...");
 		file.tag.pictures = [];
 
 		return;
@@ -157,10 +156,8 @@ export function createAndSaveImageOnMedia(
 
 function handleAlbumArtists(
 	file: MediaFile,
-	albumArtists: Readonly<string[]> = [],
+	albumArtists: Readonly<string[]>,
 ): void {
-	if (albumArtists.length === 0) return;
-
 	file.tag.albumArtists = albumArtists as Mutable<string[]>;
 
 	dbg({ "new file.tag.albumArtists": file.tag.albumArtists, albumArtists });
@@ -168,9 +165,7 @@ function handleAlbumArtists(
 
 /////////////////////////////////////////////
 
-function handleGenres(file: MediaFile, genres: Readonly<string[]> = []): void {
-	if (genres.length === 0) return;
-
+function handleGenres(file: MediaFile, genres: Readonly<string[]>): void {
 	file.tag.genres = genres as Mutable<string[]>;
 	// TODO:
 	// const genres = (value as string)
@@ -183,9 +178,7 @@ function handleGenres(file: MediaFile, genres: Readonly<string[]> = []): void {
 
 /////////////////////////////////////////////
 
-function handleAlbum(file: MediaFile, album: Readonly<string> = ""): void {
-	if (!album) return;
-
+function handleAlbum(file: MediaFile, album: string): void {
 	file.tag.album = album;
 
 	dbg({ "new file.tag.album": file.tag.album, album });
@@ -196,10 +189,8 @@ function handleAlbum(file: MediaFile, album: Readonly<string> = ""): void {
 function handleTitle(
 	file: MediaFile,
 	oldMediaPath: string,
-	title?: string,
+	title: string,
 ): Path {
-	if (!title) return "";
-
 	const sanitizedTitle = sanitize(title);
 	// If they are the same, there is no
 	// need to treat this as a new file:
@@ -282,28 +273,32 @@ export async function writeTags(
 	mediaPath: Readonly<Path>,
 	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean; }>,
 ): Promise<void> {
-	dbg("Writing tags to file:", { mediaPath, data });
+	// dbgTests("Writing tags to file:", { mediaPath, data });
 	checkOrThrow(checkForMediaPath(mediaPath));
 
 	const file = MediaFile.createFromPath(mediaPath);
 
 	// Handle the tags:
-	await handleImageMetadata(file, data.imageURL, data.downloadImg);
+	data.imageURL !== undefined &&
+		await handleImageMetadata(file, data.downloadImg, data.imageURL);
 
-	const fileNewPath = handleTitle(file, mediaPath, data.title);
+	const fileNewPath = data.title !== undefined ?
+		handleTitle(file, mediaPath, data.title) :
+		"";
 
-	handleAlbumArtists(file, data.albumArtists);
+	data.albumArtists && handleAlbumArtists(file, data.albumArtists);
 
-	handleGenres(file, data.genres);
+	data.genres && handleGenres(file, data.genres);
 
-	handleAlbum(file, data.album);
+	data.album !== undefined && handleAlbum(file, data.album);
 
 	dbg("New file tags =", file.tag);
-
-	await talkToClientToGetTheNewMedia(fileNewPath, mediaPath, data.isNewMedia);
 
 	// Clean up:
 	// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
 	file.save();
 	file.dispose();
+	//
+
+	await talkToClientToGetTheNewMedia(fileNewPath, mediaPath, data.isNewMedia);
 }
