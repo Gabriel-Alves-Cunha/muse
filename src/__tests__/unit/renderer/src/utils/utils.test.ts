@@ -1,6 +1,39 @@
 import { assert, expect, it } from "vitest";
 
-import { assertUnreachable, getRandomInt, capitalize } from "@utils/utils";
+import { sleep } from "@common/utils";
+import {
+	assertUnreachable,
+	getRandomInt,
+	capitalize,
+	time,
+} from "@utils/utils";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+it("should time a function and return what it's result", async () => {
+	function doAndReturnSomething(arg: number): number {
+		return time(() => arg + 10, "doAndReturnSomething");
+	}
+
+	const ret = doAndReturnSomething(10);
+
+	expect(ret).toBe(20);
+
+	/////////////////////////////////////////////
+
+	async function doAndReturnSomethingAsync(arg: number): Promise<number> {
+		return await time(async () => {
+			await sleep(10);
+			return arg + 100;
+		}, "doAndReturnSomethingAsync");
+	}
+
+	const ret2 = await doAndReturnSomethingAsync(10);
+
+	expect(ret2).toBe(110);
+});
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

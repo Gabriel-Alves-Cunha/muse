@@ -45,7 +45,7 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 		fs: {
 			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),
 			deleteFile: vi.fn(),
-			readdir: vi.fn(),
+			readDir: vi.fn(),
 		},
 		os: {
 			dirs: {
@@ -68,17 +68,15 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 	});
 
 	vi.stubGlobal("window", {
-		postMessage: vi
-			.fn() // eslint-disable-next-line @typescript-eslint/no-explicit-any
-			.mockImplementation(function() {
-				console.log(
-					"%cwindow.postMessage arguments =",
-					"color:blue",
-					// eslint-disable-next-line prefer-rest-params
-					JSON.stringify(arguments, null, 2),
-				);
-			}),
-		requestAnimationFrame: vi.fn(),
+		postMessage: vi.fn().mockImplementation(function() {
+			console.log(
+				"%cwindow.postMessage arguments =",
+				"color:blue",
+				// eslint-disable-next-line prefer-rest-params
+				JSON.stringify(arguments, null, 2),
+			);
+		}),
+		requestAnimationFrame: vi.fn().mockImplementation((cb: () => void) => cb()),
 		getElementById: vi.fn(),
 		createElement: vi.fn(),
 	});

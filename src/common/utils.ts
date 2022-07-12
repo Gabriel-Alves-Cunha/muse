@@ -62,8 +62,8 @@ export function makeRandomString(length = 15): Readonly<string> {
 	return result.join("");
 }
 
-export function sleep(ms: number, logFn: () => void): Promise<void> {
-	logFn();
+export function sleep(ms: number, logFn?: () => void): Promise<void> {
+	logFn?.();
 
 	return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -554,7 +554,7 @@ export async function searchLocalComputerForMedias() {
 }
 
 export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
-	return time(() => {
+	const ret = time(() => {
 		const searchTerm = searchTerm_.toLowerCase();
 		const medias: [Path, Media][] = [];
 
@@ -566,6 +566,8 @@ export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 
 		return medias;
 	}, `searchMedia(${searchTerm_})`);
+
+	return ret;
 }
 
 ///////////////////////////////////////////////////

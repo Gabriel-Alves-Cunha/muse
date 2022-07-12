@@ -9,7 +9,6 @@ import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectron
 mockElectronPlusNodeGlobalsBeforeTests();
 //
 
-import { sleep } from "@common/utils";
 import {
 	numberOfMedias,
 	firstMediaPath,
@@ -381,8 +380,6 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 
 it("getPlaylistsFuncs().searchForMedia() should return a searched media", () => {
 	const results = searchMedia("es");
-
-	sleep(1_100, () => console.log("results =", searchMedia("es")));
 
 	expect(results).toBeTruthy();
 	expect(results.length).toBeGreaterThan(0);
