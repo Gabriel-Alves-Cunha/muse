@@ -14,60 +14,73 @@ import { emptyMap } from "@utils/map-set";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
-	cancelConvertionAndOrRemoveItFromList,
-	handleSingleItemDeleteAnimation,
-} from "@components/Downloading/helper";
-import {
+	type ConvertingList,
 	getConvertingList,
 	setConvertingList,
 	useConvertingList,
 } from "@contexts/convertList";
 
-import { TitleAndCancelWrapper, ItemWrapper } from "../Downloading/styles";
 import { CancelButton, ConvertionProgress } from "./styles";
+import {
+	handleSingleItemDeleteAnimation,
+	TitleAndCancelWrapper,
+	ItemWrapper,
+} from "../Downloading/styles";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Constants:
 
 export const useNewConvertions = create<NewConvertions>(() => ({
 	newConvertions: emptyMap,
 }));
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 export function Popup() {
 	const { convertingList } = useConvertingList();
 
-	function convertBoxes(): JSX.Element[] {
-		const list: JSX.Element[] = [];
+	return (convertingList.size > 0 ?
+		(
+			<>
+				<Button variant="medium" onClick={cleanAllDoneConvertions}>
+					Clean finished
+				</Button>
 
-		let convertionIndex = 0;
-		convertingList.forEach((media, path) => {
-			list.push(
-				<ConvertBox
-					convertionIndex={convertionIndex}
-					mediaBeingConverted={media}
-					path={path}
-					key={path}
-				/>,
-			);
-			++convertionIndex;
-		});
-
-		return list;
-	}
-
-	return (
-		<>
-			{convertingList.size > 0 ?
-				(
-					<>
-						<Button variant="medium" onClick={cleanAllDoneConvertions}>
-							Clean finished
-						</Button>
-
-						{convertBoxes()}
-					</>
-				) :
-				<p>No conversions in progress!</p>}
-		</>
-	);
+				{convertBoxes(convertingList)}
+			</>
+		) :
+		<p>No conversions in progress!</p>);
 }
+
+/////////////////////////////////////////////
+// Helper functions for Popup:
+
+function convertBoxes(
+	convertingList: ConvertingList["convertingList"],
+): JSX.Element[] {
+	const list: JSX.Element[] = [];
+
+	let index = 0;
+	convertingList.forEach((media, path) => {
+		list.push(
+			<ConvertBox
+				convertionIndex={index}
+				mediaBeingConverted={media}
+				path={path}
+				key={path}
+			/>,
+		);
+		++index;
+	});
+
+	return list;
+}
+
+/////////////////////////////////////////////
 
 function cleanAllDoneConvertions(): void {
 	getConvertingList().forEach((download, url) => {
@@ -76,9 +89,13 @@ function cleanAllDoneConvertions(): void {
 				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== ProgressStatus.ACTIVE
 		)
-			cancelConvertionAndOrRemoveItFromList(url);
+			cancelConversionAndOrRemoveItFromList(url);
 	});
 }
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 const ConvertBox = (
 	{
@@ -89,7 +106,7 @@ const ConvertBox = (
 ) => (
 	<ItemWrapper className="item">
 		<TitleAndCancelWrapper>
-			<p>{getBasename(path) + "." + toExtension}</p>
+			<p>{`${getBasename(path)}.${toExtension}`}</p>
 
 			<CancelButton
 				onClick={e =>
@@ -102,19 +119,19 @@ const ConvertBox = (
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>
-			Converted: {formatDuration(timeConverted)} s /{" "}
-			{prettyBytes(sizeConverted)}
+			Converted:
+			{` ${formatDuration(timeConverted)} s / ${prettyBytes(sizeConverted)}`}
 			<span>{progressIcons.get(status)}</span>
 		</ConvertionProgress>
 	</ItemWrapper>
 );
 
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export function createNewConvertion(
-	convertInfo: Readonly<ConvertInfo>,
+	convertInfo: ConvertInfo,
 	path: Readonly<Path>,
 ): Readonly<MessagePort> {
 	const convertingList = getConvertingList();
@@ -131,94 +148,141 @@ export function createNewConvertion(
 	}
 
 	// MessageChannels are lightweight, it's cheap to create
-	// a new one for each request.
-	const { port1: myPort, port2: electronPort } = new MessageChannel();
+	// a new one for each request. They will be used to
+	// communicate the progress and status of each download.
+	const { port1: frontEndPort, port2: backEndPort } = new MessageChannel();
 
-	const convertStatus: MediaBeingConverted = {
-		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-		toExtension: convertInfo.toExtension,
-		isConverting: true,
-		timeConverted: 0,
-		sizeConverted: 0,
-		port: myPort,
-	};
-
-	setConvertingList(new Map(convertingList).set(path, convertStatus));
+	// Add new conversion to the list:
+	setConvertingList(
+		new Map(convertingList).set(path, {
+			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			toExtension: convertInfo.toExtension,
+			port: frontEndPort,
+			timeConverted: 0,
+			sizeConverted: 0,
+		}),
+	);
 
 	// On every `postMessage` you have to send the path (as an ID)!
-	myPort.postMessage({
-		toExtension: convertStatus.toExtension,
-		canStartConvert: true,
-		path,
-	});
+	frontEndPort.postMessage({ toExtension: convertInfo.toExtension, path });
 
-	myPort.onmessage = ({ data }: { data: Partial<MediaBeingConverted>; }) => {
-		const convertingList = getConvertingList();
+	frontEndPort.addEventListener("close", logThatPortIsClosing);
+	frontEndPort.addEventListener(
+		"message",
+		e => handleUpdateConvertingList(e, path),
+	);
 
-		dbg(`Received a message from Electron on port for "${path}":`, {
-			convertingList,
-			data,
-		});
+	frontEndPort.start();
 
-		// Assert that the download exists:
-		if (!convertingList.has(path))
-			return console.error(
-				"Received a message from Electron but the path is not in the list!",
-			);
-
-		setConvertingList(
-			new Map(convertingList).set(path, { ...convertStatus, ...data }),
-		);
-
-		switch (data.status) {
-			case ProgressStatus.FAILED: {
-				// @ts-ignore ^ In this case, `data` include an `error: Error` key.
-				console.assert(data.error, "data.error should exist!");
-				console.error((data as typeof data & { error: Error; }).error);
-
-				errorToast(`Download of "${path}" failed!`);
-
-				cancelConvertionAndOrRemoveItFromList(path);
-				break;
-			}
-
-			case ProgressStatus.SUCCESS: {
-				successToast(`Download of "${path}" succeded!`);
-
-				cancelConvertionAndOrRemoveItFromList(path);
-				break;
-			}
-
-			case ProgressStatus.CANCEL: {
-				infoToast(`Download of "${path}" was cancelled!`);
-
-				cancelConvertionAndOrRemoveItFromList(path);
-				break;
-			}
-
-			case ProgressStatus.ACTIVE:
-				break;
-
-			case undefined:
-				break;
-
-			case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
-				break;
-
-			default:
-				assertUnreachable(data.status);
-				break;
-		}
-	};
-
-	myPort.addEventListener("close", handleOnClose);
-
-	myPort.start();
-
-	return electronPort;
+	return backEndPort;
 }
 
-export const handleOnClose = () => dbg("Closing ports (react port).");
+/////////////////////////////////////////////
+// Helper functions for `createNewConvertion()`
+
+export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
+
+/////////////////////////////////////////////
+
+export function cancelConversionAndOrRemoveItFromList(
+	path: Readonly<string>,
+): void {
+	const convertingList = getConvertingList();
+
+	const mediaBeingConverted = convertingList.get(path);
+
+	if (!mediaBeingConverted)
+		return console.error(
+			`There should be a convertion with path "${path}"!\nconvertList =`,
+			convertingList,
+		);
+
+	// Cancel conversion
+	if (mediaBeingConverted.status === ProgressStatus.ACTIVE)
+		mediaBeingConverted.port.postMessage({ destroy: true, path });
+
+	// Remove from converting list
+	const newConvertingList = new Map(convertingList);
+	newConvertingList.delete(path);
+
+	// Make React update:
+	setConvertingList(newConvertingList);
+}
+
+/////////////////////////////////////////////
+
+function handleUpdateConvertingList(
+	{ data }: { data: Partial<MediaBeingConverted>; },
+	path: Path,
+): void {
+	const convertingList = getConvertingList();
+
+	dbg(`Received a message from Electron on port for "${path}":`, {
+		convertingList,
+		data,
+	});
+
+	// Assert that the download exists:
+	const thisConversion = convertingList.get(path);
+	if (!thisConversion)
+		return console.error(
+			"Received a message from Electron but the path is not in the list!",
+		);
+
+	// Update `convertingList`:
+	setConvertingList(
+		new Map(convertingList).set(path, { ...thisConversion, ...data }),
+	);
+
+	// Handle status:
+	switch (data.status) {
+		case ProgressStatus.FAILED: {
+			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
+			console.assert(data.error, "data.error should exist!");
+
+			errorToast(
+				`Conversion of "${path}" failed! ${
+					(data as typeof data & { error: Error; }).error.message
+				}`,
+			);
+
+			cancelConversionAndOrRemoveItFromList(path);
+			break;
+		}
+
+		case ProgressStatus.SUCCESS: {
+			successToast(`Conversion of "${path}" succeded!`);
+
+			cancelConversionAndOrRemoveItFromList(path);
+			break;
+		}
+
+		case ProgressStatus.CANCEL: {
+			infoToast(`Conversion of "${path}" was cancelled!`);
+
+			cancelConversionAndOrRemoveItFromList(path);
+			break;
+		}
+
+		case ProgressStatus.ACTIVE:
+			break;
+
+		case undefined:
+			break;
+
+		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+			break;
+
+		default:
+			assertUnreachable(data.status);
+			break;
+	}
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 export type MediaBeingConverted = Readonly<
 	{
@@ -226,10 +290,11 @@ export type MediaBeingConverted = Readonly<
 		toExtension: AllowedMedias;
 		sizeConverted: number;
 		timeConverted: number;
-		isConverting: boolean;
 		port: MessagePort;
 	}
 >;
+
+/////////////////////////////////////////////
 
 type ConvertBoxProps = Readonly<
 	{
@@ -239,9 +304,11 @@ type ConvertBoxProps = Readonly<
 	}
 >;
 
-export type ConvertInfo = Readonly<
-	{ toExtension: AllowedMedias; canStartConvert: boolean; }
->;
+/////////////////////////////////////////////
+
+export type ConvertInfo = Readonly<{ toExtension: AllowedMedias; }>;
+
+/////////////////////////////////////////////
 
 type NewConvertions = Readonly<
 	{ newConvertions: ReadonlyMap<Path, ConvertInfo>; }

@@ -37,9 +37,16 @@ export function MediaOptionsCtxMenu() {
 	);
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Helper functions:
+
 export function shareMedias() {
 	setSettings({ filesToShare: new Set(allSelectedMedias) });
 }
+
+/////////////////////////////////////////////
 
 async function deleteMedias(): Promise<void> {
 	const promises: Promise<void>[] = [];

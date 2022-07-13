@@ -53,7 +53,7 @@ contextBridge.exposeInMainWorld("electron", electron);
 
 /////////////////////////////////////////////
 
-// Relay messages from the main process to the renderer process:
+// Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
 	ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 	(_event, downloadValues) =>
@@ -64,7 +64,7 @@ ipcRenderer.on(
 );
 
 /////////////////////////////////////////////
-// Helper function:
+// Helper functions:
 
 const logThatPortIsClosing = (): void => dbg("Closing ports (electronPort).");
 
@@ -86,7 +86,7 @@ async function handleMsgsFromRendererProcess(
 	switch (msg.type) {
 		case ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD: {
 			if (!electronPort) {
-				console.error("There should be a electronPort to download media!");
+				console.error("There should be an electronPort to download a media!");
 				break;
 			}
 
@@ -102,7 +102,7 @@ async function handleMsgsFromRendererProcess(
 
 		case ReactToElectronMessageEnum.CONVERT_MEDIA: {
 			if (!electronPort) {
-				console.error("There should be a electronPort to convert media!");
+				console.error("There should be an electronPort to convert a media!");
 				break;
 			}
 

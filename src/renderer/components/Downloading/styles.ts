@@ -1,6 +1,12 @@
 import { Trigger } from "@radix-ui/react-popover";
 
+import { cancelConversionAndOrRemoveItFromList } from "../Converting/helper";
+import { cancelDownloadAndOrRemoveItFromList } from "./helper";
 import { keyframes, styled } from "@styles/global";
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const StyledPopoverTrigger = styled(Trigger, {
 	pos: "relative",
@@ -45,6 +51,10 @@ export const StyledPopoverTrigger = styled(Trigger, {
 	},
 });
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 const fallAway = keyframes({
 	"0%": { transform: "rotateZ(0deg)", opacity: 1, top: 0 },
 
@@ -52,6 +62,10 @@ const fallAway = keyframes({
 
 	"100%": { transform: "rotateZ(-5deg)", opacity: 0, top: 200 },
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 const moveUp = keyframes({
 	"0%": { transform: "translateY(0px)" },
@@ -62,9 +76,14 @@ const moveUp = keyframes({
 	},
 });
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 const fallAwayAnimationDuration = 600;
 const moveUpDelay = 200;
 const moveUpAnimationDuration = fallAwayAnimationDuration - moveUpDelay;
+
 export const ItemWrapper = styled("div", {
 	pos: "relative",
 	d: "flex",
@@ -94,7 +113,12 @@ export const ItemWrapper = styled("div", {
 		animationName: `${moveUp}`,
 	},
 });
-export const ItemWrapperClass = `.${ItemWrapper.className}`;
+
+const ItemWrapperClass = `.${ItemWrapper.className}`;
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const TitleAndCancelWrapper = styled("div", {
 	pos: "relative",
@@ -117,3 +141,56 @@ export const TitleAndCancelWrapper = styled("div", {
 		w: "90%",
 	},
 });
+
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+
+export function handleSingleItemDeleteAnimation(
+	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
+	downloadingOrConvertionIndex: Readonly<number>,
+	isDownloadList: Readonly<boolean>,
+	url: Readonly<string>,
+): void {
+	const items = document.querySelectorAll(ItemWrapperClass) as NodeListOf<
+		HTMLDivElement
+	>;
+
+	//////////////////////////////////////////
+
+	// Only add the animation to the ones below the one that was clicked:
+	for (const [index, item] of items.entries()) {
+		if (index <= downloadingOrConvertionIndex) continue;
+
+		item.classList.add("move-up");
+		item.addEventListener(
+			"animationend",
+			() => item.classList.remove("move-up"),
+			{ once: true },
+		);
+	}
+
+	//////////////////////////////////////////
+
+	const itemClicked = (e.target as HTMLElement).closest(
+		ItemWrapperClass,
+	) as HTMLDivElement;
+
+	itemClicked.classList.add("delete");
+
+	// Add event listener to the itemClicked to remove the animation:
+	itemClicked.addEventListener("animationend", () => {
+		isDownloadList ?
+			cancelDownloadAndOrRemoveItFromList(url) :
+			cancelConversionAndOrRemoveItFromList(url);
+	});
+	itemClicked.addEventListener("animationcancel", () => {
+		// This is so users can just click the cancel
+		// button and imediately leave the popup, wich
+		// cancels the animation!
+
+		isDownloadList ?
+			cancelDownloadAndOrRemoveItFromList(url) :
+			cancelConversionAndOrRemoveItFromList(url);
+	});
+}

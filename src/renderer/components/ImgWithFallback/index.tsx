@@ -1,5 +1,10 @@
 import type { Path } from "@common/@types/generalTypes";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Constants:
+
 enum Status {
 	FAILURE,
 	PENDING,
@@ -8,7 +13,14 @@ enum Status {
 
 const { SUCCESS, FAILURE, PENDING } = Status;
 
+/////////////////////////////////////////////
+
 const cache: Map<Path, Status> = new Map();
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Main function:
 
 export function ImgWithFallback(
 	{ mediaPath, Fallback, mediaImg }: Props,
@@ -23,7 +35,7 @@ export function ImgWithFallback(
 
 	cache.set(mediaPath, PENDING);
 
-	let img: HTMLImageElement | undefined = new Image();
+	let img: HTMLImageElement | null = new Image();
 
 	img.onload = () => {
 		cache.set(mediaPath, SUCCESS);
@@ -31,7 +43,7 @@ export function ImgWithFallback(
 		// 	`%c"${media.path}" img loaded with success`,
 		// 	"font-weight: bold; color: blue;",
 		// );
-		img = undefined;
+		img = null;
 	};
 
 	img.onerror = ev => {
@@ -39,7 +51,7 @@ export function ImgWithFallback(
 
 		// await writeTags(media.path, { imageURL: "erase img" });
 		cache.set(mediaPath, FAILURE);
-		img = undefined;
+		img = null;
 	};
 
 	img.src = mediaImg;
@@ -48,6 +60,9 @@ export function ImgWithFallback(
 		<img src={mediaImg} loading="lazy" decoding="async" /> :
 		(Fallback);
 }
+
+/////////////////////////////////////////////
+// Types:
 
 type Props = Readonly<
 	{ Fallback: JSX.Element; mediaImg?: string; mediaPath: Path; }

@@ -28,11 +28,13 @@ export const useProgress = create<Progress>(() => ({
 	currentTime: 0,
 	percentage: 0,
 }));
+
 const { setState: setProgress } = useProgress;
 
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
+// Main function:
 
 export function MediaPlayer() {
 	const { sortedByName: mainList } = usePlaylists();
@@ -158,6 +160,9 @@ export function MediaPlayer() {
 	);
 }
 
+/////////////////////////////////////////
+// Helper functions:
+
 const handleInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
 const handleAbort = (): void => dbg("Audio was aborted.");
 const handleClose = (): void => dbg("Audio was closed.");
@@ -170,5 +175,10 @@ const handleStalled = (e: Readonly<Event>): void =>
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",
 		e,
 	);
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 type Progress = Readonly<{ currentTime: number; percentage: number; }>;

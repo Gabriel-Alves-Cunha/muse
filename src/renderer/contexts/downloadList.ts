@@ -59,7 +59,7 @@ export const setDownloadingList = (
 	downloadingList: DownloadingList["downloadingList"],
 ) => useDownloadingList.setState({ downloadingList });
 
-type DownloadingList = Readonly<
+export type DownloadingList = Readonly<
 	{ downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>; }
 >;
 

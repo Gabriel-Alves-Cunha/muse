@@ -8,6 +8,10 @@ import { styled, darkTheme, lightTheme } from "@styles/global";
 import { useLocalStorage } from "@hooks/useLocalStorage";
 import { keyPrefix } from "@utils/localStorage";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 const themeKey = `${keyPrefix}theme` as const;
 const html = document.documentElement;
 // Themes:
@@ -17,6 +21,11 @@ const dark = "dark";
 const availableThemes: Readonly<Record<Themes, string>> = Object.freeze(
 	{ light: lightTheme.className, dark: darkTheme.className } as const,
 );
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Main function:
 
 export function ThemeToggler() {
 	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, light);
@@ -29,7 +38,7 @@ export function ThemeToggler() {
 		setTheme(nextTheme);
 	}
 
-	// Only run on firt render
+	// (Only on firt render) set the theme to initialValue (light):
 	useEffect(() => {
 		html.classList.add(availableThemes[theme]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,6 +50,11 @@ export function ThemeToggler() {
 		</ThemeButton>
 	);
 }
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Styles:
 
 const ThemeButton = styled("button", {
 	pos: "relative",
@@ -55,5 +69,10 @@ const ThemeButton = styled("button", {
 
 	"&:hover, &:focus": { c: "$active-icon" },
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 type Themes = "light" | "dark";

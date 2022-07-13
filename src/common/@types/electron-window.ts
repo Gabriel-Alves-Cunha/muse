@@ -3,11 +3,17 @@ import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions
 import type { TurnServerOnReturn } from "@main/preload/share";
 import type { videoInfo } from "ytdl-core";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 declare global {
 	/* eslint-disable no-var */
 	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[]; };
 	var electron: VisibleElectron;
 }
+
+/////////////////////////////////////////////
 
 export type VisibleElectron = Readonly<
 	{
@@ -49,6 +55,8 @@ export type VisibleElectron = Readonly<
 	}
 >;
 
+/////////////////////////////////////////////
+
 export enum ReactToElectronMessageEnum {
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
 	CONVERT_MEDIA = "convert media",
@@ -56,9 +64,13 @@ export enum ReactToElectronMessageEnum {
 	ERROR = "error",
 }
 
+/////////////////////////////////////////////
+
 export type MetadataToChange = Readonly<
 	{ newValue: string | readonly string[]; whatToChange: ChangeOptionsToSend; }
 >[];
+
+/////////////////////////////////////////////
 
 export type MsgObjectReactToElectron =
 	| Readonly<{ type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD; }>
@@ -72,21 +84,19 @@ export type MsgObjectReactToElectron =
 	>
 	| Readonly<{ type: ReactToElectronMessageEnum.ERROR; error: Error; }>;
 
+/////////////////////////////////////////////
+
 export enum ElectronToReactMessageEnum {
-	CONVERSION_CANCELED_SUCCESSFULLY = "conversion canceled successfully",
 	DELETE_ONE_MEDIA_FROM_COMPUTER = "delete one media from computer",
-	DOWNLOAD_CANCELED_SUCCESSFULLY = "download canceled successfully",
-	CREATE_CONVERSION_FAILED = "create conversion failed",
-	CREATE_DOWNLOAD_FAILED = "create download failed",
-	NEW_COVERSION_CREATED = "new conversion created",
 	CREATE_A_NEW_DOWNLOAD = "create a new download",
-	NEW_DOWNLOAD_CREATED = "new download created",
 	REFRESH_ALL_MEDIA = "refresh all media",
 	REFRESH_ONE_MEDIA = "refresh one media",
 	REMOVE_ONE_MEDIA = "remove one media",
 	ADD_ONE_MEDIA = "add one media",
 	ERROR = "error",
 }
+
+/////////////////////////////////////////////
 
 export type MsgObjectElectronToReact =
 	| Readonly<
@@ -101,18 +111,6 @@ export type MsgObjectElectronToReact =
 			downloadInfo: DownloadInfo;
 		}
 	>
-	| Readonly<
-		{
-			type: ElectronToReactMessageEnum.DOWNLOAD_CANCELED_SUCCESSFULLY;
-			url: string;
-		}
-	>
-	| Readonly<
-		{
-			type: ElectronToReactMessageEnum.CONVERSION_CANCELED_SUCCESSFULLY;
-			path: Path;
-		}
-	>
 	| Readonly<{ type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA; }>
 	| Readonly<
 		{ type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA; mediaPath: Path; }
@@ -123,21 +121,11 @@ export type MsgObjectElectronToReact =
 	| Readonly<
 		{ type: ElectronToReactMessageEnum.ADD_ONE_MEDIA; mediaPath: Path; }
 	>
-	| Readonly<{ type: ElectronToReactMessageEnum.ERROR; error: Error; }>
-	| Readonly<
-		{ type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED; url: string; }
-	>
-	| Readonly<
-		{ type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED; url: string; }
-	>
-	| Readonly<
-		{ type: ElectronToReactMessageEnum.NEW_COVERSION_CREATED; path: Path; }
-	>
-	| Readonly<
-		{ type: ElectronToReactMessageEnum.CREATE_CONVERSION_FAILED; path: Path; }
-	>;
+	| Readonly<{ type: ElectronToReactMessageEnum.ERROR; error: Error; }>;
 
-export type WriteTag = Readonly<
+/////////////////////////////////////////////
+
+export type Tags = Readonly<
 	{
 		albumArtists?: readonly string[];
 		genres?: readonly string[];
@@ -146,6 +134,8 @@ export type WriteTag = Readonly<
 		title?: string;
 	}
 >;
+
+/////////////////////////////////////////////
 
 export enum ElectronIpcMainProcessNotificationEnum {
 	TOGGLE_DEVELOPER_TOOLS,

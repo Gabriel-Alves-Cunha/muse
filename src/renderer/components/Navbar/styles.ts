@@ -1,6 +1,10 @@
 import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Nav = styled("nav", {
 	gridArea: "nav",
 
@@ -16,6 +20,10 @@ export const Nav = styled("nav", {
 	"& > :first-child": { mt: 40 },
 	"& > :last-child": { mb: 40 },
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const Buttons = styled("div", {
 	dcolumn: "center",
@@ -37,5 +45,9 @@ export const Buttons = styled("div", {
 		"&.active": { c: "$active-icon" },
 	},
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const PopupsWrapper = styled("div", { dcolumn: "center", w: "100%" });

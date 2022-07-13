@@ -3,6 +3,11 @@ import { ItemText } from "@radix-ui/react-select";
 
 import { Viewport, Item, ItemIndicator } from "./styles";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Main function:
+
 export const HeaderButtons = () => (
 	<Viewport className="notransition">
 		<Item value="Name">

@@ -1,7 +1,7 @@
-// This file is intended so Vite can bundle the assets
-// when the renderer is built.
+// This file is intended so Vite can bundle
+// the assets when the renderer is built.
 
-// these are not consumed anywhere, but it's needed to make the renderer bundle them:
+// These are only logged to console; it's needed to make the renderer bundle them:
 export const font_1 = new URL(
 	"./fonts/assistant-v16-latin-300.woff2",
 	import.meta.url,

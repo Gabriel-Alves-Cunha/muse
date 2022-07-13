@@ -66,6 +66,6 @@ export const setConvertingList = (
 	convertingList: ConvertingList["convertingList"],
 ) => useConvertingList.setState({ convertingList });
 
-type ConvertingList = Readonly<
+export type ConvertingList = Readonly<
 	{ convertingList: ReadonlyMap<Path, MediaBeingConverted>; }
 >;

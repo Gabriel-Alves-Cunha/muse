@@ -22,4 +22,7 @@ export function Reload({ className }: Props) {
 	);
 }
 
+/////////////////////////////////////////////
+// Types:
+
 type Props = Readonly<{ className?: string; }>;

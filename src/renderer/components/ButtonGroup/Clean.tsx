@@ -21,6 +21,9 @@ export const Clean = ({ className }: Props) => (
 	</ButtonFromGroup>
 );
 
+/////////////////////////////////////////////
+// Helper functions:
+
 function cleanProperList() {
 	const { fromList } = getFromList();
 
@@ -38,5 +41,8 @@ function cleanProperList() {
 			break;
 	}
 }
+
+/////////////////////////////////////////////
+// Types:
 
 type Props = Readonly<{ className?: string; }>;

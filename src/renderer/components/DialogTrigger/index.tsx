@@ -15,7 +15,7 @@ export const DialogTrigger = ({ children, className, tooltip }: Props) => (
 const StyledDialogTrigger = styled(Trigger, {
 	m: "unset",
 
-	position: "relative",
+	pos: "relative",
 	dflex: "center",
 	size: 29,
 

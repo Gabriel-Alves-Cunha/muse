@@ -97,6 +97,10 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 	);
 }
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
 		<Dialog modal>
@@ -124,6 +128,10 @@ export const Header = ({ media, path }: RefToMedia) => (
 	</OptionsAndAlbum>
 );
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Controls = ({ isPaused = false }: IsPaused) => (
 	<ControlsWrapper>
 		<CircledIconButton
@@ -147,6 +155,10 @@ export const Controls = ({ isPaused = false }: IsPaused) => (
 	</ControlsWrapper>
 );
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 function seek(e: SeekEvent, audio: Audio): void {
 	if (!audio?.duration) return;
 
@@ -158,6 +170,8 @@ function seek(e: SeekEvent, audio: Audio): void {
 
 	audio.currentTime = desiredTime;
 }
+
+/////////////////////////////////////////
 
 export function SeekerWrapper({ audio }: RefToAudio) {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
@@ -226,6 +240,11 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 		</SeekerContainer>
 	);
 }
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 type Audio = HTMLAudioElement | null;
 type RefToAudio = Readonly<{ audio: Audio; }>;

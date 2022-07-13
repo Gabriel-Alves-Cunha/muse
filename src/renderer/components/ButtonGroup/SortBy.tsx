@@ -10,6 +10,7 @@ export function SortBy({ className }: Props) {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
 
 	useEffect(() => {
+		// Default value:
 		let homeList = PlaylistList.MAIN_LIST;
 
 		switch (selectedList) {
@@ -40,6 +41,9 @@ export function SortBy({ className }: Props) {
 		</Select>
 	);
 }
+
+/////////////////////////////////////////////
+// Types:
 
 type Props = Readonly<{ className?: string; }>;
 

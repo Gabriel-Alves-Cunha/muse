@@ -2,9 +2,13 @@ import { Anchor } from "@radix-ui/react-popover";
 
 import { styled } from "@styles/global";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const ConvertionProgress = styled("div", {
 	d: "flex", // row
-	justifyContent: "space-between",
+	jc: "space-between",
 
 	whiteSpace: "nowrap", // one line
 	c: "$gray-text",
@@ -17,11 +21,15 @@ export const ConvertionProgress = styled("div", {
 	span: { c: "white", mr: 4 },
 });
 
-export const PopoverAnchor = styled(Anchor, {
-	pos: "relative",
-	left: 10,
-	t: 10,
-});
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const PopoverAnchor = styled(Anchor, { pos: "relative", l: 10, t: 10 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const CancelButton = styled("button", {
 	pos: "absolute",

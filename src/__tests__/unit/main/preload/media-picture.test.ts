@@ -27,9 +27,6 @@ const errorMsg = "File pictures length should be 1";
 //////////////////////////////////////
 
 describe("Test suite to get writeTags() to write a picture into a media.", () => {
-	//////////////////////////////////////
-	//////////////////////////////////////
-	//////////////////////////////////////
 	// This file has to use a different audio file for tests,
 	// cause the test files are run in parallel, so it's not
 	// possible to use only one file.

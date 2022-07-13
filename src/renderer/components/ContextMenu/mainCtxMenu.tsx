@@ -6,8 +6,13 @@ import { RightSlot, Separator, Item } from "./styles";
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
+/////////////////////////////////////////////
+// Helper functions:
+
 const toggleDeveloperTools = () =>
 	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS);
+
+/////////////////////////////////////////////
 
 export const MainCtxMenu = () => (
 	<>

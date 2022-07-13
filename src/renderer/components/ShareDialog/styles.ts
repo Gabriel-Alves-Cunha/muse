@@ -3,7 +3,15 @@ import { Content, Close } from "@radix-ui/react-dialog";
 import { slideUpAndFade } from "@components/Popover/styles";
 import { styled } from "@styles/global";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Canvas = styled("canvas", { pos: "relative", size: 300, br: 13 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const CloseDialogTrigger = styled(Close, {
 	pos: "absolute",
@@ -28,6 +36,10 @@ export const CloseDialogTrigger = styled(Close, {
 
 	"&:hover, &:focus": { bg: "rgba(0, 0, 0, 0.2)" },
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const StyledDialogShareContent = styled(Content, {
 	pos: "absolute",

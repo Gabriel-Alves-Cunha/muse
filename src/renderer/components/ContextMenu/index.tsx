@@ -9,6 +9,10 @@ import { MainCtxMenu } from "./mainCtxMenu";
 
 import { Content } from "./styles";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 export enum ContentEnum {
 	MEDIA_OPTIONS,
 	FULL_EXAMPLE,
@@ -16,6 +20,10 @@ export enum ContentEnum {
 }
 
 const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export const ContextMenu = (
 	{ children, content = MAIN, onContextMenu, setIsOpen }: Props,
@@ -26,6 +34,9 @@ export const ContextMenu = (
 		<Content sideOffset={5}>{contentToShow(content)}</Content>
 	</Root>
 );
+
+/////////////////////////////////////////////
+// Helper functions:
 
 function contentToShow(content: NonNullable<Props["content"]>) {
 	switch (content) {
@@ -42,6 +53,9 @@ function contentToShow(content: NonNullable<Props["content"]>) {
 			return assertUnreachable(content);
 	}
 }
+
+/////////////////////////////////////////////
+// Types:
 
 type Props = Readonly<
 	{

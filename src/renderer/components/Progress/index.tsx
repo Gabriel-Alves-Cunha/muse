@@ -8,6 +8,11 @@ import { ProgressStatus } from "@common/enums";
 
 import { Bar, Component } from "./styles";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+//////////////////////////////////////////
+// Main function:
+
 export const Progress = (
 	{ percent_0_to_100, showStatus, status }: ProgressProps,
 ) => (
@@ -20,6 +25,11 @@ export const Progress = (
 		{showStatus && progressIcons.get(status)}
 	</Component>
 );
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+//////////////////////////////////////////
+// Helper function:
 
 export const progressIcons: ReadonlyMap<ProgressStatus, JSX.Element> = Object
 	.freeze(
@@ -37,6 +47,11 @@ export const progressIcons: ReadonlyMap<ProgressStatus, JSX.Element> = Object
 			],
 		]),
 	);
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+//////////////////////////////////////////
+// Types:
 
 export type ProgressProps = Readonly<
 	{ showStatus: boolean; percent_0_to_100: number; status: ProgressStatus; }

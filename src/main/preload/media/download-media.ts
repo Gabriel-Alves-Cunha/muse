@@ -19,6 +19,7 @@ import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
+import { MediaBeingDownloaded } from "@components/Downloading";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -76,13 +77,16 @@ export async function createDownload(
 
 	// Assert file doesn't already exists:
 	if (await pathExists(saveSite)) {
-		error(`File "${saveSite}" already exists! Canceling download.`);
+		const info = `File "${saveSite}" already exists! Canceling download.`;
+
+		error(info);
 
 		// Send a msg to the client that the download failed:
-		sendMsgToClient({
-			type: ElectronToReactMessageEnum.CREATE_DOWNLOAD_FAILED,
-			url,
-		});
+		const msg: Partial<MediaBeingDownloaded> & { error: Error; } = {
+			status: ProgressStatus.FAILED,
+			error: new Error(info),
+		};
+		electronPort!.postMessage(msg);
 
 		// Don't forget to throw away the MessagePort (clean up):
 		electronPort!.close();
@@ -119,10 +123,10 @@ export async function createDownload(
 				prettyTotal = prettyBytes(total);
 
 				// Send a message to client that we're successfully starting a download:
-				sendMsgToClient({
-					type: ElectronToReactMessageEnum.NEW_DOWNLOAD_CREATED,
-					url,
-				});
+				const msg: Partial<MediaBeingDownloaded> = {
+					status: ProgressStatus.ACTIVE,
+				};
+				electronPort!.postMessage(msg);
 			}
 
 			// Log progress to node console if in development:
@@ -154,16 +158,11 @@ export async function createDownload(
 			// Delete the file since it was canceled:
 			await deleteFile(saveSite);
 
-			// TODO: unify these two below:
 			// Tell the client the download was successfully canceled:
-			sendMsgToClient({
-				type: ElectronToReactMessageEnum.DOWNLOAD_CANCELED_SUCCESSFULLY,
-				url,
-			});
-			electronPort!.postMessage({
+			const msg: Partial<MediaBeingDownloaded> = {
 				status: ProgressStatus.CANCEL,
-				isDownloading: false,
-			});
+			};
+			electronPort!.postMessage(msg);
 
 			// Clean up:
 			currentDownloads.delete(url);
@@ -184,16 +183,26 @@ export async function createDownload(
 			);
 
 			// Tell the client the download was successfull:
-			electronPort!.postMessage({
+			const msg: Partial<MediaBeingDownloaded> = {
 				status: ProgressStatus.SUCCESS,
-				isDownloading: false,
-			});
+			};
+			electronPort!.postMessage(msg);
 
 			// Download media image and put it on the media metadata:
-			await writeTags(saveSite, {
-				downloadImg: true,
-				isNewMedia: true,
-				imageURL,
+			try {
+				await writeTags(saveSite, {
+					downloadImg: true,
+					isNewMedia: true,
+					imageURL,
+				});
+			} catch (error) {
+				console.error(error);
+			}
+
+			// Tell client to add a new media...
+			sendMsgToClient({
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+				mediaPath: saveSite,
 			});
 
 			// Clean up:
@@ -207,17 +216,12 @@ export async function createDownload(
 			// Delete the file since it errored:
 			await deleteFile(saveSite);
 
-			// TODO: unify these two below:
 			// Tell the client the download threw an error:
-			sendMsgToClient({
-				type: ElectronToReactMessageEnum.DOWNLOAD_CANCELED_SUCCESSFULLY,
-				url,
-			});
-			electronPort!.postMessage({
+			const msg: Partial<MediaBeingDownloaded> & { error: Error; } = {
 				status: ProgressStatus.FAILED,
-				isDownloading: false,
-				error: err,
-			});
+				error: new Error(err.message),
+			};
+			electronPort!.postMessage(msg);
 
 			// Clean up:
 			currentDownloads.delete(url);

@@ -28,10 +28,18 @@ import {
 	Label,
 } from "./styles";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
 const warningSvg = new URL(
 	"../../../assets/icons/warning.svg",
 	import.meta.url,
 );
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export function MediaOptionsModal({ media, path }: Props) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
@@ -115,6 +123,9 @@ export function MediaOptionsModal({ media, path }: Props) {
 	);
 }
 
+/////////////////////////////////////////////
+// Helper functions:
+
 async function handleMediaDeletion(
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
@@ -126,26 +137,32 @@ async function handleMediaDeletion(
 	await deleteMedia(mediaPath);
 }
 
+/////////////////////////////////////////////
+
 function changeMediaMetadata(
 	contentWrapperRef: Readonly<RefObject<HTMLDivElement>>,
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
 ): void {
-	if (contentWrapperRef.current && closeButtonRef.current)
-		try {
-			changeMetadataIfAllowed(contentWrapperRef, mediaPath, media);
-			closeEverything(closeButtonRef);
+	if (!contentWrapperRef.current || !closeButtonRef.current)
+		return;
 
-			successToast("New media metadata has been saved.");
-		} catch (error) {
-			console.error(error);
+	try {
+		changeMetadataIfAllowed(contentWrapperRef, mediaPath, media);
+		closeEverything(closeButtonRef);
 
-			errorToast(
-				"Unable to save new metadata. See console by pressing Ctrl+Shift+i.",
-			);
-		}
+		successToast("New media metadata has been saved.");
+	} catch (error) {
+		console.error(error);
+
+		errorToast(
+			"Unable to save new metadata. See console by pressing Ctrl+Shift+i.",
+		);
+	}
 }
+
+/////////////////////////////////////////////
 
 function changeMetadataIfAllowed(
 	contentWrapper: Readonly<RefObject<HTMLDivElement>>,
@@ -199,6 +216,7 @@ function changeMetadataIfAllowed(
 							id,
 						});
 
+						// TODO:
 						// If they are different, the writeTag() function will
 						// handle splitting the string, so just continue the
 						// rest of the function.
@@ -227,6 +245,8 @@ function changeMetadataIfAllowed(
 		});
 }
 
+/////////////////////////////////////////////
+
 const options = ({ duration, artist, album, genres, title, size }: Media) => ({
 	duration,
 	artist,
@@ -235,6 +255,8 @@ const options = ({ duration, artist, album, genres, title, size }: Media) => ({
 	album,
 	size,
 });
+
+/////////////////////////////////////////////
 
 // Translating to the names that the library that changes
 // the metadata recognizes:
@@ -251,13 +273,22 @@ const allowedOptionToChange = Object.freeze(
 const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).includes(option);
 
+/////////////////////////////////////////////
+
 const closeEverything = (
 	element: Readonly<RefObject<HTMLButtonElement>>,
 ): void => element.current?.click();
 
+/////////////////////////////////////////////
+
 const format = (
 	value: string | readonly string[] | undefined,
 ): string | undefined => (value instanceof Array ? value.join(", ") : value);
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 export type WhatToChange = Readonly<
 	{
@@ -267,7 +298,12 @@ export type WhatToChange = Readonly<
 	}
 >;
 
+/////////////////////////////////////////////
+
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
+
 type ChangeOptions = keyof typeof allowedOptionToChange;
+
+/////////////////////////////////////////////
 
 type Props = Readonly<{ media: Media; path: Path; }>;

@@ -24,11 +24,5 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Show directory
-        run: ls
-
       - name: Run tests
         run: yarn test --run # do not watch
-
-      - name: Show directory of build
-        run: ls dist

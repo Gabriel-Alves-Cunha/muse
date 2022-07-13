@@ -1,11 +1,20 @@
 import type { VariantProps } from "@stitches/react";
 
-import { forwardRef, type Ref, type ReactNode } from "react";
+import { type Ref, type ReactNode, forwardRef } from "react";
 import { PopperContentProps, Root } from "@radix-ui/react-popover";
 
 import { StyledContent } from "./styles";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const PopoverRoot = Root;
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Main function:
 
 /** Usage:
  *
@@ -29,6 +38,11 @@ export const PopoverContent = forwardRef((
 	</StyledContent>
 ));
 PopoverContent.displayName = "PopoverContent";
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 type Props =
 	& PopperContentProps

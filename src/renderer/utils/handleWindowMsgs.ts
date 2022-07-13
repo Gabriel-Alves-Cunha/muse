@@ -1,11 +1,8 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { getDownloadingList, setDownloadingList } from "@contexts/downloadList";
-import { getConvertingList, setConvertingList } from "@contexts/convertList";
-import { electronSource, type MsgWithSource } from "@common/crossCommunication";
+import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
-import { ProgressStatus } from "@common/enums";
 import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
 import { deleteMedia } from "./media";
@@ -27,8 +24,8 @@ const { transformPathsToMedias } = electron.media;
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
+// listen for files drop:
 
-// listen for files drop
 function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
@@ -38,6 +35,8 @@ function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 	event.dataTransfer.dropEffect = "copy";
 	// ^ Style the drag-and-drop as a "copy file" operation.
 }
+
+//////////////////////////////////////////
 
 function listenToDropEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
@@ -52,6 +51,8 @@ function listenToDropEvent(event: Readonly<DragEvent>): void {
 	console.warn("@TODO: handle these files droped!", files);
 }
 
+//////////////////////////////////////////
+
 window.addEventListener("dragover", listenToDragoverEvent);
 window.addEventListener("drop", listenToDropEvent);
 
@@ -60,20 +61,16 @@ window.addEventListener("drop", listenToDropEvent);
 //////////////////////////////////////////
 
 const {
-	CONVERSION_CANCELED_SUCCESSFULLY,
-	DOWNLOAD_CANCELED_SUCCESSFULLY,
 	DELETE_ONE_MEDIA_FROM_COMPUTER,
-	CREATE_CONVERSION_FAILED,
-	CREATE_DOWNLOAD_FAILED,
 	CREATE_A_NEW_DOWNLOAD,
-	NEW_COVERSION_CREATED,
-	NEW_DOWNLOAD_CREATED,
 	REFRESH_ALL_MEDIA,
 	REFRESH_ONE_MEDIA,
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
 	ERROR,
 } = ElectronToReactMessageEnum;
+
+//////////////////////////////////////////
 
 export async function handleWindowMsgs(event: Event): Promise<void> {
 	if (event.data.source !== electronSource) return;
@@ -83,124 +80,20 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 	switch (msg.type) {
 		case CREATE_A_NEW_DOWNLOAD: {
-			dbg("Create a new download.");
+			dbg("[handleWindowMsgs()] Create a new download:", msg.downloadInfo);
 			setDownloadInfo(msg.downloadInfo);
-			break;
-		}
-
-		case NEW_DOWNLOAD_CREATED: {
-			dbg("New download created.");
-
-			const downloadingList = getDownloadingList();
-			// In here, there has to be a download WAITING:
-			const download = downloadingList.get(msg.url);
-
-			dbg({ downloadingList_: downloadingList, url: msg.url, download });
-
-			if (!download) {
-				console.error(
-					"There should be a download to be confirmed on `downloadingList`, but there is none!",
-				);
-				break;
-			}
-
-			setDownloadingList(
-				new Map(downloadingList).set(msg.url, {
-					...download,
-					status: ProgressStatus.ACTIVE,
-				}),
-			);
-			break;
-		}
-
-		case NEW_COVERSION_CREATED: {
-			dbg("New conversion created.");
-
-			const convertingList = getConvertingList();
-			const { path } = msg;
-			// In here, there has to be a conversion WAITING:
-			const convertingMedia = convertingList.get(path);
-
-			dbg({ convertingList, path, convertingMedia });
-
-			// In here, there has to be a conversion WAITING
-			if (!convertingMedia) {
-				console.error(
-					"There should be a convertion to be confirmed on `convertingList`, but there is none!",
-				);
-				break;
-			}
-
-			setConvertingList(
-				new Map(convertingList).set(path, {
-					...convertingMedia,
-					status: ProgressStatus.ACTIVE,
-				}),
-			);
-			break;
-		}
-
-		case CREATE_CONVERSION_FAILED: {
-			console.error("Create conversion failed!");
-
-			const convertingList = getConvertingList();
-			const { path } = msg;
-			// In here, there has to be a conversion WAITING
-			const convertingMedia = convertingList.get(path);
-
-			dbg({ convertingList, path, convertingMedia });
-
-			if (!convertingMedia) {
-				console.error(
-					"There should be a convertion to be confirmed on `convertingList`, but there is none!",
-				);
-				break;
-			}
-
-			setConvertingList(
-				new Map(convertingList).set(path, {
-					...convertingMedia,
-					status: ProgressStatus.FAILED,
-				}),
-			);
-			break;
-		}
-
-		case CREATE_DOWNLOAD_FAILED: {
-			console.error("Download failed!");
-
-			const downloadingList = getDownloadingList();
-			const { url } = msg;
-			// In here, there has to be a download WAITING:
-			const download = downloadingList.get(url);
-
-			dbg({ downloadingList, url, download });
-
-			if (!download) {
-				console.error(
-					"There should be a download to be confirmed on `downloadingList`, but there is none!",
-				);
-				break;
-			}
-
-			setDownloadingList(
-				new Map(downloadingList).set(url, {
-					...download,
-					status: ProgressStatus.FAILED,
-				}),
-			);
 			break;
 		}
 
 		case ADD_ONE_MEDIA: {
 			const { mediaPath } = msg;
-
-			dbg("At ListenToNotification.ADD_ONE_MEDIA:", { mediaPath });
-
 			const {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
 			} = getSettings();
+
+			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
+
 			const newMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias(
 					[mediaPath],
@@ -227,9 +120,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case DELETE_ONE_MEDIA_FROM_COMPUTER: {
 			const { mediaPath } = msg;
 
-			dbg("At ListenToNotification.DELETE_ONE_MEDIA_FROM_COMPUTER:", {
-				mediaPath,
-			});
+			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
 			if (!mainList().has(mediaPath)) {
 				console.error("Could not find media to delete.");
@@ -241,7 +132,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		}
 
 		case REFRESH_ALL_MEDIA: {
-			dbg("Refresh all media.");
+			dbg("[handleWindowMsgs()] Refresh all media.");
 			await searchLocalComputerForMedias();
 			break;
 		}
@@ -249,7 +140,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case REFRESH_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("At REFRESH_ONE_MEDIA:", { mediaPath });
+			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
 
 			if (!mainList().has(mediaPath)) {
 				console.warn(
@@ -263,6 +154,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
 			} = getSettings();
+
 			const refreshedMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias(
 					[mediaPath],
@@ -292,7 +184,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		case REMOVE_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("At REMOVE_ONE_MEDIA:", { mediaPath });
+			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
 			if (!mainList().has(mediaPath)) {
 				console.error(
@@ -311,18 +203,6 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		case ERROR: {
 			console.error("@TODO: ERROR", { error: msg.error });
-
-			break;
-		}
-
-		case CONVERSION_CANCELED_SUCCESSFULLY: {
-			console.error("@TODO: CONVERSION_CANCELED_SUCCESSFULLY");
-
-			break;
-		}
-
-		case DOWNLOAD_CANCELED_SUCCESSFULLY: {
-			console.error("@TODO: DOWNLOAD_CANCELED_SUCCESSFULLY");
 
 			break;
 		}

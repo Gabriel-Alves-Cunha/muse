@@ -8,9 +8,14 @@ import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
 import { emptyMap } from "@utils/map-set";
+import { time } from "@utils/utils";
 
 import { StyledPopoverTrigger } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export function Converting() {
 	const convertingListSize = useConvertingList().convertingList.size;
@@ -19,27 +24,29 @@ export function Converting() {
 
 	useEffect(() => {
 		newConvertions.forEach((newConvertion, path) => {
-			if (newConvertion.canStartConvert)
-				try {
-					const electronPort = createNewConvertion(newConvertion, path);
+			try {
+				const electronPort = time(
+					() => createNewConvertion(newConvertion, path),
+					`createNewConvertion("${path}")`,
+				);
 
-					// Sending port so we can communicate with electron:
-					sendMsgToBackend(
-						{ type: ReactToElectronMessageEnum.CONVERT_MEDIA },
-						electronPort,
-					);
-				} catch (error) {
-					errorToast(
-						`There was an error trying to convert "${path}"! Please, try again later.`,
-					);
+				// Sending port so we can communicate with electron:
+				sendMsgToBackend(
+					{ type: ReactToElectronMessageEnum.CONVERT_MEDIA },
+					electronPort,
+				);
+			} catch (error) {
+				errorToast(
+					`There was an error trying to convert "${path}"! Please, try again later.`,
+				);
 
-					console.error(error);
-				}
+				console.error(error);
+			}
 		});
 
 		// In here, we've already handled all the files,
 		// so we can clear the list;
-		// We need the check to prevent infinite loop.
+		// We need the check to prevent an infinite loop.
 		if (newConvertions.size !== 0)
 			useNewConvertions.setState({ newConvertions: emptyMap });
 	}, [newConvertions]);

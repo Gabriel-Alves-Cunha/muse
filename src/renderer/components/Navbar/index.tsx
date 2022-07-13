@@ -17,6 +17,11 @@ import { pages } from "@utils/app";
 
 import { Nav, Buttons, PopupsWrapper } from "./styles";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Main function:
+
 export const Navbar = () => (
 	<Nav className="notransition">
 		<ThemeToggler />
@@ -31,6 +36,11 @@ export const Navbar = () => (
 	</Nav>
 );
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Constants:
+
 const icons: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Favorites: <Favorites />,
 	Download: <Download />,
@@ -39,6 +49,11 @@ const icons: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Convert: <Convert />,
 	Home: <Home />,
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Helper function:
 
 function ButtonsForPages() {
 	const currPage = usePage().page;

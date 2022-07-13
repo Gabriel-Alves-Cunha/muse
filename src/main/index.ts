@@ -1,6 +1,6 @@
 import type { DownloadInfo } from "@common/@types/generalTypes";
 
-import { validateURL, getBasicInfo } from "ytdl-core";
+import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
 import { join, normalize } from "node:path";
 import { pathToFileURL } from "node:url";
 import { autoUpdater } from "electron-updater";
@@ -27,28 +27,23 @@ import {
 // ------------------------------------------------
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
-autoUpdater.on("checking-for-update", () => {
-	dbg("Checking for update...");
-});
-autoUpdater.on("update-available", info => {
-	dbg("Update available:", info);
-});
-autoUpdater.on("update-not-available", info => {
-	dbg("Update not available:", info);
-});
-autoUpdater.on("error", err => {
-	dbg("Error in auto-updater. ", err);
-});
-autoUpdater.on("download-progress", progressObj => {
-	dbg({ progressObj });
-	const log_message =
-		`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
+autoUpdater
+	.on("update-not-available", info =>
+		dbg("Update not available:", info))
+	.on("update-downloaded", info => dbg("Update downloaded:", info))
+	.on("update-available", info =>
+		dbg("Update available:", info))
+	.on("checking-for-update", () => dbg("Checking for update..."))
+	.on("error", err =>
+		dbg("Error in auto-updater. ", err))
+	.on("download-progress", progressObj => {
+		dbg({ progressObj });
 
-	dbg(log_message);
-});
-autoUpdater.on("update-downloaded", info => {
-	dbg("Update downloaded:", info);
-});
+		const log_message =
+			`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
+
+		dbg(log_message);
+	});
 // -------------------------------------------------
 
 let electronWindow: BrowserWindow | undefined;
@@ -137,11 +132,11 @@ app
 			const url = request.url.substring(7);
 			callback(decodeURI(normalize(url)));
 		});
+		//
 
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
-		// Some APIs can only be used after this event occurs.
-
+		// Some APIs can only be used after this event occurs:
 		// TODO: there is something wrong with this lib:
 		if (isDevelopment) {
 			const devtoolsInstaller = await import("electron-devtools-installer");
@@ -159,16 +154,17 @@ app
 					console.error("An error occurred while installing extension: ", err)
 				);
 		}
+		//
 
 		electronWindow = await createWindow();
 		tray = new Tray(nativeImage.createFromPath(logoPath));
 		tray.setToolTip("Music player and downloader");
 		tray.setTitle("Muse");
 
-		/** This is to make electron show notification when we copy
-		 * a link to the clipboard!
-		 */
+		// This is to make Electron show a notification
+		// when we copy a link to the clipboard:
 		try {
+			// This has to be imported after app is open.
 			const extendedClipboard = (await import("./clipboardExtended"))
 				.extendedClipboard as ClipboardExtended;
 
@@ -176,40 +172,35 @@ app
 				.on("text-changed", async () => {
 					const url = extendedClipboard.readText("clipboard");
 
-					if (validateURL(url))
-						try {
-							const { title, thumbnails } = (await getBasicInfo(url))
-								.videoDetails;
+					if (!isUrlValid(url)) return;
 
-							new Notification({
-								title: "Click to download this video as 'mp3'",
-								timeoutType: "never",
-								urgency: "normal",
-								icon: logoPath,
-								silent: true,
-								body: title,
-							})
-								.on("click", () => {
-									const downloadInfo: DownloadInfo = {
-										imageURL: thumbnails.at(-1)?.url ?? "",
-										canStartDownload: true,
-										extension: "mp3",
-										title,
-										url,
-									};
+					const { title, thumbnails } = (await getBasicInfo(url)).videoDetails;
 
-									// Send msg to ipcMain:
-									electronWindow?.webContents.send(
-										ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
-										downloadInfo,
-									);
+					new Notification({
+						title: "Click to download this media as 'mp3'",
+						timeoutType: "never",
+						urgency: "normal",
+						icon: logoPath,
+						silent: true,
+						body: title,
+					})
+						.on("click", () => {
+							const downloadInfo: DownloadInfo = {
+								imageURL: thumbnails.at(-1)?.url ?? "",
+								extension: "mp3",
+								title,
+								url,
+							};
 
-									dbg("Clicked notification and sent data:", downloadInfo);
-								})
-								.show();
-						} catch (error) {
-							console.error(error);
-						}
+							// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
+							electronWindow?.webContents.send(
+								ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+								downloadInfo,
+							);
+
+							dbg("Clicked notification and sent data:", downloadInfo);
+						})
+						.show();
 				})
 				.startWatching();
 		} catch (error) {

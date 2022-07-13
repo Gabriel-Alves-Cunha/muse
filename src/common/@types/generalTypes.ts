@@ -9,15 +9,15 @@ export type Path = Readonly<string>;
 
 export type Media = Readonly<
 	{
-		genres?: readonly string[];
+		genres: readonly string[];
 		birthTime: DateAsNumber;
 		isSelected: boolean;
 		size: PrettyBytes;
 		duration: string;
-		artist?: string;
-		album?: string;
+		artist: string;
+		album: string;
 		title: string;
-		img?: string;
+		img: string;
 	}
 >;
 
@@ -27,7 +27,6 @@ export type Mutable<T> = {
 
 export type DownloadInfo = Readonly<
 	{
-		canStartDownload: boolean;
 		extension: AllowedMedias;
 		imageURL: string;
 		title: string;

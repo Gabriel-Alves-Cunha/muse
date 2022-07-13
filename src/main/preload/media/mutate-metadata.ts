@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { Path, ImgString, Mutable } from "@common/@types/generalTypes";
-import type { WriteTag } from "@common/@types/electron-window";
+import type { Tags } from "@common/@types/electron-window";
 
 import { rename as renameFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -271,7 +271,7 @@ async function talkToClientToGetTheNewMedia(
 
 export async function writeTags(
 	mediaPath: Readonly<Path>,
-	data: Readonly<WriteTag & { isNewMedia?: boolean; downloadImg?: boolean; }>,
+	data: Readonly<Tags & { isNewMedia?: boolean; downloadImg?: boolean; }>,
 ): Promise<void> {
 	// dbgTests("Writing tags to file:", { mediaPath, data });
 	checkOrThrow(checkForMediaPath(mediaPath));

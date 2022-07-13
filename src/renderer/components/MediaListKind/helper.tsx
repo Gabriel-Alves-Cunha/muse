@@ -67,6 +67,8 @@ export function selectMedia(e: React.MouseEvent<HTMLSpanElement>): void {
 		addToAllSelectedMedias(media, itemClickedMediaPath);
 }
 
+/////////////////////////////////////////
+
 const leftClick = 0;
 
 function selectOrPlayMedia(
@@ -145,16 +147,24 @@ export const computeItemKey = (
 	_index: number,
 	[path]: [Path, Media, DateAsNumber],
 ) => path;
+
+/////////////////////////////////////////
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const computeHistoryItemKey = (
 	_index: number,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	[path, _, date]: [Path, Media, DateAsNumber],
-) => `${path} ${date}`;
+) => `${path}•${date}`;
+
+/////////////////////////////////////////
+
 export const itemContent = (
 	_index: number,
 	[path, media]: [Path, Media, DateAsNumber],
 ) => <Row media={media} path={path} />;
+
+/////////////////////////////////////////
 
 export const reloadWindow = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
@@ -162,6 +172,7 @@ export const reloadWindow = (): void =>
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+// Types:
 
 type RowProps = Readonly<{ media: Media; path: Path; }>;
 

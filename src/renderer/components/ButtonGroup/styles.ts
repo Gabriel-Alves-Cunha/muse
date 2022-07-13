@@ -1,14 +1,24 @@
 import { styled, keyframes } from "@styles/global";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 const spin = keyframes({
 	from: { transform: "rotate(0deg)" },
 	to: { transform: "rotate(360deg)" },
 });
 
+/////////////////////////////////////////
+
 const scale = keyframes({
 	"0%, 100%": { transform: "scale(1.0)" },
 	"50%": { transform: "scale(0.95)" },
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const Wrapper = styled("div", {
 	position: "relative",
@@ -58,6 +68,10 @@ export const Wrapper = styled("div", {
 		"&.reloading": { animation: `${spin} 1s infinite linear` },
 	},
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const ButtonFromGroup = styled("button", {
 	pos: "relative",

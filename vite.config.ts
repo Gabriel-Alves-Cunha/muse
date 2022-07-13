@@ -7,8 +7,9 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 
 export default defineConfig({
 	test: {
-		dir: "src/__tests__",
 		environment: "happy-dom",
+		dir: "src/__tests__",
+		logHeapUsage: true,
 		coverage: {
 			// reporter: ["html", "text"],
 			reporter: ["text"],
@@ -23,13 +24,12 @@ export default defineConfig({
 			"coverage/**",
 			"**/*.d.ts",
 		],
-		logHeapUsage: true,
 	},
 
+	define: { "import.meta.vitest": "undefined" },
 	// @ts-ignore => This shouldn't be giving an error, it works...
 	plugins: [react()],
 	root: rendererPath,
-	define: { "import.meta.vitest": "undefined" },
 	base: "./",
 	build: {
 		outDir: outDirRenderer,
@@ -39,10 +39,10 @@ export default defineConfig({
 		sourcemap: false,
 		rollupOptions: {
 			output: {
-				format: "esm",
+				assetFileNames: "assets/[name].[ext]",
 				entryFileNames: "[name].js",
 				chunkFileNames: "[name].js",
-				assetFileNames: "assets/[name].[ext]",
+				format: "esm",
 			},
 		},
 	},

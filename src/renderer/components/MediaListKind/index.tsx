@@ -30,8 +30,14 @@ import {
 import { ListWrapper, EmptyList, Footer } from "./styles";
 import { ErrorFallback } from "../ErrorFallback";
 
+/////////////////////////////////////////
+
 // href="https://www.flaticon.com/free-icons/error" =>
 const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const MediaListKind = ({ isHome }: Props) => (
 	<ErrorBoundary
@@ -43,11 +49,16 @@ export const MediaListKind = ({ isHome }: Props) => (
 			reloadWindow();
 		}}
 	>
-		<MediaListKind_ isHome={isHome} />
+		<MediaListKindWithoutErrorBoundary isHome={isHome} />
 	</ErrorBoundary>
 );
 
-function MediaListKind_({ isHome = false }: Props) {
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Main function:
+
+function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	const [isCtxMenuOpen, setIsCtxMenuOpen] = useState(false);
 	const { fromList, homeList } = useFromList();
 	const listRef = useRef<HTMLDivElement>(null);
@@ -168,6 +179,11 @@ function MediaListKind_({ isHome = false }: Props) {
 	);
 }
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Helper function:
+
 function handleDeselectAllMedias(
 	listRef: Readonly<React.RefObject<HTMLDivElement>>,
 	isCtxMenuOpen: Readonly<boolean>,
@@ -175,5 +191,10 @@ function handleDeselectAllMedias(
 	if (listRef.current && !isCtxMenuOpen && allSelectedMedias.length > 0)
 		deselectAllMedias();
 }
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 type Props = Readonly<{ isHome?: boolean; }>;

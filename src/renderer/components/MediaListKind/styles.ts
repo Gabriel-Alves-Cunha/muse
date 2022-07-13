@@ -1,5 +1,9 @@
 import { styled } from "@styles/global";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Img = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons
 
@@ -24,6 +28,10 @@ export const Img = styled("div", {
 	"& svg": { c: "$deactivated-icon" },
 });
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Info = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons
 
@@ -36,6 +44,10 @@ export const Info = styled("div", {
 	ov: "hidden",
 	pl: 20,
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const Title = styled("p", {
 	m: "unset", // Virtuoso asks for this for performance reasons
@@ -53,6 +65,10 @@ export const Title = styled("p", {
 	"& .highlight": { bg: "yellowgreen" },
 });
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const SubTitle = styled("p", {
 	m: "unset", // Virtuoso asks for this for performance reasons
 
@@ -65,12 +81,20 @@ export const SubTitle = styled("p", {
 	"&.row": { c: "$gray-text", m: "unset" },
 });
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const ListWrapper = styled("div", {
 	maxWidth: 600,
 	h: "80vh",
 
 	".list": { scroll: 5, willChange: "transform" },
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const RowWrapper = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons
@@ -100,7 +124,12 @@ export const RowWrapper = styled("div", {
 		bg: "$bg-selected",
 	},
 });
+
 export const rowWrapperClassName = `.${RowWrapper.className}`;
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const PlayButton = styled("button", {
 	pos: "relative",
@@ -113,6 +142,10 @@ export const PlayButton = styled("button", {
 	b: "none",
 });
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 export const Footer = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons
 
@@ -121,6 +154,10 @@ export const Footer = styled("div", {
 
 	bg: "none",
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const EmptyList = styled("div", {
 	m: "unset", // Virtuoso asks for this for performance reasons

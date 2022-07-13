@@ -98,6 +98,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			c: (color: string) => ({ color }),
 
 			br: (borderRadius: number | string) => ({ borderRadius }),
+			jc: (justifyContent: string) => ({ justifyContent }),
 			bs: (boxShadow: number | string) => ({ boxShadow }),
 			fd: (flexDirection: string) => ({ flexDirection }),
 			b: (border: string | number) => ({ border }),

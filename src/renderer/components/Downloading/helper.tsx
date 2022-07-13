@@ -3,61 +3,85 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 
-import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { errorToast, infoToast, successToast } from "@styles/global";
+import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
-import { handleOnClose } from "@components/Converting/helper";
 import { Progress } from "@components/Progress";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
+	type DownloadingList,
 	useDownloadingList,
 	setDownloadingList,
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { TitleAndCancelWrapper, ItemWrapper, ItemWrapperClass } from "./styles";
 import { CancelButton } from "@components/Converting/styles";
+import {
+	handleSingleItemDeleteAnimation,
+	TitleAndCancelWrapper,
+	ItemWrapper,
+} from "./styles";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
 
-	function downloadingBoxes() {
-		const list: JSX.Element[] = [];
+	return (downloadingList.size > 0 ?
+		(
+			<>
+				<Button variant="medium" onClick={cleanAllDoneDownloads}>
+					Clean finished
+				</Button>
 
-		let downloadingIndex = 0;
-		downloadingList.forEach((download, url) => {
-			list.push(
-				<DownloadingBox
-					downloadingIndex={downloadingIndex}
-					download={download}
-					url={url}
-					key={url}
-				/>,
-			);
-			++downloadingIndex;
-		});
-
-		return list;
-	}
-
-	return (
-		<>
-			{downloadingList.size > 0 ?
-				(
-					<>
-						<Button variant="medium" onClick={cleanAllDoneDownloads}>
-							Clean finished
-						</Button>
-
-						{downloadingBoxes()}
-					</>
-				) :
-				<p>No downloads in progress!</p>}
-		</>
-	);
+				{downloadingBoxes(downloadingList)}
+			</>
+		) :
+		<p>No downloads in progress!</p>);
 }
+
+/////////////////////////////////////////////
+// Helper functions for Popup:
+
+function downloadingBoxes(downloadingList: DownloadingList["downloadingList"]) {
+	const list: JSX.Element[] = [];
+
+	let index = 0;
+	downloadingList.forEach((download, url) => {
+		list.push(
+			<DownloadingBox
+				downloadingIndex={index}
+				download={download}
+				url={url}
+				key={url}
+			/>,
+		);
+		++index;
+	});
+
+	return list;
+}
+
+/////////////////////////////////////////////
+
+function cleanAllDoneDownloads(): void {
+	getDownloadingList().forEach((download, url) => {
+		if (
+			download.status !==
+				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== ProgressStatus.ACTIVE
+		)
+			cancelDownloadAndOrRemoveItFromList(url);
+	});
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 const DownloadingBox = (
 	{ downloadingIndex, download, url }: DownloadingBoxProps,
@@ -84,16 +108,9 @@ const DownloadingBox = (
 	</ItemWrapper>
 );
 
-function cleanAllDoneDownloads(): void {
-	getDownloadingList().forEach((download, url) => {
-		if (
-			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
-			download.status !== ProgressStatus.ACTIVE
-		)
-			cancelDownloadAndOrRemoveItFromList(url);
-	});
-}
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 /**
  * This function returns a MessagePort that will be send to
@@ -101,16 +118,18 @@ function cleanAllDoneDownloads(): void {
  * and React.
  */
 export function createNewDownload(
-	downloadInfo: Readonly<DownloadInfo>,
+	downloadInfo: DownloadInfo,
 ): Readonly<MessagePort> {
 	const downloadingList = getDownloadingList();
 
 	dbg("Trying to create a new download...", { downloadingList });
 
+	const { imageURL, title, url } = downloadInfo;
+
 	// First, see if there is another one that has the same url
 	// and quit if true:
-	if (downloadingList.has(downloadInfo.url)) {
-		const info = `There is already one download of "${downloadInfo.title}"`;
+	if (downloadingList.has(url)) {
+		const info = `There is already one download of "${title}"`;
 
 		infoToast(info);
 
@@ -122,107 +141,112 @@ export function createNewDownload(
 	// MessageChannels are lightweight, it's cheap to create
 	// a new one for each DownloadingMedia to communicate the
 	// download progress between React and Electron:
-	const { port1: myPort, port2: electronPort } = new MessageChannel();
+	const { port1: frontEndPort, port2: backEndPort } = new MessageChannel();
 
 	// Creating a new DownloadingMedia and adding it to the list:
 	setDownloadingList(
-		new Map(downloadingList).set(downloadInfo.url, {
+		new Map(downloadingList).set(url, {
 			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-			imageURL: downloadInfo.imageURL,
-			title: downloadInfo.title,
-			isDownloading: true,
+			port: frontEndPort,
 			percentage: 0,
-			port: myPort,
+			imageURL,
+			title,
 		}),
 	);
 
-	dbg(
-		"Added download to the list:",
-		getDownloadingList().get(downloadInfo.url),
-	);
-
 	// Send msg to electronPort to download:
-	myPort.postMessage(downloadInfo);
+	frontEndPort.postMessage(downloadInfo);
 
 	// Adding event listeners to React's MessagePort to receive and
 	// handle download progress info:
-	myPort.onmessage = (
-		{ data }: { data: Readonly<Partial<MediaBeingDownloaded>>; },
-	): void => {
-		const downloadingList = getDownloadingList();
 
-		dbg(
-			`Received a message from Electron on port for "${downloadInfo.title}":`,
-			{ data, downloadingList },
-		);
+	frontEndPort.addEventListener("close", logThatPortIsClosing);
+	frontEndPort.addEventListener(
+		"message",
+		e => handleUpdateDownloadingList(e, downloadInfo.url),
+	);
 
-		// Assert that the download exists:
-		const thisDownload = downloadingList.get(downloadInfo.url);
-		if (!thisDownload)
-			return console.error(
-				"Received a message from Electron but the url is not in the list!",
-			);
+	frontEndPort.start();
 
-		dbg("downloadStatus:", downloadingList.get(downloadInfo.url));
-
-		// Update React's information about this DownloadingMedia:
-		setDownloadingList(
-			new Map(downloadingList).set(downloadInfo.url, {
-				...thisDownload,
-				...data,
-			}),
-		);
-
-		// Handle ProgressStatus's cases:
-		switch (data.status) {
-			case ProgressStatus.FAILED: {
-				// @ts-ignore In this case, `data` include an `error: Error` key.
-				console.assert(data.error, "data.error should exist!");
-				console.error((data as typeof data & { error: Error; }).error);
-
-				errorToast(`Download of "${thisDownload.title}" failed!`);
-
-				cancelDownloadAndOrRemoveItFromList(downloadInfo.url);
-				break;
-			}
-
-			case ProgressStatus.SUCCESS: {
-				successToast(`Download of "${thisDownload.title}" succeded!`);
-
-				cancelDownloadAndOrRemoveItFromList(downloadInfo.url);
-				break;
-			}
-
-			case ProgressStatus.CANCEL: {
-				infoToast(`Download of "${thisDownload.title}" was cancelled!`);
-
-				cancelDownloadAndOrRemoveItFromList(downloadInfo.url);
-				break;
-			}
-
-			case ProgressStatus.ACTIVE:
-				break;
-
-			case undefined:
-				break;
-
-			case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
-				break;
-
-			default:
-				assertUnreachable(data.status);
-				break;
-		}
-	};
-
-	myPort.addEventListener("close", handleOnClose);
-
-	myPort.start();
-
-	return electronPort;
+	return backEndPort;
 }
 
-function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
+/////////////////////////////////////////////
+// Helper functions for `createNewDownload()`
+
+function handleUpdateDownloadingList(
+	{ data }: { data: Partial<MediaBeingDownloaded>; },
+	url: Readonly<string>,
+): void {
+	const downloadingList = getDownloadingList();
+
+	dbg(`Received a message from Electron on port for "${url}":`, {
+		data,
+		downloadingList,
+	});
+
+	// Assert that the download exists:
+	const thisDownload = downloadingList.get(url);
+	if (!thisDownload)
+		return console.error(
+			"Received a message from Electron but the url is not in the list!",
+		);
+
+	// Update React's information about this DownloadingMedia:
+	setDownloadingList(
+		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
+	);
+
+	// Handle status:
+	switch (data.status) {
+		case ProgressStatus.FAILED: {
+			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
+			console.assert(data.error, "data.error should exist!");
+
+			errorToast(
+				`Download of "${thisDownload.title}" failed! ${
+					(data as typeof data & { error: Error; }).error.message
+				}`,
+			);
+
+			cancelDownloadAndOrRemoveItFromList(url);
+			break;
+		}
+
+		case ProgressStatus.SUCCESS: {
+			successToast(`Download of "${thisDownload.title}" succeded!`);
+
+			cancelDownloadAndOrRemoveItFromList(url);
+			break;
+		}
+
+		case ProgressStatus.CANCEL: {
+			infoToast(`Download of "${thisDownload.title}" was cancelled!`);
+
+			cancelDownloadAndOrRemoveItFromList(url);
+			break;
+		}
+
+		case ProgressStatus.ACTIVE:
+			break;
+
+		case undefined:
+			break;
+
+		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+			break;
+
+		default:
+			assertUnreachable(data.status);
+			break;
+	}
+}
+
+/////////////////////////////////////////////
+
+export function cancelDownloadAndOrRemoveItFromList(
+	url: Readonly<string>,
+): void {
 	const downloadingList = getDownloadingList();
 
 	// Assert that the download exists:
@@ -235,7 +259,8 @@ function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
 		);
 
 	// Cancel download:
-	if (download.isDownloading) download.port.postMessage({ destroy: true, url });
+	if (download.status === ProgressStatus.ACTIVE)
+		download.port.postMessage({ destroy: true, url });
 
 	// Update downloading list:
 	const newDownloadingList = new Map(downloadingList);
@@ -245,79 +270,10 @@ function cancelDownloadAndOrRemoveItFromList(url: Readonly<string>): void {
 	setDownloadingList(newDownloadingList);
 }
 
-export function cancelConvertionAndOrRemoveItFromList(
-	path: Readonly<string>,
-): void {
-	const convertingList = getConvertingList();
-
-	const mediaBeingConverted = convertingList.get(path);
-
-	if (!mediaBeingConverted)
-		return console.error(
-			`There should be a convertion with path "${path}"!\nconvertList =`,
-			convertingList,
-		);
-
-	// Cancel conversion
-	if (mediaBeingConverted.isConverting)
-		mediaBeingConverted.port.postMessage({ destroy: true, path });
-
-	// Remove from converting list
-	const newConvertingList = new Map(convertingList);
-	newConvertingList.delete(path);
-
-	// Make React update:
-	setConvertingList(newConvertingList);
-}
-
-export function handleSingleItemDeleteAnimation(
-	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
-	downloadingOrConvertionIndex: Readonly<number>,
-	isDownloadList: Readonly<boolean>,
-	url: Readonly<string>,
-): void {
-	const items = document.querySelectorAll(ItemWrapperClass) as NodeListOf<
-		HTMLDivElement
-	>;
-
-	//////////////////////////////////////////
-
-	// Only add the animation to the ones below the one that was clicked:
-	for (const [index, item] of items.entries()) {
-		if (index <= downloadingOrConvertionIndex) continue;
-
-		item.classList.add("move-up");
-		item.addEventListener(
-			"animationend",
-			() => item.classList.remove("move-up"),
-			{ once: true },
-		);
-	}
-
-	//////////////////////////////////////////
-
-	const itemClicked = (e.target as HTMLElement).closest(
-		ItemWrapperClass,
-	) as HTMLDivElement;
-
-	itemClicked.classList.add("delete");
-
-	// Add event listener to the itemClicked to remove the animation:
-	itemClicked.addEventListener("animationend", () => {
-		isDownloadList ?
-			cancelDownloadAndOrRemoveItFromList(url) :
-			cancelConvertionAndOrRemoveItFromList(url);
-	});
-	itemClicked.addEventListener("animationcancel", () => {
-		// This is so users can just click the cancel
-		// button and imediately leave the popup, wich
-		// cancels the animation!
-
-		isDownloadList ?
-			cancelDownloadAndOrRemoveItFromList(url) :
-			cancelConvertionAndOrRemoveItFromList(url);
-	});
-}
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 type DownloadingBoxProps = Readonly<
 	{ download: MediaBeingDownloaded; downloadingIndex: number; url: string; }
