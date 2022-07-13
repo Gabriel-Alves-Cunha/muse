@@ -3,6 +3,10 @@ import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 // For in-hand testing porpuses:
 // import { ProgressStatus } from "@common/enums";
 // import { getRandomInt } from "@utils/utils";
@@ -55,16 +59,30 @@ import create from "zustand";
 // 	return [path, media];
 // });
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main functions:
+
 export const useConvertingList = create<ConvertingList>(() => ({
 	convertingList: new Map(),
 }));
 
+////////////////////////////////////////////////
+
 export const getConvertingList = () =>
 	useConvertingList.getState().convertingList;
+
+////////////////////////////////////////////////
 
 export const setConvertingList = (
 	convertingList: ConvertingList["convertingList"],
 ) => useConvertingList.setState({ convertingList });
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Types:
 
 export type ConvertingList = Readonly<
 	{ convertingList: ReadonlyMap<Path, MediaBeingConverted>; }

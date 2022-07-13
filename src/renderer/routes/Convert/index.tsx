@@ -27,7 +27,7 @@ export function Convert() {
 		const map: Map<Path, ConvertInfo> = new Map();
 
 		for (const file of files)
-			map.set(file.webkitRelativePath, { canStartConvert: true, toExtension });
+			map.set(file.webkitRelativePath, { toExtension });
 
 		setSelectedFiles(map);
 	}

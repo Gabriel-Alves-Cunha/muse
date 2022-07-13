@@ -5,7 +5,13 @@ import { resolve } from "node:path";
 
 // import { dbgTests } from "@common/utils";
 
-export const test_assetsDir = resolve(__dirname, "..", "..", "..", "test_assets");
+export const test_assetsDir = resolve(
+	__dirname,
+	"..",
+	"..",
+	"..",
+	"test_assets",
+);
 
 export const mediaPath = resolve(test_assetsDir, "audio for tests.mp3");
 

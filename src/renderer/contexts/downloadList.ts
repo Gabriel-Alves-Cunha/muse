@@ -2,6 +2,10 @@ import type { MediaBeingDownloaded } from "@components/Downloading";
 
 import create from "zustand";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 // For testing:
 // import { ProgressStatus } from "@common/enums";
 // import { getRandomInt } from "@utils/utils";
@@ -48,16 +52,30 @@ import create from "zustand";
 // 	return [path, media];
 // });
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main functions:
+
 export const useDownloadingList = create<DownloadingList>(() => ({
 	downloadingList: new Map(),
 }));
 
+////////////////////////////////////////////////
+
 export const getDownloadingList = () =>
 	useDownloadingList.getState().downloadingList;
+
+////////////////////////////////////////////////
 
 export const setDownloadingList = (
 	downloadingList: DownloadingList["downloadingList"],
 ) => useDownloadingList.setState({ downloadingList });
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Types:
 
 export type DownloadingList = Readonly<
 	{ downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>; }

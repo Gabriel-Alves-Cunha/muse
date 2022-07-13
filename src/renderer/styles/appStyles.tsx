@@ -1,6 +1,10 @@
 import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled, keyframes } from "./global";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export const Content = styled("div", {
 	d: "grid",
 	gridTemplate: `
@@ -21,7 +25,11 @@ export const Content = styled("div", {
 	},
 });
 
+////////////////////////////////////////////////
+
 const rotating = keyframes({ to: { transform: "rotate(1turn)" } });
+
+////////////////////////////////////////////////
 
 export const Loading = styled("div", {
 	size: 25,

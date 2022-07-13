@@ -4,11 +4,15 @@ import type { PlayOptions } from "@contexts/mediaHandler/usePlayOptions";
 import type { History } from "@contexts/mediaHandler/usePlaylists";
 
 import { stringifyAsync } from "js-coroutines";
+import { assert, error } from "node:console";
 
 import { assertUnreachable, time } from "./utils";
 import { dbgPlaylists } from "@common/utils";
 
-const { assert } = console;
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Constants:
 
 export const keyPrefix = "@muse:";
 
@@ -22,37 +26,29 @@ export const keys = Object.freeze(
 	} as const,
 );
 
-type Keys = typeof keys[keyof typeof keys];
-type Values =
-	| readonly [Path, Media][]
-	| ReadonlySet<Path>
-	| CurrentPlaying
-	| PlayOptions
-	| History;
-
-type HistoryShape = TypeOfMap<History>;
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
-	setTimeout(() => {
+	setTimeout(() =>
 		time(async () => {
-			try {
-				if (value instanceof Map || value instanceof Set)
-					// @ts-ignore => This conversion will work with either Map or Set:
-					value = [...value];
+			if (value instanceof Map || value instanceof Set)
+				// @ts-ignore => This conversion will work with either Map or Set:
+				value = [...value];
 
-				const serializedValue = await stringifyAsync(value);
+			const serializedValue = await stringifyAsync(value).catch(error);
 
-				dbgPlaylists({ key, serializedValue, value });
+			dbgPlaylists({ key, serializedValue, value });
 
-				// @ts-ignore => It doesn't matter that `serializedValue`,
-				// is of type `String` or `string`, they both work:
-				localStorage.setItem(key, serializedValue);
-			} catch (error) {
-				console.error(error);
-			}
-		}, `setLocalStorage(${key})`);
-	});
+			// @ts-ignore => It doesn't matter that `serializedValue`,
+			// is of type `String` or `string`, they both work:
+			localStorage.setItem(key, serializedValue);
+		}, `setLocalStorage(${key})`)
+	);
 }
+
+////////////////////////////////////////////////
 
 export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 	return time(() => {
@@ -139,3 +135,23 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 		}
 	}, `getFromLocalStorage(${key})`);
 }
+
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+// Types:
+
+type Keys = typeof keys[keyof typeof keys];
+
+//////////////////////////////////////////
+
+type Values =
+	| readonly [Path, Media][]
+	| ReadonlySet<Path>
+	| CurrentPlaying
+	| PlayOptions
+	| History;
+
+//////////////////////////////////////////
+
+type HistoryShape = TypeOfMap<History>;

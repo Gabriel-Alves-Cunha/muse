@@ -4,6 +4,11 @@ import create from "zustand";
 
 import { emptySet } from "@utils/map-set";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main functions:
+
 export const useSettings = create<Settings>(() => ({
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
@@ -12,6 +17,11 @@ export const useSettings = create<Settings>(() => ({
 }));
 
 export const { getState: getSettings, setState: setSettings } = useSettings;
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Types:
 
 type Settings = Readonly<
 	{

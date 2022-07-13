@@ -26,12 +26,7 @@ export type Mutable<T> = {
 };
 
 export type DownloadInfo = Readonly<
-	{
-		extension: AllowedMedias;
-		imageURL: string;
-		title: string;
-		url: string;
-	}
+	{ extension: AllowedMedias; imageURL: string; title: string; url: string; }
 >;
 
 export type QRCodeURL = `http://${string}:${number}`;

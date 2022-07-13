@@ -6,11 +6,15 @@ import type { PlayOptions } from "./usePlayOptions";
 import { keys, setLocalStorage } from "@utils/localStorage";
 import { areObjectKeysEqual } from "@utils/object";
 
-export const setCurrentPlayingLocalStorage: LoggerImpl<CurrentPlaying> =
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const setCurrentPlayingOnLocalStorage: Plugin<CurrentPlaying> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	(f, _name) =>
 		(set, get, store) => {
-			const newSet: typeof set = (
+			const newSetter: typeof set = (
 				newCurrentPlaying: Partial<CurrentPlaying>,
 				replace,
 			) => {
@@ -25,16 +29,20 @@ export const setCurrentPlayingLocalStorage: LoggerImpl<CurrentPlaying> =
 				if (!areStatesEqual) setLocalStorage(keys.currentPlaying, get());
 			};
 
-			store.setState = newSet;
+			store.setState = newSetter;
 
-			return f(newSet, get, store);
+			return f(newSetter, get, store);
 		};
 
-export const setPlayOptionsLocalStorage: LoggerImpl<PlayOptions> =
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const setPlayOptionsOnLocalStorage: Plugin<PlayOptions> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	(f, _name) =>
 		(set, get, store) => {
-			const newSet: typeof set = (
+			const newSetter: typeof set = (
 				newPlayOptions: Partial<PlayOptions>,
 				replace,
 			) => {
@@ -49,22 +57,24 @@ export const setPlayOptionsLocalStorage: LoggerImpl<PlayOptions> =
 				if (!areStatesEqual) setLocalStorage(keys.playOptions, get());
 			};
 
-			store.setState = newSet;
+			store.setState = newSetter;
 
-			return f(newSet, get, store);
+			return f(newSetter, get, store);
 		};
 
-const allowedToBeSaved = Object.freeze(["favorites", "history"] as const);
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
-export const setPlaylistsLocalStorage: LoggerImpl<UsePlaylistsActions> =
+export const setPlaylistsOnLocalStorage: Plugin<UsePlaylistsActions> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	(f, _name) =>
 		(set, get, store) => {
-			const newSet: typeof set = (
+			const newSetter: typeof set = (
 				args: ArgsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
 				replace: boolean,
 			) => {
-				allowedToBeSaved.forEach(key => {
+				(["favorites", "history"] as const).forEach(key => {
 					if (Object.hasOwn(args, key))
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						setLocalStorage(keys[key], args[key]!);
@@ -73,21 +83,28 @@ export const setPlaylistsLocalStorage: LoggerImpl<UsePlaylistsActions> =
 				set(args, replace);
 			};
 
-			store.setState = newSet;
+			store.setState = newSetter;
 
-			return f(newSet, get, store);
+			return f(newSetter, get, store);
 		};
 
-type ArgsToSave = Partial<
-	Pick<UsePlaylistsActions, typeof allowedToBeSaved[number]>
->;
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
+
+type ArgsToSave = Partial<Pick<UsePlaylistsActions, "favorites" | "history">>;
+
+/////////////////////////////////////////
 
 // Types from 'https://github.com/pmndrs/zustand/blob/main/docs/typescript.md'
 // Not sure why they're needed, haven't thought about it much.
 type PopArgument<T extends (...a: never[]) => unknown> = T extends
 	(...a: [...infer A, infer _]) => infer R ? (...a: A) => R : never;
 
-type LoggerImpl<T extends State> = (
+/////////////////////////////////////////
+
+type Plugin<T extends State> = (
 	f: PopArgument<StateCreator<T, [], []>>,
 	name?: string,
 ) => PopArgument<StateCreator<T, [], []>>;

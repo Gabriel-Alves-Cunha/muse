@@ -21,6 +21,11 @@ import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";
 
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+// Main function:
+
 export function App() {
 	GlobalCSS();
 
@@ -60,6 +65,8 @@ export function App() {
 	);
 }
 
+//////////////////////////////////////////
+
 const Main = () => (
 	<Content>
 		<Navbar />
@@ -70,11 +77,15 @@ const Main = () => (
 	</Content>
 );
 
+//////////////////////////////////////////
+
 function PageToShow() {
 	const { page } = usePage();
 
 	return pages[page];
 }
+
+//////////////////////////////////////////
 
 const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Favorites: <Favorites />,
@@ -84,6 +95,10 @@ const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Home: <Home />,
 });
 
+//////////////////////////////////////////
+
 window.addEventListener("message", handleWindowMsgs);
+
+//////////////////////////////////////////
 
 await searchLocalComputerForMedias();

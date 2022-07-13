@@ -24,7 +24,7 @@ const { transformPathsToMedias } = electron.media;
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
-// listen for files drop:
+// Listen for files drop:
 
 function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
@@ -59,6 +59,7 @@ window.addEventListener("drop", listenToDropEvent);
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
+// Main function:
 
 const {
 	DELETE_ONE_MEDIA_FROM_COMPUTER,
@@ -79,11 +80,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 	const { msg } = event.data;
 
 	switch (msg.type) {
+		//////////////////////////////////////////
+
 		case CREATE_A_NEW_DOWNLOAD: {
 			dbg("[handleWindowMsgs()] Create a new download:", msg.downloadInfo);
 			setDownloadInfo(msg.downloadInfo);
 			break;
 		}
+
+		//////////////////////////////////////////
 
 		case ADD_ONE_MEDIA: {
 			const { mediaPath } = msg;
@@ -117,6 +122,8 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
+		//////////////////////////////////////////
+
 		case DELETE_ONE_MEDIA_FROM_COMPUTER: {
 			const { mediaPath } = msg;
 
@@ -131,11 +138,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
+		//////////////////////////////////////////
+
 		case REFRESH_ALL_MEDIA: {
 			dbg("[handleWindowMsgs()] Refresh all media.");
 			await searchLocalComputerForMedias();
 			break;
 		}
+
+		//////////////////////////////////////////
 
 		case REFRESH_ONE_MEDIA: {
 			const { mediaPath } = msg;
@@ -181,6 +192,8 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
+		//////////////////////////////////////////
+
 		case REMOVE_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
@@ -201,11 +214,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			break;
 		}
 
+		//////////////////////////////////////////
+
 		case ERROR: {
 			console.error("@TODO: ERROR", { error: msg.error });
 
 			break;
 		}
+
+		//////////////////////////////////////////
 
 		default: {
 			console.error(
@@ -220,5 +237,10 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		}
 	}
 }
+
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+// types:
 
 type Event = Readonly<MessageEvent<MsgWithSource<MsgObjectElectronToReact>>>;

@@ -18,8 +18,8 @@ import sanitize from "sanitize-filename";
 import { getBasename, getLastExtension } from "@common/path";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { checkOrThrow, validator } from "@common/args-validator";
-import { sendMsgToClient } from "@common/crossCommunication";
 import { dbg, dbgTests, eraseImg } from "@common/utils";
+import { sendMsgToClient } from "@common/crossCommunication";
 import { pathExists } from "../file";
 
 /////////////////////////////////////////////
@@ -167,11 +167,6 @@ function handleAlbumArtists(
 
 function handleGenres(file: MediaFile, genres: Readonly<string[]>): void {
 	file.tag.genres = genres as Mutable<string[]>;
-	// TODO:
-	// const genres = (value as string)
-	// 	.split(separatedByCommaOrSemiColorOrSpace)
-	// 	.filter(Boolean)
-	// 	.map(v => v.trim());
 
 	dbg({ "new file.tag.genres": file.tag.genres, genres });
 }

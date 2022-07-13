@@ -15,6 +15,10 @@ export const testArray = Object.freeze(
 				birthTime: Date.now(),
 				isSelected: false,
 				size: "3.0 MB",
+				genres: [],
+				artist: "",
+				album: "",
+				img: "",
 				title,
 			};
 

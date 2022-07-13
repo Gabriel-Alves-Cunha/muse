@@ -290,6 +290,10 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 			birthTime: Date.now(),
 			isSelected: false,
 			size: "3.0 MB",
+			genres: [],
+			artist: "",
+			album: "",
+			img: "",
 			title,
 		};
 

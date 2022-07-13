@@ -23,12 +23,7 @@ export function downloadMedia(): void {
 	if (!result || !url) return;
 
 	// Start download:
-	setDownloadInfo({
-		imageURL: result.imageURL,
-		canStartDownload: true,
-		title: result.title,
-		url,
-	});
+	setDownloadInfo({ imageURL: result.imageURL, title: result.title, url });
 
 	// Reset values:
 	setSearchInfo(defaultSearchInfo);

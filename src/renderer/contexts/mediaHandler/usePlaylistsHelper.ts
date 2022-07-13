@@ -10,6 +10,10 @@ const {
 	os: { dirs },
 } = electron;
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 	const supportedFiles: File[] = [];
 
@@ -25,8 +29,12 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 	return supportedFiles;
 }
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export const searchDirectoryResult = async () =>
-	time(
+	await time(
 		async () =>
 			(await Promise.allSettled([
 				getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
@@ -39,8 +47,16 @@ export const searchDirectoryResult = async () =>
 		"searchDirectoryResult",
 	);
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export const searchDirectoryForMedias = async (directory: string) =>
 	getAllowedMedias(await readDir(directory));
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export const getAllowedMedias = (
 	filenames: readonly string[],
@@ -48,6 +64,10 @@ export const getAllowedMedias = (
 	filenames.filter(name =>
 		allowedMedias.some(ext => ext === getLastExtension(name))
 	);
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export function sortByDate(list: MainList): ReadonlySet<Path> {
 	const listAsArrayOfPaths = [...list]
@@ -61,6 +81,10 @@ export function sortByDate(list: MainList): ReadonlySet<Path> {
 
 	return new Set(listAsArrayOfPaths);
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export function sortByName(list: MainList): MainList {
 	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {

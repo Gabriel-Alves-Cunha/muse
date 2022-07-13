@@ -3,7 +3,7 @@ import type { Path } from "@common/@types/generalTypes";
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { setCurrentPlayingLocalStorage } from "./localStorageHelpers";
+import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getFirstKey, getLastKey } from "@utils/map-set";
 import { getRandomInt, time } from "@utils/utils";
 import { playOptions } from "./usePlayOptions";
@@ -19,6 +19,7 @@ import {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+// Constants:
 
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: PlaylistList.MAIN_LIST,
@@ -27,7 +28,7 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(setCurrentPlayingLocalStorage(
+	subscribeWithSelector(setCurrentPlayingOnLocalStorage(
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		(_set, _get, _api) => defaultCurrentPlaying,
 		"currentPlaying",
@@ -40,6 +41,7 @@ export const { getState: currentPlaying, setState: setCurrentPlaying } =
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+// Helper functions:
 
 export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 	// We need to update history:
@@ -52,11 +54,15 @@ export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
 	setCurrentPlaying({ path: mediaPath, currentTime: 0, listType });
 }
 
+////////////////////////////////////////////////
+
 export function togglePlayPause(): void {
 	const audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.paused ? play(audio) : pause(audio);
 }
+
+////////////////////////////////////////////////
 
 export function play(audio?: HTMLAudioElement): void {
 	(async () => {
@@ -66,6 +72,8 @@ export function play(audio?: HTMLAudioElement): void {
 	})();
 }
 
+////////////////////////////////////////////////
+
 export function pause(audio?: HTMLAudioElement): void {
 	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
@@ -74,6 +82,8 @@ export function pause(audio?: HTMLAudioElement): void {
 
 	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
 }
+
+////////////////////////////////////////////////
 
 export function playPreviousMedia(): void {
 	time(() => {
@@ -89,6 +99,7 @@ export function playPreviousMedia(): void {
 			PlaylistList.MAIN_LIST :
 			listType;
 
+		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
 		const firstMediaPath = getFirstKey(list);
@@ -125,6 +136,8 @@ export function playPreviousMedia(): void {
 	}, "playPreviousMedia");
 }
 
+////////////////////////////////////////////////
+
 export function playNextMedia(): void {
 	time(() => {
 		const { path, listType } = currentPlaying();
@@ -139,6 +152,7 @@ export function playNextMedia(): void {
 			PlaylistList.MAIN_LIST :
 			listType;
 
+		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
 		let nextMediaPath = "";
@@ -189,7 +203,10 @@ export function playNextMedia(): void {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+// Handle what happens when the `currentPlaying.path` changes:
 
+// A timeout for in case the user changes media too fast:
+// we don't load the media until the timeout ends.
 let prevMediaTimer: NodeJS.Timeout | undefined;
 
 if (!import.meta.vitest)
@@ -213,6 +230,7 @@ if (!import.meta.vitest)
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+// Types:
 
 export type CurrentPlaying = Readonly<
 	{ listType: PlaylistList; path: Path | undefined; currentTime: number; }

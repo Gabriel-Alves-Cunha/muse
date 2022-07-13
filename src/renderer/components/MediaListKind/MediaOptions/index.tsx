@@ -40,6 +40,7 @@ const warningSvg = new URL(
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+// Main function:
 
 export function MediaOptionsModal({ media, path }: Props) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
@@ -215,11 +216,6 @@ function changeMetadataIfAllowed(
 							key,
 							id,
 						});
-
-						// TODO:
-						// If they are different, the writeTag() function will
-						// handle splitting the string, so just continue the
-						// rest of the function.
 					}
 
 					const whatToChange: ChangeOptionsToSend = allowedOptionToChange[id];

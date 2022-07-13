@@ -5,6 +5,11 @@ import { getObjectDeepKeys } from "@utils/object";
 import { areArraysEqual } from "@utils/array";
 import { isDevelopment } from "@common/utils";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main functions:
+
 export const { styled, globalCss, keyframes, createTheme, css } =
 	createStitches({
 		media: {
@@ -134,6 +139,11 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 		},
 	});
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Themes:
+
 export const darkTheme = createTheme({
 	colors: {
 		"scrollbar-thumb-hover": "#565d61",
@@ -200,6 +210,8 @@ export const darkTheme = createTheme({
 		"glow-around-component": "7px 7px 14px #b1b1b1, -7px -7px 14px #fff",
 	},
 });
+
+////////////////////////////////////////////////
 
 export const lightTheme = createTheme({
 	colors: {
@@ -268,6 +280,10 @@ export const lightTheme = createTheme({
 	},
 });
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 // darkTheme and lightTheme must have the same keys
 // (colors, shadows, etc) so that the theme can be
 // switched between them without react rerenders!
@@ -285,6 +301,10 @@ if (isDevelopment) {
 			areEqual,
 		);
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 export const GlobalCSS = globalCss({
 	"*, *::after, *::before": {
@@ -392,6 +412,10 @@ export const GlobalCSS = globalCss({
 	},
 });
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export const successToast = (info: string) =>
 	toast.success(info, {
 		hideProgressBar: false,
@@ -403,6 +427,8 @@ export const successToast = (info: string) =>
 		draggable: true,
 	});
 
+////////////////////////////////////////////////
+
 export const infoToast = (info: string) =>
 	toast.info(info, {
 		hideProgressBar: false,
@@ -413,6 +439,8 @@ export const infoToast = (info: string) =>
 		autoClose: 5000,
 		draggable: true,
 	});
+
+////////////////////////////////////////////////
 
 export const errorToast = (info: string) =>
 	toast.error(info, {
