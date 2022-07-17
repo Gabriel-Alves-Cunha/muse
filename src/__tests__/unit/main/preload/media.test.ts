@@ -198,7 +198,7 @@ describe("It should account for the switch possibilities and the message sending
 		const file = MediaFile.createFromPath(mediaPath);
 		expect(
 			file.tag.pictures[0]?.data.toBase64String(),
-			"file.tag.pictures[0]?.data.toBase64String() is not equal to imgContents",
+			"`file.tag.pictures[0]?.data.toBase64String()` !== `imgContents`",
 		)
 			.toBe(imgContents);
 

@@ -52,7 +52,7 @@ export const StyledContent = styled(Content, {
 	"@media (prefers-reduced-motion: no-preference)": {
 		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
 		animationFillMode: "forwards",
-		animationDuration: "400ms",
+		animationDuration: "300ms",
 
 		"&[data-state='open']": {
 			"&[data-side='right']": { animationName: slideLeftAndFade },

@@ -6,7 +6,6 @@ import type { Path } from "@common/@types/generalTypes";
 
 import { createReadStream } from "node:fs";
 import { dirname, join } from "node:path";
-import { error, log } from "node:console";
 import sanitize from "sanitize-filename";
 
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
@@ -19,14 +18,17 @@ import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
 import { dirs } from "@main/utils";
 
+const { error, log } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Schemas For Arguments Verification
 
 const checkArgsToConvertToAudio = validator.compile<CreateConversion>({
-	electronPort: { type: "class", instanceof: MessagePort },
-	toExtension: "string", // Required. Not empty.
+	// All Required. Not empty.
+	electronPort: "object",
+	toExtension: "string",
 	path: "string",
 	// $$strict: true, // No additional properties allowed.
 });

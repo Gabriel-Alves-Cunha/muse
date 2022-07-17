@@ -1,6 +1,10 @@
 import { MainArea } from "@components/MainArea";
 import { styled } from "@styles/global";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 export const GridWrapper = styled(MainArea, {
 	pos: "relative",
 	d: "flex",
@@ -10,6 +14,8 @@ export const GridWrapper = styled(MainArea, {
 	oy: "auto",
 	scroll: 5,
 });
+
+////////////////////////////////////////////////
 
 export const SearchWrapper = styled("div", {
 	pos: "relative",
@@ -32,7 +38,12 @@ export const SearchWrapper = styled("div", {
 	},
 });
 
+////////////////////////////////////////////////
+
 const height = "40px";
+
+////////////////////////////////////////////////
+
 export const Searcher = styled("div", {
 	pos: "relative",
 	d: "flex", // row
@@ -121,6 +132,8 @@ export const Searcher = styled("div", {
 	},
 });
 
+////////////////////////////////////////////////
+
 export const ResultContainer = styled("div", {
 	dcolumn: "center",
 	mb: "1.3rem",
@@ -166,5 +179,7 @@ export const ResultContainer = styled("div", {
 		fs: "1rem",
 	},
 });
+
+////////////////////////////////////////////////
 
 export const LoadingWrapper = styled("div", { size: 25, ml: 10 });

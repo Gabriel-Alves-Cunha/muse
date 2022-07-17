@@ -41,6 +41,8 @@ export function Downloading() {
 	const downloadInfo = useDownloadInfo();
 
 	useEffect(() => {
+		if (!downloadInfo.url) return;
+
 		// For each new `downloadInfo`, start a new download:
 		try {
 			const electronPort = time(

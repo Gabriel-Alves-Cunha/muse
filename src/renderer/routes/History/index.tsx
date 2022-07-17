@@ -8,6 +8,11 @@ import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
 export function History() {
 	useEffect(() => {
 		document.title = "History of audios played";

@@ -4,10 +4,11 @@ import type { PlayOptions } from "@contexts/mediaHandler/usePlayOptions";
 import type { History } from "@contexts/mediaHandler/usePlaylists";
 
 import { stringifyAsync } from "js-coroutines";
-import { assert, error } from "node:console";
 
 import { assertUnreachable, time } from "./utils";
 import { dbgPlaylists } from "@common/utils";
+
+const { assert, error } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

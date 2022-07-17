@@ -1,5 +1,7 @@
 * FIX: get the picture to go to the media file!!!!
 * REFACTOR: media.ts for better readability.
+* Maybe introduce Remix...
+* Make info
 
 NOTES:
 

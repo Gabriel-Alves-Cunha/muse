@@ -5,7 +5,6 @@ import type { Tags } from "@common/@types/electron-window";
 
 import { rename as renameFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { error } from "node:console";
 import { get } from "node:https";
 import {
 	File as MediaFile,
@@ -21,6 +20,8 @@ import { checkOrThrow, validator } from "@common/args-validator";
 import { dbg, dbgTests, eraseImg } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { pathExists } from "../file";
+
+const { error } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

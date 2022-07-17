@@ -66,6 +66,9 @@ export function App() {
 }
 
 //////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+// Helper functions:
 
 const Main = () => (
 	<Content>
@@ -79,14 +82,6 @@ const Main = () => (
 
 //////////////////////////////////////////
 
-function PageToShow() {
-	const { page } = usePage();
-
-	return pages[page];
-}
-
-//////////////////////////////////////////
-
 const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Favorites: <Favorites />,
 	Download: <Download />,
@@ -95,7 +90,14 @@ const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
 	Home: <Home />,
 });
 
+function PageToShow() {
+	const { page } = usePage();
+
+	return pages[page];
+}
+
 //////////////////////////////////////////
+// Do on app start:
 
 window.addEventListener("message", handleWindowMsgs);
 

@@ -185,8 +185,10 @@ export const Result = styled("div", {
 	p: 7,
 
 	"&:hover, &:focus": {
-		boxShadowBorder: { color: "$colors$icon-button-hovered", width: 2 },
 		transition: "none",
+
+		outline: "2px solid $icon-button-hovered",
+		outlineOffset: -2,
 	},
 });
 

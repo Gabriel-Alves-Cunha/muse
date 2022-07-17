@@ -7,6 +7,11 @@ import { MediasInfo } from "@components/MediasInfo";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
 export function Home() {
 	useEffect(() => {
 		document.title = "Audio list";

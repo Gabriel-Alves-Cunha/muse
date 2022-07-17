@@ -6,6 +6,11 @@ import { dbg } from "@common/utils";
 
 const { getBasicInfo } = electron.media;
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Constants:
+
 const defaultSearchInfo: SearcherInfo = Object.freeze({
 	result: undefined,
 	isLoading: false,
@@ -14,7 +19,13 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 });
 
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
+
 export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Helper functions:
 
 export function downloadMedia(): void {
 	const { result, url } = searchInfo();
@@ -28,6 +39,8 @@ export function downloadMedia(): void {
 	// Reset values:
 	setSearchInfo(defaultSearchInfo);
 }
+
+////////////////////////////////////////////////
 
 export async function search(url: Readonly<string>): Promise<void> {
 	if (!url || url.length < 8) return;
@@ -60,9 +73,16 @@ export async function search(url: Readonly<string>): Promise<void> {
 	}
 }
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Types:
+
 type UrlMediaMetadata = Readonly<
 	{ imageURL: string; artist: string; title: string; }
 >;
+
+////////////////////////////////////////////////
 
 type SearcherInfo = Readonly<
 	{

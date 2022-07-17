@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { useEffect, useRef } from "react";
 import create from "zustand";
@@ -48,20 +50,18 @@ export function MediaPlayer() {
 		if (!audio) return;
 
 		function handleProgress(): void {
-			if (!audio) return;
-
-			const { duration, currentTime } = audio;
+			const { duration, currentTime } = audio!;
 			const percentage = (currentTime / duration) * 100;
 
 			setProgress({ currentTime, percentage });
 		}
 
 		function handleLoadedData(): void {
-			if (!media || !path || !audio) return;
+			if (!media || !path) return;
 
 			// Updating the duration of media:
 			setPlaylists({
-				newMedia: { ...media, duration: formatDuration(audio.duration) },
+				newMedia: { ...media, duration: formatDuration(audio!.duration) },
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 				type: WhatToDo.UPDATE_MAIN_LIST,
 				path,
@@ -72,30 +72,26 @@ export function MediaPlayer() {
 				dbg(
 					`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`,
 				);
-				audio.currentTime = lastTime;
+				audio!.currentTime = lastTime;
 			}
 		}
 
 		function handleEnded(): void {
-			if (!audio) return;
-
 			dbg(
 				`Audio ended, playing ${
-					audio.loop ?
+					audio!.loop ?
 						"again because it's on loop." :
 						"next media."
 				}`,
 			);
 
-			if (!audio.loop) playNextMedia();
+			if (!audio!.loop) playNextMedia();
 		}
 
 		async function handleAudioCanPlay(): Promise<void> {
-			if (!audio) return;
-
 			dbg("Audio can play.");
 
-			await audio.play();
+			await audio!.play();
 		}
 
 		// Adding event listeners:

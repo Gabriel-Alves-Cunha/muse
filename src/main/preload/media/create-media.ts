@@ -2,12 +2,13 @@ import type { Media, Path, ImgString } from "@common/@types/generalTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { lstatSync } from "node:fs";
-import { log } from "node:console";
 
 import { dbg, formatDuration } from "@common/utils";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
+
+const { log } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -48,21 +49,11 @@ async function createMedia(
 
 			const picture: IPicture | undefined = pictures[0];
 			const mimeType = picture?.mimeType;
-			let img = "";
-			if (picture && mimeType) {
-				const str = picture.data.toBase64String();
-				dbg({ Base64String: str });
-				// If the picture wasn't made by us. (That's the only way I found to
-				// make this work, cause, when we didn't make the picture in
-				// `writeTag`, we can't decode it!):
-				// picture.type === PictureType.NotAPicture ||
-				// picture.type === PictureType.Other ?
-				// Buffer.from(picture.data.data).toString("base64") :
-				// picture.data.toString();
-				img = `data:${mimeType};base64,${str}` as ImgString;
-			}
 
 			const media: Media = {
+				img: picture && mimeType ?
+					`data:${mimeType};base64,${picture.data.toString(3)}` as ImgString :
+					"",
 				duration: formatDuration(durationInSeconds),
 				birthTime: lstatSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
@@ -71,13 +62,9 @@ async function createMedia(
 				genres,
 				album,
 				size,
-				img,
 			};
 
-			dbg(basename, {
-				tag: { pictures, album, genres, albumArtists },
-				properties: { durationMilliseconds },
-			});
+			dbg(basename, media);
 
 			return resolve([path, media]);
 		}, `createMedia("${basename}")`);

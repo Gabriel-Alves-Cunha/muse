@@ -14,6 +14,11 @@ import {
 	Searcher,
 } from "./styles";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
 export function Download() {
 	useEffect(() => {
 		document.title = "Download medias files to audio files";
@@ -31,6 +36,9 @@ export function Download() {
 	);
 }
 
+////////////////////////////////////////////////
+// Helper functions:
+
 function SearcherWrapper() {
 	const { error, url } = useSearchInfo();
 
@@ -46,7 +54,7 @@ function SearcherWrapper() {
 				<SearchIcon size={18} />
 
 				<label className={url ? "active" : ""} htmlFor="searcher:url">
-					Paste Youtube url here
+					Paste YouTube url here
 				</label>
 				<input
 					onChange={e => setSearchInfo({ url: e.target.value })}
@@ -64,11 +72,15 @@ function SearcherWrapper() {
 	);
 }
 
+////////////////////////////////////////////////
+
 function IsLoading() {
 	const { isLoading } = useSearchInfo();
 
 	return <LoadingWrapper>{isLoading && <Loading />}</LoadingWrapper>;
 }
+
+////////////////////////////////////////////////
 
 function Result() {
 	const { result } = useSearchInfo();

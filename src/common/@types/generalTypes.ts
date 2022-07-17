@@ -14,8 +14,8 @@ export type Media = Readonly<
 		isSelected: boolean;
 		size: PrettyBytes;
 		duration: string;
-		artist: string;
-		album: string;
+		artist: string | undefined;
+		album: string | undefined;
 		title: string;
 		img: string;
 	}

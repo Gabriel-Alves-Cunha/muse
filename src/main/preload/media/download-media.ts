@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { MediaBeingDownloaded } from "@components/Downloading";
 import type { MediaUrl } from "@contexts/downloadList";
 import type { Readable } from "node:stream";
 
 import { cursorTo, clearLine } from "node:readline";
-import { error, log } from "node:console";
 import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
@@ -19,7 +19,8 @@ import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
-import { MediaBeingDownloaded } from "@components/Downloading";
+
+const { error, log } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -27,8 +28,9 @@ import { MediaBeingDownloaded } from "@components/Downloading";
 // Schemas For Arguments Verification
 
 const checkArgsToCreateDownload = validator.compile<CreateDownload>({
-	electronPort: { type: "class", instanceof: MessagePort },
-	extension: "string", // Required. Not empty.
+	// All Required. Not empty.
+	electronPort: "object",
+	extension: "string",
 	imageURL: "string",
 	title: "string",
 	url: "string",

@@ -8,8 +8,14 @@ import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
 export function Favorites() {
 	useEffect(() => {
+		// For accessibility:
 		document.title = "Favorite audios list";
 
 		setFromList({ fromList: PlaylistList.FAVORITES });

@@ -14,10 +14,17 @@ import {
 
 import { Box } from "./styles";
 
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
 export function Convert() {
 	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	////////////////////////////////////////////////
 
 	function handleSelectedFiles(
 		{ target: { files } }: ChangeEvent<HTMLInputElement>,
@@ -32,7 +39,11 @@ export function Convert() {
 		setSelectedFiles(map);
 	}
 
-	const openChooseFilesNativeUI = () => inputRef.current?.click();
+	////////////////////////////////////////////////
+
+	const openNativeUI_ChooseFiles = () => inputRef.current?.click();
+
+	////////////////////////////////////////////////
 
 	// Start converting
 	useEffect(() => {
@@ -49,11 +60,13 @@ export function Convert() {
 		document.title = "Convert medias files to mp3";
 	}, []);
 
+	////////////////////////////////////////////////
+
 	return (
 		<MainArea>
 			<Box>
 				<Button
-					onClick={openChooseFilesNativeUI}
+					onClick={openNativeUI_ChooseFiles}
 					className="notransition"
 					variant="large"
 				>
@@ -71,5 +84,10 @@ export function Convert() {
 		</MainArea>
 	);
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Types:
 
 type SelectedFiles = ReadonlyMap<Path, ConvertInfo>;

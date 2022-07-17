@@ -47,7 +47,7 @@ export function ImgWithFallback(
 	};
 
 	img.onerror = ev => {
-		console.error("Failed img, erasing it", ev);
+		console.error("Failed img, erasing it", { ev, mediaPath, mediaImg });
 
 		// await writeTags(media.path, { imageURL: "erase img" });
 		cache.set(mediaPath, FAILURE);

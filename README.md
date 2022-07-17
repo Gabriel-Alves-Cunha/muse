@@ -4,7 +4,7 @@
 	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
 </h1>
 
-> Just a simple Electron-React app to download audio from Youtube and play them.
+> Just a simple Electron-React app to download audio from YouTube and play them.
 
 ## Table of contents
 
@@ -15,10 +15,6 @@
 - [Contributing](#Contributing)
 - [Author](#Author)
 - [License](#License)
-
-<!-- <h4 align="center">
-	🚧  React - Electron 🚀 Building...  🚧
-</h4> -->
 
 ## Screenshots
 
@@ -62,7 +58,7 @@ To install and run Muse, follow these steps:
 To install and run Muse, follow these steps:
 
 ```bash
-git clone https://github.com/Gabriel-Alves-Cunha/muse
+git clone https://github.com/Gabriel-Alves-Cunha/muse --depth 1
 ```
 
 ```bash

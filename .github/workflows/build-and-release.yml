@@ -24,40 +24,26 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Setup NodeJS, checkout code, install dependencies and build AppImage
+        # Checkout code:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Setup NodeJS
-        uses: actions/setup-node@master
+        # Setup NodeJS:
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.5.0
-          cache: yarn
-
-      - name: Setup yarn cache
-        uses: c-hive/gha-yarn-cache@v2
-
-      - name: Install dependencies
+          node-version: 16.16.0
+          cache: 'yarn'
+        # Install dependencies:
         run: yarn
-
-      - name: Build AppImage
+        # Build AppImage:
         run: yarn release
 
-      - name: Show directory of build
-        run: ls dist
-
-      - name: Show directory
-        run: ls
-
-      # The `Release action` below only knows the files that are in the main folder...
-      - name: Move files
+      # The `Release action` below only knows the files that are in the root folder...
+      - name: Move release files to root folder
         run: |
           mv dist/latest-linux.yml .
           mv dist/Muse-* .
-
-      - name: Show directory
-        run: ls
 
       - name: Release action
         uses: "marvinpinto/action-automatic-releases@latest"

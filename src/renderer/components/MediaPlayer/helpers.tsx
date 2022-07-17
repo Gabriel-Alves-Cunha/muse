@@ -191,8 +191,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					The X and Y coordinates of the mouse
 					relative to the event source element.
 			*/
-			if (!audio) return;
-			if (!isDurationValid) return;
+			if (!audio || !isDurationValid) return;
 			const tooltip = timeTooltipRef.current;
 			const div = progressWrapperRef.current;
 			if (!div || !tooltip) return;
