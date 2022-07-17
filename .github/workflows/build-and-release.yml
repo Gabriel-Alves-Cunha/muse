@@ -24,19 +24,21 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Setup NodeJS, checkout code, install dependencies and build AppImage
-        # Checkout code:
+      - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-        # Setup NodeJS:
+
+      - name: Setup NodeJS
         uses: actions/setup-node@v3
         with:
           node-version: 16.16.0
           cache: 'yarn'
-        # Install dependencies:
+
+      - name: Install dependencies
         run: yarn
-        # Build AppImage:
+
+      - name: Build AppImage
         run: yarn release
 
       # The `Release action` below only knows the files that are in the root folder...
