@@ -35,6 +35,11 @@ jobs:
           node-version: 16.16.0
           cache: 'yarn'
 
+      - name: Print yarn cache folder and it's size
+        run: |
+          ls /home/runner/.cache/yarn/v6
+          du -sh /home/runner/.cache/yarn/v6
+
       - name: Install dependencies
         run: yarn
 
