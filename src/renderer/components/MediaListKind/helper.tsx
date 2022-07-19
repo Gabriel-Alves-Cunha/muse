@@ -41,6 +41,7 @@ export const useFromList = create<FromList>(() => ({
 	fromList: PlaylistList.FAVORITES,
 	isHome: true,
 }));
+
 export const { getState: getFromList, setState: setFromList } = useFromList;
 
 /////////////////////////////////////////

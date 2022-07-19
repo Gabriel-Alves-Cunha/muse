@@ -3,9 +3,9 @@ import type { Page } from "@common/@types/generalTypes";
 import { ToastContainer } from "react-toastify";
 import ReactTooltip from "react-tooltip";
 
+import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/mediaHandler/usePlaylists";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
-import { Decorations } from "@components/Decorations";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { ShareDialog } from "@components/ShareDialog";
@@ -56,11 +56,13 @@ export function App() {
 
 			<ShareDialog />
 
-			<Decorations />
+			<DecorationsTop />
 
 			<ContextMenu>
 				<Main />
 			</ContextMenu>
+
+			<DecorationsDown />
 		</>
 	);
 }
@@ -97,7 +99,7 @@ function PageToShow() {
 }
 
 //////////////////////////////////////////
-// Do on app start:
+// Do once on app start:
 
 window.addEventListener("message", handleWindowMsgs);
 

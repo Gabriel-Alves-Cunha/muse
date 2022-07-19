@@ -1,4 +1,4 @@
-import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
+import { TOP_DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled, keyframes } from "./global";
 
 ////////////////////////////////////////////////
@@ -12,7 +12,7 @@ export const Content = styled("div", {
 		/ 65px 1fr minmax(186px, 25vw)
 	`,
 
-	mt: DECORATIONS_HEIGHT,
+	mt: TOP_DECORATIONS_HEIGHT,
 	bg: "$bg-main",
 
 	"@sm": {

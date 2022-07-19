@@ -14,7 +14,7 @@ export const testArray = Object.freeze(
 				duration: formatDuration(index + 10),
 				birthTime: Date.now(),
 				isSelected: false,
-				size: "3.0 MB",
+				size: 3_000,
 				genres: [],
 				artist: "",
 				album: "",

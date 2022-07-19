@@ -4,11 +4,10 @@ import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { lstatSync } from "node:fs";
 
 import { dbg, formatDuration } from "@common/utils";
-import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
 
-const { log } = console;
+const { error } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -31,37 +30,33 @@ async function createMedia(
 
 			const durationInSeconds = durationMilliseconds / 1_000;
 
-			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60) {
-				log(
+			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60)
+				return reject(
 					`Skipping "${path}" because the duration is ${
 						durationInSeconds.toPrecision(3)
 					} s (less than 60 s)!`,
 				);
-				return reject();
-			}
 
-			const size = prettyBytes(length);
-
-			if (assureMediaSizeIsGreaterThan60KB && length < 60_000) {
-				log(`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`);
-				return reject();
-			}
+			if (assureMediaSizeIsGreaterThan60KB && length < 60_000)
+				return reject(
+					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`,
+				);
 
 			const picture: IPicture | undefined = pictures[0];
 			const mimeType = picture?.mimeType;
 
 			const media: Media = {
 				img: picture && mimeType ?
-					`data:${mimeType};base64,${picture.data.toString(3)}` as ImgString :
+					`data:${mimeType};base64,${picture.data.toBase64String()}` as ImgString :
 					"",
 				duration: formatDuration(durationInSeconds),
 				birthTime: lstatSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
 				isSelected: false,
+				size: length,
 				genres,
 				album,
-				size,
 			};
 
 			dbg(basename, media);
@@ -85,6 +80,9 @@ export async function transformPathsToMedias(
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
 			)
+				.catch(e =>
+					error(`There was an error creating media of path = "${path}".\n\n`, e)
+				)
 		);
 
 		// Run promises in parallel:

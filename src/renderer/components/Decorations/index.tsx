@@ -5,6 +5,7 @@ import {
 } from "react-icons/vsc";
 
 import { capitalizedAppName } from "@common/utils";
+import { MediasInfo } from "@components/MediasInfo";
 import { usePage } from "@contexts/page";
 import {
 	toggleMaximize,
@@ -17,12 +18,15 @@ import {
 	AppName_Folder_Wrapper,
 	WindowButtonsWrapper,
 	WindowButton,
+	DownWrapper,
+	TopWrapper,
 	AppIcon,
-	Wrapper,
+	LeftSlot,
+	RightSlot,
 } from "./styles";
 
-export const Decorations = () => (
-	<Wrapper>
+export const DecorationsTop = () => (
+	<TopWrapper>
 		{/* ^ window-draggable-region */}
 		<AppIcon>
 			<img
@@ -36,7 +40,17 @@ export const Decorations = () => (
 		<AppNamePlusFolder />
 
 		<Buttons />
-	</Wrapper>
+	</TopWrapper>
+);
+
+export const DecorationsDown = () => (
+	<DownWrapper>
+		<LeftSlot>
+			<MediasInfo />
+		</LeftSlot>
+
+		<RightSlot></RightSlot>
+	</DownWrapper>
 );
 
 const Buttons = () => (

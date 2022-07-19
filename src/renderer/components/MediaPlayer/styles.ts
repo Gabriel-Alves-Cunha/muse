@@ -1,4 +1,4 @@
-import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
+import { TOP_DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
 /////////////////////////////////////////
@@ -24,7 +24,7 @@ export const Wrapper = styled("section", {
 	justifySelf: "center", // for grid: row
 	alignSelf: "start", // for grid: column
 
-	h: `calc(100vh - ${DECORATIONS_HEIGHT})`,
+	h: `calc(100vh - ${TOP_DECORATIONS_HEIGHT})`,
 	w: "100%",
 	padding,
 

@@ -1,4 +1,4 @@
-import { DECORATIONS_HEIGHT } from "@components/Decorations/styles";
+import { TOP_DECORATIONS_HEIGHT } from "@components/Decorations/styles";
 import { styled } from "@styles/global";
 
 /////////////////////////////////////////
@@ -14,7 +14,7 @@ export const Nav = styled("nav", {
 	alignItems: "center",
 	w: 65,
 
-	h: `calc(100vh - ${DECORATIONS_HEIGHT})`,
+	h: `calc(100vh - ${TOP_DECORATIONS_HEIGHT})`,
 	bg: "$bg-navbar",
 
 	"& > :first-child": { mt: 40 },

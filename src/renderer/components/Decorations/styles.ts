@@ -5,18 +5,19 @@ import { styled } from "@styles/global";
 /////////////////////////////////////////
 // Constants:
 
-export const DECORATIONS_HEIGHT = "27px";
+export const DOWN_DECORATIONS_HEIGHT = "20px";
+export const TOP_DECORATIONS_HEIGHT = "27px";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Wrapper = styled("header", {
+export const TopWrapper = styled("header", {
 	pos: "absolute",
 	d: "flex", // row
 
-	mt: `-${DECORATIONS_HEIGHT}`,
-	h: DECORATIONS_HEIGHT,
+	mt: `-${TOP_DECORATIONS_HEIGHT}`,
+	h: TOP_DECORATIONS_HEIGHT,
 	w: "100vw",
 
 	bg: "$bg-main",
@@ -25,6 +26,36 @@ export const Wrapper = styled("header", {
 	// ^ window-draggable-region
 	userSelect: "none",
 });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const DownWrapper = styled("header", {
+	pos: "absolute",
+	d: "flex", // row
+	justifyContent: "space-between",
+	alignItems: "center",
+
+	h: DOWN_DECORATIONS_HEIGHT,
+	w: "100vw",
+	bottom: 0,
+
+	userSelect: "none",
+	bg: "$scrollbar",
+});
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const LeftSlot = styled("div", { gap: 8, "&:first-child": { pl: 8 } });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const RightSlot = styled("div", { gap: 8, "&:last-child": { pr: 8 } });
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -46,7 +77,7 @@ export const WindowButtonsWrapper = styled("div", {
 export const WindowButton = styled("button", {
 	pos: "relative",
 	dflex: "center",
-	h: DECORATIONS_HEIGHT,
+	h: TOP_DECORATIONS_HEIGHT,
 	w: 48,
 
 	c: "$window-buttons",

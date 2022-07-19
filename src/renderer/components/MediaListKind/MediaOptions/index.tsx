@@ -8,6 +8,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { prettyBytes } from "@common/prettyBytes";
 import { deleteMedia } from "@utils/media";
 import { capitalize } from "@utils/utils";
 import {
@@ -47,14 +48,14 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		// TODO: change this cause if you open the popover by pressing
-		// "Enter", it will just open and close it!
 		function handleKeyUp({ key }: KeyboardEvent) {
 			if (key === "Enter")
 				changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
 		}
 
-		document.addEventListener("keyup", handleKeyUp);
+		// This is because if you open the popover by pressing
+		// "Enter", it will just open and close it!
+		setTimeout(() => document.addEventListener("keyup", handleKeyUp), 500);
 
 		return () => document.removeEventListener("keyup", handleKeyUp);
 	}, [media, path]);
@@ -174,7 +175,7 @@ function changeMetadataIfAllowed(
 
 	const thingsToChange: MetadataToChange = [];
 
-	// This shit is to get the inputs:
+	// This shit is to get all the inputs:
 	for (const children of contentWrapper.current.children)
 		for (const element of children.children)
 			if (element instanceof HTMLInputElement && !element.disabled) {
@@ -278,8 +279,15 @@ const closeEverything = (
 /////////////////////////////////////////////
 
 const format = (
-	value: string | readonly string[] | undefined,
-): string | undefined => (value instanceof Array ? value.join(", ") : value);
+	value: string | readonly string[] | number | undefined,
+):
+	| undefined
+	| string
+	| number => (value instanceof Array ?
+		value.join(", ") :
+		typeof value === "number" ?
+		prettyBytes(value) :
+		value);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

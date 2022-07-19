@@ -49,15 +49,11 @@ async function handleImageMetadata(
 		try {
 			dbg("Downloading picture...");
 
-			const base64img = await downloadThumbnail(imageURL);
-
-			dbg({ base64img });
-
-			// createAndSaveImageOnMedia(base64img, file);
+			file.tag.pictures = await downloadThumbnail(imageURL);
 
 			console.assert(
 				file.tag.pictures.length === 1,
-				"No pictures added!",
+				"[Error] No pictures were added!",
 				file.tag.pictures,
 			);
 		} catch (err) {
@@ -78,7 +74,7 @@ async function handleImageMetadata(
 	// if imageURL === "erase img" => erase img so we
 	// don't keep getting an error on the browser.
 	if (imageURL === eraseImg) {
-		dbgTests("Erasing picture...");
+		dbgTests("Erasing picture.");
 		file.tag.pictures = [];
 
 		return;
@@ -106,13 +102,22 @@ async function handleImageMetadata(
 
 export async function downloadThumbnail(
 	url: Readonly<string>,
-): Promise<ByteVector> {
+): Promise<Picture[]> {
 	return new Promise((resolve, reject) =>
 		get(url, async res => {
-			resolve(await ByteVector.fromStream(res));
+			const byteVector = await ByteVector.fromStream(res);
+
+			const picture = Picture.fromFullData(
+				byteVector,
+				PictureType.Media,
+				res.headers["content-type"] ?? "undefined",
+				"This image was download when this media was downloaded.",
+			);
+
+			resolve([picture]);
 		})
 			.on("error", e => {
-				error(`Got error getting image on Electron side: ${e.message}`);
+				error("Got error getting image on Electron side!\n\n", e);
 				return reject(e);
 			})
 	);
@@ -143,7 +148,6 @@ export function createAndSaveImageOnMedia(
 		mimeType,
 		"This image was download when this media was downloaded.",
 	);
-	picture.filename = "thumbnail";
 
 	file.tag.pictures = [picture];
 

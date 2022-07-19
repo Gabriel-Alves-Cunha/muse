@@ -1,4 +1,8 @@
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import type { Path } from "@common/@types/generalTypes";
+import { sendMsgToBackend } from "@common/crossCommunication";
+
+import { eraseImg } from "@common/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -46,11 +50,21 @@ export function ImgWithFallback(
 		img = null;
 	};
 
-	img.onerror = ev => {
-		console.error("Failed img, erasing it", { ev, mediaPath, mediaImg });
+	img.onerror = async ev => {
+		console.error("Failed image; going to erasing it...", {
+			mediaPath,
+			mediaImg,
+			ev,
+		});
 
-		// await writeTags(media.path, { imageURL: "erase img" });
+		sendMsgToBackend({
+			type: ReactToElectronMessageEnum.WRITE_TAG,
+			thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
+			mediaPath,
+		});
+
 		cache.set(mediaPath, FAILURE);
+
 		img = null;
 	};
 

@@ -1,5 +1,4 @@
 import type { AllowedMedias } from "../utils";
-import type { PrettyBytes } from "../prettyBytes";
 
 import { pages } from "@utils/app";
 
@@ -9,14 +8,14 @@ export type Path = Readonly<string>;
 
 export type Media = Readonly<
 	{
+		artist: string | undefined;
+		album: string | undefined;
 		genres: readonly string[];
 		birthTime: DateAsNumber;
 		isSelected: boolean;
-		size: PrettyBytes;
 		duration: string;
-		artist: string | undefined;
-		album: string | undefined;
 		title: string;
+		size: number;
 		img: string;
 	}
 >;

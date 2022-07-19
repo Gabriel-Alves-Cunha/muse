@@ -289,7 +289,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 			duration: formatDuration(100 + 10),
 			birthTime: Date.now(),
 			isSelected: false,
-			size: "3.0 MB",
+			size: 3_000,
 			genres: [],
 			artist: "",
 			album: "",
@@ -355,7 +355,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 
 	it("(PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH) should refresh one media (the caller should not update the media path, it will be updated, if needed, when calling PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH).", () => {
 		const title = "I'm an updated title";
-		const size = "1.0 MB";
+		const size = 1_000;
 		const [path, oldMedia] = testArray[15]!;
 		const newMedia: Media = { ...oldMedia, title, size };
 
