@@ -17,8 +17,12 @@ import { PopoverAnchor } from "./styles";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+const convertingListSizeSelector = (
+	state: ReturnType<typeof useConvertingList.getState>,
+) => state.convertingList.size;
+
 export function Converting() {
-	const convertingListSize = useConvertingList().convertingList.size;
+	const convertingListSize = useConvertingList(convertingListSizeSelector);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
 
@@ -68,7 +72,7 @@ export function Converting() {
 				size={convertingListSize === 0 ?
 					"nothing-found-for-convertions-or-downloads" :
 					"convertions-or-downloads"}
-				alignOffset={14}
+				alignOffset={140}
 			>
 				<Popup />
 			</PopoverContent>

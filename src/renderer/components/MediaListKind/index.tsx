@@ -9,11 +9,13 @@ import { assertUnreachable, time } from "@utils/utils";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import {
-	type MainList,
-	type History,
 	deselectAllMedias,
 	allSelectedMedias,
 	selectAllMedias,
+} from "@contexts/mediaHandler/useAllSelectedMedias";
+import {
+	type MainList,
+	type History,
 	usePlaylists,
 	PlaylistList,
 	mainList,
@@ -188,7 +190,7 @@ function handleDeselectAllMedias(
 	listRef: Readonly<React.RefObject<HTMLDivElement>>,
 	isCtxMenuOpen: Readonly<boolean>,
 ) {
-	if (listRef.current && !isCtxMenuOpen && allSelectedMedias.length > 0)
+	if (listRef.current && !isCtxMenuOpen && allSelectedMedias().length > 0)
 		deselectAllMedias();
 }
 

@@ -1,10 +1,19 @@
 import { EventEmitter } from "node:events";
 import { clipboard } from "electron";
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Constants and variables:
+
 const clipboardEmitter = new EventEmitter();
 
 let watcherId: NodeJS.Timer | undefined;
 let previousText = "";
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 (clipboard as ClipboardExtended).on = <T>(
 	eventName: string,
@@ -15,6 +24,8 @@ let previousText = "";
 	return clipboard;
 };
 
+/////////////////////////////////////////
+
 (clipboard as ClipboardExtended).once = <T>(
 	eventName: string,
 	listener: (...args: T[]) => void,
@@ -23,6 +34,8 @@ let previousText = "";
 
 	return clipboard;
 };
+
+/////////////////////////////////////////
 
 (clipboard as ClipboardExtended).off = <T>(
 	eventName: string,
@@ -34,6 +47,8 @@ let previousText = "";
 	return clipboard;
 };
 
+/////////////////////////////////////////
+
 (clipboard as ClipboardExtended).startWatching = () => {
 	watcherId = setInterval(() => {
 		if (isTextDiff(previousText, previousText = clipboard.readText()))
@@ -43,6 +58,8 @@ let previousText = "";
 	return clipboard;
 };
 
+/////////////////////////////////////////
+
 (clipboard as ClipboardExtended).stopWatching = () => {
 	clearInterval(watcherId);
 	watcherId = undefined;
@@ -50,9 +67,18 @@ let previousText = "";
 	return clipboard;
 };
 
+/////////////////////////////////////////
+
 const isTextDiff = (str1 = "", str2 = "") => str1 !== str2;
 
+/////////////////////////////////////////
+
 export { clipboard as extendedClipboard };
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 // Doing this Partial<{}> so typescript doesn't complain...
 type ClipboardExtended =

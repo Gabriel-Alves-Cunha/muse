@@ -24,7 +24,6 @@ export function SortBy({ className }: Props) {
 
 			default:
 				assertUnreachable(selectedList);
-				break;
 		}
 
 		setFromList({ homeList });

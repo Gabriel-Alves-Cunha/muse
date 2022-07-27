@@ -1,18 +1,13 @@
-import type {
-	DateAsNumber,
-	Mutable,
-	Media,
-	Path,
-} from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { emptyMap, emptySet, getFirstKey } from "@utils/map-set";
-import { getFromLocalStorage, keys } from "@utils/localStorage";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
+import { getFromLocalStorage, keys } from "@utils/localStorage";
 import { assertUnreachable, time } from "@utils/utils";
-import { dbgPlaylists } from "@common/utils";
+import { dbgPlaylists, stringifyJson } from "@common/utils";
 import { getSettings } from "@contexts/settings";
 import {
 	searchDirectoryResult,
@@ -110,7 +105,6 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								default:
 									assertUnreachable(action);
-									break;
 							}
 						}, `setPlaylists on 'UPDATE_HISTORY'\u279D'${action.whatToDo}'`);
 						break;
@@ -188,7 +182,6 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								default:
 									assertUnreachable(action);
-									break;
 							}
 						}, `setPlaylists on 'UPDATE_FAVORITES'\u279D'${action.whatToDo}'`);
 						break;
@@ -200,7 +193,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						time(() => {
 							////////////////////////////////////////////////
 
-							const updateAndSortSortedAndMainLists = (newMainList: MainList) =>
+							const updateAndSortSortedAndMainLists = (
+								newMainList: MainList,
+							): void =>
 								set({
 									sortedByDate: sortByDate(newMainList),
 									sortedByName: sortByName(newMainList),
@@ -382,7 +377,6 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 								default:
 									assertUnreachable(action);
-									break;
 							}
 						}, `playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'${action.type}'`);
 						break;
@@ -392,9 +386,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 					default:
 						assertUnreachable(action);
-						break;
 				}
-			}, "setPlaylists with: " + JSON.stringify(action, null, 2)),
+			}, "setPlaylists with: " + stringifyJson(action)),
 	}))),
 );
 
@@ -445,7 +438,7 @@ export const { setPlaylists } = getState();
 
 export function getPlaylist(
 	list: Readonly<PlaylistList>,
-): ReadonlySet<string> | MainList | History {
+): ReadonlySet<Path> | MainList | History {
 	switch (list) {
 		case PlaylistList.MAIN_LIST:
 			return mainList();
@@ -460,7 +453,7 @@ export function getPlaylist(
 			return sortedByDate();
 
 		default:
-			return assertUnreachable(list);
+			assertUnreachable(list);
 	}
 }
 
@@ -482,7 +475,7 @@ export const cleanFavorites = () =>
 
 ///////////////////////////////////////////////////
 
-export async function searchLocalComputerForMedias() {
+export async function searchLocalComputerForMedias(): Promise<void> {
 	time(async () => {
 		try {
 			usePlaylists.setState({ isLoadingMedias: true });
@@ -526,125 +519,34 @@ export async function searchLocalComputerForMedias() {
 
 export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 	return time(() => {
-		const searchTerm = searchTerm_.toLowerCase();
+		/** normalize()ing to NFD Unicode normal form decomposes
+		 * combined graphemes into the combination of simple ones.
+		 * The è of Crème ends up expressed as e +  ̀.
+		 * It is now trivial to globally get rid of the diacritics,
+		 * which the Unicode standard conveniently groups as the
+		 * Combining Diacritical Marks Unicode block.
+		 */
+		const searchTerm = searchTerm_.toLowerCase().normalize("NFD").replace(
+			/\p{Diacritic}/gu,
+			"",
+		);
 		const medias: [Path, Media][] = [];
 
 		mainList().forEach((media, path) =>
 		{
-			if (media.title.toLowerCase().includes(searchTerm))
+			if (
+				media
+					.title
+					.toLowerCase()
+					.normalize("NFD")
+					.replace(/\p{Diacritic}/gu, "")
+					.includes(searchTerm)
+			)
 				medias.push([path, media]);
 		});
 
 		return medias;
 	}, `searchMedia("${searchTerm_}")`);
-}
-
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-// Handle media selection:
-
-export let allSelectedMedias: readonly Path[] = [];
-
-// Every the mainList (sortedByName) changes,
-// update `allSelectedMedias`:
-if (!import.meta.vitest)
-	usePlaylists.subscribe(
-		({ sortedByName }) => sortedByName,
-		function updateAllSelectedMedias() {
-			time(() =>
-			{
-				allSelectedMedias = Array
-					.from(getState().sortedByName)
-					.filter(([, { isSelected }]) => isSelected)
-					.map(([path]) => path);
-			}, "updateAllSelectedMedias");
-		},
-	);
-
-///////////////////////////////////////////////////
-
-export function toggleSelectedMedia(media: Media, mediaPath: Path): void {
-	time(
-		() =>
-			allSelectedMedias.includes(mediaPath) ?
-				removeFromAllSelectedMedias(media, mediaPath) :
-				addToAllSelectedMedias(media, mediaPath),
-		"toggleSelectedMedia",
-	);
-}
-
-///////////////////////////////////////////////////
-
-export function addToAllSelectedMedias(newMedia: Media, mediaPath: Path): void {
-	time(
-		() =>
-			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-				newMedia: { ...newMedia, isSelected: true },
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				path: mediaPath,
-			}),
-		"addToAllSelectedMedias",
-	);
-}
-
-///////////////////////////////////////////////////
-
-export function removeFromAllSelectedMedias(
-	newMedia: Media,
-	mediaPath: Path,
-): void {
-	time(
-		() =>
-			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-				newMedia: { ...newMedia, isSelected: false },
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				path: mediaPath,
-			}),
-		"removeFromAllSelectedMedias",
-	);
-}
-
-///////////////////////////////////////////////////
-
-export function deselectAllMedias() {
-	time(() => {
-		if (allSelectedMedias.length === 0) return;
-
-		const newMediasList = mainList() as Map<Path, Mutable<Media>>;
-
-		newMediasList.forEach((media, path) =>
-			newMediasList.set(path, { ...media, isSelected: false })
-		);
-
-		setPlaylists({
-			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: WhatToDo.UPDATE_MAIN_LIST,
-			list: newMediasList,
-		});
-	}, "deselectAllMedias");
-}
-
-///////////////////////////////////////////////////
-
-export function selectAllMedias() {
-	time(() => {
-		const newMediasList = mainList() as Map<Path, Mutable<Media>>;
-
-		if (allSelectedMedias.length === newMediasList.size) return;
-
-		newMediasList.forEach((media, path) =>
-			newMediasList.set(path, { ...media, isSelected: true })
-		);
-
-		setPlaylists({
-			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: WhatToDo.UPDATE_MAIN_LIST,
-			list: newMediasList,
-		});
-	}, "selectAllMedias");
 }
 
 ///////////////////////////////////////////////////

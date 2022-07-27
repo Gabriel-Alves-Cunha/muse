@@ -24,6 +24,7 @@ import { PopoverAnchor } from "../Converting/styles";
 const defaultDownloadInfo: DownloadInfo = Object.freeze({
 	extension: "mp3",
 	imageURL: "",
+	artist: "",
 	title: "",
 	url: "",
 });
@@ -35,8 +36,11 @@ export const { setState: setDownloadInfo } = useDownloadInfo;
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+const sizeSelector = (state: ReturnType<typeof useDownloadingList.getState>) =>
+	state.downloadingList.size;
+
 export function Downloading() {
-	const downloadingListSize = useDownloadingList().downloadingList.size;
+	const downloadingListSize = useDownloadingList(sizeSelector);
 	const [isOpen, setIsOpen] = useState(false);
 	const downloadInfo = useDownloadInfo();
 
@@ -69,7 +73,7 @@ export function Downloading() {
 		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
 			<StyledPopoverTrigger
 				className={(downloadingListSize ? "has-items " : "") +
-					(isOpen ? "active " : "")}
+					(isOpen ? "active" : "")}
 				data-tip="Show all downloading medias"
 			>
 				<span data-length={downloadingListSize}></span>

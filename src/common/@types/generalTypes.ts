@@ -8,12 +8,12 @@ export type Path = Readonly<string>;
 
 export type Media = Readonly<
 	{
-		artist: string | undefined;
-		album: string | undefined;
 		genres: readonly string[];
 		birthTime: DateAsNumber;
 		isSelected: boolean;
 		duration: string;
+		artist: string;
+		album: string;
 		title: string;
 		size: number;
 		img: string;
@@ -25,7 +25,13 @@ export type Mutable<T> = {
 };
 
 export type DownloadInfo = Readonly<
-	{ extension: AllowedMedias; imageURL: string; title: string; url: string; }
+	{
+		extension: AllowedMedias;
+		imageURL: string;
+		artist: string;
+		title: string;
+		url: string;
+	}
 >;
 
 export type QRCodeURL = `http://${string}:${number}`;

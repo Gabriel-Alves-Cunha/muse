@@ -1,4 +1,4 @@
-import { createStitches } from "@stitches/react";
+import { createStitches, type CSSProperties } from "@stitches/react";
 import { toast } from "react-toastify";
 
 import { getObjectDeepKeys } from "@utils/object";
@@ -32,88 +32,96 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 			},
 		},
 		utils: {
-			size: (width: number | string) => ({ height: width, width }),
-			bo: (bottom: number | string) => ({ bottom }),
-			h: (height: number | string) => ({ height }),
-			w: (width: number | string) => ({ width }),
-			r: (right: number | string) => ({ right }),
-			pos: (position: string) => ({ position }),
-			l: (left: number | string) => ({ left }),
-			t: (top: number | string) => ({ top }),
+			size: (width: CSSProperties["width"]) => ({ height: width, width }),
+			pos: (position: CSSProperties["position"]) => ({ position }),
+			bo: (bottom: CSSProperties["bottom"]) => ({ bottom }),
+			h: (height: CSSProperties["height"]) => ({ height }),
+			w: (width: CSSProperties["width"]) => ({ width }),
+			r: (right: CSSProperties["right"]) => ({ right }),
+			l: (left: CSSProperties["left"]) => ({ left }),
+			t: (top: CSSProperties["top"]) => ({ top }),
 
-			pb: (paddingBottom: number | string) => ({ paddingBottom }),
-			pr: (paddingRight: number | string) => ({ paddingRight }),
-			pl: (paddingLeft: number | string) => ({ paddingLeft }),
-			pt: (paddingTop: number | string) => ({ paddingTop }),
-			p: (padding: number | string) => ({ padding }),
-			px: (value: number | string) => ({
+			pb: (paddingBottom: CSSProperties["paddingBottom"]) => ({
+				paddingBottom,
+			}),
+			pr: (paddingRight: CSSProperties["paddingRight"]) => ({ paddingRight }),
+			pl: (paddingLeft: CSSProperties["paddingLeft"]) => ({ paddingLeft }),
+			pt: (paddingTop: CSSProperties["paddingTop"]) => ({ paddingTop }),
+			p: (padding: CSSProperties["padding"]) => ({ padding }),
+			px: (value: CSSProperties["padding"]) => ({
 				paddingRight: value,
 				paddingLeft: value,
 			}),
-			py: (value: number | string) => ({
+			py: (value: CSSProperties["padding"]) => ({
 				paddingBottom: value,
 				paddingTop: value,
 			}),
 
-			mb: (marginBottom: number | string) => ({ marginBottom }),
-			mr: (marginRight: number | string) => ({ marginRight }),
-			ml: (marginLeft: number | string) => ({ marginLeft }),
-			mt: (marginTop: number | string) => ({ marginTop }),
-			m: (margin: number | string) => ({ margin }),
-			mx: (value: number | string) => ({
+			mb: (marginBottom: CSSProperties["marginBottom"]) => ({ marginBottom }),
+			mr: (marginRight: CSSProperties["marginRight"]) => ({ marginRight }),
+			ml: (marginLeft: CSSProperties["marginLeft"]) => ({ marginLeft }),
+			mt: (marginTop: CSSProperties["marginTop"]) => ({ marginTop }),
+			m: (margin: CSSProperties["margin"]) => ({ margin }),
+			mx: (value: CSSProperties["margin"]) => ({
 				marginRight: value,
 				marginLeft: value,
 			}),
-			my: (value: number | string) => ({
+			my: (value: CSSProperties["margin"]) => ({
 				marginBottom: value,
 				marginTop: value,
 			}),
 
-			dflex: (value: string) => ({
+			dflex: (value: CSSProperties["justifyContent"]) => ({
 				display: "flex", // row
 				justifyContent: value,
 				alignItems: value,
 			}),
-			dcolumn: (value: string) => ({
+			dcolumn: (value: CSSProperties["justifyContent"]) => ({
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: value,
 				alignItems: value,
 			}),
 
-			sizeMin: (width: number | string) => ({
+			sizeMin: (width: CSSProperties["width"]) => ({
 				minHeight: width,
 				minWidth: width,
 				height: width,
 				width,
 			}),
 
-			textGradient: (value: number | string) => ({
+			textGradient: (value: CSSProperties["backgroundImage"]) => ({
 				backgroundImage: `linear-gradient(${value})`,
 				WebkitTextFillColor: "transparent",
 				WebkitBackgroundClip: "text",
 			}),
 
-			ls: (letterSpacing: number | string) => ({ letterSpacing }),
-			fw: (fontWeight: string | number) => ({ fontWeight }),
-			lh: (lineHeight: number | string) => ({ lineHeight }),
-			fs: (fontSize: number | string) => ({ fontSize }),
-			ff: (fontFamily: string) => ({ fontFamily }),
-			ta: (textAlign: string) => ({ textAlign }),
-			c: (color: string) => ({ color }),
+			ls: (letterSpacing: CSSProperties["letterSpacing"]) => ({
+				letterSpacing,
+			}),
+			fw: (fontWeight: CSSProperties["fontWeight"]) => ({ fontWeight }),
+			lh: (lineHeight: CSSProperties["lineHeight"]) => ({ lineHeight }),
+			ff: (fontFamily: CSSProperties["fontFamily"]) => ({ fontFamily }),
+			ta: (textAlign: CSSProperties["textAlign"]) => ({ textAlign }),
+			fs: (fontSize: CSSProperties["fontSize"]) => ({ fontSize }),
+			c: (color: CSSProperties["color"]) => ({ color }),
 
-			br: (borderRadius: number | string) => ({ borderRadius }),
-			jc: (justifyContent: string) => ({ justifyContent }),
-			bs: (boxShadow: number | string) => ({ boxShadow }),
-			fd: (flexDirection: string) => ({ flexDirection }),
-			b: (border: string | number) => ({ border }),
-			bg: (background: string) => ({ background }),
-			ox: (overflowX: string) => ({ overflowX }),
-			oy: (overflowY: string) => ({ overflowY }),
-			ov: (overflow: string) => ({ overflow }),
-			d: (display: string) => ({ display }),
+			jc: (justifyContent: CSSProperties["justifyContent"]) => ({
+				justifyContent,
+			}),
+			fd: (flexDirection: CSSProperties["flexDirection"]) => ({
+				flexDirection,
+			}),
+			br: (borderRadius: CSSProperties["borderRadius"]) => ({ borderRadius }),
+			bg: (background: CSSProperties["background"]) => ({ background }),
+			bs: (boxShadow: CSSProperties["boxShadow"]) => ({ boxShadow }),
+			ox: (overflowX: CSSProperties["overflowX"]) => ({ overflowX }),
+			oy: (overflowY: CSSProperties["overflowY"]) => ({ overflowY }),
+			ov: (overflow: CSSProperties["overflow"]) => ({ overflow }),
+			d: (display: CSSProperties["display"]) => ({ display }),
+			b: (border: CSSProperties["border"]) => ({ border }),
 
-			scroll: (size: string | number) => ({
+			scroll: (size: CSSProperties["width"]) => ({
 				/* width */
 				"&::-webkit-scrollbar": { d: "block", size },
 
@@ -306,7 +314,6 @@ export const GlobalCSS = globalCss({
 		margin: 0,
 
 		overscrollBehavior: "none",
-		// outline: "none !important",
 	},
 
 	"*": {
@@ -399,7 +406,7 @@ export const GlobalCSS = globalCss({
 			pointerEvents: "none",
 			transition: "none",
 
-			"&::before, &&::after": { content: "none" },
+			"&::before, &::after": { content: "none" },
 		},
 	},
 });

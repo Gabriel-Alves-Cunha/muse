@@ -2,6 +2,11 @@ import { Trigger } from "@radix-ui/react-dialog";
 
 import { styled } from "@styles/global";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Main function:
+
 export const DialogTrigger = ({ children, className, tooltip }: Props) => (
 	<StyledDialogTrigger
 		className={className + " notransition"}
@@ -11,6 +16,11 @@ export const DialogTrigger = ({ children, className, tooltip }: Props) => (
 		{children}
 	</StyledDialogTrigger>
 );
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Styles:
 
 const StyledDialogTrigger = styled(Trigger, {
 	m: "unset",
@@ -37,6 +47,11 @@ const StyledDialogTrigger = styled(Trigger, {
 		},
 	},
 });
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 type Props = Readonly<
 	{ children: React.ReactNode; className?: string; tooltip: string; }

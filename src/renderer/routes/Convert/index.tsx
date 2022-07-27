@@ -48,12 +48,12 @@ export function Convert() {
 	// Start converting
 	useEffect(() => {
 		// If there are selected files, convert them:
-		if (selectedFiles.size > 0) {
-			// To start convert, add to the convertInfoList:
-			useNewConvertions.setState({ newConvertions: selectedFiles });
+		if (!(selectedFiles.size > 0)) return;
 
-			setSelectedFiles(emptyMap);
-		}
+		// To start convert, add to the convertInfoList:
+		useNewConvertions.setState({ newConvertions: selectedFiles });
+
+		setSelectedFiles(emptyMap);
 	}, [toExtension, selectedFiles]);
 
 	useEffect(() => {

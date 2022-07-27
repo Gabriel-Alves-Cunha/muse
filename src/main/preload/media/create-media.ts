@@ -23,12 +23,15 @@ async function createMedia(
 
 		time(() => {
 			const {
-				tag: { pictures, title, album, genres, albumArtists },
+				tag: { pictures, title, album = "", genres, albumArtists },
 				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 			} = MediaFile.createFromPath(path);
 
 			const durationInSeconds = durationMilliseconds / 1_000;
+
+			/////////////////////////////////////////////
+			/////////////////////////////////////////////
 
 			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60)
 				return reject(
@@ -41,6 +44,9 @@ async function createMedia(
 				return reject(
 					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`,
 				);
+
+			/////////////////////////////////////////////
+			/////////////////////////////////////////////
 
 			const picture: IPicture | undefined = pictures[0];
 			const mimeType = picture?.mimeType;
@@ -93,5 +99,5 @@ export async function transformPathsToMedias(
 		console.groupEnd();
 
 		return medias;
-	}, "transformPathsToMedias");
+	}, "create and transform paths to medias");
 }

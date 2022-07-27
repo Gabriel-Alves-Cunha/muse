@@ -38,10 +38,17 @@ const { setState: setProgress } = useProgress;
 ///////////////////////////////////////
 // Main function:
 
+const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
+	state.sortedByName;
+
+const currentPlayingPathSelector = (
+	state: ReturnType<typeof useCurrentPlaying.getState>,
+) => state.path;
+
 export function MediaPlayer() {
-	const { sortedByName: mainList } = usePlaylists();
+	const path = useCurrentPlaying(currentPlayingPathSelector) ?? "";
 	const audioRef = useRef<HTMLAudioElement>(null);
-	const path = useCurrentPlaying().path ?? "";
+	const mainList = usePlaylists(mainListSelector);
 
 	const media = mainList.get(path);
 	const audio = audioRef.current;

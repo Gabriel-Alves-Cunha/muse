@@ -39,8 +39,12 @@ export function Download() {
 ////////////////////////////////////////////////
 // Helper functions:
 
+const errorAndUrlSelectors = (
+	{ error, url }: ReturnType<typeof useSearchInfo.getState>,
+) => ({ error, url });
+
 function SearcherWrapper() {
-	const { error, url } = useSearchInfo();
+	const { error, url } = useSearchInfo(errorAndUrlSelectors);
 
 	useEffect(() => {
 		const searchTimeout = setTimeout(async () => await search(url), 300);
@@ -74,23 +78,29 @@ function SearcherWrapper() {
 
 ////////////////////////////////////////////////
 
+const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
+	state.isLoading;
+
 function IsLoading() {
-	const { isLoading } = useSearchInfo();
+	const isLoading = useSearchInfo(isLoadingSelector);
 
 	return <LoadingWrapper>{isLoading && <Loading />}</LoadingWrapper>;
 }
 
 ////////////////////////////////////////////////
 
-function Result() {
-	const { result } = useSearchInfo();
+const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
+	state.result;
 
-	return result ?
+function Result() {
+	const { imageURL, title } = useSearchInfo(resultSelector);
+
+	return title ?
 		(
 			<ResultContainer>
-				<img src={result.imageURL} alt="Video thumbnail." />
+				<img src={imageURL} alt="Video thumbnail." />
 
-				<p>{result.title}</p>
+				<p>{title}</p>
 
 				<Button variant="large" onClick={downloadMedia}>Download</Button>
 			</ResultContainer>

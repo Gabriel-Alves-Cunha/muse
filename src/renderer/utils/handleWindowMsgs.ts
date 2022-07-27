@@ -233,7 +233,6 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			);
 
 			assertUnreachable(msg);
-			break;
 		}
 	}
 }

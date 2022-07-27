@@ -1,5 +1,7 @@
 import { vi } from "vitest";
 
+import { stringifyJson } from "@common/utils";
+
 // Mocking window.localStorage
 class LocalStorageMock {
 	#store: Record<string, string>;
@@ -73,7 +75,7 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 				"%cwindow.postMessage arguments =",
 				"color:blue",
 				// eslint-disable-next-line prefer-rest-params
-				JSON.stringify(arguments, null, 2),
+				stringifyJson(arguments),
 			);
 		}),
 		requestAnimationFrame: vi.fn().mockImplementation((cb: () => void) => cb()),

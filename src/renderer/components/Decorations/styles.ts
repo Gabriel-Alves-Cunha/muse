@@ -31,8 +31,8 @@ export const TopWrapper = styled("header", {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const DownWrapper = styled("header", {
-	pos: "absolute",
+export const DownWrapper = styled("footer", {
+	pos: "relative", // For some reason 'absolute' makes it behave weird with the ctx menu...
 	d: "flex", // row
 	justifyContent: "space-between",
 	alignItems: "center",
@@ -43,19 +43,49 @@ export const DownWrapper = styled("header", {
 
 	userSelect: "none",
 	bg: "$scrollbar",
+
+	"& p": {
+		dflex: "center",
+		h: "100%",
+
+		c: "$alternative-text",
+		ff: "$secondary",
+		ls: "0.03rem",
+		fs: "0.9rem",
+		ta: "center",
+		fw: 500,
+	},
 });
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const LeftSlot = styled("div", { gap: 8, "&:first-child": { pl: 8 } });
+const gap = "12px";
+
+export const LeftSlot = styled("div", {
+	d: "flex", // row
+	justifyContent: "left",
+	alignItems: "center",
+
+	gap,
+
+	"&:first-child": { pl: gap },
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const RightSlot = styled("div", { gap: 8, "&:last-child": { pr: 8 } });
+export const RightSlot = styled("div", {
+	d: "flex", // row
+	justifyContent: "left",
+	alignItems: "center",
+
+	gap,
+
+	"&:last-child": { pr: gap },
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////

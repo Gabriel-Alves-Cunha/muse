@@ -1,7 +1,5 @@
 import { type RefObject, useEffect } from "react";
 
-type Handler = (event: MouseEvent | TouchEvent) => void;
-
 /**
  * It's worth noting that because passed in `handler` is a new
  * function on every render, that will cause this effect
@@ -32,3 +30,5 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 		};
 	}, [ref, handler]);
 }
+
+type Handler = (event: MouseEvent | TouchEvent) => void;

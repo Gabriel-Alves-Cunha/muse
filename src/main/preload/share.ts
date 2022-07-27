@@ -91,6 +91,8 @@ function getMyIpAddress(): Readonly<string> {
 }
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 // Main function:
 
 export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
@@ -99,6 +101,8 @@ export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
 		// will try again after changing the port:
 		let errorListening = false;
 		let port = 8_000;
+
+		///////////////////////////////////////////
 
 		function handleCloseServer(err: Error): void {
 			error("Error on server. Closing it.", { err });
@@ -230,6 +234,7 @@ export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
 		///////////////////////////////////////////
 		///////////////////////////////////////////
 		///////////////////////////////////////////
+		// Return:
 
 		const responseApi: TurnServerOnReturn = Object.freeze({
 			addListener: (event: string, listener: (...args: unknown[]) => void) =>
@@ -243,6 +248,9 @@ export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
 }
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 export type TurnServerOnReturn = Readonly<
 	{

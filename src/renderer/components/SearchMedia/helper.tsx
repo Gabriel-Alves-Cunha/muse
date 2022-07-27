@@ -55,7 +55,7 @@ const { setState: setSearcher } = useSearcher;
 /////////////////////////////////////////
 
 const updateSearchTerm = (e: InputChange) =>
-	setSearcher({ searchTerm: e.target.value.toLowerCase() });
+	setSearcher({ searchTerm: e.target.value });
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -85,12 +85,15 @@ export function InputAndResults() {
 	// I found that such time had to be high, I settled on
 	// a time of 200ms, but maybe on a slow machine it could
 	// be need a higher time for the event to bubble...
-	useOnClickOutside(inputRef, () =>
-		isOnFocus && setTimeout(() => {
+	useOnClickOutside(inputRef, () => {
+		if (!isOnFocus) return;
+
+		setTimeout(() => {
 			setSearcher(defaultSearcher);
 			setIsOnFocus(false);
 			inputRef.current?.blur();
-		}, 200));
+		}, 200);
+	});
 
 	/////////////////////////////////////////
 
@@ -186,7 +189,18 @@ export function InputAndResults() {
 /////////////////////////////////////////
 
 function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
-	const index = title.toLowerCase().indexOf(highlight);
+	/** normalize()ing to NFD Unicode normal form decomposes
+	 * combined graphemes into the combination of simple ones.
+	 * The è of Crème ends up expressed as e +  ̀.
+	 * It is now trivial to globally get rid of the diacritics,
+	 * which the Unicode standard conveniently groups as the
+	 * Combining Diacritical Marks Unicode block.
+	 */
+	const index = title
+		.toLowerCase()
+		.normalize("NFD")
+		.replace(/\p{Diacritic}/gu, "")
+		.indexOf(highlight);
 
 	return (
 		<Result
@@ -226,8 +240,12 @@ type Searcher = Readonly<
 	}
 >;
 
+/////////////////////////////////////////
+
 type RowProps = Readonly<
 	{ highlight: Lowercase<string>; media: Media; path: Path; }
 >;
+
+/////////////////////////////////////////
 
 type InputChange = Readonly<React.ChangeEvent<HTMLInputElement>>;

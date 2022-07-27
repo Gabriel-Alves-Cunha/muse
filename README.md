@@ -10,6 +10,7 @@
 
 - [Layout](#Layout)
 - [Tecnologies](#Tecnologies)
+- [Features](#Features)
 - [Installing](#Installing)
 - [Requirements](#Requirements)
 - [Contributing](#Contributing)
@@ -43,6 +44,13 @@ The following tools were used on this project construction:
 - [React Icons](https://react-icons.github.io/react-icons/)
 - [Node TagLib Sharp](https://github.com/benrr101/node-taglib-sharp)
 - [Fluent ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
+
+## Features
+
+* Copy an URL and see a message asking if you want to download
+an 'mp3' version of the media.
+
+* Share medias with devices on the same WiFi network.
 
 ## 🚀 Installing
 

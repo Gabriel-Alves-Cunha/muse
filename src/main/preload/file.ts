@@ -3,6 +3,10 @@ import type { Path } from "@common/@types/generalTypes";
 import { readdir, unlink, access } from "node:fs/promises";
 import { join } from "node:path";
 
+///////////////////////////////////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+
 export async function getFullPathOfFilesForFilesInThisDirectory(
 	dir: Readonly<Path>,
 ): Promise<readonly Path[]> {
@@ -13,12 +17,16 @@ export async function getFullPathOfFilesForFilesInThisDirectory(
 		.map(filename => join(dir, filename));
 }
 
+///////////////////////////////////////////
+
 export async function readDir(dir: Readonly<Path>): Promise<readonly Path[]> {
 	return await readdir(dir).catch(err => {
 		console.error(err);
 		return [];
 	});
 }
+
+///////////////////////////////////////////
 
 export async function deleteFile(
 	path: Readonly<Path>,
@@ -28,6 +36,8 @@ export async function deleteFile(
 		return false;
 	});
 }
+
+///////////////////////////////////////////
 
 export async function pathExists(
 	path: Readonly<Path>,

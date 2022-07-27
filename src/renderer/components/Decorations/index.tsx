@@ -4,8 +4,10 @@ import {
 	VscClose as Close,
 } from "react-icons/vsc";
 
+import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
-import { MediasInfo } from "@components/MediasInfo";
+import { NumberOfMedias } from "./NumberOfMedias";
+import { MediasInfo } from "@components/Decorations/MediasInfo";
 import { usePage } from "@contexts/page";
 import {
 	toggleMaximize,
@@ -20,10 +22,14 @@ import {
 	WindowButton,
 	DownWrapper,
 	TopWrapper,
-	AppIcon,
-	LeftSlot,
 	RightSlot,
+	LeftSlot,
+	AppIcon,
 } from "./styles";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export const DecorationsTop = () => (
 	<TopWrapper>
@@ -43,15 +49,23 @@ export const DecorationsTop = () => (
 	</TopWrapper>
 );
 
+/////////////////////////////////////////////
+
 export const DecorationsDown = () => (
 	<DownWrapper>
 		<LeftSlot>
+			<NumberOfMedias />
+
 			<MediasInfo />
 		</LeftSlot>
 
-		<RightSlot></RightSlot>
+		<RightSlot>
+			<NumberOfMediasSelected />
+		</RightSlot>
 	</DownWrapper>
 );
+
+/////////////////////////////////////////////
 
 const Buttons = () => (
 	<WindowButtonsWrapper className="notransition">
@@ -77,6 +91,8 @@ const Buttons = () => (
 		</WindowButton>
 	</WindowButtonsWrapper>
 );
+
+/////////////////////////////////////////////
 
 function AppNamePlusFolder() {
 	const { page } = usePage();

@@ -238,7 +238,6 @@ function handleUpdateDownloadingList(
 
 		default:
 			assertUnreachable(data.status);
-			break;
 	}
 }
 

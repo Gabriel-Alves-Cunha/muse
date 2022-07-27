@@ -6,6 +6,8 @@ export function getBasename(filename: Readonly<string>): Readonly<string> {
 	return filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
 }
 
+/////////////////////////////////////////
+
 export function getPathWithoutExtension(
 	filename: Readonly<string>,
 ): Readonly<string> {
@@ -16,6 +18,8 @@ export function getPathWithoutExtension(
 	return filename.slice(0, lastIndex);
 }
 
+/////////////////////////////////////////
+
 /**
  * This doesn't handle files with only extensions,
  * e.g.: '.gitignore' will result in ''.
@@ -23,6 +27,8 @@ export function getPathWithoutExtension(
 export function getLastExtension(filename: Readonly<string>): Readonly<string> {
 	return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
 }
+
+/////////////////////////////////////////
 
 export function getBasenameAndExtension(
 	filename: Readonly<string>,

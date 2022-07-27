@@ -186,6 +186,7 @@ function handleAlbum(file: MediaFile, album: string): void {
 
 /////////////////////////////////////////////
 
+/** Returns a new file name if it exists, otherwise, just an empty string. */
 function handleTitle(
 	file: MediaFile,
 	oldMediaPath: string,
@@ -210,7 +211,7 @@ function handleTitle(
 
 /////////////////////////////////////////////
 
-async function talkToClientToGetTheNewMedia(
+async function talkToClientSoItCanGetTheNewMedia(
 	fileNewPath: Readonly<string>,
 	mediaPath: Readonly<string>,
 	isNewMedia: Readonly<boolean> = false,
@@ -258,7 +259,7 @@ async function talkToClientToGetTheNewMedia(
 			mediaPath,
 		});
 	/////////////////////////////////////////////
-	// If everything else fails, refresh media:
+	// If everything else fails, at least refresh media:
 	else
 		sendMsgToClient({
 			type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
@@ -266,6 +267,8 @@ async function talkToClientToGetTheNewMedia(
 		});
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
@@ -300,5 +303,9 @@ export async function writeTags(
 	file.dispose();
 	//
 
-	await talkToClientToGetTheNewMedia(fileNewPath, mediaPath, data.isNewMedia);
+	await talkToClientSoItCanGetTheNewMedia(
+		fileNewPath,
+		mediaPath,
+		data.isNewMedia,
+	);
 }

@@ -24,6 +24,7 @@ const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+// Main function:
 
 export const ContextMenu = (
 	{ children, content = MAIN, onContextMenu, setIsOpen }: Props,
@@ -31,10 +32,12 @@ export const ContextMenu = (
 	<Root onOpenChange={setIsOpen}>
 		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
-		<Content sideOffset={5}>{contentToShow(content)}</Content>
+		<Content>{contentToShow(content)}</Content>
 	</Root>
 );
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions:
 
@@ -54,6 +57,8 @@ function contentToShow(content: NonNullable<Props["content"]>) {
 	}
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 

@@ -9,6 +9,8 @@ export function areObjectKeysEqual(object1: Obj, object2: Obj) {
 	return true;
 }
 
+//////////////////////////////////////////
+
 export function getObjectDeepKeys(obj: Obj): string[] {
 	return Object
 		.keys(obj)

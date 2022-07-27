@@ -39,7 +39,7 @@ export function FullExampleCtxMenu() {
 					</RightSlot>
 				</TriggerItem>
 
-				<Content sideOffset={2} alignOffset={-5}>
+				<Content alignOffset={-5}>
 					<Item>
 						Save Page As… <RightSlot>⌘+S</RightSlot>
 					</Item>

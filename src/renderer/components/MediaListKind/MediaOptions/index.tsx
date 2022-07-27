@@ -6,8 +6,10 @@ import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
+import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { areArraysEqual } from "@utils/array";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteMedia } from "@utils/media";
 import { capitalize } from "@utils/utils";
@@ -32,15 +34,6 @@ import {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-
-const warningSvg = new URL(
-	"../../../assets/icons/warning.svg",
-	import.meta.url,
-);
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
 // Main function:
 
 export function MediaOptionsModal({ media, path }: Props) {
@@ -48,16 +41,20 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		function handleKeyUp({ key }: KeyboardEvent) {
+		function changeMediaMetadataOnEnter({ key }: KeyboardEvent) {
 			if (key === "Enter")
 				changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
 		}
 
 		// This is because if you open the popover by pressing
 		// "Enter", it will just open and close it!
-		setTimeout(() => document.addEventListener("keyup", handleKeyUp), 500);
+		setTimeout(
+			() => document.addEventListener("keyup", changeMediaMetadataOnEnter),
+			500,
+		);
 
-		return () => document.removeEventListener("keyup", handleKeyUp);
+		return () =>
+			document.removeEventListener("keyup", changeMediaMetadataOnEnter);
 	}, [media, path]);
 
 	return (
@@ -93,24 +90,10 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 					<StyledDialogBlurOverlay />
 
-					<StyledDialogContent className="delete-media">
-						<StyledTitle className="subtitle">
-							Are you sure you want to delete this media from your computer?
-						</StyledTitle>
-
-						<FlexRow>
-							<img src={warningSvg.href} alt="Warning sign." id="warning" />
-
-							<CloseDialog
-								onClick={() => handleMediaDeletion(closeButtonRef, path)}
-								className="delete-media"
-							>
-								Confirm
-							</CloseDialog>
-
-							<CloseDialog id="cancel">Cancel</CloseDialog>
-						</FlexRow>
-					</StyledDialogContent>
+					<DeleteMediaDialogContent
+						handleMediaDeletion={() =>
+							handleMediaDeletion(closeButtonRef, path)}
+					/>
 				</Dialog>
 
 				<CloseDialog
@@ -125,6 +108,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 	);
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions:
 
@@ -201,10 +186,7 @@ function changeMetadataIfAllowed(
 							newValueAsArray.pop();
 
 						// If both arrays are equal by values, we don't need to change anything:
-						if (
-							newValueAsArray.length === oldValue.length &&
-							newValueAsArray.every(v => oldValue.includes(v))
-						)
+						if (areArraysEqual(newValueAsArray, oldValue))
 							return console.log(
 								"Values are equal, not gonna change anything:",
 								{ newValueAsArray, oldValue },
@@ -267,6 +249,8 @@ const allowedOptionToChange = Object.freeze(
 	} as const,
 );
 
+/////////////////////////////////////////////
+
 const isChangeable = (option: string): option is ChangeOptions =>
 	Object.keys(allowedOptionToChange).includes(option);
 
@@ -280,14 +264,15 @@ const closeEverything = (
 
 const format = (
 	value: string | readonly string[] | number | undefined,
-):
-	| undefined
-	| string
-	| number => (value instanceof Array ?
-		value.join(", ") :
-		typeof value === "number" ?
-		prettyBytes(value) :
-		value);
+): undefined | string | number => {
+	if (value instanceof Array)
+		return value.join(", ");
+
+	if (typeof value === "number")
+		return prettyBytes(value);
+
+	return value;
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

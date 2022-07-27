@@ -19,7 +19,7 @@ dbg({ font_1, font_2, font_3, font_4 });
 if (isDevelopment) {
 	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
 
-	// @ts-ignore Setting Virtuoso log level
+	// @ts-ignore => Setting Virtuoso log level
 	globalThis.VIRTUOSO_LOG_LEVEL = LogLevel.DEBUG;
 }
 

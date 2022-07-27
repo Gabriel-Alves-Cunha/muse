@@ -7,6 +7,7 @@ import { memo } from "react";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
+import { PlaylistList, mainList } from "@contexts/mediaHandler/usePlaylists";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
@@ -14,9 +15,7 @@ import { DialogTrigger } from "@components/DialogTrigger";
 import {
 	addToAllSelectedMedias,
 	toggleSelectedMedia,
-	PlaylistList,
-	mainList,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/mediaHandler/useAllSelectedMedias";
 
 import { StyledDialogBlurOverlay } from "./MediaOptions/styles";
 import {
@@ -53,7 +52,7 @@ export function selectMedia(e: React.MouseEvent<HTMLSpanElement>): void {
 		HTMLDivElement
 	>(rowWrapperClassName);
 
-	if (!itemClicked) return console.warn("No media row found.");
+	if (!itemClicked) return console.warn("No media item found.");
 
 	const itemClickedMediaPath = itemClicked.getAttribute("data-path");
 
@@ -147,16 +146,14 @@ Row.displayName = "Row";
 export const computeItemKey = (
 	_index: number,
 	[path]: [Path, Media, DateAsNumber],
-) => path;
+): Path => path;
 
 /////////////////////////////////////////
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const computeHistoryItemKey = (
 	_index: number,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	[path, _, date]: [Path, Media, DateAsNumber],
-) => `${path}•${date}`;
+	[path, , date]: [Path, Media, DateAsNumber],
+): `${Path}•${DateAsNumber}` => `${path}•${date}`;
 
 /////////////////////////////////////////
 

@@ -67,24 +67,7 @@ export const StyledDialogContent = styled(Content, {
 
 	animation: `${overlayShow} 90ms linear`,
 
-	"&.delete-media": {
-		pos: "fixed",
-		d: "grid",
-		w: 300,
-
-		// Centered:
-		transform: "translate(-50%, -50%)",
-		l: "50%",
-		t: "50%",
-
-		bg: "$bg-dialog",
-		bs: "$dialog",
-		zIndex: 150,
-		p: 30,
-		br: 4,
-
-		"& #warning": { size: 35, mr: "auto" },
-	},
+	"&.delete-media": { w: 300, "& #warning": { size: 35, mr: "auto" } },
 });
 
 /////////////////////////////////////////

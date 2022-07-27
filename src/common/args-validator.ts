@@ -1,5 +1,7 @@
 import Validator, { type ValidationError } from "fastest-validator";
 
+import { stringifyJson } from "./utils";
+
 export const validator = new Validator();
 
 export function checkOrThrow(
@@ -7,5 +9,5 @@ export function checkOrThrow(
 ): void {
 	if (result === true) return;
 
-	throw new Error(JSON.stringify(result, null, 2));
+	throw new Error(stringifyJson(result));
 }

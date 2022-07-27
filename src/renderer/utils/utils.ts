@@ -1,4 +1,4 @@
-import { dbg } from "@common/utils";
+import { dbg, stringifyJson } from "@common/utils";
 
 const { random, floor } = Math;
 
@@ -24,7 +24,7 @@ export const capitalize = (string: string) =>
 //////////////////////////////////////////
 
 export function assertUnreachable(received: never): never {
-	const error = JSON.stringify(received, null, 2) ?? received;
+	const error = stringifyJson(received) ?? received;
 
 	throw new Error(
 		"I shouldn't get here (on 'assertUnreachable')!\nreceived = " + error,
@@ -47,5 +47,5 @@ export function time<T>(fn: () => T, label: string): T {
 		"color:brown",
 	);
 
-	return fnReturn as T;
+	return fnReturn;
 }

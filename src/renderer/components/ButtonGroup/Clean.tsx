@@ -38,7 +38,6 @@ function cleanProperList() {
 
 		default:
 			assertUnreachable(fromList);
-			break;
 	}
 }
 

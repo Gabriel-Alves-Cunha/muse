@@ -3,6 +3,10 @@ import { debug } from "debug";
 const { trunc, floor, random } = Math;
 const { isNaN } = Number;
 
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
 // @ts-ignore => `NODE_ENV` has to be accessed by dot notation:
 export const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -15,8 +19,12 @@ export const dbg = debug(lowercaseAppName);
 
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
+/////////////////////////////////////////
+
 export const separatedByCommaOrSemiColorOrSpace = /,|;| /gm;
 export const separatedByCommaOrSemiColon = /,|;/gm;
+
+/////////////////////////////////////////
 
 export const allowedMedias = Object.freeze(
 	[
@@ -36,6 +44,8 @@ export const allowedMedias = Object.freeze(
 );
 export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 
+/////////////////////////////////////////
+
 export function formatDuration(time: number | undefined): Readonly<string> {
 	if (!time || isNaN(time)) return "00:00";
 	time = trunc(time);
@@ -50,22 +60,31 @@ export function formatDuration(time: number | undefined): Readonly<string> {
 		(minutes + ":" + seconds));
 }
 
+/////////////////////////////////////////
+
 export function makeRandomString(length = 15): Readonly<string> {
-	const characters =
+	const chars =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	const charactersLength = characters.length;
 
 	const result = [];
 	for (let i = 0; i < length; ++i)
-		result.push(characters.charAt(floor(random() * charactersLength)));
+		result.push(chars.charAt(floor(random() * chars.length)));
 
 	return result.join("");
 }
+
+/////////////////////////////////////////
 
 export function sleep(ms: number, logFn?: () => void): Promise<void> {
 	logFn?.();
 
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/////////////////////////////////////////
+
+export const stringifyJson = (obj: unknown) => JSON.stringify(obj, null, 2);
+
+/////////////////////////////////////////
 
 export const eraseImg = "erase img";

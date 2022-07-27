@@ -72,6 +72,9 @@ export async function convertToAudio(
 
 	const titleWithExtension = sanitize(`${getBasename(path)}.${toExtension}`);
 
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
 	{
 		// Assert files don't have the same extension
 		const pathWithNewExtension = join(dirname(path), titleWithExtension);
@@ -99,14 +102,22 @@ export async function convertToAudio(
 		}
 	}
 
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
 	const saveSite = join(dirs.music, titleWithExtension);
 	const readStream = createReadStream(path);
 	let interval: NodeJS.Timer | undefined;
 
 	dbg(`Creating stream for "${path}" to convert to "${toExtension}".`);
 
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
 	// Receive the readStream of path and act with ffmpeg on it:
 	fluent_ffmpeg(readStream)
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		.on("progress", ({ targetSize, timemark }: Progress) => {
 			// targetSize: current size of the target file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
@@ -115,11 +126,10 @@ export async function convertToAudio(
 			if (!interval) {
 				// ^ Only in the firt time this setInterval is called!
 				interval = setInterval(() =>
-					electronPort!
-						.postMessage({
-							sizeConverted: targetSize,
-							timeConverted: timemark,
-						}), 750);
+					electronPort!.postMessage({
+						sizeConverted: targetSize,
+						timeConverted: timemark,
+					}), 750);
 
 				// Send a message to client that we're starting a conversion:
 				const msg: Partial<MediaBeingConverted> = {
@@ -129,6 +139,8 @@ export async function convertToAudio(
 					.postMessage(msg);
 			}
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		.on("error", async err => {
 			error(`Error converting file: "${titleWithExtension}"!`, err);
 
@@ -155,6 +167,8 @@ export async function convertToAudio(
 				await pathExists(saveSite),
 			);
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		.on("end", async () => {
 			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
@@ -190,6 +204,9 @@ export async function convertToAudio(
 			electronPort!.close();
 			readStream.close();
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
 		.on("destroy", async () => {
 			log(
 				`%cDestroy was called on readStream for converter! path: ${path}`,
@@ -223,12 +240,18 @@ export async function convertToAudio(
 				await pathExists(saveSite),
 			);
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		.save(saveSite);
+
+	/////////////////////////////////////////////
 
 	mediasConverting.set(path, readStream);
 	dbg(`Added "${path}" to mediasConverting:`, mediasConverting);
 }
 
+////////////////////////////////////////////
+////////////////////////////////////////////
 ////////////////////////////////////////////
 // Types:
 
@@ -240,5 +263,7 @@ export type CreateConversion = Readonly<
 		path: Path;
 	}
 >;
+
+/////////////////////////////////////////////
 
 type Progress = Readonly<{ targetSize: number; timemark: number; }>;

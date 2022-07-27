@@ -22,17 +22,20 @@ const { turnServerOn, makeItOnlyOneFile } = electron.share;
 /////////////////////////////////////////
 // Constants:
 
-const qrid = "qrcode-canvas";
+const qrID = "qrcode-canvas";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
+const filesToShareSelector = (state: ReturnType<typeof useSettings.getState>) =>
+	state.filesToShare;
+
 export function ShareDialog() {
 	const [server, setServer] = useState<TurnServerOnReturn | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const { filesToShare } = useSettings();
+	const filesToShare = useSettings(filesToShareSelector);
 
 	/////////////////////////////////////////
 
@@ -44,21 +47,18 @@ export function ShareDialog() {
 		async (canvas: HTMLCanvasElement | null) => {
 			if (!canvas || !isDialogOpen || !server) return;
 
-			try {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				await makeQrcode(server.url);
-			} catch (error) {
-				console.error("Error making QR Code.", error);
+			await makeQrcode(server.url).catch(err => {
+				console.error("Error making QR Code.", err);
 				closePopover(server.close);
-			}
+			});
 		},
 		[isDialogOpen, server],
 	);
 
 	/////////////////////////////////////////
 
-	function handleDialogOpenStates(newValue: boolean) {
-		if (newValue === false) server?.close();
+	function handleDialogOpenStates(newValue: boolean): void {
+		if (!newValue) server?.close();
 
 		setIsDialogOpen(newValue);
 	}
@@ -129,7 +129,7 @@ export function ShareDialog() {
 						<ol>{namesOfFilesToShare(filesToShare)}</ol>
 					</div>
 
-					<Canvas ref={onCanvasElementMakeQRCode} id={qrid}>
+					<Canvas ref={onCanvasElementMakeQRCode} id={qrID}>
 						<Loading />
 					</Canvas>
 				</>
@@ -143,7 +143,7 @@ export function ShareDialog() {
 /////////////////////////////////////////
 // Helper functions:
 
-function closePopover(closeServerFunction?: () => void) {
+function closePopover(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
 	setSettings({ filesToShare: emptySet });
@@ -166,7 +166,7 @@ function namesOfFilesToShare(filesToShare: ReadonlySet<Path>): JSX.Element[] {
 async function makeQrcode(url: QRCodeURL): Promise<void> {
 	dbg(`Making QR Code for "${url}"`);
 
-	const canvasElement = document.getElementById(qrid) as HTMLCanvasElement;
+	const canvasElement = document.getElementById(qrID) as HTMLCanvasElement;
 
 	console.assert(canvasElement, "There is no canvas element!");
 

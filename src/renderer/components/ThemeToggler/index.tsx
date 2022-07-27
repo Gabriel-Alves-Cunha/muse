@@ -18,9 +18,10 @@ const html = document.documentElement;
 const light = "light";
 const dark = "dark";
 
-const availableThemes: Readonly<Record<Themes, string>> = Object.freeze(
-	{ light: lightTheme.className, dark: darkTheme.className } as const,
-);
+const availableThemes: Readonly<Record<Themes, string>> = Object.freeze({
+	light: lightTheme.className,
+	dark: darkTheme.className,
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////

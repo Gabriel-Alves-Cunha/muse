@@ -70,7 +70,7 @@ export async function createOrCancelDownload(
 export async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
-	{ electronPort, extension, imageURL, title, url }: CreateDownload,
+	{ electronPort, extension, imageURL, title, url, artist }: CreateDownload,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
 
@@ -96,27 +96,33 @@ export async function createDownload(
 		return;
 	}
 
+	/////////////////////////////////////////////
+
 	let interval: NodeJS.Timer | undefined;
 	const startTime = Date.now();
 	let percentageToSend = 0;
 	let prettyTotal = "";
+
+	/////////////////////////////////////////////
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
 		requestOptions: { maxRetries: 0 },
 		quality: "highestaudio",
 	})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		// On progress, send percentage of download to client:
 		.on("progress", (_, downloaded: number, total: number) => {
 			const percentage = (downloaded / total) * 100;
 			percentageToSend = percentage;
 
-			// To react:
+			// To client:
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort!.postMessage({ percentage: percentageToSend }),
-					750,
+					500,
 				);
 
 				// Save download size to prettyTotal to not keep recalculating
@@ -150,6 +156,8 @@ export async function createDownload(
 				} seconds. ETA: ${estimatedDownloadTime} seconds.`);
 			}
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		// Handle download cancelation:
 		.on("destroy", async () => {
 			log(
@@ -178,6 +186,8 @@ export async function createDownload(
 				await pathExists(saveSite),
 			);
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		.on("end", async () => {
 			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
@@ -193,9 +203,11 @@ export async function createDownload(
 			// Download media image and put it on the media metadata:
 			try {
 				await writeTags(saveSite, {
+					albumArtists: [artist ?? ""],
 					downloadImg: true,
 					isNewMedia: true,
 					imageURL,
+					title,
 				});
 			} catch (error) {
 				console.error(error);
@@ -212,6 +224,8 @@ export async function createDownload(
 			clearInterval(interval);
 			electronPort!.close();
 		})
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 		.on("error", async err => {
 			error(`Error downloading file: "${titleWithExtension}"!`, err);
 
@@ -239,12 +253,18 @@ export async function createDownload(
 			);
 		});
 
+	/////////////////////////////////////////////
+
 	fluent_ffmpeg(readStream).toFormat(extension!).saveToFile(saveSite);
+
+	/////////////////////////////////////////////
 
 	currentDownloads.set(url, readStream);
 	dbg(`Added "${url}" to currentDownloads =`, currentDownloads);
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
@@ -254,6 +274,7 @@ export type CreateDownload = Readonly<
 		extension?: AllowedMedias;
 		imageURL?: string;
 		destroy?: boolean;
+		artist?: string;
 		title?: string;
 		url: string;
 	}

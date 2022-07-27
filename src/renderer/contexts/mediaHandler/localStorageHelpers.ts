@@ -1,6 +1,6 @@
 import type { UsePlaylistsActions } from "./usePlaylists";
-import type { StateCreator, State } from "zustand";
 import type { CurrentPlaying } from "./useCurrentPlaying";
+import type { StateCreator } from "zustand";
 import type { PlayOptions } from "./usePlayOptions";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
@@ -104,7 +104,7 @@ type PopArgument<T extends (...a: never[]) => unknown> = T extends
 
 /////////////////////////////////////////
 
-type Plugin<T extends State> = (
+type Plugin<T extends object> = (
 	f: PopArgument<StateCreator<T, [], []>>,
 	name?: string,
 ) => PopArgument<StateCreator<T, [], []>>;

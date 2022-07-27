@@ -1,13 +1,15 @@
 * FIX: get the picture to go to the media file!!!!
-* REFACTOR: media.ts for better readability.
-* Maybe introduce Remix...
-* Make info
+* ADD: get lyrics
+* FIX: scroll should not appear or take space on delete animation!!
+* ADD: gunzip on client when share!!
 
-NOTES:
+### NOTES:
 
 1. `const { getState: getPage } = usePage;
 		// and then:
 		getPage().page
 	 ` is not reactive!
 
-2.
+2. `const { isLoadingMedias } = usePlaylists();`
+		will rerender not only with `isLoadingMedias`,
+		you have to use a select function.

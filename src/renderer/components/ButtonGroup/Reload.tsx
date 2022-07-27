@@ -8,7 +8,7 @@ import {
 import { ButtonFromGroup } from "./styles";
 
 export function Reload({ className }: Props) {
-	const { isLoadingMedias } = usePlaylists();
+	const isLoadingMedias = usePlaylists(selector);
 
 	return (
 		<ButtonFromGroup
@@ -21,6 +21,9 @@ export function Reload({ className }: Props) {
 		</ButtonFromGroup>
 	);
 }
+
+const selector = (state: ReturnType<typeof usePlaylists.getState>) =>
+	state.isLoadingMedias;
 
 /////////////////////////////////////////////
 // Types:

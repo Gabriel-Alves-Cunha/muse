@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { stringifyJson } from "@common/utils";
+
 export function useLocalStorage<T>(
 	key: string,
 	initialValue: Readonly<NonNullable<T>>,
@@ -31,7 +33,7 @@ export function useLocalStorage<T>(
 				setStoredValue(valueToStore);
 
 				// Save to local storage
-				window.localStorage.setItem(key, JSON.stringify(valueToStore));
+				window.localStorage.setItem(key, stringifyJson(valueToStore));
 			} catch (error) {
 				console.error(error);
 			}

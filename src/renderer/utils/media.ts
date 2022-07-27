@@ -23,7 +23,7 @@ export async function deleteMedia(path: Path) {
 		});
 	} else {
 		errorToast(
-			`Could not delete ${path}\nSee console by pressing 'Ctrl' + 'Shift' + 'i'.`,
+			`Could not delete "${path}"\nSee console by pressing 'Ctrl'+'Shift'+'i'!`,
 		);
 	}
 }

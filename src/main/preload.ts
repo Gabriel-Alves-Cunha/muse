@@ -90,6 +90,7 @@ async function handleMsgsFromRendererProcess(
 				break;
 			}
 
+			// TODO: see if artist is being sent
 			electronPort.onmessage = async ({ data }: { data: CreateDownload; }) =>
 				await createOrCancelDownload({ ...data, electronPort });
 
@@ -149,11 +150,12 @@ async function handleMsgsFromRendererProcess(
 			);
 
 			assertUnreachable(msg);
-			break;
 		}
 	}
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 

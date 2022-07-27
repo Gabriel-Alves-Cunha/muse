@@ -24,7 +24,11 @@ import {
 	ElectronToReactMessageEnum,
 } from "@common/@types/electron-window";
 
-// ------------------------------------------------
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Auto updater setup:
+
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater
@@ -44,12 +48,18 @@ autoUpdater
 
 		dbg(log_message);
 	});
-// -------------------------------------------------
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Variables:
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
 
-async function createWindow(): Promise<BrowserWindow> {
+/////////////////////////////////////////
+
+async function createElectronWindow(): Promise<BrowserWindow> {
 	const window = new BrowserWindow({
 		title: capitalizedAppName,
 		titleBarStyle: "hidden",
@@ -77,7 +87,11 @@ async function createWindow(): Promise<BrowserWindow> {
 			window.focus();
 		});
 
+	/////////////////////////////////////////
+	// Setup Electron global keyboard shortcuts:
+
 	const menu = new Menu();
+
 	menu.append(
 		new MenuItem({
 			label: "Refresh Page",
@@ -88,6 +102,7 @@ async function createWindow(): Promise<BrowserWindow> {
 			}],
 		}),
 	);
+
 	menu.append(
 		new MenuItem({
 			label: "Open/close Dev Tools",
@@ -101,7 +116,10 @@ async function createWindow(): Promise<BrowserWindow> {
 			}],
 		}),
 	);
+
 	Menu.setApplicationMenu(menu);
+
+	/////////////////////////////////////////
 
 	const url = isDevelopment ?
 		"http://localhost:3000" :
@@ -123,7 +141,7 @@ app
 	.on("activate", () => {
 		// On macOS it's common to re-create a window in the app when the
 		// dock icon is clicked and there are no other windows open.
-		if (BrowserWindow.getAllWindows().length === 0) createWindow();
+		if (BrowserWindow.getAllWindows().length === 0) createElectronWindow();
 	})
 	.whenReady()
 	.then(async () => {
@@ -132,7 +150,8 @@ app
 			const url = request.url.substring(7);
 			callback(decodeURI(normalize(url)));
 		});
-		//
+
+		/////////////////////////////////////////
 
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
@@ -141,25 +160,35 @@ app
 		if (isDevelopment) {
 			const devtoolsInstaller = await import("electron-devtools-installer");
 			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-			// @ts-ignore - this is a workaround for a bug in the lib
+			// @ts-ignore => this is a workaround for a bug in the lib:
 			const { default: installExtension } = devtoolsInstaller.default;
 
 			console.log({ installExtension });
 
 			await installExtension(REACT_DEVELOPER_TOOLS, {
 				loadExtensionOptions: { allowFileAccess: true },
-			}) // @ts-ignore - this is a workaround for a bug in the lib
-				.then(name => console.log(`Added Extension: ${name}`)) // @ts-ignore - this is a workaround for a bug in the lib
+			}) // @ts-ignore => this is a workaround for a bug in the lib
+				.then(name => console.log(`Added Extension: ${name}`))
+				// @ts-ignore => this is a workaround for a bug in the lib
 				.catch(err =>
 					console.error("An error occurred while installing extension: ", err)
 				);
 		}
-		//
 
-		electronWindow = await createWindow();
+		/////////////////////////////////////////
+
+		// This variable is needed to hold a reference to the window,
+		// so it doesn't get garbge collected:
+		electronWindow = await createElectronWindow();
+
+		/////////////////////////////////////////
+
+		// Tray setup:
 		tray = new Tray(nativeImage.createFromPath(logoPath));
 		tray.setToolTip("Music player and downloader");
 		tray.setTitle("Muse");
+
+		/////////////////////////////////////////
 
 		// This is to make Electron show a notification
 		// when we copy a link to the clipboard:
@@ -174,7 +203,8 @@ app
 
 					if (!isUrlValid(url)) return;
 
-					const { title, thumbnails } = (await getBasicInfo(url)).videoDetails;
+					const { title, thumbnails, media: { artist = "" } } =
+						(await getBasicInfo(url)).videoDetails;
 
 					new Notification({
 						title: "Click to download this media as 'mp3'",
@@ -188,6 +218,7 @@ app
 							const downloadInfo: DownloadInfo = {
 								imageURL: thumbnails.at(-1)?.url ?? "",
 								extension: "mp3",
+								artist,
 								title,
 								url,
 							};
@@ -207,6 +238,8 @@ app
 			console.error(error);
 		}
 
+		/////////////////////////////////////////
+
 		// This will immediately download an update,
 		// then install when the app quits.
 		setTimeout(
@@ -215,6 +248,10 @@ app
 			5_000,
 		);
 	});
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
@@ -231,6 +268,8 @@ ipcMain.on(
 		);
 	},
 );
+
+/////////////////////////////////////////
 
 ipcMain.on(
 	"notify",
@@ -273,11 +312,15 @@ ipcMain.on(
 				);
 
 				assertUnreachable(type);
-				break;
 			}
 		}
 	},
 );
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 // Also defining it here with all types required so typescript doesn't complain...
 type ClipboardExtended = Electron.Clipboard & {

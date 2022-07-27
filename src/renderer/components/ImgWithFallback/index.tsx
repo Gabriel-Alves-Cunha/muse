@@ -1,7 +1,7 @@
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
 import type { Path } from "@common/@types/generalTypes";
-import { sendMsgToBackend } from "@common/crossCommunication";
 
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 
 /////////////////////////////////////////////

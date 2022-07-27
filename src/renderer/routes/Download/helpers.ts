@@ -12,7 +12,7 @@ const { getBasicInfo } = electron.media;
 // Constants:
 
 const defaultSearchInfo: SearcherInfo = Object.freeze({
-	result: undefined,
+	result: { imageURL: "", artist: "", title: "" },
 	isLoading: false,
 	error: "",
 	url: "",
@@ -28,13 +28,13 @@ export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 // Helper functions:
 
 export function downloadMedia(): void {
-	const { result, url } = searchInfo();
+	const { result: { artist, imageURL, title }, url } = searchInfo();
 
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
-	if (!result || !url) return;
+	if (!title || !url) return;
 
 	// Start download:
-	setDownloadInfo({ imageURL: result.imageURL, title: result.title, url });
+	setDownloadInfo({ imageURL, title, url, artist });
 
 	// Reset values:
 	setSearchInfo(defaultSearchInfo);
@@ -47,7 +47,11 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 	dbg(`Searching for "${url}".`);
 
-	setSearchInfo({ result: undefined, isLoading: true, error: "" });
+	setSearchInfo({
+		result: defaultSearchInfo.result,
+		isLoading: true,
+		error: "",
+	});
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -62,8 +66,8 @@ export async function search(url: Readonly<string>): Promise<void> {
 		setSearchInfo({ isLoading: false, result });
 	} catch (error) {
 		setSearchInfo({
+			result: defaultSearchInfo.result,
 			isLoading: false,
-			result: undefined,
 			error: getErrorMessage(error).includes("No video id found") ?
 				"No video ID found!" :
 				"There was an error getting media information!",
@@ -85,10 +89,5 @@ type UrlMediaMetadata = Readonly<
 ////////////////////////////////////////////////
 
 type SearcherInfo = Readonly<
-	{
-		result: UrlMediaMetadata | undefined;
-		isLoading: boolean;
-		error: string;
-		url: string;
-	}
+	{ result: UrlMediaMetadata; isLoading: boolean; error: string; url: string; }
 >;

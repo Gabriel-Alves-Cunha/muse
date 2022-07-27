@@ -23,8 +23,8 @@ import {
 
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: PlaylistList.MAIN_LIST,
-	path: undefined,
 	currentTime: 0,
+	path: "",
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
@@ -43,15 +43,15 @@ export const { getState: currentPlaying, setState: setCurrentPlaying } =
 ////////////////////////////////////////////////
 // Helper functions:
 
-export function playThisMedia(mediaPath: Path, listType: PlaylistList): void {
+export function playThisMedia(path: Path, listType: PlaylistList): void {
 	// We need to update history:
 	setPlaylists({
 		whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 		type: WhatToDo.UPDATE_HISTORY,
-		path: mediaPath,
+		path,
 	});
 
-	setCurrentPlaying({ path: mediaPath, currentTime: 0, listType });
+	setCurrentPlaying({ path, currentTime: 0, listType });
 }
 
 ////////////////////////////////////////////////
@@ -103,7 +103,7 @@ export function playPreviousMedia(): void {
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
 		const firstMediaPath = getFirstKey(list);
-		let prevMediaPath: Path | undefined;
+		let prevMediaPath: Path = "";
 
 		if (firstMediaPath === path) prevMediaPath = getLastKey(list) as Path;
 		else {
@@ -209,23 +209,30 @@ export function playNextMedia(): void {
 // we don't load the media until the timeout ends.
 let prevMediaTimer: NodeJS.Timeout | undefined;
 
+const currentPlayingPathSelector = (
+	state: ReturnType<typeof useCurrentPlaying.getState>,
+) => state.path;
+
 if (!import.meta.vitest)
-	useCurrentPlaying.subscribe(({ path }) => path, function setAudioSource() {
-		clearTimeout(prevMediaTimer);
+	useCurrentPlaying.subscribe(
+		currentPlayingPathSelector,
+		function setAudioSource() {
+			clearTimeout(prevMediaTimer);
 
-		const { path } = currentPlaying();
-		if (!path) return;
+			const { path } = currentPlaying();
+			if (!path) return;
 
-		const pathForElectron = `atom:///${path}`;
+			const pathForElectron = `atom:///${path}`;
 
-		const mediaTimer = setTimeout(
-			() => ((document.getElementById("audio") as HTMLAudioElement).src =
-				pathForElectron),
-			150,
-		);
+			const mediaTimer = setTimeout(
+				() => ((document.getElementById("audio") as HTMLAudioElement).src =
+					pathForElectron),
+				150,
+			);
 
-		prevMediaTimer = mediaTimer;
-	});
+			prevMediaTimer = mediaTimer;
+		},
+	);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -233,5 +240,5 @@ if (!import.meta.vitest)
 // Types:
 
 export type CurrentPlaying = Readonly<
-	{ listType: PlaylistList; path: Path | undefined; currentTime: number; }
+	{ listType: PlaylistList; path: Path; currentTime: number; }
 >;

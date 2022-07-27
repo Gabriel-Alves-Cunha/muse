@@ -33,7 +33,7 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const searchDirectoryResult = async () =>
+export const searchDirectoryResult = async (): Promise<readonly string[]> =>
 	await time(
 		async () =>
 			(await Promise.allSettled([
@@ -41,7 +41,7 @@ export const searchDirectoryResult = async () =>
 				getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
 				getFullPathOfFilesForFilesInThisDirectory(dirs.music),
 			]))
-				.map(p => (p.status === "fulfilled" ? p.value : undefined))
+				.map(p => (p.status === "fulfilled" ? p.value : false))
 				.filter(Boolean)
 				.flat() as readonly string[],
 		"searchDirectoryResult",
@@ -51,8 +51,9 @@ export const searchDirectoryResult = async () =>
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const searchDirectoryForMedias = async (directory: string) =>
-	getAllowedMedias(await readDir(directory));
+export const searchDirectoryForMedias = async (
+	directory: string,
+): Promise<readonly string[]> => getAllowedMedias(await readDir(directory));
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -70,8 +71,10 @@ export const getAllowedMedias = (
 ////////////////////////////////////////////////
 
 export function sortByDate(list: MainList): ReadonlySet<Path> {
-	const listAsArrayOfPaths = [...list]
-		.sort(([, prevMedia], [, nextMedia]) => {
+	const listAsArrayOfPaths = Array
+		.from(list)
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		.sort(([_, prevMedia], [__, nextMedia]) => {
 			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
 			if (prevMedia.birthTime < nextMedia.birthTime) return -1;
 			// a must be equal to b:
@@ -87,7 +90,8 @@ export function sortByDate(list: MainList): ReadonlySet<Path> {
 ////////////////////////////////////////////////
 
 export function sortByName(list: MainList): MainList {
-	const listAsArrayOfPaths = [...list].sort(([, prevMedia], [, nextMedia]) => {
+	const listAsArrayOfPaths = Array.from(list)// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	.sort(([_, prevMedia], [__, nextMedia]) => {
 		const prevTitle = prevMedia.title.toLocaleLowerCase();
 		const nextTitle = nextMedia.title.toLocaleLowerCase();
 

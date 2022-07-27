@@ -44,10 +44,15 @@ export const StyledContent = styled(Content, {
 
 	bg: "$bg-popover",
 	ox: "hidden",
+	ml: 10,
 	br: 10,
 	p: 10,
 
 	boxShadow: "$popover",
+	zIndex: 100,
+	scroll: 2,
+
+	/////////////////////////////////////////
 
 	"@media (prefers-reduced-motion: no-preference)": {
 		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
@@ -61,6 +66,8 @@ export const StyledContent = styled(Content, {
 			"&[data-side='top']": { animationName: slideDownAndFade },
 		},
 	},
+
+	/////////////////////////////////////////
 
 	"& > p": {
 		pos: "relative",
@@ -78,9 +85,11 @@ export const StyledContent = styled(Content, {
 		fw: 500,
 	},
 
+	/////////////////////////////////////////
+
 	"&:focus": { boxShadow: "$popover", outline: "none" },
 
-	scroll: 2,
+	/////////////////////////////////////////
 
 	variants: {
 		size: {

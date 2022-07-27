@@ -1,9 +1,10 @@
+import { Trigger } from "@radix-ui/react-dialog";
 import {
 	ItemIndicator as CtxItemIndicator,
 	CheckboxItem as CtxCheckboxItem,
-	TriggerItem as CtxTriggerItem,
 	RadioItem as CtxRadioItem,
 	Separator as CtxSeparator,
+	Trigger as CtxTrigger,
 	Content as CtxContent,
 	Label as CtxLabel,
 	Item as CtxItem,
@@ -16,10 +17,10 @@ import { styled } from "@styles/global";
 /////////////////////////////////////////
 
 export const Content = styled(CtxContent, {
-	ov: "hidden",
 	minWidth: 220,
 
 	bg: "$bg-ctx-menu",
+	zIndex: 200,
 	br: 6,
 	p: 5,
 
@@ -58,6 +59,37 @@ export const itemStyles = styled("div", {
 	},
 
 	"&:focus": { c: "$ctx-menu-item-text-focus", bg: "$ctx-menu-item-bg-focus" },
+});
+
+export const TriggerToDeleteMedia = styled(Trigger, {
+	all: "unset",
+
+	pos: "relative",
+	d: "flex",
+	alignItems: "center",
+	w: 180,
+	h: 25,
+
+	cursor: "pointer",
+	border: "none",
+	p: "0 5px",
+	pl: 25,
+	br: 3,
+
+	c: "$ctx-menu-item-text",
+	ff: "$secondary",
+	ls: "0.03rem",
+	fs: 15,
+	lh: 1,
+
+	userSelect: "none",
+
+	"&:focus, &:hover": {
+		c: "$ctx-menu-item-text-focus",
+		bg: "$ctx-menu-item-bg-focus",
+
+		"& svg": { color: "$ctx-menu-item-text-focus" },
+	},
 });
 
 /////////////////////////////////////////
@@ -103,7 +135,7 @@ export const RadioItem = styled(CtxRadioItem, { ...itemStyles });
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const TriggerItem = styled(CtxTriggerItem, {
+export const TriggerItem = styled(CtxTrigger, {
 	"&[data-state='open']": { c: "$ctx-menu-item-text", bg: "white" },
 
 	...itemStyles,

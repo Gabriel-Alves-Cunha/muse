@@ -1,3 +1,5 @@
+import { stringifyJson } from "@common/utils";
+
 type ErrorWithMessage = { message: string; };
 
 const isErrorWithMessage = (error: unknown): error is ErrorWithMessage =>
@@ -7,7 +9,7 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 	if (isErrorWithMessage(maybeError)) return maybeError;
 
 	try {
-		return new Error(JSON.stringify(maybeError, null, 2));
+		return new Error(stringifyJson(maybeError));
 	} catch (error) {
 		// Fallback in case there's an error stringifying
 		return new Error(String(maybeError));
