@@ -243,6 +243,7 @@ const allowedOptionToChange = Object.freeze(
 	{
 		artist: "albumArtists",
 		imageURL: "imageURL",
+		lyrics: "lyrics",
 		genres: "genres",
 		album: "album",
 		title: "title",

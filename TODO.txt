@@ -1,5 +1,5 @@
 * FIX: get the picture to go to the media file!!!!
-* ADD: get lyrics
+* ADD: get lyrics on input edit
 * FIX: scroll should not appear or take space on delete animation!!
 * ADD: gunzip on client when share!!
 

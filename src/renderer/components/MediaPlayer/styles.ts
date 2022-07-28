@@ -12,7 +12,7 @@ const padding = "10px";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Wrapper = styled("section", {
+export const Wrapper = styled("aside", {
 	gridArea: "media-player",
 
 	pos: "relative",
@@ -121,9 +121,8 @@ export const ControlsAndSeekerContainer = styled("div", {
 	pos: "absolute",
 	d: "flex",
 	fd: "column",
+	w: "100%",
 	bottom: 40,
-
-	w: `calc(100% - 2 * ${padding})`,
 });
 
 /////////////////////////////////////////
@@ -151,7 +150,7 @@ export const Duration = styled("div", {
 	"& p": {
 		c: "$media-player-icons",
 		ff: "$primary",
-		ls: "0.03em",
+		ls: "0.03rem",
 		ta: "center",
 		fs: "1rem",
 
@@ -203,6 +202,8 @@ export const CircledIconButton = styled("button", {
 		bg: "$media-player-icon-button-hovered",
 	},
 
+	"&:disabled": { transition: "none", cursor: "default", bg: "none" },
+
 	variants: { size: { small: { size: 30 }, large: { size: 50, mx: 5 } } },
 
 	defaultVariants: { size: "small" },
@@ -240,6 +241,26 @@ export const ProgressWrapper = styled("div", {
 		c: "$text",
 		fw: 500,
 	},
+});
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const LyricsWrapper = styled("div", {
+	size: "100%",
+
+	ff: "$primary",
+	ls: "0.03rem",
+	lh: "0.5rem",
+	fs: "0.8rem",
+	ta: "left",
+	c: "white",
+	fw: 500,
+
+	"&.lyrics-holder": {},
+
+	"&.lyrics": {},
 });
 
 /////////////////////////////////////////

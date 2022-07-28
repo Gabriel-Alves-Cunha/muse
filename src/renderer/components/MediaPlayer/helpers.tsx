@@ -1,8 +1,10 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { BiDotsVerticalRounded as Dots } from "react-icons/bi";
+// import { BsJournalText as LyricsPresent } from "react-icons/bs";
+// import { BsJournal as NoLyrics } from "react-icons/bs";
+import { BsFillFileTextFill as LyricsPresent } from "react-icons/bs";
 import { useCallback, useMemo, useRef } from "react";
-import { Dialog } from "@radix-ui/react-dialog";
+import { BsFileText as NoLyrics } from "react-icons/bs";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdRepeatOne as RepeatOne,
@@ -18,10 +20,12 @@ import {
 	IoPlaySharp as Play,
 } from "react-icons/io5";
 
-import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { flipMediaPlayerCard } from "@components/FlipCard";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { formatDuration } from "@common/utils";
-import { DialogTrigger } from "@components/DialogTrigger";
 import { useProgress } from ".";
+import { infoToast } from "@styles/global";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
@@ -39,7 +43,6 @@ import {
 	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 
-import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import {
 	ControlsAndSeekerContainer,
 	ControlsButtonsWrapper,
@@ -53,6 +56,7 @@ import {
 	Album,
 } from "./styles";
 
+const { searchForLyricsAndImage } = electron.lyric;
 const { floor } = Math;
 
 ///////////////////////////////////////
@@ -74,6 +78,7 @@ function toggleFavorite(path?: Readonly<Path>): void {
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
+	const isThereAMedia = Boolean(audio?.src);
 
 	return (
 		<ControlsAndSeekerContainer>
@@ -83,13 +88,18 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 				<CircledIconButton
 					data-tip="Toggle loop this media"
 					onClick={toggleLoopMedia}
+					disabled={isThereAMedia}
 				>
 					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
 				</CircledIconButton>
 
-				<Controls isPaused={audio?.paused} />
+				<Controls isThereAMedia={isThereAMedia} isPaused={audio?.paused} />
 
-				<CircledIconButton data-tip="Toggle random" onClick={toggleRandom}>
+				<CircledIconButton
+					data-tip="Toggle random"
+					disabled={isThereAMedia}
+					onClick={toggleRandom}
+				>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 				</CircledIconButton>
 			</ControlsButtonsWrapper>
@@ -103,23 +113,20 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 
 export const Header = ({ media, path }: RefToMedia) => (
 	<OptionsAndAlbum>
-		<Dialog modal>
-			<DialogTrigger className="on-media-player" tooltip="Open media options">
-				<Dots size={19} />
-			</DialogTrigger>
-
-			{media && path && (
-				<StyledDialogBlurOverlay>
-					<MediaOptionsModal media={media} path={path} />
-				</StyledDialogBlurOverlay>
-			)}
-		</Dialog>
+		<CircledIconButton
+			onClick={() => handleSearchAndOpenLyrics(media, path)}
+			data-tip="Toggle open lyrics"
+			disabled={!media}
+		>
+			{media?.lyrics ? <LyricsPresent size={16} /> : <NoLyrics size={16} />}
+		</CircledIconButton>
 
 		<Album>{media?.album}</Album>
 
 		<CircledIconButton
 			onClick={() => toggleFavorite(path)}
 			data-tip="Toggle favorite"
+			disabled={!media}
 		>
 			{favorites().has(path) ?
 				<Favorite size={17} /> :
@@ -128,28 +135,61 @@ export const Header = ({ media, path }: RefToMedia) => (
 	</OptionsAndAlbum>
 );
 
+function handleSearchAndOpenLyrics(
+	media: Media | undefined,
+	mediaPath: Path,
+): void {
+	if (!media) return;
+
+	if (media.lyrics) return flipMediaPlayerCard();
+
+	if (!media.artist) {
+		infoToast("Make sure that media has artist metadata!");
+		return;
+	}
+
+	searchForLyricsAndImage(media.title, media.artist, media.img)
+		.then(({ lyric, image }) => {
+			sendMsgToBackend({
+				type: ReactToElectronMessageEnum.WRITE_TAG,
+				thingsToChange: [{ whatToChange: "imageURL", newValue: image }, {
+					whatToChange: "lyrics",
+					newValue: lyric,
+				}],
+				mediaPath,
+			});
+		})
+		.catch(console.error);
+}
+
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Controls = ({ isPaused = false }: IsPaused) => (
+export const Controls = ({ isPaused = false, isThereAMedia }: IsPaused) => (
 	<ControlsWrapper>
 		<CircledIconButton
 			data-tip="Play previous track"
 			onClick={playPreviousMedia}
+			disabled={isThereAMedia}
 		>
 			<Previous />
 		</CircledIconButton>
 
 		<CircledIconButton
 			onClick={togglePlayPause}
+			disabled={isThereAMedia}
 			data-tip="Play/pause"
 			size="large"
 		>
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
 		</CircledIconButton>
 
-		<CircledIconButton data-tip="Play next track" onClick={playNextMedia}>
+		<CircledIconButton
+			data-tip="Play next track"
+			disabled={isThereAMedia}
+			onClick={playNextMedia}
+		>
 			<Next />
 		</CircledIconButton>
 	</ControlsWrapper>
@@ -247,6 +287,6 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 type Audio = HTMLAudioElement | null;
 type RefToAudio = Readonly<{ audio: Audio; }>;
-type IsPaused = Readonly<{ isPaused: boolean | undefined; }>;
 type RefToMedia = Readonly<{ media: Media | undefined; path: Path; }>;
 type SeekEvent = Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>;
+type IsPaused = Readonly<{ isPaused?: boolean; isThereAMedia: boolean; }>;

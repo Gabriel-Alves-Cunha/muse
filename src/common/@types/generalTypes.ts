@@ -12,6 +12,7 @@ export type Media = Readonly<
 		birthTime: DateAsNumber;
 		isSelected: boolean;
 		duration: string;
+		lyrics: string;
 		artist: string;
 		album: string;
 		title: string;

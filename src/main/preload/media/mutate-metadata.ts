@@ -91,6 +91,8 @@ async function handleImageMetadata(
 			`Invalid imgAsString (it should be "data:\${string};base64,\${string}") = "${imageURL}"!`,
 		);
 
+	// If imageURL is empty, do nothing.
+
 	console.assert(
 		file.tag.pictures.length === 1,
 		"No pictures added!",
@@ -182,6 +184,14 @@ function handleAlbum(file: MediaFile, album: string): void {
 	file.tag.album = album;
 
 	dbg({ "new file.tag.album": file.tag.album, album });
+}
+
+/////////////////////////////////////////////
+
+function handleLyrics(file: MediaFile, lyrics: string): void {
+	file.tag.lyrics = lyrics;
+
+	dbg({ "new file.tag.album": file.tag.lyrics, lyrics });
 }
 
 /////////////////////////////////////////////
@@ -294,6 +304,8 @@ export async function writeTags(
 	data.genres && handleGenres(file, data.genres);
 
 	data.album !== undefined && handleAlbum(file, data.album);
+
+	data.lyrics !== undefined && handleLyrics(file, data.lyrics);
 
 	dbg("New file tags =", file.tag);
 

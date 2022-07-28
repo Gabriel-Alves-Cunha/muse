@@ -7,6 +7,7 @@ import { sendNotificationToElectronIpcMainProcess } from "./preload/notification
 import { makeItOnlyOneFile, turnServerOn } from "./preload/share";
 import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
+import { searchForLyricsAndImage } from "./preload/getLyrics";
 import { writeTags } from "./preload/media/mutate-metadata";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
@@ -46,6 +47,7 @@ const electron: VisibleElectron = Object.freeze({
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
 	share: { turnServerOn, makeItOnlyOneFile },
+	lyric: { searchForLyricsAndImage },
 	os: { dirs },
 });
 
