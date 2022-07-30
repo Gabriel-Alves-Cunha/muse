@@ -1,8 +1,8 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { TurnServerOnReturn } from "@main/preload/share";
+import type { LyricsResponse } from "@main/preload/getLyrics.js";
 import type { videoInfo } from "ytdl-core";
-import type { LyricAndImage } from "@main/preload/getLyrics";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -59,7 +59,7 @@ export type VisibleElectron = Readonly<
 					mediaTitle: string,
 					mediaArtist: string,
 					mediaImage: string,
-				): Promise<LyricAndImage>;
+				): Promise<LyricsResponse>;
 			}
 		>;
 	}

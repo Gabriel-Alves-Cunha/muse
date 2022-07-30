@@ -292,6 +292,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 			size: 3_000,
 			genres: [],
 			artist: "",
+			lyrics: "",
 			album: "",
 			img: "",
 			title,

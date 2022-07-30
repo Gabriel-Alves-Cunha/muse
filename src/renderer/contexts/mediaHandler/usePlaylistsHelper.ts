@@ -90,16 +90,16 @@ export function sortByDate(list: MainList): ReadonlySet<Path> {
 ////////////////////////////////////////////////
 
 export function sortByName(list: MainList): MainList {
-	const listAsArrayOfPaths = Array.from(list)// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	.sort(([_, prevMedia], [__, nextMedia]) => {
-		const prevTitle = prevMedia.title.toLocaleLowerCase();
-		const nextTitle = nextMedia.title.toLocaleLowerCase();
+	const listAsArrayOfPaths = Array.from(list) // eslint-disable-next-line @typescript-eslint/no-unused-vars
+		.sort(([_, prevMedia], [__, nextMedia]) => {
+			const prevTitle = prevMedia.title.toLocaleLowerCase();
+			const nextTitle = nextMedia.title.toLocaleLowerCase();
 
-		if (prevTitle > nextTitle) return 1;
-		if (prevTitle < nextTitle) return -1;
-		// a must be equal to b:
-		return 0;
-	});
+			if (prevTitle > nextTitle) return 1;
+			if (prevTitle < nextTitle) return -1;
+			// a must be equal to b:
+			return 0;
+		});
 
 	return new Map(listAsArrayOfPaths);
 }

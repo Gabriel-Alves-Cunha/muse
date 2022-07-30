@@ -23,7 +23,7 @@ async function createMedia(
 
 		time(() => {
 			const {
-				tag: { pictures, title, album = "", genres, albumArtists },
+				tag: { pictures, title, album, genres, albumArtists, lyrics },
 				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 			} = MediaFile.createFromPath(path);
@@ -59,10 +59,11 @@ async function createMedia(
 				birthTime: lstatSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
+				lyrics: lyrics ?? "",
+				album: album ?? "",
 				isSelected: false,
 				size: length,
 				genres,
-				album,
 			};
 
 			dbg(basename, media);

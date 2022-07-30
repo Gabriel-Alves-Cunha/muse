@@ -1,24 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import type { ImgString } from "@common/@types/generalTypes";
-
-import { get } from "node:http";
-import axios from "axios";
-
+import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { dbg, stringifyJson } from "@common/utils";
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Constants:
-
-const lyricApiKey = "1996d0wcfWZB02aebwtkAYhcnERFnAbOGlDiIPWDNdnh3K0955cZpHov";
-
-if (!lyricApiKey)
-	throw new Error(
-		"Lyric api key is not present: " + lyricApiKey + "\nimport.meta.env = " +
-			stringifyJson(import.meta.env),
-	);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -27,22 +8,23 @@ if (!lyricApiKey)
 
 export async function searchForLyricsAndImage(
 	mediaTitle: string,
-	mediaImage: string,
 	mediaArtist: string,
-): Promise<LyricAndImage> {
-	const possibleLyrics = await queryForPossibleLyric(mediaTitle, mediaArtist);
+	mediaImage: string,
+): Promise<LyricsResponse> {
+	dbg({ mediaTitle, mediaImage, mediaArtist });
 
-	if (possibleLyrics.length === 0)
+	const [possibleLyric] = await queryForPossibleLyric(mediaTitle, mediaArtist);
+
+	if (!possibleLyric)
 		throw new Error("No lyrics found!");
 
-	const lyric = await queryForLyric(possibleLyrics[0]!.lyricURL);
-	const image = !mediaImage ?
-		await queryForImage(possibleLyrics[0]!.imageURL) :
-		"";
+	const image = !mediaImage ? await queryForImage(possibleLyric.imageURL) : "";
+	const lyric = await queryForLyric(possibleLyric.lyricURL);
+	const albumName = possibleLyric.albumName;
 
-	dbg({ lyric, image });
+	dbg({ lyric, image, albumName });
 
-	const ret: LyricAndImage = { lyric, image };
+	const ret: LyricsResponse = { lyric, image, albumName };
 
 	return ret;
 }
@@ -56,37 +38,47 @@ async function queryForPossibleLyric(
 	mediaTitle: string,
 	mediaArtist: string,
 ): Promise<PossibleLyrics[]> {
-	if (!lyricApiKey || !mediaTitle || !mediaArtist)
+	if (!mediaTitle || !mediaArtist)
 		throw new Error(
-			`Required argument is empty: ${{ mediaArtist, lyricApiKey, mediaTitle }}`,
+			`Required argument is empty: ${
+				stringifyJson({ mediaArtist, mediaTitle })
+			}`,
 		);
 
-	// From 'https://happi.dev/docs/music' docs.
-
-	const queryUrl = "https://api.happi.dev/v1/music";
-	const params = {
-		// Text to search
+	// From 'https://happi.dev/docs/music' docs:
+	const params = new URLSearchParams({
+		// Text to search:
 		q: `${mediaTitle}, ${mediaArtist}`,
-		lyrics: "0",
+		// Return only tracks with lyrics:
+		lyrics: "1", // 1 for true, 0 for false.
+		// Limit (Max 50):
 		limit: "1",
-	};
-
-	const res = await axios.get<Track | ErrorResponse>(queryUrl, {
-		headers: {
-			// Happy's way to use the api key:
-			"x-happi-key": lyricApiKey,
-		},
-		params,
 	});
 
-	dbg("`queryForPossibleLyric` response =", res);
+	const jsonRes =
+		await (await fetch(lyricsAPI + "?" + params.toString(), {
+			headers: {
+				"Content-Type": "application/json",
+				"x-happi-key": lyricApiKey,
+			},
+			method: "GET",
+		}))
+			.json() as Track | ErrorResponse;
 
-	if (!res.data.success)
-		throw new Error(res.data.error);
+	dbg({ queryForPossibleLyric: jsonRes });
 
-	const possibleLyrics: PossibleLyrics[] = (res.data as Track).result.map((
-		{ artist = "", track = "", cover = "", api_lyrics = "" },
-	) => ({ artist, title: track, imageURL: cover, lyricURL: api_lyrics }));
+	if (!jsonRes.success)
+		throw new Error(jsonRes.error);
+
+	const possibleLyrics: PossibleLyrics[] = jsonRes.result.map((
+		{ artist = "", track = "", cover = "", api_lyrics = "", album = "" },
+	) => ({
+		lyricURL: api_lyrics,
+		albumName: album,
+		imageURL: cover,
+		title: track,
+		artist,
+	}));
 
 	return possibleLyrics;
 }
@@ -94,45 +86,55 @@ async function queryForPossibleLyric(
 /////////////////////////////////////////
 
 async function queryForLyric(lyricURL: string): Promise<string> {
-	dbg(`Querying for lyricURL = "${lyricURL}"...`);
+	dbg(`Querying for lyricURL = "${lyricURL}".`);
 
-	const res = await axios.get<ErrorResponse | QueryForLyricsSuccessResponse>(
-		lyricURL,
-		{
+	const jsonRes =
+		await (await fetch(lyricURL, {
 			headers: {
-				// Happy's way to use the api key:
+				"Content-Type": "application/json",
 				"x-happi-key": lyricApiKey,
 			},
-		},
-	);
+			method: "GET",
+		}))
+			.json() as ErrorResponse | QueryForLyricsSuccessResponse;
 
-	dbg("`queryForLyric` response =", res);
+	dbg({ queryForLyricJSONResponse: jsonRes });
 
-	if (!res.data.success) throw new Error((res.data as ErrorResponse).error);
+	if (!jsonRes.success) {
+		console.error(jsonRes.error);
 
-	return (res.data as QueryForLyricsSuccessResponse).lyrics;
+		return "";
+	}
+
+	return jsonRes.result.lyrics;
 }
 
 /////////////////////////////////////////
 
-async function queryForImage(imageURL: string): Promise<ImgString> {
-	return new Promise((resolve, reject) =>
-		get(imageURL, res => {
-			res.setEncoding("base64");
+async function queryForImage(imageURL: string): Promise<string> {
+	dbg(`Querying for lyricURL = "${imageURL}".`);
 
-			let img = `data:${res.headers["content-type"]};base64,` as ImgString;
+	const blob =
+		await (await fetch(imageURL, { redirect: "follow", method: "GET" })).blob();
 
-			res.on("data", data => {
-				img += data;
-			});
+	dbg({ blob });
 
-			resolve(img);
-		})
-			.on("error", e => {
-				console.error("Got error getting image on Electron side!\n\n", e);
-				return reject(e);
-			})
-	);
+	const base64 = await blobToBase64(blob);
+
+	return base64;
+}
+
+/////////////////////////////////////////
+
+function blobToBase64(blob: Blob): Promise<string> {
+	const reader = new FileReader();
+	reader.readAsDataURL(blob);
+
+	return new Promise(resolve => {
+		reader.onloadend = () => {
+			resolve(reader.result as string);
+		};
+	});
 }
 
 /////////////////////////////////////////
@@ -141,44 +143,38 @@ async function queryForImage(imageURL: string): Promise<ImgString> {
 // Types:
 
 type PossibleLyrics = Readonly<
-	{ imageURL: string; lyricURL: string; artist: string; title: string; }
+	{
+		albumName: string;
+		imageURL: string;
+		lyricURL: string;
+		artist: string;
+		title: string;
+	}
 >;
 
 /////////////////////////////////////////
 
-type QueryForLyricsSuccessResponse = Readonly<
-	{ success: true; lyrics: string; }
->;
+interface QueryForLyricsSuccessResponse {
+	success: true;
+	result: { lyrics: string; };
+}
 
 /////////////////////////////////////////
 
 // From Happy's docs:
-type Track = Readonly<
-	{
-		success: true;
-		length: number;
-		result: [
-			{
-				track: string;
-				id_track: number;
-				artist: string;
-				haslyrics: boolean;
-				id_artist: number;
-				album: string;
-				bpm: number;
-				id_album: number;
-				cover: string;
-				lang: string /* ISO 639-1 */;
-				api_artist: string;
-				api_albums: string;
-				api_album: string;
-				api_tracks: string;
-				api_track: string;
-				api_lyrics: string;
-			},
-		];
-	}
->;
+interface Track {
+	success: true;
+	result: [
+		{
+			track: string;
+			artist: string;
+			album: string;
+			cover: string;
+			api_album: string;
+			api_lyrics: string;
+		},
+	];
+}
 
 /////////////////////////////////////////
 
@@ -186,4 +182,6 @@ type ErrorResponse = Readonly<{ success: false; error: string; }>;
 
 /////////////////////////////////////////
 
-export type LyricAndImage = Readonly<{ image: string; lyric: string; }>;
+export type LyricsResponse = Readonly<
+	{ image: string; lyric: string; albumName: string; }
+>;

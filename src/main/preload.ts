@@ -5,9 +5,9 @@ import { getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { makeItOnlyOneFile, turnServerOn } from "./preload/share";
+import { searchForLyricsAndImage } from "./preload/getLyrics.js";
 import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
-import { searchForLyricsAndImage } from "./preload/getLyrics";
 import { writeTags } from "./preload/media/mutate-metadata";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
@@ -92,7 +92,6 @@ async function handleMsgsFromRendererProcess(
 				break;
 			}
 
-			// TODO: see if artist is being sent
 			electronPort.onmessage = async ({ data }: { data: CreateDownload; }) =>
 				await createOrCancelDownload({ ...data, electronPort });
 

@@ -30,6 +30,7 @@ export default defineConfig({
 	// @ts-ignore => This shouldn't be giving an error, it works...
 	plugins: [react()],
 	root: rendererPath,
+	envDir: ".",
 	base: "./",
 	build: {
 		chunkSizeWarningLimit: 1_000,

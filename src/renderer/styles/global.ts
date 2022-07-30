@@ -153,6 +153,7 @@ export const darkTheme = createTheme({
 		"lingrad-bottom": "#0B3866",
 		"lingrad-top": "#103783",
 
+		"media-player-icons-disabled": "#e0e6ee7a",
 		"media-player-icons": "#f3f3ee",
 		"deactivated-icon": "#6272a4",
 		"active-icon": "#4a00e0",
@@ -222,6 +223,7 @@ export const lightTheme = createTheme({
 		"lingrad-bottom": "#4a00e0",
 		"lingrad-top": "#8e2de2",
 
+		"media-player-icons-disabled": "#e0e6ee7a",
 		"deactivated-icon": "dimgray",
 		"media-player-icons": "#fff",
 		"active-icon": "#4a00e0",

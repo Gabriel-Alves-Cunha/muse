@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { isDevelopment } from "@common/utils";
 
+/////////////////////////////////////////
+
 // I'm doing this with trial and error and console, unfortunally:
 const rootDirectory = join(__dirname, "..", "..", "..");
 
@@ -15,9 +17,17 @@ export const logoPath = isDevelopment ?
 
 // console.log({ rootDirectory, logoPath });
 
+/////////////////////////////////////////
+
 const homeDir = homedir();
 export const dirs = Object.freeze({
 	documents: join(homeDir, "Documents"),
 	downloads: join(homeDir, "Downloads"),
 	music: join(homeDir, "Music"),
 });
+
+/////////////////////////////////////////
+
+export const lyricApiKey =
+	"1996d0wcfWZB02aebwtkAYhcnERFnAbOGlDiIPWDNdnh3K0955cZpHov";
+export const lyricsAPI = "https://api.happi.dev/v1/music";

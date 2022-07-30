@@ -1,10 +1,10 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-// import { BsJournalText as LyricsPresent } from "react-icons/bs";
-// import { BsJournal as NoLyrics } from "react-icons/bs";
-import { BsFillFileTextFill as LyricsPresent } from "react-icons/bs";
+import { BsJournalText as LyricsPresent } from "react-icons/bs";
+import { BsJournal as NoLyrics } from "react-icons/bs";
+// import { BsFillFileTextFill as LyricsPresent } from "react-icons/bs";
+// import { BsFileText as NoLyrics } from "react-icons/bs";
 import { useCallback, useMemo, useRef } from "react";
-import { BsFileText as NoLyrics } from "react-icons/bs";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdRepeatOne as RepeatOne,
@@ -78,7 +78,7 @@ function toggleFavorite(path?: Readonly<Path>): void {
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
-	const isThereAMedia = Boolean(audio?.src);
+	const isThereAMedia = Boolean(!audio?.src);
 
 	return (
 		<ControlsAndSeekerContainer>
@@ -111,7 +111,7 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Header = ({ media, path }: RefToMedia) => (
+export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 	<OptionsAndAlbum>
 		<CircledIconButton
 			onClick={() => handleSearchAndOpenLyrics(media, path)}
@@ -121,7 +121,7 @@ export const Header = ({ media, path }: RefToMedia) => (
 			{media?.lyrics ? <LyricsPresent size={16} /> : <NoLyrics size={16} />}
 		</CircledIconButton>
 
-		<Album>{media?.album}</Album>
+		<Album>{displayTitle ? media?.title : media?.album}</Album>
 
 		<CircledIconButton
 			onClick={() => toggleFavorite(path)}
@@ -134,6 +134,12 @@ export const Header = ({ media, path }: RefToMedia) => (
 		</CircledIconButton>
 	</OptionsAndAlbum>
 );
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+const noLyricsFound = "No lyrics found!";
 
 function handleSearchAndOpenLyrics(
 	media: Media | undefined,
@@ -149,17 +155,24 @@ function handleSearchAndOpenLyrics(
 	}
 
 	searchForLyricsAndImage(media.title, media.artist, media.img)
-		.then(({ lyric, image }) => {
+		.then(({ lyric, image, albumName }) => {
 			sendMsgToBackend({
 				type: ReactToElectronMessageEnum.WRITE_TAG,
-				thingsToChange: [{ whatToChange: "imageURL", newValue: image }, {
-					whatToChange: "lyrics",
-					newValue: lyric,
-				}],
+				thingsToChange: [{ whatToChange: "album", newValue: albumName }, {
+					whatToChange: "imageURL",
+					newValue: image,
+				}, { whatToChange: "lyrics", newValue: lyric }],
 				mediaPath,
 			});
+
+			setTimeout(() => flipMediaPlayerCard(), 1_000);
 		})
-		.catch(console.error);
+		.catch(err => {
+			if (err.message === noLyricsFound)
+				infoToast(noLyricsFound);
+
+			console.error(err);
+		});
 }
 
 /////////////////////////////////////////
@@ -287,6 +300,8 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 
 type Audio = HTMLAudioElement | null;
 type RefToAudio = Readonly<{ audio: Audio; }>;
-type RefToMedia = Readonly<{ media: Media | undefined; path: Path; }>;
 type SeekEvent = Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>;
 type IsPaused = Readonly<{ isPaused?: boolean; isThereAMedia: boolean; }>;
+type HeaderProps = Readonly<
+	{ media: Media | undefined; displayTitle?: boolean; path: Path; }
+>;

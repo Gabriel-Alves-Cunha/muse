@@ -195,14 +195,16 @@ export const CircledIconButton = styled("button", {
 	br: "50%",
 	b: "none",
 
-	transition: "$bgc",
+	svg: { c: "$media-player-icon" },
 
-	"&:hover, &:focus": {
-		transition: "$bgc",
-		bg: "$media-player-icon-button-hovered",
+	"&:hover, &:focus": { bg: "$media-player-icon-button-hovered" },
+
+	"&:disabled": {
+		cursor: "default",
+		bg: "none",
+
+		svg: { c: "$media-player-icons-disabled" },
 	},
-
-	"&:disabled": { transition: "none", cursor: "default", bg: "none" },
 
 	variants: { size: { small: { size: 30 }, large: { size: 50, mx: 5 } } },
 
@@ -247,20 +249,40 @@ export const ProgressWrapper = styled("div", {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const LyricsWrapper = styled("div", {
+export const LyricsCardWrapper = styled("div", { size: "100%" });
+
+export const LyricsHolder = styled("div", {
 	size: "100%",
 
-	ff: "$primary",
-	ls: "0.03rem",
-	lh: "0.5rem",
-	fs: "0.8rem",
-	ta: "left",
-	c: "white",
-	fw: 500,
+	mt: 30,
+	mx: 10,
 
-	"&.lyrics-holder": {},
+	/* width */
+	"&::-webkit-scrollbar": { d: "block", size: 3 },
 
-	"&.lyrics": {},
+	/* Track */
+	"&::-webkit-scrollbar-track": { bg: "none" },
+
+	/* Handle */
+	"&::-webkit-scrollbar-thumb": { bg: "white" },
+
+	/* Handle on hover */
+	"&::-webkit-scrollbar-thumb:hover": { bg: "white" },
+
+	overflowY: "auto",
+
+	"& p": {
+		mb: 100,
+
+		whiteSpace: "pre-line", // break on new line!
+		ff: "$primary",
+		ls: "0.03rem",
+		lh: "1.5rem",
+		fs: "1rem",
+		ta: "left",
+		c: "white",
+		fw: 500,
+	},
 });
 
 /////////////////////////////////////////

@@ -35,7 +35,6 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	setTimeout(() =>
 		time(async () => {
 			if (value instanceof Map || value instanceof Set)
-				// @ts-ignore => This conversion will work with either Map or Set:
 				value = [...value];
 
 			const serializedValue = await stringifyAsync(value).catch(error);

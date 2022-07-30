@@ -71,6 +71,11 @@ async function handleImageMetadata(
 
 	/////////////////////////////////////////////
 
+	// From here on, if there is no URL, then do nothing.
+	if (!imageURL) return;
+
+	/////////////////////////////////////////////
+
 	// if imageURL === "erase img" => erase img so we
 	// don't keep getting an error on the browser.
 	if (imageURL === eraseImg) {
@@ -191,7 +196,7 @@ function handleAlbum(file: MediaFile, album: string): void {
 function handleLyrics(file: MediaFile, lyrics: string): void {
 	file.tag.lyrics = lyrics;
 
-	dbg({ "new file.tag.album": file.tag.lyrics, lyrics });
+	dbg({ "new file.tag.lyrics": file.tag.lyrics, lyrics });
 }
 
 /////////////////////////////////////////////

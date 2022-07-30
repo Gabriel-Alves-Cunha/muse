@@ -2,19 +2,19 @@ import type { Media, Path } from "@common/@types/generalTypes";
 
 import { Header } from "./helpers";
 
-import { LyricsWrapper } from "./styles";
+import { LyricsCardWrapper, LyricsHolder } from "./styles";
 
 /////////////////////////////////////////
 
 export function Lyrics({ media, path }: Props) {
 	return (
-		<LyricsWrapper>
-			<Header media={media} path={path} />
+		<LyricsCardWrapper>
+			<Header media={media} path={path} displayTitle />
 
-			<div className="lyrics-holder">
-				<p className="lyrics">{media?.lyrics}</p>
-			</div>
-		</LyricsWrapper>
+			<LyricsHolder>
+				<p>{media?.lyrics}</p>
+			</LyricsHolder>
+		</LyricsCardWrapper>
 	);
 }
 

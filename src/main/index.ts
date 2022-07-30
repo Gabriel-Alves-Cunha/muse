@@ -43,10 +43,9 @@ autoUpdater
 	.on("download-progress", progressObj => {
 		dbg({ progressObj });
 
-		const log_message =
-			`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
-
-		dbg(log_message);
+		dbg(
+			`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
+		);
 	});
 
 /////////////////////////////////////////

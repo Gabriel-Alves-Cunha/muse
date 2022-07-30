@@ -17,6 +17,7 @@ export const testArray = Object.freeze(
 				size: 3_000,
 				genres: [],
 				artist: "",
+				lyrics: "",
 				album: "",
 				img: "",
 				title,
