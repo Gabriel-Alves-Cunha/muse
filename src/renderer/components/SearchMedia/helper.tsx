@@ -200,7 +200,9 @@ function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
 		.toLowerCase()
 		.normalize("NFD")
 		.replace(/\p{Diacritic}/gu, "")
-		.indexOf(highlight);
+		.indexOf(
+			highlight.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""),
+		);
 
 	return (
 		<Result

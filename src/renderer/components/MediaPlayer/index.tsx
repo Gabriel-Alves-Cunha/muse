@@ -174,13 +174,16 @@ function handleLoadedData(
 ): void {
 	if (!media || !path || !audio) return;
 
-	// Updating the duration of media:
-	setPlaylists({
-		newMedia: { ...media, duration: formatDuration(audio.duration) },
-		whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-		type: WhatToDo.UPDATE_MAIN_LIST,
-		path,
-	});
+	const formatedDuration = formatDuration(audio.duration);
+	if (formatedDuration !== media.duration) {
+		// Updating the duration of media:
+		setPlaylists({
+			newMedia: { ...media, duration: formatedDuration },
+			whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
+			type: WhatToDo.UPDATE_MAIN_LIST,
+			path,
+		});
+	}
 
 	// Maybe set audio currentTime to last played time:
 	const lastTime = currentPlaying().currentTime;

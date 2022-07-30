@@ -546,7 +546,7 @@ export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 		});
 
 		return medias;
-	}, `searchMedia("${searchTerm_}")`);
+	}, `searchMedia('${searchTerm_}')`);
 }
 
 ///////////////////////////////////////////////////

@@ -2,7 +2,6 @@
 * ADD: get lyrics on input edit.
 * FIX: scroll should not appear or take space on delete animation!!
 * ADD: gunzip on client when share!!
-* FIX: only refresh media when durations dont match!
 * FIX: highlight search diacritics!
 * ADD: way to reload lyrics/image.
 
