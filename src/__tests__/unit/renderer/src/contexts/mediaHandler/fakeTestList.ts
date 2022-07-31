@@ -19,7 +19,7 @@ export const testArray = Object.freeze(
 				artist: "",
 				lyrics: "",
 				album: "",
-				img: "",
+				image: "",
 				title,
 			};
 

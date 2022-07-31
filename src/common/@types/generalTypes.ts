@@ -1,4 +1,4 @@
-import type { AllowedMedias } from "../utils";
+import type { AllowedMedias, eraseImg } from "../utils";
 
 import { pages } from "@utils/app";
 
@@ -16,8 +16,8 @@ export type Media = Readonly<
 		artist: string;
 		album: string;
 		title: string;
+		image: string;
 		size: number;
-		img: string;
 	}
 >;
 
@@ -43,6 +43,9 @@ export type TypeOfMap<T> = T extends ReadonlyMap<infer K, infer V> ? [K, V][]
 	: never;
 
 export type ImgString = Readonly<`data:${string};base64,${string}`>;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type ImageURL = typeof eraseImg | ImgString | (string & {});
 
 export type Values<Obj> = Obj[keyof Obj];
 

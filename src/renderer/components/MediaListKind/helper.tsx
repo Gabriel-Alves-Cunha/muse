@@ -106,7 +106,7 @@ const Row = memo(
 				<Img>
 					<ImgWithFallback
 						Fallback={<MusicNote size="1.4rem" />}
-						mediaImg={media.img}
+						mediaImg={media.image}
 						mediaPath={path}
 					/>
 				</Img>

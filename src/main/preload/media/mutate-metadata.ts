@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Path, ImgString, Mutable } from "@common/@types/generalTypes";
 import type { Tags } from "@common/@types/electron-window";
+import type {
+	ImgString,
+	ImageURL,
+	Mutable,
+	Path,
+} from "@common/@types/generalTypes";
 
-import { rename as renameFile } from "node:fs/promises";
+import { readFile, rename as renameFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { get } from "node:https";
 import {
@@ -20,6 +25,7 @@ import { checkOrThrow, validator } from "@common/args-validator";
 import { dbg, dbgTests, eraseImg } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { pathExists } from "../file";
+import { isBase64Image } from "@main/utils";
 
 const { error } = console;
 
@@ -43,7 +49,7 @@ const checkForMediaPath = validator.compile({
 async function handleImageMetadata(
 	file: MediaFile,
 	downloadImg: Readonly<boolean> = false,
-	imageURL: Readonly<typeof eraseImg | ImgString | string>,
+	imageURL: ImageURL = "",
 ): Promise<void> {
 	if (downloadImg) {
 		try {
@@ -87,16 +93,24 @@ async function handleImageMetadata(
 
 	/////////////////////////////////////////////
 
-	// else:
-	// Here, assume we received an img as a base64 string
-	// as in: `data:${string};base64,${string}`.
-	imageURL.includes("data:image/") && imageURL.includes(";base64,") ?
-		createAndSaveImageOnMedia(imageURL as ImgString, file) :
-		error(
-			`Invalid imgAsString (it should be "data:\${string};base64,\${string}") = "${imageURL}"!`,
-		);
+	// if received a base64 image:
+	if (isBase64Image(imageURL))
+		createAndSaveImageOnMedia(imageURL as ImgString, file);
 
-	// If imageURL is empty, do nothing.
+	/////////////////////////////////////////////
+
+	// else, it's an image file path
+	if (await pathExists(imageURL)) {
+		const base64 = await readFile(imageURL, {
+			encoding: "base64",
+		}) as ImgString;
+
+		dbg({ base64 });
+
+		createAndSaveImageOnMedia(base64, file);
+	}
+
+	/////////////////////////////////////////////
 
 	console.assert(
 		file.tag.pictures.length === 1,
@@ -136,7 +150,6 @@ export function createAndSaveImageOnMedia(
 	imgAsString: Readonly<ImgString>,
 	file: MediaFile,
 ): void {
-	// TODO: see if this still works
 	const txtForByteVector = imgAsString.slice(
 		imgAsString.indexOf(",") + 1,
 		imgAsString.length,
@@ -209,8 +222,11 @@ function handleTitle(
 ): Path {
 	const sanitizedTitle = sanitize(title);
 	// If they are the same, there is no
-	// need to treat this as a new file:
-	if (getBasename(oldMediaPath) === sanitizedTitle) return "";
+	// need to treat this as a new file,
+	// or if the sanitization left no strings,
+	// return :
+	if (getBasename(oldMediaPath) === sanitizedTitle || !sanitizedTitle)
+		return "";
 
 	const newPath = join(
 		dirname(oldMediaPath),
@@ -297,20 +313,24 @@ export async function writeTags(
 	const file = MediaFile.createFromPath(mediaPath);
 
 	// Handle the tags:
-	data.imageURL !== undefined &&
+	if (data.imageURL || data.downloadImg)
 		await handleImageMetadata(file, data.downloadImg, data.imageURL);
 
-	const fileNewPath = data.title !== undefined ?
+	const fileNewPath = data.title ?
 		handleTitle(file, mediaPath, data.title) :
 		"";
 
-	data.albumArtists && handleAlbumArtists(file, data.albumArtists);
+	if (data.albumArtists)
+		handleAlbumArtists(file, data.albumArtists);
 
-	data.genres && handleGenres(file, data.genres);
+	if (data.genres)
+		handleGenres(file, data.genres);
 
-	data.album !== undefined && handleAlbum(file, data.album);
+	if (data.album)
+		handleAlbum(file, data.album);
 
-	data.lyrics !== undefined && handleLyrics(file, data.lyrics);
+	if (data.lyrics)
+		handleLyrics(file, data.lyrics);
 
 	dbg("New file tags =", file.tag);
 

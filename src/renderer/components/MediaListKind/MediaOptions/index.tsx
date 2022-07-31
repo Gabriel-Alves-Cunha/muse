@@ -1,6 +1,7 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { type RefObject, useEffect, useRef } from "react";
+import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
+import { type RefObject, type ChangeEvent, useEffect, useRef } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
@@ -9,10 +10,11 @@ import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@styles/global";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { areArraysEqual } from "@utils/array";
+import { areArraysEqualByValue } from "@utils/array";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteMedia } from "@utils/media";
 import { capitalize } from "@utils/utils";
+import { Button } from "@components/Button";
 import {
 	ReactToElectronMessageEnum,
 	MetadataToChange,
@@ -20,7 +22,6 @@ import {
 
 import {
 	DialogTriggerToRemoveMedia,
-	StyledDialogBlurOverlay,
 	StyledDialogContent,
 	StyledDescription,
 	StyledTitle,
@@ -39,11 +40,37 @@ import {
 export function MediaOptionsModal({ media, path }: Props) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
+	const imageButtonRef = useRef<HTMLButtonElement>(null);
+	const imageInputRef = useRef<HTMLInputElement>(null);
+	const imageFilePathRef = useRef("");
+
+	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
+
+	function handleSelectedFile(
+		{ target: { files } }: ChangeEvent<HTMLInputElement>,
+	) {
+		if (!imageButtonRef.current || !imageInputRef.current || !files?.length)
+			return;
+
+		const [file] = files;
+
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		imageFilePathRef.current = file!.webkitRelativePath;
+
+		// Change button color to indicate that selection was successfull:
+		imageButtonRef.current.classList.add("file-present");
+	}
 
 	useEffect(() => {
 		function changeMediaMetadataOnEnter({ key }: KeyboardEvent) {
 			if (key === "Enter")
-				changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media);
+				changeMediaMetadata(
+					contentWrapperRef,
+					closeButtonRef,
+					imageFilePathRef.current,
+					path,
+					media,
+				);
 		}
 
 		// This is because if you open the popover by pressing
@@ -73,22 +100,41 @@ export function MediaOptionsModal({ media, path }: Props) {
 			{Object.entries(options(media)).map(([option, value]) => (
 				<Fieldset key={option}>
 					<Label htmlFor={option}>{capitalize(option)}</Label>
-					<Input
-						readOnly={!isChangeable(option)}
-						defaultValue={format(value)}
-						id={option}
-					/>
+					{option === "image" ?
+						// handle file input for image
+						(<Button
+							onClick={openNativeUI_ChooseFiles}
+							className="notransition"
+							ref={imageButtonRef}
+							variant="input"
+							id={option}
+						>
+							<SearchImage size={18} />
+							<input
+								onChange={handleSelectedFile}
+								ref={imageInputRef}
+								accept="image/*"
+								type="file"
+							/>
+							Select an image
+						</Button>) :
+						(
+							<Input
+								placeholder={option === "lyrics" ? "Paste lyrics here" : ""}
+								readOnly={!isChangeable(option)}
+								defaultValue={format(value)}
+								id={option}
+							/>
+						)}
 				</Fieldset>
 			))}
 
 			<FlexRow>
 				<Dialog modal>
-					<DialogTriggerToRemoveMedia data-tip="Close delete's dialog">
+					<DialogTriggerToRemoveMedia className="notransition">
 						Delete media
 						<Remove />
 					</DialogTriggerToRemoveMedia>
-
-					<StyledDialogBlurOverlay />
 
 					<DeleteMediaDialogContent
 						handleMediaDeletion={() =>
@@ -98,7 +144,13 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 				<CloseDialog
 					onClick={() =>
-						changeMediaMetadata(contentWrapperRef, closeButtonRef, path, media)}
+						changeMediaMetadata(
+							contentWrapperRef,
+							closeButtonRef,
+							imageFilePathRef.current,
+							path,
+							media,
+						)}
 					id="save-changes"
 				>
 					Save changes
@@ -129,6 +181,7 @@ async function handleMediaDeletion(
 function changeMediaMetadata(
 	contentWrapperRef: Readonly<RefObject<HTMLDivElement>>,
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
+	imageFilePath: Readonly<Path>,
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
 ): void {
@@ -136,10 +189,15 @@ function changeMediaMetadata(
 		return;
 
 	try {
-		changeMetadataIfAllowed(contentWrapperRef, mediaPath, media);
+		const hasAnythingChanged = changeMetadataIfAllowed(
+			contentWrapperRef,
+			imageFilePath,
+			mediaPath,
+			media,
+		);
 		closeEverything(closeButtonRef);
 
-		successToast("New media metadata has been saved.");
+		hasAnythingChanged && successToast("New media metadata has been saved.");
 	} catch (error) {
 		console.error(error);
 
@@ -153,17 +211,23 @@ function changeMediaMetadata(
 
 function changeMetadataIfAllowed(
 	contentWrapper: Readonly<RefObject<HTMLDivElement>>,
+	imageFilePath: Readonly<Path>,
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
-): void {
-	if (!contentWrapper.current) return;
+): boolean {
+	if (!contentWrapper.current) return false;
 
 	const thingsToChange: MetadataToChange = [];
+
+	if (imageFilePath)
+		thingsToChange.push({ newValue: imageFilePath, whatToChange: "imageURL" });
 
 	// This shit is to get all the inputs:
 	for (const children of contentWrapper.current.children)
 		for (const element of children.children)
 			if (element instanceof HTMLInputElement && !element.disabled) {
+				if (!isChangeable(element.id)) continue;
+
 				const id = element.id as ChangeOptions;
 				const newValue = element.value.trim();
 
@@ -186,7 +250,7 @@ function changeMetadataIfAllowed(
 							newValueAsArray.pop();
 
 						// If both arrays are equal by values, we don't need to change anything:
-						if (areArraysEqual(newValueAsArray, oldValue))
+						if (areArraysEqualByValue(newValueAsArray, oldValue))
 							return console.log(
 								"Values are equal, not gonna change anything:",
 								{ newValueAsArray, oldValue },
@@ -215,34 +279,33 @@ function changeMetadataIfAllowed(
 				});
 			}
 
+	const isThereAnythingToChange = thingsToChange.length > 0;
+
 	// Send message to Electron to execute the function writeTag() in the main process:
-	if (thingsToChange.length > 0)
+	if (isThereAnythingToChange)
 		sendMsgToBackend({
 			type: ReactToElectronMessageEnum.WRITE_TAG,
 			thingsToChange,
 			mediaPath,
 		});
+
+	return isThereAnythingToChange;
 }
 
 /////////////////////////////////////////////
 
-const options = ({ duration, artist, album, genres, title, size }: Media) => ({
-	duration,
-	artist,
-	genres,
-	title,
-	album,
-	size,
-});
+const options = (
+	{ duration, artist, album, genres, title, size, image, lyrics }: Media,
+) => ({ duration, size, artist, genres, title, album, lyrics, image });
 
 /////////////////////////////////////////////
 
-// Translating to the names that the library that changes
-// the metadata recognizes:
+// Translating to the names that our API that changes
+// the metadata recognizes (on "main/preload/media/mutate-metadata.ts"):
 const allowedOptionToChange = Object.freeze(
 	{
 		artist: "albumArtists",
-		imageURL: "imageURL",
+		image: "imageURL",
 		lyrics: "lyrics",
 		genres: "genres",
 		album: "album",

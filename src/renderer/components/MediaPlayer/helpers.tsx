@@ -93,7 +93,7 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
 				</CircledIconButton>
 
-				<Controls isThereAMedia={isThereAMedia} isPaused={audio?.paused} />
+				<Controls isDisabled={isThereAMedia} isPaused={audio?.paused} />
 
 				<CircledIconButton
 					data-tip="Toggle random"
@@ -114,7 +114,12 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 	<OptionsAndAlbum>
 		<CircledIconButton
-			onClick={() => handleSearchAndOpenLyrics(media, path)}
+			onClick={async () => {
+				await searchAndOpenLyrics(media, path, true);
+
+				if (media?.lyrics)
+					setTimeout(flipMediaPlayerCard, 1_000);
+			}}
 			data-tip="Toggle open lyrics"
 			disabled={!media}
 		>
@@ -139,59 +144,63 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const noLyricsFound = "No lyrics found!";
-
-function handleSearchAndOpenLyrics(
+export async function searchAndOpenLyrics(
 	media: Media | undefined,
 	mediaPath: Path,
-): void {
-	if (!media) return;
+	openLyrics: boolean,
+): Promise<void> {
+	if (!media || !mediaPath) return;
 
-	if (media.lyrics) return flipMediaPlayerCard();
+	if (media.lyrics && openLyrics) return flipMediaPlayerCard();
 
 	if (!media.artist) {
 		infoToast("Make sure that media has artist metadata!");
 		return;
 	}
 
-	searchForLyricsAndImage(media.title, media.artist, media.img)
-		.then(({ lyric, image, albumName }) => {
-			sendMsgToBackend({
-				type: ReactToElectronMessageEnum.WRITE_TAG,
-				thingsToChange: [{ whatToChange: "album", newValue: albumName }, {
-					whatToChange: "imageURL",
-					newValue: image,
-				}, { whatToChange: "lyrics", newValue: lyric }],
-				mediaPath,
-			});
+	// If there is no image already, go get one:
+	const getImage = Boolean(media.image);
 
-			setTimeout(() => flipMediaPlayerCard(), 1_000);
-		})
-		.catch(err => {
-			if (err.message === noLyricsFound)
-				infoToast(noLyricsFound);
+	try {
+		const { lyric, image, albumName } = await searchForLyricsAndImage(
+			media.title,
+			media.artist,
+			getImage,
+		);
 
-			console.error(err);
+		sendMsgToBackend({
+			type: ReactToElectronMessageEnum.WRITE_TAG,
+			thingsToChange: [{ whatToChange: "album", newValue: albumName }, {
+				whatToChange: "imageURL",
+				newValue: image,
+			}, { whatToChange: "lyrics", newValue: lyric }],
+			mediaPath,
 		});
+	} catch (error) {
+		if ((error as Error).message.includes("No lyrics found"))
+			infoToast(`No lyrics found for "${media.title}"!`);
+
+		console.error(error);
+	}
 }
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Controls = ({ isPaused = false, isThereAMedia }: IsPaused) => (
+export const Controls = ({ isPaused = false, isDisabled }: IsPaused) => (
 	<ControlsWrapper>
 		<CircledIconButton
 			data-tip="Play previous track"
 			onClick={playPreviousMedia}
-			disabled={isThereAMedia}
+			disabled={isDisabled}
 		>
 			<Previous />
 		</CircledIconButton>
 
 		<CircledIconButton
 			onClick={togglePlayPause}
-			disabled={isThereAMedia}
+			disabled={isDisabled}
 			data-tip="Play/pause"
 			size="large"
 		>
@@ -200,7 +209,7 @@ export const Controls = ({ isPaused = false, isThereAMedia }: IsPaused) => (
 
 		<CircledIconButton
 			data-tip="Play next track"
-			disabled={isThereAMedia}
+			disabled={isDisabled}
 			onClick={playNextMedia}
 		>
 			<Next />
@@ -301,7 +310,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 type Audio = HTMLAudioElement | null;
 type RefToAudio = Readonly<{ audio: Audio; }>;
 type SeekEvent = Readonly<React.MouseEvent<HTMLDivElement, MouseEvent>>;
-type IsPaused = Readonly<{ isPaused?: boolean; isThereAMedia: boolean; }>;
+type IsPaused = Readonly<{ isPaused?: boolean; isDisabled: boolean; }>;
 type HeaderProps = Readonly<
 	{ media: Media | undefined; displayTitle?: boolean; path: Path; }
 >;

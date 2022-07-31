@@ -188,7 +188,7 @@ export function InputAndResults() {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
+function Row({ media: { title, image, duration }, highlight, path }: RowProps) {
 	/** normalize()ing to NFD Unicode normal form decomposes
 	 * combined graphemes into the combination of simple ones.
 	 * The è of Crème ends up expressed as e +  ̀.
@@ -213,7 +213,7 @@ function Row({ media: { title, img, duration }, highlight, path }: RowProps) {
 				<ImgWithFallback
 					Fallback={<MusicNote size={13} />}
 					mediaPath={path}
-					mediaImg={img}
+					mediaImg={image}
 				/>
 			</Img>
 

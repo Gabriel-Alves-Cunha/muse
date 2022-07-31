@@ -58,7 +58,7 @@ export type VisibleElectron = Readonly<
 				searchForLyricsAndImage(
 					mediaTitle: string,
 					mediaArtist: string,
-					mediaImage: string,
+					getImage: boolean,
 				): Promise<LyricsResponse>;
 			}
 		>;

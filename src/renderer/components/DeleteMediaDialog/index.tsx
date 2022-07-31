@@ -1,4 +1,7 @@
+import { Root } from "@radix-ui/react-portal";
+
 import {
+	StyledDialogBlurOverlay,
 	StyledDialogContent,
 	StyledTitle,
 	CloseDialog,
@@ -10,24 +13,38 @@ const warningSvg = new URL(
 	import.meta.url,
 );
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Main function:
+
 export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 	return (
-		<StyledDialogContent className="delete-media">
-			<StyledTitle className="subtitle">
-				Are you sure you want to delete this media from your computer?
-			</StyledTitle>
+		<Root>
+			<StyledDialogBlurOverlay />
 
-			<FlexRow>
-				<img src={warningSvg.href} alt="Warning sign." id="warning" />
+			<StyledDialogContent className="delete-media">
+				<StyledTitle className="subtitle">
+					Are you sure you want to delete this media from your computer?
+				</StyledTitle>
 
-				<CloseDialog onClick={handleMediaDeletion} className="delete-media">
-					Confirm
-				</CloseDialog>
+				<FlexRow>
+					<img src={warningSvg.href} alt="Warning sign." id="warning" />
 
-				<CloseDialog id="cancel">Cancel</CloseDialog>
-			</FlexRow>
-		</StyledDialogContent>
+					<CloseDialog onClick={handleMediaDeletion} className="delete-media">
+						Confirm
+					</CloseDialog>
+
+					<CloseDialog id="cancel">Cancel</CloseDialog>
+				</FlexRow>
+			</StyledDialogContent>
+		</Root>
 	);
 }
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 type Props = Readonly<{ handleMediaDeletion: () => void; }>;

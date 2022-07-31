@@ -52,6 +52,8 @@ an 'mp3' version of the media.
 
 * Share medias with devices on the same WiFi network.
 
+* Get a media's lyrics.
+
 ## 🚀 Installing
 
 To install and run Muse, follow these steps:

@@ -124,7 +124,7 @@ const Player = ({ media, audioRef, audio, path }: PlayerProps) => (
 			<div>
 				<ImgWithFallback
 					Fallback={<MusicNote size={13} />}
-					mediaImg={media?.img}
+					mediaImg={media?.image}
 					mediaPath={path}
 				/>
 			</div>

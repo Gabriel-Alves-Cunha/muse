@@ -35,7 +35,7 @@ export const StyledDialogBlurOverlay = styled(Overlay, {
 	bg: "rgba(0, 0, 0, 0.1)",
 
 	overflowY: "auto",
-	zIndex: 100,
+	zIndex: 225,
 
 	animation: `${overlayShow} 90ms linear`,
 });
@@ -62,7 +62,7 @@ export const StyledDialogContent = styled(Content, {
 
 	bg: "$bg-dialog",
 	bs: "$dialog",
-	zIndex: 150,
+	zIndex: 250,
 	br: 4,
 
 	animation: `${overlayShow} 90ms linear`,
@@ -300,7 +300,7 @@ export const Input = styled("input", {
 	p: "0 10px",
 	br: 12,
 
-	whiteSpace: "nowrap",
+	whiteSpace: "nowrap", // keep it one line
 	c: "$input-text",
 	ff: "$secondary",
 	ls: "0.04rem",

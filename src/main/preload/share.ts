@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 
-import { createReadStream, ReadStream } from "node:fs";
+import { createReadStream, ReadStream, createWriteStream } from "node:fs";
+import { createGzip, createGunzip, constants } from "node:zlib";
 import { networkInterfaces, tmpdir } from "node:os";
-import { exec as syncExec } from "node:child_process";
+import { pack, extract } from "tar-stream";
 import { createServer } from "node:http";
-import { promisify } from "node:util";
 import { unlink } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -23,8 +23,8 @@ const { log, error } = console;
 // Constants:
 
 const fileLocation = join(tmpdir(), "medias");
-const zipFileLocation = fileLocation + ".zip";
-const cmd = `zip -j -0 -v ${fileLocation} `;
+const tarZipFileLocation = fileLocation + ".tar.gz";
+// const cmd = `zip -j -0 -v ${fileLocation} `;
 const myIp = getMyIpAddress();
 let id = 0;
 
@@ -35,59 +35,81 @@ dbg(`My ip address = ${myIp}`);
 /////////////////////////////////////////////
 // Helper functions for `turnServerOn`:
 
-const exec = promisify(syncExec);
-
-/////////////////////////////////////////////
-
-// TODO: if ever to make Muse for Windows, see to make this portable!
 export async function makeItOnlyOneFile(
 	filepaths: ReadonlySet<Path>,
 ): Promise<Readonly<Path>> {
-	const mediasSeparatedBySpaceAndSurroundedByQuotationMarks = [...filepaths]
-		.map(filepath => `"${filepath}"`)
-		.join(" ");
+	return await time(async () => { // If only one file, send it directly:
+		if (filepaths.size === 1) return getFirstKey(filepaths) as string;
 
-	// If only one file, send it directly:
-	if (filepaths.size === 1) return getFirstKey(filepaths) as string;
+		// Else, make an uncompressed zip file:
+		try {
+			if (await pathExists(tarZipFileLocation)) {
+				dbg(`Deleting pre existing file: "${tarZipFileLocation}"`);
+				// If this errors, don't throw an error, just log it:
+				await unlink(tarZipFileLocation).catch(error);
+			}
 
-	// Else, make an uncompressed zip file:
-	try {
-		const start = performance.now();
+			const writeStreamToTarZipFile = createWriteStream(tarZipFileLocation).on(
+				"error",
+				err => {
+					writeStreamToTarZipFile.close();
+					throw err;
+				},
+			);
+			const zip = createGzip({ level: constants.Z_NO_COMPRESSION }).on(
+				"error",
+				err => {
+					zip.close();
+					throw err;
+				},
+			);
+			const tar = pack().on("error", err => {
+				tar.finalize();
+				throw err;
+			});
 
-		if (await pathExists(zipFileLocation)) {
-			dbg(`Deleting pre existing file: "${zipFileLocation}"`);
-			// If this errors, don't throw an error, just log it:
-			await unlink(zipFileLocation).catch(error);
+			filepaths.forEach(path => {
+				const fileContents = createReadStream(path);
+
+				fileContents.pipe(tar.entry({ name: getBasename(path) })).on(
+					"error",
+					err => {
+						fileContents.close();
+						throw err;
+					},
+				);
+			});
+
+			// No more entries:
+			tar.finalize();
+
+			tar.pipe(zip).pipe(writeStreamToTarZipFile, { end: true });
+		} catch (error) {
+			throw new Error("Error ziping medias! " + error);
 		}
 
-		// Full command to execute on shell:
-		const fullCmd = cmd + mediasSeparatedBySpaceAndSurroundedByQuotationMarks;
-
-		const { stdout, stderr } = await exec(fullCmd);
-
-		dbg("zip stdout:", stdout);
-		dbg("zip stderr:", stderr);
-
-		const time = performance.now() - start;
-
-		dbg("makeItOnlyOneFile took:", time);
-	} catch (error) {
-		throw new Error("Error ziping medias! " + error);
-	}
-
-	return zipFileLocation;
+		return tarZipFileLocation;
+	}, "makeItOnlyOneFile");
 }
 
 /////////////////////////////////////////////
 
 function getMyIpAddress(): Readonly<string> {
 	// Got this from StackOverflow, if this ever fails, replace it.
-	return Object
-		.values(networkInterfaces())
-		.flat()
-		.filter(item => !item?.internal && item?.family === "IPv4")
-		.find(Boolean)
-		?.address ?? "";
+	const myIp =
+		Object
+			.values(networkInterfaces())
+			.flat()
+			.filter(item => !item?.internal && item?.family === "IPv4")
+			.find(Boolean)
+			?.address ?? "";
+
+	if (!myIp)
+		throw new Error(
+			"Unable to get your ip address. Sharing medias is not possible!",
+		);
+
+	return myIp;
 }
 
 /////////////////////////////////////////////
@@ -169,15 +191,25 @@ export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
 					"open",
 					// We do a simple call to readStream.pipe(). This just pipes the
 					// read stream to the response object (which goes to the client):
-					() =>
-						readStream.pipe(res).on("error", err => {
-							// Log possible piping error:
-							error("Error piping readStream!", { err });
+					() => {
+						const extractor = extract().on("entry", (_header, stream, next) => {
+							// header is the tar header
+							// stream is the content body (might be an empty stream)
+							// call next when you are done with this entry
 
-							// Clean up:
-							res.end();
-							server.close();
-						}),
+							// Ready for next entry:
+							stream.on("end", next);
+							// Just auto drain the stream:
+							stream.resume();
+						});
+
+						readStream.pipe(createGunzip()).pipe(extractor).pipe(res).on(
+							"finish",
+							() => {
+								log("Piping to client finished!");
+							},
+						);
+					},
 				)
 				// Log possible readStream error:
 				.on("error", err => {
@@ -206,9 +238,9 @@ export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
 			.on("close", async () => {
 				dbg("Closing server from NodeJS side.");
 
-				if (await pathExists(zipFileLocation)) {
-					dbg(`Deleting zip file: "${zipFileLocation}"`);
-					await unlink(zipFileLocation).catch(error);
+				if (await pathExists(tarZipFileLocation)) {
+					dbg(`Deleting zip file: "${tarZipFileLocation}"`);
+					await unlink(tarZipFileLocation).catch(error);
 				}
 
 				if (errorListening) {
@@ -217,7 +249,7 @@ export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
 				}
 			})
 			.on("connection", socket => {
-				dbg("Connected to another computer!");
+				dbg("Connected to another device!");
 
 				// Log possible socket error:
 				socket.on("error", err => error("Error on socket!", { err })).on(

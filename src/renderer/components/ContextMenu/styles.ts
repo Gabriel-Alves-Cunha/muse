@@ -58,7 +58,10 @@ export const itemStyles = styled("div", {
 		pointerEvents: "none",
 	},
 
-	"&:focus": { c: "$ctx-menu-item-text-focus", bg: "$ctx-menu-item-bg-focus" },
+	"&:hover, &:focus": {
+		c: "$ctx-menu-item-text-focus",
+		bg: "$ctx-menu-item-bg-focus",
+	},
 });
 
 export const TriggerToDeleteMedia = styled(Trigger, {

@@ -8,7 +8,6 @@ import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
 import { emptyMap } from "@utils/map-set";
-import { time } from "@utils/utils";
 
 import { StyledPopoverTrigger } from "../Downloading/styles";
 import { PopoverAnchor } from "./styles";
@@ -29,10 +28,7 @@ export function Converting() {
 	useEffect(() => {
 		newConvertions.forEach((newConvertion, path) => {
 			try {
-				const electronPort = time(
-					() => createNewConvertion(newConvertion, path),
-					`createNewConvertion("${path}")`,
-				);
+				const electronPort = createNewConvertion(newConvertion, path);
 
 				// Sending port so we can communicate with electron:
 				sendMsgToBackend(

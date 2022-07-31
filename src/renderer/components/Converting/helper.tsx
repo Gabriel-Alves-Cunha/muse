@@ -183,6 +183,7 @@ export function createNewConvertion(
 export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export function cancelConversionAndOrRemoveItFromList(
 	path: Readonly<string>,
@@ -209,6 +210,7 @@ export function cancelConversionAndOrRemoveItFromList(
 	setConvertingList(newConvertingList);
 }
 
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 
 function handleUpdateConvertingList(

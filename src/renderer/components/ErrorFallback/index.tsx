@@ -12,6 +12,11 @@ import {
 	StyledTitle,
 } from "../MediaListKind/MediaOptions/styles";
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Main function:
+
 export function ErrorFallback({ description }: ErrorBoundaryProps) {
 	return (
 		<Dialog modal open>
@@ -40,5 +45,10 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 		</Dialog>
 	);
 }
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 type ErrorBoundaryProps = Readonly<{ description: string; }>;

@@ -52,7 +52,7 @@ async function createMedia(
 			const mimeType = picture?.mimeType;
 
 			const media: Media = {
-				img: picture && mimeType ?
+				image: picture && mimeType ?
 					`data:${mimeType};base64,${picture.data.toBase64String()}` as ImgString :
 					"",
 				duration: formatDuration(durationInSeconds),

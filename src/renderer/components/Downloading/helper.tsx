@@ -172,6 +172,7 @@ export function createNewDownload(
 }
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
 // Helper functions for `createNewDownload()`
 
 function handleUpdateDownloadingList(
@@ -241,6 +242,7 @@ function handleUpdateDownloadingList(
 	}
 }
 
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 
 export function cancelDownloadAndOrRemoveItFromList(

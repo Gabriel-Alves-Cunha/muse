@@ -60,7 +60,7 @@ export const StyledDialogShareContent = styled(Content, {
 
 	boxShadow: "$popover",
 	bg: "$bg-popover",
-	zIndex: 150,
+	zIndex: 250,
 	br: 13,
 
 	"@media (prefers-reduced-motion: no-preference)": {

@@ -68,7 +68,7 @@ export function ShareDialog() {
 	// When the server closes, get rid of it's reference:
 	useEffect(() => {
 		server?.addListener("close", () => {
-			setServer(null);
+			setTimeout(() => setServer(null), 1_000);
 			closePopover();
 		});
 	}, [server]);

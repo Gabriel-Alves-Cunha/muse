@@ -2,7 +2,7 @@ import { createStitches, type CSSProperties } from "@stitches/react";
 import { toast } from "react-toastify";
 
 import { getObjectDeepKeys } from "@utils/object";
-import { areArraysEqual } from "@utils/array";
+import { areArraysEqualByValue } from "@utils/array";
 import { isDevelopment } from "@common/utils";
 
 ////////////////////////////////////////////////
@@ -134,6 +134,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				/* Handle on hover */
 				"&::-webkit-scrollbar-thumb:hover": { bg: "$scrollbar-thumb-hover" },
 
+				scrollbarGutter: "stable",
 				overflowY: "auto",
 			}),
 		},
@@ -294,7 +295,7 @@ if (isDevelopment) {
 	const lightThemeKeys = getObjectDeepKeys(lightTheme);
 	// @ts-ignore It will work:
 	const darkThemeKeys = getObjectDeepKeys(darkTheme);
-	const areEqual = areArraysEqual(lightThemeKeys, darkThemeKeys);
+	const areEqual = areArraysEqualByValue(lightThemeKeys, darkThemeKeys);
 
 	if (!areEqual)
 		console.error(

@@ -32,7 +32,7 @@ export const ContextMenu = (
 	<Root onOpenChange={setIsOpen}>
 		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
-		<Content>{contentToShow(content)}</Content>
+		<Content className="notransition">{contentToShow(content)}</Content>
 	</Root>
 );
 

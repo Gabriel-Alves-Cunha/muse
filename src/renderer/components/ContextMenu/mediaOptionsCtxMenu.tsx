@@ -3,17 +3,16 @@ import { FiTrash as Trash } from "react-icons/fi";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
+import { searchAndOpenLyrics } from "@components/MediaPlayer/helpers";
 import { deleteMedia } from "@utils/media";
 import { setSettings } from "@contexts/settings";
+import { mainList } from "@contexts/mediaHandler/usePlaylists";
 import {
 	allSelectedMedias,
 	selectAllMedias,
 } from "@contexts/mediaHandler/useAllSelectedMedias";
 
 import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
-import {
-	StyledDialogBlurOverlay,
-} from "@components/MediaListKind/MediaOptions/styles";
 
 export function MediaOptionsCtxMenu() {
 	const plural = allSelectedMedias().length > 1 ? "s" : "";
@@ -22,7 +21,7 @@ export function MediaOptionsCtxMenu() {
 		<>
 			<>
 				<Dialog modal>
-					<TriggerToDeleteMedia className="notransition">
+					<TriggerToDeleteMedia>
 						Delete media{plural}
 
 						<RightSlot>
@@ -30,23 +29,23 @@ export function MediaOptionsCtxMenu() {
 						</RightSlot>
 					</TriggerToDeleteMedia>
 
-					<StyledDialogBlurOverlay />
-
 					<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
 				</Dialog>
 			</>
 
-			<Item onClick={shareMedias} className="notransition">
+			<Item onClick={shareMedias}>
 				Share media{plural}
 				<RightSlot>
 					<Share />
 				</RightSlot>
 			</Item>
 
-			<Item onClick={selectAllMedias} className="notransition">
+			<Item onClick={selectAllMedias}>
 				Select all medias
 				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
+
+			<Item onClick={searchForLyrics}>Search for lyrics</Item>
 		</>
 	);
 }
@@ -68,4 +67,16 @@ async function deleteMedias(): Promise<void> {
 	allSelectedMedias().forEach(path => promises.push(deleteMedia(path)));
 
 	await Promise.all(promises);
+}
+
+/////////////////////////////////////////////
+
+function searchForLyrics(): void {
+	const allMedias = mainList();
+
+	allSelectedMedias().forEach(async selectedMediaPath => {
+		const media = allMedias.get(selectedMediaPath);
+
+		await searchAndOpenLyrics(media, selectedMediaPath, false);
+	});
 }

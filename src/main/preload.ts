@@ -27,8 +27,8 @@ import {
 	createOrCancelConvert,
 } from "./preload/media/create-conversion";
 import {
-	createOrCancelDownload,
 	type CreateDownload,
+	createOrCancelDownload,
 } from "./preload/media/download-media";
 import {
 	getFullPathOfFilesForFilesInThisDirectory,

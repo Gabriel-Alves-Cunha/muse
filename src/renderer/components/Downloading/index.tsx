@@ -11,7 +11,6 @@ import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { errorToast } from "@styles/global";
-import { time } from "@utils/utils";
 
 import { StyledPopoverTrigger } from "./styles";
 import { PopoverAnchor } from "../Converting/styles";
@@ -30,6 +29,7 @@ const defaultDownloadInfo: DownloadInfo = Object.freeze({
 });
 
 export const useDownloadInfo = create(() => defaultDownloadInfo);
+
 export const { setState: setDownloadInfo } = useDownloadInfo;
 
 /////////////////////////////////////////////
@@ -49,10 +49,7 @@ export function Downloading() {
 
 		// For each new `downloadInfo`, start a new download:
 		try {
-			const electronPort = time(
-				() => createNewDownload(downloadInfo),
-				`createNewDownload("${downloadInfo.title}")`,
-			);
+			const electronPort = createNewDownload(downloadInfo);
 
 			// Sending port so we can communicate with Electron:
 			sendMsgToBackend({
@@ -73,7 +70,7 @@ export function Downloading() {
 		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
 			<StyledPopoverTrigger
 				className={(downloadingListSize ? "has-items " : "") +
-					(isOpen ? "active" : "")}
+					(isOpen ? "active " : "")}
 				data-tip="Show all downloading medias"
 			>
 				<span data-length={downloadingListSize}></span>

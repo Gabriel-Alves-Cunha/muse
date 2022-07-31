@@ -9,16 +9,20 @@ import { dbg, stringifyJson } from "@common/utils";
 export async function searchForLyricsAndImage(
 	mediaTitle: string,
 	mediaArtist: string,
-	mediaImage: string,
+	getImage: boolean,
 ): Promise<LyricsResponse> {
-	dbg({ mediaTitle, mediaImage, mediaArtist });
+	if (!mediaTitle || !mediaArtist)
+		throw new Error(
+			`Required argument is empty: ${
+				stringifyJson({ mediaArtist, mediaTitle })
+			}`,
+		);
 
-	const [possibleLyric] = await queryForPossibleLyric(mediaTitle, mediaArtist);
+	dbg({ mediaTitle, getImage, mediaArtist });
 
-	if (!possibleLyric)
-		throw new Error("No lyrics found!");
+	const possibleLyric = await queryForPossibleLyric(mediaTitle, mediaArtist);
 
-	const image = !mediaImage ? await queryForImage(possibleLyric.imageURL) : "";
+	const image = getImage ? await queryForImage(possibleLyric.imageURL) : "";
 	const lyric = await queryForLyric(possibleLyric.lyricURL);
 	const albumName = possibleLyric.albumName;
 
@@ -37,14 +41,7 @@ export async function searchForLyricsAndImage(
 async function queryForPossibleLyric(
 	mediaTitle: string,
 	mediaArtist: string,
-): Promise<PossibleLyrics[]> {
-	if (!mediaTitle || !mediaArtist)
-		throw new Error(
-			`Required argument is empty: ${
-				stringifyJson({ mediaArtist, mediaTitle })
-			}`,
-		);
-
+): Promise<PossibleLyrics> {
 	// From 'https://happi.dev/docs/music' docs:
 	const params = new URLSearchParams({
 		// Text to search:
@@ -56,7 +53,7 @@ async function queryForPossibleLyric(
 	});
 
 	const jsonRes =
-		await (await fetch(lyricsAPI + "?" + params.toString(), {
+		await (await fetch(`${lyricsAPI}?${params.toString()}`, {
 			headers: {
 				"Content-Type": "application/json",
 				"x-happi-key": lyricApiKey,
@@ -70,15 +67,18 @@ async function queryForPossibleLyric(
 	if (!jsonRes.success)
 		throw new Error(jsonRes.error);
 
-	const possibleLyrics: PossibleLyrics[] = jsonRes.result.map((
-		{ artist = "", track = "", cover = "", api_lyrics = "", album = "" },
-	) => ({
-		lyricURL: api_lyrics,
-		albumName: album,
-		imageURL: cover,
-		title: track,
-		artist,
-	}));
+	const track = jsonRes.result[0];
+
+	if (!track)
+		throw new Error("No lyrics found!");
+
+	const possibleLyrics: PossibleLyrics = {
+		lyricURL: track.api_lyrics,
+		albumName: track.album,
+		imageURL: track.cover,
+		artist: track.artist,
+		title: track.track,
+	};
 
 	return possibleLyrics;
 }
@@ -166,12 +166,12 @@ interface Track {
 	success: true;
 	result: [
 		{
-			track: string;
+			api_lyrics: string;
+			api_album: string;
 			artist: string;
+			track: string;
 			album: string;
 			cover: string;
-			api_album: string;
-			api_lyrics: string;
 		},
 	];
 }

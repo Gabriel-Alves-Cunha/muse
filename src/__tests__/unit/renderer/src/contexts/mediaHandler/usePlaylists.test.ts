@@ -294,7 +294,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 			artist: "",
 			lyrics: "",
 			album: "",
-			img: "",
+			image: "",
 			title,
 		};
 
