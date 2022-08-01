@@ -1,16 +1,23 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 
-import { createReadStream, ReadStream, createWriteStream } from "node:fs";
 import { createGzip, createGunzip, constants } from "node:zlib";
 import { networkInterfaces, tmpdir } from "node:os";
-import { pack, extract } from "tar-stream";
 import { createServer } from "node:http";
+import { pipeline } from "node:stream/promises";
+import { create } from "archiver";
 import { unlink } from "node:fs/promises";
 import { join } from "node:path";
+import {
+	createWriteStream,
+	createReadStream,
+	ReadStream,
+	statSync,
+} from "node:fs";
 
 import { getFirstKey } from "@utils/map-set";
 import { getBasename } from "@common/path";
+import { prettyBytes } from "@common/prettyBytes";
 import { pathExists } from "./file";
 import { time } from "@utils/utils";
 import { dbg } from "@common/utils";
@@ -42,51 +49,55 @@ export async function makeItOnlyOneFile(
 		if (filepaths.size === 1) return getFirstKey(filepaths) as string;
 
 		// Else, make an uncompressed zip file:
-		try {
-			if (await pathExists(tarZipFileLocation)) {
-				dbg(`Deleting pre existing file: "${tarZipFileLocation}"`);
-				// If this errors, don't throw an error, just log it:
-				await unlink(tarZipFileLocation).catch(error);
-			}
-
-			const writeStreamToTarZipFile = createWriteStream(tarZipFileLocation).on(
-				"error",
-				err => {
-					writeStreamToTarZipFile.close();
-					throw err;
-				},
-			);
-			const zip = createGzip({ level: constants.Z_NO_COMPRESSION }).on(
-				"error",
-				err => {
-					zip.close();
-					throw err;
-				},
-			);
-			const tar = pack().on("error", err => {
-				tar.finalize();
-				throw err;
-			});
-
-			filepaths.forEach(path => {
-				const fileContents = createReadStream(path);
-
-				fileContents.pipe(tar.entry({ name: getBasename(path) })).on(
-					"error",
-					err => {
-						fileContents.close();
-						throw err;
-					},
-				);
-			});
-
-			// No more entries:
-			tar.finalize();
-
-			tar.pipe(zip).pipe(writeStreamToTarZipFile, { end: true });
-		} catch (error) {
-			throw new Error("Error ziping medias! " + error);
+		if (await pathExists(tarZipFileLocation)) {
+			dbg(`Deleting pre existing file: "${tarZipFileLocation}"`);
+			// If this errors, don't throw an error, just log it:
+			await unlink(tarZipFileLocation).catch(error);
 		}
+
+		const writeStreamToTarZipFile = createWriteStream(tarZipFileLocation).on(
+			"error",
+			err => {
+				throw new Error("Error on writeStreamToTarZipFile!\n" + err);
+			},
+		);
+		const zip = createGzip({ level: constants.Z_NO_COMPRESSION }).on(
+			"error",
+			err => {
+				throw new Error("Error on zip!\n" + err);
+			},
+		);
+		const tarArchiver = create("tar");
+
+		for (const path of filepaths) {
+			dbg({ path });
+			const fileContents = createReadStream(path);
+
+			const exitNumber = await new Promise<0>((resolve, reject) => {
+				dbg("on exitNumber Promise");
+				tarArchiver
+					.append(fileContents, { name: getBasename(path) })
+					.on("entry", () => resolve(0))
+					.on("error", err => reject(err))
+					.on("pipe", () => dbg("Piping"));
+			});
+
+			dbg(`exitNumber for "${path}" = ${exitNumber}`);
+		}
+
+		// finalize the archive (ie we are done appending files but streams have to finish yet)
+		// 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand
+		tarArchiver.finalize();
+
+		await pipeline(tarArchiver, zip, writeStreamToTarZipFile).catch(err => {
+			throw new Error("Error on entry!\n" + err);
+		});
+
+		dbg(
+			`pipeline finalized. ${tarZipFileLocation}.size = ${
+				prettyBytes(statSync(tarZipFileLocation).size)
+			}`,
+		);
 
 		return tarZipFileLocation;
 	}, "makeItOnlyOneFile");
