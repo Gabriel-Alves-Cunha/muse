@@ -1,6 +1,6 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
-import type { TurnServerOnReturn } from "@main/preload/share";
+import type { ClientServerAPI } from "@main/preload/share";
 import type { LyricsResponse } from "@main/preload/getLyrics.js";
 import type { videoInfo } from "ytdl-core";
 
@@ -46,12 +46,7 @@ export type VisibleElectron = Readonly<
 			}
 		>;
 		share: Readonly<
-			{
-				turnServerOn(filePath: Readonly<Path>): Readonly<TurnServerOnReturn>;
-				makeItOnlyOneFile(
-					filepaths: ReadonlySet<Path>,
-				): Promise<Readonly<Path>>;
-			}
+			{ createServer(filepaths: readonly Path[]): Readonly<ClientServerAPI>; }
 		>;
 		lyric: Readonly<
 			{

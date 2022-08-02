@@ -4,10 +4,10 @@ import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
-import { makeItOnlyOneFile, turnServerOn } from "./preload/share";
 import { searchForLyricsAndImage } from "./preload/getLyrics.js";
 import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
+import { createServer } from "./preload/share";
 import { writeTags } from "./preload/media/mutate-metadata";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
@@ -46,8 +46,8 @@ const electron: VisibleElectron = Object.freeze({
 	fs: { getFullPathOfFilesForFilesInThisDirectory, deleteFile, readDir },
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
-	share: { turnServerOn, makeItOnlyOneFile },
 	lyric: { searchForLyricsAndImage },
+	share: { createServer },
 	os: { dirs },
 });
 

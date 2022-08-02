@@ -1,109 +1,140 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type { Path, QRCodeURL } from "@common/@types/generalTypes";
+import { networkInterfaces } from "node:os";
+import { createReadStream } from "node:fs";
+import { Path, QRCodeURL } from "@common/@types/generalTypes";
+import Router from "koa-router";
+import Koa from "koa";
 
-import { createGzip, createGunzip, constants } from "node:zlib";
-import { networkInterfaces, tmpdir } from "node:os";
-import { createServer } from "node:http";
-import { pipeline } from "node:stream/promises";
-import { create } from "archiver";
-import { unlink } from "node:fs/promises";
-import { join } from "node:path";
-import {
-	createWriteStream,
-	createReadStream,
-	ReadStream,
-	statSync,
-} from "node:fs";
-
-import { getFirstKey } from "@utils/map-set";
-import { getBasename } from "@common/path";
-import { prettyBytes } from "@common/prettyBytes";
-import { pathExists } from "./file";
-import { time } from "@utils/utils";
+import { getBasenameAndExtension } from "@common/path";
+import { prettyPrintStringArray } from "@utils/array";
 import { dbg } from "@common/utils";
 
-const { log, error } = console;
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// Constants:
+// Main function:
 
-const fileLocation = join(tmpdir(), "medias");
-const tarZipFileLocation = fileLocation + ".tar.gz";
-// const cmd = `zip -j -0 -v ${fileLocation} `;
-const myIp = getMyIpAddress();
-let id = 0;
+const mainPath = "/download/medias/";
 
-dbg(`My ip address = ${myIp}`);
+export function createServer(filepaths: readonly Path[]): ClientServerAPI {
+	const port = 3_010;
+	const url: QRCodeURL = `http://${myIp}:${port}`;
+	const router = new Router();
 
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Helper functions for `turnServerOn`:
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
 
-export async function makeItOnlyOneFile(
-	filepaths: ReadonlySet<Path>,
-): Promise<Readonly<Path>> {
-	return await time(async () => { // If only one file, send it directly:
-		if (filepaths.size === 1) return getFirstKey(filepaths) as string;
+	router.get("/", async (ctx, next) => {
+		ctx.body = `\
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Download file(s)</title>
+	</head>
 
-		// Else, make an uncompressed zip file:
-		if (await pathExists(tarZipFileLocation)) {
-			dbg(`Deleting pre existing file: "${tarZipFileLocation}"`);
-			// If this errors, don't throw an error, just log it:
-			await unlink(tarZipFileLocation).catch(error);
-		}
+	<body>
+		<script>
+			console.log("Downloading medias...");
 
-		const writeStreamToTarZipFile = createWriteStream(tarZipFileLocation).on(
-			"error",
-			err => {
-				throw new Error("Error on writeStreamToTarZipFile!\n" + err);
-			},
-		);
-		const zip = createGzip({ level: constants.Z_NO_COMPRESSION }).on(
-			"error",
-			err => {
-				throw new Error("Error on zip!\n" + err);
-			},
-		);
-		const tarArchiver = create("tar");
+			function getBasename(filename) {
+				return filename.split("\\U+005C").pop()?.split("/").pop()?.split(".")[0] ?? "";
+			}
 
-		for (const path of filepaths) {
-			dbg({ path });
-			const fileContents = createReadStream(path);
+			function getLastExtension(filename) {
+				return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+			}
 
-			const exitNumber = await new Promise<0>((resolve, reject) => {
-				dbg("on exitNumber Promise");
-				tarArchiver
-					.append(fileContents, { name: getBasename(path) })
-					.on("entry", () => resolve(0))
-					.on("error", err => reject(err))
-					.on("pipe", () => dbg("Piping"));
+			function getBasenameAndExtension(filename) {
+				return [getBasename(filename), getLastExtension(filename)];
+			}
+
+			function downloadURL(url, filename) {
+				const a = document.createElement("a");
+
+				a.download = filename;
+				a.href = url;
+
+				a.click();
+			}
+
+			${prettyPrintStringArray(filepaths)}.forEach((path, index) => {
+				const filename = getBasenameAndExtension(path).join(".");
+				const urlOfDownload = "${url}${mainPath}" + index;
+
+				downloadURL(urlOfDownload, filename);
 			});
+		</script>
+	</body>
+</html>`;
 
-			dbg(`exitNumber for "${path}" = ${exitNumber}`);
-		}
+		await next();
+	});
 
-		// finalize the archive (ie we are done appending files but streams have to finish yet)
-		// 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand
-		tarArchiver.finalize();
+	router.get(`${mainPath}:index`, async (ctx, next) => {
+		const index = Number(ctx.params["index"]);
 
-		await pipeline(tarArchiver, zip, writeStreamToTarZipFile).catch(err => {
-			throw new Error("Error on entry!\n" + err);
-		});
+		if (Number.isNaN(index))
+			throw new Error(`Index not present on params. index = ${index}.`);
 
-		dbg(
-			`pipeline finalized. ${tarZipFileLocation}.size = ${
-				prettyBytes(statSync(tarZipFileLocation).size)
-			}`,
-		);
+		const filePath = filepaths[index];
 
-		return tarZipFileLocation;
-	}, "makeItOnlyOneFile");
+		if (!filePath)
+			throw new Error(
+				`Index not within index bounds. index = ${index}, filepaths = ${filepaths}.`,
+			);
+
+		////////////////////////////////////////////////
+		////////////////////////////////////////////////
+
+		ctx.attachment(getBasenameAndExtension(filePath).join("."));
+		ctx.set("Content-Type", "application/octet-stream");
+
+		const fileContents = createReadStream(filePath);
+		ctx.body = fileContents;
+
+		////////////////////////////////////////////////
+		////////////////////////////////////////////////
+
+		await next();
+	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
+	const app = new Koa()
+		.use(router.routes())
+		.use(router.allowedMethods())
+		.on("error", (err: Error) => {
+			throw err;
+		})
+		.on("listen", () => dbg(`Listening on port ${port}`));
+
+	const server = app.listen(port).on("error", (err: Error) => {
+		throw err;
+	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
+	const clientServerAPI: ClientServerAPI = Object.freeze({
+		addListener: (event: string, listener: (...args: unknown[]) => void) =>
+			server.addListener(event, listener),
+		close: () => server.close(),
+		url,
+	});
+
+	return clientServerAPI;
 }
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Helper functions for `createServer`:
+
+const myIp = getMyIpAddress();
+dbg(`My ip address = ${myIp}`);
 
 function getMyIpAddress(): Readonly<string> {
 	// Got this from StackOverflow, if this ever fails, replace it.
@@ -126,176 +157,9 @@ function getMyIpAddress(): Readonly<string> {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// Main function:
-
-export function turnServerOn(oneFilePath: Readonly<Path>): TurnServerOnReturn {
-	return time(() => {
-		// If there is an error listening to port, we
-		// will try again after changing the port:
-		let errorListening = false;
-		let port = 8_000;
-
-		///////////////////////////////////////////
-
-		function handleCloseServer(err: Error): void {
-			error("Error on server. Closing it.", { err });
-
-			// @ts-ignore => err.code does exists here.
-			if (err.code === "EADDRINUSE") {
-				// The error is of address in use, so
-				// increase the port and try again.
-				errorListening = true;
-				port += 10;
-			}
-
-			server.close();
-		}
-
-		///////////////////////////////////////////
-
-		function tryToStartServer(): void {
-			errorListening = false;
-			++id;
-
-			server.listen(
-				port,
-				myIp,
-				() => log(`Server '${id}' is running on http://${myIp}:${port}`),
-			);
-		}
-
-		///////////////////////////////////////////
-
-		async function handleDownloadMedia(
-			req: IncomingMessage,
-			res: ServerResponse,
-		): Promise<void> {
-			// Log possible request error:
-			req.on("error", err => {
-				error("Error on request.", { err });
-
-				// Clean up:
-				req.destroy(err);
-				server.close();
-			});
-
-			// Preparing the response to the client:
-			res
-				.setHeader(
-					"Content-Disposition",
-					`attachment;filename=${getBasename(oneFilePath)}`,
-				)
-				.setHeader("Content-Type", "application/octet-stream")
-				.setHeader("Accept-Encoding", "gzip")
-				// Log possible response error:
-				.on("error", err => {
-					error("Error on response!", { err });
-
-					// Clean up:
-					res.end();
-					server.close();
-				});
-
-			// The file will be streamed to the client:
-			const readStream: ReadStream = createReadStream(oneFilePath)
-				.on(
-					"open",
-					// We do a simple call to readStream.pipe(). This just pipes the
-					// read stream to the response object (which goes to the client):
-					() => {
-						const extractor = extract().on("entry", (_header, stream, next) => {
-							// header is the tar header
-							// stream is the content body (might be an empty stream)
-							// call next when you are done with this entry
-
-							// Ready for next entry:
-							stream.on("end", next);
-							// Just auto drain the stream:
-							stream.resume();
-						});
-
-						readStream.pipe(createGunzip()).pipe(extractor).pipe(res).on(
-							"finish",
-							() => {
-								log("Piping to client finished!");
-							},
-						);
-					},
-				)
-				// Log possible readStream error:
-				.on("error", err => {
-					error("Error on downloadMedias's readStream.", { err });
-
-					// Clean up:
-					res.end();
-					server.close();
-				})
-				// On end, close communication, but keep the
-				// server open for more possible requests:
-				.on("end", () => {
-					dbg("Ended reading `oneFilePath`.");
-					res.end();
-				});
-		}
-
-		///////////////////////////////////////////
-
-		// We create a new server object via the http module's
-		// createServer() function. This server accepts HTTP
-		// requests and passes them on to our downloadMedias()
-		// function, a callback function that fires when the
-		// server receives a request.
-		const server = createServer(handleDownloadMedia)
-			.on("close", async () => {
-				dbg("Closing server from NodeJS side.");
-
-				if (await pathExists(tarZipFileLocation)) {
-					dbg(`Deleting zip file: "${tarZipFileLocation}"`);
-					await unlink(tarZipFileLocation).catch(error);
-				}
-
-				if (errorListening) {
-					dbg("Restarting server because error 'EADDRINUSE' was found!");
-					tryToStartServer();
-				}
-			})
-			.on("connection", socket => {
-				dbg("Connected to another device!");
-
-				// Log possible socket error:
-				socket.on("error", err => error("Error on socket!", { err })).on(
-					"close",
-					() => log("Closing socket from NodeJS side."),
-				);
-			})
-			.on("error", handleCloseServer);
-
-		///////////////////////////////////////////
-
-		tryToStartServer();
-
-		///////////////////////////////////////////
-		///////////////////////////////////////////
-		///////////////////////////////////////////
-		// Return:
-
-		const responseApi: TurnServerOnReturn = Object.freeze({
-			addListener: (event: string, listener: (...args: unknown[]) => void) =>
-				server.addListener(event, listener),
-			url: `http://${myIp}:${port}`,
-			close: () => server.close(),
-		});
-
-		return responseApi;
-	}, `turnServerOn("${oneFilePath}")`);
-}
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
 // Types:
 
-export type TurnServerOnReturn = Readonly<
+export type ClientServerAPI = Readonly<
 	{
 		addListener(event: string, listener: (...args: unknown[]) => void): void;
 		url: QRCodeURL;

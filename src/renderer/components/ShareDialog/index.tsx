@@ -1,4 +1,4 @@
-import type { TurnServerOnReturn } from "@main/preload/share";
+import type { ClientServerAPI } from "@main/preload/share";
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 
 import { useCallback, useEffect, useState } from "react";
@@ -15,7 +15,7 @@ import { CloseDialogTrigger, StyledDialogShareContent, Canvas } from "./styles";
 import { StyledDialogBlurOverlay } from "../MediaListKind/MediaOptions/styles";
 import { Loading } from "@styles/appStyles";
 
-const { turnServerOn, makeItOnlyOneFile } = electron.share;
+const { createServer } = electron.share;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -33,7 +33,7 @@ const filesToShareSelector = (state: ReturnType<typeof useSettings.getState>) =>
 	state.filesToShare;
 
 export function ShareDialog() {
-	const [server, setServer] = useState<TurnServerOnReturn | null>(null);
+	const [server, setServer] = useState<ClientServerAPI | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const filesToShare = useSettings(filesToShareSelector);
 
@@ -96,10 +96,11 @@ export function ShareDialog() {
 			if (!shouldDialogOpen) return;
 
 			try {
-				const onlyOneFile = await makeItOnlyOneFile(filesToShare);
-				const response = turnServerOn(onlyOneFile);
+				const filepaths = [...filesToShare];
 
-				setServer(response);
+				const clientServerApi = createServer(filepaths);
+
+				setServer(clientServerApi);
 			} catch (error) {
 				console.error(error);
 				closePopover();
