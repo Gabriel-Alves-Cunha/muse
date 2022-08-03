@@ -7,6 +7,7 @@ import { join } from "node:path";
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 
+/** Infallible async function. */
 export async function getFullPathOfFilesForFilesInThisDirectory(
 	dir: Readonly<Path>,
 ): Promise<readonly Path[]> {
@@ -19,6 +20,7 @@ export async function getFullPathOfFilesForFilesInThisDirectory(
 
 ///////////////////////////////////////////
 
+/** Infallible async function. */
 export async function readDir(dir: Readonly<Path>): Promise<readonly Path[]> {
 	return await readdir(dir).catch(err => {
 		console.error(err);
@@ -28,6 +30,7 @@ export async function readDir(dir: Readonly<Path>): Promise<readonly Path[]> {
 
 ///////////////////////////////////////////
 
+/** Infallible async function. */
 export async function deleteFile(
 	path: Readonly<Path>,
 ): Promise<Readonly<boolean>> {
@@ -39,7 +42,8 @@ export async function deleteFile(
 
 ///////////////////////////////////////////
 
-export async function pathExists(
+/** Infallible async function. */
+export async function doesPathExists(
 	path: Readonly<Path>,
 ): Promise<Readonly<boolean>>
 {

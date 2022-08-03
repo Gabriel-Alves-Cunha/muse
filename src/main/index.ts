@@ -41,8 +41,6 @@ autoUpdater
 	.on("error", err =>
 		dbg("Error in auto-updater. ", err))
 	.on("download-progress", progressObj => {
-		dbg({ progressObj });
-
 		dbg(
 			`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
 		);
@@ -87,6 +85,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 		});
 
 	/////////////////////////////////////////
+	/////////////////////////////////////////
 	// Setup Electron global keyboard shortcuts:
 
 	const menu = new Menu();
@@ -118,6 +117,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 
 	Menu.setApplicationMenu(menu);
 
+	/////////////////////////////////////////
 	/////////////////////////////////////////
 
 	const url = isDevelopment ?
@@ -151,6 +151,7 @@ app
 		});
 
 		/////////////////////////////////////////
+		/////////////////////////////////////////
 
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
@@ -175,11 +176,13 @@ app
 		}
 
 		/////////////////////////////////////////
+		/////////////////////////////////////////
 
 		// This variable is needed to hold a reference to the window,
 		// so it doesn't get garbge collected:
 		electronWindow = await createElectronWindow();
 
+		/////////////////////////////////////////
 		/////////////////////////////////////////
 
 		// Tray setup:
@@ -187,6 +190,7 @@ app
 		tray.setToolTip("Music player and downloader");
 		tray.setTitle("Muse");
 
+		/////////////////////////////////////////
 		/////////////////////////////////////////
 
 		// This is to make Electron show a notification
@@ -223,7 +227,8 @@ app
 							};
 
 							// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
-							electronWindow?.webContents.send(
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+							electronWindow!.webContents.send(
 								ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
 								downloadInfo,
 							);
@@ -268,6 +273,7 @@ ipcMain.on(
 	},
 );
 
+/////////////////////////////////////////
 /////////////////////////////////////////
 
 ipcMain.on(

@@ -34,6 +34,7 @@ export const isBase64Image = (str: string): str is ImgString =>
 
 /////////////////////////////////////////
 
+// TODO: I don't know how to put this api key in .env and get Vite to pick it up!!
 export const lyricApiKey =
 	"1996d0wcfWZB02aebwtkAYhcnERFnAbOGlDiIPWDNdnh3K0955cZpHov";
 export const lyricsAPI = "https://api.happi.dev/v1/music";

@@ -1,7 +1,7 @@
-import type { Media, Path, ImgString } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
-import { lstatSync } from "node:fs";
+import { statSync } from "node:fs";
 
 import { dbg, formatDuration } from "@common/utils";
 import { getBasename } from "@common/path";
@@ -23,7 +23,7 @@ async function createMedia(
 
 		time(() => {
 			const {
-				tag: { pictures, title, album, genres, albumArtists, lyrics },
+				tag: { pictures, title, album = "", genres, albumArtists, lyrics = "" },
 				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 			} = MediaFile.createFromPath(path);
@@ -36,7 +36,7 @@ async function createMedia(
 			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60)
 				return reject(
 					`Skipping "${path}" because the duration is ${
-						durationInSeconds.toPrecision(3)
+						durationInSeconds.toPrecision(2)
 					} s (less than 60 s)!`,
 				);
 
@@ -53,17 +53,17 @@ async function createMedia(
 
 			const media: Media = {
 				image: picture && mimeType ?
-					`data:${mimeType};base64,${picture.data.toBase64String()}` as ImgString :
+					`data:${mimeType};base64,${picture.data.toBase64String()}` :
 					"",
 				duration: formatDuration(durationInSeconds),
-				birthTime: lstatSync(path).birthtimeMs,
+				birthTime: statSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
-				lyrics: lyrics ?? "",
-				album: album ?? "",
 				isSelected: false,
 				size: length,
+				lyrics,
 				genres,
+				album,
 			};
 
 			dbg(basename, media);

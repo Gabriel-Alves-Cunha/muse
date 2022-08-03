@@ -1,5 +1,6 @@
 import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { dbg, stringifyJson } from "@common/utils";
+import { ImgString } from "@common/@types/generalTypes";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -7,9 +8,9 @@ import { dbg, stringifyJson } from "@common/utils";
 // Main function:
 
 export async function searchForLyricsAndImage(
-	mediaTitle: string,
-	mediaArtist: string,
-	getImage: boolean,
+	mediaTitle: Readonly<string>,
+	mediaArtist: Readonly<string>,
+	getImage: Readonly<boolean>,
 ): Promise<LyricsResponse> {
 	if (!mediaTitle || !mediaArtist)
 		throw new Error(
@@ -20,17 +21,19 @@ export async function searchForLyricsAndImage(
 
 	dbg({ mediaTitle, getImage, mediaArtist });
 
-	const possibleLyric = await queryForPossibleLyric(mediaTitle, mediaArtist);
+	const { albumName, imageURL, lyricURL } = await queryForPossibleLyric(
+		mediaTitle,
+		mediaArtist,
+	);
 
-	const image = getImage ? await queryForImage(possibleLyric.imageURL) : "";
-	const lyric = await queryForLyric(possibleLyric.lyricURL);
-	const albumName = possibleLyric.albumName;
+	const image = getImage ? await queryForImage(imageURL) : "";
+	const lyric = await queryForLyric(lyricURL);
 
 	dbg({ lyric, image, albumName });
 
-	const ret: LyricsResponse = { lyric, image, albumName };
+	const lyricsResponse: LyricsResponse = { lyric, image, albumName };
 
-	return ret;
+	return lyricsResponse;
 }
 
 /////////////////////////////////////////
@@ -39,8 +42,8 @@ export async function searchForLyricsAndImage(
 // Helper functions:
 
 async function queryForPossibleLyric(
-	mediaTitle: string,
-	mediaArtist: string,
+	mediaTitle: Readonly<string>,
+	mediaArtist: Readonly<string>,
 ): Promise<PossibleLyrics> {
 	// From 'https://happi.dev/docs/music' docs:
 	const params = new URLSearchParams({
@@ -67,17 +70,23 @@ async function queryForPossibleLyric(
 	if (!jsonRes.success)
 		throw new Error(jsonRes.error);
 
-	const track = jsonRes.result[0];
+	const [track] = jsonRes.result;
 
 	if (!track)
 		throw new Error("No lyrics found!");
 
+	const {
+		api_lyrics: lyricURL,
+		album: albumName,
+		cover: imageURL,
+		track: title,
+	} = track;
+
 	const possibleLyrics: PossibleLyrics = {
-		lyricURL: track.api_lyrics,
-		albumName: track.album,
-		imageURL: track.cover,
-		artist: track.artist,
-		title: track.track,
+		albumName,
+		lyricURL,
+		imageURL,
+		title,
 	};
 
 	return possibleLyrics;
@@ -85,7 +94,9 @@ async function queryForPossibleLyric(
 
 /////////////////////////////////////////
 
-async function queryForLyric(lyricURL: string): Promise<string> {
+async function queryForLyric(
+	lyricURL: Readonly<string>,
+): Promise<Readonly<string>> {
 	dbg(`Querying for lyricURL = "${lyricURL}".`);
 
 	const jsonRes =
@@ -111,29 +122,28 @@ async function queryForLyric(lyricURL: string): Promise<string> {
 
 /////////////////////////////////////////
 
-async function queryForImage(imageURL: string): Promise<string> {
+async function queryForImage(imageURL: Readonly<string>): Promise<ImgString> {
 	dbg(`Querying for lyricURL = "${imageURL}".`);
 
 	const blob =
 		await (await fetch(imageURL, { redirect: "follow", method: "GET" })).blob();
 
-	dbg({ blob });
-
 	const base64 = await blobToBase64(blob);
+
+	dbg({ blob, base64 });
 
 	return base64;
 }
 
 /////////////////////////////////////////
 
-function blobToBase64(blob: Blob): Promise<string> {
+function blobToBase64(blob: Blob): Promise<ImgString> {
 	const reader = new FileReader();
 	reader.readAsDataURL(blob);
 
-	return new Promise(resolve => {
-		reader.onloadend = () => {
-			resolve(reader.result as string);
-		};
+	return new Promise((resolve, reject) => {
+		reader.onerror = () => reject("Error reading on blobToBase64!");
+		reader.onloadend = () => resolve(reader.result as ImgString);
 	});
 }
 
@@ -143,13 +153,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 // Types:
 
 type PossibleLyrics = Readonly<
-	{
-		albumName: string;
-		imageURL: string;
-		lyricURL: string;
-		artist: string;
-		title: string;
-	}
+	{ albumName: string; imageURL: string; lyricURL: string; title: string; }
 >;
 
 /////////////////////////////////////////
@@ -165,14 +169,7 @@ interface QueryForLyricsSuccessResponse {
 interface Track {
 	success: true;
 	result: [
-		{
-			api_lyrics: string;
-			api_album: string;
-			artist: string;
-			track: string;
-			album: string;
-			cover: string;
-		},
+		{ api_lyrics: string; track: string; album: string; cover: string; },
 	];
 }
 

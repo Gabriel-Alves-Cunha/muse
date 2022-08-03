@@ -13,7 +13,7 @@ import { dbg } from "@common/utils";
 /////////////////////////////////////////////
 // Main function:
 
-const mainPath = "/download/medias/";
+const mainUrlPath = "/download/medias/";
 
 export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 	const port = 3_010;
@@ -61,7 +61,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 
 			${prettyPrintStringArray(filepaths)}.forEach((path, index) => {
 				const filename = getBasenameAndExtension(path).join(".");
-				const urlOfDownload = "${url}${mainPath}" + index;
+				const urlOfDownload = "${url}${mainUrlPath}" + index;
 
 				downloadURL(urlOfDownload, filename);
 			});
@@ -72,7 +72,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 		await next();
 	});
 
-	router.get(`${mainPath}:index`, async (ctx, next) => {
+	router.get(`${mainUrlPath}:index`, async (ctx, next) => {
 		const index = Number(ctx.params["index"]);
 
 		if (Number.isNaN(index))

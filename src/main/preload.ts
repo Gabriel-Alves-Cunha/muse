@@ -54,6 +54,7 @@ const electron: VisibleElectron = Object.freeze({
 contextBridge.exposeInMainWorld("electron", electron);
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
 
 // Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
@@ -66,15 +67,18 @@ ipcRenderer.on(
 );
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
 // Helper functions:
 
 const logThatPortIsClosing = (): void => dbg("Closing ports (electronPort).");
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Handle messages from the renderer process:
 
 window.addEventListener("message", handleMsgsFromRendererProcess);
 
-// Handle messages from the renderer process:
 async function handleMsgsFromRendererProcess(
 	event: CrossWindowEvent,
 ): Promise<void> {
@@ -82,7 +86,7 @@ async function handleMsgsFromRendererProcess(
 
 	dbg("Received message from React:", event.data);
 
-	const electronPort = event.ports[0];
+	const [electronPort] = event.ports;
 	const msg = event.data.msg;
 
 	switch (msg.type) {

@@ -8,7 +8,7 @@ import type {
 	Path,
 } from "@common/@types/generalTypes";
 
-import { readFile, rename as renameFile } from "node:fs/promises";
+import { readFile, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { get } from "node:https";
 import {
@@ -24,7 +24,7 @@ import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { dbg, dbgTests, eraseImg } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { pathExists } from "../file";
+import { doesPathExists } from "../file";
 import { isBase64Image } from "@main/utils";
 
 const { error } = console;
@@ -100,7 +100,7 @@ async function handleImageMetadata(
 	/////////////////////////////////////////////
 
 	// else, it's an image file path
-	if (await pathExists(imageURL)) {
+	if (await doesPathExists(imageURL)) {
 		const base64 = await readFile(imageURL, {
 			encoding: "base64",
 		}) as ImgString;
@@ -217,14 +217,12 @@ function handleLyrics(file: MediaFile, lyrics: string): void {
 /** Returns a new file name if it exists, otherwise, just an empty string. */
 function handleTitle(
 	file: MediaFile,
-	oldMediaPath: string,
-	title: string,
+	oldMediaPath: Readonly<string>,
+	title: Readonly<string>,
 ): Path {
 	const sanitizedTitle = sanitize(title);
-	// If they are the same, there is no
-	// need to treat this as a new file,
-	// or if the sanitization left no strings,
-	// return :
+	// If they are the same, there is no need to treat this as a new
+	// file, or if the sanitization left an empty string, return "":
 	if (getBasename(oldMediaPath) === sanitizedTitle || !sanitizedTitle)
 		return "";
 
@@ -249,7 +247,7 @@ async function talkToClientSoItCanGetTheNewMedia(
 ): Promise<void> {
 	if (fileNewPath)
 		try {
-			await renameFile(mediaPath, fileNewPath);
+			await rename(mediaPath, fileNewPath);
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
@@ -277,9 +275,9 @@ async function talkToClientSoItCanGetTheNewMedia(
 		} finally {
 			dbg(
 				"Was file renamed?",
-				await pathExists(fileNewPath),
+				await doesPathExists(fileNewPath),
 				"Does old file remains?",
-				await pathExists(mediaPath),
+				await doesPathExists(mediaPath),
 			);
 		}
 	/////////////////////////////////////////////

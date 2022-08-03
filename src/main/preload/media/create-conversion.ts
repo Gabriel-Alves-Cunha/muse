@@ -9,9 +9,9 @@ import { dirname, join } from "node:path";
 import sanitize from "sanitize-filename";
 
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { type AllowedMedias, dbg } from "@common/utils";
-import { deleteFile, pathExists } from "../file";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
@@ -76,12 +76,13 @@ export async function convertToAudio(
 	/////////////////////////////////////////////
 
 	{
-		// Assert files don't have the same extension
+		// Assert files don't have the same extension:
 		const pathWithNewExtension = join(dirname(path), titleWithExtension);
 
-		// && that there already doesn't exists one:
+		// And that there already doesn't exists one:
 		if (
-			path.endsWith(toExtension!) || (await pathExists(pathWithNewExtension))
+			path.endsWith(toExtension!) ||
+			(await doesPathExists(pathWithNewExtension))
 		) {
 			const info =
 				`File "${path}" already is "${toExtension}"! Conversion canceled.`;
@@ -129,7 +130,7 @@ export async function convertToAudio(
 					electronPort!.postMessage({
 						sizeConverted: targetSize,
 						timeConverted: timemark,
-					}), 750);
+					}), 500);
 
 				// Send a message to client that we're starting a conversion:
 				const msg: Partial<MediaBeingConverted> = {
@@ -164,7 +165,7 @@ export async function convertToAudio(
 				"Convertion threw an error. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				await pathExists(saveSite),
+				await doesPathExists(saveSite),
 			);
 		})
 		/////////////////////////////////////////////
@@ -206,7 +207,6 @@ export async function convertToAudio(
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-
 		.on("destroy", async () => {
 			log(
 				`%cDestroy was called on readStream for converter! path: ${path}`,
@@ -237,7 +237,7 @@ export async function convertToAudio(
 				"Convertion was destroyed. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				await pathExists(saveSite),
+				await doesPathExists(saveSite),
 			);
 		})
 		/////////////////////////////////////////////

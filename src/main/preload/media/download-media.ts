@@ -11,8 +11,8 @@ import ytdl from "ytdl-core";
 
 import { type AllowedMedias, dbg, isDevelopment } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
-import { deleteFile, pathExists } from "../file";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
@@ -51,6 +51,7 @@ const currentDownloads: Map<MediaUrl, Readable> = new Map();
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+// Entry function:
 
 export async function createOrCancelDownload(
 	args: CreateDownload,
@@ -70,7 +71,8 @@ export async function createOrCancelDownload(
 export async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
-	{ electronPort, extension, imageURL, title, url, artist }: CreateDownload,
+	{ electronPort, extension, imageURL, title, url, artist = "" }:
+		CreateDownload,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
 
@@ -78,7 +80,7 @@ export async function createDownload(
 	const saveSite = join(dirs.music, titleWithExtension);
 
 	// Assert file doesn't already exists:
-	if (await pathExists(saveSite)) {
+	if (await doesPathExists(saveSite)) {
 		const info = `File "${saveSite}" already exists! Canceling download.`;
 
 		error(info);
@@ -183,7 +185,7 @@ export async function createDownload(
 				"Download was destroyed. Deleting stream from currentDownloads:",
 				currentDownloads,
 				"Does the downloaded file still exists?",
-				await pathExists(saveSite),
+				await doesPathExists(saveSite),
 			);
 		})
 		/////////////////////////////////////////////
@@ -203,14 +205,14 @@ export async function createDownload(
 			// Download media image and put it on the media metadata:
 			try {
 				await writeTags(saveSite, {
-					albumArtists: [artist ?? ""],
+					albumArtists: [artist],
 					downloadImg: true,
 					isNewMedia: true,
 					imageURL,
 					title,
 				});
-			} catch (error) {
-				console.error(error);
+			} catch (err) {
+				error(err);
 			}
 
 			// Tell client to add a new media...
@@ -249,7 +251,7 @@ export async function createDownload(
 				"Download threw an error. Deleting stream from currentDownloads:",
 				currentDownloads,
 				"Does the downloaded file still exists?",
-				await pathExists(saveSite),
+				await doesPathExists(saveSite),
 			);
 		});
 
