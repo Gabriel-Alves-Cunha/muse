@@ -45,7 +45,7 @@
 		"cross-env": "^7.0.3",
 		"debug": "^4.3.4",
 		"dprint": "^0.30.3",
-		"electron": "^20.0.0",
+		"electron": "^20.0.1",
 		"electron-builder": "^23.3.3",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-run": "^2.3.1",

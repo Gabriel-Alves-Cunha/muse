@@ -55,9 +55,9 @@ export const StyledDialogContent = styled(Content, {
 	l: "50%",
 	t: "50%",
 
-	maxHeight: "85vh",
 	maxWidth: 450,
 	minWidth: 300,
+	// h: "85vh",
 	p: 30,
 
 	bg: "$bg-dialog",
@@ -143,20 +143,14 @@ export const CloseDialog = styled(Close, {
 	b: "none",
 	br: 4,
 
+	whiteSpace: "nowrap", // keep it one line!
 	ff: "$secondary",
 	ls: "0.04rem",
 	fs: "1rem",
+	lh: "35px", // same as height!
 	fw: 600,
-	lh: 1,
 
 	"&.delete-media": {
-		h: 35,
-
-		ff: "$secondary",
-		ls: "0.04rem",
-		fs: "1rem",
-		fw: 600,
-
 		bg: "#bb2b2e",
 		c: "white",
 
@@ -164,13 +158,6 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#cancel": {
-		h: 35,
-
-		ff: "$secondary",
-		ls: "0.04rem",
-		fs: "1rem",
-		fw: 600,
-
 		bg: "transparent",
 		c: "#2c6e4f",
 
@@ -178,13 +165,6 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#reset-app-data": {
-		h: 35,
-
-		ff: "$secondary",
-		ls: "0.04rem",
-		fs: "1rem",
-		fw: 600,
-
 		bg: "#94a59b",
 		m: "10px 0",
 		c: "black",
@@ -193,13 +173,6 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#reload-window": {
-		h: 35,
-
-		ff: "$secondary",
-		ls: "0.04rem",
-		fs: "1rem",
-		fw: 600,
-
 		bg: "#94a59b",
 		c: "black",
 
@@ -207,14 +180,6 @@ export const CloseDialog = styled(Close, {
 	},
 
 	"&#save-changes": {
-		h: 35,
-
-		ff: "$secondary",
-		lh: "2.1875rem", // same as height (35px)
-		ls: "0.04rem",
-		fs: "1rem",
-		fw: 600,
-
 		bg: "#ddf4e5",
 		c: "#2c6e4f",
 

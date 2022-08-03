@@ -1,4 +1,4 @@
-* FIX: get the picture to go to the media file!!!!
+* FIX: font with I and L different!!
 
 ### NOTES:
 

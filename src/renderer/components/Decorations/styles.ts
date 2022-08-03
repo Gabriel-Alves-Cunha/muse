@@ -61,7 +61,7 @@ export const DownWrapper = styled("footer", {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const gap = "15px";
+const gap = "18px";
 
 export const LeftSlot = styled("div", {
 	d: "flex", // row

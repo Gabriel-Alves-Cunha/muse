@@ -14,7 +14,7 @@ import { join } from "node:path";
 
 import { mediaPath, mediaPicture, test_assetsDir } from "./utils";
 import { eraseImg, makeRandomString } from "@common/utils";
-import { pathExists } from "@main/preload/file";
+import { doesPathExists } from "@main/preload/file";
 
 const { writeTags } = await import("@main/preload/media/mutate-metadata");
 
@@ -84,7 +84,7 @@ describe("It should account for the switch possibilities and the message sending
 				await renameFile(changedPath, mediaPath);
 
 				expect(
-					await pathExists(mediaPath),
+					await doesPathExists(mediaPath),
 					"There should be a mediaPath renamed back to it's original path before tests were run!",
 				)
 					.toBe(true);

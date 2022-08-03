@@ -57,6 +57,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		imageFilePathRef.current = file!.webkitRelativePath;
 
+		dbg("imageFilePath =", imageFilePathRef.current);
+
 		// Change button color to indicate that selection was successfull:
 		imageButtonRef.current.classList.add("file-present");
 	}
@@ -101,7 +103,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				<Fieldset key={option}>
 					<Label htmlFor={option}>{capitalize(option)}</Label>
 					{option === "image" ?
-						// handle file input for image
+						// Handle file input for image:
 						(<Button
 							onClick={openNativeUI_ChooseFiles}
 							className="notransition"
@@ -214,7 +216,7 @@ function changeMetadataIfAllowed(
 	imageFilePath: Readonly<Path>,
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
-): boolean {
+): Readonly<boolean> {
 	if (!contentWrapper.current) return false;
 
 	const thingsToChange: MetadataToChange = [];
@@ -296,7 +298,7 @@ function changeMetadataIfAllowed(
 
 const options = (
 	{ duration, artist, album, genres, title, size, image, lyrics }: Media,
-) => ({ duration, size, artist, genres, title, album, lyrics, image });
+) => ({ size, duration, title, album, artist, genres, lyrics, image });
 
 /////////////////////////////////////////////
 

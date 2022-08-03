@@ -1,8 +1,8 @@
 import { createStitches, type CSSProperties } from "@stitches/react";
 import { toast } from "react-toastify";
 
-import { getObjectDeepKeys } from "@utils/object";
 import { areArraysEqualByValue } from "@utils/array";
+import { getObjectDeepKeys } from "@utils/object";
 import { isDevelopment } from "@common/utils";
 
 ////////////////////////////////////////////////
@@ -24,7 +24,6 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				boxShadow: "box-shadow .2s ease-in-out 20ms",
 				bgc: "background-color .1s ease-in-out 20ms",
 				scale: "scale .2s ease-in-out 20ms",
-				color: "color .1s ease-in-out 20ms",
 			},
 			fonts: {
 				primary: "'Assistant', sans-serif",
@@ -371,7 +370,6 @@ export const GlobalCSS = globalCss({
 	button: { "-webkit-app-region": "no-drag" },
 
 	body: {
-		overflow: "hidden !important",
 		position: "fixed",
 		lineHeight: 1.5,
 		size: "100%",

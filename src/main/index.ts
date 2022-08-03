@@ -17,7 +17,7 @@ import {
 } from "electron";
 
 import { capitalizedAppName, dbg, isDevelopment } from "@common/utils";
-import { assertUnreachable } from "@utils/utils";
+import { assertUnreachable, time } from "@utils/utils";
 import { logoPath } from "./utils";
 import {
 	ElectronIpcMainProcessNotificationEnum,
@@ -57,77 +57,79 @@ let tray: Tray | undefined;
 /////////////////////////////////////////
 
 async function createElectronWindow(): Promise<BrowserWindow> {
-	const window = new BrowserWindow({
-		title: capitalizedAppName,
-		titleBarStyle: "hidden",
-		icon: logoPath,
+	return await time(async () => {
+		const window = new BrowserWindow({
+			title: capitalizedAppName,
+			titleBarStyle: "hidden",
+			icon: logoPath,
 
-		frame: false,
-		show: false,
+			frame: false,
+			show: false,
 
-		minHeight: 500,
-		minWidth: 315,
-		height: 600,
-		width: 800,
+			minHeight: 500,
+			minWidth: 315,
+			height: 600,
+			width: 800,
 
-		webPreferences: {
-			preload: join(__dirname, "preload.js"),
-			allowRunningInsecureContent: false,
-			contextIsolation: true, // <-- Needed to use contextBridge
-			nodeIntegration: true,
-			webSecurity: true,
-			webgl: false,
-		},
-	})
-		.once("ready-to-show", () => {
-			window.show();
-			window.focus();
-		});
+			webPreferences: {
+				preload: join(__dirname, "preload.js"),
+				allowRunningInsecureContent: false,
+				contextIsolation: true, // <-- Needed to use contextBridge
+				nodeIntegration: true,
+				webSecurity: true,
+				webgl: false,
+			},
+		})
+			.once("ready-to-show", () => {
+				window.show();
+				window.focus();
+			});
 
-	/////////////////////////////////////////
-	/////////////////////////////////////////
-	// Setup Electron global keyboard shortcuts:
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+		// Setup Electron global keyboard shortcuts:
 
-	const menu = new Menu();
+		const menu = new Menu();
 
-	menu.append(
-		new MenuItem({
-			label: "Refresh Page",
-			submenu: [{
-				click: () => window.reload(),
-				accelerator: "f5",
-				role: "reload",
-			}],
-		}),
-	);
+		menu.append(
+			new MenuItem({
+				label: "Refresh Page",
+				submenu: [{
+					click: () => window.reload(),
+					accelerator: "f5",
+					role: "reload",
+				}],
+			}),
+		);
 
-	menu.append(
-		new MenuItem({
-			label: "Open/close Dev Tools",
-			submenu: [{
-				click: () =>
-					window
-						.webContents
-						.toggleDevTools(),
-				accelerator: "CommandOrControl+shift+i",
-				role: "toggleDevTools",
-			}],
-		}),
-	);
+		menu.append(
+			new MenuItem({
+				label: "Open/close Dev Tools",
+				submenu: [{
+					click: () =>
+						window
+							.webContents
+							.toggleDevTools(),
+					accelerator: "CommandOrControl+shift+i",
+					role: "toggleDevTools",
+				}],
+			}),
+		);
 
-	Menu.setApplicationMenu(menu);
+		Menu.setApplicationMenu(menu);
 
-	/////////////////////////////////////////
-	/////////////////////////////////////////
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-	const url = isDevelopment ?
-		"http://localhost:3000" :
-		pathToFileURL(join(__dirname, "vite-renderer-build", "index.html"))
-			.toString();
+		const url = isDevelopment ?
+			"http://localhost:3000" :
+			pathToFileURL(join(__dirname, "vite-renderer-build", "index.html"))
+				.toString();
 
-	await window.loadURL(url);
+		await window.loadURL(url);
 
-	return window;
+		return window;
+	}, "createElectronWindow");
 }
 
 app
@@ -144,113 +146,115 @@ app
 	})
 	.whenReady()
 	.then(async () => {
-		// This is so Electron can load local media files:
-		protocol.registerFileProtocol("atom", (request, callback) => {
-			const url = request.url.substring(7);
-			callback(decodeURI(normalize(url)));
-		});
+		await time(async () => {
+			// This is so Electron can load local media files:
+			protocol.registerFileProtocol("atom", (request, callback) => {
+				const url = request.url.substring(7);
+				callback(decodeURI(normalize(url)));
+			});
 
-		/////////////////////////////////////////
-		/////////////////////////////////////////
+			/////////////////////////////////////////
+			/////////////////////////////////////////
 
-		// This method will be called when Electron has finished
-		// initialization and is ready to create browser windows.
-		// Some APIs can only be used after this event occurs:
-		// TODO: there is something wrong with this lib:
-		if (isDevelopment) {
-			const devtoolsInstaller = await import("electron-devtools-installer");
-			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-			// @ts-ignore => this is a workaround for a bug in the lib:
-			const { default: installExtension } = devtoolsInstaller.default;
+			// This method will be called when Electron has finished
+			// initialization and is ready to create browser windows.
+			// Some APIs can only be used after this event occurs:
+			// TODO: there is something wrong with this lib:
+			if (isDevelopment) {
+				const devtoolsInstaller = await import("electron-devtools-installer");
+				const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
+				// @ts-ignore => this is a workaround for a bug in the lib:
+				const { default: installExtension } = devtoolsInstaller.default;
 
-			console.log({ installExtension });
+				console.log({ installExtension });
 
-			await installExtension(REACT_DEVELOPER_TOOLS, {
-				loadExtensionOptions: { allowFileAccess: true },
-			}) // @ts-ignore => this is a workaround for a bug in the lib
-				.then(name => console.log(`Added Extension: ${name}`))
-				// @ts-ignore => this is a workaround for a bug in the lib
-				.catch(err =>
-					console.error("An error occurred while installing extension: ", err)
-				);
-		}
+				await installExtension(REACT_DEVELOPER_TOOLS, {
+					loadExtensionOptions: { allowFileAccess: true },
+				}) // @ts-ignore => this is a workaround for a bug in the lib
+					.then(name => console.log(`Added Extension: ${name}`))
+					// @ts-ignore => this is a workaround for a bug in the lib
+					.catch(err =>
+						console.error("An error occurred while installing extension: ", err)
+					);
+			}
 
-		/////////////////////////////////////////
-		/////////////////////////////////////////
+			/////////////////////////////////////////
+			/////////////////////////////////////////
 
-		// This variable is needed to hold a reference to the window,
-		// so it doesn't get garbge collected:
-		electronWindow = await createElectronWindow();
+			// This variable is needed to hold a reference to the window,
+			// so it doesn't get garbge collected:
+			electronWindow = await createElectronWindow();
 
-		/////////////////////////////////////////
-		/////////////////////////////////////////
+			/////////////////////////////////////////
+			/////////////////////////////////////////
 
-		// Tray setup:
-		tray = new Tray(nativeImage.createFromPath(logoPath));
-		tray.setToolTip("Music player and downloader");
-		tray.setTitle("Muse");
+			// Tray setup:
+			tray = new Tray(nativeImage.createFromPath(logoPath));
+			tray.setToolTip("Music player and downloader");
+			tray.setTitle("Muse");
 
-		/////////////////////////////////////////
-		/////////////////////////////////////////
+			/////////////////////////////////////////
+			/////////////////////////////////////////
 
-		// This is to make Electron show a notification
-		// when we copy a link to the clipboard:
-		try {
-			// This has to be imported after app is open.
-			const extendedClipboard = (await import("./clipboardExtended"))
-				.extendedClipboard as ClipboardExtended;
+			// This is to make Electron show a notification
+			// when we copy a link to the clipboard:
+			try {
+				// This has to be imported after app is open.
+				const extendedClipboard = (await import("./clipboardExtended"))
+					.extendedClipboard as ClipboardExtended;
 
-			extendedClipboard
-				.on("text-changed", async () => {
-					const url = extendedClipboard.readText("clipboard");
+				extendedClipboard
+					.on("text-changed", async () => {
+						const url = extendedClipboard.readText("clipboard");
 
-					if (!isUrlValid(url)) return;
+						if (!isUrlValid(url)) return;
 
-					const { title, thumbnails, media: { artist = "" } } =
-						(await getBasicInfo(url)).videoDetails;
+						const { title, thumbnails, media: { artist = "" } } =
+							(await getBasicInfo(url)).videoDetails;
 
-					new Notification({
-						title: "Click to download this media as 'mp3'",
-						timeoutType: "never",
-						urgency: "normal",
-						icon: logoPath,
-						silent: true,
-						body: title,
-					})
-						.on("click", () => {
-							const downloadInfo: DownloadInfo = {
-								imageURL: thumbnails.at(-1)?.url ?? "",
-								extension: "mp3",
-								artist,
-								title,
-								url,
-							};
-
-							// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
-							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-							electronWindow!.webContents.send(
-								ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
-								downloadInfo,
-							);
-
-							dbg("Clicked notification and sent data:", downloadInfo);
+						new Notification({
+							title: "Click to download this media as 'mp3'",
+							timeoutType: "never",
+							urgency: "normal",
+							icon: logoPath,
+							silent: true,
+							body: title,
 						})
-						.show();
-				})
-				.startWatching();
-		} catch (error) {
-			console.error(error);
-		}
+							.on("click", () => {
+								const downloadInfo: DownloadInfo = {
+									imageURL: thumbnails.at(-1)?.url ?? "",
+									extension: "mp3",
+									artist,
+									title,
+									url,
+								};
 
-		/////////////////////////////////////////
+								// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
+								// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+								electronWindow!.webContents.send(
+									ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+									downloadInfo,
+								);
 
-		// This will immediately download an update,
-		// then install when the app quits.
-		setTimeout(
-			async () =>
-				await autoUpdater.checkForUpdatesAndNotify().catch(console.error),
-			5_000,
-		);
+								dbg("Clicked notification and sent data:", downloadInfo);
+							})
+							.show();
+					})
+					.startWatching();
+			} catch (error) {
+				console.error(error);
+			}
+
+			/////////////////////////////////////////
+
+			// This will immediately download an update,
+			// then install when the app quits.
+			setTimeout(
+				async () =>
+					await autoUpdater.checkForUpdatesAndNotify().catch(console.error),
+				5_000,
+			);
+		}, "app.whenReady.then");
 	});
 
 /////////////////////////////////////////

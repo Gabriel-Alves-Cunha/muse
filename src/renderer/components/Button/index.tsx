@@ -45,7 +45,7 @@ const GenericBorderedButton = styled("button", {
 	},
 	//
 
-	whiteSpace: "nowrap", // keep it one line
+	whiteSpace: "nowrap", // keep it one line!
 	ff: "$secondary",
 	ls: "0.04rem",
 	fs: "1rem",
@@ -67,7 +67,8 @@ const GenericBorderedButton = styled("button", {
 	// Additional classes
 
 	"&.file-present": {
-		bg: "#ddf4e5",
+		bg: "rgb(0, 255, 89)",
+		c: "black",
 
 		transition: "border-color 250ms ease",
 

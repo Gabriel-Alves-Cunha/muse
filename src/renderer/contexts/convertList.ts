@@ -49,7 +49,6 @@ import create from "zustand";
 // 	const path: Path = `/home/path/convert-test-${index}.mp4`;
 // 	const media: MediaBeingConverted = {
 // 		timeConverted: 50 + index * 2,
-// 		isConverting: random,
 // 		sizeConverted: 1000,
 // 		toExtension: "mp3",
 // 		port: testPort,
