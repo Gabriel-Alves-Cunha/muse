@@ -1,5 +1,7 @@
 # To make this file run, do this on the terminal:
 
+# Make sure to bump the version on package.json
+
 # Make sure your working tree is in a clean state:
 # > git status
 
