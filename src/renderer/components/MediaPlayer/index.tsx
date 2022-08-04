@@ -13,7 +13,7 @@ import { dbg } from "@common/utils";
 import {
 	PlaylistActions,
 	setPlaylists,
-	usePlaylists,
+	mainList,
 	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
@@ -40,23 +40,19 @@ const { setState: setProgress } = useProgress;
 ///////////////////////////////////////
 // Main function:
 
-const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByName;
-
 const currentPlayingPathSelector = (
 	state: ReturnType<typeof useCurrentPlaying.getState>,
 ) => state.path;
 
 export function MediaPlayer() {
-	const path = useCurrentPlaying(currentPlayingPathSelector) ?? "";
+	const path = useCurrentPlaying(currentPlayingPathSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
-	const mainList = usePlaylists(mainListSelector);
 
-	const media = mainList.get(path);
+	const media = mainList().get(path);
 	const audio = audioRef.current;
 
 	useEffect(() => {
-		if (!audio) return;
+		if (audio === null || media === undefined) return;
 
 		const lambdaHandleLoadedData = () => handleLoadedData(audio, path, media);
 		const lambdaHandleAudioCanPlay = () => handleAudioCanPlay(audio);
@@ -99,10 +95,10 @@ export function MediaPlayer() {
 
 	return (
 		<Wrapper aria-label="Media player">
+			<audio id="audio" ref={audioRef} />
+
 			<FlipCard
-				cardFront={
-					<Player media={media} audioRef={audioRef} audio={audio} path={path} />
-				}
+				cardFront={<Player media={media} audio={audio} path={path} />}
 				cardBack={<Lyrics media={media} path={path} />}
 			/>
 		</Wrapper>
@@ -112,12 +108,8 @@ export function MediaPlayer() {
 /////////////////////////////////////////
 // Helper functions:
 
-const Player = ({ media, audioRef, audio, path }: PlayerProps) => (
+const Player = ({ media, audio, path }: PlayerProps) => (
 	<>
-		<>
-			<audio id="audio" preload="metadata" ref={audioRef} />
-		</>
-
 		<Header media={media} path={path} />
 
 		<SquareImage>
@@ -156,9 +148,7 @@ const handleStalled = (e: Readonly<Event>): void =>
 
 /////////////////////////////////////////
 
-function handleProgress(audio: Audio): void {
-	if (!audio) return;
-
+function handleProgress(audio: HTMLAudioElement): void {
 	const { duration, currentTime } = audio;
 	const percentage = (currentTime / duration) * 100;
 
@@ -168,14 +158,13 @@ function handleProgress(audio: Audio): void {
 /////////////////////////////////////////
 
 function handleLoadedData(
-	audio: Audio,
+	audio: HTMLAudioElement,
 	path: Path,
-	media: Media | undefined,
+	media: Media,
 ): void {
-	if (!media || !path || !audio) return;
-
 	const formatedDuration = formatDuration(audio.duration);
-	if (formatedDuration !== media.duration) {
+
+	if (formatedDuration !== media.duration)
 		// Updating the duration of media:
 		setPlaylists({
 			newMedia: { ...media, duration: formatedDuration },
@@ -183,7 +172,6 @@ function handleLoadedData(
 			type: WhatToDo.UPDATE_MAIN_LIST,
 			path,
 		});
-	}
 
 	// Maybe set audio currentTime to last played time:
 	const lastTime = currentPlaying().currentTime;
@@ -197,9 +185,7 @@ function handleLoadedData(
 
 /////////////////////////////////////////
 
-function handleEnded(audio: Audio): void {
-	if (!audio) return;
-
+function handleEnded(audio: HTMLAudioElement): void {
 	dbg(
 		`Audio ended, playing ${
 			audio.loop ?
@@ -213,9 +199,7 @@ function handleEnded(audio: Audio): void {
 
 /////////////////////////////////////////
 
-async function handleAudioCanPlay(audio: Audio): Promise<void> {
-	if (!audio) return;
-
+async function handleAudioCanPlay(audio: HTMLAudioElement): Promise<void> {
 	dbg("Audio can play.");
 	await audio.play();
 }
@@ -229,15 +213,6 @@ type Progress = Readonly<{ currentTime: number; percentage: number; }>;
 
 /////////////////////////////////////////
 
-type Audio = HTMLAudioElement | null;
-
-/////////////////////////////////////////
-
 type PlayerProps = Readonly<
-	{
-		audioRef: React.RefObject<HTMLAudioElement>;
-		audio: HTMLAudioElement | null;
-		media: Media | undefined;
-		path: Path;
-	}
+	{ audio: HTMLAudioElement | null; media: Media | undefined; path: Path; }
 >;

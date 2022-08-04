@@ -25,10 +25,7 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 				bgc: "background-color .1s ease-in-out 20ms",
 				scale: "scale .2s ease-in-out 20ms",
 			},
-			fonts: {
-				primary: "'Assistant', sans-serif",
-				secondary: "Source Sans Pro",
-			},
+			fonts: { primary: "Assistant", secondary: "Source Sans Pro" },
 		},
 		utils: {
 			size: (width: CSSProperties["width"]) => ({ height: width, width }),

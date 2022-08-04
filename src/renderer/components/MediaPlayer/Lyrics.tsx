@@ -1,5 +1,6 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
+import { mediaPlayerCard } from "@components/FlipCard";
 import { Header } from "./helpers";
 
 import { LyricsCardWrapper, LyricsHolder } from "./styles";
@@ -16,6 +17,15 @@ export function Lyrics({ media, path }: Props) {
 			</LyricsHolder>
 		</LyricsCardWrapper>
 	);
+}
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Helper functions:
+
+export function flipMediaPlayerCard(): void {
+	document.getElementById(mediaPlayerCard)?.classList.toggle("active");
 }
 
 /////////////////////////////////////////

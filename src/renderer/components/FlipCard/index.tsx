@@ -7,7 +7,7 @@ import { Wrapper } from "./styles";
 /////////////////////////////////////////
 // Constants:
 
-const mediaPlayerCard = "media-player-flip-card";
+export const mediaPlayerCard = "media-player-flip-card";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -22,17 +22,6 @@ export function FlipCard({ cardFront, cardBack }: Props) {
 				<div className="flip-card-back">{cardBack}</div>
 			</div>
 		</Wrapper>
-	);
-}
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Helper functions:
-
-export function flipMediaPlayerCard(): void {
-	(document.getElementById(mediaPlayerCard) as HTMLDivElement).classList.toggle(
-		"active",
 	);
 }
 

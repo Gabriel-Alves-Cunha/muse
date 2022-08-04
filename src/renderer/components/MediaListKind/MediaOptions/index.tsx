@@ -1,7 +1,7 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
 import { type RefObject, type ChangeEvent, useEffect, useRef } from "react";
+import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
@@ -49,7 +49,10 @@ export function MediaOptionsModal({ media, path }: Props) {
 	function handleSelectedFile(
 		{ target: { files } }: ChangeEvent<HTMLInputElement>,
 	) {
-		if (!imageButtonRef.current || !imageInputRef.current || !files?.length)
+		if (
+			imageButtonRef.current === null || imageInputRef.current === null ||
+			!(files?.length === 0)
+		)
 			return;
 
 		const [file] = files;
@@ -171,7 +174,7 @@ async function handleMediaDeletion(
 	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
 ): Promise<void> {
-	if (!closeButtonRef.current) return;
+	if (closeButtonRef.current === null) return;
 
 	closeEverything(closeButtonRef);
 
@@ -187,7 +190,7 @@ function changeMediaMetadata(
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
 ): void {
-	if (!contentWrapperRef.current || !closeButtonRef.current)
+	if (contentWrapperRef.current === null || closeButtonRef.current === null)
 		return;
 
 	try {
@@ -199,7 +202,7 @@ function changeMediaMetadata(
 		);
 		closeEverything(closeButtonRef);
 
-		hasAnythingChanged && successToast("New media metadata has been saved.");
+		if (hasAnythingChanged) successToast("New media metadata has been saved.");
 	} catch (error) {
 		console.error(error);
 
@@ -217,7 +220,7 @@ function changeMetadataIfAllowed(
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
 ): Readonly<boolean> {
-	if (!contentWrapper.current) return false;
+	if (contentWrapper.current === null) return false;
 
 	const thingsToChange: MetadataToChange = [];
 

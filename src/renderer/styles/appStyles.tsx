@@ -12,7 +12,7 @@ export const Content = styled("div", {
 	d: "grid",
 	gridTemplate: `
 		"nav main-area media-player" 100%
-		/ 65px 1fr minmax(186px, 25vw)
+		/ 65px 1fr minmax(200px, 25vw)
 	`,
 	width: "100vw",
 	height:

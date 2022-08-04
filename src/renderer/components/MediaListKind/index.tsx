@@ -190,7 +190,9 @@ function handleDeselectAllMedias(
 	listRef: Readonly<React.RefObject<HTMLDivElement>>,
 	isCtxMenuOpen: Readonly<boolean>,
 ) {
-	if (listRef.current && !isCtxMenuOpen && allSelectedMedias().length > 0)
+	if (
+		listRef.current !== null && !isCtxMenuOpen && allSelectedMedias().length > 0
+	)
 		deselectAllMedias();
 }
 

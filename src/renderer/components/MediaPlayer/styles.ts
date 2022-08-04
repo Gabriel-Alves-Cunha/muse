@@ -55,10 +55,13 @@ export const OptionsAndAlbum = styled("div", {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Album = styled("span", {
+export const Album = styled("div", {
+	width: "calc(100% - 2 * 30px - 8px)",
+
 	c: "$media-player-icons",
 	ff: "$secondary",
 	ls: "0.04rem",
+	ta: "center",
 	fs: "1rem",
 	fw: 500,
 });
@@ -121,8 +124,8 @@ export const ControlsAndSeekerContainer = styled("div", {
 	pos: "absolute",
 	d: "flex",
 	fd: "column",
-	w: "100%",
 	bottom: 40,
+	w: "100%",
 });
 
 /////////////////////////////////////////
@@ -249,13 +252,17 @@ export const ProgressWrapper = styled("div", {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const LyricsCardWrapper = styled("div", { size: "100%" });
+export const LyricsCardWrapper = styled("div", {
+	pos: "relative",
+	size: "100%",
+});
 
 export const LyricsHolder = styled("div", {
+	pos: "relative",
 	size: "100%",
 
 	mt: 30,
-	mx: 10,
+	// mx: 10,
 
 	/* width */
 	"&::-webkit-scrollbar": { d: "block", size: 3 },
@@ -269,12 +276,15 @@ export const LyricsHolder = styled("div", {
 	/* Handle on hover */
 	"&::-webkit-scrollbar-thumb:hover": { bg: "white" },
 
+	overflowX: "hidden",
 	overflowY: "auto",
 
 	"& p": {
+		pos: "relative",
 		mb: 100,
 
 		whiteSpace: "pre-line", // break on new line!
+		wordWrap: "break-word",
 		ff: "$primary",
 		ls: "0.03rem",
 		lh: "1.5rem",

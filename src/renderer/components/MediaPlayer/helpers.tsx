@@ -1,10 +1,8 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
-import { BsJournal as NoLyrics } from "react-icons/bs";
-// import { BsFillFileTextFill as LyricsPresent } from "react-icons/bs";
-// import { BsFileText as NoLyrics } from "react-icons/bs";
 import { useCallback, useMemo, useRef } from "react";
+import { BsJournal as NoLyrics } from "react-icons/bs";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdRepeatOne as RepeatOne,
@@ -21,7 +19,7 @@ import {
 } from "react-icons/io5";
 
 import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
-import { flipMediaPlayerCard } from "@components/FlipCard";
+import { flipMediaPlayerCard } from "./Lyrics";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { formatDuration } from "@common/utils";
 import { useProgress } from ".";
@@ -63,8 +61,8 @@ const { floor } = Math;
 ///////////////////////////////////////
 ///////////////////////////////////////
 
-function toggleFavorite(path?: Readonly<Path>): void {
-	if (path)
+function toggleFavorite(path: Readonly<Path>): void {
+	if (path.length > 0)
 		setPlaylists({
 			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
 			type: WhatToDo.UPDATE_FAVORITES,
@@ -78,7 +76,7 @@ function toggleFavorite(path?: Readonly<Path>): void {
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
-	const isThereAMedia = Boolean(!audio?.src);
+	const isThereAMedia = Boolean(audio?.src);
 
 	return (
 		<ControlsAndSeekerContainer>
@@ -115,13 +113,13 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 	<OptionsAndAlbum>
 		<CircledIconButton
 			onClick={async () => {
-				await searchAndOpenLyrics(media, path, true);
-
 				if (media?.lyrics)
-					setTimeout(flipMediaPlayerCard, 1_000);
+					return flipMediaPlayerCard();
+
+				await searchAndOpenLyrics(media, path, true);
 			}}
+			disabled={media === undefined}
 			data-tip="Toggle open lyrics"
-			disabled={!media}
 		>
 			{media?.lyrics ? <LyricsPresent size={16} /> : <NoLyrics size={16} />}
 		</CircledIconButton>
@@ -130,8 +128,8 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 
 		<CircledIconButton
 			onClick={() => toggleFavorite(path)}
+			disabled={media === undefined}
 			data-tip="Toggle favorite"
-			disabled={!media}
 		>
 			{favorites().has(path) ?
 				<Favorite size={17} /> :
@@ -149,17 +147,15 @@ export async function searchAndOpenLyrics(
 	mediaPath: Path,
 	openLyrics: boolean,
 ): Promise<void> {
-	if (!media || !mediaPath) return;
+	if (media === undefined) return;
 
-	if (media.lyrics && openLyrics) return flipMediaPlayerCard();
-
-	if (!media.artist) {
+	if (media.artist.length === 0) {
 		infoToast("Make sure that media has artist metadata!");
 		return;
 	}
 
 	// If there is no image already, go get one:
-	const getImage = Boolean(media.image);
+	const getImage = media.image.length === 0;
 
 	try {
 		const { lyric, image, albumName } = await searchForLyricsAndImage(
@@ -170,10 +166,12 @@ export async function searchAndOpenLyrics(
 
 		sendMsgToBackend({
 			type: ReactToElectronMessageEnum.WRITE_TAG,
-			thingsToChange: [{ whatToChange: "album", newValue: albumName }, {
-				whatToChange: "imageURL",
-				newValue: image,
-			}, { whatToChange: "lyrics", newValue: lyric }],
+			// dprint-ignore
+			thingsToChange: [
+				{ whatToChange: "album", newValue: albumName },
+				{ whatToChange: "imageURL",	newValue: image	},
+				{ whatToChange: "lyrics", newValue: lyric }
+			],
 			mediaPath,
 		});
 	} catch (error) {
@@ -182,6 +180,8 @@ export async function searchAndOpenLyrics(
 
 		console.error(error);
 	}
+
+	if (media.lyrics.length > 0 && openLyrics) return flipMediaPlayerCard();
 }
 
 /////////////////////////////////////////
@@ -209,8 +209,8 @@ export const Controls = ({ isPaused = false, isDisabled }: IsPaused) => (
 
 		<CircledIconButton
 			data-tip="Play next track"
-			disabled={isDisabled}
 			onClick={playNextMedia}
+			disabled={isDisabled}
 		>
 			<Next />
 		</CircledIconButton>
@@ -253,11 +253,14 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					The X and Y coordinates of the mouse
 					relative to the event source element.
 			*/
-			if (!audio || !isDurationValid) return;
+			if (
+				audio === null || !isDurationValid || timeTooltipRef.current === null ||
+				progressWrapperRef.current === null
+			)
+				return;
+
 			const tooltip = timeTooltipRef.current;
 			const div = progressWrapperRef.current;
-			if (!div || !tooltip) return;
-
 			const progressBarWidth = floor(div.getBoundingClientRect().width);
 
 			// Set lower barier at 0, otherwise, for some reason, it gives < 0 values:
