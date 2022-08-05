@@ -58,7 +58,7 @@ async function queryForPossibleLyric(
 	const jsonRes =
 		await (await fetch(`${lyricsAPI}?${params.toString()}`, {
 			headers: {
-				"Content-Type": "application/json",
+				"content-type": "application/json",
 				"x-happi-key": lyricApiKey,
 			},
 			method: "GET",
@@ -102,7 +102,7 @@ async function queryForLyric(
 	const jsonRes =
 		await (await fetch(lyricURL, {
 			headers: {
-				"Content-Type": "application/json",
+				"content-type": "application/json",
 				"x-happi-key": lyricApiKey,
 			},
 			method: "GET",

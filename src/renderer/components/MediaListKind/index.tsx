@@ -6,6 +6,7 @@ import { Virtuoso } from "react-virtuoso";
 
 import { ContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
+import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import {
@@ -135,16 +136,18 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 	useEffect(() => {
 		function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
-			if (e.ctrlKey && e.key === "a") {
+			if (
+				e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])
+			) {
 				e.preventDefault();
 				selectAllMedias();
 			}
 		}
 
-		window.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
+		window.addEventListener("keyup", selectAllMediasOnCtrlPlusA);
 
 		return () =>
-			window.removeEventListener("keydown", selectAllMediasOnCtrlPlusA);
+			window.removeEventListener("keyup", selectAllMediasOnCtrlPlusA);
 	}, []);
 
 	return (

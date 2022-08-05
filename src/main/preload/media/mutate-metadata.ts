@@ -127,13 +127,16 @@ export async function downloadThumbnail(
 	return new Promise((resolve, reject) =>
 		get(url, async res => {
 			const byteVector = await ByteVector.fromStream(res);
+			const mimeType = res.headers["content-type"] ?? "";
 
 			const picture = Picture.fromFullData(
 				byteVector,
 				PictureType.Media,
-				res.headers["content-type"] ?? "undefined",
-				"This image was download when this media was downloaded.",
+				mimeType,
+				"This thumbnail was download when this media was downloaded.",
 			);
+
+			dbg("Header of thumbnail download and picture =", { res, picture });
 
 			resolve([picture]);
 		})
@@ -181,9 +184,12 @@ export function createAndSaveImageOnMedia(
 
 function handleAlbumArtists(
 	file: MediaFile,
-	albumArtists: Readonly<string[]>,
+	albumArtists: Readonly<string[] | string>,
 ): void {
-	file.tag.albumArtists = albumArtists as Mutable<string[]>;
+	if (albumArtists instanceof Array)
+		file.tag.albumArtists = albumArtists as Mutable<string[]>;
+	else if (typeof albumArtists === "string")
+		file.tag.albumArtists = [albumArtists];
 
 	dbg({ "new file.tag.albumArtists": file.tag.albumArtists, albumArtists });
 }

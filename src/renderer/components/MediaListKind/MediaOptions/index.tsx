@@ -9,8 +9,9 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@styles/global";
-import { sendMsgToBackend } from "@common/crossCommunication";
 import { areArraysEqualByValue } from "@utils/array";
+import { isAModifierKeyPressed } from "@utils/keyboard";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteMedia } from "@utils/media";
 import { capitalize } from "@utils/utils";
@@ -24,6 +25,7 @@ import {
 	DialogTriggerToRemoveMedia,
 	StyledDialogContent,
 	StyledDescription,
+	TextAreaInput,
 	StyledTitle,
 	CloseDialog,
 	Fieldset,
@@ -51,7 +53,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 	) {
 		if (
 			imageButtonRef.current === null || imageInputRef.current === null ||
-			!(files?.length === 0)
+			files === null ||
+			files?.length === 0
 		)
 			return;
 
@@ -67,8 +70,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 	}
 
 	useEffect(() => {
-		function changeMediaMetadataOnEnter({ key }: KeyboardEvent) {
-			if (key === "Enter")
+		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
+			if (event.key === "Enter" && !isAModifierKeyPressed(event))
 				changeMediaMetadata(
 					contentWrapperRef,
 					closeButtonRef,
@@ -123,9 +126,11 @@ export function MediaOptionsModal({ media, path }: Props) {
 							/>
 							Select an image
 						</Button>) :
+						// Handle text input with line feeds:
+						option === "lyrics" ?
+						<TextAreaInput defaultValue={format(value)} id={option} /> :
 						(
 							<Input
-								placeholder={option === "lyrics" ? "Paste lyrics here" : ""}
 								readOnly={!isChangeable(option)}
 								defaultValue={format(value)}
 								id={option}
@@ -225,23 +230,28 @@ function changeMetadataIfAllowed(
 	const thingsToChange: MetadataToChange = [];
 
 	if (imageFilePath)
-		thingsToChange.push({ newValue: imageFilePath, whatToChange: "imageURL" });
+		thingsToChange.push({ whatToChange: "imageURL", newValue: imageFilePath });
 
 	// This shit is to get all the inputs:
 	for (const children of contentWrapper.current.children)
 		for (const element of children.children)
-			if (element instanceof HTMLInputElement && !element.disabled) {
+			if (
+				(element instanceof HTMLInputElement ||
+					element instanceof HTMLTextAreaElement) && !element.disabled
+			) {
 				if (!isChangeable(element.id)) continue;
 
 				const id = element.id as ChangeOptions;
 				const newValue = element.value.trim();
 
 				Object.entries(media).forEach(([key, oldValue]) => {
-					if (key !== id) return;
-					if (oldValue === newValue) return;
 					// If `oldValue` is falsy AND `newValue` is
 					// empty, there's nothing to do, so just return:
-					if (!oldValue && newValue === "") return;
+					if (
+						key !== id || oldValue === newValue ||
+						(!oldValue && newValue === "")
+					)
+						return;
 
 					// We need to handle the case where the key is an array, as in "genres":
 					if (oldValue instanceof Array) {
@@ -257,7 +267,7 @@ function changeMetadataIfAllowed(
 						// If both arrays are equal by values, we don't need to change anything:
 						if (areArraysEqualByValue(newValueAsArray, oldValue))
 							return console.log(
-								"Values are equal, not gonna change anything:",
+								`Values of "${id}" are equal, not gonna change anything:`,
 								{ newValueAsArray, oldValue },
 							);
 
@@ -269,6 +279,9 @@ function changeMetadataIfAllowed(
 							id,
 						});
 					}
+
+					/////////////////////////////////////////////
+					/////////////////////////////////////////////
 
 					const whatToChange: ChangeOptionsToSend = allowedOptionToChange[id];
 

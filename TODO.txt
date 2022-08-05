@@ -1,4 +1,6 @@
+* TODO: close ctx menu!
 * FIX: font with I and L different!!
+* ADD: media player on notification.
 
 ### NOTES:
 

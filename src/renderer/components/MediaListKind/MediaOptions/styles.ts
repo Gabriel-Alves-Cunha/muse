@@ -254,6 +254,7 @@ export const Label = styled("label", {
 export const Input = styled("input", {
 	all: "unset",
 
+	boxSizing: "border-box",
 	d: "inline-flex",
 	flex: 1,
 	justifyContent: "center",
@@ -264,6 +265,40 @@ export const Input = styled("input", {
 	b: "2px solid $input-border",
 	p: "0 10px",
 	br: 12,
+
+	whiteSpace: "nowrap", // keep it one line
+	c: "$input-text",
+	ff: "$secondary",
+	ls: "0.04rem",
+	fs: "1rem",
+	fw: 500,
+	lh: 1,
+
+	transition: "border-color 250ms ease",
+
+	"&:focus, &:hover": { borderColor: "$input-border-active" },
+
+	"&:read-only": { c: "$accent-light", b: "none" },
+});
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const TextAreaInput = styled("textarea", {
+	all: "unset",
+
+	boxSizing: "border-box",
+	d: "inline-flex",
+	flex: 1,
+	justifyContent: "center",
+	alignItems: "center",
+	w: "100%",
+	h: 35,
+
+	b: "2px solid $input-border",
+	br: 12,
+	p: 10,
 
 	whiteSpace: "nowrap", // keep it one line
 	c: "$input-text",

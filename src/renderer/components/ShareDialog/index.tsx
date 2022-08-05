@@ -7,6 +7,7 @@ import { toCanvas } from "qrcode";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { setSettings, useSettings } from "@contexts/settings";
+import { isAModifierKeyPressed } from "@utils/keyboard";
 import { getBasename } from "@common/path";
 import { emptySet } from "@utils/map-set";
 import { dbg } from "@common/utils";
@@ -76,13 +77,14 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	useEffect(() => {
-		function closeShareDialogOnEsc({ key }: KeyboardEvent) {
-			if (key === "Escape" && isDialogOpen) closePopover(server?.close);
+		function closeShareDialogOnEsc(e: KeyboardEvent) {
+			if (e.key === "Escape" && isDialogOpen && !isAModifierKeyPressed(e))
+				closePopover(server?.close);
 		}
 
-		window.addEventListener("keydown", closeShareDialogOnEsc);
+		window.addEventListener("keyup", closeShareDialogOnEsc);
 
-		return () => window.removeEventListener("keydown", closeShareDialogOnEsc);
+		return () => window.removeEventListener("keyup", closeShareDialogOnEsc);
 	}, [isDialogOpen, server]);
 
 	/////////////////////////////////////////

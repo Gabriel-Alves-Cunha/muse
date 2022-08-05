@@ -56,12 +56,16 @@ export function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export function shareMedias() {
+	// TODO: close ctx menu!
+
 	setSettings({ filesToShare: new Set(allSelectedMedias()) });
 }
 
 /////////////////////////////////////////////
 
 async function deleteMedias(): Promise<void> {
+	// TODO: close ctx menu!
+
 	const promises: Promise<void>[] = [];
 
 	allSelectedMedias().forEach(path => promises.push(deleteMedia(path)));
@@ -72,6 +76,8 @@ async function deleteMedias(): Promise<void> {
 /////////////////////////////////////////////
 
 function searchForLyrics(): void {
+	// TODO: close ctx menu!
+
 	const allMedias = mainList();
 
 	allSelectedMedias().forEach(async selectedMediaPath => {

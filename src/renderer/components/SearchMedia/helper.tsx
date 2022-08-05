@@ -6,6 +6,7 @@ import create from "zustand";
 
 import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { PlaylistList, searchMedia } from "@contexts/mediaHandler/usePlaylists";
+import { isAModifierKeyPressed } from "@utils/keyboard";
 import { constRefToEmptyArray } from "@utils/array";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { ImgWithFallback } from "@components/ImgWithFallback";
@@ -98,18 +99,18 @@ export function InputAndResults() {
 	/////////////////////////////////////////
 
 	useEffect(() => {
-		function closeSearchMediaPopoverOnEsc({ key }: KeyboardEvent) {
-			if (key === "Escape" && isOnFocus) {
+		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent) {
+			if (e.key === "Escape" && isOnFocus && !isAModifierKeyPressed(e)) {
 				setSearcher(defaultSearcher);
-				setIsOnFocus(false);
 				inputRef.current?.blur();
+				setIsOnFocus(false);
 			}
 		}
 
-		window.addEventListener("keydown", closeSearchMediaPopoverOnEsc);
+		window.addEventListener("keyup", closeSearchMediaPopoverOnEsc);
 
 		return () =>
-			window.removeEventListener("keydown", closeSearchMediaPopoverOnEsc);
+			window.removeEventListener("keyup", closeSearchMediaPopoverOnEsc);
 	}, [isOnFocus]);
 
 	/////////////////////////////////////////

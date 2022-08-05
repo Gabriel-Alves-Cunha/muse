@@ -1,6 +1,6 @@
 {
 	"name": "muse",
-	"version": "1.4.1",
+	"version": "1.4.2",
 	"repository": "https://github.com/Gabriel-Alves-Cunha/muse.git",
 	"description": "Just an YouTube music downloader and player.",
 	"author": "Gabriel Alves Cunha <gabriel925486@outlook.com>",
@@ -33,7 +33,7 @@
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/koa": "^2.13.5",
 		"@types/koa-router": "^7.4.4",
-		"@types/node": "^18.6.3",
+		"@types/node": "^18.6.4",
 		"@types/qrcode": "^1.4.2",
 		"@types/react": "^18.0.15",
 		"@types/react-dom": "^18.0.6",

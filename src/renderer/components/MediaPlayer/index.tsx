@@ -12,8 +12,8 @@ import { Lyrics } from "./Lyrics";
 import { dbg } from "@common/utils";
 import {
 	PlaylistActions,
+	usePlaylists,
 	setPlaylists,
-	mainList,
 	WhatToDo,
 } from "@contexts/mediaHandler/usePlaylists";
 import {
@@ -44,11 +44,15 @@ const currentPlayingPathSelector = (
 	state: ReturnType<typeof useCurrentPlaying.getState>,
 ) => state.path;
 
+const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
+	state.sortedByName;
+
 export function MediaPlayer() {
 	const path = useCurrentPlaying(currentPlayingPathSelector);
+	const mainList = usePlaylists(mainListSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
 
-	const media = mainList().get(path);
+	const media = mainList.get(path);
 	const audio = audioRef.current;
 
 	useEffect(() => {

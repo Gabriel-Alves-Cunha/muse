@@ -93,10 +93,10 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => (
 		<RowWrapper
-			data-path={path}
 			className={media.isSelected ?
 				"selected" :
 				""}
+			data-path={path}
 		>
 			<PlayButton
 				onClick={e => selectOrPlayMedia(e, path, media)}
@@ -113,8 +113,11 @@ const Row = memo(
 
 				<Info>
 					<Title>{media.title}</Title>
+
 					<SubTitle className="row">
 						{media.duration}
+						&emsp;|&emsp;
+						{media.artist}
 					</SubTitle>
 				</Info>
 			</PlayButton>

@@ -76,7 +76,7 @@ function toggleFavorite(path: Readonly<Path>): void {
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
-	const isThereAMedia = Boolean(audio?.src);
+	const isThereAMedia = Boolean(!audio?.src);
 
 	return (
 		<ControlsAndSeekerContainer>

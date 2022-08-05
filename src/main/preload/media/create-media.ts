@@ -48,11 +48,16 @@ async function createMedia(
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////
 
-			const picture: IPicture | undefined = pictures[0];
-			const mimeType = picture?.mimeType;
+			let picture: IPicture | undefined, mimeType: string | undefined;
+			try {
+				picture = pictures[0];
+				mimeType = picture?.mimeType;
+			} catch (error) {
+				console.error(error, { picture, mimeType });
+			}
 
 			const media: Media = {
-				image: picture && mimeType ?
+				image: picture !== undefined && mimeType ?
 					`data:${mimeType};base64,${picture.data.toBase64String()}` :
 					"",
 				duration: formatDuration(durationInSeconds),
@@ -66,7 +71,7 @@ async function createMedia(
 				album,
 			};
 
-			dbg(basename, media);
+			dbg(basename, { media, picture });
 
 			return resolve([path, media]);
 		}, `createMedia("${basename}")`);

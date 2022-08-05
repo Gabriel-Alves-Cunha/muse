@@ -42,6 +42,7 @@ export const Info = styled("div", {
 	size: "95%",
 
 	ov: "hidden",
+	gap: 8,
 	pl: 20,
 });
 
@@ -78,7 +79,7 @@ export const SubTitle = styled("p", {
 	fs: "0.9rem",
 	fw: 500,
 
-	"&.row": { c: "$gray-text", m: "unset" },
+	"&.row": { c: "$gray-text" },
 });
 
 /////////////////////////////////////////

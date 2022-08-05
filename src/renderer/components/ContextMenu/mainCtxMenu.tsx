@@ -16,14 +16,24 @@ const toggleDeveloperTools = () =>
 
 export const MainCtxMenu = () => (
 	<>
-		<Item onClick={selectAllMedias}>
+		<Item
+			onClick={() => {
+				// TODO: close ctx menu!
+				selectAllMedias();
+			}}
+		>
 			Select all medias
 			<RightSlot>Ctrl+A</RightSlot>
 		</Item>
 
 		<Separator />
 
-		<Item onClick={toggleDeveloperTools}>
+		<Item
+			onClick={() => {
+				// TODO: close ctx menu!
+				toggleDeveloperTools();
+			}}
+		>
 			Toggle Developer Tools <RightSlot>Ctrl+Shift+i</RightSlot>
 		</Item>
 	</>
