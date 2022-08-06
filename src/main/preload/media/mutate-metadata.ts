@@ -2,9 +2,9 @@
 
 import type { Tags } from "@common/@types/electron-window";
 import type {
-	ImgString,
 	ImageURL,
 	Mutable,
+	Base64,
 	Path,
 } from "@common/@types/generalTypes";
 
@@ -95,15 +95,13 @@ async function handleImageMetadata(
 
 	// if received a base64 image:
 	if (isBase64Image(imageURL))
-		createAndSaveImageOnMedia(imageURL as ImgString, file);
+		createAndSaveImageOnMedia(imageURL as Base64, file);
 
 	/////////////////////////////////////////////
 
 	// else, it's an image file path
 	if (await doesPathExists(imageURL)) {
-		const base64 = await readFile(imageURL, {
-			encoding: "base64",
-		}) as ImgString;
+		const base64 = await readFile(imageURL, { encoding: "base64" }) as Base64;
 
 		dbg({ base64 });
 
@@ -150,7 +148,7 @@ export async function downloadThumbnail(
 /////////////////////////////////////////////
 
 export function createAndSaveImageOnMedia(
-	imgAsString: Readonly<ImgString>,
+	imgAsString: Readonly<Base64>,
 	file: MediaFile,
 ): void {
 	const txtForByteVector = imgAsString.slice(

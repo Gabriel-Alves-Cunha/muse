@@ -1,10 +1,11 @@
 import { useAllSelectedMedias } from "@contexts/mediaHandler/useAllSelectedMedias";
 
-const length = (state: ReturnType<typeof useAllSelectedMedias.getState>) =>
-	state.medias.length;
+const sizeSelector = (
+	state: ReturnType<typeof useAllSelectedMedias.getState>,
+) => state.medias.size;
 
 export function NumberOfMediasSelected() {
-	const numberOfMediasSelected = useAllSelectedMedias(length);
+	const numberOfMediasSelected = useAllSelectedMedias(sizeSelector);
 
 	return (
 		<p>

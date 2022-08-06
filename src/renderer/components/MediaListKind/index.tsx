@@ -144,10 +144,10 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			}
 		}
 
-		window.addEventListener("keyup", selectAllMediasOnCtrlPlusA);
+		window.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
 
 		return () =>
-			window.removeEventListener("keyup", selectAllMediasOnCtrlPlusA);
+			window.removeEventListener("keydown", selectAllMediasOnCtrlPlusA);
 	}, []);
 
 	return (
@@ -194,7 +194,7 @@ function handleDeselectAllMedias(
 	isCtxMenuOpen: Readonly<boolean>,
 ) {
 	if (
-		listRef.current !== null && !isCtxMenuOpen && allSelectedMedias().length > 0
+		listRef.current !== null && !isCtxMenuOpen && allSelectedMedias().size > 0
 	)
 		deselectAllMedias();
 }

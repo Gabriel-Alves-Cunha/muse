@@ -1,11 +1,11 @@
 import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
 import { prettyBytes } from "@common/prettyBytes";
 
-const getMainList = (state: ReturnType<typeof usePlaylists.getState>) =>
+const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByName;
 
 export function MediasInfo() {
-	const mainList = usePlaylists(getMainList);
+	const mainList = usePlaylists(mainListSelector);
 
 	let allFilesSize = 0;
 

@@ -14,6 +14,7 @@ import {
 	setPlaylists,
 	getPlaylist,
 	WhatToDo,
+	mainList,
 } from "./usePlaylists";
 
 ////////////////////////////////////////////////
@@ -66,7 +67,7 @@ export function togglePlayPause(): void {
 
 export function play(audio?: HTMLAudioElement): void {
 	(async () => {
-		audio ?
+		audio !== undefined ?
 			await audio.play() :
 			await (document.getElementById("audio") as HTMLAudioElement).play();
 	})();
@@ -75,7 +76,8 @@ export function play(audio?: HTMLAudioElement): void {
 ////////////////////////////////////////////////
 
 export function pause(audio?: HTMLAudioElement): void {
-	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
+	if (audio === undefined)
+		audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
@@ -203,36 +205,89 @@ export function playNextMedia(): void {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+// Register functions to window mediaSession:
+
+navigator.mediaSession.setActionHandler(
+	"previoustrack",
+	() => playPreviousMedia(),
+);
+navigator.mediaSession.setActionHandler("nexttrack", () => playNextMedia());
+navigator.mediaSession.setActionHandler("pause", () => pause());
+navigator.mediaSession.setActionHandler("play", () => play());
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 // Handle what happens when the `currentPlaying.path` changes:
 
 // A timeout for in case the user changes media too fast:
 // we don't load the media until the timeout ends.
 let prevMediaTimer: NodeJS.Timeout | undefined;
 
-const currentPlayingPathSelector = (
-	state: ReturnType<typeof useCurrentPlaying.getState>,
-) => state.path;
-
 if (!import.meta.vitest)
 	useCurrentPlaying.subscribe(
-		currentPlayingPathSelector,
-		function setAudioSource() {
-			clearTimeout(prevMediaTimer);
-
-			const { path } = currentPlaying();
+		state => state.path,
+		function runSubscribedFunctions(path, prevPath) {
 			if (!path) return;
 
-			const pathForElectron = `atom:///${path}`;
+			// Run functions:
+			setAudioSource(path, prevPath);
 
-			const mediaTimer = setTimeout(
-				() => ((document.getElementById("audio") as HTMLAudioElement).src =
-					pathForElectron),
-				150,
-			);
-
-			prevMediaTimer = mediaTimer;
+			changeMediaSessionMetadata(path);
 		},
 	);
+
+////////////////////////////////////////////////
+
+function setAudioSource(path: Path, prevPath: Path) {
+	clearTimeout(prevMediaTimer);
+
+	const pathForElectron = `atom:///${path}`;
+
+	const mediaTimer = setTimeout(() => {
+		(document.getElementById("audio") as HTMLAudioElement).src =
+			pathForElectron;
+
+		handleDecorateMediaRow(path, prevPath);
+	}, 150);
+
+	prevMediaTimer = mediaTimer;
+}
+
+////////////////////////////////////////////////
+
+const playingClass = "playing";
+
+function handleDecorateMediaRow(path: Path, previousPath: Path) {
+	const prevElement = document.querySelector(`[data-path="${previousPath}"]`);
+	const newElement = document.querySelector(`[data-path="${path}"]`);
+
+	if (prevElement === null)
+		console.info(`No previous media row found for "${path}!"`);
+	if (newElement === null)
+		return console.info(`No media row found for "${path}"!`);
+
+	if (previousPath.length !== 0 && prevElement !== null)
+		// de-decorate previous playing media row:
+		prevElement.classList.remove(playingClass);
+
+	newElement.classList.add(playingClass);
+}
+
+////////////////////////////////////////////////
+
+function changeMediaSessionMetadata(path: Path): void {
+	const media = mainList().get(path);
+
+	if (media === undefined) return;
+
+	navigator.mediaSession.metadata = new MediaMetadata({
+		artwork: [{ src: media.image }],
+		artist: media.artist,
+		title: media.title,
+		album: media.album,
+	});
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

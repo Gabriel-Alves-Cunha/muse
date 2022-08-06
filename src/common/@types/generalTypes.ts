@@ -10,13 +10,12 @@ export type Media = Readonly<
 	{
 		genres: readonly string[];
 		birthTime: DateAsNumber;
-		isSelected: boolean;
 		duration: string;
 		lyrics: string;
 		artist: string;
 		album: string;
 		title: string;
-		image: string;
+		image: Base64;
 		size: number;
 	}
 >;
@@ -42,10 +41,10 @@ export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
 export type TypeOfMap<T> = T extends ReadonlyMap<infer K, infer V> ? [K, V][]
 	: never;
 
-export type ImgString = Readonly<`data:${string};base64,${string}`>;
+export type Base64 = Readonly<`data:${string};base64,${string}`>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type ImageURL = typeof eraseImg | ImgString | (string & {});
+export type ImageURL = typeof eraseImg | Base64 | (string & {});
 
 export type Values<Obj> = Obj[keyof Obj];
 

@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 import { isDevelopment } from "@common/utils";
-import { ImgString } from "@common/@types/generalTypes";
+import { Base64 } from "@common/@types/generalTypes";
 
 /////////////////////////////////////////
 
@@ -29,7 +29,7 @@ export const dirs = Object.freeze({
 
 /////////////////////////////////////////
 
-export const isBase64Image = (str: string): str is ImgString =>
+export const isBase64Image = (str: string): str is Base64 =>
 	str.includes("data:image/") && str.includes(";base64,");
 
 /////////////////////////////////////////

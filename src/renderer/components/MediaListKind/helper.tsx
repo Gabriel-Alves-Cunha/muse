@@ -7,13 +7,14 @@ import { memo } from "react";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
-import { PlaylistList, mainList } from "@contexts/mediaHandler/usePlaylists";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
 import { DialogTrigger } from "@components/DialogTrigger";
+import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
 import {
 	addToAllSelectedMedias,
+	allSelectedMedias,
 	toggleSelectedMedia,
 } from "@contexts/mediaHandler/useAllSelectedMedias";
 
@@ -48,23 +49,18 @@ export const { getState: getFromList, setState: setFromList } = useFromList;
 /////////////////////////////////////////
 
 export function selectMedia(e: React.MouseEvent<HTMLSpanElement>): void {
-	const itemClicked = (e.nativeEvent.target as HTMLElement).closest<
+	const mediaRowClicked = (e.nativeEvent.target as HTMLElement).closest<
 		HTMLDivElement
 	>(rowWrapperClassName);
 
-	if (!itemClicked) return console.warn("No media item found.");
+	if (mediaRowClicked === null) return console.warn("No media row found.");
 
-	const itemClickedMediaPath = itemClicked.getAttribute("data-path");
+	const mediaClickedMediaPath = mediaRowClicked.getAttribute("data-path");
 
-	if (!itemClickedMediaPath) return console.error("No data-path found!");
+	if (mediaClickedMediaPath === null)
+		return console.error("No 'data-path' found!");
 
-	const media = mainList().get(itemClickedMediaPath);
-
-	if (!media)
-		return console.error(`No media found for "${itemClickedMediaPath}"`);
-
-	if (!media.isSelected)
-		addToAllSelectedMedias(media, itemClickedMediaPath);
+	addToAllSelectedMedias(mediaClickedMediaPath);
 }
 
 /////////////////////////////////////////
@@ -74,7 +70,6 @@ const leftClick = 0;
 function selectOrPlayMedia(
 	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 	mediaPath: Path,
-	media: Media,
 ) {
 	if (e.button !== leftClick || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
@@ -83,7 +78,7 @@ function selectOrPlayMedia(
 		return playThisMedia(mediaPath, list);
 	}
 
-	toggleSelectedMedia(media, mediaPath);
+	toggleSelectedMedia(mediaPath);
 }
 
 /////////////////////////////////////////////
@@ -93,13 +88,13 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => (
 		<RowWrapper
-			className={media.isSelected ?
+			className={allSelectedMedias().has(path) ?
 				"selected" :
 				""}
 			data-path={path}
 		>
 			<PlayButton
-				onClick={e => selectOrPlayMedia(e, path, media)}
+				onClick={e => selectOrPlayMedia(e, path)}
 				data-tip="Play this media"
 				data-place="bottom"
 			>
@@ -137,8 +132,8 @@ const Row = memo(
 	),
 	(prev, next) =>
 		prev.media.title === next.media.title &&
-		prev.media.duration === next.media.duration &&
-		prev.media.isSelected === next.media.isSelected,
+		prev.media.artist === next.media.artist &&
+		prev.media.duration === next.media.duration,
 );
 Row.displayName = "Row";
 

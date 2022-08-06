@@ -1,4 +1,4 @@
-import type { ImgString } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/generalTypes";
 
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -34,7 +34,7 @@ export const mediaPicture = resolve(test_assetsDir, "img for tests.png");
 export async function getThumbnail() {
 	const base64 = await readFile(mediaPicture, { encoding: "base64" });
 
-	const img: ImgString = `data:image/png;base64,${base64}`;
+	const img: Base64 = `data:image/png;base64,${base64}`;
 
 	return img;
 }

@@ -13,7 +13,6 @@ export const testArray = Object.freeze(
 			const media: Media = {
 				duration: formatDuration(index + 10),
 				birthTime: Date.now(),
-				isSelected: false,
 				size: 3_000,
 				genres: [],
 				artist: "",

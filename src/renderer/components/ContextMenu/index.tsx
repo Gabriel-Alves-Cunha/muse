@@ -29,10 +29,10 @@ const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
 export const ContextMenu = (
 	{ children, content = MAIN, onContextMenu, setIsOpen }: Props,
 ) => (
-	<Root onOpenChange={setIsOpen}>
+	<Root onOpenChange={setIsOpen} modal>
 		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
-		<Content className="notransition">{contentToShow(content)}</Content>
+		<Content loop className="notransition">{contentToShow(content)}</Content>
 	</Root>
 );
 

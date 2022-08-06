@@ -1,6 +1,6 @@
 import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { dbg, stringifyJson } from "@common/utils";
-import { ImgString } from "@common/@types/generalTypes";
+import { Base64 } from "@common/@types/generalTypes";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -122,7 +122,7 @@ async function queryForLyric(
 
 /////////////////////////////////////////
 
-async function queryForImage(imageURL: Readonly<string>): Promise<ImgString> {
+async function queryForImage(imageURL: Readonly<string>): Promise<Base64> {
 	dbg(`Querying for lyricURL = "${imageURL}".`);
 
 	const blob =
@@ -137,13 +137,13 @@ async function queryForImage(imageURL: Readonly<string>): Promise<ImgString> {
 
 /////////////////////////////////////////
 
-function blobToBase64(blob: Blob): Promise<ImgString> {
+function blobToBase64(blob: Blob): Promise<Base64> {
 	const reader = new FileReader();
 	reader.readAsDataURL(blob);
 
 	return new Promise((resolve, reject) => {
 		reader.onerror = () => reject("Error reading on blobToBase64!");
-		reader.onloadend = () => resolve(reader.result as ImgString);
+		reader.onloadend = () => resolve(reader.result as Base64);
 	});
 }
 

@@ -15,37 +15,37 @@ import {
 import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 
 export function MediaOptionsCtxMenu() {
-	const plural = allSelectedMedias().length > 1 ? "s" : "";
+	const plural = allSelectedMedias().size > 1 ? "s" : "";
 
 	return (
 		<>
-			<>
-				<Dialog modal>
-					<TriggerToDeleteMedia>
+			<Dialog modal>
+				<TriggerToDeleteMedia>
+					<>
 						Delete media{plural}
 
 						<RightSlot>
 							<Trash />
 						</RightSlot>
-					</TriggerToDeleteMedia>
+					</>
+				</TriggerToDeleteMedia>
 
-					<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
-				</Dialog>
-			</>
+				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+			</Dialog>
 
-			<Item onClick={shareMedias}>
+			<Item onSelect={shareMedias}>
 				Share media{plural}
 				<RightSlot>
 					<Share />
 				</RightSlot>
 			</Item>
 
-			<Item onClick={selectAllMedias}>
+			<Item onSelect={selectAllMedias}>
 				Select all medias
 				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
-			<Item onClick={searchForLyrics}>Search for lyrics</Item>
+			<Item onSelect={searchForLyrics}>Search for lyrics</Item>
 		</>
 	);
 }
@@ -56,16 +56,12 @@ export function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export function shareMedias() {
-	// TODO: close ctx menu!
-
-	setSettings({ filesToShare: new Set(allSelectedMedias()) });
+	setSettings({ filesToShare: allSelectedMedias() });
 }
 
 /////////////////////////////////////////////
 
 async function deleteMedias(): Promise<void> {
-	// TODO: close ctx menu!
-
 	const promises: Promise<void>[] = [];
 
 	allSelectedMedias().forEach(path => promises.push(deleteMedia(path)));
@@ -76,13 +72,11 @@ async function deleteMedias(): Promise<void> {
 /////////////////////////////////////////////
 
 function searchForLyrics(): void {
-	// TODO: close ctx menu!
-
 	const allMedias = mainList();
 
-	allSelectedMedias().forEach(async selectedMediaPath => {
-		const media = allMedias.get(selectedMediaPath);
+	allSelectedMedias().forEach(async path => {
+		const media = allMedias.get(path);
 
-		await searchAndOpenLyrics(media, selectedMediaPath, false);
+		await searchAndOpenLyrics(media, path, false);
 	});
 }

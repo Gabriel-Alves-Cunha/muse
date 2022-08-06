@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import type { ImgString } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/generalTypes";
 
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../../mockElectronPlusNodeGlobalsBeforeTests";
@@ -71,7 +71,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	//////////////////////////////////////
 
 	it("Should be able to write the tag 'picture' to a file.", async () => {
-		const imgAsString: ImgString = await getThumbnail();
+		const imgAsString: Base64 = await getThumbnail();
 
 		await writeTags(anotherMediaPath, { imageURL: imgAsString });
 

@@ -53,7 +53,7 @@ async function createMedia(
 				picture = pictures[0];
 				mimeType = picture?.mimeType;
 			} catch (error) {
-				console.error(error, { picture, mimeType });
+				console.error(error, { picture, mimeType, basename });
 			}
 
 			const media: Media = {
@@ -64,7 +64,6 @@ async function createMedia(
 				birthTime: statSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
 				title: title ?? basename,
-				isSelected: false,
 				size: length,
 				lyrics,
 				genres,

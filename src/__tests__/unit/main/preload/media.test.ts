@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import type { ImgString } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/generalTypes";
 
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "../../mockElectronPlusNodeGlobalsBeforeTests";
@@ -190,7 +190,7 @@ describe("It should account for the switch possibilities and the message sending
 
 	it("Should be able to write the tag 'imageURL' to a file.", async () => {
 		const imgContents = await readFile(mediaPicture, { encoding: "base64" });
-		const imgAsString: ImgString = `data:image/png;base64,${imgContents}`;
+		const imgAsString: Base64 = `data:image/png;base64,${imgContents}`;
 		const data = Object.freeze({ imageURL: imgAsString });
 
 		await writeTags(mediaPath, data);

@@ -1,26 +1,23 @@
-import type { Media, Mutable, Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/generalTypes";
 
+import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
+import { sortedByDate } from "./usePlaylists";
+import { emptySet } from "@utils/map-set";
 import { time } from "@utils/utils";
-import {
-	PlaylistActions,
-	setPlaylists,
-	usePlaylists,
-	mainList,
-	WhatToDo,
-} from "./usePlaylists";
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const useAllSelectedMedias = create<{ medias: readonly Path[]; }>(
-	() => ({ medias: [] })
+export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path>; }>()(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
 );
 
 export const allSelectedMedias = () => useAllSelectedMedias.getState().medias;
-export const setAllSelectedMedias = (medias: Path[]) =>
+export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 	useAllSelectedMedias.setState({ medias });
 
 ///////////////////////////////////////////////////
@@ -28,105 +25,69 @@ export const setAllSelectedMedias = (medias: Path[]) =>
 ///////////////////////////////////////////////////
 // Handle media selection:
 
-// Every the mainList (sortedByName) changes,
-// update `allSelectedMedias`:
 if (!import.meta.vitest)
-	usePlaylists.subscribe(
-		({ sortedByName }) => sortedByName,
-		function updateAllSelectedMedias() {
-			time(() =>
-			{
-				setAllSelectedMedias(
-					Array.from(mainList()).filter(([, { isSelected }]) => isSelected).map(
-						([path]) =>
-							path
-					),
+	useAllSelectedMedias.subscribe(
+		state => state.medias,
+		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
+			time(() => {
+				// Has to be this order:
+				prevSelectedMedias.forEach(path =>
+					document.querySelector(`[data-path="${path}"]`)?.classList.remove(
+						"selected",
+					)
 				);
-			}, "updateAllSelectedMedias");
+				selectedMedias.forEach(path =>
+					document.querySelector(`[data-path="${path}"]`)?.classList.add(
+						"selected",
+					)
+				);
+			}, "handleDecorateMediasRow");
 		},
 	);
 
 ///////////////////////////////////////////////////
 
-export function toggleSelectedMedia(media: Media, mediaPath: Path): void {
+export function toggleSelectedMedia(path: Path): void {
 	time(
 		() =>
-			allSelectedMedias().includes(mediaPath) ?
-				removeFromAllSelectedMedias(media, mediaPath) :
-				addToAllSelectedMedias(media, mediaPath),
+			allSelectedMedias().has(path) ?
+				removeFromAllSelectedMedias(path) :
+				addToAllSelectedMedias(path),
 		"toggleSelectedMedia",
 	);
 }
 
 ///////////////////////////////////////////////////
 
-export function addToAllSelectedMedias(newMedia: Media, mediaPath: Path): void {
-	time(
-		() =>
-			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-				newMedia: { ...newMedia, isSelected: true },
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				path: mediaPath,
-			}),
-		"addToAllSelectedMedias",
-	);
+export function addToAllSelectedMedias(path: Path): void {
+	if (allSelectedMedias().has(path)) return;
+
+	setAllSelectedMedias(new Set(allSelectedMedias()).add(path));
 }
 
 ///////////////////////////////////////////////////
 
-export function removeFromAllSelectedMedias(
-	newMedia: Media,
-	mediaPath: Path,
-): void {
-	time(
-		() =>
-			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-				newMedia: { ...newMedia, isSelected: false },
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				path: mediaPath,
-			}),
-		"removeFromAllSelectedMedias",
-	);
+export function removeFromAllSelectedMedias(path: Path): void {
+	if (!allSelectedMedias().has(path)) return;
+
+	const newSet = new Set(allSelectedMedias());
+	newSet.delete(path);
+
+	setAllSelectedMedias(newSet);
 }
 
 ///////////////////////////////////////////////////
 
-export function deselectAllMedias() {
-	time(() => {
-		if (allSelectedMedias().length === 0) return;
+export function deselectAllMedias(): void {
+	if (allSelectedMedias().size === 0) return;
 
-		const newMediasList = mainList() as Map<Path, Mutable<Media>>;
-
-		newMediasList.forEach((media, path) =>
-			newMediasList.set(path, { ...media, isSelected: false })
-		);
-
-		setPlaylists({
-			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: WhatToDo.UPDATE_MAIN_LIST,
-			list: newMediasList,
-		});
-	}, "deselectAllMedias");
+	setAllSelectedMedias(emptySet);
 }
 
 ///////////////////////////////////////////////////
 
-export function selectAllMedias() {
-	time(() => {
-		const newMediasList = mainList() as Map<Path, Mutable<Media>>;
+export function selectAllMedias(): void {
+	if (allSelectedMedias().size === sortedByDate().size) return;
 
-		if (allSelectedMedias().length === newMediasList.size) return;
-
-		newMediasList.forEach((media, path) =>
-			newMediasList.set(path, { ...media, isSelected: true })
-		);
-
-		setPlaylists({
-			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-			type: WhatToDo.UPDATE_MAIN_LIST,
-			list: newMediasList,
-		});
-	}, "selectAllMedias");
+	setAllSelectedMedias(sortedByDate());
 }
