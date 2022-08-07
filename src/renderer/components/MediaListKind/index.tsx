@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
-import { ContentEnum, ContextMenu } from "@components/ContextMenu";
+import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
@@ -13,21 +13,21 @@ import {
 	deselectAllMedias,
 	allSelectedMedias,
 	selectAllMedias,
-} from "@contexts/mediaHandler/useAllSelectedMedias";
+} from "@contexts/useAllSelectedMedias";
 import {
 	type MainList,
 	type History,
 	usePlaylists,
 	PlaylistList,
 	mainList,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 import {
 	computeHistoryItemKey,
+	selectMediaByEvent,
 	computeItemKey,
 	reloadWindow,
 	itemContent,
 	useFromList,
-	selectMedia,
 } from "./helper";
 
 import { ListWrapper, EmptyList, Footer } from "./styles";
@@ -144,18 +144,18 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			}
 		}
 
-		window.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
+		document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
 
 		return () =>
-			window.removeEventListener("keydown", selectAllMediasOnCtrlPlusA);
+			document.removeEventListener("keydown", selectAllMediasOnCtrlPlusA);
 	}, []);
 
 	return (
 		<ListWrapper ref={listRef}>
 			<ContextMenu
-				content={ContentEnum.MEDIA_OPTIONS}
+				content={CtxContentEnum.MEDIA_OPTIONS}
+				onContextMenu={selectMediaByEvent}
 				setIsOpen={setIsCtxMenuOpen}
-				onContextMenu={selectMedia}
 			>
 				<Virtuoso
 					components={{
@@ -194,7 +194,8 @@ function handleDeselectAllMedias(
 	isCtxMenuOpen: Readonly<boolean>,
 ) {
 	if (
-		listRef.current !== null && !isCtxMenuOpen && allSelectedMedias().size > 0
+		listRef.current !== null && isCtxMenuOpen === false &&
+		allSelectedMedias().size > 0
 	)
 		deselectAllMedias();
 }

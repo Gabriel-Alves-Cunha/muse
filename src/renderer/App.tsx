@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import ReactTooltip from "react-tooltip";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
-import { searchLocalComputerForMedias } from "@contexts/mediaHandler/usePlaylists";
+import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";

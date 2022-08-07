@@ -1,5 +1,5 @@
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
-import { selectAllMedias } from "@contexts/mediaHandler/useAllSelectedMedias";
+import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 
 import { RightSlot, Separator, Item } from "./styles";
 

@@ -6,14 +6,14 @@ import {
 	PlaylistActions,
 	setPlaylists,
 	WhatToDo,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 
 const { deleteFile } = electron.fs;
 
 export async function deleteMedia(path: Path) {
 	const wasDeleteSuccessfull = await deleteFile(path);
 
-	if (wasDeleteSuccessfull) {
+	if (wasDeleteSuccessfull === true) {
 		successToast(`Deleted ${getBasename(path)}`);
 
 		setPlaylists({

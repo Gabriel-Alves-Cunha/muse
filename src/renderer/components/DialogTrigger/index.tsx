@@ -1,3 +1,5 @@
+import type { ComponentProps } from "@stitches/react";
+
 import { Trigger } from "@radix-ui/react-dialog";
 
 import { styled } from "@styles/global";
@@ -9,7 +11,7 @@ import { styled } from "@styles/global";
 
 export const DialogTrigger = ({ children, className, tooltip }: Props) => (
 	<StyledDialogTrigger
-		className={className + " notransition"}
+		className={"notransition " + (className ?? "")}
 		data-place="bottom"
 		data-tip={tooltip}
 	>
@@ -37,8 +39,10 @@ const StyledDialogTrigger = styled(Trigger, {
 
 	"&:hover, &:focus": { bg: "$icon-button-hovered", "& svg": { c: "$text" } },
 
-	"&.on-media-player": {
-		c: "$media-player-icons",
+	"&.on-search-media": {
+		pos: "absolute",
+		t: "25%",
+		r: 10,
 
 		"&:hover, &:focus": {
 			bg: "$media-player-icon-button-hovered",
@@ -54,5 +58,9 @@ const StyledDialogTrigger = styled(Trigger, {
 // Types:
 
 type Props = Readonly<
-	{ children: React.ReactNode; className?: string; tooltip: string; }
+	ComponentProps<typeof StyledDialogTrigger> & {
+		children: React.ReactNode;
+		className?: string;
+		tooltip: string;
+	}
 >;

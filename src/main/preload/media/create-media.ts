@@ -1,4 +1,4 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { Base64, Media, Path } from "@common/@types/generalTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { statSync } from "node:fs";
@@ -58,7 +58,7 @@ async function createMedia(
 
 			const media: Media = {
 				image: picture !== undefined && mimeType ?
-					`data:${mimeType};base64,${picture.data.toBase64String()}` :
+					`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64 :
 					"",
 				duration: formatDuration(durationInSeconds),
 				birthTime: statSync(path).birthtimeMs,

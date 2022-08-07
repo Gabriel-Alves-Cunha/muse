@@ -1,25 +1,30 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
+import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
+import { subscribeWithSelector } from "zustand/middleware";
+import { useEffect, useRef } from "react";
+import { Dialog, Portal } from "@radix-ui/react-dialog";
 import create from "zustand";
 
-import { PopoverContent, PopoverRoot } from "@components/Popover";
-import { PlaylistList, searchMedia } from "@contexts/mediaHandler/usePlaylists";
+import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
+import { diacriticRegex, searchMedia } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { constRefToEmptyArray } from "@utils/array";
-import { useOnClickOutside } from "@hooks/useOnClickOutside";
+import { selectMediaByEvent } from "@components/MediaListKind/helper";
+import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { playThisMedia } from "@contexts/mediaHandler/useCurrentPlaying";
+import { DialogTrigger } from "@components/DialogTrigger";
+import { playThisMedia } from "@contexts/useCurrentPlaying";
+import { emptyArray } from "@utils/array";
 
+import { Img, PlayButton, RowWrapper } from "../MediaListKind/styles";
+import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import { RightSlot } from "@components/ContextMenu/styles";
-import { Img } from "../MediaListKind/styles";
 import {
 	SearchMediaPopoverAnchor,
 	NothingFound,
 	Highlight,
-	SubTitle,
-	Result,
 	Title,
 	Info,
 } from "./styles";
@@ -42,145 +47,105 @@ const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING, SEARCHING } =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const defaultSearcher: Searcher = Object.freeze({
-	results: constRefToEmptyArray,
+const defaultSearcher: Searcher = Object.freeze({
 	searchStatus: DOING_NOTHING,
+	isInputOnFocus: false,
+	results: emptyArray,
 	searchTerm: "",
+	highlight: "",
 });
 
-const useSearcher = create(() => defaultSearcher);
-const { setState: setSearcher } = useSearcher;
+const useSearcher = create<Searcher>()(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	subscribeWithSelector((_set, _get, _api) => defaultSearcher),
+);
+
+export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const updateSearchTerm = (e: InputChange) =>
-	setSearcher({ searchTerm: e.target.value });
+useSearcher.subscribe(
+	state => state.searchTerm,
+	function searchForMedias(searchTerm): void {
+		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
+
+		if (searchTerm.length < 2) return;
+
+		const results = searchMedia(searchTerm);
+		const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+
+		setSearcher({ searchStatus, results });
+	},
+);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-// I know this function is not the prettiest... I wanted to have specific
-// abilities wich made me make this beautiful component...
-export function InputAndResults() {
-	const { searchStatus, searchTerm, results } = useSearcher();
-	const [isOnFocus, setIsOnFocus] = useState(false);
-	const inputRef = useRef<HTMLInputElement>(null);
-	const [, startTransition] = useTransition();
-
-	/////////////////////////////////////////
-
-	const foundSomething = searchStatus === FOUND_SOMETHING;
-	const nothingFound = searchStatus === NOTHING_FOUND;
-	const shouldPopoverOpen = foundSomething || nothingFound;
-
-	/////////////////////////////////////////
-
-	// Close everything when the user clicks outside of the input,
-	// but only if the input is not focused so it doesn't fire
-	// everytime the user clicks outside of the input;
-	// But if the user clicked on a media, we must play it,
-	// so the only I found this to work was to wait a bit,
-	// I found that such time had to be high, I settled on
-	// a time of 200ms, but maybe on a slow machine it could
-	// be need a higher time for the event to bubble...
-	useOnClickOutside(inputRef, () => {
-		if (!isOnFocus) return;
-
-		setTimeout(() => {
-			setSearcher(defaultSearcher);
-			setIsOnFocus(false);
-			inputRef.current?.blur();
-		}, 200);
+const setSearchTerm = (e: InputChange) =>
+	setSearcher({
+		searchTerm: e.target.value,
+		highlight: e.target.value.toLowerCase().normalize("NFD").replace(
+			diacriticRegex,
+			"",
+		),
 	});
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+const setIsInputOnFocus = (bool: boolean) =>
+	setSearcher({ isInputOnFocus: bool });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export function Input() {
+	const inputRef = useRef<HTMLInputElement>(null);
+	const { searchTerm } = useSearcher();
 
 	/////////////////////////////////////////
 
 	useEffect(() => {
 		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent) {
-			if (e.key === "Escape" && isOnFocus && !isAModifierKeyPressed(e)) {
+			if (
+				e.key === "Escape" && getSearcher().isInputOnFocus === true &&
+				isAModifierKeyPressed(e) === false
+			) {
 				setSearcher(defaultSearcher);
 				inputRef.current?.blur();
-				setIsOnFocus(false);
 			}
 		}
 
-		window.addEventListener("keyup", closeSearchMediaPopoverOnEsc);
+		document.addEventListener("keyup", closeSearchMediaPopoverOnEsc);
 
 		return () =>
-			window.removeEventListener("keyup", closeSearchMediaPopoverOnEsc);
-	}, [isOnFocus]);
-
-	/////////////////////////////////////////
-
-	useEffect(function searchForMedia() {
-		setSearcher({ results: constRefToEmptyArray, searchStatus: SEARCHING });
-
-		if (searchTerm.length < 2) return;
-
-		// Using startTransition in case the search takes too long:
-		startTransition(() => {
-			const results = searchMedia(searchTerm);
-			const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
-
-			setSearcher({ searchStatus, results });
-
-			// Doing this hack to keep focus on the input cause
-			// it is lost when the popover opens...	:(
-			setTimeout(() => inputRef.current?.focus());
-		});
-	}, [searchTerm]);
+			document.removeEventListener("keyup", closeSearchMediaPopoverOnEsc);
+	}, []);
 
 	/////////////////////////////////////////
 
 	return (
 		<>
-			<>
-				<label htmlFor="search-songs">Search for songs</label>
-				<input
-					onFocus={() => setIsOnFocus(true)}
-					onChange={updateSearchTerm}
-					value={searchTerm}
-					spellCheck="false"
-					key="search-songs"
-					id="search-songs"
-					autoCorrect="off"
-					ref={inputRef}
-					accessKey="k"
-					type="text"
-				/>
+			<label htmlFor="search-songs">Search for songs</label>
 
-				{!isOnFocus && <RightSlot id="search">Alt+k</RightSlot>}
-			</>
+			<input
+				onFocus={() => setIsInputOnFocus(true)}
+				onChange={setSearchTerm}
+				value={searchTerm}
+				spellCheck="false"
+				autoCorrect="off"
+				ref={inputRef}
+				accessKey="s"
+			/>
 
-			<PopoverRoot open={shouldPopoverOpen}>
-				<SearchMediaPopoverAnchor />
-
-				<PopoverContent
-					size={nothingFound ?
-						"nothing-found-for-search-media" :
-						"search-media-results"}
-				>
-					{nothingFound ?
-						(
-							<NothingFound>
-								Nothing was found for &quot;{searchTerm}&quot;
-							</NothingFound>
-						) :
-						foundSomething ?
-						(results.map(([path, media]) => (
-							<Row
-								highlight={searchTerm}
-								media={media}
-								path={path}
-								key={path}
-							/>
-						))) :
-						undefined}
-				</PopoverContent>
-			</PopoverRoot>
+			{getSearcher().isInputOnFocus === false && (
+				<RightSlot id="search">Alt+s</RightSlot>
+			)}
 		</>
 	);
 }
@@ -189,7 +154,62 @@ export function InputAndResults() {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function Row({ media: { title, image, duration }, highlight, path }: RowProps) {
+export function Results() {
+	const { results, searchStatus } = useSearcher();
+
+	/////////////////////////////////////////
+
+	const foundSomething = searchStatus === FOUND_SOMETHING;
+	const nothingFound = searchStatus === NOTHING_FOUND;
+	const shouldPopoverOpen = foundSomething === true || nothingFound === true;
+
+	/////////////////////////////////////////
+
+	return shouldPopoverOpen ?
+		(
+			<ContextMenu
+				content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
+				onContextMenu={selectMediaByEvent}
+				isAllDisabled={nothingFound}
+			>
+				<PopoverRoot open={shouldPopoverOpen}>
+					<SearchMediaPopoverAnchor />
+
+					<PopoverContent
+						size={nothingFound === true ?
+							"nothing-found-for-search-media" :
+							"search-media-results"}
+						onPointerDownOutside={() => setSearcher(defaultSearcher)}
+						onOpenAutoFocus={e => e.preventDefault()}
+					>
+						{nothingFound === true ?
+							(
+								<NothingFound>
+									Nothing was found for &quot;{getSearcher().searchTerm}&quot;
+								</NothingFound>
+							) :
+							foundSomething === true ?
+							(results.map(([path, media]) => (
+								<MediaSearchRow
+									highlight={getSearcher().highlight}
+									media={media}
+									path={path}
+									key={path}
+								/>
+							))) :
+							undefined}
+					</PopoverContent>
+				</PopoverRoot>
+			</ContextMenu>
+		) :
+		undefined;
+}
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 	/** normalize()ing to NFD Unicode normal form decomposes
 	 * combined graphemes into the combination of simple ones.
 	 * The è of Crème ends up expressed as e +  ̀.
@@ -197,36 +217,61 @@ function Row({ media: { title, image, duration }, highlight, path }: RowProps) {
 	 * which the Unicode standard conveniently groups as the
 	 * Combining Diacritical Marks Unicode block.
 	 */
-	const index = title
+	const index = media
+		.title
 		.toLowerCase()
 		.normalize("NFD")
-		.replace(/\p{Diacritic}/gu, "")
-		.indexOf(
-			highlight.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""),
-		);
+		.replace(diacriticRegex, "")
+		.indexOf(highlight);
 
 	return (
-		<Result
-			onClick={() => playThisMedia(path, PlaylistList.MAIN_LIST)}
-			data-tip="Play this media"
-		>
-			<Img>
-				<ImgWithFallback
-					Fallback={<MusicNote size={13} />}
-					mediaPath={path}
-					mediaImg={image}
-				/>
-			</Img>
+		<RowWrapper data-path={path}>
+			<PlayButton
+				onClick={e => {
+					e.stopPropagation();
+					e.preventDefault();
+					playThisMedia(path);
+				}}
+				data-tip="Play this media"
+				data-place="right"
+			>
+				<Img>
+					<ImgWithFallback
+						Fallback={<MusicNote size={13} />}
+						mediaImg={media.image}
+						mediaPath={path}
+					/>
+				</Img>
 
-			<Info>
-				<Title>
-					{title.slice(0, index)}
-					<Highlight>{title.slice(index, index + highlight.length)}</Highlight>
-					{title.slice(index + highlight.length)}
-				</Title>
-				<SubTitle>{duration}</SubTitle>
-			</Info>
-		</Result>
+				<Info>
+					<Title>
+						{media.title.slice(0, index)}
+						<Highlight>
+							{media.title.slice(index, index + highlight.length)}
+						</Highlight>
+						{media.title.slice(index + highlight.length)}
+					</Title>
+				</Info>
+			</PlayButton>
+
+			<Dialog modal>
+				<DialogTrigger
+					onClick={e => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
+					tooltip="Open media options"
+				>
+					<Dots size={17} />
+				</DialogTrigger>
+
+				<Portal>
+					<StyledDialogBlurOverlay>
+						<MediaOptionsModal media={media} path={path} />
+					</StyledDialogBlurOverlay>
+				</Portal>
+			</Dialog>
+		</RowWrapper>
 	);
 }
 
@@ -238,14 +283,16 @@ function Row({ media: { title, image, duration }, highlight, path }: RowProps) {
 type Searcher = Readonly<
 	{
 		results: readonly [Path, Media][];
-		searchTerm: Lowercase<string>;
+		highlight: Lowercase<string>;
 		searchStatus: SearchStatus;
+		isInputOnFocus: boolean;
+		searchTerm: string;
 	}
 >;
 
 /////////////////////////////////////////
 
-type RowProps = Readonly<
+type MediaSearchRowProps = Readonly<
 	{ highlight: Lowercase<string>; media: Media; path: Path; }
 >;
 

@@ -28,18 +28,18 @@ import {
 	toggleLoopMedia,
 	usePlayOptions,
 	toggleRandom,
-} from "@contexts/mediaHandler/usePlayOptions";
+} from "@contexts/usePlayOptions";
 import {
 	playPreviousMedia,
 	togglePlayPause,
 	playNextMedia,
-} from "@contexts/mediaHandler/useCurrentPlaying";
+} from "@contexts/useCurrentPlaying";
 import {
 	PlaylistActions,
 	setPlaylists,
 	favorites,
 	WhatToDo,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 
 import {
 	ControlsAndSeekerContainer,
@@ -76,6 +76,7 @@ function toggleFavorite(path: Readonly<Path>): void {
 
 export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
+	// `audio !== null && audio.src.length > 0`:
 	const isThereAMedia = Boolean(!audio?.src);
 
 	return (
@@ -124,14 +125,14 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 			{media?.lyrics ? <LyricsPresent size={16} /> : <NoLyrics size={16} />}
 		</CircledIconButton>
 
-		<Album>{displayTitle ? media?.title : media?.album}</Album>
+		<Album>{displayTitle === true ? media?.title : media?.album}</Album>
 
 		<CircledIconButton
 			onClick={() => toggleFavorite(path)}
 			disabled={media === undefined}
 			data-tip="Toggle favorite"
 		>
-			{favorites().has(path) ?
+			{favorites().has(path) === true ?
 				<Favorite size={17} /> :
 				<AddFavorite size={17} />}
 		</CircledIconButton>
@@ -181,7 +182,8 @@ export async function searchAndOpenLyrics(
 		console.error(error);
 	}
 
-	if (media.lyrics.length > 0 && openLyrics) return flipMediaPlayerCard();
+	if (media.lyrics.length > 0 && openLyrics === true)
+		return flipMediaPlayerCard();
 }
 
 /////////////////////////////////////////
@@ -254,7 +256,8 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 					relative to the event source element.
 			*/
 			if (
-				audio === null || !isDurationValid || timeTooltipRef.current === null ||
+				audio === null || isDurationValid === false || timeTooltipRef
+						.current === null ||
 				progressWrapperRef.current === null
 			)
 				return;

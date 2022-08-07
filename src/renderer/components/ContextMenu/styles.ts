@@ -93,6 +93,13 @@ export const TriggerToDeleteMedia = styled(Trigger, {
 
 		"& svg": { color: "$ctx-menu-item-text-focus" },
 	},
+
+	"&:disabled": {
+		c: "$ctx-menu-item-text-disabled",
+		pointerEvents: "none",
+
+		"& svg": { color: "$ctx-menu-item-text-disabled" },
+	},
 });
 
 /////////////////////////////////////////

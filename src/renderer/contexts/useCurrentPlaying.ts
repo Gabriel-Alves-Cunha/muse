@@ -44,7 +44,10 @@ export const { getState: currentPlaying, setState: setCurrentPlaying } =
 ////////////////////////////////////////////////
 // Helper functions:
 
-export function playThisMedia(path: Path, listType: PlaylistList): void {
+export function playThisMedia(
+	path: Path,
+	listType: PlaylistList = PlaylistList.MAIN_LIST,
+): void {
 	// We need to update history:
 	setPlaylists({
 		whatToDo: PlaylistActions.ADD_ONE_MEDIA,
@@ -207,13 +210,15 @@ export function playNextMedia(): void {
 ////////////////////////////////////////////////
 // Register functions to window mediaSession:
 
-navigator.mediaSession.setActionHandler(
-	"previoustrack",
-	() => playPreviousMedia(),
-);
-navigator.mediaSession.setActionHandler("nexttrack", () => playNextMedia());
-navigator.mediaSession.setActionHandler("pause", () => pause());
-navigator.mediaSession.setActionHandler("play", () => play());
+if (import.meta.vitest === undefined) {
+	navigator.mediaSession.setActionHandler(
+		"previoustrack",
+		() => playPreviousMedia(),
+	);
+	navigator.mediaSession.setActionHandler("nexttrack", () => playNextMedia());
+	navigator.mediaSession.setActionHandler("pause", () => pause());
+	navigator.mediaSession.setActionHandler("play", () => play());
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -224,7 +229,7 @@ navigator.mediaSession.setActionHandler("play", () => play());
 // we don't load the media until the timeout ends.
 let prevMediaTimer: NodeJS.Timeout | undefined;
 
-if (!import.meta.vitest)
+if (import.meta.vitest === undefined)
 	useCurrentPlaying.subscribe(
 		state => state.path,
 		function runSubscribedFunctions(path, prevPath) {

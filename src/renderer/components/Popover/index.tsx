@@ -1,7 +1,7 @@
-import type { VariantProps } from "@stitches/react";
+import type { VariantProps, ComponentProps } from "@stitches/react";
 
 import { type Ref, type ReactNode, forwardRef } from "react";
-import { PopperContentProps, Root } from "@radix-ui/react-popover";
+import { Root } from "@radix-ui/react-popover";
 
 import { StyledContent } from "./styles";
 
@@ -45,7 +45,7 @@ PopoverContent.displayName = "PopoverContent";
 // Types:
 
 type Props =
-	& PopperContentProps
+	& ComponentProps<typeof StyledContent>
 	& Readonly<
 		{ size: VariantProps<typeof StyledContent>["size"]; children: ReactNode; }
 	>;

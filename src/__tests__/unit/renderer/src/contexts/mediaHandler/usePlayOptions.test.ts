@@ -6,7 +6,7 @@ mockElectronPlusNodeGlobalsBeforeTests();
 //
 
 const { playOptions, setPlayOptions, toggleLoopMedia } = await import(
-	"@contexts/mediaHandler/usePlayOptions"
+	"@contexts/usePlayOptions"
 );
 
 /////////////////////////////////////////////

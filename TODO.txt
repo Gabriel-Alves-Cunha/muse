@@ -1,6 +1,8 @@
 * FIX: font with I and L different!!
 * ADD: loader on lyrics searching!!!
 * ADD: options to search results!
+* FIX: when ctrl+a with options open, everything is selected!!!!
+* FIX: change from mouse or touch events to something that WebDevSimplified talks about!!
 
 ### NOTES:
 

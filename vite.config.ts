@@ -7,6 +7,7 @@ const rendererPath = resolve(__dirname, "./src/renderer");
 
 export default defineConfig({
 	test: {
+		includeSource: ["src/**/*.{js,ts}"],
 		environment: "happy-dom",
 		dir: "src/__tests__",
 		logHeapUsage: true,

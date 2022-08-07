@@ -44,7 +44,7 @@ export const SearchWrapper = styled("div", {
 		},
 	},
 
-	"& svg": { c: "$input-border", cursor: "default", ml: 10 },
+	"& > svg": { c: "$input-border", cursor: "default", ml: 10 },
 
 	label: {
 		pos: "absolute",
@@ -116,6 +116,7 @@ export const SearchWrapper = styled("div", {
 
 export const Info = styled("div", {
 	dcolumn: "flex-start",
+	justifyContent: "center",
 	size: "calc(100% - 5px)",
 
 	ov: "hidden",
@@ -166,30 +167,6 @@ export const SearchMediaPopoverAnchor = styled(Anchor, {
 	pos: "absolute",
 	l: "50%",
 	t: 30,
-});
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export const Result = styled("div", {
-	pos: "relative",
-	d: "flex", // row
-	justifyContent: "flex-start",
-	w: "100%",
-	h: 60,
-
-	cursor: "pointer",
-	bg: "none",
-	br: 7,
-	p: 7,
-
-	"&:hover, &:focus": {
-		transition: "none",
-
-		outline: "2px solid $icon-button-hovered",
-		outlineOffset: -2,
-	},
 });
 
 /////////////////////////////////////////

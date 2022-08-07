@@ -1,4 +1,4 @@
-import { useAllSelectedMedias } from "@contexts/mediaHandler/useAllSelectedMedias";
+import { useAllSelectedMedias } from "@contexts/useAllSelectedMedias";
 
 const sizeSelector = (
 	state: ReturnType<typeof useAllSelectedMedias.getState>,

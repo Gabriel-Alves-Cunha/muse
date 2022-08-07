@@ -54,7 +54,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 		if (
 			imageButtonRef.current === null || imageInputRef.current === null ||
 			files === null ||
-			files?.length === 0
+			files.length === 0
 		)
 			return;
 
@@ -71,7 +71,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 	useEffect(() => {
 		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
-			if (event.key === "Enter" && !isAModifierKeyPressed(event))
+			if (event.key === "Enter" && isAModifierKeyPressed(event) === false)
 				changeMediaMetadata(
 					contentWrapperRef,
 					closeButtonRef,
@@ -207,7 +207,8 @@ function changeMediaMetadata(
 		);
 		closeEverything(closeButtonRef);
 
-		if (hasAnythingChanged) successToast("New media metadata has been saved.");
+		if (hasAnythingChanged === true)
+			successToast("New media metadata has been saved.");
 	} catch (error) {
 		console.error(error);
 
@@ -229,7 +230,7 @@ function changeMetadataIfAllowed(
 
 	const thingsToChange: MetadataToChange = [];
 
-	if (imageFilePath)
+	if (imageFilePath.length > 0)
 		thingsToChange.push({ whatToChange: "imageURL", newValue: imageFilePath });
 
 	// This shit is to get all the inputs:

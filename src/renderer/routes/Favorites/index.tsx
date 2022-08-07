@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { MediaListKind } from "@components/MediaListKind";
-import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
+import { PlaylistList } from "@contexts/usePlaylists";
 import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
 import { setFromList } from "@components/MediaListKind/helper";

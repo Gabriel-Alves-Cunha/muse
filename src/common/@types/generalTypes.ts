@@ -10,12 +10,12 @@ export type Media = Readonly<
 	{
 		genres: readonly string[];
 		birthTime: DateAsNumber;
+		image: Base64 | "";
 		duration: string;
 		lyrics: string;
 		artist: string;
 		album: string;
 		title: string;
-		image: Base64;
 		size: number;
 	}
 >;

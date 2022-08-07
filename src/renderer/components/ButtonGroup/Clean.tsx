@@ -6,7 +6,7 @@ import {
 	cleanFavorites,
 	cleanHistory,
 	PlaylistList,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 
 import { ButtonFromGroup } from "./styles";
 

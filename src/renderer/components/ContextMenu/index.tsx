@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 
 import { Root, Trigger } from "@radix-ui/react-context-menu";
 
+import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
 import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
 import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
 import { assertUnreachable } from "@utils/utils";
@@ -13,13 +14,15 @@ import { Content } from "./styles";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export enum ContentEnum {
+export enum CtxContentEnum {
+	SEARCH_MEDIA_OPTIONS,
 	MEDIA_OPTIONS,
 	FULL_EXAMPLE,
 	MAIN,
 }
 
-const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
+const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN, SEARCH_MEDIA_OPTIONS } =
+	CtxContentEnum;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -27,12 +30,15 @@ const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN } = ContentEnum;
 // Main function:
 
 export const ContextMenu = (
-	{ children, content = MAIN, onContextMenu, setIsOpen }: Props,
+	{ children, content = MAIN, onContextMenu, setIsOpen, isAllDisabled = false }:
+		Props,
 ) => (
 	<Root onOpenChange={setIsOpen} modal>
 		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
-		<Content loop className="notransition">{contentToShow(content)}</Content>
+		<Content loop className="notransition">
+			{contentToShow(content, isAllDisabled)}
+		</Content>
 	</Root>
 );
 
@@ -41,8 +47,14 @@ export const ContextMenu = (
 /////////////////////////////////////////////
 // Helper functions:
 
-function contentToShow(content: NonNullable<Props["content"]>) {
+function contentToShow(
+	content: NonNullable<Props["content"]>,
+	isAllDisabled: boolean,
+) {
 	switch (content) {
+		case SEARCH_MEDIA_OPTIONS:
+			return <SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />;
+
 		case MEDIA_OPTIONS:
 			return <MediaOptionsCtxMenu />;
 
@@ -66,7 +78,8 @@ type Props = Readonly<
 	{
 		onContextMenu?: React.MouseEventHandler<HTMLSpanElement>;
 		setIsOpen?: (newIsOpen: boolean) => void;
-		content?: ContentEnum;
+		content?: CtxContentEnum;
+		isAllDisabled?: boolean;
 		children: ReactNode;
 	}
 >;

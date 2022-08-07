@@ -1,5 +1,7 @@
 import { type RefObject, useEffect } from "react";
 
+import { leftClick } from "@components/MediaListKind/helper";
+
 /**
  * It's worth noting that because passed in `handler` is a new
  * function on every render, that will cause this effect
@@ -12,7 +14,9 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 	handler: Handler,
 ) {
 	useEffect(() => {
-		function listener(event: MouseEvent | TouchEvent) {
+		function listener(event: MouseEvent) {
+			if (event.button !== leftClick) return;
+
 			const el = ref.current;
 
 			// Do nothing if clicking ref's element or descendent elements
@@ -22,11 +26,9 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 		}
 
 		document.addEventListener("mousedown", listener);
-		document.addEventListener("touchstart", listener);
 
 		return () => {
 			document.removeEventListener("mousedown", listener);
-			document.removeEventListener("touchstart", listener);
 		};
 	}, [ref, handler]);
 }

@@ -1,4 +1,4 @@
-import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
+import { usePlaylists } from "@contexts/usePlaylists";
 import { prettyBytes } from "@common/prettyBytes";
 
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>

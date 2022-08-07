@@ -15,12 +15,12 @@ import {
 	usePlaylists,
 	setPlaylists,
 	WhatToDo,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 import {
 	useCurrentPlaying,
 	currentPlaying,
 	playNextMedia,
-} from "@contexts/mediaHandler/useCurrentPlaying";
+} from "@contexts/useCurrentPlaying";
 
 import { SquareImage, Wrapper, Info } from "./styles";
 
@@ -174,6 +174,7 @@ function handleLoadedData(
 			newMedia: { ...media, duration: formatedDuration },
 			whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 			type: WhatToDo.UPDATE_MAIN_LIST,
+			newPath: "",
 			path,
 		});
 
@@ -192,13 +193,13 @@ function handleLoadedData(
 function handleEnded(audio: HTMLAudioElement): void {
 	dbg(
 		`Audio ended, playing ${
-			audio.loop ?
+			audio.loop === true ?
 				"again because it's on loop." :
 				"next media."
 		}`,
 	);
 
-	if (!audio.loop) playNextMedia();
+	if (audio.loop === false) playNextMedia();
 }
 
 /////////////////////////////////////////

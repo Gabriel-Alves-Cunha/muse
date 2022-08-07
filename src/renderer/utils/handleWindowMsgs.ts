@@ -3,7 +3,7 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
-import { getMediaFiles } from "@contexts/mediaHandler/usePlaylistsHelper";
+import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
 import { deleteMedia } from "./media";
 import { dbg } from "@common/utils";
@@ -13,7 +13,7 @@ import {
 	setPlaylists,
 	WhatToDo,
 	mainList,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 import {
 	type MsgObjectElectronToReact,
 	ElectronToReactMessageEnum,
@@ -30,7 +30,7 @@ function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
 
-	if (!event.dataTransfer) return;
+	if (event.dataTransfer === null) return;
 
 	event.dataTransfer.dropEffect = "copy";
 	// ^ Style the drag-and-drop as a "copy file" operation.
@@ -42,7 +42,7 @@ function listenToDropEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
 
-	if (!event.dataTransfer) return;
+	if (event.dataTransfer === null) return;
 
 	const fileList = event.dataTransfer.files;
 	const files = getMediaFiles(fileList);
@@ -108,7 +108,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			const newMedia = newMediaInArray[0]?.[1];
 
-			if (!newMedia) {
+			if (newMedia === undefined) {
 				console.error(`Could not transform "${mediaPath}" to a media.`);
 				break;
 			}
@@ -117,6 +117,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: WhatToDo.UPDATE_MAIN_LIST,
 				path: mediaPath,
+				newPath: "",
 				newMedia,
 			});
 			break;
@@ -129,7 +130,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
-			if (!mainList().has(mediaPath)) {
+			if (mainList().has(mediaPath) === false) {
 				console.error("Could not find media to delete.");
 				break;
 			}
@@ -153,7 +154,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
 
-			if (!mainList().has(mediaPath)) {
+			if (mainList().has(mediaPath) === false) {
 				console.warn(
 					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`,
 				);
@@ -175,7 +176,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			const refreshedMedia = refreshedMediaInArray[0]?.[1];
 
-			if (!refreshedMedia) {
+			if (refreshedMedia === undefined) {
 				console.error(
 					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media instead.`,
 				);
@@ -188,6 +189,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				type: WhatToDo.UPDATE_MAIN_LIST,
 				newMedia: refreshedMedia,
 				path: mediaPath,
+				newPath: "",
 			});
 			break;
 		}
@@ -199,7 +201,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
-			if (!mainList().has(mediaPath)) {
+			if (mainList().has(mediaPath) === false) {
 				console.error(
 					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
 				);

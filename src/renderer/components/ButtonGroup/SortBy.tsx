@@ -2,7 +2,7 @@ import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { assertUnreachable } from "@utils/utils";
-import { PlaylistList } from "@contexts/mediaHandler/usePlaylists";
+import { PlaylistList } from "@contexts/usePlaylists";
 import { setFromList } from "@components/MediaListKind/helper";
 import { Select } from "@components/Select";
 

@@ -8,21 +8,20 @@ import { deleteMedia } from "@utils/media";
 import { setSettings } from "@contexts/settings";
 import { mainList } from "@contexts/usePlaylists";
 import {
+	setAllSelectedMedias,
 	allSelectedMedias,
-	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 
 import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
+import { getSearcher } from "@components/SearchMedia/helper";
 
-export function MediaOptionsCtxMenu() {
+export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 	const plural = allSelectedMedias().size > 1 ? "s" : "";
-	// If there is none selected, disable:
-	const isDisabled = allSelectedMedias().size > 0;
 
 	return (
 		<>
 			<Dialog modal>
-				<TriggerToDeleteMedia disabled={isDisabled}>
+				<TriggerToDeleteMedia disabled={isAllDisabled}>
 					<>
 						Delete media{plural}
 
@@ -35,19 +34,19 @@ export function MediaOptionsCtxMenu() {
 				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
 			</Dialog>
 
-			<Item onSelect={shareMedias} disabled={isDisabled}>
+			<Item onSelect={shareMedias} disabled={isAllDisabled}>
 				Share media{plural}
 				<RightSlot>
 					<Share />
 				</RightSlot>
 			</Item>
 
-			<Item onSelect={selectAllMedias}>
+			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
 				Select all medias
 				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
-			<Item onSelect={searchForLyrics} disabled={isDisabled}>
+			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
 				Search for lyrics
 			</Item>
 		</>
@@ -75,6 +74,13 @@ async function deleteMedias(): Promise<void> {
 
 /////////////////////////////////////////////
 
+function selectAllMediasOnSearchResult(): void {
+	const arr = getSearcher().results.map(([path]) => path);
+	setAllSelectedMedias(new Set(arr));
+}
+
+/////////////////////////////////////////////
+
 function searchForLyrics(): void {
 	const allMedias = mainList();
 
@@ -84,3 +90,10 @@ function searchForLyrics(): void {
 		await searchAndOpenLyrics(media, path, false);
 	});
 }
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
+
+type Props = Readonly<{ isAllDisabled: boolean; }>;

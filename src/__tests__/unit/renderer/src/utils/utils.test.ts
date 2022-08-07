@@ -12,6 +12,8 @@ import {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+console.log("import.meta.vitest =", import.meta.vitest);
+
 it("should time a function and return what it's result", async () => {
 	function doAndReturnSomething(arg: number): number {
 		return time(() => arg + 10, "doAndReturnSomething");

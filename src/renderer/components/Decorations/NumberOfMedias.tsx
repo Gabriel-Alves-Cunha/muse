@@ -1,4 +1,4 @@
-import { usePlaylists } from "@contexts/mediaHandler/usePlaylists";
+import { usePlaylists } from "@contexts/usePlaylists";
 
 const sizeSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByDate.size;

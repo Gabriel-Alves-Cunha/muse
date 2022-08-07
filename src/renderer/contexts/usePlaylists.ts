@@ -71,7 +71,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									// Add to history if there isn't one yet:
 									const historyOfDates = history.get(path);
-									!historyOfDates ?
+									historyOfDates === undefined ?
 										dates.push(Date.now()) :
 										dates.push(...historyOfDates, Date.now());
 
@@ -123,7 +123,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// map.delete() returns true if an element in the Map
 									// object existed and has been removed, or false if
 									// the element does not exist.
-									if (!newFavorites.delete(action.path))
+									if (newFavorites.delete(action.path) === false)
 										newFavorites.add(action.path);
 
 									set({ favorites: newFavorites });
@@ -156,13 +156,15 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
 									const { favorites } = get();
 
-									if (favorites.has(action.path)) {
-										const newFavorites = new Set(favorites);
-										newFavorites.delete(action.path);
-
-										set({ favorites: newFavorites });
-									} else
+									if (favorites.has(action.path) === false) {
 										console.error("Media not found in favorites");
+										break;
+									}
+
+									const newFavorites = new Set(favorites);
+									newFavorites.delete(action.path);
+
+									set({ favorites: newFavorites });
 
 									dbgPlaylists(
 										"setPlaylists on 'UPDATE_FAVORITES'\u279D'REMOVE_ONE_MEDIA'. new favorites =",
@@ -209,7 +211,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.ADD_ONE_MEDIA: {
 									const mainList = get().sortedByName;
 
-									if (mainList.has(action.path)) {
+									if (mainList.has(action.path) === false) {
 										console.error(
 											`A media with path "${action.path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call this function with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
 										);
@@ -244,13 +246,13 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									const newMainList = new Map(mainList);
 									const newHistory = new Map(history);
 
-									if (!newMainList.delete(action.path)) {
+									if (newMainList.delete(action.path) === false) {
 										console.error(
 											`A media with path "${action.path}" does not exist at sortedByName.`,
 										);
 										break;
 									}
-									if (!newSortedByDate.delete(action.path)) {
+									if (newSortedByDate.delete(action.path) === false) {
 										console.error(
 											`A media with path "${action.path}" does not exist at newSortedByDate.`,
 										);
@@ -263,11 +265,11 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									});
 
 									// If the media is in the favorites, remove it from the favorites
-									if (newFavorites.delete(action.path))
+									if (newFavorites.delete(action.path) === true)
 										set({ favorites: newFavorites });
 
 									// If the media is in the history, remove it from the history
-									if (newHistory.delete(action.path))
+									if (newHistory.delete(action.path) === true)
 										set({ history: newHistory });
 
 									dbgPlaylists(
@@ -287,17 +289,21 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									// If the media in the favorites list is not on
 									// action.list, remove it from the favorites:
-									favorites.forEach(path =>
-										!action.list.has(path) && newFavorites.delete(path)
-									);
+									favorites.forEach(path => {
+										if (action.list.has(path) === false)
+											newFavorites.delete(path);
+									});
+
 									if (favorites.size !== newFavorites.size)
 										set({ favorites: newFavorites });
 
 									// If the media in the history list is not on
 									// action.list, remove it from the favorites:
-									history.forEach((_, path) =>
-										!action.list.has(path) && newHistory.delete(path)
-									);
+									history.forEach((_, path) => {
+										if (action.list.has(path) === false)
+											newHistory.delete(path);
+									});
+
 									if (history.size !== newHistory.size)
 										set({ history: newHistory });
 
@@ -318,7 +324,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									const mainList = get().sortedByName;
 									const oldMedia = mainList.get(path);
 
-									if (!oldMedia) {
+									if (oldMedia === undefined) {
 										console.error(
 											`I did not find a media with path = "${action.path}" when calling 'REFRESH_ONE_MEDIA_BY_PATH'!`,
 										);
@@ -327,7 +333,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									const newMainList = new Map(mainList);
 
-									if (newPath) {
+									if (newPath.length > 0) {
 										newMainList.delete(path);
 										newMainList.set(newPath, newMedia);
 
@@ -349,7 +355,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 									dbgPlaylists(
 										"playlistsReducer on 'UPDATE_MEDIA_LIST'\u279D'REFRESH_ONE_MEDIA_BY_ID'. newMedia =",
-										get().sortedByName.get(newPath ? newPath : path),
+										get().sortedByName.get(newPath.length > 0 ? newPath : path),
 										"\nnewMainList =",
 										get().sortedByName,
 									);
@@ -517,6 +523,8 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 
 ///////////////////////////////////////////////////
 
+export const diacriticRegex = /\p{Diacritic}/gu;
+
 export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 	return time(() => {
 		/** normalize()ing to NFD Unicode normal form decomposes
@@ -527,7 +535,7 @@ export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 		 * Combining Diacritical Marks Unicode block.
 		 */
 		const searchTerm = searchTerm_.toLowerCase().normalize("NFD").replace(
-			/\p{Diacritic}/gu,
+			diacriticRegex,
 			"",
 		);
 		const medias: [Path, Media][] = [];
@@ -539,7 +547,7 @@ export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
 					.title
 					.toLowerCase()
 					.normalize("NFD")
-					.replace(/\p{Diacritic}/gu, "")
+					.replace(diacriticRegex, "")
 					.includes(searchTerm)
 			)
 				medias.push([path, media]);
@@ -602,7 +610,7 @@ export type PlaylistsReducer_Action =
 				| PlaylistActions.ADD_ONE_MEDIA;
 			type: WhatToDo.UPDATE_MAIN_LIST;
 			newMedia: Media;
-			newPath?: Path;
+			newPath: Path;
 			path: Path;
 		}
 	>

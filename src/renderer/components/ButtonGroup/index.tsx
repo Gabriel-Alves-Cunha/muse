@@ -26,7 +26,7 @@ export function ButtonGroup({ buttons }: Props) {
 
 function additionalClasses(button: OneOf<Buttons>, buttons: Props["buttons"]) {
 	const isOnlyOneButton = Object.keys(buttons).filter(Boolean).length === 1;
-	if (isOnlyOneButton) return " single-button";
+	if (isOnlyOneButton === true) return " single-button";
 
 	const { clean, reload, sortBy } = buttons;
 
@@ -71,8 +71,8 @@ function additionalClasses(button: OneOf<Buttons>, buttons: Props["buttons"]) {
 
 	/////////////////////////////////////////////
 
-	if (isFirstButton()) return " first";
-	if (isLastButton()) return " last";
+	if (isFirstButton() === true) return " first";
+	if (isLastButton() === true) return " last";
 	return "";
 }
 

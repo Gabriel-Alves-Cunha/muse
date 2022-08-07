@@ -164,12 +164,14 @@ export const darkTheme = createTheme({
 
 		"input-border-active": "#0072F5",
 		"selected-border": "#4d4d4d",
+		"playing-border": "#C04569",
 		"input-border": "#4d4d4d",
 		"input-disabled": "gray",
 
 		"bg-button-hover": "#08368D",
 		"bg-highlight": "#C04569",
 		"bg-selected": "#252121",
+		"bg-playing": "black",
 		"bg-popover": "#182825",
 		"bg-navbar": "#191a21",
 		"bg-button": "#191a21",
@@ -234,18 +236,20 @@ export const lightTheme = createTheme({
 
 		"input-border-active": "#344880",
 		"selected-border": "#4b00e038",
+		"playing-border": "#F4A1A9",
 		"input-disabled": "lightgray",
 		"input-border": "#e0e0e0",
 
 		"bg-button-hover": "#8e2de2",
-		"bg-highlight": "#9882AC",
 		"bg-selected": "#aac1ff70",
+		"bg-highlight": "#9381FF",
 		"bg-popover": "#f9f6f5",
 		"bg-button": "#f9f6f5",
 		"bg-navbar": "#f9f6f5",
 		"bg-media": "#f9f6f5",
 		"bg-main": "#f9f6f5",
 		"bg-ctx-menu": "#fff",
+		"bg-playing": "#fff",
 		"bg-dialog": "#fff",
 		"bg-select": "#fff",
 

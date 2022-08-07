@@ -124,6 +124,13 @@ export const RowWrapper = styled("div", {
 
 		bg: "$bg-selected",
 	},
+
+	"&.playing": {
+		outline: "2px solid $playing-border",
+		outlineOffset: -2,
+
+		bg: "$bg-playing",
+	},
 });
 
 export const rowWrapperClassName = `.${RowWrapper.className}`;

@@ -3,7 +3,7 @@ import { MdAutorenew as ReloadIcon } from "react-icons/md";
 import {
 	searchLocalComputerForMedias,
 	usePlaylists,
-} from "@contexts/mediaHandler/usePlaylists";
+} from "@contexts/usePlaylists";
 
 import { ButtonFromGroup } from "./styles";
 

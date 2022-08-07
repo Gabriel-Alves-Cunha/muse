@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { CurrentPlaying } from "@contexts/mediaHandler/useCurrentPlaying";
+import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
@@ -18,7 +18,7 @@ import {
 } from "./fakeTestList";
 
 const { playPreviousMedia, currentPlaying, playThisMedia, playNextMedia } =
-	await import("@contexts/mediaHandler/useCurrentPlaying");
+	await import("@contexts/useCurrentPlaying");
 const {
 	PlaylistActions,
 	PlaylistList,
@@ -26,7 +26,7 @@ const {
 	mainList,
 	WhatToDo,
 	history,
-} = await import("@contexts/mediaHandler/usePlaylists");
+} = await import("@contexts/usePlaylists");
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

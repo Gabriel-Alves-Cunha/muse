@@ -10,11 +10,11 @@ import { Content, Trigger } from "./styles";
 /////////////////////////////////////////
 // Enums:
 
-export enum ContentEnum {
+export enum ContentOfSelectEnum {
 	HEADER_BUTTONS,
 }
 
-const { HEADER_BUTTONS } = ContentEnum;
+const { HEADER_BUTTONS } = ContentOfSelectEnum;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -76,7 +76,7 @@ type Props<Options extends string> = Readonly<
 		setValue: (value: Options) => void;
 		triggerClassName?: string;
 		children: React.ReactNode;
-		content?: ContentEnum;
+		content?: ContentOfSelectEnum;
 		triggerTitle?: string;
 		tooltip: string;
 		value: Options;

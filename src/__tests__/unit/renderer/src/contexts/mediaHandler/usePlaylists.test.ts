@@ -16,7 +16,7 @@ import {
 	testList,
 } from "./fakeTestList";
 const { currentPlaying, playNextMedia, playThisMedia } = await import(
-	"@contexts/mediaHandler/useCurrentPlaying"
+	"@contexts/useCurrentPlaying"
 );
 const { formatDuration } = await import("@common/utils");
 const { getRandomInt } = await import("@utils/utils");
@@ -30,7 +30,7 @@ const {
 	WhatToDo,
 	mainList,
 	history,
-} = await import("@contexts/mediaHandler/usePlaylists");
+} = await import("@contexts/usePlaylists");
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -271,6 +271,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		setPlaylists({
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 			type: WhatToDo.UPDATE_MAIN_LIST,
+			newPath: "",
 			newMedia,
 			path,
 		});
@@ -300,6 +301,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		setPlaylists({
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 			type: WhatToDo.UPDATE_MAIN_LIST,
+			newPath: "",
 			newMedia,
 			path,
 		});
@@ -364,6 +366,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		setPlaylists({
 			whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 			type: WhatToDo.UPDATE_MAIN_LIST,
+			newPath: "",
 			newMedia,
 			path,
 		});
