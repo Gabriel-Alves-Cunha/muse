@@ -11,6 +11,7 @@ import { isAModifierKeyPressed } from "@utils/keyboard";
 import { getBasename } from "@common/path";
 import { emptySet } from "@utils/map-set";
 import { dbg } from "@common/utils";
+import { t } from "@components/I18n";
 
 import { CloseDialogTrigger, StyledDialogShareContent, Canvas } from "./styles";
 import { StyledDialogBlurOverlay } from "../MediaListKind/MediaOptions/styles";
@@ -78,13 +79,16 @@ export function ShareDialog() {
 
 	useEffect(() => {
 		function closeShareDialogOnEsc(e: KeyboardEvent) {
-			if (e.key === "Escape" && isDialogOpen && !isAModifierKeyPressed(e))
+			if (
+				e.key === "Escape" && isDialogOpen === true &&
+				isAModifierKeyPressed(e) === false
+			)
 				closePopover(server?.close);
 		}
 
-		window.addEventListener("keyup", closeShareDialogOnEsc);
+		document.addEventListener("keyup", closeShareDialogOnEsc);
 
-		return () => window.removeEventListener("keyup", closeShareDialogOnEsc);
+		return () => document.removeEventListener("keyup", closeShareDialogOnEsc);
 	}, [isDialogOpen, server]);
 
 	/////////////////////////////////////////
@@ -98,9 +102,7 @@ export function ShareDialog() {
 			if (!shouldDialogOpen) return;
 
 			try {
-				const filepaths = [...filesToShare];
-
-				const clientServerApi = createServer(filepaths);
+				const clientServerApi = createServer([...filesToShare]);
 
 				setServer(clientServerApi);
 			} catch (error) {
@@ -118,16 +120,16 @@ export function ShareDialog() {
 
 			<StyledDialogShareContent className="notransition">
 				<CloseDialogTrigger
+					data-tip={t("tooltips.closeShareScreen")}
 					onClick={() =>
 						closePopover(server?.close)}
-					data-tip="Close share screen"
 				>
 					<Close />
 				</CloseDialogTrigger>
 
 				<>
 					<div>
-						<p>Sharing media{isPlural && "s"}:</p>
+						<p>{t("dialogs.sharingMedia")}{isPlural && "s"}:</p>
 
 						<ol>{namesOfFilesToShare(filesToShare)}</ol>
 					</div>

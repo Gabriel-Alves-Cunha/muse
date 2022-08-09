@@ -6,17 +6,25 @@ import { Clean } from "./Clean";
 
 import { Wrapper } from "./styles";
 
-export function ButtonGroup({ buttons }: Props) {
-	const { clean, reload, sortBy } = buttons;
+const reload_ = "reload";
+const sortBy_ = "sortBy";
+const clean_ = "clean";
 
+export function ButtonGroup(buttons: Buttons) {
 	return (
 		<Wrapper className="notransition">
 			{/* Order matters here: */}
-			{reload && <Reload className={additionalClasses("reload", buttons)} />}
+			{buttons.reload && (
+				<Reload className={additionalClasses(reload_, buttons)} />
+			)}
 
-			{sortBy && <SortBy className={additionalClasses("sortBy", buttons)} />}
+			{buttons.sortBy && (
+				<SortBy className={additionalClasses(sortBy_, buttons)} />
+			)}
 
-			{clean && <Clean className={additionalClasses("clean", buttons)} />}
+			{buttons.clean && <Clean
+				className={additionalClasses(clean_, buttons)}
+			/>}
 		</Wrapper>
 	);
 }
@@ -24,11 +32,14 @@ export function ButtonGroup({ buttons }: Props) {
 /////////////////////////////////////////////
 // Helper functions:
 
-function additionalClasses(button: OneOf<Buttons>, buttons: Props["buttons"]) {
-	const isOnlyOneButton = Object.keys(buttons).filter(Boolean).length === 1;
-	if (isOnlyOneButton === true) return " single-button";
+function additionalClasses(button: OneOf<Buttons>, buttons: Buttons) {
+	// Is only one button:
+	if (Object.keys(buttons).filter(Boolean).length === 1)
+		return " single-button";
 
-	const { clean, reload, sortBy } = buttons;
+	/////////////////////////////////////////////
+
+	const { clean = false, reload = false, sortBy = false } = buttons;
 
 	/////////////////////////////////////////////
 
@@ -39,11 +50,11 @@ function additionalClasses(button: OneOf<Buttons>, buttons: Props["buttons"]) {
 		// the first one that is true, if equals
 		// to the button received on params,
 		// it is the first one:
-		const firstButton: OneOf<Buttons> = reload ?
-			"reload" :
-			sortBy ?
-			"sortBy" :
-			"clean";
+		const firstButton: OneOf<Buttons> = reload === true ?
+			reload_ :
+			sortBy === true ?
+			sortBy_ :
+			clean_;
 
 		if (button === firstButton) isFirstButton = true;
 
@@ -58,11 +69,11 @@ function additionalClasses(button: OneOf<Buttons>, buttons: Props["buttons"]) {
 		// On the reverse order that is inside <Wrapper>,
 		// the first one that is true, if equals to the
 		// button received on params, it is the last one:
-		const lastButton: OneOf<Buttons> = clean ?
-			"clean" :
-			sortBy ?
-			"sortBy" :
-			"reload";
+		const lastButton: OneOf<Buttons> = clean === true ?
+			clean_ :
+			sortBy === true ?
+			sortBy_ :
+			reload_;
 
 		if (button === lastButton) isLastButton = true;
 
@@ -82,5 +93,3 @@ function additionalClasses(button: OneOf<Buttons>, buttons: Props["buttons"]) {
 type Buttons = Readonly<
 	{ reload?: boolean; sortBy?: boolean; clean?: boolean; }
 >;
-
-type Props = Readonly<{ buttons: Buttons; }>;

@@ -12,9 +12,9 @@ import { errorToast, successToast } from "@styles/global";
 import { areArraysEqualByValue } from "@utils/array";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteMedia } from "@utils/media";
-import { capitalize } from "@utils/utils";
 import { Button } from "@components/Button";
 import {
 	ReactToElectronMessageEnum,
@@ -94,21 +94,31 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 	return (
 		<StyledDialogContent ref={contentWrapperRef}>
-			<StyledTitle>Edit/See media information</StyledTitle>
+			<StyledTitle>
+				<Translator path="dialogs.mediaOptions.title" />
+			</StyledTitle>
 
 			<StyledDescription>
-				Make changes to your media&apos;s metadata here. Click save when
-				you&apos;re done.
+				<Translator path="dialogs.mediaOptions.description" />
 			</StyledDescription>
 
-			<CloseDialog ref={closeButtonRef} data-tip="Close dialog" id="close-icon">
+			<CloseDialog
+				data-tip={t("tooltips.closeDialog")}
+				ref={closeButtonRef}
+				id="close-icon"
+			>
 				<Close />
 			</CloseDialog>
 
 			{Object.entries(options(media)).map(([option, value]) => (
 				<Fieldset key={option}>
-					<Label htmlFor={option}>{capitalize(option)}</Label>
+					<Label htmlFor={option}>
+						<Translator path={`labels.${option as Options}`} />
+					</Label>
+
 					{option === "image" ?
+						/////////////////////////////////////////////
+						/////////////////////////////////////////////
 						// Handle file input for image:
 						(<Button
 							onClick={openNativeUI_ChooseFiles}
@@ -118,14 +128,18 @@ export function MediaOptionsModal({ media, path }: Props) {
 							id={option}
 						>
 							<SearchImage size={18} />
+
 							<input
 								onChange={handleSelectedFile}
 								ref={imageInputRef}
 								accept="image/*"
 								type="file"
 							/>
-							Select an image
+
+							<Translator path="buttons.selectImg" />
 						</Button>) :
+						/////////////////////////////////////////////
+						/////////////////////////////////////////////
 						// Handle text input with line feeds:
 						option === "lyrics" ?
 						<TextAreaInput defaultValue={format(value)} id={option} /> :
@@ -142,7 +156,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 			<FlexRow>
 				<Dialog modal>
 					<DialogTriggerToRemoveMedia className="notransition">
-						Delete media
+						<Translator path="buttons.deleteMedia" />
+
 						<Remove />
 					</DialogTriggerToRemoveMedia>
 
@@ -163,7 +178,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 						)}
 					id="save-changes"
 				>
-					Save changes
+					<Translator path="buttons.saveChanges" />
 				</CloseDialog>
 			</FlexRow>
 		</StyledDialogContent>
@@ -208,13 +223,11 @@ function changeMediaMetadata(
 		closeEverything(closeButtonRef);
 
 		if (hasAnythingChanged === true)
-			successToast("New media metadata has been saved.");
+			successToast(t("toasts.mediaMetadataSaved"));
 	} catch (error) {
 		console.error(error);
 
-		errorToast(
-			"Unable to save new metadata. See console by pressing Ctrl+Shift+i.",
-		);
+		errorToast(t("toasts.mediaMetadataNotSaved"));
 	}
 }
 
@@ -315,7 +328,7 @@ function changeMetadataIfAllowed(
 
 const options = (
 	{ duration, artist, album, genres, title, size, image, lyrics }: Media,
-) => ({ size, duration, title, album, artist, genres, lyrics, image });
+) => ({ size, duration, title, album, artist, genres, lyrics, image } as const);
 
 /////////////////////////////////////////////
 
@@ -375,6 +388,10 @@ export type WhatToChange = Readonly<
 export type ChangeOptionsToSend = typeof allowedOptionToChange[ChangeOptions];
 
 type ChangeOptions = keyof typeof allowedOptionToChange;
+
+/////////////////////////////////////////////
+
+type Options = keyof ReturnType<typeof options>;
 
 /////////////////////////////////////////////
 

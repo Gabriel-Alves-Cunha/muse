@@ -5,6 +5,12 @@ import { assertUnreachable } from "@utils/utils";
 import { PlaylistList } from "@contexts/usePlaylists";
 import { setFromList } from "@components/MediaListKind/helper";
 import { Select } from "@components/Select";
+import { t } from "@components/I18n";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 export function SortBy({ className }: Props) {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
@@ -32,9 +38,9 @@ export function SortBy({ className }: Props) {
 	return (
 		<Select
 			setValue={setSelectedList as (value: SelectedList) => void}
+			tooltip={t("tooltips.sortBy")}
 			triggerClassName={className}
 			value={selectedList}
-			tooltip="Sort by"
 		>
 			<SortIcon size={19} />
 		</Select>
@@ -42,8 +48,12 @@ export function SortBy({ className }: Props) {
 }
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 // Types:
 
 type Props = Readonly<{ className?: string; }>;
+
+/////////////////////////////////////////////
 
 type SelectedList = "Name" | "Date";

@@ -30,6 +30,7 @@ if (!import.meta.vitest)
 		state => state.medias,
 		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
 			time(() => {
+				// TODO: improve this:
 				// Has to be this order:
 				prevSelectedMedias.forEach(path =>
 					document.querySelector(`[data-path="${path}"]`)?.classList.remove(

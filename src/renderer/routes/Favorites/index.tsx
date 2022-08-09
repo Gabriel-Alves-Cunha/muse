@@ -6,7 +6,9 @@ import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
 import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
+import { useTitle } from "@hooks/useTitle";
 import { Header } from "@components/Header";
+import { t } from "@components/I18n";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -14,10 +16,9 @@ import { Header } from "@components/Header";
 // Main function:
 
 export function Favorites() {
-	useEffect(() => {
-		// For accessibility:
-		document.title = "Favorite audios list";
+	useTitle(t("titles.favorites"));
 
+	useEffect(() => {
 		setFromList({ fromList: PlaylistList.FAVORITES });
 	}, []);
 
@@ -26,7 +27,7 @@ export function Favorites() {
 			<Header>
 				<SearchMedia />
 
-				<ButtonGroup buttons={{ clean: true }} />
+				<ButtonGroup clean />
 			</Header>
 
 			<MediaListKind />

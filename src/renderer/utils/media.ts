@@ -2,6 +2,7 @@ import type { Path } from "@common/@types/generalTypes";
 
 import { errorToast, successToast } from "@styles/global";
 import { getBasename } from "@common/path";
+import { t } from "@components/I18n";
 import {
 	PlaylistActions,
 	setPlaylists,
@@ -14,7 +15,7 @@ export async function deleteMedia(path: Path) {
 	const wasDeleteSuccessfull = await deleteFile(path);
 
 	if (wasDeleteSuccessfull === true) {
-		successToast(`Deleted ${getBasename(path)}`);
+		successToast(`${t("toasts.mediaDeletionSuccess")}"${getBasename(path)}"!`);
 
 		setPlaylists({
 			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
@@ -23,7 +24,9 @@ export async function deleteMedia(path: Path) {
 		});
 	} else {
 		errorToast(
-			`Could not delete "${path}"\nSee console by pressing 'Ctrl'+'Shift'+'i'!`,
+			`${t("toasts.mediaDeletionError.beforePath")}"${path}"${
+				t("toasts.mediaDeletionError.afterPath")
+			}`,
 		);
 	}
 }

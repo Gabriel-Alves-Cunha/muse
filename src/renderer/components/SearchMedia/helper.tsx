@@ -14,6 +14,7 @@ import { isAModifierKeyPressed } from "@utils/keyboard";
 import { selectMediaByEvent } from "@components/MediaListKind/helper";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
+import { t, Translator } from "@components/I18n";
 import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyArray } from "@utils/array";
@@ -67,13 +68,13 @@ export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 /////////////////////////////////////////
 
 useSearcher.subscribe(
-	state => state.searchTerm,
-	function searchForMedias(searchTerm): void {
+	state => state.highlight,
+	function searchForMedias(highlight): void {
 		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
 
-		if (searchTerm.length < 2) return;
+		if (highlight.length < 2) return;
 
-		const results = searchMedia(searchTerm);
+		const results = searchMedia(highlight);
 		const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
 
 		setSearcher({ searchStatus, results });
@@ -104,14 +105,17 @@ const setIsInputOnFocus = (bool: boolean) =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
+const searchTermSelector = (state: ReturnType<typeof useSearcher.getState>) =>
+	state.searchTerm;
+
 export function Input() {
+	const searchTerm = useSearcher(searchTermSelector);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const { searchTerm } = useSearcher();
 
 	/////////////////////////////////////////
 
 	useEffect(() => {
-		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent) {
+		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent): void {
 			if (
 				e.key === "Escape" && getSearcher().isInputOnFocus === true &&
 				isAModifierKeyPressed(e) === false
@@ -131,7 +135,9 @@ export function Input() {
 
 	return (
 		<>
-			<label htmlFor="search-songs">Search for songs</label>
+			<label htmlFor="search-songs">
+				<Translator path="labels.searchForSongs" />
+			</label>
 
 			<input
 				onFocus={() => setIsInputOnFocus(true)}
@@ -154,8 +160,12 @@ export function Input() {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
+const searchStatusAndResultsSelector = (
+	state: ReturnType<typeof useSearcher.getState>,
+) => ({ searchStatus: state.searchStatus, results: state.results });
+
 export function Results() {
-	const { results, searchStatus } = useSearcher();
+	const { results, searchStatus } = useSearcher(searchStatusAndResultsSelector);
 
 	/////////////////////////////////////////
 
@@ -180,7 +190,9 @@ export function Results() {
 							"nothing-found-for-search-media" :
 							"search-media-results"}
 						onPointerDownOutside={() => setSearcher(defaultSearcher)}
+						// This is to mantain focus on the input:
 						onOpenAutoFocus={e => e.preventDefault()}
+						className="notransition"
 					>
 						{nothingFound === true ?
 							(
@@ -202,7 +214,7 @@ export function Results() {
 				</PopoverRoot>
 			</ContextMenu>
 		) :
-		undefined;
+		null;
 }
 
 /////////////////////////////////////////
@@ -210,9 +222,9 @@ export function Results() {
 /////////////////////////////////////////
 
 function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
-	/** normalize()ing to NFD Unicode normal form decomposes
+	/** normalize()ing to 'NFD' Unicode normal form decomposes
 	 * combined graphemes into the combination of simple ones.
-	 * The è of Crème ends up expressed as e +  ̀.
+	 * The è of Crème ends up expressed as 'e' + ' ̀'.
 	 * It is now trivial to globally get rid of the diacritics,
 	 * which the Unicode standard conveniently groups as the
 	 * Combining Diacritical Marks Unicode block.
@@ -227,12 +239,8 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 	return (
 		<RowWrapper data-path={path}>
 			<PlayButton
-				onClick={e => {
-					e.stopPropagation();
-					e.preventDefault();
-					playThisMedia(path);
-				}}
-				data-tip="Play this media"
+				data-tip={t("tooltips.playThisMedia")}
+				onClick={() => playThisMedia(path)}
 				data-place="right"
 			>
 				<Img>
@@ -255,13 +263,7 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 			</PlayButton>
 
 			<Dialog modal>
-				<DialogTrigger
-					onClick={e => {
-						e.stopPropagation();
-						e.preventDefault();
-					}}
-					tooltip="Open media options"
-				>
+				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
 					<Dots size={17} />
 				</DialogTrigger>
 

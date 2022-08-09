@@ -5,6 +5,7 @@ import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
 import { dbg, isDevelopment } from "@common/utils";
 import { LogLevel } from "react-virtuoso";
 import { App } from "./App";
+import "./i18n"; // Import translations on app root.
 
 import { font_1, font_2, font_3, font_4 } from "./assets";
 

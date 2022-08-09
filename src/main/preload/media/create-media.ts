@@ -51,6 +51,7 @@ async function createMedia(
 			let picture: IPicture | undefined, mimeType: string | undefined;
 			try {
 				picture = pictures[0];
+				console.log("picture[0] =", picture);
 				mimeType = picture?.mimeType;
 			} catch (error) {
 				console.error(error, { picture, mimeType, basename });

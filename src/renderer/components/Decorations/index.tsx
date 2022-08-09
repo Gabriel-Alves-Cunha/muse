@@ -9,6 +9,7 @@ import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
 import { MediasInfo } from "@components/Decorations/MediasInfo";
 import { usePage } from "@contexts/page";
+import { t } from "@components/I18n";
 import {
 	toggleMaximize,
 	minimizeWindow,
@@ -36,7 +37,7 @@ export const DecorationsTop = () => (
 		{/* ^ window-draggable-region */}
 		<AppIcon>
 			<img
-				alt="Muse's logo, a donut-like circle with shades of blue."
+				alt={t("alts.museLogo")}
 				src={imageUrl.href}
 				height={24}
 				width={24}
@@ -70,7 +71,7 @@ export const DecorationsDown = () => (
 const Buttons = () => (
 	<WindowButtonsWrapper className="notransition">
 		<WindowButton
-			data-tip="Close window"
+			data-tip={t("tooltips.closeWindow")}
 			onClick={closeWindow}
 			data-place="left"
 			id="close"
@@ -79,14 +80,17 @@ const Buttons = () => (
 		</WindowButton>
 
 		<WindowButton
-			data-tip="Toggle maximize window"
+			data-tip={t("tooltips.toggleMaximizeWindow")}
 			onClick={toggleMaximize}
 			data-place="left"
 		>
 			<Maximize size={16} />
 		</WindowButton>
 
-		<WindowButton data-tip="Minimize window" onClick={minimizeWindow}>
+		<WindowButton
+			data-tip={t("tooltips.toggleMinimizeWindow")}
+			onClick={minimizeWindow}
+		>
 			<Minimize size={16} />
 		</WindowButton>
 	</WindowButtonsWrapper>

@@ -3,6 +3,7 @@ import create from "zustand";
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { dbg } from "@common/utils";
+import { t } from "@components/I18n";
 
 const { getBasicInfo } = electron.media;
 
@@ -31,7 +32,7 @@ export function downloadMedia(): void {
 	const { result: { artist, imageURL, title }, url } = searchInfo();
 
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
-	if (!title || !url) return;
+	if (title.length === 0 || url.length === 0) return;
 
 	// Start download:
 	setDownloadInfo({ imageURL, title, url, artist });
@@ -43,7 +44,7 @@ export function downloadMedia(): void {
 ////////////////////////////////////////////////
 
 export async function search(url: Readonly<string>): Promise<void> {
-	if (!url || url.length < 8) return;
+	if (url.length < 8) return;
 
 	dbg(`Searching for "${url}".`);
 
@@ -69,8 +70,8 @@ export async function search(url: Readonly<string>): Promise<void> {
 			result: defaultSearchInfo.result,
 			isLoading: false,
 			error: getErrorMessage(error).includes("No video id found") ?
-				"No video ID found!" :
-				"There was an error getting media information!",
+				t("errors.noVideoIdFound") :
+				t("errors.gettingMediaInfo"),
 		});
 
 		console.error(error);

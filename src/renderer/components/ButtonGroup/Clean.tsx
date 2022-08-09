@@ -2,6 +2,7 @@ import { FiTrash as CleanIcon } from "react-icons/fi";
 
 import { assertUnreachable } from "@utils/utils";
 import { getFromList } from "@components/MediaListKind/helper";
+import { t } from "@components/I18n";
 import {
 	cleanFavorites,
 	cleanHistory,
@@ -12,9 +13,9 @@ import { ButtonFromGroup } from "./styles";
 
 export const Clean = ({ className }: Props) => (
 	<ButtonFromGroup
+		data-tip={t("tooltips.cleanList")}
 		onClick={cleanProperList}
 		className={className}
-		data-tip="Clean list"
 		data-place="bottom"
 	>
 		<CleanIcon size={18} />

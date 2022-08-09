@@ -9,6 +9,7 @@ import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
+import { t, Translator } from "@components/I18n";
 import {
 	deselectAllMedias,
 	allSelectedMedias,
@@ -45,7 +46,9 @@ const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
 export const MediaListKind = ({ isHome }: Props) => (
 	<ErrorBoundary
 		FallbackComponent={() => (
-			<ErrorFallback description="Rendering the list threw an error. This is probably a bug. Try	closing and opening the app, if the error persists, click on the button below." />
+			<ErrorFallback
+				description={t("errors.mediaListKind.errorFallbackDescription")}
+			/>
 		)}
 		onReset={() => {
 			resetAllAppData();
@@ -161,8 +164,9 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					components={{
 						EmptyPlaceholder: () => (
 							<EmptyList>
-								<img src={noMediaFoundPng.href} alt="No medias found." />
-								No medias found
+								<img src={noMediaFoundPng.href} alt={t("alts.noMediasFound")} />
+
+								<Translator path="alts.noMediasFound" />
 							</EmptyList>
 						),
 						Header: () => <Footer />,

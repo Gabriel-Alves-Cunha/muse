@@ -94,8 +94,8 @@ export function playPreviousMedia(): void {
 	time(() => {
 		const { path, listType } = currentPlaying();
 
-		if (!path)
-			return console.error(
+		if (path.length === 0)
+			return console.warn(
 				"A media needs to be currently selected to play a previous media!",
 			);
 
@@ -107,7 +107,7 @@ export function playPreviousMedia(): void {
 		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
-		const firstMediaPath = getFirstKey(list);
+		const [firstMediaPath] = list;
 		let prevMediaPath: Path = "";
 
 		if (firstMediaPath === path) prevMediaPath = getLastKey(list) as Path;
@@ -124,7 +124,7 @@ export function playPreviousMedia(): void {
 			}
 		}
 
-		if (!prevMediaPath)
+		if (prevMediaPath.length === 0)
 			return console.error(
 				"There should be a prevMediaPath, but there isn't!",
 				{ prevMediaPath, list },
@@ -147,8 +147,8 @@ export function playNextMedia(): void {
 	time(() => {
 		const { path, listType } = currentPlaying();
 
-		if (!path)
-			return console.warn(
+		if (path.length === 0)
+			return console.info(
 				"A media needs to be currently selected to play a next media!",
 			);
 
@@ -185,14 +185,14 @@ export function playNextMedia(): void {
 				if (newPath === path) found = true;
 			}
 
-			if (!nextMediaPath) nextMediaPath = getFirstKey(list) as Path;
+			if (nextMediaPath.length === 0) nextMediaPath = getFirstKey(list) as Path;
 		}
 
-		if (!nextMediaPath)
-			return console.error(
-				"There should be a nextMediaPath, but there isn't!",
-				{ nextMediaPath, list },
-			);
+		if (nextMediaPath.length === 0)
+			return console.warn("There should be a nextMediaPath, but there isn't!", {
+				nextMediaPath,
+				list,
+			});
 
 		// We need to update history:
 		setPlaylists({
@@ -233,7 +233,7 @@ if (import.meta.vitest === undefined)
 	useCurrentPlaying.subscribe(
 		state => state.path,
 		function runSubscribedFunctions(path, prevPath) {
-			if (!path) return;
+			if (path.length === 0) return;
 
 			// Run functions:
 			setAudioSource(path, prevPath);

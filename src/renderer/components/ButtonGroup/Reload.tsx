@@ -1,5 +1,6 @@
 import { MdAutorenew as ReloadIcon } from "react-icons/md";
 
+import { t } from "@components/I18n";
 import {
 	searchLocalComputerForMedias,
 	usePlaylists,
@@ -7,23 +8,24 @@ import {
 
 import { ButtonFromGroup } from "./styles";
 
+const isLoadingMediasSelector = (
+	state: ReturnType<typeof usePlaylists.getState>,
+) => state.isLoadingMedias;
+
 export function Reload({ className }: Props) {
-	const isLoadingMedias = usePlaylists(selector);
+	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
 
 	return (
 		<ButtonFromGroup
 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
+			data-tip={t("tooltips.reloadAllMedias")}
 			onClick={searchLocalComputerForMedias}
-			data-tip="Reload all medias"
 			data-place="bottom"
 		>
 			<ReloadIcon size={17} />
 		</ButtonFromGroup>
 	);
 }
-
-const selector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.isLoadingMedias;
 
 /////////////////////////////////////////////
 // Types:

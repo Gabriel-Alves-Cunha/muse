@@ -123,7 +123,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// map.delete() returns true if an element in the Map
 									// object existed and has been removed, or false if
 									// the element does not exist.
-									if (newFavorites.delete(action.path) === false)
+									if (!newFavorites.delete(action.path))
 										newFavorites.add(action.path);
 
 									set({ favorites: newFavorites });
@@ -156,7 +156,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH: {
 									const { favorites } = get();
 
-									if (favorites.has(action.path) === false) {
+									if (!favorites.has(action.path)) {
 										console.error("Media not found in favorites");
 										break;
 									}
@@ -211,8 +211,8 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								case PlaylistActions.ADD_ONE_MEDIA: {
 									const mainList = get().sortedByName;
 
-									if (mainList.has(action.path) === false) {
-										console.error(
+									if (!mainList.has(action.path)) {
+										console.warn(
 											`A media with path "${action.path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call this function with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
 										);
 										break;
@@ -246,13 +246,13 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									const newMainList = new Map(mainList);
 									const newHistory = new Map(history);
 
-									if (newMainList.delete(action.path) === false) {
+									if (!newMainList.delete(action.path)) {
 										console.error(
 											`A media with path "${action.path}" does not exist at sortedByName.`,
 										);
 										break;
 									}
-									if (newSortedByDate.delete(action.path) === false) {
+									if (!newSortedByDate.delete(action.path)) {
 										console.error(
 											`A media with path "${action.path}" does not exist at newSortedByDate.`,
 										);
@@ -265,11 +265,11 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									});
 
 									// If the media is in the favorites, remove it from the favorites
-									if (newFavorites.delete(action.path) === true)
+									if (newFavorites.delete(action.path))
 										set({ favorites: newFavorites });
 
 									// If the media is in the history, remove it from the history
-									if (newHistory.delete(action.path) === true)
+									if (newHistory.delete(action.path))
 										set({ history: newHistory });
 
 									dbgPlaylists(
@@ -290,7 +290,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// If the media in the favorites list is not on
 									// action.list, remove it from the favorites:
 									favorites.forEach(path => {
-										if (action.list.has(path) === false)
+										if (!action.list.has(path))
 											newFavorites.delete(path);
 									});
 
@@ -300,7 +300,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// If the media in the history list is not on
 									// action.list, remove it from the favorites:
 									history.forEach((_, path) => {
-										if (action.list.has(path) === false)
+										if (!action.list.has(path))
 											newHistory.delete(path);
 									});
 
@@ -525,36 +525,34 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 
 export const diacriticRegex = /\p{Diacritic}/gu;
 
-export function searchMedia(searchTerm_: Readonly<string>): [Path, Media][] {
+export function searchMedia(
+	highlight: Readonly<Lowercase<string>>,
+): [Path, Media][] {
 	return time(() => {
-		/** normalize()ing to NFD Unicode normal form decomposes
-		 * combined graphemes into the combination of simple ones.
-		 * The è of Crème ends up expressed as e +  ̀.
-		 * It is now trivial to globally get rid of the diacritics,
-		 * which the Unicode standard conveniently groups as the
-		 * Combining Diacritical Marks Unicode block.
-		 */
-		const searchTerm = searchTerm_.toLowerCase().normalize("NFD").replace(
-			diacriticRegex,
-			"",
-		);
 		const medias: [Path, Media][] = [];
 
 		mainList().forEach((media, path) =>
 		{
 			if (
+				/** normalize()ing to NFD Unicode normal form decomposes
+				 * combined graphemes into the combination of simple ones.
+				 * The è of Crème ends up expressed as e +  ̀.
+				 * It is now trivial to globally get rid of the diacritics,
+				 * which the Unicode standard conveniently groups as the
+				 * Combining Diacritical Marks Unicode block.
+				 */
 				media
 					.title
 					.toLowerCase()
 					.normalize("NFD")
 					.replace(diacriticRegex, "")
-					.includes(searchTerm)
+					.includes(highlight)
 			)
 				medias.push([path, media]);
 		});
 
 		return medias;
-	}, `searchMedia('${searchTerm_}')`);
+	}, `searchMedia('${highlight}')`);
 }
 
 ///////////////////////////////////////////////////

@@ -7,6 +7,7 @@ import {
 import { styled, darkTheme, lightTheme } from "@styles/global";
 import { useLocalStorage } from "@hooks/useLocalStorage";
 import { keyPrefix } from "@utils/localStorage";
+import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -46,7 +47,7 @@ export function ThemeToggler() {
 	}, []);
 
 	return (
-		<ThemeButton data-tip="Toggle theme" onClick={toggleTheme}>
+		<ThemeButton data-tip={t("tooltips.toggleTheme")} onClick={toggleTheme}>
 			{theme === light ? <Dark size="20px" /> : <Light size="20px" />}
 		</ThemeButton>
 	);

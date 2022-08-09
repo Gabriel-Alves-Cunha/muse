@@ -1,4 +1,5 @@
 import { useAllSelectedMedias } from "@contexts/useAllSelectedMedias";
+import { t } from "@components/I18n";
 
 const sizeSelector = (
 	state: ReturnType<typeof useAllSelectedMedias.getState>,
@@ -9,7 +10,9 @@ export function NumberOfMediasSelected() {
 
 	return (
 		<p>
-			{numberOfMediasSelected === 0 ? "" : `${numberOfMediasSelected} selected`}
+			{numberOfMediasSelected === 0 ?
+				"" :
+				`${numberOfMediasSelected} ${t("decorations.selected")}`}
 		</p>
 	);
 }

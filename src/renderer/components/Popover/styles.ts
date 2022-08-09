@@ -37,14 +37,13 @@ export const slideLeftAndFade = keyframes({
 /////////////////////////////////////////
 
 export const StyledContent = styled(Content, {
-	pos: "relative", // to the popover anchor
+	// pos: "relative", // to the popover anchor
 	d: "flex",
 	fd: "column",
 	gap: 10,
 
 	bg: "$bg-popover",
 	ox: "hidden",
-	ml: 10,
 	br: 10,
 	p: 10,
 
@@ -57,7 +56,7 @@ export const StyledContent = styled(Content, {
 	"@media (prefers-reduced-motion: no-preference)": {
 		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
 		animationFillMode: "forwards",
-		animationDuration: "300ms",
+		animationDuration: "150ms",
 
 		"&[data-state='open']": {
 			"&[data-side='right']": { animationName: slideLeftAndFade },
@@ -93,21 +92,19 @@ export const StyledContent = styled(Content, {
 
 	variants: {
 		size: {
-			"nothing-found-for-search-media": {
-				maxHeight: 100,
-				minHeight: 50,
-				w: 350,
-
-				ov: "auto",
-			},
 			"nothing-found-for-convertions-or-downloads": {
 				h: 100,
 				w: 260,
 
 				ov: "hidden",
 			},
-			"search-media-results": { h: 250, w: 350, ov: "auto" },
-			"convertions-or-downloads": { h: 300, w: 260, ov: "auto" },
+			"nothing-found-for-search-media": {
+				maxHeight: 100,
+				minHeight: 50,
+				w: 350,
+			},
+			"convertions-or-downloads": { h: 300, w: 260 },
+			"search-media-results": { h: 250, w: 350 },
 		},
 	},
 });

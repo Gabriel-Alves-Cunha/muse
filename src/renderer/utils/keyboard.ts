@@ -1,3 +1,5 @@
+import { dbg } from "@common/utils";
+
 const modifierKeys = Object.freeze(
 	[
 		"SymbolLock",
@@ -25,7 +27,7 @@ export function isAModifierKeyPressed(
 		if (except.includes(key)) continue;
 
 		if (event.getModifierState(key)) {
-			console.log("Modifier key pressed =", key);
+			dbg("Modifier key pressed =", key);
 
 			return true;
 		}

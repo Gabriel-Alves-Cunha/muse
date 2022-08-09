@@ -13,7 +13,7 @@ import { ProgressStatus } from "@common/enums";
 import { errorToast } from "@styles/global";
 
 import { StyledPopoverTrigger } from "./styles";
-import { PopoverAnchor } from "../Converting/styles";
+import { t } from "@components/I18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -45,7 +45,7 @@ export function Downloading() {
 	const downloadInfo = useDownloadInfo();
 
 	useEffect(() => {
-		if (!downloadInfo.url) return;
+		if (downloadInfo.url.length === 0) return;
 
 		// For each new `downloadInfo`, start a new download:
 		try {
@@ -59,7 +59,9 @@ export function Downloading() {
 			console.error(error);
 
 			errorToast(
-				`There was an error trying to download "${downloadInfo.title}"! Please, try again later.`,
+				`${t("toasts.downloadError.beforePath")}"${downloadInfo.title}"${
+					t("toasts.downloadError.afterPath")
+				}`,
 			);
 		}
 
@@ -67,24 +69,23 @@ export function Downloading() {
 	}, [downloadInfo.title, downloadInfo]);
 
 	return (
-		<PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
+		<PopoverRoot modal open={isOpen} onOpenChange={setIsOpen}>
 			<StyledPopoverTrigger
-				className={(downloadingListSize ? "has-items " : "") +
-					(isOpen ? "active " : "")}
-				data-tip="Show all downloading medias"
+				className={(downloadingListSize > 0 ? "has-items " : "") +
+					(isOpen === true ? "active " : "")}
+				data-tip={t("tooltips.showAllDownloadingMedias")}
 			>
 				<span data-length={downloadingListSize}></span>
 
 				<DownloadingIcon size={20} />
 			</StyledPopoverTrigger>
 
-			<PopoverAnchor />
-
 			<PopoverContent
 				size={downloadingListSize === 0 ?
 					"nothing-found-for-convertions-or-downloads" :
 					"convertions-or-downloads"}
-				alignOffset={14}
+				side="right"
+				align="end"
 			>
 				<Popup />
 			</PopoverContent>

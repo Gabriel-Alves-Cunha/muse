@@ -1,5 +1,7 @@
 import { Root } from "@radix-ui/react-portal";
 
+import { Translator } from "@components/I18n";
+
 import {
 	StyledDialogBlurOverlay,
 	StyledDialogContent,
@@ -25,17 +27,19 @@ export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 
 			<StyledDialogContent className="delete-media">
 				<StyledTitle className="subtitle">
-					Are you sure you want to delete this media from your computer?
+					<Translator path="dialogs.deleteMedia.subtitle" />
 				</StyledTitle>
 
 				<FlexRow>
 					<img src={warningSvg.href} alt="Warning sign." id="warning" />
 
 					<CloseDialog onClick={handleMediaDeletion} className="delete-media">
-						Confirm
+						<Translator path="buttons.confirm" />
 					</CloseDialog>
 
-					<CloseDialog id="cancel">Cancel</CloseDialog>
+					<CloseDialog id="cancel">
+						<Translator path="buttons.cancel" />
+					</CloseDialog>
 				</FlexRow>
 			</StyledDialogContent>
 		</Root>

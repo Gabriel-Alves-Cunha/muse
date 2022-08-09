@@ -24,6 +24,7 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { formatDuration } from "@common/utils";
 import { useProgress } from ".";
 import { infoToast } from "@styles/global";
+import { t } from "@components/I18n";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
@@ -85,7 +86,7 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 
 			<ControlsButtonsWrapper>
 				<CircledIconButton
-					data-tip="Toggle loop this media"
+					data-tip={t("tooltips.toggleLoopThisMedia")}
 					onClick={toggleLoopMedia}
 					disabled={isThereAMedia}
 				>
@@ -95,7 +96,7 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 				<Controls isDisabled={isThereAMedia} isPaused={audio?.paused} />
 
 				<CircledIconButton
-					data-tip="Toggle random"
+					data-tip={t("tooltips.toggleRandom")}
 					disabled={isThereAMedia}
 					onClick={toggleRandom}
 				>
@@ -119,8 +120,9 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 
 				await searchAndOpenLyrics(media, path, true);
 			}}
+			data-tip={t("tooltips.toggleOpenLyrics")}
 			disabled={media === undefined}
-			data-tip="Toggle open lyrics"
+			data-side="bottom"
 		>
 			{media?.lyrics ? <LyricsPresent size={16} /> : <NoLyrics size={16} />}
 		</CircledIconButton>
@@ -128,9 +130,9 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 		<Album>{displayTitle === true ? media?.title : media?.album}</Album>
 
 		<CircledIconButton
+			data-tip={t("tooltips.toggleFavorite")}
 			onClick={() => toggleFavorite(path)}
 			disabled={media === undefined}
-			data-tip="Toggle favorite"
 		>
 			{favorites().has(path) === true ?
 				<Favorite size={17} /> :
@@ -151,7 +153,7 @@ export async function searchAndOpenLyrics(
 	if (media === undefined) return;
 
 	if (media.artist.length === 0) {
-		infoToast("Make sure that media has artist metadata!");
+		infoToast(t("toasts.assureMediaHasArtistMetadata"));
 		return;
 	}
 
@@ -177,7 +179,7 @@ export async function searchAndOpenLyrics(
 		});
 	} catch (error) {
 		if ((error as Error).message.includes("No lyrics found"))
-			infoToast(`No lyrics found for "${media.title}"!`);
+			infoToast(`${t("toasts.noLyricsFound")}"${media.title}"!`);
 
 		console.error(error);
 	}
@@ -193,7 +195,7 @@ export async function searchAndOpenLyrics(
 export const Controls = ({ isPaused = false, isDisabled }: IsPaused) => (
 	<ControlsWrapper>
 		<CircledIconButton
-			data-tip="Play previous track"
+			data-tip={t("tooltips.playPreviousTrack")}
 			onClick={playPreviousMedia}
 			disabled={isDisabled}
 		>
@@ -201,16 +203,16 @@ export const Controls = ({ isPaused = false, isDisabled }: IsPaused) => (
 		</CircledIconButton>
 
 		<CircledIconButton
+			data-tip={t("tooltips.playPause")}
 			onClick={togglePlayPause}
 			disabled={isDisabled}
-			data-tip="Play/pause"
 			size="large"
 		>
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
 		</CircledIconButton>
 
 		<CircledIconButton
-			data-tip="Play next track"
+			data-tip={t("tooltips.playNextTrack")}
 			onClick={playNextMedia}
 			disabled={isDisabled}
 		>

@@ -2,6 +2,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 
 import { resetAllAppData } from "@utils/app";
 import { reloadWindow } from "@components/MediaListKind/helper";
+import { Translator } from "@components/I18n";
 
 import { SubTitle } from "@components/MediaListKind/styles";
 import { Center } from "./styles";
@@ -24,7 +25,9 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 
 			<StyledDialogContent>
 				<Center>
-					<StyledTitle>Something went wrong</StyledTitle>
+					<StyledTitle>
+						<Translator path="errors.mediaListKind.errorTitle" />
+					</StyledTitle>
 					<SubTitle>{description}</SubTitle>
 
 					<CloseDialog
@@ -34,11 +37,11 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 						}}
 						id="reset-app-data"
 					>
-						Reset all app data
+						<Translator path="buttons.resetAllAppData" />
 					</CloseDialog>
 
 					<CloseDialog id="reload-window" onClick={reloadWindow}>
-						Reload window
+						<Translator path="buttons.reloadWindow" />
 					</CloseDialog>
 				</Center>
 			</StyledDialogContent>

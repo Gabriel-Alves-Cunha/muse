@@ -7,6 +7,7 @@ import { errorToast, infoToast, successToast } from "@styles/global";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
+import { t, Translator } from "@components/I18n";
 import { Progress } from "@components/Progress";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
@@ -35,13 +36,17 @@ export function Popup() {
 		(
 			<>
 				<Button variant="medium" onClick={cleanAllDoneDownloads}>
-					Clean finished
+					<Translator path="buttons.cleanFinished" />
 				</Button>
 
 				{downloadingBoxes(downloadingList)}
 			</>
 		) :
-		<p>No downloads in progress!</p>);
+		(
+			<p>
+				<Translator path="infos.noDownloadsInProgress" />
+			</p>
+		));
 }
 
 /////////////////////////////////////////////
@@ -83,6 +88,8 @@ function cleanAllDoneDownloads(): void {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+export const isDownloadList = true;
+
 const DownloadingBox = (
 	{ downloadingIndex, download, url }: DownloadingBoxProps,
 ) => (
@@ -92,9 +99,14 @@ const DownloadingBox = (
 
 			<CancelButton
 				onClick={e =>
-					handleSingleItemDeleteAnimation(e, downloadingIndex, true, url)}
+					handleSingleItemDeleteAnimation(
+						e,
+						downloadingIndex,
+						isDownloadList,
+						url,
+					)}
+				data-tip={t("tooltips.cancelDownload")}
 				className="cancel-button notransition"
-				data-tip="Cancel/Remove download"
 			>
 				<Cancel size={12} />
 			</CancelButton>
@@ -129,7 +141,7 @@ export function createNewDownload(
 	// First, see if there is another one that has the same url
 	// and quit if true:
 	if (downloadingList.has(url)) {
-		const info = `There is already one download of "${title}"`;
+		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
 		infoToast(info);
 
@@ -188,7 +200,7 @@ function handleUpdateDownloadingList(
 
 	// Assert that the download exists:
 	const thisDownload = downloadingList.get(url);
-	if (!thisDownload)
+	if (thisDownload === undefined)
 		return console.error(
 			"Received a message from Electron but the url is not in the list!",
 		);
@@ -205,9 +217,9 @@ function handleUpdateDownloadingList(
 			console.assert(data.error, "data.error should exist!");
 
 			errorToast(
-				`Download of "${thisDownload.title}" failed! ${
-					(data as typeof data & { error: Error; }).error.message
-				}`,
+				`${t("toasts.downloadError.beforePath")}"${thisDownload.title}"${
+					t("toasts.downloadError.afterPath")
+				} ${(data as typeof data & { error: Error; }).error.message}`,
 			);
 
 			cancelDownloadAndOrRemoveItFromList(url);
@@ -215,14 +227,14 @@ function handleUpdateDownloadingList(
 		}
 
 		case ProgressStatus.SUCCESS: {
-			successToast(`Download of "${thisDownload.title}" succeded!`);
+			successToast(`${t("toasts.downloadSuccess")}"${thisDownload.title}"!`);
 
 			cancelDownloadAndOrRemoveItFromList(url);
 			break;
 		}
 
 		case ProgressStatus.CANCEL: {
-			infoToast(`Download of "${thisDownload.title}" was cancelled!`);
+			infoToast(`${t("toasts.downloadCanceled")}"${thisDownload.title}"!`);
 
 			cancelDownloadAndOrRemoveItFromList(url);
 			break;
@@ -253,7 +265,7 @@ export function cancelDownloadAndOrRemoveItFromList(
 	// Assert that the download exists:
 	const download = downloadingList.get(url);
 
-	if (!download)
+	if (download === undefined)
 		return console.error(
 			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
 			downloadingList,

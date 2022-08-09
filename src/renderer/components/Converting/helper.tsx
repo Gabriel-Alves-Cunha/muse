@@ -7,7 +7,9 @@ import { errorToast, infoToast, successToast } from "@styles/global";
 import { type AllowedMedias, formatDuration } from "@common/utils";
 import { type ProgressProps, progressIcons } from "@components/Progress";
 import { assertUnreachable } from "@utils/utils";
+import { isDownloadList } from "@components/Downloading/helper";
 import { ProgressStatus } from "@common/enums";
+import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
 import { emptyMap } from "@utils/map-set";
@@ -47,13 +49,17 @@ export function Popup() {
 		(
 			<>
 				<Button variant="medium" onClick={cleanAllDoneConvertions}>
-					Clean finished
+					<Translator path="buttons.cleanFinished" />
 				</Button>
 
 				{convertBoxes(convertingList)}
 			</>
 		) :
-		<p>No conversions in progress!</p>);
+		(
+			<p>
+				<Translator path="infos.noConversionsInProgress" />
+			</p>
+		));
 }
 
 /////////////////////////////////////////////
@@ -110,8 +116,13 @@ const ConvertBox = (
 
 			<CancelButton
 				onClick={e =>
-					handleSingleItemDeleteAnimation(e, convertionIndex, false, path)}
-				data-tip="Cancel conversion"
+					handleSingleItemDeleteAnimation(
+						e,
+						convertionIndex,
+						!isDownloadList,
+						path,
+					)}
+				data-tip={t("tooltips.cancelConversion")}
 				className="notransition"
 			>
 				<Cancel size={12} />
@@ -119,8 +130,9 @@ const ConvertBox = (
 		</TitleAndCancelWrapper>
 
 		<ConvertionProgress>
-			Converted:
-			{` ${formatDuration(timeConverted)} s / ${prettyBytes(sizeConverted)}`}
+			{`${t("infos.converted")} ${formatDuration(timeConverted)} s / ${
+				prettyBytes(sizeConverted)
+			}`}
 			<span>{progressIcons.get(status)}</span>
 		</ConvertionProgress>
 	</ItemWrapper>
@@ -139,7 +151,7 @@ export function createNewConvertion(
 	dbg("Trying to create a new conversion...", { convertingList });
 
 	if (convertingList.has(path)) {
-		const info = `There is already one convert of "${path}"!`;
+		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		infoToast(info);
 
@@ -192,7 +204,7 @@ export function cancelConversionAndOrRemoveItFromList(
 
 	const mediaBeingConverted = convertingList.get(path);
 
-	if (!mediaBeingConverted)
+	if (mediaBeingConverted === undefined)
 		return console.error(
 			`There should be a convertion with path "${path}"!\nconvertList =`,
 			convertingList,
@@ -226,7 +238,7 @@ function handleUpdateConvertingList(
 
 	// Assert that the download exists:
 	const thisConversion = convertingList.get(path);
-	if (!thisConversion)
+	if (thisConversion === undefined)
 		return console.error(
 			"Received a message from Electron but the path is not in the list!",
 		);
@@ -243,7 +255,7 @@ function handleUpdateConvertingList(
 			console.assert(data.error, "data.error should exist!");
 
 			errorToast(
-				`Conversion of "${path}" failed! ${
+				`${t("toasts.conversionFailed")}${path}"! ${
 					(data as typeof data & { error: Error; }).error.message
 				}`,
 			);
@@ -253,14 +265,14 @@ function handleUpdateConvertingList(
 		}
 
 		case ProgressStatus.SUCCESS: {
-			successToast(`Conversion of "${path}" succeded!`);
+			successToast(`${t("toasts.conversionSuccess")}"${path}"!`);
 
 			cancelConversionAndOrRemoveItFromList(path);
 			break;
 		}
 
 		case ProgressStatus.CANCEL: {
-			infoToast(`Conversion of "${path}" was cancelled!`);
+			infoToast(`${t("toasts.conversionCanceled")}"${path}"!`);
 
 			cancelConversionAndOrRemoveItFromList(path);
 			break;

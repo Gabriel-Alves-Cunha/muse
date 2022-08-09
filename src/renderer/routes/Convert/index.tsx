@@ -4,12 +4,14 @@ import type { Path } from "@common/@types/generalTypes";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { SiConvertio as ConvertIcon } from "react-icons/si";
 
+import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
 import { emptyMap } from "@utils/map-set";
+import { useTitle } from "@hooks/useTitle";
 import { Button } from "@components/Button";
 import {
-	useNewConvertions,
 	type ConvertInfo,
+	useNewConvertions,
 } from "@components/Converting/helper";
 
 import { Box } from "./styles";
@@ -23,6 +25,7 @@ export function Convert() {
 	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
+	useTitle(t("titles.convert"));
 
 	////////////////////////////////////////////////
 
@@ -56,10 +59,6 @@ export function Convert() {
 		setSelectedFiles(emptyMap);
 	}, [toExtension, selectedFiles]);
 
-	useEffect(() => {
-		document.title = "Convert medias files to mp3";
-	}, []);
-
 	////////////////////////////////////////////////
 
 	return (
@@ -71,6 +70,7 @@ export function Convert() {
 					variant="large"
 				>
 					<ConvertIcon size={18} />
+
 					<input
 						onChange={handleSelectedFiles}
 						accept="video/*,audio/*"
@@ -78,7 +78,8 @@ export function Convert() {
 						type="file"
 						multiple
 					/>
-					Select media(s) to convert
+
+					<Translator path="buttons.convert" />
 				</Button>
 			</Box>
 		</MainArea>

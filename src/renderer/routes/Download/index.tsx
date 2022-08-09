@@ -2,6 +2,8 @@ import { AiOutlineSearch as SearchIcon } from "react-icons/ai";
 import { useEffect } from "react";
 
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
+import { t, Translator } from "@components/I18n";
+import { useTitle } from "@hooks/useTitle";
 import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 
@@ -20,9 +22,7 @@ import {
 // Main function:
 
 export function Download() {
-	useEffect(() => {
-		document.title = "Download medias files to audio files";
-	}, []);
+	useTitle(t("titles.download"));
 
 	return (
 		<GridWrapper>
@@ -39,9 +39,16 @@ export function Download() {
 ////////////////////////////////////////////////
 // Helper functions:
 
+const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
+	setSearchInfo({ url: e.target.value });
+
+////////////////////////////////////////////////
+
 const errorAndUrlSelectors = (
 	{ error, url }: ReturnType<typeof useSearchInfo.getState>,
 ) => ({ error, url });
+
+////////////////////////////////////////////////
 
 function SearcherWrapper() {
 	const { error, url } = useSearchInfo(errorAndUrlSelectors);
@@ -58,16 +65,16 @@ function SearcherWrapper() {
 				<SearchIcon size={18} />
 
 				<label className={url ? "active" : ""} htmlFor="searcher:url">
-					Paste YouTube url here
+					<Translator path="labels.pasteVideoURL" />
 				</label>
+
 				<input
-					onChange={e => setSearchInfo({ url: e.target.value })}
 					autoCapitalize="off"
 					spellCheck="false"
+					onChange={setUrl}
 					autoCorrect="off"
 					id="searcher:url"
 					value={url}
-					type="text"
 				/>
 			</Searcher>
 
@@ -84,7 +91,7 @@ const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 function IsLoading() {
 	const isLoading = useSearchInfo(isLoadingSelector);
 
-	return <LoadingWrapper>{isLoading && <Loading />}</LoadingWrapper>;
+	return <LoadingWrapper>{isLoading === true && <Loading />}</LoadingWrapper>;
 }
 
 ////////////////////////////////////////////////
@@ -95,14 +102,16 @@ const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 function Result() {
 	const { imageURL, title } = useSearchInfo(resultSelector);
 
-	return title ?
+	return title.length > 0 ?
 		(
 			<ResultContainer>
-				<img src={imageURL} alt="Video thumbnail." />
+				<img src={imageURL} alt={t("alts.videoThumbnail")} />
 
 				<p>{title}</p>
 
-				<Button variant="large" onClick={downloadMedia}>Download</Button>
+				<Button variant="large" onClick={downloadMedia}>
+					<Translator path="buttons.download" />
+				</Button>
 			</ResultContainer>
 		) :
 		null;

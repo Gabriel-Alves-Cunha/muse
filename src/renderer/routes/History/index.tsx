@@ -6,7 +6,9 @@ import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
 import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
+import { useTitle } from "@hooks/useTitle";
 import { Header } from "@components/Header";
+import { t } from "@components/I18n";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -14,9 +16,9 @@ import { Header } from "@components/Header";
 // Main function:
 
 export function History() {
-	useEffect(() => {
-		document.title = "History of audios played";
+	useTitle(t("titles.history"));
 
+	useEffect(() => {
 		setFromList({ fromList: PlaylistList.HISTORY });
 	}, []);
 
@@ -25,7 +27,7 @@ export function History() {
 			<Header>
 				<SearchMedia />
 
-				<ButtonGroup buttons={{ clean: true }} />
+				<ButtonGroup clean />
 			</Header>
 
 			<MediaListKind />

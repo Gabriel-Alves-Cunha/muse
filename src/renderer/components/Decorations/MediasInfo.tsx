@@ -1,5 +1,6 @@
 import { usePlaylists } from "@contexts/usePlaylists";
 import { prettyBytes } from "@common/prettyBytes";
+import { t } from "@components/I18n";
 
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByName;
@@ -11,5 +12,5 @@ export function MediasInfo() {
 
 	mainList.forEach(({ size }) => allFilesSize += size);
 
-	return <p>Size: {prettyBytes(allFilesSize)}</p>;
+	return <p>{t("decorations.size")}: {prettyBytes(allFilesSize)}</p>;
 }

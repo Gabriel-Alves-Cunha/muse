@@ -1,5 +1,6 @@
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
+import { Translator } from "@components/I18n";
 
 import { RightSlot, Separator, Item } from "./styles";
 
@@ -17,14 +18,17 @@ const toggleDeveloperTools = () =>
 export const MainCtxMenu = () => (
 	<>
 		<Item onSelect={selectAllMedias}>
-			Select all medias
+			<Translator path="ctxMenus.selectAllMedias" />
+
 			<RightSlot>Ctrl+A</RightSlot>
 		</Item>
 
 		<Separator />
 
 		<Item onSelect={toggleDeveloperTools}>
-			Toggle Developer Tools <RightSlot>Ctrl+Shift+i</RightSlot>
+			<Translator path="ctxMenus.toggleDevTools" />
+
+			<RightSlot>Ctrl+Shift+i</RightSlot>
 		</Item>
 	</>
 );

@@ -7,15 +7,16 @@ import { memo } from "react";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
+import { currentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { currentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { DialogTrigger } from "@components/DialogTrigger";
 import { PlaylistList } from "@contexts/usePlaylists";
+import { t } from "@components/I18n";
 import {
 	addToAllSelectedMedias,
-	allSelectedMedias,
 	toggleSelectedMedia,
+	allSelectedMedias,
 } from "@contexts/useAllSelectedMedias";
 
 import { StyledDialogBlurOverlay } from "./MediaOptions/styles";
@@ -92,7 +93,7 @@ const Row = memo(
 		>
 			<PlayButton
 				onClick={e => selectOrPlayMedia(e, path)}
-				data-tip="Play this media"
+				data-tip={t("tooltips.playThisMedia")}
 				data-place="bottom"
 			>
 				<Img>
@@ -115,7 +116,7 @@ const Row = memo(
 			</PlayButton>
 
 			<Dialog modal>
-				<DialogTrigger tooltip="Open media options">
+				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
 					<Dots size={17} />
 				</DialogTrigger>
 

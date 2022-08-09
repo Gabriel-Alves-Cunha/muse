@@ -8,9 +8,9 @@ import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
 import { emptyMap } from "@utils/map-set";
+import { t } from "@components/I18n";
 
 import { StyledPopoverTrigger } from "../Downloading/styles";
-import { PopoverAnchor } from "./styles";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -37,7 +37,9 @@ export function Converting() {
 				);
 			} catch (error) {
 				errorToast(
-					`There was an error trying to convert "${path}"! Please, try again later.`,
+					`${t("toasts.conversionError.beforePath")}"${path}"${
+						t("toasts.conversionError.afterPath")
+					}`,
 				);
 
 				console.error(error);
@@ -52,23 +54,22 @@ export function Converting() {
 	}, [newConvertions]);
 
 	return (
-		<PopoverRoot open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<StyledPopoverTrigger
-				className={convertingListSize ? "has-items " : ""}
-				data-tip="Show all converting medias"
+				data-tip={t("tooltips.showAllConvertingMedias")}
+				className={convertingListSize > 0 ? "has-items " : ""}
 			>
 				<span data-length={convertingListSize}></span>
 
 				<Convert size={20} />
 			</StyledPopoverTrigger>
 
-			<PopoverAnchor />
-
 			<PopoverContent
 				size={convertingListSize === 0 ?
 					"nothing-found-for-convertions-or-downloads" :
 					"convertions-or-downloads"}
-				alignOffset={140}
+				side="right"
+				align="end"
 			>
 				<Popup />
 			</PopoverContent>

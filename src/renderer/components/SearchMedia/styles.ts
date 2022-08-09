@@ -165,8 +165,9 @@ export const Highlight = styled("span", { bg: "$bg-highlight", c: "white" });
 
 export const SearchMediaPopoverAnchor = styled(Anchor, {
 	pos: "absolute",
-	l: "50%",
-	t: 30,
+	// Tried to center it relative to the search input:
+	l: "17.1%",
+	t: 40,
 });
 
 /////////////////////////////////////////

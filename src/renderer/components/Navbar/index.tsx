@@ -14,6 +14,7 @@ import { ThemeToggler } from "@components/ThemeToggler";
 import { Downloading } from "@components/Downloading";
 import { Converting } from "@components/Converting";
 import { pages } from "@utils/app";
+import { t } from "@components/I18n";
 
 import { Nav, Buttons, PopupsWrapper } from "./styles";
 
@@ -63,8 +64,8 @@ function ButtonsForPages() {
 			{pages.map(page => (
 				<button
 					className={page === currPage ? "active" : ""}
+					data-tip={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
 					onClick={() => setPage({ page })}
-					data-tip={`Go to ${page}`}
 					key={page}
 				>
 					{icons[page]}

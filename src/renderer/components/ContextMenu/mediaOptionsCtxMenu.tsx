@@ -6,6 +6,7 @@ import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/helpers";
 import { deleteMedia } from "@utils/media";
 import { setSettings } from "@contexts/settings";
+import { Translator } from "@components/I18n";
 import { mainList } from "@contexts/usePlaylists";
 import {
 	allSelectedMedias,
@@ -17,14 +18,15 @@ import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 export function MediaOptionsCtxMenu() {
 	const plural = allSelectedMedias().size > 1 ? "s" : "";
 	// If there is none selected, disable:
-	const isDisabled = allSelectedMedias().size > 0;
+	const isDisabled = allSelectedMedias().size === 0;
 
 	return (
 		<>
 			<Dialog modal>
 				<TriggerToDeleteMedia disabled={isDisabled}>
 					<>
-						Delete media{plural}
+						<Translator path="ctxMenus.deleteMedia" />
+						{plural}
 
 						<RightSlot>
 							<Trash />
@@ -36,19 +38,22 @@ export function MediaOptionsCtxMenu() {
 			</Dialog>
 
 			<Item onSelect={shareMedias} disabled={isDisabled}>
-				Share media{plural}
+				<Translator path="ctxMenus.shareMedia" />
+				{plural}
+
 				<RightSlot>
 					<Share />
 				</RightSlot>
 			</Item>
 
 			<Item onSelect={selectAllMedias}>
-				Select all medias
+				<Translator path="ctxMenus.selectAllMedias" />
+
 				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
 			<Item onSelect={searchForLyrics} disabled={isDisabled}>
-				Search for lyrics
+				<Translator path="ctxMenus.searchForLyrics" />
 			</Item>
 		</>
 	);

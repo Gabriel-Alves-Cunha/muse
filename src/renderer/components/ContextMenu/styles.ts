@@ -70,7 +70,8 @@ export const TriggerToDeleteMedia = styled(Trigger, {
 	pos: "relative",
 	d: "flex",
 	alignItems: "center",
-	w: 180,
+	// Account for padding:
+	w: "calc(100% - 25px - 5px)",
 	h: 25,
 
 	cursor: "pointer",
