@@ -115,7 +115,7 @@ const ConvertBox = (
 			<p>{`${getBasename(path)}.${toExtension}`}</p>
 
 			<CancelButton
-				onClick={e =>
+				onPointerUp={e =>
 					handleSingleItemDeleteAnimation(
 						e,
 						convertionIndex,

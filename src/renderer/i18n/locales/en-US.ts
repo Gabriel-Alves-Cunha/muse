@@ -113,9 +113,9 @@ export const en_US_Translations: Translations = Object.freeze({
 		ctxMenus: {
 			toggleDevTools: "Toggle Developer Tools",
 			searchForLyrics: "Search for lyrics",
-			selectAllMedias: "Select all medias",
-			deleteMedia: "Delete media",
-			shareMedia: "Share media",
+			selectAllMedias: "Select all",
+			deleteMedia: "Delete",
+			shareMedia: "Share",
 		},
 
 		infos: {

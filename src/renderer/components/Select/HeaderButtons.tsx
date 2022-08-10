@@ -1,17 +1,9 @@
 import { BsCheck2 as CheckIcon } from "react-icons/bs";
 import { ItemText } from "@radix-ui/react-select";
 
-import { t } from "@components/I18n";
+import { Translator } from "@components/I18n";
 
 import { Viewport, Item, ItemIndicator } from "./styles";
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Constants:
-
-const name = t("sortTypes.name");
-const date = t("sortTypes.date");
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -22,7 +14,9 @@ const date = t("sortTypes.date");
 export const HeaderButtons = () => (
 	<Viewport className="notransition">
 		<Item value="Name">
-			<ItemText>{name}</ItemText>
+			<ItemText>
+				<Translator path="sortTypes.name" />
+			</ItemText>
 
 			<ItemIndicator>
 				<CheckIcon />
@@ -30,7 +24,9 @@ export const HeaderButtons = () => (
 		</Item>
 
 		<Item value="Date">
-			<ItemText>{date}</ItemText>
+			<ItemText>
+				<Translator path="sortTypes.date" />
+			</ItemText>
 
 			<ItemIndicator>
 				<CheckIcon />

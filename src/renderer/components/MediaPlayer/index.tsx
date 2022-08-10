@@ -1,13 +1,14 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
+import { type MutableRefObject, useEffect, useRef } from "react";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
-import { useEffect, useRef } from "react";
 import create from "zustand";
 
-import { ControlsAndSeeker, Header } from "./helpers";
+import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
 import { FlipCard } from "@components/FlipCard";
+import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
 import { dbg } from "@common/utils";
 import {
@@ -44,18 +45,32 @@ const currentPlayingPathSelector = (
 	state: ReturnType<typeof useCurrentPlaying.getState>,
 ) => state.path;
 
+///////////////////////////////////////
+
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByName;
+
+///////////////////////////////////////
 
 export function MediaPlayer() {
 	const path = useCurrentPlaying(currentPlayingPathSelector);
 	const mainList = usePlaylists(mainListSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
+	const isSeekingRef = useRef(false);
+
+	function handleProgress(audio: HTMLAudioElement): void {
+		const { duration, currentTime } = audio;
+
+		setProgress({ currentTime });
+
+		if (isSeekingRef.current === false)
+			setProgress({ percentage: (currentTime / duration) * 100 });
+	}
 
 	const media = mainList.get(path);
-	const audio = audioRef.current;
 
 	useEffect(() => {
+		const audio = audioRef.current;
 		if (audio === null || media === undefined) return;
 
 		const lambdaHandleLoadedData = () => handleLoadedData(audio, path, media);
@@ -68,15 +83,15 @@ export function MediaPlayer() {
 		audio.addEventListener("canplay", lambdaHandleAudioCanPlay);
 		audio.addEventListener("timeupdate", lambdaHandleProgress);
 		audio.addEventListener("ended", lambdaHandleEnded);
-		audio.addEventListener("invalid", handleInvalid);
-		audio.addEventListener("stalled", handleStalled);
+		audio.addEventListener("invalid", logInvalid);
+		audio.addEventListener("stalled", logStalled);
 		audio.addEventListener("ended", playNextMedia);
-		audio.addEventListener("error", handleError);
-		audio.addEventListener("abort", handleAbort);
-		audio.addEventListener("close", handleClose);
+		audio.addEventListener("error", logError);
+		audio.addEventListener("abort", logAbort);
+		audio.addEventListener("close", logClose);
 		audio.addEventListener(
 			"securitypolicyviolation",
-			handleSecurityPolicyViolation,
+			logSecurityPolicyViolation,
 		);
 
 		return () => {
@@ -84,26 +99,33 @@ export function MediaPlayer() {
 			audio.removeEventListener("canplay", lambdaHandleAudioCanPlay);
 			audio.removeEventListener("timeupdate", lambdaHandleProgress);
 			audio.removeEventListener("ended", lambdaHandleEnded);
-			audio.removeEventListener("invalid", handleInvalid);
-			audio.removeEventListener("stalled", handleStalled);
+			audio.removeEventListener("invalid", logInvalid);
+			audio.removeEventListener("stalled", logStalled);
 			audio.removeEventListener("ended", playNextMedia);
-			audio.removeEventListener("error", handleError);
-			audio.removeEventListener("abort", handleAbort);
-			audio.removeEventListener("close", handleClose);
+			audio.removeEventListener("error", logError);
+			audio.removeEventListener("abort", logAbort);
+			audio.removeEventListener("close", logClose);
 			audio.removeEventListener(
 				"securitypolicyviolation",
-				handleSecurityPolicyViolation,
+				logSecurityPolicyViolation,
 			);
 		};
-	}, [audio, media, path]);
+	}, [media, path]);
 
 	return (
 		<Wrapper aria-label="Media player">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
-				cardFront={<Player media={media} audio={audio} path={path} />}
 				cardBack={<Lyrics media={media} path={path} />}
+				cardFront={
+					<Player
+						isSeeking={isSeekingRef}
+						audio={audioRef.current}
+						media={media}
+						path={path}
+					/>
+				}
 			/>
 		</Wrapper>
 	);
@@ -112,7 +134,7 @@ export function MediaPlayer() {
 /////////////////////////////////////////
 // Helper functions:
 
-const Player = ({ media, audio, path }: PlayerProps) => (
+const Player = ({ media, audio, path, isSeeking }: PlayerProps) => (
 	<>
 		<Header media={media} path={path} />
 
@@ -131,33 +153,23 @@ const Player = ({ media, audio, path }: PlayerProps) => (
 			<span id="subtitle">{media?.artist}</span>
 		</Info>
 
-		<ControlsAndSeeker audio={audio} />
+		<ControlsAndSeeker audio={audio} isSeeking={isSeeking} />
 	</>
 );
 
 /////////////////////////////////////////
 
-const handleInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
-const handleAbort = (): void => dbg("Audio was aborted.");
-const handleClose = (): void => dbg("Audio was closed.");
-const handleSecurityPolicyViolation = (e: Readonly<Event>): void =>
+const logInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
+const logAbort = (): void => dbg("Audio was aborted.");
+const logClose = (): void => dbg("Audio was closed.");
+const logSecurityPolicyViolation = (e: Readonly<Event>): void =>
 	console.error("Audio has a security policy violation:", e);
-const handleError = (e: Readonly<Event>): void =>
-	console.error("Audio error:", e);
-const handleStalled = (e: Readonly<Event>): void =>
+const logError = (e: Readonly<Event>): void => console.error("Audio error:", e);
+const logStalled = (e: Readonly<Event>): void =>
 	dbg(
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",
 		e,
 	);
-
-/////////////////////////////////////////
-
-function handleProgress(audio: HTMLAudioElement): void {
-	const { duration, currentTime } = audio;
-	const percentage = (currentTime / duration) * 100;
-
-	setProgress({ currentTime, percentage });
-}
 
 /////////////////////////////////////////
 
@@ -219,5 +231,10 @@ type Progress = Readonly<{ currentTime: number; percentage: number; }>;
 /////////////////////////////////////////
 
 type PlayerProps = Readonly<
-	{ audio: HTMLAudioElement | null; media: Media | undefined; path: Path; }
+	{
+		isSeeking: MutableRefObject<boolean>;
+		audio: HTMLAudioElement | null;
+		media: Media | undefined;
+		path: Path;
+	}
 >;

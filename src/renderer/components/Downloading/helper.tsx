@@ -98,7 +98,7 @@ const DownloadingBox = (
 			<p>{download.title}</p>
 
 			<CancelButton
-				onClick={e =>
+				onPointerUp={e =>
 					handleSingleItemDeleteAnimation(
 						e,
 						downloadingIndex,

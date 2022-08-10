@@ -76,7 +76,7 @@ function contentToShow(
 
 type Props = Readonly<
 	{
-		onContextMenu?: React.MouseEventHandler<HTMLSpanElement>;
+		onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
 		setIsOpen?: (newIsOpen: boolean) => void;
 		content?: CtxContentEnum;
 		isAllDisabled?: boolean;

@@ -147,7 +147,7 @@ export const TitleAndCancelWrapper = styled("div", {
 //////////////////////////////////////////
 
 export function handleSingleItemDeleteAnimation(
-	e: Readonly<React.MouseEvent<HTMLButtonElement, MouseEvent>>,
+	e: Readonly<React.PointerEvent<HTMLButtonElement>>,
 	downloadingOrConvertionIndex: Readonly<number>,
 	isDownloadList: Readonly<boolean>,
 	url: Readonly<string>,

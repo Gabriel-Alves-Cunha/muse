@@ -49,7 +49,9 @@ export const { getState: getFromList, setState: setFromList } = useFromList;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function selectMediaByEvent(e: React.MouseEvent<HTMLSpanElement>): void {
+export function selectMediaByEvent(
+	e: React.PointerEvent<HTMLSpanElement>,
+): void {
 	const mediaClickedMediaPath = (e.nativeEvent.target as HTMLElement)
 		.closest<HTMLDivElement>(rowWrapperClassName)
 		?.getAttribute("data-path");
@@ -66,7 +68,7 @@ export const rightClick = 2;
 export const leftClick = 0;
 
 function selectOrPlayMedia(
-	e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
 ) {
 	if (e.button !== leftClick || e.ctrlKey === false) {
@@ -92,7 +94,7 @@ const Row = memo(
 			data-path={path}
 		>
 			<PlayButton
-				onClick={e => selectOrPlayMedia(e, path)}
+				onPointerUp={e => selectOrPlayMedia(e, path)}
 				data-tip={t("tooltips.playThisMedia")}
 				data-place="bottom"
 			>

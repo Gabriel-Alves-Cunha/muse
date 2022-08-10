@@ -114,10 +114,10 @@ export const pt_BR_Translations: Translations = Object.freeze({
 
 		ctxMenus: {
 			toggleDevTools: "Ferramentas do Desenvolvedor",
-			selectAllMedias: "Selecionar todas as medias",
+			selectAllMedias: "Selecionar tudo",
 			searchForLyrics: "Buscar letras",
-			shareMedia: "Compartilhar media",
-			deleteMedia: "Deletar media",
+			shareMedia: "Compartilhar",
+			deleteMedia: "Deletar",
 		},
 
 		infos: {

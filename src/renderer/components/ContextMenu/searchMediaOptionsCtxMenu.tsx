@@ -3,9 +3,11 @@ import { FiTrash as Trash } from "react-icons/fi";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
-import { searchAndOpenLyrics } from "@components/MediaPlayer/helpers";
+import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
 import { deleteMedia } from "@utils/media";
 import { setSettings } from "@contexts/settings";
+import { getSearcher } from "@components/SearchMedia/helper";
+import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
 import { mainList } from "@contexts/usePlaylists";
 import {
@@ -14,7 +16,11 @@ import {
 } from "@contexts/useAllSelectedMedias";
 
 import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
-import { getSearcher } from "@components/SearchMedia/helper";
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Main function:
 
 export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 	const plural = allSelectedMedias().size > 1 ? "s" : "";
@@ -92,7 +98,7 @@ function searchForLyrics(): void {
 	allSelectedMedias().forEach(async path => {
 		const media = allMedias.get(path);
 
-		await searchAndOpenLyrics(media, path, false);
+		await searchAndOpenLyrics(media, path, !openLyrics);
 	});
 }
 

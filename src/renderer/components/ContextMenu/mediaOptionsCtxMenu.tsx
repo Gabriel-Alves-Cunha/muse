@@ -3,9 +3,10 @@ import { FiTrash as Trash } from "react-icons/fi";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
-import { searchAndOpenLyrics } from "@components/MediaPlayer/helpers";
+import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
 import { deleteMedia } from "@utils/media";
 import { setSettings } from "@contexts/settings";
+import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
 import { mainList } from "@contexts/usePlaylists";
 import {
@@ -86,6 +87,6 @@ function searchForLyrics(): void {
 	allSelectedMedias().forEach(async path => {
 		const media = allMedias.get(path);
 
-		await searchAndOpenLyrics(media, path, false);
+		await searchAndOpenLyrics(media, path, !openLyrics);
 	});
 }

@@ -14,7 +14,7 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 	handler: Handler,
 ) {
 	useEffect(() => {
-		function listener(event: MouseEvent) {
+		function listener(event: PointerEvent) {
 			if (event.button !== leftClick) return;
 
 			const el = ref.current;
@@ -25,12 +25,12 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 			handler(event);
 		}
 
-		document.addEventListener("mousedown", listener);
+		document.addEventListener("pointerup", listener);
 
 		return () => {
-			document.removeEventListener("mousedown", listener);
+			document.removeEventListener("pointerup", listener);
 		};
 	}, [ref, handler]);
 }
 
-type Handler = (event: MouseEvent | TouchEvent) => void;
+type Handler = (event: PointerEvent) => void;

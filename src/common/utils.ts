@@ -87,4 +87,14 @@ export const stringifyJson = (obj: unknown) => JSON.stringify(obj, null, 2);
 
 /////////////////////////////////////////
 
+/** Map a number from range X to range Y. */
+export const mapTo = (
+	val: Readonly<number>,
+	from: readonly [start: number, end: number],
+	to: readonly [start: number, end: number],
+): Readonly<number> =>
+	((val - from[0]) * (to[1] - to[0])) / (from[1] - from[0]) + to[0];
+
+/////////////////////////////////////////
+
 export const eraseImg = "erase img";

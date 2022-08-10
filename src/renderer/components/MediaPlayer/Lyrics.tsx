@@ -1,9 +1,15 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
+import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { mediaPlayerCard } from "@components/FlipCard";
-import { Header } from "./helpers";
+import { infoToast } from "@styles/global";
+import { Header } from "./Header";
+import { t } from "@components/I18n";
 
 import { LyricsCardWrapper, LyricsHolder } from "./styles";
+
+const { searchForLyricsAndImage } = electron.lyric;
 
 /////////////////////////////////////////
 
@@ -26,6 +32,51 @@ export function Lyrics({ media, path }: Props) {
 
 export function flipMediaPlayerCard(): void {
 	document.getElementById(mediaPlayerCard)?.classList.toggle("active");
+}
+
+/////////////////////////////////////////
+
+export async function searchAndOpenLyrics(
+	media: Media | undefined,
+	mediaPath: Path,
+	openLyrics: boolean,
+): Promise<void> {
+	if (media === undefined) return;
+
+	if (media.artist.length === 0) {
+		infoToast(t("toasts.assureMediaHasArtistMetadata"));
+		return;
+	}
+
+	// If there is no image already, go get one:
+	const getImage = media.image.length === 0;
+
+	try {
+		const { lyric, image, albumName } = await searchForLyricsAndImage(
+			media.title,
+			media.artist,
+			getImage,
+		);
+
+		sendMsgToBackend({
+			type: ReactToElectronMessageEnum.WRITE_TAG,
+			// dprint-ignore
+			thingsToChange: [
+				{ whatToChange: "album", newValue: albumName },
+				{ whatToChange: "imageURL",	newValue: image	},
+				{ whatToChange: "lyrics", newValue: lyric }
+			],
+			mediaPath,
+		});
+	} catch (error) {
+		if ((error as Error).message.includes("No lyrics found"))
+			infoToast(`${t("toasts.noLyricsFound")}"${media.title}"!`);
+
+		console.error(error);
+	}
+
+	if (media.lyrics.length > 0 && openLyrics === true)
+		return flipMediaPlayerCard();
 }
 
 /////////////////////////////////////////

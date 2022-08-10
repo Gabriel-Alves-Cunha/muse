@@ -39,6 +39,7 @@ export const Select = <Options extends string>(
 			data-tip={tooltip}
 		>
 			<Value>{triggerTitle}</Value>
+
 			{children}
 		</Trigger>
 
