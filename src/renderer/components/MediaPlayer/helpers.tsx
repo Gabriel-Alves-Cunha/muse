@@ -1,8 +1,9 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
-import { useCallback, useMemo, useRef } from "react";
+import { CSSProperties, useCallback, useMemo, useRef, useState } from "react";
 import { BsJournal as NoLyrics } from "react-icons/bs";
+import { RingLoader } from "react-spinners";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdRepeatOne as RepeatOne,
@@ -111,35 +112,53 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
-	<OptionsAndAlbum>
-		<CircledIconButton
-			onClick={async () => {
-				if (media?.lyrics)
-					return flipMediaPlayerCard();
+const putLoaderOnTopOfLyricsSvg: CSSProperties = { position: "absolute" };
 
-				await searchAndOpenLyrics(media, path, true);
-			}}
-			data-tip={t("tooltips.toggleOpenLyrics")}
-			disabled={media === undefined}
-			data-side="bottom"
-		>
-			{media?.lyrics ? <LyricsPresent size={16} /> : <NoLyrics size={16} />}
-		</CircledIconButton>
+export function Header({ media, path, displayTitle = false }: HeaderProps) {
+	const [isLoadingLyrics, setIsLoadingLyrics] = useState(true);
 
-		<Album>{displayTitle === true ? media?.title : media?.album}</Album>
+	return (
+		<OptionsAndAlbum>
+			<CircledIconButton
+				onClick={async () => {
+					if (media?.lyrics)
+						return flipMediaPlayerCard();
 
-		<CircledIconButton
-			data-tip={t("tooltips.toggleFavorite")}
-			onClick={() => toggleFavorite(path)}
-			disabled={media === undefined}
-		>
-			{favorites().has(path) === true ?
-				<Favorite size={17} /> :
-				<AddFavorite size={17} />}
-		</CircledIconButton>
-	</OptionsAndAlbum>
-);
+					setIsLoadingLyrics(true);
+					await searchAndOpenLyrics(media, path, true);
+					setIsLoadingLyrics(false);
+				}}
+				data-tip={t("tooltips.toggleOpenLyrics")}
+				disabled={media === undefined}
+				data-place="bottom"
+			>
+				{media?.lyrics ?
+					<LyricsPresent size={16} /> :
+					isLoadingLyrics === true ?
+					(
+						<RingLoader
+							cssOverride={putLoaderOnTopOfLyricsSvg}
+							color="white"
+							size={30}
+						/>
+					) :
+					<NoLyrics size={16} />}
+			</CircledIconButton>
+
+			<Album>{displayTitle === true ? media?.title : media?.album}</Album>
+
+			<CircledIconButton
+				data-tip={t("tooltips.toggleFavorite")}
+				onClick={() => toggleFavorite(path)}
+				disabled={media === undefined}
+			>
+				{favorites().has(path) === true ?
+					<Favorite size={17} /> :
+					<AddFavorite size={17} />}
+			</CircledIconButton>
+		</OptionsAndAlbum>
+	);
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
