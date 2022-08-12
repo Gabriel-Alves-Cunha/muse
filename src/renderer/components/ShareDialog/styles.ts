@@ -1,6 +1,5 @@
 import { Content, Close } from "@radix-ui/react-dialog";
 
-import { slideUpAndFade } from "@components/Popover/styles";
 import { styled } from "@styles/global";
 
 /////////////////////////////////////////
@@ -62,15 +61,6 @@ export const StyledDialogShareContent = styled(Content, {
 	bg: "$bg-popover",
 	zIndex: 250,
 	br: 13,
-
-	"@media (prefers-reduced-motion: no-preference)": {
-		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-		animationFillMode: "forwards",
-		animationDuration: "400ms",
-
-		"&[data-state='open']": { animationName: slideUpAndFade },
-		"&[data-state='close']": { animationName: slideUpAndFade },
-	},
 
 	"& div": {
 		pos: "relative",

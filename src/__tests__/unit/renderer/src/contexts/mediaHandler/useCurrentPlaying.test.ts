@@ -23,9 +23,9 @@ const {
 	PlaylistActions,
 	PlaylistList,
 	setPlaylists,
-	mainList,
+	getMainList,
 	WhatToDo,
-	history,
+	getHistory,
 } = await import("@contexts/usePlaylists");
 
 /////////////////////////////////////////////
@@ -43,13 +43,13 @@ describe("Testing useCurrentPlaying", () => {
 			list: testList as Map<Path, Media>,
 			type: WhatToDo.UPDATE_MAIN_LIST,
 		});
-		expect(mainList()).toEqual(testList);
+		expect(getMainList()).toEqual(testList);
 
 		setPlaylists({
 			whatToDo: PlaylistActions.CLEAN,
 			type: WhatToDo.UPDATE_HISTORY,
 		});
-		expect(history().size).toBe(0);
+		expect(getHistory().size).toBe(0);
 	});
 
 	/////////////////////////////////////////////
@@ -84,7 +84,7 @@ describe("Testing useCurrentPlaying", () => {
 			.toBe(testArray[initialIndex]![0]);
 
 		testArray.forEach((_, index) => {
-			expect(history().size, "history.length is wrong!").toBe(index + 1);
+			expect(getHistory().size, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
 

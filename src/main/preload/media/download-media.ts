@@ -9,7 +9,7 @@ import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { type AllowedMedias, dbg, isDevelopment } from "@common/utils";
+import { type AllowedMedias, dbg, isDev } from "@common/utils";
 import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
 import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
@@ -140,7 +140,7 @@ export async function createDownload(
 			}
 
 			// Log progress to node console if in development:
-			if (isDevelopment) {
+			if (isDev) {
 				const secondsDownloading = (Date.now() - startTime) / 1_000;
 				const estimatedDownloadTime =
 					(secondsDownloading / (percentage / 100) - secondsDownloading)

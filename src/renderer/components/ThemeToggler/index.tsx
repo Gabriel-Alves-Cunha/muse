@@ -47,7 +47,7 @@ export function ThemeToggler() {
 	}, []);
 
 	return (
-		<ThemeButton data-tip={t("tooltips.toggleTheme")} onClick={toggleTheme}>
+		<ThemeButton data-tip={t("tooltips.toggleTheme")} onPointerUp={toggleTheme}>
 			{theme === light ? <Dark size="20px" /> : <Light size="20px" />}
 		</ThemeButton>
 	);

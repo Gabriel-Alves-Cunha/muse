@@ -121,7 +121,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 						/////////////////////////////////////////////
 						// Handle file input for image:
 						(<Button
-							onClick={openNativeUI_ChooseFiles}
+							onPointerUp={openNativeUI_ChooseFiles}
 							className="notransition"
 							ref={imageButtonRef}
 							variant="input"
@@ -168,7 +168,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				</Dialog>
 
 				<CloseDialog
-					onClick={() =>
+					onPointerUp={() =>
 						changeMediaMetadata(
 							contentWrapperRef,
 							closeButtonRef,

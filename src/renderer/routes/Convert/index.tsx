@@ -65,7 +65,7 @@ export function Convert() {
 		<MainArea>
 			<Box>
 				<Button
-					onClick={openNativeUI_ChooseFiles}
+					onPointerUp={openNativeUI_ChooseFiles}
 					className="notransition"
 					variant="large"
 				>

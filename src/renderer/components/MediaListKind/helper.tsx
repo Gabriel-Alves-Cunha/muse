@@ -2,7 +2,7 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { Dialog, Portal } from "@radix-ui/react-dialog";
+import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { memo } from "react";
 import create from "zustand";
 
@@ -122,11 +122,11 @@ const Row = memo(
 					<Dots size={17} />
 				</DialogTrigger>
 
-				<Portal>
+				<DialogPortal>
 					<StyledDialogBlurOverlay>
 						<MediaOptionsModal media={media} path={path} />
 					</StyledDialogBlurOverlay>
-				</Portal>
+				</DialogPortal>
 			</Dialog>
 		</RowWrapper>
 	),

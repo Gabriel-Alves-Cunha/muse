@@ -65,7 +65,7 @@ function ButtonsForPages() {
 				<button
 					className={page === currPage ? "active" : ""}
 					data-tip={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
-					onClick={() => setPage({ page })}
+					onPointerUp={() => setPage({ page })}
 					key={page}
 				>
 					{icons[page]}

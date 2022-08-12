@@ -12,7 +12,6 @@ import { Progress } from "@components/Progress";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
-	type DownloadingList,
 	useDownloadingList,
 	setDownloadingList,
 	getDownloadingList,
@@ -35,11 +34,21 @@ export function Popup() {
 	return (downloadingList.size > 0 ?
 		(
 			<>
-				<Button variant="medium" onClick={cleanAllDoneDownloads}>
+				<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
 					<Translator path="buttons.cleanFinished" />
 				</Button>
 
-				{downloadingBoxes(downloadingList)}
+				{Array.from(
+					downloadingList,
+					([url, downloadingMedia], index) => (
+						<DownloadingBox
+							download={downloadingMedia}
+							downloadingIndex={index}
+							url={url}
+							key={url}
+						/>
+					),
+				)}
 			</>
 		) :
 		(
@@ -51,27 +60,6 @@ export function Popup() {
 
 /////////////////////////////////////////////
 // Helper functions for Popup:
-
-function downloadingBoxes(downloadingList: DownloadingList["downloadingList"]) {
-	const list: JSX.Element[] = [];
-
-	let index = 0;
-	downloadingList.forEach((download, url) => {
-		list.push(
-			<DownloadingBox
-				downloadingIndex={index}
-				download={download}
-				url={url}
-				key={url}
-			/>,
-		);
-		++index;
-	});
-
-	return list;
-}
-
-/////////////////////////////////////////////
 
 function cleanAllDoneDownloads(): void {
 	getDownloadingList().forEach((download, url) => {

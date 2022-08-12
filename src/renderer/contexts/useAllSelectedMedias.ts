@@ -3,7 +3,7 @@ import type { Path } from "@common/@types/generalTypes";
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { sortedByDate } from "./usePlaylists";
+import { getSortedByDate } from "./usePlaylists";
 import { emptySet } from "@utils/map-set";
 import { time } from "@utils/utils";
 
@@ -88,7 +88,7 @@ export function deselectAllMedias(): void {
 ///////////////////////////////////////////////////
 
 export function selectAllMedias(): void {
-	if (allSelectedMedias().size === sortedByDate().size) return;
+	if (allSelectedMedias().size === getSortedByDate().size) return;
 
-	setAllSelectedMedias(sortedByDate());
+	setAllSelectedMedias(getSortedByDate());
 }

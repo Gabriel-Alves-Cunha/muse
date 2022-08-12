@@ -4,8 +4,8 @@ import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
+import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { useEffect, useRef } from "react";
-import { Dialog, Portal } from "@radix-ui/react-dialog";
 import create from "zustand";
 
 import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
@@ -19,16 +19,10 @@ import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyArray } from "@utils/array";
 
+import { NothingFound, Highlight, Title, Info } from "./styles";
 import { Img, PlayButton, RowWrapper } from "../MediaListKind/styles";
 import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import { RightSlot } from "@components/ContextMenu/styles";
-import {
-	SearchMediaPopoverAnchor,
-	NothingFound,
-	Highlight,
-	Title,
-	Info,
-} from "./styles";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -41,8 +35,7 @@ export enum SearchStatus {
 	SEARCHING,
 }
 
-const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING, SEARCHING } =
-	SearchStatus;
+const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING } = SearchStatus;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -70,7 +63,7 @@ export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 useSearcher.subscribe(
 	state => state.highlight,
 	function searchForMedias(highlight): void {
-		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
+		// setSearcher({ results: emptyArray, searchStatus: SEARCHING });
 
 		if (highlight.length < 2) return;
 
@@ -100,6 +93,12 @@ const setSearchTerm = (e: InputChange) =>
 
 const setIsInputOnFocus = (bool: boolean) =>
 	setSearcher({ isInputOnFocus: bool });
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+const setDefaultSearch = () => setSearcher(defaultSearcher);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -144,6 +143,7 @@ export function Input() {
 				onChange={setSearchTerm}
 				value={searchTerm}
 				spellCheck="false"
+				id="search-songs"
 				autoCorrect="off"
 				ref={inputRef}
 				accessKey="s"
@@ -160,61 +160,54 @@ export function Input() {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const searchStatusAndResultsSelector = (
-	state: ReturnType<typeof useSearcher.getState>,
-) => ({ searchStatus: state.searchStatus, results: state.results });
+const mantainFocusOnInput = (e: Event) => e.preventDefault();
 
 export function Results() {
-	const { results, searchStatus } = useSearcher(searchStatusAndResultsSelector);
+	const { searchStatus, results, searchTerm, highlight } = useSearcher();
 
 	/////////////////////////////////////////
 
 	const foundSomething = searchStatus === FOUND_SOMETHING;
 	const nothingFound = searchStatus === NOTHING_FOUND;
-	const shouldPopoverOpen = foundSomething === true || nothingFound === true;
+	const shouldPopoverOpen = foundSomething || nothingFound;
 
 	/////////////////////////////////////////
 
-	return shouldPopoverOpen ?
-		(
-			<ContextMenu
-				content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
-				onContextMenu={selectMediaByEvent}
-				isAllDisabled={nothingFound}
-			>
-				<PopoverRoot open={shouldPopoverOpen}>
-					<SearchMediaPopoverAnchor />
-
-					<PopoverContent
-						size={nothingFound === true ?
-							"nothing-found-for-search-media" :
-							"search-media-results"}
-						onPointerDownOutside={() => setSearcher(defaultSearcher)}
-						// This is to mantain focus on the input:
-						onOpenAutoFocus={e => e.preventDefault()}
-						className="notransition"
-					>
-						{nothingFound === true ?
-							(
-								<NothingFound>
-									Nothing was found for &quot;{getSearcher().searchTerm}&quot;
-								</NothingFound>
-							) :
-							foundSomething === true ?
-							(results.map(([path, media]) => (
-								<MediaSearchRow
-									highlight={getSearcher().highlight}
-									media={media}
-									path={path}
-									key={path}
-								/>
-							))) :
-							undefined}
-					</PopoverContent>
-				</PopoverRoot>
-			</ContextMenu>
-		) :
-		null;
+	return (
+		<ContextMenu
+			content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
+			onContextMenu={selectMediaByEvent}
+			isAllDisabled={nothingFound}
+		>
+			<PopoverRoot open={shouldPopoverOpen}>
+				<PopoverContent
+					size={nothingFound ?
+						"nothing-found-for-search-media" :
+						"search-media-results"}
+					onPointerDownOutside={setDefaultSearch}
+					onOpenAutoFocus={mantainFocusOnInput}
+					className="notransition"
+				>
+					{nothingFound ?
+						(
+							<NothingFound>
+								Nothing was found for &quot;{searchTerm}&quot;
+							</NothingFound>
+						) :
+						foundSomething ?
+						(results.map(([path, media]) => (
+							<MediaSearchRow
+								highlight={highlight}
+								media={media}
+								path={path}
+								key={path}
+							/>
+						))) :
+						undefined}
+				</PopoverContent>
+			</PopoverRoot>
+		</ContextMenu>
+	);
 }
 
 /////////////////////////////////////////
@@ -239,8 +232,8 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 	return (
 		<RowWrapper data-path={path}>
 			<PlayButton
+				onPointerUp={() => playThisMedia(path)}
 				data-tip={t("tooltips.playThisMedia")}
-				onClick={() => playThisMedia(path)}
 				data-place="right"
 			>
 				<Img>
@@ -267,11 +260,11 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 					<Dots size={17} />
 				</DialogTrigger>
 
-				<Portal>
+				<DialogPortal>
 					<StyledDialogBlurOverlay>
 						<MediaOptionsModal media={media} path={path} />
 					</StyledDialogBlurOverlay>
-				</Portal>
+				</DialogPortal>
 			</Dialog>
 		</RowWrapper>
 	);

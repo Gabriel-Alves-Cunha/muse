@@ -109,7 +109,7 @@ function Result() {
 
 				<p>{title}</p>
 
-				<Button variant="large" onClick={downloadMedia}>
+				<Button variant="large" onPointerUp={downloadMedia}>
 					<Translator path="buttons.download" />
 				</Button>
 			</ResultContainer>

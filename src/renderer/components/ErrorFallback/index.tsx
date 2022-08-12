@@ -31,7 +31,7 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 					<SubTitle>{description}</SubTitle>
 
 					<CloseDialog
-						onClick={() => {
+						onPointerUp={() => {
 							resetAllAppData();
 							reloadWindow();
 						}}
@@ -40,7 +40,7 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 						<Translator path="buttons.resetAllAppData" />
 					</CloseDialog>
 
-					<CloseDialog id="reload-window" onClick={reloadWindow}>
+					<CloseDialog id="reload-window" onPointerUp={reloadWindow}>
 						<Translator path="buttons.reloadWindow" />
 					</CloseDialog>
 				</Center>

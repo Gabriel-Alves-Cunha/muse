@@ -1,36 +1,6 @@
 import { Content } from "@radix-ui/react-popover";
 
-import { styled, keyframes } from "@styles/global";
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export const slideUpAndFade = keyframes({
-	"0%": { opacity: 0, transform: "translateY(2px)" },
-	"100%": { opacity: 1, transform: "translateY(0)" },
-});
-
-/////////////////////////////////////////
-
-export const slideRightAndFade = keyframes({
-	"0%": { opacity: 0, transform: "translateX(-2px)" },
-	"100%": { opacity: 1, transform: "translateX(0)" },
-});
-
-/////////////////////////////////////////
-
-export const slideDownAndFade = keyframes({
-	"0%": { opacity: 0, transform: "translateY(-2px)" },
-	"100%": { opacity: 1, transform: "translateY(0)" },
-});
-
-/////////////////////////////////////////
-
-export const slideLeftAndFade = keyframes({
-	"0%": { opacity: 0, transform: "translateX(2px)" },
-	"100%": { opacity: 1, transform: "translateX(0)" },
-});
+import { styled } from "@styles/global";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -53,28 +23,13 @@ export const StyledContent = styled(Content, {
 
 	/////////////////////////////////////////
 
-	"@media (prefers-reduced-motion: no-preference)": {
-		animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-		animationFillMode: "forwards",
-		animationDuration: "150ms",
-
-		"&[data-state='open']": {
-			"&[data-side='right']": { animationName: slideLeftAndFade },
-			"&[data-side='left']": { animationName: slideRightAndFade },
-			"&[data-side='bottom']": { animationName: slideUpAndFade },
-			"&[data-side='top']": { animationName: slideDownAndFade },
-		},
-	},
-
-	/////////////////////////////////////////
-
 	"& > p": {
 		pos: "relative",
 
-		// Center:
-		t: "50%", // position the top  edge of the element at the middle of the parent
-		l: "50%", // position the left edge of the element at the middle of the parent
-		transform: "translate(-50%, -50%)",
+		// // Center:
+		// t: "50%", // position the top  edge of the element at the middle of the parent
+		// l: "50%", // position the left edge of the element at the middle of the parent
+		// transform: "translate(-50%, -50%)",
 
 		c: "$deactivated-icon",
 		ff: "$secondary",
@@ -101,10 +56,16 @@ export const StyledContent = styled(Content, {
 			"nothing-found-for-search-media": {
 				maxHeight: 100,
 				minHeight: 50,
-				w: 350,
+				w: 300,
 			},
 			"convertions-or-downloads": { h: 300, w: 260 },
-			"search-media-results": { h: 250, w: 350 },
+			"search-media-results": {
+				pos: "absolute",
+				l: "calc(64px + 3.5vw)",
+				h: 250,
+				w: 300,
+				t: 90,
+			},
 		},
 	},
 });

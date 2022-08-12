@@ -72,7 +72,7 @@ const Buttons = () => (
 	<WindowButtonsWrapper className="notransition">
 		<WindowButton
 			data-tip={t("tooltips.closeWindow")}
-			onClick={closeWindow}
+			onPointerUp={closeWindow}
 			data-place="left"
 			id="close"
 		>
@@ -81,7 +81,7 @@ const Buttons = () => (
 
 		<WindowButton
 			data-tip={t("tooltips.toggleMaximizeWindow")}
-			onClick={toggleMaximize}
+			onPointerUp={toggleMaximize}
 			data-place="left"
 		>
 			<Maximize size={16} />
@@ -89,7 +89,7 @@ const Buttons = () => (
 
 		<WindowButton
 			data-tip={t("tooltips.toggleMinimizeWindow")}
-			onClick={minimizeWindow}
+			onPointerUp={minimizeWindow}
 		>
 			<Minimize size={16} />
 		</WindowButton>

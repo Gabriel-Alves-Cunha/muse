@@ -1,5 +1,5 @@
-import type { ClientServerAPI } from "@main/preload/share";
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
+import type { ClientServerAPI } from "@main/preload/share";
 
 import { useCallback, useEffect, useState } from "react";
 import { MdClose as Close } from "react-icons/md";
@@ -39,15 +39,13 @@ export function ShareDialog() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const filesToShare = useSettings(filesToShareSelector);
 
-	/////////////////////////////////////////
-
-	const isPlural = filesToShare.size > 1;
+	const plural = filesToShare.size > 1 ? "s" : "";
 
 	/////////////////////////////////////////
 
 	const onCanvasElementMakeQRCode = useCallback(
 		async (canvas: HTMLCanvasElement | null) => {
-			if (!canvas || !isDialogOpen || !server) return;
+			if (canvas === null || isDialogOpen === false || server === null) return;
 
 			await makeQrcode(server.url).catch(err => {
 				console.error("Error making QR Code.", err);
@@ -60,7 +58,7 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	function handleDialogOpenStates(newValue: boolean): void {
-		if (!newValue) server?.close();
+		if (newValue === false) server?.close();
 
 		setIsDialogOpen(newValue);
 	}
@@ -93,23 +91,21 @@ export function ShareDialog() {
 
 	/////////////////////////////////////////
 
-	useEffect(() => {
-		(async function createNewServer() {
-			const shouldDialogOpen = filesToShare.size > 0;
+	useEffect(function createNewServer() {
+		const shouldDialogOpen = filesToShare.size > 0;
 
-			setIsDialogOpen(shouldDialogOpen);
+		setIsDialogOpen(shouldDialogOpen);
 
-			if (!shouldDialogOpen) return;
+		if (shouldDialogOpen === false) return;
 
-			try {
-				const clientServerApi = createServer([...filesToShare]);
+		try {
+			const clientServerApi = createServer([...filesToShare]);
 
-				setServer(clientServerApi);
-			} catch (error) {
-				console.error(error);
-				closePopover();
-			}
-		})();
+			setServer(clientServerApi);
+		} catch (error) {
+			console.error(error);
+			closePopover();
+		}
 	}, [filesToShare]);
 
 	/////////////////////////////////////////
@@ -121,23 +117,21 @@ export function ShareDialog() {
 			<StyledDialogShareContent className="notransition">
 				<CloseDialogTrigger
 					data-tip={t("tooltips.closeShareScreen")}
-					onClick={() =>
+					onPointerUp={() =>
 						closePopover(server?.close)}
 				>
 					<Close />
 				</CloseDialogTrigger>
 
-				<>
-					<div>
-						<p>{t("dialogs.sharingMedia")}{isPlural && "s"}:</p>
+				<div>
+					<p>{t("dialogs.sharingMedia")}{plural}:</p>
 
-						<ol>{namesOfFilesToShare(filesToShare)}</ol>
-					</div>
+					<ol>{namesOfFilesToShare(filesToShare)}</ol>
+				</div>
 
-					<Canvas ref={onCanvasElementMakeQRCode} id={qrID}>
-						<Loading />
-					</Canvas>
-				</>
+				<Canvas ref={onCanvasElementMakeQRCode} id={qrID}>
+					<Loading />
+				</Canvas>
 			</StyledDialogShareContent>
 		</Dialog>
 	);
@@ -156,15 +150,8 @@ function closePopover(closeServerFunction?: () => void): void {
 
 /////////////////////////////////////////
 
-function namesOfFilesToShare(filesToShare: ReadonlySet<Path>): JSX.Element[] {
-	const list: JSX.Element[] = [];
-
-	filesToShare.forEach(path =>
-		list.push(<li key={path}>{getBasename(path)}</li>)
-	);
-
-	return list;
-}
+const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
+	Array.from(filesToShare, path => <li key={path}>{getBasename(path)}</li>);
 
 /////////////////////////////////////////
 

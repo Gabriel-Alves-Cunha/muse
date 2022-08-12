@@ -3,7 +3,7 @@ import type { Media, Page } from "@common/@types/generalTypes";
 import { pt_BR_Translations } from "./pt-BR";
 import { en_US_Translations } from "./en-US";
 import { getObjectDeepKeys } from "@utils/object";
-import { isDevelopment } from "@common/utils";
+import { isDev } from "@common/utils";
 import { areArraysEqualByValue } from "@utils/array";
 
 /////////////////////////////////////////////
@@ -21,7 +21,7 @@ export const translations = Object.freeze({
 /////////////////////////////////////////////
 
 // Assure all translations are complete:
-if (isDevelopment) {
+if (isDev) {
 	const pt_BR_TranslationsKeys = getObjectDeepKeys(pt_BR_Translations);
 	const en_US_TranslationsKeys = getObjectDeepKeys(en_US_Translations);
 	const areEqual = areArraysEqualByValue(

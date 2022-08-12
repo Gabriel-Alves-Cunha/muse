@@ -48,7 +48,7 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 			<ControlsButtonsWrapper>
 				<CircledIconButton
 					data-tip={t("tooltips.toggleLoopThisMedia")}
-					onClick={toggleLoopMedia}
+					onPointerUp={toggleLoopMedia}
 					disabled={isThereAMedia}
 				>
 					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
@@ -59,7 +59,7 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 				<CircledIconButton
 					data-tip={t("tooltips.toggleRandom")}
 					disabled={isThereAMedia}
-					onClick={toggleRandom}
+					onPointerUp={toggleRandom}
 				>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 				</CircledIconButton>
@@ -93,7 +93,7 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	return (
 		<CircledIconButton
 			data-tip={t("tooltips.playPause")}
-			onClick={togglePlayPause}
+			onPointerUp={togglePlayPause}
 			disabled={isDisabled}
 			size="large"
 		>
@@ -110,7 +110,7 @@ export const Controls = ({ isDisabled, audio }: ControlsProps) => (
 	<ControlsWrapper>
 		<CircledIconButton
 			data-tip={t("tooltips.playPreviousTrack")}
-			onClick={playPreviousMedia}
+			onPointerUp={playPreviousMedia}
 			disabled={isDisabled}
 		>
 			<Previous />
@@ -120,7 +120,7 @@ export const Controls = ({ isDisabled, audio }: ControlsProps) => (
 
 		<CircledIconButton
 			data-tip={t("tooltips.playNextTrack")}
-			onClick={playNextMedia}
+			onPointerUp={playNextMedia}
 			disabled={isDisabled}
 		>
 			<Next />

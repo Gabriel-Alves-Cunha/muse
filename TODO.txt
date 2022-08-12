@@ -1,5 +1,5 @@
 * FIX: font with I and L different!!
-* FIX: when ctrl+a with options open, everything is selected!!!!
+* ADD: select with mouse moving!!
 
 ### NOTES:
 

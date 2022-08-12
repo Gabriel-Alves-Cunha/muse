@@ -20,7 +20,7 @@ import {
 	type History,
 	usePlaylists,
 	PlaylistList,
-	mainList,
+	getMainList,
 } from "@contexts/usePlaylists";
 import {
 	computeHistoryItemKey,
@@ -31,7 +31,7 @@ import {
 	useFromList,
 } from "./helper";
 
-import { ListWrapper, EmptyList, Footer } from "./styles";
+import { ListWrapper, EmptyList, Footer as StyledFooter } from "./styles";
 import { ErrorFallback } from "../ErrorFallback";
 
 /////////////////////////////////////////
@@ -88,15 +88,21 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 					case PlaylistList.SORTED_BY_DATE:
 					case PlaylistList.FAVORITES: {
-						const mainList_ = mainList();
+						const mainList = getMainList();
 
-						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = [];
+						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
+							list as ReadonlySet<Path>,
+							path => {
+								const media = mainList.get(path);
 
-						(list as Set<Path>).forEach(path => {
-							const media = mainList_.get(path);
+								if (media === undefined)
+									throw new Error(
+										`Tried to access inexistent media with path = "${path}"`,
+									);
 
-							media && listAsArrayOfAMap.push([path, media, 0]);
-						});
+								return [path, media, 0];
+							},
+						);
 
 						return listAsArrayOfAMap;
 					}
@@ -108,11 +114,11 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 							dates.forEach(date => unsortedList.push([path, date]))
 						);
 
-						const mainList_ = mainList();
+						const mainList = getMainList();
 
 						const listAsArrayOfMap = unsortedList
 							.sort((a, b) => a[1] - b[1]) // sorted by date
-							.map(([path, date]) => [path, mainList_.get(path), date]) as [
+							.map(([path, date]) => [path, mainList.get(path), date]) as [
 								Path,
 								Media,
 								DateAsNumber,
@@ -138,15 +144,6 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	}, [isHome]);
 
 	useEffect(() => {
-		function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
-			if (
-				e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])
-			) {
-				e.preventDefault();
-				selectAllMedias();
-			}
-		}
-
 		document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
 
 		return () =>
@@ -161,23 +158,13 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 				setIsOpen={setIsCtxMenuOpen}
 			>
 				<Virtuoso
-					components={{
-						EmptyPlaceholder: () => (
-							<EmptyList>
-								<img src={noMediaFoundPng.href} alt={t("alts.noMediasFound")} />
-
-								<Translator path="alts.noMediasFound" />
-							</EmptyList>
-						),
-						Header: () => <Footer />,
-						Footer: () => <Footer />,
-					}}
 					computeItemKey={listName === PlaylistList.HISTORY ?
 						computeHistoryItemKey :
 						computeItemKey}
 					totalCount={listAsArrayOfAMap.length}
 					itemContent={itemContent}
 					data={listAsArrayOfAMap}
+					components={components}
 					fixedItemHeight={65}
 					className="list"
 					overscan={10}
@@ -191,7 +178,33 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-// Helper function:
+// Helper functions:
+
+const Footer = () => <StyledFooter />;
+
+const EmptyPlaceholder = () => (
+	<EmptyList>
+		<img src={noMediaFoundPng.href} alt={t("alts.noMediasFound")} />
+
+		<Translator path="alts.noMediasFound" />
+	</EmptyList>
+);
+
+const components = { EmptyPlaceholder, Header: Footer, Footer };
+
+/////////////////////////////////////////
+
+function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
+	if (
+		e.ctrlKey === true && e.key === "a" &&
+		isAModifierKeyPressed(e, ["Control"]) === false
+	) {
+		e.preventDefault();
+		selectAllMedias();
+	}
+}
+
+/////////////////////////////////////////
 
 function handleDeselectAllMedias(
 	listRef: Readonly<React.RefObject<HTMLDivElement>>,

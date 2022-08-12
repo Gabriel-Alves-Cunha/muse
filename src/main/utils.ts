@@ -1,7 +1,7 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { isDevelopment } from "@common/utils";
+import { isDev } from "@common/utils";
 import { Base64 } from "@common/@types/generalTypes";
 
 /////////////////////////////////////////
@@ -12,7 +12,7 @@ const rootDirectory = join(__dirname, "..", "..", "..");
 // This path has to be like this cause of the transpiling of
 // Typescript -> Javascript output dir is different for 'main'
 // compared to 'electron' (confirm with the log):
-export const logoPath = isDevelopment ?
+export const logoPath = isDev ?
 	join(rootDirectory, "src", "renderer", "assets", "icons", "logo.png") :
 	join(rootDirectory, "muse.png");
 

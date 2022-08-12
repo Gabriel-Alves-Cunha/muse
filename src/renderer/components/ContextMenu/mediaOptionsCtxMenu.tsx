@@ -4,11 +4,11 @@ import { Dialog } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
+import { shareMedias } from "./searchMediaOptionsCtxMenu";
 import { deleteMedia } from "@utils/media";
-import { setSettings } from "@contexts/settings";
 import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
-import { mainList } from "@contexts/usePlaylists";
+import { getMainList } from "@contexts/usePlaylists";
 import {
 	allSelectedMedias,
 	selectAllMedias,
@@ -17,7 +17,6 @@ import {
 import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 
 export function MediaOptionsCtxMenu() {
-	const plural = allSelectedMedias().size > 1 ? "s" : "";
 	// If there is none selected, disable:
 	const isDisabled = allSelectedMedias().size === 0;
 
@@ -27,7 +26,6 @@ export function MediaOptionsCtxMenu() {
 				<TriggerToDeleteMedia disabled={isDisabled}>
 					<>
 						<Translator path="ctxMenus.deleteMedia" />
-						{plural}
 
 						<RightSlot>
 							<Trash />
@@ -40,7 +38,6 @@ export function MediaOptionsCtxMenu() {
 
 			<Item onSelect={shareMedias} disabled={isDisabled}>
 				<Translator path="ctxMenus.shareMedia" />
-				{plural}
 
 				<RightSlot>
 					<Share />
@@ -65,16 +62,8 @@ export function MediaOptionsCtxMenu() {
 /////////////////////////////////////////////
 // Helper functions:
 
-export function shareMedias() {
-	setSettings({ filesToShare: allSelectedMedias() });
-}
-
-/////////////////////////////////////////////
-
-async function deleteMedias(): Promise<void> {
-	const promises: Promise<void>[] = [];
-
-	allSelectedMedias().forEach(path => promises.push(deleteMedia(path)));
+export async function deleteMedias(): Promise<void> {
+	const promises = Array.from(allSelectedMedias(), path => deleteMedia(path));
 
 	await Promise.all(promises);
 }
@@ -82,7 +71,7 @@ async function deleteMedias(): Promise<void> {
 /////////////////////////////////////////////
 
 function searchForLyrics(): void {
-	const allMedias = mainList();
+	const allMedias = getMainList();
 
 	allSelectedMedias().forEach(async path => {
 		const media = allMedias.get(path);

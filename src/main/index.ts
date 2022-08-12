@@ -16,7 +16,7 @@ import {
 	app,
 } from "electron";
 
-import { capitalizedAppName, dbg, isDevelopment } from "@common/utils";
+import { capitalizedAppName, dbg, isDev } from "@common/utils";
 import { assertUnreachable, time } from "@utils/utils";
 import { logoPath } from "./utils";
 import {
@@ -121,7 +121,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		const url = isDevelopment ?
+		const url = isDev ?
 			"http://localhost:3000" :
 			pathToFileURL(join(__dirname, "vite-renderer-build", "index.html"))
 				.toString();
@@ -160,7 +160,7 @@ app
 			// initialization and is ready to create browser windows.
 			// Some APIs can only be used after this event occurs:
 			// TODO: there is something wrong with this lib:
-			if (isDevelopment) {
+			if (isDev) {
 				const devtoolsInstaller = await import("electron-devtools-installer");
 				const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
 				// @ts-ignore => this is a workaround for a bug in the lib:

@@ -4,12 +4,12 @@ import { Dialog } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
-import { deleteMedia } from "@utils/media";
+import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { setSettings } from "@contexts/settings";
 import { getSearcher } from "@components/SearchMedia/helper";
 import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
-import { mainList } from "@contexts/usePlaylists";
+import { getMainList } from "@contexts/usePlaylists";
 import {
 	setAllSelectedMedias,
 	allSelectedMedias,
@@ -22,78 +22,61 @@ import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 /////////////////////////////////////////////
 // Main function:
 
-export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
-	const plural = allSelectedMedias().size > 1 ? "s" : "";
+export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => (
+	<>
+		<Dialog modal>
+			<TriggerToDeleteMedia disabled={isAllDisabled}>
+				<>
+					<Translator path="ctxMenus.deleteMedia" />
 
-	return (
-		<>
-			<Dialog modal>
-				<TriggerToDeleteMedia disabled={isAllDisabled}>
-					<>
-						<Translator path="ctxMenus.deleteMedia" />
-						{plural}
+					<RightSlot>
+						<Trash />
+					</RightSlot>
+				</>
+			</TriggerToDeleteMedia>
 
-						<RightSlot>
-							<Trash />
-						</RightSlot>
-					</>
-				</TriggerToDeleteMedia>
+			<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+		</Dialog>
 
-				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
-			</Dialog>
+		<Item onSelect={shareMedias} disabled={isAllDisabled}>
+			<Translator path="ctxMenus.shareMedia" />
 
-			<Item onSelect={shareMedias} disabled={isAllDisabled}>
-				<Translator path="ctxMenus.shareMedia" />
-				{plural}
+			<RightSlot>
+				<Share />
+			</RightSlot>
+		</Item>
 
-				<RightSlot>
-					<Share />
-				</RightSlot>
-			</Item>
+		<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
+			<Translator path="ctxMenus.selectAllMedias" />
 
-			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
-				<Translator path="ctxMenus.selectAllMedias" />
+			<RightSlot>Ctrl+A</RightSlot>
+		</Item>
 
-				<RightSlot>Ctrl+A</RightSlot>
-			</Item>
-
-			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
-				<Translator path="ctxMenus.searchForLyrics" />
-			</Item>
-		</>
-	);
-}
+		<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
+			<Translator path="ctxMenus.searchForLyrics" />
+		</Item>
+	</>
+);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions:
 
-export function shareMedias() {
+export const shareMedias = () =>
 	setSettings({ filesToShare: allSelectedMedias() });
-}
-
-/////////////////////////////////////////////
-
-async function deleteMedias(): Promise<void> {
-	const promises: Promise<void>[] = [];
-
-	allSelectedMedias().forEach(path => promises.push(deleteMedia(path)));
-
-	await Promise.all(promises);
-}
 
 /////////////////////////////////////////////
 
 function selectAllMediasOnSearchResult(): void {
-	const arr = getSearcher().results.map(([path]) => path);
-	setAllSelectedMedias(new Set(arr));
+	const paths = getSearcher().results.map(([path]) => path);
+	setAllSelectedMedias(new Set(paths));
 }
 
 /////////////////////////////////////////////
 
 function searchForLyrics(): void {
-	const allMedias = mainList();
+	const allMedias = getMainList();
 
 	allSelectedMedias().forEach(async path => {
 		const media = allMedias.get(path);

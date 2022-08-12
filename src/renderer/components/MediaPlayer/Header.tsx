@@ -14,7 +14,7 @@ import { t } from "@components/I18n";
 import {
 	PlaylistActions,
 	setPlaylists,
-	favorites,
+	getFavorites,
 	WhatToDo,
 } from "@contexts/usePlaylists";
 
@@ -56,7 +56,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 	return (
 		<CircledIconButton
 			data-tip={t("tooltips.toggleOpenLyrics")}
-			onClick={loadAndOrToggleLyrics}
+			onPointerUp={loadAndOrToggleLyrics}
 			disabled={media === undefined}
 			data-place="bottom"
 		>
@@ -87,10 +87,10 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 
 		<CircledIconButton
 			data-tip={t("tooltips.toggleFavorite")}
-			onClick={() => toggleFavorite(path)}
+			onPointerUp={() => toggleFavorite(path)}
 			disabled={media === undefined}
 		>
-			{favorites().has(path) === true ?
+			{getFavorites().has(path) === true ?
 				<Favorite size={17} /> :
 				<AddFavorite size={17} />}
 		</CircledIconButton>

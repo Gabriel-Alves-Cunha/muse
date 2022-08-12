@@ -16,7 +16,6 @@ import { emptyMap } from "@utils/map-set";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
-	type ConvertingList,
 	getConvertingList,
 	setConvertingList,
 	useConvertingList,
@@ -48,11 +47,21 @@ export function Popup() {
 	return (convertingList.size > 0 ?
 		(
 			<>
-				<Button variant="medium" onClick={cleanAllDoneConvertions}>
+				<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
 					<Translator path="buttons.cleanFinished" />
 				</Button>
 
-				{convertBoxes(convertingList)}
+				{Array.from(
+					convertingList,
+					([path, convertingMedia], index) => (
+						<ConvertBox
+							mediaBeingConverted={convertingMedia}
+							convertionIndex={index}
+							path={path}
+							key={path}
+						/>
+					),
+				)}
 			</>
 		) :
 		(
@@ -64,29 +73,6 @@ export function Popup() {
 
 /////////////////////////////////////////////
 // Helper functions for Popup:
-
-function convertBoxes(
-	convertingList: ConvertingList["convertingList"],
-): JSX.Element[] {
-	const list: JSX.Element[] = [];
-
-	let index = 0;
-	convertingList.forEach((media, path) => {
-		list.push(
-			<ConvertBox
-				convertionIndex={index}
-				mediaBeingConverted={media}
-				path={path}
-				key={path}
-			/>,
-		);
-		++index;
-	});
-
-	return list;
-}
-
-/////////////////////////////////////////////
 
 function cleanAllDoneConvertions(): void {
 	getConvertingList().forEach((download, url) => {

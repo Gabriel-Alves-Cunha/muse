@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 import { areArraysEqualByValue } from "@utils/array";
 import { getObjectDeepKeys } from "@utils/object";
-import { isDevelopment } from "@common/utils";
+import { isDev } from "@common/utils";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -290,7 +290,7 @@ export const lightTheme = createTheme({
 // darkTheme and lightTheme must have the same keys
 // (colors, shadows, etc) so that the theme can be
 // switched between them without react rerenders!
-if (isDevelopment) {
+if (isDev) {
 	// @ts-ignore It will work:
 	const lightThemeKeys = getObjectDeepKeys(lightTheme);
 	// @ts-ignore It will work:
@@ -335,7 +335,7 @@ export const GlobalCSS = globalCss({
 			// This shit is the hacky way I found to get the fonts to load
 			// both on development and production with Vite!
 			src: `url('./assets/${
-				isDevelopment ? "fonts/" : ""
+				isDev ? "fonts/" : ""
 			}assistant-v16-latin-300.woff2') format('woff2')`,
 		},
 		/* assistant-regular-400 - latin */
@@ -344,7 +344,7 @@ export const GlobalCSS = globalCss({
 			fontStyle: "normal",
 			fontWeight: 400,
 			src: `url('./assets/${
-				isDevelopment ? "fonts/" : ""
+				isDev ? "fonts/" : ""
 			}assistant-v16-latin-regular.woff2') format('woff2')`,
 		},
 		/* assistant-500 - latin */
@@ -353,7 +353,7 @@ export const GlobalCSS = globalCss({
 			fontStyle: "normal",
 			fontWeight: 500,
 			src: `url('./assets/${
-				isDevelopment ? "fonts/" : ""
+				isDev ? "fonts/" : ""
 			}assistant-v16-latin-500.woff2') format('woff2')`,
 		},
 
@@ -363,7 +363,7 @@ export const GlobalCSS = globalCss({
 			fontStyle: "normal",
 			fontWeight: 400,
 			src: `url('./assets/${
-				isDevelopment ? "fonts/" : ""
+				isDev ? "fonts/" : ""
 			}source-sans-pro-v21-latin-regular.woff2') format('woff2')`,
 		},
 	],

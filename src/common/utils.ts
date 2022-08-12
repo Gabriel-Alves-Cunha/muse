@@ -8,7 +8,7 @@ const { isNaN } = Number;
 /////////////////////////////////////////
 
 // @ts-ignore => `NODE_ENV` has to be accessed by dot notation:
-export const isDevelopment = process.env.NODE_ENV === "development";
+export const isDev = process.env.NODE_ENV === "development";
 
 export const capitalizedAppName = "Muse";
 export const lowercaseAppName = "muse";
@@ -47,7 +47,7 @@ export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
 /////////////////////////////////////////
 
 export function formatDuration(time: number | undefined): Readonly<string> {
-	if (!time || isNaN(time)) return "00:00";
+	if (time === undefined || isNaN(time) || !isFinite(time)) return "00:00";
 	time = trunc(time);
 
 	const hour = ("0" + (floor(time / 3_600) % 24)).slice(-2),
@@ -62,15 +62,15 @@ export function formatDuration(time: number | undefined): Readonly<string> {
 
 /////////////////////////////////////////
 
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 export function makeRandomString(length = 15): Readonly<string> {
-	const chars =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	const randomString = Array
+		.from({ length }, () =>
+			chars.charAt(floor(random() * chars.length)))
+		.join("");
 
-	const result = [];
-	for (let i = 0; i < length; ++i)
-		result.push(chars.charAt(floor(random() * chars.length)));
-
-	return result.join("");
+	return randomString;
 }
 
 /////////////////////////////////////////

@@ -14,7 +14,7 @@ import {
 	setPlaylists,
 	getPlaylist,
 	WhatToDo,
-	mainList,
+	getMainList,
 } from "./usePlaylists";
 
 ////////////////////////////////////////////////
@@ -282,7 +282,7 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 ////////////////////////////////////////////////
 
 function changeMediaSessionMetadata(path: Path): void {
-	const media = mainList().get(path);
+	const media = getMainList().get(path);
 
 	if (media === undefined) return;
 

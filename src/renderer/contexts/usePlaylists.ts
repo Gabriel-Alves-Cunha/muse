@@ -434,10 +434,10 @@ export enum WhatToDo {
 // Helper funtions:
 
 const { getState } = usePlaylists;
-export const sortedByDate = () => getState().sortedByDate;
-export const mainList = () => getState().sortedByName;
-export const favorites = () => getState().favorites;
-export const history = () => getState().history;
+export const getSortedByDate = () => getState().sortedByDate;
+export const getMainList = () => getState().sortedByName;
+export const getFavorites = () => getState().favorites;
+export const getHistory = () => getState().history;
 export const { setPlaylists } = getState();
 
 ///////////////////////////////////////////////////
@@ -447,16 +447,16 @@ export function getPlaylist(
 ): ReadonlySet<Path> | MainList | History {
 	switch (list) {
 		case PlaylistList.MAIN_LIST:
-			return mainList();
+			return getMainList();
 
 		case PlaylistList.HISTORY:
-			return history();
+			return getHistory();
 
 		case PlaylistList.FAVORITES:
-			return favorites();
+			return getFavorites();
 
 		case PlaylistList.SORTED_BY_DATE:
-			return sortedByDate();
+			return getSortedByDate();
 
 		default:
 			assertUnreachable(list);
@@ -482,43 +482,41 @@ export const cleanFavorites = () =>
 ///////////////////////////////////////////////////
 
 export async function searchLocalComputerForMedias(): Promise<void> {
-	time(async () => {
-		try {
-			usePlaylists.setState({ isLoadingMedias: true });
+	try {
+		usePlaylists.setState({ isLoadingMedias: true });
 
-			const paths = getAllowedMedias(await searchDirectoryResult());
+		const paths = getAllowedMedias(await searchDirectoryResult());
 
-			const {
+		const {
+			assureMediaSizeIsGreaterThan60KB,
+			ignoreMediaWithLessThan60Seconds,
+		} = getSettings();
+
+		const newMainList: MainList = new Map(
+			await transformPathsToMedias(
+				paths,
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			} = getSettings();
+			),
+		);
 
-			const newMainList: MainList = new Map(
-				await transformPathsToMedias(
-					paths,
-					assureMediaSizeIsGreaterThan60KB,
-					ignoreMediaWithLessThan60Seconds,
-				),
-			);
+		dbgPlaylists(
+			"Finished searching, paths =",
+			paths,
+			"Finished searching, newMainList =",
+			newMainList,
+		);
 
-			dbgPlaylists(
-				"Finished searching, paths =",
-				paths,
-				"Finished searching, newMainList =",
-				newMainList,
-			);
-
-			setPlaylists({
-				whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				list: newMainList,
-			});
-		} catch (error) {
-			console.error(error);
-		} finally {
-			usePlaylists.setState({ isLoadingMedias: false });
-		}
-	}, "searchLocalComputerForMedias");
+		setPlaylists({
+			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST,
+			type: WhatToDo.UPDATE_MAIN_LIST,
+			list: newMainList,
+		});
+	} catch (error) {
+		console.error(error);
+	} finally {
+		usePlaylists.setState({ isLoadingMedias: false });
+	}
 }
 
 ///////////////////////////////////////////////////
@@ -531,7 +529,7 @@ export function searchMedia(
 	return time(() => {
 		const medias: [Path, Media][] = [];
 
-		mainList().forEach((media, path) =>
+		getMainList().forEach((media, path) =>
 		{
 			if (
 				/** normalize()ing to NFD Unicode normal form decomposes

@@ -12,7 +12,7 @@ import {
 	PlaylistActions,
 	setPlaylists,
 	WhatToDo,
-	mainList,
+	getMainList,
 } from "@contexts/usePlaylists";
 import {
 	type MsgObjectElectronToReact,
@@ -130,7 +130,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
-			if (!mainList().has(mediaPath)) {
+			if (!getMainList().has(mediaPath)) {
 				console.error("Could not find media to delete.");
 				break;
 			}
@@ -154,7 +154,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
 
-			if (!mainList().has(mediaPath)) {
+			if (!getMainList().has(mediaPath)) {
 				console.warn(
 					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`,
 				);
@@ -201,7 +201,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
-			if (!mainList().has(mediaPath)) {
+			if (!getMainList().has(mediaPath)) {
 				console.error(
 					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
 				);

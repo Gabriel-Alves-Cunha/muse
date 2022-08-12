@@ -127,7 +127,7 @@ export const Info = styled("div", {
 /////////////////////////////////////////
 
 export const Title = styled("p", {
-	ml: 5,
+	pl: 5,
 
 	textOverflow: "ellipsis",
 	c: "$alternative-text",
@@ -144,7 +144,7 @@ export const Title = styled("p", {
 /////////////////////////////////////////
 
 export const SubTitle = styled("p", {
-	ml: 5,
+	pl: 5,
 
 	c: "$gray-text",
 	ff: "$primary",
@@ -175,7 +175,18 @@ export const SearchMediaPopoverAnchor = styled(Anchor, {
 /////////////////////////////////////////
 
 export const NothingFound = styled("div", {
+	pos: "absolute",
 	dflex: "center",
+	l: "calc(64px + 3.5vw)",
+	w: 300,
+	t: 190,
+
+	br: 10,
+	p: 10,
+
+	boxShadow: "$popover",
+	bg: "$bg-popover",
+	zIndex: 100,
 
 	c: "$deactivated-icon",
 	ff: "$secondary",

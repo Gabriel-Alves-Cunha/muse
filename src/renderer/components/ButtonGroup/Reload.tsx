@@ -19,7 +19,7 @@ export function Reload({ className }: Props) {
 		<ButtonFromGroup
 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
 			data-tip={t("tooltips.reloadAllMedias")}
-			onClick={searchLocalComputerForMedias}
+			onPointerUp={searchLocalComputerForMedias}
 			data-place="bottom"
 		>
 			<ReloadIcon size={17} />

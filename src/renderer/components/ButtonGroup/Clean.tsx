@@ -14,7 +14,7 @@ import { ButtonFromGroup } from "./styles";
 export const Clean = ({ className }: Props) => (
 	<ButtonFromGroup
 		data-tip={t("tooltips.cleanList")}
-		onClick={cleanProperList}
+		onPointerUp={cleanProperList}
 		className={className}
 		data-place="bottom"
 	>

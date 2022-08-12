@@ -33,7 +33,10 @@ export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 				<FlexRow>
 					<img src={warningSvg.href} alt="Warning sign." id="warning" />
 
-					<CloseDialog onClick={handleMediaDeletion} className="delete-media">
+					<CloseDialog
+						onPointerUp={handleMediaDeletion}
+						className="delete-media"
+					>
 						<Translator path="buttons.confirm" />
 					</CloseDialog>
 
