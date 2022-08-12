@@ -24,6 +24,10 @@
 </h1>
 
 <h1 align="center">
+  <img src="screenshots/lyrics.png" alt="Muse's download page." />
+</h1>
+
+<h1 align="center">
   <img src="screenshots/download.png" alt="Muse's download page." />
 </h1>
 
@@ -31,7 +35,9 @@
 
 The following tools were used on this project construction:
 
+- [Koa](https://koajs.com/)
 - [Vite](https://vitejs.dev/)
+- [Dprint](https://dprint.dev/)
 - [Vitest](https://vitest.dev/)
 - [Stitches](https://stitches.dev/)
 - [Radix UI](https://radix-ui.com/)
@@ -53,6 +59,8 @@ an 'mp3' version of the media.
 * Share medias with devices on the same WiFi network.
 
 * Get a media's lyrics.
+
+* App auto updates when new version is available.
 
 ## 🚀 Installing
 

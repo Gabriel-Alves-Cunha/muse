@@ -145,7 +145,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 						<TextAreaInput defaultValue={format(value)} id={option} /> :
 						(
 							<Input
-								readOnly={!isChangeable(option)}
+								readOnly={isChangeable(option) === false}
 								defaultValue={format(value)}
 								id={option}
 							/>
@@ -196,7 +196,7 @@ async function handleMediaDeletion(
 ): Promise<void> {
 	if (closeButtonRef.current === null) return;
 
-	closeEverything(closeButtonRef);
+	closeEverything(closeButtonRef.current);
 
 	await deleteMedia(mediaPath);
 }
@@ -215,12 +215,12 @@ function changeMediaMetadata(
 
 	try {
 		const hasAnythingChanged = changeMetadataIfAllowed(
-			contentWrapperRef,
+			contentWrapperRef.current,
 			imageFilePath,
 			mediaPath,
 			media,
 		);
-		closeEverything(closeButtonRef);
+		closeEverything(closeButtonRef.current);
 
 		if (hasAnythingChanged === true)
 			successToast(t("toasts.mediaMetadataSaved"));
@@ -234,26 +234,24 @@ function changeMediaMetadata(
 /////////////////////////////////////////////
 
 function changeMetadataIfAllowed(
-	contentWrapper: Readonly<RefObject<HTMLDivElement>>,
+	contentWrapper: Readonly<HTMLDivElement>,
 	imageFilePath: Readonly<Path>,
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
 ): Readonly<boolean> {
-	if (contentWrapper.current === null) return false;
-
 	const thingsToChange: MetadataToChange = [];
 
 	if (imageFilePath.length > 0)
 		thingsToChange.push({ whatToChange: "imageURL", newValue: imageFilePath });
 
 	// This shit is to get all the inputs:
-	for (const children of contentWrapper.current.children)
+	for (const children of contentWrapper.children)
 		for (const element of children.children)
 			if (
 				(element instanceof HTMLInputElement ||
-					element instanceof HTMLTextAreaElement) && !element.disabled
+					element instanceof HTMLTextAreaElement) && element.disabled === false
 			) {
-				if (!isChangeable(element.id)) continue;
+				if (isChangeable(element.id) === false) continue;
 
 				const id = element.id as ChangeOptions;
 				const newValue = element.value.trim();
@@ -352,9 +350,7 @@ const isChangeable = (option: string): option is ChangeOptions =>
 
 /////////////////////////////////////////////
 
-const closeEverything = (
-	element: Readonly<RefObject<HTMLButtonElement>>,
-): void => element.current?.click();
+const closeEverything = (element: HTMLButtonElement): void => element.click();
 
 /////////////////////////////////////////////
 

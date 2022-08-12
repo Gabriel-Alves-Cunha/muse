@@ -64,6 +64,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 								////////////////////////////////////////////////
 
 								case PlaylistActions.ADD_ONE_MEDIA: {
+									const { maxSizeOfHistory } = getSettings();
 									const { history } = get();
 									const { path } = action;
 
@@ -72,18 +73,23 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									// Add to history if there isn't one yet:
 									const historyOfDates = history.get(path);
 									historyOfDates === undefined ?
-										dates.push(Date.now()) :
-										dates.push(...historyOfDates, Date.now());
+										dates.unshift(Date.now()) :
+										dates.unshift(...historyOfDates, Date.now());
 
 									const newHistory = new Map(history).set(path, dates);
 
 									// history has a max size of `maxSizeOfHistory`:
-									if (newHistory.size > getSettings().maxSizeOfHistory) {
+									if (newHistory.size > maxSizeOfHistory) {
 										// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 										const firstPath = getFirstKey(newHistory)!;
 										// remove the first element:
 										newHistory.delete(firstPath);
 									}
+
+									newHistory.forEach(dates => {
+										if (dates.length > maxSizeOfHistory)
+											dates.length = maxSizeOfHistory;
+									});
 
 									set({ history: newHistory });
 
@@ -529,8 +535,7 @@ export function searchMedia(
 	return time(() => {
 		const medias: [Path, Media][] = [];
 
-		getMainList().forEach((media, path) =>
-		{
+		getMainList().forEach((media, path) => {
 			if (
 				/** normalize()ing to NFD Unicode normal form decomposes
 				 * combined graphemes into the combination of simple ones.

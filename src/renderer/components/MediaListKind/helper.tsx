@@ -7,7 +7,7 @@ import { memo } from "react";
 import create from "zustand";
 
 import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
-import { currentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
+import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { DialogTrigger } from "@components/DialogTrigger";
@@ -16,7 +16,7 @@ import { t } from "@components/I18n";
 import {
 	addToAllSelectedMedias,
 	toggleSelectedMedia,
-	allSelectedMedias,
+	getAllSelectedMedias,
 } from "@contexts/useAllSelectedMedias";
 
 import { StyledDialogBlurOverlay } from "./MediaOptions/styles";
@@ -46,6 +46,14 @@ export const useFromList = create<FromList>(() => ({
 export const { getState: getFromList, setState: setFromList } = useFromList;
 
 /////////////////////////////////////////
+
+const useIsCtxMenuOpen = create(() => ({ isCtxMenuOpen: false }));
+
+export const isCtxMenuOpen = () => useIsCtxMenuOpen.getState().isCtxMenuOpen;
+
+export const setIsCtxMenuOpen = (bool: boolean) =>
+	useIsCtxMenuOpen.setState({ isCtxMenuOpen: bool });
+
 /////////////////////////////////////////
 /////////////////////////////////////////
 
@@ -88,9 +96,9 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => (
 		<RowWrapper
-			className={(allSelectedMedias().has(path) === true ?
+			className={(getAllSelectedMedias().has(path) === true ?
 				"selected " :
-				"") + (currentPlaying().path === path ? "playing " : "")}
+				"") + (getCurrentPlaying().path === path ? "playing " : "")}
 			data-path={path}
 		>
 			<PlayButton
@@ -171,6 +179,8 @@ export const reloadWindow = (): void =>
 // Types:
 
 type RowProps = Readonly<{ media: Media; path: Path; }>;
+
+/////////////////////////////////////////////
 
 type FromList = Readonly<
 	{

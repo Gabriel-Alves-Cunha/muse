@@ -19,7 +19,7 @@ import {
 } from "@contexts/usePlaylists";
 import {
 	useCurrentPlaying,
-	currentPlaying,
+	getCurrentPlaying,
 	playNextMedia,
 } from "@contexts/useCurrentPlaying";
 
@@ -191,7 +191,7 @@ function handleLoadedData(
 		});
 
 	// Maybe set audio currentTime to last played time:
-	const lastTime = currentPlaying().currentTime;
+	const lastTime = getCurrentPlaying().currentTime;
 	if (lastTime > 30 /* seconds */) {
 		dbg(
 			`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`,

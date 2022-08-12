@@ -10,7 +10,7 @@ import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
 import { getMainList } from "@contexts/usePlaylists";
 import {
-	allSelectedMedias,
+	getAllSelectedMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 
@@ -18,7 +18,7 @@ import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 
 export function MediaOptionsCtxMenu() {
 	// If there is none selected, disable:
-	const isDisabled = allSelectedMedias().size === 0;
+	const isDisabled = getAllSelectedMedias().size === 0;
 
 	return (
 		<>
@@ -63,7 +63,7 @@ export function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export async function deleteMedias(): Promise<void> {
-	const promises = Array.from(allSelectedMedias(), path => deleteMedia(path));
+	const promises = Array.from(getAllSelectedMedias(), path => deleteMedia(path));
 
 	await Promise.all(promises);
 }
@@ -73,7 +73,7 @@ export async function deleteMedias(): Promise<void> {
 function searchForLyrics(): void {
 	const allMedias = getMainList();
 
-	allSelectedMedias().forEach(async path => {
+	getAllSelectedMedias().forEach(async path => {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);

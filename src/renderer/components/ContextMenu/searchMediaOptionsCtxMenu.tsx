@@ -12,7 +12,7 @@ import { Translator } from "@components/I18n";
 import { getMainList } from "@contexts/usePlaylists";
 import {
 	setAllSelectedMedias,
-	allSelectedMedias,
+	getAllSelectedMedias,
 } from "@contexts/useAllSelectedMedias";
 
 import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
@@ -64,7 +64,7 @@ export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => (
 // Helper functions:
 
 export const shareMedias = () =>
-	setSettings({ filesToShare: allSelectedMedias() });
+	setSettings({ filesToShare: getAllSelectedMedias() });
 
 /////////////////////////////////////////////
 
@@ -78,7 +78,7 @@ function selectAllMediasOnSearchResult(): void {
 function searchForLyrics(): void {
 	const allMedias = getMainList();
 
-	allSelectedMedias().forEach(async path => {
+	getAllSelectedMedias().forEach(async path => {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);

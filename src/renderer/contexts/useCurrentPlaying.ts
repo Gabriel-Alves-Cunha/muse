@@ -6,15 +6,15 @@ import create from "zustand";
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getFirstKey, getLastKey } from "@utils/map-set";
 import { getRandomInt, time } from "@utils/utils";
-import { playOptions } from "./usePlayOptions";
+import { getPlayOptions } from "./usePlayOptions";
 import {
 	type MainList,
 	PlaylistActions,
 	PlaylistList,
 	setPlaylists,
 	getPlaylist,
-	WhatToDo,
 	getMainList,
+	WhatToDo,
 } from "./usePlaylists";
 
 ////////////////////////////////////////////////
@@ -36,7 +36,7 @@ export const useCurrentPlaying = create<CurrentPlaying>()(
 	)),
 );
 
-export const { getState: currentPlaying, setState: setCurrentPlaying } =
+export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
 	useCurrentPlaying;
 
 ////////////////////////////////////////////////
@@ -92,7 +92,7 @@ export function pause(audio?: HTMLAudioElement): void {
 
 export function playPreviousMedia(): void {
 	time(() => {
-		const { path, listType } = currentPlaying();
+		const { path, listType } = getCurrentPlaying();
 
 		if (path.length === 0)
 			return console.warn(
@@ -145,7 +145,7 @@ export function playPreviousMedia(): void {
 
 export function playNextMedia(): void {
 	time(() => {
-		const { path, listType } = currentPlaying();
+		const { path, listType } = getCurrentPlaying();
 
 		if (path.length === 0)
 			return console.info(
@@ -162,7 +162,7 @@ export function playNextMedia(): void {
 
 		let nextMediaPath = "";
 
-		if (playOptions().random) {
+		if (getPlayOptions().random) {
 			const randomIndex = getRandomInt(0, list.size);
 
 			let index = 0;
@@ -253,7 +253,10 @@ function setAudioSource(path: Path, prevPath: Path) {
 		(document.getElementById("audio") as HTMLAudioElement).src =
 			pathForElectron;
 
-		handleDecorateMediaRow(path, prevPath);
+		time(
+			() => handleDecorateMediaRow(path, prevPath),
+			"handleDecorateMediaRow",
+		);
 	}, 150);
 
 	prevMediaTimer = mediaTimer;
@@ -263,20 +266,26 @@ function setAudioSource(path: Path, prevPath: Path) {
 
 const playingClass = "playing";
 
+/**
+ * Decorate the rows of current playing medias
+ * and undecorate previous playing ones.
+ */
 function handleDecorateMediaRow(path: Path, previousPath: Path) {
-	const prevElement = document.querySelector(`[data-path="${previousPath}"]`);
-	const newElement = document.querySelector(`[data-path="${path}"]`);
+	const prevElements = previousPath.length > 0 ?
+		document.querySelectorAll(`[data-path="${previousPath}"]`) :
+		null;
+	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
-	if (prevElement === null)
-		console.info(`No previous media row found for "${path}!"`);
-	if (newElement === null)
+	if (prevElements === null)
+		console.info(`No previous media row found for "${previousPath}!"`);
+	if (newElements === null)
 		return console.info(`No media row found for "${path}"!`);
 
-	if (previousPath.length !== 0 && prevElement !== null)
-		// de-decorate previous playing media row:
-		prevElement.classList.remove(playingClass);
+	if (previousPath.length !== 0 && prevElements !== null)
+		// Undecorate previous playing media row:
+		prevElements.forEach(element => element.classList.remove(playingClass));
 
-	newElement.classList.add(playingClass);
+	newElements.forEach(element => element.classList.add(playingClass));
 }
 
 ////////////////////////////////////////////////

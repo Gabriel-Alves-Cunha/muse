@@ -1,6 +1,6 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
@@ -12,7 +12,7 @@ import { resetAllAppData } from "@utils/app";
 import { t, Translator } from "@components/I18n";
 import {
 	deselectAllMedias,
-	allSelectedMedias,
+	getAllSelectedMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 import {
@@ -25,7 +25,9 @@ import {
 import {
 	computeHistoryItemKey,
 	selectMediaByEvent,
+	setIsCtxMenuOpen,
 	computeItemKey,
+	isCtxMenuOpen,
 	reloadWindow,
 	itemContent,
 	useFromList,
@@ -65,7 +67,6 @@ export const MediaListKind = ({ isHome }: Props) => (
 // Main function:
 
 function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
-	const [isCtxMenuOpen, setIsCtxMenuOpen] = useState(false);
 	const { fromList, homeList } = useFromList();
 	const listRef = useRef<HTMLDivElement>(null);
 
@@ -116,13 +117,10 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 						const mainList = getMainList();
 
-						const listAsArrayOfMap = unsortedList
-							.sort((a, b) => a[1] - b[1]) // sorted by date
-							.map(([path, date]) => [path, mainList.get(path), date]) as [
-								Path,
-								Media,
-								DateAsNumber,
-							][];
+						const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
+							.sort((a, b) => b[1] - a[1]) // sorted by date
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+							.map(([path, date]) => [path, mainList.get(path)!, date]);
 
 						return listAsArrayOfMap;
 					}
@@ -134,14 +132,9 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 		[listName, list],
 	);
 
-	useOnClickOutside(
-		listRef,
-		() => handleDeselectAllMedias(listRef, isCtxMenuOpen),
-	);
+	useOnClickOutside(listRef, handleDeselectAllMedias);
 
-	useEffect(() => {
-		useFromList.setState({ isHome });
-	}, [isHome]);
+	useEffect(() => useFromList.setState({ isHome }), [isHome]);
 
 	useEffect(() => {
 		document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
@@ -167,7 +160,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					components={components}
 					fixedItemHeight={65}
 					className="list"
-					overscan={10}
+					overscan={15}
 					noValidate
 				/>
 			</ContextMenu>
@@ -206,14 +199,8 @@ function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
 
 /////////////////////////////////////////
 
-function handleDeselectAllMedias(
-	listRef: Readonly<React.RefObject<HTMLDivElement>>,
-	isCtxMenuOpen: Readonly<boolean>,
-) {
-	if (
-		listRef.current !== null && isCtxMenuOpen === false &&
-		allSelectedMedias().size > 0
-	)
+function handleDeselectAllMedias() {
+	if (isCtxMenuOpen() === false && getAllSelectedMedias().size > 0)
 		deselectAllMedias();
 }
 

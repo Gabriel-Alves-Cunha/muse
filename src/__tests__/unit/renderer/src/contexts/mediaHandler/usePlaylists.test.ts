@@ -15,7 +15,7 @@ import {
 	testArray,
 	testList,
 } from "./fakeTestList";
-const { currentPlaying, playNextMedia, playThisMedia } = await import(
+const { getCurrentPlaying, playNextMedia, playThisMedia } = await import(
 	"@contexts/useCurrentPlaying"
 );
 const { formatDuration } = await import("@common/utils");
@@ -125,7 +125,7 @@ it("should play the next media", () => {
 
 		playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);
 		expect(
-			currentPlaying().path,
+			getCurrentPlaying().path,
 			"currentPlaying().path should be equal to firstMediaPath!",
 		)
 			.toBe(firstMediaPath);
@@ -142,7 +142,7 @@ it("should play the next media", () => {
 		const expectedMediaPath = testArray[nextIndex]![0];
 
 		expect(
-			currentPlaying().path,
+			getCurrentPlaying().path,
 			`\ncurrentPlaying().path before playing the next media should be the prevMediaPath = "${currMediaPath}"!\n`,
 		)
 			.toBe(currMediaPath);
@@ -150,7 +150,7 @@ it("should play the next media", () => {
 		playNextMedia();
 
 		expect(
-			currentPlaying().path,
+			getCurrentPlaying().path,
 			`currentPlaying().path after playing the next media should be the expectedMediaPath = "${expectedMediaPath}".\nprevMediaPath = "${currMediaPath}"!\n`,
 		)
 			.toBe(expectedMediaPath);
@@ -170,7 +170,7 @@ it("should play a chosen media", () => {
 		expect(randomMediaPath).toBeTruthy();
 
 		playThisMedia(randomMediaPath, PlaylistList.MAIN_LIST);
-		expect(currentPlaying().path).toBe(randomMediaPath);
+		expect(getCurrentPlaying().path).toBe(randomMediaPath);
 	});
 });
 

@@ -17,7 +17,7 @@ import {
 	testList,
 } from "./fakeTestList";
 
-const { playPreviousMedia, currentPlaying, playThisMedia, playNextMedia } =
+const { playPreviousMedia, getCurrentPlaying, playThisMedia, playNextMedia } =
 	await import("@contexts/useCurrentPlaying");
 const {
 	PlaylistActions,
@@ -66,7 +66,7 @@ describe("Testing useCurrentPlaying", () => {
 				path,
 			};
 
-			expect(expected).toEqual(currentPlaying());
+			expect(expected).toEqual(getCurrentPlaying());
 		});
 	});
 
@@ -78,7 +78,7 @@ describe("Testing useCurrentPlaying", () => {
 		const initialIndex = 15;
 		playThisMedia(testArray[initialIndex]![0], PlaylistList.MAIN_LIST);
 		expect(
-			currentPlaying().path,
+			getCurrentPlaying().path,
 			"currentPlaying().path at the start should be set to the initialIndex path!",
 		)
 			.toBe(testArray[initialIndex]![0]);
@@ -98,7 +98,7 @@ describe("Testing useCurrentPlaying", () => {
 			};
 
 			expect(expected, "The expected currentPlaying is wrong!").toEqual(
-				currentPlaying(),
+				getCurrentPlaying(),
 			);
 		});
 	});
@@ -110,7 +110,7 @@ describe("Testing useCurrentPlaying", () => {
 	it("should play the next media from a given playlist and update history", () => {
 		playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);
 		expect(
-			currentPlaying().path,
+			getCurrentPlaying().path,
 			"currentPlaying().path at the start should be set to the firstMediaPath!",
 		)
 			.toBe(firstMediaPath);
@@ -118,7 +118,7 @@ describe("Testing useCurrentPlaying", () => {
 		testArray.forEach((_, index) => {
 			playNextMedia();
 
-			const currMediaPath = currentPlaying().path;
+			const currMediaPath = getCurrentPlaying().path;
 			const expectedMediaPath = testArray[index + 1]?.[0] ?? firstMediaPath;
 
 			expect(

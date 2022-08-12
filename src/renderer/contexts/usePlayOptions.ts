@@ -11,7 +11,7 @@ export const usePlayOptions = create<PlayOptions>()(
 	setPlayOptionsOnLocalStorage(() => ({ random: false, loop: false })),
 );
 
-export const { getState: playOptions, setState: setPlayOptions } =
+export const { getState: getPlayOptions, setState: setPlayOptions } =
 	usePlayOptions;
 
 ////////////////////////////////////////////////
@@ -20,7 +20,7 @@ export const { getState: playOptions, setState: setPlayOptions } =
 // Helper functions:
 
 export function toggleLoopMedia(): void {
-	const loop = !playOptions().loop;
+	const loop = !getPlayOptions().loop;
 
 	(document.getElementById("audio") as HTMLAudioElement).loop = loop;
 
@@ -30,7 +30,7 @@ export function toggleLoopMedia(): void {
 ////////////////////////////////////////////////
 
 export const toggleRandom = () =>
-	setPlayOptions({ random: !playOptions().random });
+	setPlayOptions({ random: !getPlayOptions().random });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

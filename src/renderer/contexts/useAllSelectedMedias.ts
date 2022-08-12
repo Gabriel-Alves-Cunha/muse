@@ -16,7 +16,8 @@ export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path>; }>()(
 	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
 );
 
-export const allSelectedMedias = () => useAllSelectedMedias.getState().medias;
+export const getAllSelectedMedias = () =>
+	useAllSelectedMedias.getState().medias;
 export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 	useAllSelectedMedias.setState({ medias });
 
@@ -25,21 +26,24 @@ export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 ///////////////////////////////////////////////////
 // Handle media selection:
 
-if (!import.meta.vitest)
+if (import.meta.vitest === undefined)
 	useAllSelectedMedias.subscribe(
 		state => state.medias,
 		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
 			time(() => {
-				// TODO: improve this:
 				// Has to be this order:
 				prevSelectedMedias.forEach(path =>
-					document.querySelector(`[data-path="${path}"]`)?.classList.remove(
-						"selected",
+					document.querySelectorAll(`[data-path="${path}"]`)?.forEach(
+						element => {
+							if (selectedMedias.has(path)) return;
+
+							element.classList.remove("selected");
+						},
 					)
 				);
 				selectedMedias.forEach(path =>
-					document.querySelector(`[data-path="${path}"]`)?.classList.add(
-						"selected",
+					document.querySelectorAll(`[data-path="${path}"]`)?.forEach(element =>
+						element.classList.add("selected")
 					)
 				);
 			}, "handleDecorateMediasRow");
@@ -51,7 +55,7 @@ if (!import.meta.vitest)
 export function toggleSelectedMedia(path: Path): void {
 	time(
 		() =>
-			allSelectedMedias().has(path) ?
+			getAllSelectedMedias().has(path) ?
 				removeFromAllSelectedMedias(path) :
 				addToAllSelectedMedias(path),
 		"toggleSelectedMedia",
@@ -61,17 +65,21 @@ export function toggleSelectedMedia(path: Path): void {
 ///////////////////////////////////////////////////
 
 export function addToAllSelectedMedias(path: Path): void {
-	if (allSelectedMedias().has(path)) return;
+	const allSelectedMedias = getAllSelectedMedias();
 
-	setAllSelectedMedias(new Set(allSelectedMedias()).add(path));
+	if (allSelectedMedias.has(path)) return;
+
+	setAllSelectedMedias(new Set(allSelectedMedias).add(path));
 }
 
 ///////////////////////////////////////////////////
 
 export function removeFromAllSelectedMedias(path: Path): void {
-	if (!allSelectedMedias().has(path)) return;
+	const allSelectedMedias = getAllSelectedMedias();
 
-	const newSet = new Set(allSelectedMedias());
+	if (!allSelectedMedias.has(path)) return;
+
+	const newSet = new Set(allSelectedMedias);
 	newSet.delete(path);
 
 	setAllSelectedMedias(newSet);
@@ -80,7 +88,7 @@ export function removeFromAllSelectedMedias(path: Path): void {
 ///////////////////////////////////////////////////
 
 export function deselectAllMedias(): void {
-	if (allSelectedMedias().size === 0) return;
+	if (getAllSelectedMedias().size === 0) return;
 
 	setAllSelectedMedias(emptySet);
 }
@@ -88,7 +96,9 @@ export function deselectAllMedias(): void {
 ///////////////////////////////////////////////////
 
 export function selectAllMedias(): void {
-	if (allSelectedMedias().size === getSortedByDate().size) return;
+	const sortedByDate = getSortedByDate();
 
-	setAllSelectedMedias(getSortedByDate());
+	if (getAllSelectedMedias().size === sortedByDate.size) return;
+
+	setAllSelectedMedias(sortedByDate);
 }

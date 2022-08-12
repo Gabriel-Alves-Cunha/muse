@@ -15,12 +15,11 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 ) {
 	useEffect(() => {
 		function listener(event: PointerEvent) {
-			if (event.button !== leftClick) return;
-
-			const el = ref.current;
-
-			// Do nothing if clicking ref's element or descendent elements
-			if (!el || el.contains(event.target as Node)) return;
+			if (
+				event.button !== leftClick || ref.current === null ||
+				ref.current.contains(event.target as Node)
+			)
+				return;
 
 			handler(event);
 		}
