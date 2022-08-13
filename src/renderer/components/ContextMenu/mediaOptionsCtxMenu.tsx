@@ -63,7 +63,10 @@ export function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export async function deleteMedias(): Promise<void> {
-	const promises = Array.from(getAllSelectedMedias(), path => deleteMedia(path));
+	const promises = Array.from(
+		getAllSelectedMedias(),
+		path => deleteMedia(path),
+	);
 
 	await Promise.all(promises);
 }

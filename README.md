@@ -4,7 +4,7 @@
 	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
 </h1>
 
-> Just a simple Electron-React app to download audio from YouTube and play them.
+> Just a simple, Electron-React app, to download audio from YouTube and play them.
 
 ## Table of contents
 
