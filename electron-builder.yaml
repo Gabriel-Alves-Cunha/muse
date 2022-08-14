@@ -10,6 +10,9 @@ linux:
   target: AppImage
   category: AudioVideo
 
+win:
+  target: portable
+
 publish:
     releaseType: release
     provider: github

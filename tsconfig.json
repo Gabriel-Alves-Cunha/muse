@@ -5,6 +5,7 @@
 		"allowSyntheticDefaultImports": true,
 		"strictPropertyInitialization": true,
 		"noFallthroughCasesInSwitch": true,
+		"exactOptionalPropertyTypes": true,
 		"noUncheckedIndexedAccess": true,
 		"experimentalDecorators": false,
 		"strictFunctionTypes": true,

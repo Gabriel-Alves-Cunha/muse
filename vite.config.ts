@@ -40,14 +40,14 @@ export default defineConfig({
 		emptyOutDir: true,
 		minify: "esbuild",
 		target: "esnext",
-		sourcemap: true,
+		sourcemap: false,
 		rollupOptions: {
 			output: {
 				assetFileNames: "assets/[name].[ext]",
 				entryFileNames: "[name].js",
 				chunkFileNames: "[name].js",
 				minifyInternalExports: true,
-				sourcemap: true,
+				sourcemap: false,
 				compact: true,
 				format: "esm",
 			},
