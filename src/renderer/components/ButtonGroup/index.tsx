@@ -1,4 +1,4 @@
-import type { OneOf } from "@common/@types/generalTypes";
+import type { OneOf } from "@common/@types/utils";
 
 import { Reload } from "./Reload";
 import { SortBy } from "./SortBy";

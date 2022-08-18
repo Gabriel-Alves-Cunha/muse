@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";

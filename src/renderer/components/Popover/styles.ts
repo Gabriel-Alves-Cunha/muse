@@ -7,7 +7,6 @@ import { styled } from "@styles/global";
 /////////////////////////////////////////
 
 export const StyledContent = styled(Content, {
-	// pos: "relative", // to the popover anchor
 	d: "flex",
 	fd: "column",
 	gap: 10,
@@ -25,11 +24,6 @@ export const StyledContent = styled(Content, {
 
 	"& > p": {
 		pos: "relative",
-
-		// // Center:
-		// t: "50%", // position the top  edge of the element at the middle of the parent
-		// l: "50%", // position the left edge of the element at the middle of the parent
-		// transform: "translate(-50%, -50%)",
 
 		c: "$deactivated-icon",
 		ff: "$secondary",

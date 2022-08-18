@@ -42,9 +42,9 @@ export function time<T>(fn: () => T, label: string): T {
 
 	dbg(
 		`%cFunction %c"${label}" %ctook: ${end - start} ms.`,
-		"color:brown",
-		"color:blue",
-		"color:brown",
+		"color: brown",
+		"color: blue",
+		"color: brown",
 	);
 
 	return fnReturn;

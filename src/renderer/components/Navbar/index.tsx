@@ -63,8 +63,8 @@ function ButtonsForPages() {
 		<Buttons>
 			{pages.map(page => (
 				<button
-					className={page === currPage ? "active" : ""}
 					data-tip={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
+					className={page === currPage ? "active" : ""}
 					onPointerUp={() => setPage({ page })}
 					key={page}
 				>

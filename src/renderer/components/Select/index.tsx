@@ -74,9 +74,9 @@ function contentToShow<Options extends string>(
 
 type Props<Options extends string> = Readonly<
 	{
+		triggerClassName: string | undefined;
 		setValue: (value: Options) => void;
 		content?: ContentOfSelectEnum;
-		triggerClassName?: string;
 		children: React.ReactNode;
 		triggerTitle?: string;
 		tooltip: string;

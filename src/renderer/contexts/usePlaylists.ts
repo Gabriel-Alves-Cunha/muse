@@ -564,71 +564,59 @@ export function searchMedia(
 // Types:
 
 export type History = ReadonlyMap<Path, DateAsNumber[]>;
+
 export type MainList = ReadonlyMap<Path, Media>;
 
-export type PlaylistsReducer_Action =
-	// ---------------------------------------- favorites:
-	| Readonly<
-		{
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
-			type: WhatToDo.UPDATE_FAVORITES;
-			path: Path;
-		}
-	>
-	| Readonly<
-		{
-			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA;
-			type: WhatToDo.UPDATE_FAVORITES;
-			path: Path;
-		}
-	>
-	| Readonly<
-		{
-			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH;
-			type: WhatToDo.UPDATE_FAVORITES;
-			path: Path;
-		}
-	>
-	| Readonly<
-		{ type: WhatToDo.UPDATE_FAVORITES; whatToDo: PlaylistActions.CLEAN; }
-	>
-	// ---------------------------------------- history:
-	| Readonly<
-		{
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA;
-			type: WhatToDo.UPDATE_HISTORY;
-			path: Path;
-		}
-	>
-	| Readonly<
-		{ type: WhatToDo.UPDATE_HISTORY; whatToDo: PlaylistActions.CLEAN; }
-	>
-	// ---------------------------------------- main list:
-	| Readonly<
-		{
-			whatToDo:
-				| PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH
-				| PlaylistActions.ADD_ONE_MEDIA;
-			type: WhatToDo.UPDATE_MAIN_LIST;
-			newMedia: Media;
-			newPath: Path;
-			path: Path;
-		}
-	>
-	| Readonly<
-		{
-			whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH;
-			type: WhatToDo.UPDATE_MAIN_LIST;
-			path: Path;
-		}
-	>
-	| Readonly<
-		{
-			whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST;
-			type: WhatToDo.UPDATE_MAIN_LIST;
-			list: MainList;
-		}
-	>
-	| Readonly<
-		{ type: WhatToDo.UPDATE_MAIN_LIST; whatToDo: PlaylistActions.CLEAN; }
-	>;
+export type PlaylistsReducer_Action = Readonly<
+	// ----------------------------------------
+	// ----------------------------------------
+	// ---------------------------------------- Favorites:
+	| { type: WhatToDo.UPDATE_FAVORITES; whatToDo: PlaylistActions.CLEAN; }
+	| {
+		whatToDo: PlaylistActions.ADD_ONE_MEDIA;
+		type: WhatToDo.UPDATE_FAVORITES;
+		path: Path;
+	}
+	| {
+		whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA;
+		type: WhatToDo.UPDATE_FAVORITES;
+		path: Path;
+	}
+	| {
+		whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH;
+		type: WhatToDo.UPDATE_FAVORITES;
+		path: Path;
+	}
+	// ----------------------------------------
+	// ----------------------------------------
+	// ---------------------------------------- History:
+	| { type: WhatToDo.UPDATE_HISTORY; whatToDo: PlaylistActions.CLEAN; }
+	| {
+		whatToDo: PlaylistActions.ADD_ONE_MEDIA;
+		type: WhatToDo.UPDATE_HISTORY;
+		path: Path;
+	}
+	// ----------------------------------------
+	// ----------------------------------------
+	// ---------------------------------------- MainList:
+	| { type: WhatToDo.UPDATE_MAIN_LIST; whatToDo: PlaylistActions.CLEAN; }
+	| {
+		whatToDo:
+			| PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH
+			| PlaylistActions.ADD_ONE_MEDIA;
+		type: WhatToDo.UPDATE_MAIN_LIST;
+		newMedia: Media;
+		newPath: Path;
+		path: Path;
+	}
+	| {
+		whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH;
+		type: WhatToDo.UPDATE_MAIN_LIST;
+		path: Path;
+	}
+	| {
+		whatToDo: PlaylistActions.REPLACE_ENTIRE_LIST;
+		type: WhatToDo.UPDATE_MAIN_LIST;
+		list: MainList;
+	}
+>;

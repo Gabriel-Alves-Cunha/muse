@@ -1,6 +1,6 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 
@@ -79,5 +79,5 @@ export function ImgWithFallback(
 // Types:
 
 type Props = Readonly<
-	{ Fallback: JSX.Element; mediaImg?: string; mediaPath: Path; }
+	{ Fallback: JSX.Element; mediaImg: string | undefined; mediaPath: Path; }
 >;

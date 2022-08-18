@@ -1,5 +1,5 @@
 import { createStitches, type CSSProperties } from "@stitches/react";
-import { toast } from "react-toastify";
+import { toast, type ToastOptions } from "react-toastify";
 
 import { areArraysEqualByValue } from "@utils/array";
 import { getObjectDeepKeys } from "@utils/object";
@@ -417,39 +417,21 @@ export const GlobalCSS = globalCss({
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const successToast = (info: string) =>
-	toast.success(info, {
-		hideProgressBar: false,
-		position: "top-right",
-		progress: undefined,
-		closeOnClick: true,
-		pauseOnHover: true,
-		autoClose: 5000,
-		draggable: true,
-	});
+const toastOptions: ToastOptions = {
+	hideProgressBar: false,
+	position: "top-right",
+	closeOnClick: true,
+	pauseOnHover: true,
+	autoClose: 5000,
+	draggable: true,
+};
 
-////////////////////////////////////////////////
+export const successToast = (info: string) => toast.success(info, toastOptions);
 
-export const infoToast = (info: string) =>
-	toast.info(info, {
-		hideProgressBar: false,
-		position: "top-right",
-		progress: undefined,
-		closeOnClick: true,
-		pauseOnHover: true,
-		autoClose: 5000,
-		draggable: true,
-	});
+////////////////////////////////////////////
 
-////////////////////////////////////////////////
+export const infoToast = (info: string) => toast.info(info, toastOptions);
 
-export const errorToast = (info: string) =>
-	toast.error(info, {
-		hideProgressBar: false,
-		position: "top-right",
-		progress: undefined,
-		closeOnClick: true,
-		pauseOnHover: true,
-		autoClose: 5000,
-		draggable: true,
-	});
+////////////////////////////////////////////
+
+export const errorToast = (info: string) => toast.error(info, toastOptions);

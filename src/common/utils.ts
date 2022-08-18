@@ -42,7 +42,8 @@ export const allowedMedias = Object.freeze(
 		"m4v",
 	] as const,
 );
-export type AllowedMedias = Readonly<typeof allowedMedias[number]>;
+
+export type AllowedMedias = typeof allowedMedias[number];
 
 /////////////////////////////////////////
 
@@ -89,11 +90,38 @@ export const stringifyJson = (obj: unknown) => JSON.stringify(obj, null, 2);
 
 /** Map a number from range X to range Y. */
 export const mapTo = (
-	val: Readonly<number>,
+	value: Readonly<number>,
 	from: readonly [start: number, end: number],
 	to: readonly [start: number, end: number],
 ): Readonly<number> =>
-	((val - from[0]) * (to[1] - to[0])) / (from[1] - from[0]) + to[0];
+	((value - from[0]) * (to[1] - to[0])) / (from[1] - from[0]) + to[0];
+
+/////////////////////////////////////////
+
+export function randomBackgroundColorForConsole(): () => string {
+	let index = 0;
+
+	// dprint-ignore
+	const colors: Color[] = [
+		["#fff", "#3490db"],
+		["#fff", "#1abc9c"],
+		["#fff", "#2a47ec"],
+	];
+
+	return () => {
+		if (index >= colors.length) index = 0;
+
+		const color = `color: ${colors[index]
+			?.[0]}; background-color: ${colors[index]
+			?.[1]}; border-radius: 2px; padding: 2px 4px;`;
+
+		++index;
+
+		return color;
+	};
+}
+
+type Color = readonly [color: string, backgroundColor: string];
 
 /////////////////////////////////////////
 

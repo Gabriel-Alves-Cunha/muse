@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
+import type { ImageURL, Base64, Path } from "@common/@types/generalTypes";
 import type { Tags } from "@common/@types/electron-window";
-import type {
-	ImageURL,
-	Mutable,
-	Base64,
-	Path,
-} from "@common/@types/generalTypes";
 
 import { readFile, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -20,12 +15,13 @@ import {
 import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
-import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { dbg, dbgTests, eraseImg } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { doesPathExists } from "../file";
 import { isBase64Image } from "@main/utils";
+import { Mutable } from "@common/@types/utils";
 
 const { error } = console;
 
@@ -306,8 +302,8 @@ async function talkToClientSoItCanGetTheNewMedia(
 // Main function:
 
 export async function writeTags(
-	mediaPath: Readonly<Path>,
-	data: Readonly<Tags & { isNewMedia?: boolean; downloadImg?: boolean; }>,
+	mediaPath: Path,
+	data: WriteTagsData,
 ): Promise<void> {
 	// dbgTests("Writing tags to file:", { mediaPath, data });
 	checkOrThrow(checkForMediaPath(mediaPath));
@@ -347,4 +343,9 @@ export async function writeTags(
 		mediaPath,
 		data.isNewMedia,
 	);
+}
+
+interface WriteTagsData extends Tags {
+	readonly downloadImg?: boolean;
+	readonly isNewMedia?: boolean;
 }

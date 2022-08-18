@@ -1,11 +1,12 @@
-export const emptyArray = Object.freeze([]);
+export const emptyArray: readonly never[] = Object.freeze([]);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function prettyPrintStringArray<T>(arr: readonly T[]) {
+export function prettyPrintStringArray<T>(arr: readonly T[]): string {
 	const s = arr.map(item => `"${item}"`).join(",");
+
 	return `[${s}]`;
 }
 
@@ -14,7 +15,10 @@ export function prettyPrintStringArray<T>(arr: readonly T[]) {
 /////////////////////////////////////////////
 
 /** Check if arrays contain the same values, not necessarily on the same order. */
-export function areArraysEqualByValue<T>(a: readonly T[], b: readonly T[]) {
+export function areArraysEqualByValue<T>(
+	a: readonly T[],
+	b: readonly T[],
+): boolean {
 	if (!a || !b) return false;
 	// Are references equal?
 	if (a === b) return true;

@@ -3,11 +3,19 @@ import type { Base64, Media, Path } from "@common/@types/generalTypes";
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { statSync } from "node:fs";
 
-import { dbg, formatDuration } from "@common/utils";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
+import {
+	randomBackgroundColorForConsole,
+	formatDuration,
+	dbg,
+} from "@common/utils";
 
 const { error } = console;
+
+/////////////////////////////////////////////
+
+const randomColor = randomBackgroundColorForConsole();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -23,9 +31,16 @@ async function createMedia(
 
 		time(() => {
 			const {
-				tag: { pictures, title, album = "", genres, albumArtists, lyrics = "" },
 				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
+				tag: {
+					title = basename,
+					albumArtists,
+					lyrics = "",
+					album = "",
+					pictures,
+					genres,
+				},
 			} = MediaFile.createFromPath(path);
 
 			const durationInSeconds = durationMilliseconds / 1_000;
@@ -33,14 +48,14 @@ async function createMedia(
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////
 
-			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60)
+			if (ignoreMediaWithLessThan60Seconds === true && durationInSeconds < 60)
 				return reject(
 					`Skipping "${path}" because the duration is ${
 						durationInSeconds.toPrecision(2)
 					} s (less than 60 s)!`,
 				);
 
-			if (assureMediaSizeIsGreaterThan60KB && length < 60_000)
+			if (assureMediaSizeIsGreaterThan60KB === true && length < 60_000)
 				return reject(
 					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`,
 				);
@@ -48,13 +63,12 @@ async function createMedia(
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////
 
-			let picture: IPicture | undefined, mimeType: string | undefined;
+			let picture: IPicture | undefined, mimeType: string | undefined, error;
 			try {
 				picture = pictures[0];
-				console.log("picture[0] =", picture);
 				mimeType = picture?.mimeType;
-			} catch (error) {
-				console.error(error, { picture, mimeType, basename });
+			} catch (err) {
+				error = err;
 			}
 
 			const media: Media = {
@@ -64,17 +78,17 @@ async function createMedia(
 				duration: formatDuration(durationInSeconds),
 				birthTime: statSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
-				title: title ?? basename,
 				size: length,
 				lyrics,
 				genres,
+				title,
 				album,
 			};
 
-			dbg(basename, { media, picture });
+			dbg(`%c${basename}`, randomColor(), { media, picture, mimeType, error });
 
 			return resolve([path, media]);
-		}, `createMedia("${basename}")`);
+		}, `createMedia('${basename}')`);
 	});
 }
 
@@ -105,5 +119,5 @@ export async function transformPathsToMedias(
 		console.groupEnd();
 
 		return medias;
-	}, "create and transform paths to medias");
+	}, "transformPathsToMedias");
 }

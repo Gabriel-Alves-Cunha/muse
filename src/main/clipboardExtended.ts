@@ -8,64 +8,54 @@ import { clipboard } from "electron";
 
 const clipboardEmitter = new EventEmitter();
 
-let watcherId: NodeJS.Timer | undefined;
-let previousText = "";
-
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-(clipboard as ClipboardExtended).on = <T>(
-	eventName: string,
-	listener: (...args: T[]) => void,
-) => {
-	clipboardEmitter.on(eventName, listener);
+Object.assign(clipboard, {
+	watcherId: undefined as NodeJS.Timer | undefined,
+	previousText: "",
 
-	return clipboard;
-};
+	on<T>(eventName: string, listener: (...args: T[]) => void) {
+		clipboardEmitter.on(eventName, listener);
 
-/////////////////////////////////////////
+		return clipboard;
+	},
 
-(clipboard as ClipboardExtended).once = <T>(
-	eventName: string,
-	listener: (...args: T[]) => void,
-) => {
-	clipboardEmitter.once(eventName, listener);
+	once<T>(eventName: string, listener: (...args: T[]) => void) {
+		clipboardEmitter.once(eventName, listener);
 
-	return clipboard;
-};
+		return clipboard;
+	},
 
-/////////////////////////////////////////
+	off<T>(eventName: string, listener?: (...args: T[]) => void) {
+		if (listener) clipboardEmitter.removeListener(eventName, listener);
+		else clipboardEmitter.removeAllListeners(eventName);
 
-(clipboard as ClipboardExtended).off = <T>(
-	eventName: string,
-	listener?: (...args: T[]) => void,
-) => {
-	if (listener) clipboardEmitter.removeListener(eventName, listener);
-	else clipboardEmitter.removeAllListeners(eventName);
+		return clipboard;
+	},
 
-	return clipboard;
-};
+	startWatching() {
+		this.watcherId = setInterval(() => {
+			if (
+				isTextDiff(
+					this.previousText,
+					this.previousText = clipboard.readText(),
+				)
+			)
+				clipboardEmitter.emit("text-changed");
+		}, 400);
 
-/////////////////////////////////////////
+		return clipboard;
+	},
 
-(clipboard as ClipboardExtended).startWatching = () => {
-	watcherId = setInterval(() => {
-		if (isTextDiff(previousText, previousText = clipboard.readText()))
-			clipboardEmitter.emit("text-changed");
-	}, 400);
+	stopWatching() {
+		clearInterval(this.watcherId);
+		this.watcherId = undefined;
 
-	return clipboard;
-};
-
-/////////////////////////////////////////
-
-(clipboard as ClipboardExtended).stopWatching = () => {
-	clearInterval(watcherId);
-	watcherId = undefined;
-
-	return clipboard;
-};
+		return clipboard;
+	},
+});
 
 /////////////////////////////////////////
 
@@ -80,24 +70,23 @@ export { clipboard as extendedClipboard };
 /////////////////////////////////////////
 // Types:
 
-// Doing this Partial<{}> so typescript doesn't complain...
-type ClipboardExtended =
-	& Electron.Clipboard
-	& Partial<
-		{
-			startWatching: () => ClipboardExtended;
-			stopWatching: () => ClipboardExtended;
-			off: <T>(
-				eventName: string,
-				listener?: (...args: T[]) => void,
-			) => ClipboardExtended;
-			on: <T>(
-				eventName: string,
-				listener: (...args: T[]) => void,
-			) => ClipboardExtended;
-			once: <T>(
-				eventName: string,
-				listener: (...args: T[]) => void,
-			) => ClipboardExtended;
-		}
-	>;
+export interface ClipboardExtended extends Electron.Clipboard, ClipboardExtension {}
+
+interface ClipboardExtension {
+	watcherId: NodeJS.Timer | undefined;
+	previousText: string;
+	startWatching: () => ClipboardExtended;
+	stopWatching: () => ClipboardExtended;
+	off: <T>(
+		eventName: string,
+		listener?: (...args: T[]) => void,
+	) => ClipboardExtended;
+	on: <T>(
+		eventName: string,
+		listener: (...args: T[]) => void,
+	) => ClipboardExtended;
+	once: <T>(
+		eventName: string,
+		listener: (...args: T[]) => void,
+	) => ClipboardExtended;
+}

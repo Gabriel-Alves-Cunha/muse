@@ -1,6 +1,7 @@
-import type { Media, Path, TypeOfMap } from "@common/@types/generalTypes";
 import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
+import type { Media, Path } from "@common/@types/generalTypes";
 import type { PlayOptions } from "@contexts/usePlayOptions";
+import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
 import { stringifyAsync } from "js-coroutines";

@@ -10,7 +10,7 @@ import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { type AllowedMedias, dbg, isDev } from "@common/utils";
-import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { sendMsgToClient } from "@common/crossCommunication";
@@ -206,10 +206,10 @@ export async function createDownload(
 			try {
 				await writeTags(saveSite, {
 					albumArtists: [artist],
+					imageURL: imageURL!,
 					downloadImg: true,
 					isNewMedia: true,
-					imageURL,
-					title,
+					title: title!,
 				});
 			} catch (err) {
 				error(err);

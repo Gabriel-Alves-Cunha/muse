@@ -8,7 +8,7 @@ import { createReadStream } from "node:fs";
 import { dirname, join } from "node:path";
 import sanitize from "sanitize-filename";
 
-import { ElectronToReactMessageEnum } from "@common/@types/electron-window";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { type AllowedMedias, dbg } from "@common/utils";

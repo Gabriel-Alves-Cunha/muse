@@ -1,4 +1,8 @@
-import type { Mutable } from "@common/@types/generalTypes";
+import type { Mutable } from "@common/@types/utils";
+import type {
+	MsgObjectReactToElectron,
+	VisibleElectron,
+} from "@common/@types/electron-window";
 
 import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
@@ -11,12 +15,6 @@ import { createServer } from "./preload/share";
 import { writeTags } from "./preload/media/mutate-metadata";
 import { dirs } from "./utils";
 import { dbg } from "@common/utils";
-import {
-	type MsgObjectReactToElectron,
-	type VisibleElectron,
-	ReactToElectronMessageEnum,
-	ElectronToReactMessageEnum,
-} from "@common/@types/electron-window";
 import {
 	type MsgWithSource,
 	sendMsgToClient,
@@ -35,6 +33,10 @@ import {
 	deleteFile,
 	readDir,
 } from "./preload/file";
+import {
+	ElectronToReactMessageEnum,
+	ReactToElectronMessageEnum,
+} from "@common/enums";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

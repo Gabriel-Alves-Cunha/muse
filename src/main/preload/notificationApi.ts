@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
 
-import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
 
 export function sendNotificationToElectronIpcMainProcess(
 	type: ElectronIpcMainProcessNotificationEnum,

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import create from "zustand";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { createNewDownload, Popup } from "./helper";
 import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";

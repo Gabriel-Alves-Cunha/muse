@@ -11,8 +11,8 @@ import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import { t, Translator } from "@components/I18n";
 import {
-	deselectAllMedias,
 	getAllSelectedMedias,
+	deselectAllMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 import {
@@ -74,7 +74,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	// when the user is at the home page, the homeList is used
 	// then, cause it will have what the user has last set as the main list:
 	// either sortedByDate or sortedByName, in our current case.
-	const listName = isHome ? homeList : fromList;
+	const listName = isHome === true ? homeList : fromList;
 	const { [listName]: list } = usePlaylists();
 
 	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
@@ -209,4 +209,4 @@ function handleDeselectAllMedias() {
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ isHome?: boolean; }>;
+type Props = Readonly<{ isHome?: boolean | undefined; }>;

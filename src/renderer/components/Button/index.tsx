@@ -77,14 +77,12 @@ const GenericBorderedButton = styled("button", {
 });
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 // Types:
 
-type Props =
-	& ComponentProps<typeof GenericBorderedButton>
-	& Readonly<
-		{
-			variant: "large" | "medium" | "input";
-			children: React.ReactNode;
-			className?: string;
-		}
-	>;
+interface Props extends ComponentProps<typeof GenericBorderedButton> {
+	readonly variant: "large" | "medium" | "input";
+	readonly children: React.ReactNode;
+	readonly className?: string;
+}

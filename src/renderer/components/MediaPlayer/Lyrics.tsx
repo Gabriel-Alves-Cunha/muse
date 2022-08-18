@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { ReactToElectronMessageEnum } from "@common/@types/electron-window";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { mediaPlayerCard } from "@components/FlipCard";
 import { infoToast } from "@styles/global";

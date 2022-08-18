@@ -76,9 +76,9 @@
 		]
 	},
 	"exclude": [
-		"app",
 		"**/node_modules",
 		"**/.*/",
+		"app",
 		"out"
 	]
 }

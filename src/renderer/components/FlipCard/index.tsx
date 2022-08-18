@@ -30,9 +30,7 @@ export function FlipCard({ cardFront, cardBack }: Props) {
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<
-	ComponentProps<typeof Wrapper> & {
-		cardFront: React.ReactNode;
-		cardBack: React.ReactNode;
-	}
->;
+interface Props extends ComponentProps<typeof Wrapper> {
+	readonly cardFront: React.ReactNode;
+	readonly cardBack: React.ReactNode;
+}

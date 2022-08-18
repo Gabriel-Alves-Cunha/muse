@@ -11,7 +11,7 @@ import {
 
 const { deleteFile } = electron.fs;
 
-export async function deleteMedia(path: Path) {
+export async function deleteMedia(path: Path): Promise<void> {
 	const wasDeleteSuccessfull = await deleteFile(path);
 
 	if (wasDeleteSuccessfull === true) {
@@ -22,11 +22,10 @@ export async function deleteMedia(path: Path) {
 			type: WhatToDo.UPDATE_MAIN_LIST,
 			path,
 		});
-	} else {
+	} else
 		errorToast(
 			`${t("toasts.mediaDeletionError.beforePath")}"${path}"${
 				t("toasts.mediaDeletionError.afterPath")
 			}`,
 		);
-	}
 }

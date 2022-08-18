@@ -1,3 +1,4 @@
+import type { ClipboardExtended } from "./clipboardExtended";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
@@ -22,7 +23,7 @@ import { logoPath } from "./utils";
 import {
 	ElectronIpcMainProcessNotificationEnum,
 	ElectronToReactMessageEnum,
-} from "@common/@types/electron-window";
+} from "@common/enums";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -166,12 +167,12 @@ app
 				// @ts-ignore => this is a workaround for a bug in the lib:
 				const { default: installExtension } = devtoolsInstaller.default;
 
-				console.log({ installExtension });
+				dbg({ installExtension });
 
 				await installExtension(REACT_DEVELOPER_TOOLS, {
 					loadExtensionOptions: { allowFileAccess: true },
 				}) // @ts-ignore => this is a workaround for a bug in the lib
-					.then(name => console.log(`Added Extension: ${name}`))
+					.then(name => dbg(`Added Extension: ${name}`))
 					// @ts-ignore => this is a workaround for a bug in the lib
 					.catch(err =>
 						console.error("An error occurred while installing extension: ", err)
@@ -325,23 +326,3 @@ ipcMain.on(
 		}
 	},
 );
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Types:
-
-// Also defining it here with all types required so typescript doesn't complain...
-type ClipboardExtended = Electron.Clipboard & {
-	startWatching: () => ClipboardExtended;
-	stopWatching: () => ClipboardExtended;
-	off: <T>(
-		event: string,
-		listener?: (...args: T[]) => void,
-	) => ClipboardExtended;
-	on: <T>(event: string, listener: (...args: T[]) => void) => ClipboardExtended;
-	once: <T>(
-		event: string,
-		listener: (...args: T[]) => void,
-	) => ClipboardExtended;
-};

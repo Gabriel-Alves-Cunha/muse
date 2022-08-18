@@ -1,4 +1,4 @@
-import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 import { Translator } from "@components/I18n";
 

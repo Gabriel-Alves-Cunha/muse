@@ -159,8 +159,8 @@ type PossibleLyrics = Readonly<
 /////////////////////////////////////////
 
 interface QueryForLyricsSuccessResponse {
-	success: true;
 	result: { lyrics: string; };
+	success: true;
 }
 
 /////////////////////////////////////////

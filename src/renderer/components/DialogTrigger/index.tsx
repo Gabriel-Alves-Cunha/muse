@@ -57,10 +57,8 @@ const StyledDialogTrigger = styled(Trigger, {
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<
-	ComponentProps<typeof StyledDialogTrigger> & {
-		children: React.ReactNode;
-		className?: string;
-		tooltip: string;
-	}
->;
+interface Props extends ComponentProps<typeof StyledDialogTrigger> {
+	readonly children: React.ReactNode;
+	readonly className?: string;
+	readonly tooltip: string;
+}

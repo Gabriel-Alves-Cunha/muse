@@ -1,3 +1,4 @@
+import type { MetadataToChange } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { type RefObject, type ChangeEvent, useEffect, useRef } from "react";
@@ -7,6 +8,7 @@ import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@styles/global";
 import { areArraysEqualByValue } from "@utils/array";
@@ -16,10 +18,6 @@ import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteMedia } from "@utils/media";
 import { Button } from "@components/Button";
-import {
-	ReactToElectronMessageEnum,
-	MetadataToChange,
-} from "@common/@types/electron-window";
 
 import {
 	DialogTriggerToRemoveMedia,

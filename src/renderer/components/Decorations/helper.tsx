@@ -1,4 +1,4 @@
-import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;

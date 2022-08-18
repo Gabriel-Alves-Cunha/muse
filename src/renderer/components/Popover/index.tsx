@@ -32,7 +32,7 @@ export const PopoverRoot = Root;
 export const PopoverContent = forwardRef((
 	{ children, size, ...props }: Props,
 	forwardedRef: Ref<HTMLDivElement>,
-) => (
+): JSX.Element => (
 	<StyledContent size={size} sideOffset={10} {...props} ref={forwardedRef}>
 		{children}
 	</StyledContent>
@@ -44,8 +44,7 @@ PopoverContent.displayName = "PopoverContent";
 /////////////////////////////////////////
 // Types:
 
-type Props =
-	& ComponentProps<typeof StyledContent>
-	& Readonly<
-		{ size: VariantProps<typeof StyledContent>["size"]; children: ReactNode; }
-	>;
+interface Props extends ComponentProps<typeof StyledContent> {
+	readonly size: NonNullable<VariantProps<typeof StyledContent>["size"]>;
+	readonly children: ReactNode;
+}

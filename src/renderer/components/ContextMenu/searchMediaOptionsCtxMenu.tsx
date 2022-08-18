@@ -7,9 +7,9 @@ import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { setSettings } from "@contexts/settings";
 import { getSearcher } from "@components/SearchMedia/helper";
+import { getMainList } from "@contexts/usePlaylists";
 import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
-import { getMainList } from "@contexts/usePlaylists";
 import {
 	setAllSelectedMedias,
 	getAllSelectedMedias,

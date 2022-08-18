@@ -7,13 +7,17 @@ files: "app/"
 icon: "./src/renderer/assets/icons/256x256.png"
 
 linux:
-  target: AppImage
   category: AudioVideo
+  target:
+    target: AppImage
+    arch: x64
 
 win:
-  target: portable
+  target:
+    target: zip
+    arch: x64
 
 publish:
-    releaseType: release
-    provider: github
-    # token: GH_TOKEN # If github is private
+  releaseType: release
+  provider: github
+  # token: GH_TOKEN # If github is private

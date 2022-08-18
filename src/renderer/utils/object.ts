@@ -1,4 +1,4 @@
-export function areObjectKeysEqual(object1: Obj, object2: Obj) {
+export function areObjectKeysEqual(object1: Obj, object2: Obj): boolean {
 	const object2Lenght = Object.keys(object2).length;
 	const keys1 = Object.keys(object1);
 

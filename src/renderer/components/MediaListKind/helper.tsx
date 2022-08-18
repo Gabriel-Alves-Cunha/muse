@@ -6,7 +6,7 @@ import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { memo } from "react";
 import create from "zustand";
 
-import { ElectronIpcMainProcessNotificationEnum } from "@common/@types/electron-window";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
@@ -78,7 +78,7 @@ export const leftClick = 0;
 function selectOrPlayMedia(
 	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
-) {
+): void {
 	if (e.button !== leftClick || e.ctrlKey === false) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome === true ? homeList : fromList;

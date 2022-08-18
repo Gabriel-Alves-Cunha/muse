@@ -163,7 +163,8 @@ export function createNewDownload(
 	frontEndPort.addEventListener("close", logThatPortIsClosing);
 	frontEndPort.addEventListener(
 		"message",
-		e => handleUpdateDownloadingList(e, downloadInfo.url),
+		(e: MessageEvent<PartialExceptStatus>) =>
+			handleUpdateDownloadingList(e, downloadInfo.url),
 	);
 
 	frontEndPort.start();
@@ -176,14 +177,14 @@ export function createNewDownload(
 // Helper functions for `createNewDownload()`
 
 function handleUpdateDownloadingList(
-	{ data }: { data: Partial<MediaBeingDownloaded>; },
+	{ data }: MessageEvent<PartialExceptStatus>,
 	url: Readonly<string>,
 ): void {
 	const downloadingList = getDownloadingList();
 
 	dbg(`Received a message from Electron on port for "${url}":`, {
-		data,
 		downloadingList,
+		data,
 	});
 
 	// Assert that the download exists:
@@ -279,3 +280,9 @@ export function cancelDownloadAndOrRemoveItFromList(
 type DownloadingBoxProps = Readonly<
 	{ download: MediaBeingDownloaded; downloadingIndex: number; url: string; }
 >;
+
+/////////////////////////////////////////////
+
+interface PartialExceptStatus extends Partial<MediaBeingDownloaded> {
+	status: ProgressStatus;
+}

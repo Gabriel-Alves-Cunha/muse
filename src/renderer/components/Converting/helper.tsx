@@ -167,7 +167,8 @@ export function createNewConvertion(
 	frontEndPort.addEventListener("close", logThatPortIsClosing);
 	frontEndPort.addEventListener(
 		"message",
-		e => handleUpdateConvertingList(e, path),
+		(e: MessageEvent<PartialExceptStatus>) =>
+			handleUpdateConvertingList(e, path),
 	);
 
 	frontEndPort.start();
@@ -175,6 +176,8 @@ export function createNewConvertion(
 	return backEndPort;
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions for `createNewConvertion()`
 
@@ -212,7 +215,7 @@ export function cancelConversionAndOrRemoveItFromList(
 /////////////////////////////////////////////
 
 function handleUpdateConvertingList(
-	{ data }: { data: Partial<MediaBeingConverted>; },
+	{ data }: MessageEvent<PartialExceptStatus>,
 	path: Path,
 ): void {
 	const convertingList = getConvertingList();
@@ -307,6 +310,12 @@ type ConvertBoxProps = Readonly<
 /////////////////////////////////////////////
 
 export type ConvertInfo = Readonly<{ toExtension: AllowedMedias; }>;
+
+/////////////////////////////////////////////
+
+interface PartialExceptStatus extends Partial<MediaBeingConverted> {
+	status: ProgressStatus;
+}
 
 /////////////////////////////////////////////
 

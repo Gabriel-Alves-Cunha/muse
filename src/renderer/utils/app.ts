@@ -7,7 +7,7 @@ export const pages = Object.freeze(
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function resetAllAppData() {
+export function resetAllAppData(): void {
 	console.log("Resetting all app data...");
 
 	localStorage.clear();

@@ -1,6 +1,8 @@
+import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
@@ -11,13 +13,9 @@ import {
 	searchLocalComputerForMedias,
 	PlaylistActions,
 	setPlaylists,
-	WhatToDo,
 	getMainList,
+	WhatToDo,
 } from "@contexts/usePlaylists";
-import {
-	type MsgObjectElectronToReact,
-	ElectronToReactMessageEnum,
-} from "@common/@types/electron-window";
 
 const { transformPathsToMedias } = electron.media;
 
