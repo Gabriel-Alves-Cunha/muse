@@ -77,8 +77,8 @@
 	},
 	"exclude": [
 		"**/node_modules",
+		"**/app/*",
+		"**/out/*",
 		"**/.*/",
-		"app",
-		"out"
 	]
 }

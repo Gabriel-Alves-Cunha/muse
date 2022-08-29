@@ -29,11 +29,13 @@ const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(setCurrentPlayingOnLocalStorage(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		(_set, _get, _api) => defaultCurrentPlaying,
-		"currentPlaying",
-	)),
+	subscribeWithSelector(
+		setCurrentPlayingOnLocalStorage(
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			(_set, _get, _api) => defaultCurrentPlaying,
+			"currentPlaying"
+		)
+	)
 );
 
 export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
@@ -46,7 +48,7 @@ export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
 
 export function playThisMedia(
 	path: Path,
-	listType: PlaylistList = PlaylistList.MAIN_LIST,
+	listType: PlaylistList = PlaylistList.MAIN_LIST
 ): void {
 	// We need to update history:
 	setPlaylists({
@@ -70,9 +72,9 @@ export function togglePlayPause(): void {
 
 export function play(audio?: HTMLAudioElement): void {
 	(async () => {
-		audio !== undefined ?
-			await audio.play() :
-			await (document.getElementById("audio") as HTMLAudioElement).play();
+		audio !== undefined
+			? await audio.play()
+			: await (document.getElementById("audio") as HTMLAudioElement).play();
 	})();
 }
 
@@ -96,13 +98,12 @@ export function playPreviousMedia(): void {
 
 		if (path.length === 0)
 			return console.warn(
-				"A media needs to be currently selected to play a previous media!",
+				"A media needs to be currently selected to play a previous media!"
 			);
 
 		// We don't play previous media if it's the history list:
-		const correctListType = listType === PlaylistList.HISTORY ?
-			PlaylistList.MAIN_LIST :
-			listType;
+		const correctListType =
+			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
 
 		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
@@ -127,7 +128,7 @@ export function playPreviousMedia(): void {
 		if (prevMediaPath.length === 0)
 			return console.error(
 				"There should be a prevMediaPath, but there isn't!",
-				{ prevMediaPath, list },
+				{ prevMediaPath, listType, list }
 			);
 
 		// We need to update history:
@@ -149,13 +150,12 @@ export function playNextMedia(): void {
 
 		if (path.length === 0)
 			return console.info(
-				"A media needs to be currently selected to play a next media!",
+				"A media needs to be currently selected to play a next media!"
 			);
 
 		// We don't play next media if it's the history list:
-		const correctListType = listType === PlaylistList.HISTORY ?
-			PlaylistList.MAIN_LIST :
-			listType;
+		const correctListType =
+			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
 
 		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
@@ -210,15 +210,12 @@ export function playNextMedia(): void {
 ////////////////////////////////////////////////
 // Register functions to window mediaSession:
 
-if (import.meta.vitest === undefined) {
-	navigator.mediaSession.setActionHandler(
-		"previoustrack",
-		() => playPreviousMedia(),
-	);
-	navigator.mediaSession.setActionHandler("nexttrack", () => playNextMedia());
-	navigator.mediaSession.setActionHandler("pause", () => pause());
-	navigator.mediaSession.setActionHandler("play", () => play());
-}
+navigator?.mediaSession?.setActionHandler?.("previoustrack", () =>
+	playPreviousMedia()
+);
+navigator?.mediaSession?.setActionHandler?.("nexttrack", () => playNextMedia());
+navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
+navigator?.mediaSession?.setActionHandler?.("play", () => play());
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -239,7 +236,7 @@ if (import.meta.vitest === undefined)
 			setAudioSource(path, prevPath);
 
 			changeMediaSessionMetadata(path);
-		},
+		}
 	);
 
 ////////////////////////////////////////////////
@@ -255,7 +252,7 @@ function setAudioSource(path: Path, prevPath: Path) {
 
 		time(
 			() => handleDecorateMediaRow(path, prevPath),
-			"handleDecorateMediaRow",
+			"handleDecorateMediaRow"
 		);
 	}, 150);
 
@@ -271,9 +268,10 @@ const playingClass = "playing";
  * and undecorate previous playing ones.
  */
 function handleDecorateMediaRow(path: Path, previousPath: Path) {
-	const prevElements = previousPath.length > 0 ?
-		document.querySelectorAll(`[data-path="${previousPath}"]`) :
-		null;
+	const prevElements =
+		previousPath.length > 0
+			? document.querySelectorAll(`[data-path="${previousPath}"]`)
+			: null;
 	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
 	if (prevElements === null)
@@ -291,6 +289,8 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 ////////////////////////////////////////////////
 
 function changeMediaSessionMetadata(path: Path): void {
+	if (navigator?.mediaSession === undefined) return;
+
 	const media = getMainList().get(path);
 
 	if (media === undefined) return;
@@ -308,6 +308,8 @@ function changeMediaSessionMetadata(path: Path): void {
 ////////////////////////////////////////////////
 // Types:
 
-export type CurrentPlaying = Readonly<
-	{ listType: PlaylistList; path: Path; currentTime: number; }
->;
+export type CurrentPlaying = Readonly<{
+	listType: PlaylistList;
+	path: Path;
+	currentTime: number;
+}>;

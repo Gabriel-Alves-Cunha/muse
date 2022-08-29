@@ -20,4 +20,3 @@ win:
 publish:
   releaseType: release
   provider: github
-  # token: GH_TOKEN # If github is private
