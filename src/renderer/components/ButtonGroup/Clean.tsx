@@ -13,10 +13,10 @@ import { ButtonFromGroup } from "./styles";
 
 export const Clean = ({ className }: Props) => (
 	<ButtonFromGroup
-		data-tip={t("tooltips.cleanList")}
+		aria-label={t("tooltips.cleanList")}
+		title={t("tooltips.cleanList")}
 		onPointerUp={cleanProperList}
 		className={className}
-		data-place="bottom"
 	>
 		<CleanIcon size={18} />
 	</ButtonFromGroup>

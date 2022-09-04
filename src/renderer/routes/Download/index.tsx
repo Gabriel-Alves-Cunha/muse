@@ -100,6 +100,7 @@ const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 	state.result;
 
 function Result() {
+	// Only need to change on `result`'s change:
 	const { imageURL, title } = useSearchInfo(resultSelector);
 
 	return title.length > 0 ?

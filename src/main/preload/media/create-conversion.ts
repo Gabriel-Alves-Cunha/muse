@@ -124,7 +124,7 @@ export async function convertToAudio(
 			// timemark: the timestamp of the current frame in seconds
 
 			// To react:
-			if (!interval) {
+			if (interval === undefined) {
 				// ^ Only in the firt time this setInterval is called!
 				interval = setInterval(() =>
 					electronPort!.postMessage({

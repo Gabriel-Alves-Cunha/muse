@@ -22,16 +22,14 @@ const randomColor = randomBackgroundColorForConsole();
 async function createMedia(
 	path: Readonly<Path>,
 	assureMediaSizeIsGreaterThan60KB: Readonly<boolean>,
-	ignoreMediaWithLessThan60Seconds: Readonly<boolean>
+	ignoreMediaWithLessThan60Seconds: Readonly<boolean>,
 ): Promise<readonly [Path, Media]> {
 	return new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
 		time(() => {
 			const {
-				fileAbstraction: {
-					readStream: { length },
-				},
+				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 				tag: {
 					title = basename,
@@ -50,14 +48,14 @@ async function createMedia(
 
 			if (ignoreMediaWithLessThan60Seconds === true && durationInSeconds < 60)
 				return reject(
-					`Skipping "${path}" because the duration is ${durationInSeconds.toPrecision(
-						2
-					)} s (less than 60 s)!`
+					`Skipping "${path}" because the duration is ${
+						durationInSeconds.toPrecision(2)
+					} s (less than 60 s)!`,
 				);
 
 			if (assureMediaSizeIsGreaterThan60KB === true && length < 60_000)
 				return reject(
-					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`
+					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`,
 				);
 
 			/////////////////////////////////////////////
@@ -72,10 +70,9 @@ async function createMedia(
 			}
 
 			const media: Media = {
-				image:
-					picture !== undefined && mimeType
-						? (`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64)
-						: "",
+				image: picture !== undefined && mimeType ?
+					(`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64) :
+					"",
 				duration: formatDuration(durationInSeconds),
 				birthTime: statSync(path).birthtimeMs,
 				artist: albumArtists[0] ?? "",
@@ -96,7 +93,7 @@ async function createMedia(
 export async function transformPathsToMedias(
 	paths: readonly Path[],
 	assureMediaSizeIsGreaterThan60KB = true,
-	ignoreMediaWithLessThan60Seconds = true
+	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<readonly [Path, Media][]> {
 	return time(async () => {
 		console.groupCollapsed("Creating medias...");
@@ -105,13 +102,14 @@ export async function transformPathsToMedias(
 			createMedia(
 				path,
 				assureMediaSizeIsGreaterThan60KB,
-				ignoreMediaWithLessThan60Seconds
-			).catch(e =>
-				console.error(
-					`There was an error creating media of path = "${path}".\n\n`,
-					e
-				)
+				ignoreMediaWithLessThan60Seconds,
 			)
+				.catch(e =>
+					console.error(
+						`There was an error creating media of path = "${path}".\n\n`,
+						e,
+					)
+				)
 		);
 
 		// Run promises in parallel:

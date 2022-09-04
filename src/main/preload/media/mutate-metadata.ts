@@ -47,7 +47,7 @@ async function handleImageMetadata(
 	downloadImg: Readonly<boolean> = false,
 	imageURL: ImageURL = "",
 ): Promise<void> {
-	if (downloadImg) {
+	if (downloadImg === true) {
 		try {
 			dbg("Downloading picture...");
 

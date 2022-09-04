@@ -529,9 +529,7 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 
 export const diacriticRegex = /\p{Diacritic}/gu;
 
-export function searchMedia(
-	highlight: Readonly<Lowercase<string>>,
-): [Path, Media][] {
+export function searchMedia(highlight: string): [Path, Media][] {
 	return time(() => {
 		const medias: [Path, Media][] = [];
 

@@ -26,20 +26,22 @@ export const separatedByCommaOrSemiColon = /,|;/gm;
 
 /////////////////////////////////////////
 
-export const allowedMedias = Object.freeze([
-	"vorbis",
-	"webm",
-	"flac",
-	"opus",
-	"mp3",
-	"pcm",
-	"aac",
-	"m4a",
-	"m4p",
-	"m4b",
-	"m4r",
-	"m4v",
-] as const);
+export const allowedMedias = Object.freeze(
+	[
+		"vorbis",
+		"webm",
+		"flac",
+		"opus",
+		"mp3",
+		"pcm",
+		"aac",
+		"m4a",
+		"m4p",
+		"m4b",
+		"m4r",
+		"m4v",
+	] as const,
+);
 
 export type AllowedMedias = typeof allowedMedias[number];
 
@@ -54,11 +56,9 @@ export function formatDuration(time: number | undefined): Readonly<string> {
 		seconds = ("0" + (time % 60)).slice(-2),
 		days = floor(time / 86_400);
 
-	return (
-		(days > 0 ? days + "d " : "") +
+	return ((days > 0 ? days + "d " : "") +
 		(Number(hour) > 0 ? hour + ":" : "") +
-		(minutes + ":" + seconds)
-	);
+		(minutes + ":" + seconds));
 }
 
 /////////////////////////////////////////
@@ -66,9 +66,10 @@ export function formatDuration(time: number | undefined): Readonly<string> {
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 export function makeRandomString(length = 15): Readonly<string> {
-	const randomString = Array.from({ length }, () =>
-		chars.charAt(floor(random() * chars.length))
-	).join("");
+	const randomString = Array
+		.from({ length }, () =>
+			chars.charAt(floor(random() * chars.length)))
+		.join("");
 
 	return randomString;
 }
@@ -83,7 +84,9 @@ export function sleep(ms: number, logFn?: () => void): Promise<void> {
 
 /////////////////////////////////////////
 
-export const stringifyJson = (obj: unknown) => JSON.stringify(obj, null, 2);
+export function stringifyJson(obj: unknown) {
+	return JSON.stringify(obj, null, 2);
+}
 
 /////////////////////////////////////////
 
@@ -91,7 +94,7 @@ export const stringifyJson = (obj: unknown) => JSON.stringify(obj, null, 2);
 export const mapTo = (
 	value: Readonly<number>,
 	from: readonly [start: number, end: number],
-	to: readonly [start: number, end: number]
+	to: readonly [start: number, end: number],
 ): Readonly<number> =>
 	((value - from[0]) * (to[1] - to[0])) / (from[1] - from[0]) + to[0];
 
@@ -110,7 +113,9 @@ export function randomBackgroundColorForConsole(): () => string {
 	return () => {
 		if (index >= colors.length) index = 0;
 
-		const color = `color: ${colors[index]?.[0]}; background-color: ${colors[index]?.[1]}; border-radius: 2px; padding: 2px 4px; font-weight: bold;`;
+		const color = `color: ${colors[index]
+			?.[0]}; background-color: ${colors[index]
+			?.[1]}; border-radius: 2px; padding: 2px 4px; font-weight: bold;`;
 
 		++index;
 

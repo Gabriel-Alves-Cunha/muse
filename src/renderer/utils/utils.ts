@@ -18,8 +18,9 @@ export function getRandomInt(min: number, max: number): number {
 
 //////////////////////////////////////////
 
-export const capitalize = (str: string): Capitalize<typeof str> =>
-	str.charAt(0).toUpperCase() + str.slice(1);
+export function capitalize(str: string): string {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 //////////////////////////////////////////
 

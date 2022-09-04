@@ -101,7 +101,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 			</StyledDescription>
 
 			<CloseDialog
-				data-tip={t("tooltips.closeDialog")}
+				aria-label={t("tooltips.closeDialog")}
+				title={t("tooltips.closeDialog")}
 				ref={closeButtonRef}
 				id="close-icon"
 			>

@@ -1,10 +1,10 @@
-import type { DeepReadonly } from "./@types/utils";
+import type { DeepReadonly } from "./@types/utils.js";
 import type {
 	MsgObjectElectronToReact,
 	MsgObjectReactToElectron,
-} from "@common/@types/electron-window";
+} from "@common/@types/electron-window.js";
 
-import { dbg } from "./utils";
+import { dbg } from "./utils.js";
 
 export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,

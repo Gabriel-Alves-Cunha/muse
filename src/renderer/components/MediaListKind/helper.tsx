@@ -103,8 +103,8 @@ const Row = memo(
 		>
 			<PlayButton
 				onPointerUp={e => selectOrPlayMedia(e, path)}
-				data-tip={t("tooltips.playThisMedia")}
-				data-place="bottom"
+				aria-label={t("tooltips.playThisMedia")}
+				title={t("tooltips.playThisMedia")}
 			>
 				<Img>
 					<ImgWithFallback

@@ -15,7 +15,13 @@ import { dbg } from "@common/utils";
 
 const mainUrlPath = "/download/medias/";
 
+const unableToShareMediasError = new Error(
+	"Unable to get your ip address. Sharing medias is not possible!",
+);
+
 export function createServer(filepaths: readonly Path[]): ClientServerAPI {
+	if (myIp.length === 0) throw unableToShareMediasError;
+
 	const port = 3_010;
 	const url: QRCodeURL = `http://${myIp}:${port}`;
 	const router = new Router();
@@ -55,6 +61,8 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 
 				a.download = filename;
 				a.href = url;
+
+				// document.appendChild(a);
 
 				a.click();
 			}
@@ -146,10 +154,8 @@ function getMyIpAddress(): Readonly<string> {
 			.find(Boolean)
 			?.address ?? "";
 
-	if (!myIp)
-		throw new Error(
-			"Unable to get your ip address. Sharing medias is not possible!",
-		);
+	if (myIp.length === 0)
+		throw unableToShareMediasError;
 
 	return myIp;
 }

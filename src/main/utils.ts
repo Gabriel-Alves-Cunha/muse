@@ -1,8 +1,9 @@
+import type { Base64 } from "@common/@types/generalTypes";
+
 import { homedir } from "node:os";
 import { join } from "node:path";
 
 import { isDev } from "@common/utils";
-import { Base64 } from "@common/@types/generalTypes";
 
 /////////////////////////////////////////
 
@@ -29,12 +30,13 @@ export const dirs = Object.freeze({
 
 /////////////////////////////////////////
 
-export const isBase64Image = (str: string): str is Base64 =>
-	str.includes("data:image/") && str.includes(";base64,");
+export function isBase64Image(str: string): str is Base64 {
+	return str.includes("data:image/") && str.includes(";base64,");
+}
 
 /////////////////////////////////////////
 
-// TODO: I don't know how to put this api key in .env and get Vite to pick it up!!
+// TODO: I don't know how to put this api key in .env and get Vite+elecrun to pick it up!!
 export const lyricApiKey =
 	"1996d0wcfWZB02aebwtkAYhcnERFnAbOGlDiIPWDNdnh3K0955cZpHov";
 export const lyricsAPI = "https://api.happi.dev/v1/music";

@@ -116,7 +116,8 @@ export function ShareDialog() {
 
 			<StyledDialogShareContent className="notransition">
 				<CloseDialogTrigger
-					data-tip={t("tooltips.closeShareScreen")}
+					aria-label={t("tooltips.closeShareScreen")}
+					title={t("tooltips.closeShareScreen")}
 					onPointerUp={() =>
 						closePopover(server?.close)}
 				>

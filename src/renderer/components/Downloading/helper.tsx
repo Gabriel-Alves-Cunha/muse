@@ -93,8 +93,9 @@ const DownloadingBox = (
 						isDownloadList,
 						url,
 					)}
-				data-tip={t("tooltips.cancelDownload")}
+				aria-label={t("tooltips.cancelDownload")}
 				className="cancel-button notransition"
+				title={t("tooltips.cancelDownload")}
 			>
 				<Cancel size={12} />
 			</CancelButton>

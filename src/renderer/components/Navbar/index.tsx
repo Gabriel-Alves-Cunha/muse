@@ -63,7 +63,8 @@ function ButtonsForPages() {
 		<Buttons>
 			{pages.map(page => (
 				<button
-					data-tip={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
+					aria-label={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
+					title={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
 					className={page === currPage ? "active" : ""}
 					onPointerUp={() => setPage({ page })}
 					key={page}

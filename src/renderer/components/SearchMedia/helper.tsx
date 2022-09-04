@@ -232,9 +232,9 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 	return (
 		<RowWrapper data-path={path}>
 			<PlayButton
+				aria-label={t("tooltips.playThisMedia")}
 				onPointerUp={() => playThisMedia(path)}
-				data-tip={t("tooltips.playThisMedia")}
-				data-place="right"
+				title={t("tooltips.playThisMedia")}
 			>
 				<Img>
 					<ImgWithFallback
@@ -278,17 +278,17 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 type Searcher = Readonly<
 	{
 		results: readonly [Path, Media][];
-		highlight: Lowercase<string>;
 		searchStatus: SearchStatus;
 		isInputOnFocus: boolean;
 		searchTerm: string;
+		highlight: string;
 	}
 >;
 
 /////////////////////////////////////////
 
 type MediaSearchRowProps = Readonly<
-	{ highlight: Lowercase<string>; media: Media; path: Path; }
+	{ highlight: string; media: Media; path: Path; }
 >;
 
 /////////////////////////////////////////

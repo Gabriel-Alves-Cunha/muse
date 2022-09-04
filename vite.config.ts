@@ -47,27 +47,29 @@ export default defineConfig(({ mode }) => {
 			chunkSizeWarningLimit: 1_000,
 			reportCompressedSize: false,
 			outDir: outDirRenderer,
+			sourcemap: !isProd,
 			emptyOutDir: true,
 			minify: "esbuild",
 			target: "esnext",
-			sourcemap: !isProd,
 			rollupOptions: {
+				// The 'debug' pkg is already on nodeJS:
+				external: ["debug"],
 				output: {
 					assetFileNames: "assets/[name].[ext]",
 					entryFileNames: "[name].js",
 					chunkFileNames: "[name].js",
 					minifyInternalExports: true,
 					sourcemap: !isProd,
-					compact: !isProd,
+					compact: isProd,
 					format: "esm",
 				},
 			},
 		},
 
 		esbuild: {
+			sourcemap: !isProd,
 			treeShaking: true,
 			target: "esnext",
-			sourcemap: !isProd,
 			format: "esm",
 		},
 

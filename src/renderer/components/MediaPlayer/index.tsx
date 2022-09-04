@@ -113,7 +113,7 @@ export function MediaPlayer() {
 	}, [media, path]);
 
 	return (
-		<Wrapper aria-label="Media player">
+		<Wrapper aria-label="Media player" title="Media player">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard

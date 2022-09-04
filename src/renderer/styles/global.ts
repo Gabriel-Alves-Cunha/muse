@@ -1,5 +1,5 @@
 import { createStitches, type CSSProperties } from "@stitches/react";
-import { toast, type ToastOptions } from "react-toastify";
+import { toast } from "react-toastify";
 
 import { areArraysEqualByValue } from "@utils/array";
 import { getObjectDeepKeys } from "@utils/object";
@@ -19,14 +19,17 @@ export const { styled, globalCss, keyframes, createTheme, css } =
 
 			"media-player": "(max-width: 177px)",
 		},
+
 		theme: {
+			fonts: { primary: "Assistant", secondary: "Source Sans Pro" },
+
 			transitions: {
 				boxShadow: "box-shadow .2s ease-in-out 20ms",
 				bgc: "background-color .1s ease-in-out 20ms",
 				scale: "scale .2s ease-in-out 20ms",
 			},
-			fonts: { primary: "Assistant", secondary: "Source Sans Pro" },
 		},
+
 		utils: {
 			size: (width: CSSProperties["width"]) => ({ height: width, width }),
 			pos: (position: CSSProperties["position"]) => ({ position }),
@@ -290,7 +293,7 @@ export const lightTheme = createTheme({
 // darkTheme and lightTheme must have the same keys
 // (colors, shadows, etc) so that the theme can be
 // switched between them without react rerenders!
-if (isDev) {
+if (isDev === true) {
 	// @ts-ignore It will work:
 	const lightThemeKeys = getObjectDeepKeys(lightTheme);
 	// @ts-ignore It will work:
@@ -417,21 +420,6 @@ export const GlobalCSS = globalCss({
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const toastOptions: ToastOptions = {
-	hideProgressBar: false,
-	position: "top-right",
-	closeOnClick: true,
-	pauseOnHover: true,
-	autoClose: 5000,
-	draggable: true,
-};
-
-export const successToast = (info: string) => toast.success(info, toastOptions);
-
-////////////////////////////////////////////
-
-export const infoToast = (info: string) => toast.info(info, toastOptions);
-
-////////////////////////////////////////////
-
-export const errorToast = (info: string) => toast.error(info, toastOptions);
+export const successToast = (info: string) => toast.success(info);
+export const errorToast = (info: string) => toast.error(info);
+export const infoToast = (info: string) => toast.info(info);

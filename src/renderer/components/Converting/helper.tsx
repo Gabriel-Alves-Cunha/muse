@@ -108,7 +108,8 @@ const ConvertBox = (
 						!isDownloadList,
 						path,
 					)}
-				data-tip={t("tooltips.cancelConversion")}
+				aria-label={t("tooltips.cancelConversion")}
+				title={t("tooltips.cancelConversion")}
 				className="notransition"
 			>
 				<Cancel size={12} />

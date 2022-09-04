@@ -55,10 +55,10 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 
 	return (
 		<CircledIconButton
-			data-tip={t("tooltips.toggleOpenLyrics")}
+			aria-label={t("tooltips.toggleOpenLyrics")}
+			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
 			disabled={media === undefined}
-			data-place="bottom"
 		>
 			{media?.lyrics ?
 				<LyricsPresent size={16} /> :
@@ -86,8 +86,9 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
 		<Album>{displayTitle === true ? media?.title : media?.album}</Album>
 
 		<CircledIconButton
-			data-tip={t("tooltips.toggleFavorite")}
+			aria-label={t("tooltips.toggleFavorite")}
 			onPointerUp={() => toggleFavorite(path)}
+			title={t("tooltips.toggleFavorite")}
 			disabled={media === undefined}
 		>
 			{getFavorites().has(path) === true ?

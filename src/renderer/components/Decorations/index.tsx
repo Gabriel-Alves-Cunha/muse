@@ -71,24 +71,25 @@ export const DecorationsDown = () => (
 const Buttons = () => (
 	<WindowButtonsWrapper className="notransition">
 		<WindowButton
-			data-tip={t("tooltips.closeWindow")}
+			aria-label={t("tooltips.closeWindow")}
+			title={t("tooltips.closeWindow")}
 			onPointerUp={closeWindow}
-			data-place="left"
 			id="close"
 		>
 			<Close size={16} />
 		</WindowButton>
 
 		<WindowButton
-			data-tip={t("tooltips.toggleMaximizeWindow")}
+			aria-label={t("tooltips.toggleMaximizeWindow")}
+			title={t("tooltips.toggleMaximizeWindow")}
 			onPointerUp={toggleMaximize}
-			data-place="left"
 		>
 			<Maximize size={16} />
 		</WindowButton>
 
 		<WindowButton
-			data-tip={t("tooltips.toggleMinimizeWindow")}
+			aria-label={t("tooltips.toggleMinimizeWindow")}
+			title={t("tooltips.toggleMinimizeWindow")}
 			onPointerUp={minimizeWindow}
 		>
 			<Minimize size={16} />

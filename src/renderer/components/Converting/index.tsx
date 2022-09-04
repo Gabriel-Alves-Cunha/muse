@@ -56,8 +56,9 @@ export function Converting() {
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<StyledPopoverTrigger
-				data-tip={t("tooltips.showAllConvertingMedias")}
 				className={convertingListSize > 0 ? "has-items " : ""}
+				aria-label={t("tooltips.showAllConvertingMedias")}
+				title={t("tooltips.showAllConvertingMedias")}
 			>
 				<span data-length={convertingListSize}></span>
 

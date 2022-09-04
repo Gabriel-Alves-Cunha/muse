@@ -1,6 +1,19 @@
+import type { Base64 } from "@common/@types/generalTypes";
+
 import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { dbg, stringifyJson } from "@common/utils";
-import { Base64 } from "@common/@types/generalTypes";
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Constants:
+
+const headers = {
+	"content-type": "application/json",
+	"x-happi-key": lyricApiKey,
+};
+
+const method = "GET";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -57,17 +70,14 @@ async function queryForPossibleLyric(
 
 	const jsonRes =
 		await (await fetch(`${lyricsAPI}?${params.toString()}`, {
-			headers: {
-				"content-type": "application/json",
-				"x-happi-key": lyricApiKey,
-			},
-			method: "GET",
+			headers,
+			method,
 		}))
 			.json() as Track | ErrorResponse;
 
 	dbg({ queryForPossibleLyric: jsonRes });
 
-	if (!jsonRes.success)
+	if (jsonRes.success === false)
 		throw new Error(jsonRes.error);
 
 	const [track] = jsonRes.result;
@@ -99,19 +109,13 @@ async function queryForLyric(
 ): Promise<Readonly<string>> {
 	dbg(`Querying for lyricURL = "${lyricURL}".`);
 
-	const jsonRes =
-		await (await fetch(lyricURL, {
-			headers: {
-				"content-type": "application/json",
-				"x-happi-key": lyricApiKey,
-			},
-			method: "GET",
-		}))
-			.json() as ErrorResponse | QueryForLyricsSuccessResponse;
+	const jsonRes = await (await fetch(lyricURL, { method, headers })).json() as
+		| QueryForLyricsSuccessResponse
+		| ErrorResponse;
 
 	dbg({ queryForLyricJSONResponse: jsonRes });
 
-	if (!jsonRes.success) {
+	if (jsonRes.success === false) {
 		console.error(jsonRes.error);
 
 		return "";
@@ -125,8 +129,8 @@ async function queryForLyric(
 async function queryForImage(imageURL: Readonly<string>): Promise<Base64> {
 	dbg(`Querying for lyricURL = "${imageURL}".`);
 
-	const blob =
-		await (await fetch(imageURL, { redirect: "follow", method: "GET" })).blob();
+	const blob = await (await fetch(imageURL, { redirect: "follow", method }))
+		.blob();
 
 	const base64 = await blobToBase64(blob);
 
@@ -152,33 +156,41 @@ function blobToBase64(blob: Blob): Promise<Base64> {
 /////////////////////////////////////////
 // Types:
 
-type PossibleLyrics = Readonly<
-	{ albumName: string; imageURL: string; lyricURL: string; title: string; }
->;
+interface PossibleLyrics {
+	readonly albumName: string;
+	readonly imageURL: string;
+	readonly lyricURL: string;
+	readonly title: string;
+}
 
 /////////////////////////////////////////
 
 interface QueryForLyricsSuccessResponse {
-	result: { lyrics: string; };
-	success: true;
+	readonly result: { lyrics: string; };
+	readonly success: true;
 }
 
 /////////////////////////////////////////
 
 // From Happy's docs:
 interface Track {
-	success: true;
-	result: [
+	readonly success: true;
+	readonly result: readonly [
 		{ api_lyrics: string; track: string; album: string; cover: string; },
 	];
 }
 
 /////////////////////////////////////////
 
-type ErrorResponse = Readonly<{ success: false; error: string; }>;
+interface ErrorResponse {
+	readonly success: false;
+	readonly error: string;
+}
 
 /////////////////////////////////////////
 
-export type LyricsResponse = Readonly<
-	{ image: string; lyric: string; albumName: string; }
->;
+export interface LyricsResponse {
+	readonly albumName: string;
+	readonly image: string;
+	readonly lyric: string;
+}

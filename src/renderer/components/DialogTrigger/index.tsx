@@ -12,8 +12,8 @@ import { styled } from "@styles/global";
 export const DialogTrigger = ({ children, className, tooltip }: Props) => (
 	<StyledDialogTrigger
 		className={"notransition " + (className ?? "")}
-		data-place="bottom"
-		data-tip={tooltip}
+		aria-label={tooltip}
+		title={tooltip}
 	>
 		{children}
 	</StyledDialogTrigger>

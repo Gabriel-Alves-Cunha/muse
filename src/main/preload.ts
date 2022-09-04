@@ -38,13 +38,16 @@ import {
 	ReactToElectronMessageEnum,
 } from "@common/enums";
 
+// @ts-ignore => will test if it exists
+dbg("process.env.LYRIC_API_KEY =", process.env.LYRIC_API_KEY);
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
 // Expose methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object:
-const electron: VisibleElectron = Object.freeze({
+const visibleElectronAPI: VisibleElectron = Object.freeze({
 	fs: { getFullPathOfFilesForFilesInThisDirectory, deleteFile, readDir },
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
@@ -53,7 +56,7 @@ const electron: VisibleElectron = Object.freeze({
 	os: { dirs },
 });
 
-contextBridge.exposeInMainWorld("electron", electron);
+contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

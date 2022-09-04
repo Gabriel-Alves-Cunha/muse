@@ -73,7 +73,8 @@ export function Downloading() {
 			<StyledPopoverTrigger
 				className={(downloadingListSize > 0 ? "has-items " : "") +
 					(isOpen === true ? "active " : "")}
-				data-tip={t("tooltips.showAllDownloadingMedias")}
+				aria-label={t("tooltips.showAllDownloadingMedias")}
+				title={t("tooltips.showAllDownloadingMedias")}
 			>
 				<span data-length={downloadingListSize}></span>
 

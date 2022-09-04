@@ -70,7 +70,8 @@ export { clipboard as extendedClipboard };
 /////////////////////////////////////////
 // Types:
 
-export interface ClipboardExtended extends Electron.Clipboard, ClipboardExtension {}
+export interface ClipboardExtended
+	extends Electron.Clipboard, ClipboardExtension {}
 
 interface ClipboardExtension {
 	watcherId: NodeJS.Timer | undefined;

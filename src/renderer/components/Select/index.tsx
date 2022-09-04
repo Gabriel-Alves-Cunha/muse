@@ -33,11 +33,7 @@ export const Select = <Options extends string>(
 	}: Props<Options>,
 ) => (
 	<Root value={value} onValueChange={setValue}>
-		<Trigger
-			className={triggerClassName}
-			data-place="bottom"
-			data-tip={tooltip}
-		>
+		<Trigger className={triggerClassName} aria-label={tooltip} title={tooltip}>
 			<Value>{triggerTitle}</Value>
 
 			{children}

@@ -1,7 +1,6 @@
-import type { Page } from "@common/@types/generalTypes";
+import type { Page } from "@common/@types/generalTypes.js";
 
 import { ToastContainer } from "react-toastify";
-import ReactTooltip from "react-tooltip";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
@@ -42,18 +41,6 @@ export function App() {
 				draggable
 			/>
 
-			<ReactTooltip
-				backgroundColor="#181818"
-				globalEventOff="click"
-				className="tooltip"
-				delayShow={1_000}
-				textColor="white"
-				delayHide={20}
-				effect="solid"
-				multiline
-				border
-			/>
-
 			<ShareDialog />
 
 			<DecorationsTop />
@@ -72,15 +59,17 @@ export function App() {
 //////////////////////////////////////////
 // Helper functions:
 
-const Main = () => (
-	<Content>
-		<Navbar />
+function Main() {
+	return (
+		<Content>
+			<Navbar />
 
-		<PageToShow />
+			<PageToShow />
 
-		<MediaPlayer />
-	</Content>
-);
+			<MediaPlayer />
+		</Content>
+	);
+}
 
 //////////////////////////////////////////
 

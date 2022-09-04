@@ -120,7 +120,7 @@ export async function createDownload(
 			percentageToSend = percentage;
 
 			// To client:
-			if (!interval) {
+			if (interval === undefined) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort!.postMessage({ percentage: percentageToSend }),
