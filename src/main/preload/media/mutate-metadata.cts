@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { ImageURL, Base64, Path } from "@common/@types/generalTypes";
+import type { Mutable } from "@common/@types/utils";
 import type { Tags } from "@common/@types/electron-window";
 
 import { readFile, rename } from "node:fs/promises";
@@ -15,13 +16,13 @@ import {
 import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
-import { ElectronToReactMessageEnum } from "@common/enums";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { dbg, dbgTests, eraseImg } from "@common/utils";
+import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { doesPathExists } from "../file";
-import { isBase64Image } from "@main/utils";
-import { Mutable } from "@common/@types/utils";
+import { doesPathExists } from "../file.cjs";
+import { isBase64Image } from "@main/utils.cjs";
+import { emptyString } from "@common/empty";
 
 const { error } = console;
 
@@ -44,26 +45,20 @@ const checkForMediaPath = validator.compile({
 
 async function handleImageMetadata(
 	file: MediaFile,
-	downloadImg: Readonly<boolean> = false,
-	imageURL: ImageURL = "",
+	downloadImg = false,
+	imageURL: ImageURL = emptyString,
 ): Promise<void> {
 	if (downloadImg === true) {
 		try {
 			dbg("Downloading picture...");
 
 			file.tag.pictures = await downloadThumbnail(imageURL);
-
-			console.assert(
-				file.tag.pictures.length === 1,
-				"[Error] No pictures were added!",
-				file.tag.pictures,
-			);
 		} catch (err) {
 			error("There was an error getting the picture data.", err);
 
 			// Send error to client:
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ERROR,
+				type: ElectronToReactMessage.ERROR,
 				error: err as Error,
 			});
 		}
@@ -91,7 +86,7 @@ async function handleImageMetadata(
 
 	// if received a base64 image:
 	if (isBase64Image(imageURL))
-		createAndSaveImageOnMedia(imageURL as Base64, file);
+		return createAndSaveImageOnMedia(imageURL as Base64, file);
 
 	/////////////////////////////////////////////
 
@@ -103,14 +98,6 @@ async function handleImageMetadata(
 
 		createAndSaveImageOnMedia(base64, file);
 	}
-
-	/////////////////////////////////////////////
-
-	console.assert(
-		file.tag.pictures.length === 1,
-		"No pictures added!",
-		file.tag.pictures,
-	);
 }
 
 /////////////////////////////////////////////
@@ -121,7 +108,7 @@ export async function downloadThumbnail(
 	return new Promise((resolve, reject) =>
 		get(url, async res => {
 			const byteVector = await ByteVector.fromStream(res);
-			const mimeType = res.headers["content-type"] ?? "";
+			const mimeType = res.headers["content-type"] ?? emptyString;
 
 			const picture = Picture.fromFullData(
 				byteVector,
@@ -144,7 +131,7 @@ export async function downloadThumbnail(
 /////////////////////////////////////////////
 
 export function createAndSaveImageOnMedia(
-	imgAsString: Readonly<Base64>,
+	imgAsString: Base64,
 	file: MediaFile,
 ): void {
 	const txtForByteVector = imgAsString.slice(
@@ -178,7 +165,7 @@ export function createAndSaveImageOnMedia(
 
 function handleAlbumArtists(
 	file: MediaFile,
-	albumArtists: Readonly<string[] | string>,
+	albumArtists: string | readonly string[],
 ): void {
 	if (albumArtists instanceof Array)
 		file.tag.albumArtists = albumArtists as Mutable<string[]>;
@@ -217,14 +204,14 @@ function handleLyrics(file: MediaFile, lyrics: string): void {
 /** Returns a new file name if it exists, otherwise, just an empty string. */
 function handleTitle(
 	file: MediaFile,
-	oldMediaPath: Readonly<string>,
-	title: Readonly<string>,
+	oldMediaPath: string,
+	title: string,
 ): Path {
 	const sanitizedTitle = sanitize(title);
 	// If they are the same, there is no need to treat this as a new
 	// file, or if the sanitization left an empty string, return "":
 	if (getBasename(oldMediaPath) === sanitizedTitle || !sanitizedTitle)
-		return "";
+		return emptyString;
 
 	const newPath = join(
 		dirname(oldMediaPath),
@@ -241,41 +228,41 @@ function handleTitle(
 /////////////////////////////////////////////
 
 async function talkToClientSoItCanGetTheNewMedia(
-	fileNewPath: Readonly<string>,
-	mediaPath: Readonly<string>,
-	isNewMedia: Readonly<boolean> = false,
+	newPathOfFile: string,
+	mediaPath: string,
+	isNewMedia = false,
 ): Promise<void> {
-	if (fileNewPath)
+	if (newPathOfFile)
 		try {
-			await rename(mediaPath, fileNewPath);
+			await rename(mediaPath, newPathOfFile);
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
-				mediaPath: fileNewPath,
+				type: ElectronToReactMessage.ADD_ONE_MEDIA,
+				mediaPath: newPathOfFile,
 			});
 
 			// and remove old one
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
+				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
 				mediaPath,
 			});
 		} catch (error) {
 			// Send error to react process: (error renaming file => file has old path)
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ERROR,
+				type: ElectronToReactMessage.ERROR,
 				error: error as Error,
 			});
 
 			// Since there was an error, let's at least refresh media:
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
+				type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
 				mediaPath,
 			});
 		} finally {
 			dbg(
 				"Was file renamed?",
-				await doesPathExists(fileNewPath),
+				await doesPathExists(newPathOfFile),
 				"Does old file remains?",
 				await doesPathExists(mediaPath),
 			);
@@ -283,15 +270,12 @@ async function talkToClientSoItCanGetTheNewMedia(
 	/////////////////////////////////////////////
 	else if (isNewMedia)
 		// Add the new media:
-		sendMsgToClient({
-			type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
-			mediaPath,
-		});
+		sendMsgToClient({ type: ElectronToReactMessage.ADD_ONE_MEDIA, mediaPath });
 	/////////////////////////////////////////////
 	// If everything else fails, at least refresh media:
 	else
 		sendMsgToClient({
-			type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA,
+			type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
 			mediaPath,
 		});
 }
@@ -311,23 +295,30 @@ export async function writeTags(
 	const file = MediaFile.createFromPath(mediaPath);
 
 	// Handle the tags:
-	if (data.imageURL || data.downloadImg)
+	if (data.imageURL || data.downloadImg === true) {
 		await handleImageMetadata(file, data.downloadImg, data.imageURL);
 
-	const fileNewPath = data.title ?
-		handleTitle(file, mediaPath, data.title) :
-		"";
+		console.assert(
+			file.tag.pictures.length === 1,
+			"No pictures added!",
+			file.tag.pictures,
+		);
+	}
 
-	if (data.albumArtists)
+	const newPathOfFile = data.title ?
+		handleTitle(file, mediaPath, data.title) :
+		emptyString;
+
+	if (data.albumArtists !== undefined)
 		handleAlbumArtists(file, data.albumArtists);
 
-	if (data.genres)
+	if (data.genres !== undefined)
 		handleGenres(file, data.genres);
 
-	if (data.album)
+	if (data.album !== undefined)
 		handleAlbum(file, data.album);
 
-	if (data.lyrics)
+	if (data.lyrics !== undefined)
 		handleLyrics(file, data.lyrics);
 
 	dbg("New file tags =", file.tag);
@@ -339,7 +330,7 @@ export async function writeTags(
 	//
 
 	await talkToClientSoItCanGetTheNewMedia(
-		fileNewPath,
+		newPathOfFile,
 		mediaPath,
 		data.isNewMedia,
 	);

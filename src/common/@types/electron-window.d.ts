@@ -1,13 +1,14 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
+import type { DeepReadonly, Values } from "./utils";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { ClientServerAPI } from "@main/preload/share";
 import type { LyricsResponse } from "@main/preload/getLyrics.js";
-import type { DeepReadonly } from "./utils";
 import type { videoInfo } from "ytdl-core";
-import type {
-	ElectronIpcMainProcessNotificationEnum,
-	ElectronToReactMessageEnum,
-	ReactToElectronMessageEnum,
+
+import {
+	ElectronIpcMainProcessNotification,
+	ElectronToReactMessage,
+	ReactToElectronMessage,
 } from "../enums";
 
 /////////////////////////////////////////////
@@ -27,7 +28,7 @@ export type VisibleElectron = DeepReadonly<
 		os: { dirs: { documents: Path; downloads: Path; music: Path; }; };
 		notificationApi: {
 			sendNotificationToElectronIpcMainProcess(
-				type: ElectronIpcMainProcessNotificationEnum,
+				type: Values<typeof ElectronIpcMainProcessNotification>,
 			): void;
 		};
 		fs: {
@@ -65,11 +66,11 @@ export type MetadataToChange = Readonly<
 /////////////////////////////////////////////
 
 export type MsgObjectReactToElectron = Readonly<
-	| { type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD; }
-	| { type: ReactToElectronMessageEnum.ERROR; error: Error; }
-	| { type: ReactToElectronMessageEnum.CONVERT_MEDIA; }
+	| { type: typeof ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD; }
+	| { type: typeof ReactToElectronMessage.ERROR; error: Error; }
+	| { type: typeof ReactToElectronMessage.CONVERT_MEDIA; }
 	| {
-		type: ReactToElectronMessageEnum.WRITE_TAG;
+		type: typeof ReactToElectronMessage.WRITE_TAG;
 		thingsToChange: MetadataToChange;
 		mediaPath: Path;
 	}
@@ -78,27 +79,27 @@ export type MsgObjectReactToElectron = Readonly<
 /////////////////////////////////////////////
 
 export type MsgObjectElectronToReact = Readonly<
-	| { type: ElectronToReactMessageEnum.REFRESH_ONE_MEDIA; mediaPath: Path; }
-	| { type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA; mediaPath: Path; }
-	| { type: ElectronToReactMessageEnum.ADD_ONE_MEDIA; mediaPath: Path; }
-	| { type: ElectronToReactMessageEnum.ERROR; error: Error; }
-	| { type: ElectronToReactMessageEnum.REFRESH_ALL_MEDIA; }
+	| { type: typeof ElectronToReactMessage.REFRESH_ONE_MEDIA; mediaPath: Path; }
+	| { type: typeof ElectronToReactMessage.REMOVE_ONE_MEDIA; mediaPath: Path; }
+	| { type: typeof ElectronToReactMessage.ADD_ONE_MEDIA; mediaPath: Path; }
+	| { type: typeof ElectronToReactMessage.ERROR; error: Error; }
+	| { type: typeof ElectronToReactMessage.REFRESH_ALL_MEDIA; }
 	| {
-		type: ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
+		type: typeof ElectronToReactMessage.DELETE_ONE_MEDIA_FROM_COMPUTER;
 		mediaPath: Path;
 	}
 	| {
-		type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD;
+		type: typeof ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD;
 		downloadInfo: DownloadInfo;
 	}
 >;
 
 /////////////////////////////////////////////
 
-export type Tags = DeepReadonly<
+export type Tags = Readonly<
 	{
-		albumArtists?: string[];
-		genres?: string[];
+		albumArtists?: readonly string[];
+		genres?: readonly string[];
 		imageURL?: string;
 		lyrics?: string;
 		album?: string;

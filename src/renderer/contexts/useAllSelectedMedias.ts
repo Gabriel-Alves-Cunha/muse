@@ -4,7 +4,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { getSortedByDate } from "./usePlaylists";
-import { emptySet } from "@utils/map-set";
+import { emptySet } from "@common/empty";
 import { time } from "@utils/utils";
 
 ///////////////////////////////////////////////////

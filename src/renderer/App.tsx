@@ -1,5 +1,3 @@
-import type { Page } from "@common/@types/generalTypes.js";
-
 import { ToastContainer } from "react-toastify";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
@@ -73,13 +71,13 @@ function Main() {
 
 //////////////////////////////////////////
 
-const pages: Readonly<Record<Page, JSX.Element>> = Object.freeze({
+const pages = {
 	Favorites: <Favorites />,
 	Download: <Download />,
 	Convert: <Convert />,
 	History: <History />,
 	Home: <Home />,
-});
+} as const;
 
 function PageToShow() {
 	const { page } = usePage();

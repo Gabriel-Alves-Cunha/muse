@@ -1,10 +1,14 @@
-import type { DeepReadonly } from "./@types/utils.js";
+import type { DeepReadonly } from "./@types/utils";
 import type {
 	MsgObjectElectronToReact,
 	MsgObjectReactToElectron,
-} from "@common/@types/electron-window.js";
+} from "@common/@types/electron-window";
 
 import { dbg } from "./utils.js";
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
@@ -17,14 +21,23 @@ export const sendMsgToBackend = (
 		window.postMessage({ msg, source: reactSource }, "*");
 };
 
+/////////////////////////////////////////
+
 export const sendMsgToClient = (msg: MsgObjectElectronToReact): void => {
 	dbg("Sending message to client:", msg);
 
 	window.postMessage({ msg, source: electronSource }, "*");
 };
 
-const baseSource = "muse-";
-export const electronSource = `${baseSource}electron`;
-export const reactSource = `${baseSource}react`;
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+export const electronSource = "muse-electron";
+export const reactSource = "muse-react";
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Types:
 
 export type MsgWithSource<T> = DeepReadonly<{ source: string; msg: T; }>;

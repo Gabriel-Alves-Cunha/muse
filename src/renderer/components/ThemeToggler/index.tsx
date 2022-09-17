@@ -4,45 +4,45 @@ import {
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
+import { type Settings, setSettings, useSettings } from "@contexts/settings";
 import { styled, darkTheme, lightTheme } from "@styles/global";
-import { useLocalStorage } from "@hooks/useLocalStorage";
-import { keyPrefix } from "@utils/localStorage";
 import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const themeKey = `${keyPrefix}theme` as const;
-const html = document.documentElement;
 // Themes:
 const light = "light";
 const dark = "dark";
 
-const availableThemes: Readonly<Record<Themes, string>> = Object.freeze({
+const availableThemes = {
 	light: lightTheme.className,
 	dark: darkTheme.className,
-});
+} as const;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
+const themeSelector = (state: ReturnType<typeof useSettings.getState>) =>
+	state.theme;
+
 export function ThemeToggler() {
-	const [theme, setTheme] = useLocalStorage<Themes>(themeKey, light);
-	const nextTheme: Themes = theme === light ? dark : light;
+	const theme = useSettings(themeSelector);
+	const nextTheme: Settings["theme"] = theme === light ? dark : light;
 
 	function toggleTheme() {
-		html.classList.remove(availableThemes[theme]);
-		html.classList.add(availableThemes[nextTheme]);
+		document.documentElement.classList.remove(availableThemes[theme]);
+		document.documentElement.classList.add(availableThemes[nextTheme]);
 
-		setTheme(nextTheme);
+		setSettings({ theme: nextTheme });
 	}
 
 	// (Only on firt render) set the theme to initialValue (light):
 	useEffect(() => {
-		html.classList.add(availableThemes[theme]);
+		document.documentElement.classList.add(availableThemes[theme]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -75,10 +75,3 @@ const ThemeButton = styled("button", {
 
 	"&:hover, &:focus": { c: "$active-icon" },
 });
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Types:
-
-type Themes = "light" | "dark";

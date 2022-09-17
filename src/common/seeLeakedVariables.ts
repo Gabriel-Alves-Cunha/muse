@@ -18,7 +18,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 
 	// Known globals on the window object that we can safely ignored.
 	// This list should be populated manually after trial and errors.
-	const ignoredGlobals = Object.freeze([
+	const ignoredGlobals = [
 		"__vite_plugin_react_preamble_installed__",
 		"__REACT_DEVTOOLS_GLOBAL_HOOK__",
 		"__vite_plugin_react_timeout",
@@ -27,7 +27,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 		"$RefreshReg$",
 		"$RefreshSig$",
 		"electron",
-	]);
+	];
 
 	/**
 	 * Collect the global variables added to the window object by the browser by

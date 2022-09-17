@@ -1,6 +1,7 @@
 import type { Media } from "@common/@types/generalTypes";
 
 import { formatDuration } from "@common/utils";
+import { emptyString } from "@common/empty";
 
 // Make a test list full of fake medias:
 export const numberOfMedias = 30;
@@ -13,12 +14,12 @@ export const testArray = Object.freeze(
 			const media: Media = {
 				duration: formatDuration(index + 10),
 				birthTime: Date.now(),
+				artist: emptyString,
+				lyrics: emptyString,
+				album: emptyString,
+				image: emptyString,
 				size: 3_000,
 				genres: [],
-				artist: "",
-				lyrics: "",
-				album: "",
-				image: "",
 				title,
 			};
 

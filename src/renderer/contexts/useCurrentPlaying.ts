@@ -7,6 +7,7 @@ import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getFirstKey, getLastKey } from "@utils/map-set";
 import { getRandomInt, time } from "@utils/utils";
 import { getPlayOptions } from "./usePlayOptions";
+import { emptyString } from "@common/empty";
 import {
 	type MainList,
 	PlaylistActions,
@@ -24,8 +25,8 @@ import {
 
 const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: PlaylistList.MAIN_LIST,
+	path: emptyString,
 	currentTime: 0,
-	path: "",
 });
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
@@ -108,11 +109,11 @@ export function playPreviousMedia(): void {
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
 		const [firstMediaPath] = list;
-		let prevMediaPath: Path = "";
+		let prevMediaPath: Path = emptyString;
 
 		if (firstMediaPath === path) prevMediaPath = getLastKey(list) as Path;
 		else {
-			let prevPath = "";
+			let prevPath = emptyString;
 
 			for (const newPath of list.keys()) {
 				if (path === newPath) {
@@ -160,7 +161,7 @@ export function playNextMedia(): void {
 		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
 
-		let nextMediaPath = "";
+		let nextMediaPath = emptyString;
 
 		if (getPlayOptions().random) {
 			const randomIndex = getRandomInt(0, list.size);
@@ -225,7 +226,7 @@ navigator?.mediaSession?.setActionHandler?.("play", () => play());
 
 // A timeout for in case the user changes media too fast:
 // we don't load the media until the timeout ends.
-let prevMediaTimer: NodeJS.Timeout | undefined;
+let prevTimerToSetMedia: NodeJS.Timeout | undefined;
 
 if (import.meta.vitest === undefined)
 	useCurrentPlaying.subscribe(
@@ -243,13 +244,13 @@ if (import.meta.vitest === undefined)
 ////////////////////////////////////////////////
 
 function setAudioSource(path: Path, prevPath: Path) {
-	clearTimeout(prevMediaTimer);
+	clearTimeout(prevTimerToSetMedia);
 
-	const pathForElectron = `atom:///${path}`;
+	const mediaPathSuitableForElectron = `atom:///${path}`;
 
-	const mediaTimer = setTimeout(() => {
+	const timerToSetMedia = setTimeout(() => {
 		(document.getElementById("audio") as HTMLAudioElement).src =
-			pathForElectron;
+			mediaPathSuitableForElectron;
 
 		time(
 			() => handleDecorateMediaRow(path, prevPath),
@@ -257,7 +258,7 @@ function setAudioSource(path: Path, prevPath: Path) {
 		);
 	}, 150);
 
-	prevMediaTimer = mediaTimer;
+	prevTimerToSetMedia = timerToSetMedia;
 }
 
 ////////////////////////////////////////////////

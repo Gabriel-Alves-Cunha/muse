@@ -6,8 +6,8 @@ import { SiConvertio as ConvertIcon } from "react-icons/si";
 
 import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
-import { emptyMap } from "@utils/map-set";
 import { useTitle } from "@hooks/useTitle";
+import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
 import {
 	type ConvertInfo,

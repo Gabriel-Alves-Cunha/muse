@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
-const outDirRenderer = resolve(__dirname, "./app/vite-renderer-build");
+const outputRendererBuildDirectory = resolve(__dirname, "./build/renderer");
 const rendererPath = resolve(__dirname, "./src/renderer");
 
 export default defineConfig(({ mode }) => {
@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
 		test: {
 			includeSource: ["src/**/*.{js,ts}"],
 			environment: "happy-dom",
-			dir: "src/__tests__",
+			dir: "./tests",
 			logHeapUsage: true,
 			coverage: {
 				// reporter: ["html", "text"],
@@ -37,22 +37,22 @@ export default defineConfig(({ mode }) => {
 		},
 
 		define: isTest ? {} : { "import.meta.vitest": "undefined" },
-		// @ts-ignore => This shouldn't be giving an error, it works...
+		// @ts-ignore => This is giving an error cause of VitestUserConfig type... but it works.
 		plugins: [react()],
 		root: rendererPath,
 		envDir: "./",
 		base: "./",
 
 		build: {
+			outDir: outputRendererBuildDirectory,
 			chunkSizeWarningLimit: 1_000,
 			reportCompressedSize: false,
-			outDir: outDirRenderer,
 			sourcemap: !isProd,
 			emptyOutDir: true,
 			minify: "esbuild",
 			target: "esnext",
 			rollupOptions: {
-				// The 'debug' pkg is already on nodeJS:
+				// The 'debug' pkg is already on nodeJS, no need to compile it:
 				external: ["debug"],
 				output: {
 					assetFileNames: "assets/[name].[ext]",
@@ -80,6 +80,7 @@ export default defineConfig(({ mode }) => {
 				{ find: "@renderer", replacement: resolve(__dirname, "src/renderer") },
 				{ find: "@common", replacement: resolve(__dirname, "src/common") },
 				{ find: "@main", replacement: resolve(__dirname, "src/main") },
+				{ find: "@tests", replacement: resolve(__dirname, "tests") },
 				{
 					find: "@contexts",
 					replacement: resolve(__dirname, "src/renderer/contexts"),

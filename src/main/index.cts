@@ -1,5 +1,6 @@
-import type { ClipboardExtended } from "./clipboardExtended";
+import type { ClipboardExtended } from "./clipboardExtended.cjs";
 import type { DownloadInfo } from "@common/@types/generalTypes";
+import type { Values } from "@common/@types/utils.js";
 
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
 import { join, normalize } from "node:path";
@@ -19,10 +20,11 @@ import {
 
 import { capitalizedAppName, dbg, isDev } from "@common/utils";
 import { assertUnreachable, time } from "@utils/utils";
-import { logoPath } from "./utils";
+import { emptyString } from "@common/empty";
+import { logoPath } from "./utils.cjs";
 import {
-	ElectronIpcMainProcessNotificationEnum,
-	ElectronToReactMessageEnum,
+	ElectronIpcMainProcessNotification,
+	ElectronToReactMessage,
 } from "@common/enums";
 
 /////////////////////////////////////////
@@ -41,11 +43,13 @@ autoUpdater
 	.on("checking-for-update", () => dbg("Checking for update..."))
 	.on("error", err =>
 		dbg("Error in auto-updater. ", err))
-	.on("download-progress", progressObj => {
-		dbg(
-			`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
-		);
-	});
+	.on(
+		"download-progress",
+		progressObj =>
+			dbg(
+				`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
+			),
+	);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -73,7 +77,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 			width: 800,
 
 			webPreferences: {
-				preload: join(__dirname, "preload.js"),
+				preload: join(__dirname, "preload.cjs"),
 				allowRunningInsecureContent: false,
 				contextIsolation: true, // <-- Needed to use contextBridge
 				nodeIntegration: true,
@@ -124,8 +128,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 
 		const url = isDev ?
 			"http://localhost:3000" :
-			pathToFileURL(join(__dirname, "vite-renderer-build", "index.html"))
-				.toString();
+			pathToFileURL(join(__dirname, "..", "renderer", "index.html")).toString();
 
 		await window.loadURL(url);
 
@@ -147,115 +150,113 @@ app
 	})
 	.whenReady()
 	.then(async () => {
-		await time(async () => {
-			// This is so Electron can load local media files:
-			protocol.registerFileProtocol("atom", (request, callback) => {
-				const url = request.url.substring(7);
-				callback(decodeURI(normalize(url)));
-			});
+		// This is so Electron can load local media files:
+		protocol.registerFileProtocol("atom", (request, callback) => {
+			const url = request.url.substring(7);
+			callback(decodeURI(normalize(url)));
+		});
 
-			/////////////////////////////////////////
-			/////////////////////////////////////////
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-			// This method will be called when Electron has finished
-			// initialization and is ready to create browser windows.
-			// Some APIs can only be used after this event occurs:
-			// TODO: there is something wrong with this lib:
-			if (isDev) {
-				const devtoolsInstaller = await import("electron-devtools-installer");
-				const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-				// @ts-ignore => this is a workaround for a bug in the lib:
-				const { default: installExtension } = devtoolsInstaller.default;
+		// This method will be called when Electron has finished
+		// initialization and is ready to create browser windows.
+		// Some APIs can only be used after this event occurs:
+		// TODO: there is something wrong with this lib:
+		if (isDev) {
+			const devtoolsInstaller = await import("electron-devtools-installer");
+			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
+			// @ts-ignore => this is a workaround for a bug in the lib:
+			const { default: installExtension } = devtoolsInstaller.default;
 
-				dbg({ installExtension });
+			dbg({ installExtension });
 
-				await installExtension(REACT_DEVELOPER_TOOLS, {
-					loadExtensionOptions: { allowFileAccess: true },
-				}) // @ts-ignore => this is a workaround for a bug in the lib
-					.then(name => dbg(`Added Extension: ${name}`))
-					// @ts-ignore => this is a workaround for a bug in the lib
-					.catch(err =>
-						console.error("An error occurred while installing extension: ", err)
-					);
-			}
+			await installExtension(REACT_DEVELOPER_TOOLS, {
+				loadExtensionOptions: { allowFileAccess: true },
+			}) // @ts-ignore => this is a workaround for a bug in the lib
+				.then(name => dbg(`Added Extension: ${name}`))
+				// @ts-ignore => this is a workaround for a bug in the lib
+				.catch(err =>
+					console.error("An error occurred while installing extension: ", err)
+				);
+		}
 
-			/////////////////////////////////////////
-			/////////////////////////////////////////
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-			// This variable is needed to hold a reference to the window,
-			// so it doesn't get garbge collected:
-			electronWindow = await createElectronWindow();
+		// This variable is needed to hold a reference to the window,
+		// so it doesn't get garbge collected:
+		electronWindow = await createElectronWindow();
 
-			/////////////////////////////////////////
-			/////////////////////////////////////////
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-			// Tray setup:
-			tray = new Tray(nativeImage.createFromPath(logoPath));
-			tray.setToolTip("Music player and downloader");
-			tray.setTitle("Muse");
+		// Tray setup:
+		tray = new Tray(nativeImage.createFromPath(logoPath));
+		tray.setToolTip("Music player and downloader");
+		tray.setTitle("Muse");
 
-			/////////////////////////////////////////
-			/////////////////////////////////////////
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-			// This is to make Electron show a notification
-			// when we copy a link to the clipboard:
-			try {
-				// This has to be imported after app is open.
-				const extendedClipboard = (await import("./clipboardExtended"))
-					.extendedClipboard as ClipboardExtended;
+		// This is to make Electron show a notification
+		// when we copy a link to the clipboard:
+		try {
+			// This has to be imported after app is open.
+			const extendedClipboard = (await import("./clipboardExtended.cjs"))
+				.extendedClipboard as ClipboardExtended;
 
-				extendedClipboard
-					.on("text-changed", async () => {
-						const url = extendedClipboard.readText("clipboard");
+			extendedClipboard
+				.on("text-changed", async () => {
+					const url = extendedClipboard.readText("clipboard");
 
-						if (!isUrlValid(url)) return;
+					if (!isUrlValid(url)) return;
 
-						const { title, thumbnails, media: { artist = "" } } =
-							(await getBasicInfo(url)).videoDetails;
+					const { title, thumbnails, media: { artist = emptyString } } =
+						(await getBasicInfo(url)).videoDetails;
 
-						new Notification({
-							title: "Click to download this media as 'mp3'",
-							timeoutType: "never",
-							urgency: "normal",
-							icon: logoPath,
-							silent: true,
-							body: title,
-						})
-							.on("click", () => {
-								const downloadInfo: DownloadInfo = {
-									imageURL: thumbnails.at(-1)?.url ?? "",
-									extension: "mp3",
-									artist,
-									title,
-									url,
-								};
-
-								// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
-								// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-								electronWindow!.webContents.send(
-									ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
-									downloadInfo,
-								);
-
-								dbg("Clicked notification and sent data:", downloadInfo);
-							})
-							.show();
+					new Notification({
+						title: "Click to download this media as 'mp3'",
+						timeoutType: "never",
+						urgency: "normal",
+						icon: logoPath,
+						silent: true,
+						body: title,
 					})
-					.startWatching();
-			} catch (error) {
-				console.error(error);
-			}
+						.on("click", () => {
+							const downloadInfo: DownloadInfo = {
+								imageURL: thumbnails.at(-1)?.url ?? emptyString,
+								extension: "mp3",
+								artist,
+								title,
+								url,
+							};
 
-			/////////////////////////////////////////
+							// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+							electronWindow!.webContents.send(
+								ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+								downloadInfo,
+							);
 
-			// This will immediately download an update,
-			// then install when the app quits.
-			setTimeout(
-				async () =>
-					await autoUpdater.checkForUpdatesAndNotify().catch(console.error),
-				5_000,
-			);
-		}, "app.whenReady.then");
+							dbg("Clicked notification and sent data:", downloadInfo);
+						})
+						.show();
+				})
+				.startWatching();
+		} catch (error) {
+			console.error(error);
+		}
+
+		/////////////////////////////////////////
+
+		// This will immediately download an update,
+		// then install when the app quits.
+		setTimeout(
+			async () =>
+				await autoUpdater.checkForUpdatesAndNotify().catch(console.error),
+			5_000,
+		);
 	});
 
 /////////////////////////////////////////
@@ -267,14 +268,11 @@ app
 
 // Relay message from electronWindow to ipcRenderer:
 ipcMain.on(
-	ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+	ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 	(_e, downloadValues: DownloadInfo) => {
 		dbg("ipcMain received data from electronWindow:", downloadValues);
 
-		ipcMain.emit(
-			ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
-			downloadValues,
-		);
+		ipcMain.emit(ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD, downloadValues);
 	},
 );
 
@@ -283,14 +281,14 @@ ipcMain.on(
 
 ipcMain.on(
 	"notify",
-	(event, type: ElectronIpcMainProcessNotificationEnum): void => {
+	(event, type: Values<typeof ElectronIpcMainProcessNotification>): void => {
 		switch (type) {
-			case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
+			case ElectronIpcMainProcessNotification.QUIT_APP: {
 				app.quit();
 				break;
 			}
 
-			case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
+			case ElectronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
 				const focusedWindow = BrowserWindow.getFocusedWindow();
 				if (!focusedWindow) break;
 
@@ -300,17 +298,17 @@ ipcMain.on(
 				break;
 			}
 
-			case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
+			case ElectronIpcMainProcessNotification.MINIMIZE: {
 				BrowserWindow.getFocusedWindow()?.minimize();
 				break;
 			}
 
-			case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
+			case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
 				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
 				break;
 			}
 
-			case ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW: {
+			case ElectronIpcMainProcessNotification.RELOAD_WINDOW: {
 				BrowserWindow.getFocusedWindow()?.reload();
 				break;
 			}

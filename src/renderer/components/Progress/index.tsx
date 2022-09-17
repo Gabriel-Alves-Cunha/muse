@@ -1,3 +1,5 @@
+import type { Values } from "@common/@types/utils";
+
 import { RiDownloadFill as Downloading } from "react-icons/ri";
 import { CgSearchLoading as Loading } from "react-icons/cg";
 import { AiOutlineCheck as Success } from "react-icons/ai";
@@ -31,22 +33,24 @@ export const Progress = (
 //////////////////////////////////////////
 // Helper function:
 
-export const progressIcons: ReadonlyMap<ProgressStatus, JSX.Element> = Object
-	.freeze(
-		new Map([
-			[
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-				<Loading size={15} key="loading" />,
-			],
-			[ProgressStatus.ACTIVE, <Downloading size={15} key="active" />],
-			[ProgressStatus.CANCEL, <Canceled size={15} key="canceled" />],
-			[ProgressStatus.SUCCESS, <Success size={15} key="success" />],
-			[
-				ProgressStatus.FAILED,
-				<Failed size={15} key="failed" />,
-			],
-		]),
-	);
+export const progressIcons: ReadonlyMap<
+	Values<typeof ProgressStatus>,
+	JSX.Element
+> = Object.freeze(
+	new Map([
+		[
+			ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			<Loading size={15} key="loading" />,
+		],
+		[ProgressStatus.ACTIVE, <Downloading size={15} key="active" />],
+		[ProgressStatus.CANCEL, <Canceled size={15} key="canceled" />],
+		[ProgressStatus.SUCCESS, <Success size={15} key="success" />],
+		[
+			ProgressStatus.FAILED,
+			<Failed size={15} key="failed" />,
+		],
+	]),
+);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -54,5 +58,9 @@ export const progressIcons: ReadonlyMap<ProgressStatus, JSX.Element> = Object
 // Types:
 
 export type ProgressProps = Readonly<
-	{ showStatus: boolean; percent_0_to_100: number; status: ProgressStatus; }
+	{
+		status: Values<typeof ProgressStatus>;
+		percent_0_to_100: number;
+		showStatus: boolean;
+	}
 >;

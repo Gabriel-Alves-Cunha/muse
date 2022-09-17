@@ -1,14 +1,8 @@
 const { log10, floor, abs, min } = Math;
 
-const UNITS = Object.freeze(
-	["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"] as const,
-);
+const UNITS = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"] as const;
 
-export type PrettyBytes = Readonly<
-	`${"" | "-"}${number} ${typeof UNITS[number]}`
->;
-
-export function prettyBytes(num: Readonly<number>, precision = 3): PrettyBytes {
+export function prettyBytes(num: number, precision = 3): PrettyBytes {
 	if (abs(num) < 1) return `${num} B`;
 
 	const exponent = min(
@@ -23,3 +17,5 @@ export function prettyBytes(num: Readonly<number>, precision = 3): PrettyBytes {
 	// @ts-ignore => I'm almost sure exponent is a number < UNITS.length >= 0
 	return `${num < 0 ? "-" : ""}${n} ${UNITS[exponent]}`;
 }
+
+export type PrettyBytes = `${"" | "-"}${number} ${typeof UNITS[number]}`;

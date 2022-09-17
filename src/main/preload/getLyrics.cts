@@ -1,7 +1,8 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
-import { lyricApiKey, lyricsAPI } from "@main/utils";
+import { lyricApiKey, lyricsAPI } from "@main/utils.cjs";
 import { dbg, stringifyJson } from "@common/utils";
+import { emptyString } from "@common/empty";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -21,9 +22,9 @@ const method = "GET";
 // Main function:
 
 export async function searchForLyricsAndImage(
-	mediaTitle: Readonly<string>,
-	mediaArtist: Readonly<string>,
-	getImage: Readonly<boolean>,
+	mediaTitle: string,
+	mediaArtist: string,
+	getImage: boolean,
 ): Promise<LyricsResponse> {
 	if (!mediaTitle || !mediaArtist)
 		throw new Error(
@@ -39,7 +40,7 @@ export async function searchForLyricsAndImage(
 		mediaArtist,
 	);
 
-	const image = getImage ? await queryForImage(imageURL) : "";
+	const image = getImage ? await queryForImage(imageURL) : emptyString;
 	const lyric = await queryForLyric(lyricURL);
 
 	dbg({ lyric, image, albumName });
@@ -55,8 +56,8 @@ export async function searchForLyricsAndImage(
 // Helper functions:
 
 async function queryForPossibleLyric(
-	mediaTitle: Readonly<string>,
-	mediaArtist: Readonly<string>,
+	mediaTitle: string,
+	mediaArtist: string,
 ): Promise<PossibleLyrics> {
 	// From 'https://happi.dev/docs/music' docs:
 	const params = new URLSearchParams({
@@ -66,14 +67,13 @@ async function queryForPossibleLyric(
 		lyrics: "1", // 1 for true, 0 for false.
 		// Limit (Max 50):
 		limit: "1",
-	});
+	})
+		.toString();
 
 	const jsonRes =
-		await (await fetch(`${lyricsAPI}?${params.toString()}`, {
-			headers,
-			method,
-		}))
-			.json() as Track | ErrorResponse;
+		await (await fetch(`${lyricsAPI}?${params}`, { headers, method })).json() as
+			| Track
+			| ErrorResponse;
 
 	dbg({ queryForPossibleLyric: jsonRes });
 
@@ -82,7 +82,7 @@ async function queryForPossibleLyric(
 
 	const [track] = jsonRes.result;
 
-	if (!track)
+	if (!track || !track.api_lyrics)
 		throw new Error("No lyrics found!");
 
 	const {
@@ -104,9 +104,7 @@ async function queryForPossibleLyric(
 
 /////////////////////////////////////////
 
-async function queryForLyric(
-	lyricURL: Readonly<string>,
-): Promise<Readonly<string>> {
+async function queryForLyric(lyricURL: string): Promise<string> {
 	dbg(`Querying for lyricURL = "${lyricURL}".`);
 
 	const jsonRes = await (await fetch(lyricURL, { method, headers })).json() as
@@ -118,7 +116,7 @@ async function queryForLyric(
 	if (jsonRes.success === false) {
 		console.error(jsonRes.error);
 
-		return "";
+		return emptyString;
 	}
 
 	return jsonRes.result.lyrics;

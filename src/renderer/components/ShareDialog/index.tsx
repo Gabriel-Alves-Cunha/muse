@@ -1,5 +1,5 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
-import type { ClientServerAPI } from "@main/preload/share";
+import type { ClientServerAPI } from "@main/preload/share/server.cjs";
 
 import { useCallback, useEffect, useState } from "react";
 import { MdClose as Close } from "react-icons/md";
@@ -9,7 +9,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { setSettings, useSettings } from "@contexts/settings";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { getBasename } from "@common/path";
-import { emptySet } from "@utils/map-set";
+import { emptySet } from "@common/empty";
 import { dbg } from "@common/utils";
 import { t } from "@components/I18n";
 

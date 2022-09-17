@@ -9,7 +9,7 @@ import { join } from "node:path";
 
 /** Infallible async function. */
 export async function getFullPathOfFilesForFilesInThisDirectory(
-	dir: Readonly<Path>,
+	dir: Path,
 ): Promise<readonly Path[]> {
 	return (await readDir(dir).catch(err => {
 		console.error(err);
@@ -21,7 +21,7 @@ export async function getFullPathOfFilesForFilesInThisDirectory(
 ///////////////////////////////////////////
 
 /** Infallible async function. */
-export async function readDir(dir: Readonly<Path>): Promise<readonly Path[]> {
+export async function readDir(dir: Path): Promise<readonly Path[]> {
 	return await readdir(dir).catch(err => {
 		console.error(err);
 		return [];
@@ -31,9 +31,7 @@ export async function readDir(dir: Readonly<Path>): Promise<readonly Path[]> {
 ///////////////////////////////////////////
 
 /** Infallible async function. */
-export async function deleteFile(
-	path: Readonly<Path>,
-): Promise<Readonly<boolean>> {
+export async function deleteFile(path: Path): Promise<boolean> {
 	return unlink(path).then(() => true).catch(err => {
 		console.error(err);
 		return false;
@@ -43,9 +41,6 @@ export async function deleteFile(
 ///////////////////////////////////////////
 
 /** Infallible async function. */
-export async function doesPathExists(
-	path: Readonly<Path>,
-): Promise<Readonly<boolean>>
-{
+export async function doesPathExists(path: Path): Promise<boolean> {
 	return access(path).then(() => true).catch(() => false);
 }

@@ -3,6 +3,7 @@ import type { Base64, Media, Path } from "@common/@types/generalTypes";
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { statSync } from "node:fs";
 
+import { emptyString } from "@common/empty";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
 import {
@@ -32,10 +33,10 @@ async function createMedia(
 				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 				tag: {
+					lyrics = emptyString,
+					album = emptyString,
 					title = basename,
 					albumArtists,
-					lyrics = "",
-					album = "",
 					pictures,
 					genres,
 				},
@@ -72,10 +73,10 @@ async function createMedia(
 			const media: Media = {
 				image: picture !== undefined && mimeType ?
 					(`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64) :
-					"",
+					emptyString,
 				duration: formatDuration(durationInSeconds),
+				artist: albumArtists[0] ?? emptyString,
 				birthTime: statSync(path).birthtimeMs,
-				artist: albumArtists[0] ?? "",
 				size: length,
 				lyrics,
 				genres,
@@ -106,7 +107,7 @@ export async function transformPathsToMedias(
 			)
 				.catch(e =>
 					console.error(
-						`There was an error creating media of path = "${path}".\n\n`,
+						`There was a possible error creating media of path: "${path}".\n\n`,
 						e,
 					)
 				)

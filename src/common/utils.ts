@@ -11,43 +11,40 @@ const { isNaN } = Number;
 export const isDev = process.env.NODE_ENV === "development";
 
 export const capitalizedAppName = "Muse";
-export const lowercaseAppName = "muse";
 
-export const dbgPlaylists = debug(`${lowercaseAppName}:playlists`);
-export const dbgTests = debug(`${lowercaseAppName}:tests`);
-export const dbg = debug(lowercaseAppName);
+export const dbgPlaylists = debug("muse:playlists");
+export const dbgTests = debug("muse:tests");
+export const dbg = debug("muse");
 
 dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 /////////////////////////////////////////
 
 export const separatedByCommaOrSemiColorOrSpace = /,|;| /gm;
-export const separatedByCommaOrSemiColon = /,|;/gm;
+// export const separatedByCommaOrSemiColon = /,|;/gm;
 
 /////////////////////////////////////////
 
-export const allowedMedias = Object.freeze(
-	[
-		"vorbis",
-		"webm",
-		"flac",
-		"opus",
-		"mp3",
-		"pcm",
-		"aac",
-		"m4a",
-		"m4p",
-		"m4b",
-		"m4r",
-		"m4v",
-	] as const,
-);
+export const allowedMedias = [
+	"vorbis",
+	"webm",
+	"flac",
+	"opus",
+	"mp3",
+	"pcm",
+	"aac",
+	"m4a",
+	"m4p",
+	"m4b",
+	"m4r",
+	"m4v",
+] as const;
 
 export type AllowedMedias = typeof allowedMedias[number];
 
 /////////////////////////////////////////
 
-export function formatDuration(time: number | undefined): Readonly<string> {
+export function formatDuration(time?: number): Readonly<string> {
 	if (time === undefined || isNaN(time) || !isFinite(time)) return "00:00";
 	time = trunc(time);
 

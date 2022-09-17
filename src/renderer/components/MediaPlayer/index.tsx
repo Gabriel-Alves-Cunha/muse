@@ -7,6 +7,7 @@ import create from "zustand";
 import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
+import { emptyString } from "@common/empty";
 import { FlipCard } from "@components/FlipCard";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
@@ -186,7 +187,7 @@ function handleLoadedData(
 			newMedia: { ...media, duration: formatedDuration },
 			whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 			type: WhatToDo.UPDATE_MAIN_LIST,
-			newPath: "",
+			newPath: emptyString,
 			path,
 		});
 

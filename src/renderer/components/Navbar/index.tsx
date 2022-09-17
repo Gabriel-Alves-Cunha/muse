@@ -66,6 +66,7 @@ function ButtonsForPages() {
 					aria-label={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
 					title={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
 					className={page === currPage ? "active" : ""}
+					// eslint-disable-next-line react/no-unknown-property
 					onPointerUp={() => setPage({ page })}
 					key={page}
 				>

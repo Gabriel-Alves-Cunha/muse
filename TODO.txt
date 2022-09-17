@@ -1,7 +1,12 @@
-* FIX: font with I and L different!!
-* ADD: select with mouse moving!!
+################## TODOS ##################
 
-### NOTES:
+* FIX: choose a font with I and L different!!
+* FIX: tests!
+* ADD: select with mouse moving!!
+* CHANGE: from stitches to tailwind (smaller bundle and less js)
+
+
+################## NOTES ##################
 
 1. `const { getState: getPage } = usePage;
 		// and then:

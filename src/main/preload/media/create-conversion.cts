@@ -8,15 +8,15 @@ import { createReadStream } from "node:fs";
 import { dirname, join } from "node:path";
 import sanitize from "sanitize-filename";
 
-import { ElectronToReactMessageEnum } from "@common/enums";
-import { deleteFile, doesPathExists } from "../file";
+import { deleteFile, doesPathExists } from "../file.cjs";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { type AllowedMedias, dbg } from "@common/utils";
+import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
-import { fluent_ffmpeg } from "./ffmpeg";
+import { fluent_ffmpeg } from "./ffmpeg.cjs";
 import { getBasename } from "@common/path";
-import { dirs } from "@main/utils";
+import { dirs } from "@main/utils.cjs";
 
 const { error, log } = console;
 
@@ -184,13 +184,13 @@ export async function convertToAudio(
 
 			// Treat the successfully converted file as a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+				type: ElectronToReactMessage.ADD_ONE_MEDIA,
 				mediaPath: saveSite,
 			});
 
 			// ...and remove old one
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
+				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
 				mediaPath: path,
 			});
 

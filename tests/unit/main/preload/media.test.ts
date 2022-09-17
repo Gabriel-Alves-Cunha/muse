@@ -3,7 +3,7 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "../../mockElectronPlusNodeGlobalsBeforeTests";
+import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
 //
 
@@ -14,9 +14,9 @@ import { join } from "node:path";
 
 import { mediaPath, mediaPicture, test_assetsDir } from "./utils";
 import { eraseImg, makeRandomString } from "@common/utils";
-import { doesPathExists } from "@main/preload/file";
+import { doesPathExists } from "@main/preload/file.cjs";
 
-const { writeTags } = await import("@main/preload/media/mutate-metadata");
+const { writeTags } = await import("@main/preload/media/mutate-metadata.cjs");
 
 //////////////////////////////////////
 //////////////////////////////////////

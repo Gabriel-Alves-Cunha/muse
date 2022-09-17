@@ -1,0 +1,11 @@
+{
+	"outExtension": { ".js": ".cjs" },
+	"target": ["node16", "esnext"],
+	"outdir": "build/backend",
+	"treeShaking": true,
+	"platform": "node",
+	"minify": false,
+	"format": "cjs",
+	"bundle": true,
+	"color": true
+}

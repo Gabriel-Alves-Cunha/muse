@@ -1,6 +1,6 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { ReactToElectronMessageEnum } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 
@@ -58,7 +58,7 @@ export function ImgWithFallback(
 		});
 
 		sendMsgToBackend({
-			type: ReactToElectronMessageEnum.WRITE_TAG,
+			type: ReactToElectronMessage.WRITE_TAG,
 			thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
 			mediaPath,
 		});

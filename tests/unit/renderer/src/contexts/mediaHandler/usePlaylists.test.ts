@@ -5,16 +5,18 @@ import type { Media } from "@common/@types/generalTypes";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectronPlusNodeGlobalsBeforeTests";
+import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
 //
 
+import { emptyString } from "@common/empty";
 import {
 	numberOfMedias,
 	firstMediaPath,
 	testArray,
 	testList,
 } from "./fakeTestList";
+
 const { getCurrentPlaying, playNextMedia, playThisMedia } = await import(
 	"@contexts/useCurrentPlaying"
 );
@@ -271,7 +273,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		setPlaylists({
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 			type: WhatToDo.UPDATE_MAIN_LIST,
-			newPath: "",
+			newPath: emptyString,
 			newMedia,
 			path,
 		});
@@ -289,19 +291,19 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		const newMedia: Media = {
 			duration: formatDuration(100 + 10),
 			birthTime: Date.now(),
+			artist: emptyString,
+			lyrics: emptyString,
+			album: emptyString,
+			image: emptyString,
 			size: 3_000,
 			genres: [],
-			artist: "",
-			lyrics: "",
-			album: "",
-			image: "",
 			title,
 		};
 
 		setPlaylists({
 			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 			type: WhatToDo.UPDATE_MAIN_LIST,
-			newPath: "",
+			newPath: emptyString,
 			newMedia,
 			path,
 		});
@@ -366,7 +368,7 @@ describe("Testing PlaylistEnum.UPDATE_MEDIA_LIST", () => {
 		setPlaylists({
 			whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 			type: WhatToDo.UPDATE_MAIN_LIST,
-			newPath: "",
+			newPath: emptyString,
 			newMedia,
 			path,
 		});

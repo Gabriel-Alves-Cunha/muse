@@ -10,15 +10,16 @@ import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { type AllowedMedias, dbg, isDev } from "@common/utils";
-import { ElectronToReactMessageEnum } from "@common/enums";
-import { deleteFile, doesPathExists } from "../file";
+import { deleteFile, doesPathExists } from "../file.cjs";
 import { checkOrThrow, validator } from "@common/args-validator";
+import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
-import { fluent_ffmpeg } from "./ffmpeg";
+import { fluent_ffmpeg } from "./ffmpeg.cjs";
 import { prettyBytes } from "@common/prettyBytes";
-import { writeTags } from "./mutate-metadata";
-import { dirs } from "@main/utils";
+import { emptyString } from "@common/empty";
+import { writeTags } from "./mutate-metadata.cjs";
+import { dirs } from "@main/utils.cjs";
 
 const { error, log } = console;
 
@@ -71,7 +72,7 @@ export async function createOrCancelDownload(
 export async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
-	{ electronPort, extension, imageURL, title, url, artist = "" }:
+	{ electronPort, extension, imageURL, title, url, artist = emptyString }:
 		CreateDownload,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
@@ -101,9 +102,9 @@ export async function createDownload(
 	/////////////////////////////////////////////
 
 	let interval: NodeJS.Timer | undefined;
+	let prettyTotal = emptyString;
 	const startTime = Date.now();
 	let percentageToSend = 0;
-	let prettyTotal = "";
 
 	/////////////////////////////////////////////
 
@@ -217,7 +218,7 @@ export async function createDownload(
 
 			// Tell client to add a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+				type: ElectronToReactMessage.ADD_ONE_MEDIA,
 				mediaPath: saveSite,
 			});
 

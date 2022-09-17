@@ -8,7 +8,7 @@ import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
-import { ReactToElectronMessageEnum } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@styles/global";
 import { areArraysEqualByValue } from "@utils/array";
@@ -16,6 +16,7 @@ import { isAModifierKeyPressed } from "@utils/keyboard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
+import { emptyString } from "@common/empty";
 import { deleteMedia } from "@utils/media";
 import { Button } from "@components/Button";
 
@@ -42,7 +43,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
-	const imageFilePathRef = useRef("");
+	const imageFilePathRef = useRef(emptyString);
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 
@@ -260,7 +261,7 @@ function changeMetadataIfAllowed(
 					// empty, there's nothing to do, so just return:
 					if (
 						key !== id || oldValue === newValue ||
-						(!oldValue && newValue === "")
+						(!oldValue && newValue === emptyString)
 					)
 						return;
 
@@ -313,7 +314,7 @@ function changeMetadataIfAllowed(
 	// Send message to Electron to execute the function writeTag() in the main process:
 	if (isThereAnythingToChange)
 		sendMsgToBackend({
-			type: ReactToElectronMessageEnum.WRITE_TAG,
+			type: ReactToElectronMessage.WRITE_TAG,
 			thingsToChange,
 			mediaPath,
 		});

@@ -7,13 +7,14 @@ import type {
 import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
-import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
-import { searchForLyricsAndImage } from "./preload/getLyrics.js";
-import { transformPathsToMedias } from "./preload/media/create-media";
+import { ElectronToReactMessage, ReactToElectronMessage } from "@common/enums";
+import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi.cjs";
+import { searchForLyricsAndImage } from "./preload/getLyrics.cjs";
+import { transformPathsToMedias } from "./preload/media/create-media.cjs";
 import { assertUnreachable } from "@utils/utils";
-import { createServer } from "./preload/share";
-import { writeTags } from "./preload/media/mutate-metadata";
-import { dirs } from "./utils";
+import { createServer } from "./preload/share/server.cjs";
+import { writeTags } from "./preload/media/mutate-metadata.cjs";
+import { dirs } from "./utils.cjs";
 import { dbg } from "@common/utils";
 import {
 	type MsgWithSource,
@@ -23,20 +24,16 @@ import {
 import {
 	type CreateConversion,
 	createOrCancelConvert,
-} from "./preload/media/create-conversion";
+} from "./preload/media/create-conversion.cjs";
 import {
 	type CreateDownload,
 	createOrCancelDownload,
-} from "./preload/media/download-media";
+} from "./preload/media/download-media.cjs";
 import {
 	getFullPathOfFilesForFilesInThisDirectory,
 	deleteFile,
 	readDir,
-} from "./preload/file";
-import {
-	ElectronToReactMessageEnum,
-	ReactToElectronMessageEnum,
-} from "@common/enums";
+} from "./preload/file.cjs";
 
 // @ts-ignore => will test if it exists
 dbg("process.env.LYRIC_API_KEY =", process.env.LYRIC_API_KEY);
@@ -63,10 +60,10 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
 // Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
-	ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+	ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 	(_event, downloadValues) =>
 		sendMsgToClient({
-			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+			type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 			downloadInfo: downloadValues,
 		}),
 );
@@ -95,8 +92,11 @@ async function handleMsgsFromRendererProcess(
 	const msg = event.data.msg;
 
 	switch (msg.type) {
-		case ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD: {
-			if (!electronPort) {
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD: {
+			if (electronPort === undefined) {
 				console.error("There should be an electronPort to download a media!");
 				break;
 			}
@@ -109,10 +109,13 @@ async function handleMsgsFromRendererProcess(
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
 			break;
-		} // 1
+		}
 
-		case ReactToElectronMessageEnum.CONVERT_MEDIA: {
-			if (!electronPort) {
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.CONVERT_MEDIA: {
+			if (electronPort === undefined) {
 				console.error("There should be an electronPort to convert a media!");
 				break;
 			}
@@ -125,9 +128,12 @@ async function handleMsgsFromRendererProcess(
 			// MessagePortMain queues messages until the .start() method has been called.
 			electronPort.start();
 			break;
-		} // 2
+		}
 
-		case ReactToElectronMessageEnum.WRITE_TAG: {
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.WRITE_TAG: {
 			const { mediaPath, thingsToChange } = msg;
 
 			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
@@ -139,16 +145,22 @@ async function handleMsgsFromRendererProcess(
 
 			await writeTags(mediaPath, data);
 			break;
-		} // 3
+		}
 
-		case ReactToElectronMessageEnum.ERROR: {
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.ERROR: {
 			console.error(
-				"@TODO: maybe do something with this error...?\n",
+				"TODO: maybe do something with this error...?\n",
 				msg.error,
 			);
 
 			break;
-		} // 4
+		}
+
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 
 		default: {
 			console.error(

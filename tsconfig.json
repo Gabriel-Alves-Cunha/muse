@@ -10,7 +10,6 @@
 		"experimentalDecorators": false,
 		"strictFunctionTypes": true,
 		"strictBindCallApply": true,
-		"preserveConstEnums": true,
 		"noUnusedParameters": true,
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
@@ -27,8 +26,8 @@
 		"target": "ESNext",
 		"jsx": "react-jsx",
 		"module": "ESNext",
-		"baseUrl": "./src",
 		"sourceMap": false,
+		"baseUrl": "./",
 		"allowJs": true,
 		"checkJs": true,
 		"pretty": true,
@@ -38,35 +37,38 @@
 		],
 		"paths": {
 			"@components/*": [
-				"renderer/components/*"
+				"src/renderer/components/*"
 			],
 			"@contexts/*": [
-				"renderer/contexts/*"
+				"src/renderer/contexts/*"
 			],
 			"@modules/*": [
-				"renderer/modules/*"
+				"src/renderer/modules/*"
 			],
 			"@styles/*": [
-				"renderer/styles/*"
+				"src/renderer/styles/*"
 			],
 			"@routes/*": [
-				"renderer/routes/*"
+				"src/renderer/routes/*"
 			],
 			"@utils/*": [
-				"renderer/utils/*"
+				"src/renderer/utils/*"
 			],
 			"@hooks/*": [
-				"renderer/hooks/*"
+				"src/renderer/hooks/*"
 			],
 			"@renderer/*": [
-				"renderer/*"
+				"src/renderer/*"
 			],
 			"@common/*": [
-				"common/*"
+				"src/common/*"
 			],
 			"@main/*": [
-				"main/*"
-			]
+				"src/main/*"
+			],
+			"@tests/*": [
+				"tests/*"
+			],
 		},
 		"lib": [
 			"DOM.Iterable",
@@ -74,10 +76,14 @@
 			"DOM"
 		]
 	},
+	"include": [
+		"tests",
+		"src",
+	],
 	"exclude": [
 		"**/node_modules",
-		"**/app/*",
-		"**/out/*",
+		"**/build/*",
+		"**/dist/*",
 		"**/.*/"
 	]
 }

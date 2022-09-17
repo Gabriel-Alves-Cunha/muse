@@ -1,9 +1,12 @@
+import { emptyString } from "./empty";
+
 /**
  * These are not a bulletproof fns, but for the purpose of
  * getting the allowedMedias, it is ok, faster than NodeJS's.
  */
 export function getBasename(filename: Readonly<string>): Readonly<string> {
-	return filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
+	return filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ??
+		emptyString;
 }
 
 /////////////////////////////////////////

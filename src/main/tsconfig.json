@@ -1,8 +1,18 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"outDir": "../../app"
+		"module": "CommonJS",
 	},
-	"exclude": ["../renderer/**/*", "**/node_modules", "**/.*/"],
-	"include": ["../main/**/*", "../common/**/*", "../renderer/assets/**/*"]
+	"exclude": [
+		"../renderer/**/*",
+		"**/node_modules",
+		"**/build/*",
+		"**/dist/*",
+		"**/.*/"
+	],
+	"include": [
+		"../renderer/assets/**/*",
+		"../common/**/*",
+		"../main/**/*",
+	]
 }

@@ -2,11 +2,12 @@ import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
-import { ElectronToReactMessageEnum } from "@common/enums";
+import { ElectronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
+import { emptyString } from "@common/empty";
 import { deleteMedia } from "./media";
 import { dbg } from "@common/utils";
 import {
@@ -67,7 +68,7 @@ const {
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
 	ERROR,
-} = ElectronToReactMessageEnum;
+} = ElectronToReactMessage;
 
 //////////////////////////////////////////
 
@@ -114,8 +115,8 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			setPlaylists({
 				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
 				type: WhatToDo.UPDATE_MAIN_LIST,
+				newPath: emptyString,
 				path: mediaPath,
-				newPath: "",
 				newMedia,
 			});
 			break;
@@ -186,8 +187,8 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
 				type: WhatToDo.UPDATE_MAIN_LIST,
 				newMedia: refreshedMedia,
+				newPath: emptyString,
 				path: mediaPath,
-				newPath: "",
 			});
 			break;
 		}

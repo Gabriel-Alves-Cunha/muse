@@ -3,12 +3,13 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { emptyMap, emptySet, getFirstKey } from "@utils/map-set";
 import { dbgPlaylists, stringifyJson } from "@common/utils";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
 import { getFromLocalStorage, keys } from "@utils/localStorage";
 import { assertUnreachable, time } from "@utils/utils";
+import { emptyMap, emptySet } from "@common/empty";
 import { getSettings } from "@contexts/settings";
+import { getFirstKey } from "@utils/map-set";
 import {
 	searchDirectoryResult,
 	getAllowedMedias,
@@ -527,30 +528,25 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 
 ///////////////////////////////////////////////////
 
-export const diacriticRegex = /\p{Diacritic}/gu;
+const diacriticRegex = /\p{Diacritic}/gu;
+
+/** normalize()ing to NFD Unicode normal form decomposes
+ * combined graphemes into the combination of simple ones.
+ * The è of Crème ends up expressed as e +  ̀.
+ * It is now trivial to globally get rid of the diacritics,
+ * which the Unicode standard conveniently groups as the
+ * Combining Diacritical Marks Unicode block.
+ */
+export const unDiacritic = (str: string): string =>
+	str.toLocaleLowerCase().normalize("NFD").replaceAll(diacriticRegex, "");
 
 export function searchMedia(highlight: string): [Path, Media][] {
 	return time(() => {
 		const medias: [Path, Media][] = [];
 
-		getMainList().forEach((media, path) => {
-			if (
-				/** normalize()ing to NFD Unicode normal form decomposes
-				 * combined graphemes into the combination of simple ones.
-				 * The è of Crème ends up expressed as e +  ̀.
-				 * It is now trivial to globally get rid of the diacritics,
-				 * which the Unicode standard conveniently groups as the
-				 * Combining Diacritical Marks Unicode block.
-				 */
-				media
-					.title
-					.toLowerCase()
-					.normalize("NFD")
-					.replace(diacriticRegex, "")
-					.includes(highlight)
-			)
-				medias.push([path, media]);
-		});
+		getMainList().forEach((media, path) =>
+			unDiacritic(media.title).includes(highlight) && medias.push([path, media])
+		);
 
 		return medias;
 	}, `searchMedia('${highlight}')`);

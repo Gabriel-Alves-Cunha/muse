@@ -1,3 +1,4 @@
+import type { Values } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
@@ -12,7 +13,7 @@ import { ProgressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
-import { emptyMap } from "@utils/map-set";
+import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
 import { dbg } from "@common/utils";
 import {
@@ -315,7 +316,7 @@ export type ConvertInfo = Readonly<{ toExtension: AllowedMedias; }>;
 /////////////////////////////////////////////
 
 interface PartialExceptStatus extends Partial<MediaBeingConverted> {
-	status: ProgressStatus;
+	status: Values<typeof ProgressStatus>;
 }
 
 /////////////////////////////////////////////

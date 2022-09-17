@@ -1,4 +1,4 @@
-import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
+import { ElectronIpcMainProcessNotification } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 import { Translator } from "@components/I18n";
 
@@ -11,7 +11,7 @@ const notify =
 // Helper functions:
 
 const toggleDeveloperTools = () =>
-	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS);
+	notify(ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS);
 
 /////////////////////////////////////////////
 

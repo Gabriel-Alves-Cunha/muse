@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
-import { diacriticRegex, searchMedia } from "@contexts/usePlaylists";
+import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { selectMediaByEvent } from "@components/MediaListKind/helper";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
@@ -23,6 +23,7 @@ import { NothingFound, Highlight, Title, Info } from "./styles";
 import { Img, PlayButton, RowWrapper } from "../MediaListKind/styles";
 import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import { RightSlot } from "@components/ContextMenu/styles";
+import { emptyString } from "@common/empty";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -43,10 +44,10 @@ const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING } = SearchStatus;
 
 const defaultSearcher: Searcher = Object.freeze({
 	searchStatus: DOING_NOTHING,
+	searchTerm: emptyString,
+	highlight: emptyString,
 	isInputOnFocus: false,
 	results: emptyArray,
-	searchTerm: "",
-	highlight: "",
 });
 
 const useSearcher = create<Searcher>()(
@@ -80,11 +81,8 @@ useSearcher.subscribe(
 
 const setSearchTerm = (e: InputChange) =>
 	setSearcher({
+		highlight: unDiacritic(e.target.value),
 		searchTerm: e.target.value,
-		highlight: e.target.value.toLowerCase().normalize("NFD").replace(
-			diacriticRegex,
-			"",
-		),
 	});
 
 /////////////////////////////////////////
@@ -215,19 +213,7 @@ export function Results() {
 /////////////////////////////////////////
 
 function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
-	/** normalize()ing to 'NFD' Unicode normal form decomposes
-	 * combined graphemes into the combination of simple ones.
-	 * The è of Crème ends up expressed as 'e' + ' ̀'.
-	 * It is now trivial to globally get rid of the diacritics,
-	 * which the Unicode standard conveniently groups as the
-	 * Combining Diacritical Marks Unicode block.
-	 */
-	const index = media
-		.title
-		.toLowerCase()
-		.normalize("NFD")
-		.replace(diacriticRegex, "")
-		.indexOf(highlight);
+	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (
 		<RowWrapper data-path={path}>

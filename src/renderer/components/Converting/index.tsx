@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { ReactToElectronMessageEnum } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@styles/global";
-import { emptyMap } from "@utils/map-set";
+import { emptyMap } from "@common/empty";
 import { t } from "@components/I18n";
 
 import { StyledPopoverTrigger } from "../Downloading/styles";
@@ -32,7 +32,7 @@ export function Converting() {
 
 				// Sending port so we can communicate with electron:
 				sendMsgToBackend(
-					{ type: ReactToElectronMessageEnum.CONVERT_MEDIA },
+					{ type: ReactToElectronMessage.CONVERT_MEDIA },
 					electronPort,
 				);
 			} catch (error) {

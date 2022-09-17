@@ -2,6 +2,7 @@ import create from "zustand";
 
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
+import { emptyString } from "@common/empty";
 import { dbg } from "@common/utils";
 import { t } from "@components/I18n";
 
@@ -13,10 +14,10 @@ const { getBasicInfo } = electron.media;
 // Constants:
 
 const defaultSearchInfo: SearcherInfo = Object.freeze({
-	result: { imageURL: "", artist: "", title: "" },
+	result: { imageURL: emptyString, artist: emptyString, title: emptyString },
+	error: emptyString,
+	url: emptyString,
 	isLoading: false,
-	error: "",
-	url: "",
 });
 
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
@@ -50,17 +51,17 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 	setSearchInfo({
 		result: defaultSearchInfo.result,
+		error: emptyString,
 		isLoading: true,
-		error: "",
 	});
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
 
 		const result: UrlMediaMetadata = {
-			imageURL: thumbnails.at(-1)?.url ?? "",
+			imageURL: thumbnails.at(-1)?.url ?? emptyString,
 			// ^ Highest quality is last in this array.
-			artist: media.artist ?? "",
+			artist: media.artist ?? emptyString,
 			title,
 		};
 

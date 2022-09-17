@@ -1,15 +1,17 @@
 import type { DownloadInfo } from "@common/@types/generalTypes";
+import type { Values } from "@common/@types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import create from "zustand";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { ReactToElectronMessageEnum } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { createNewDownload, Popup } from "./helper";
 import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
+import { emptyString } from "@common/empty";
 import { errorToast } from "@styles/global";
 
 import { StyledPopoverTrigger } from "./styles";
@@ -21,11 +23,11 @@ import { t } from "@components/I18n";
 // Constants:
 
 const defaultDownloadInfo: DownloadInfo = Object.freeze({
+	imageURL: emptyString,
+	artist: emptyString,
+	title: emptyString,
+	url: emptyString,
 	extension: "mp3",
-	imageURL: "",
-	artist: "",
-	title: "",
-	url: "",
 });
 
 export const useDownloadInfo = create(() => defaultDownloadInfo);
@@ -52,9 +54,10 @@ export function Downloading() {
 			const electronPort = createNewDownload(downloadInfo);
 
 			// Sending port so we can communicate with Electron:
-			sendMsgToBackend({
-				type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD,
-			}, electronPort);
+			sendMsgToBackend(
+				{ type: ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
+				electronPort,
+			);
 		} catch (error) {
 			console.error(error);
 
@@ -101,7 +104,7 @@ export function Downloading() {
 
 export type MediaBeingDownloaded = Readonly<
 	{
-		status: ProgressStatus;
+		status: Values<typeof ProgressStatus>;
 		percentage: number;
 		port: MessagePort;
 		imageURL: string;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "../../../../mockElectronPlusNodeGlobalsBeforeTests";
+import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
 mockElectronPlusNodeGlobalsBeforeTests();
 //
 

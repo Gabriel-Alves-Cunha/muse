@@ -1,10 +1,10 @@
 {
 	"plugins": [
-		"https://plugins.dprint.dev/typescript-0.69.1.wasm",
-		"https://plugins.dprint.dev/json-0.15.3.wasm"
+		"https://plugins.dprint.dev/typescript-0.73.1.wasm",
+		"https://plugins.dprint.dev/json-0.15.6.wasm"
 	],
-	"excludes": ["node_modules", "*-lock.json", "dist", "app"],
-	"includes": ["*.{ts,tsx,js,jsx,json}"],
+	"excludes": ["node_modules", "*-lock.json", "dist", "build"],
+	"includes": ["*.{ts,tsx,js,jsx,json,cts}"],
 	"indentWidth": 2,
 	"lineWidth": 80,
 	"useTabs": true,

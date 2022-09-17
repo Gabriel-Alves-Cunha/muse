@@ -6,7 +6,7 @@ import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { memo } from "react";
 import create from "zustand";
 
-import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
+import { ElectronIpcMainProcessNotification } from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
@@ -171,7 +171,7 @@ export const itemContent = (
 /////////////////////////////////////////
 
 export const reloadWindow = (): void =>
-	notify(ElectronIpcMainProcessNotificationEnum.RELOAD_WINDOW);
+	notify(ElectronIpcMainProcessNotification.RELOAD_WINDOW);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
