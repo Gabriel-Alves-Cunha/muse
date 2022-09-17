@@ -4,12 +4,10 @@ import type { PlayOptions } from "@contexts/usePlayOptions";
 import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
-import { stringifyAsync } from "js-coroutines";
-
 import { assertUnreachable, time } from "./utils";
 import { dbgPlaylists } from "@common/utils";
 
-const { assert, error } = console;
+const { assert } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -18,15 +16,13 @@ const { assert, error } = console;
 
 export const keyPrefix = "@muse:";
 
-export const keys = Object.freeze(
-	{
-		sortedByDate: `${keyPrefix}playlist:sortedByDate`,
-		currentPlaying: `${keyPrefix}currentPlaying`,
-		favorites: `${keyPrefix}playlist:favorites`,
-		history: `${keyPrefix}playlist:history`,
-		playOptions: `${keyPrefix}playOptions`,
-	} as const,
-);
+export const keys = {
+	sortedByDate: `${keyPrefix}playlist:sortedByDate`,
+	currentPlaying: `${keyPrefix}currentPlaying`,
+	favorites: `${keyPrefix}playlist:favorites`,
+	history: `${keyPrefix}playlist:history`,
+	playOptions: `${keyPrefix}playOptions`,
+} as const;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -34,17 +30,17 @@ export const keys = Object.freeze(
 
 export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	setTimeout(() =>
-		time(async () => {
+		time(() => {
 			if (value instanceof Map || value instanceof Set)
 				value = [...value];
 
-			const serializedValue = await stringifyAsync(value).catch(error);
+			const json = JSON.stringify(value);
 
-			dbgPlaylists({ key, serializedValue, value });
+			dbgPlaylists({ key, json, value });
 
 			// @ts-ignore => It doesn't matter that `serializedValue`,
 			// is of type `String` or `string`, they both work:
-			localStorage.setItem(key, serializedValue);
+			localStorage.setItem(key, json);
 		}, `setLocalStorage(${key})`)
 	);
 }

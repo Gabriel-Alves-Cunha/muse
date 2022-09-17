@@ -3,18 +3,19 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
 import { type CSSProperties, useState } from "react";
 import { BsJournal as NoLyrics } from "react-icons/bs";
-import { RingLoader } from "react-spinners";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdFavorite as Favorite,
 } from "react-icons/md";
+import UseAnimations from "react-useanimations";
+import loading from "react-useanimations/lib/loading";
 
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
 import { t } from "@components/I18n";
 import {
 	PlaylistActions,
 	setPlaylists,
-	getFavorites,
+	usePlaylists,
 	WhatToDo,
 } from "@contexts/usePlaylists";
 
@@ -37,7 +38,7 @@ function toggleFavorite(path: Readonly<Path>): void {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const putLoaderOnTopOfLyricsSvg: CSSProperties = { position: "absolute" };
+export const putOnTop: CSSProperties = { position: "absolute" };
 
 export const openLyrics = true;
 
@@ -64,9 +65,10 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 				<LyricsPresent size={16} /> :
 				isLoadingLyrics === true ?
 				(
-					<RingLoader
-						cssOverride={putLoaderOnTopOfLyricsSvg}
-						color="white"
+					<UseAnimations
+						wrapperStyle={putOnTop}
+						strokeColor="white"
+						animation={loading}
 						size={30}
 					/>
 				) :
@@ -79,24 +81,30 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Header = ({ media, path, displayTitle = false }: HeaderProps) => (
-	<OptionsAndAlbum>
-		<LoadOrToggleLyrics media={media} path={path} />
+const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
+	state.favorites;
 
-		<Album>{displayTitle === true ? media?.title : media?.album}</Album>
+export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
+	const favorites = usePlaylists(favoritesSelector);
+	const isFavorite = favorites.has(path);
 
-		<CircledIconButton
-			aria-label={t("tooltips.toggleFavorite")}
-			onPointerUp={() => toggleFavorite(path)}
-			title={t("tooltips.toggleFavorite")}
-			disabled={media === undefined}
-		>
-			{getFavorites().has(path) === true ?
-				<Favorite size={17} /> :
-				<AddFavorite size={17} />}
-		</CircledIconButton>
-	</OptionsAndAlbum>
-);
+	return (
+		<OptionsAndAlbum>
+			<LoadOrToggleLyrics media={media} path={path} />
+
+			<Album>{displayTitle === true ? media?.title : media?.album}</Album>
+
+			<CircledIconButton
+				aria-label={t("tooltips.toggleFavorite")}
+				onPointerUp={() => toggleFavorite(path)}
+				title={t("tooltips.toggleFavorite")}
+				disabled={media === undefined}
+			>
+				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
+			</CircledIconButton>
+		</OptionsAndAlbum>
+	);
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

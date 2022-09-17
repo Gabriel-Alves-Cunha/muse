@@ -80,6 +80,4 @@ export const ButtonFromGroup = styled("button", {
 	cursor: "pointer",
 	bg: "none",
 	b: "none",
-
-	transition: "none !important",
 });
