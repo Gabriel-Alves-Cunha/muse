@@ -2,9 +2,9 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
 import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
-import { dbg, isDev } from "@common/utils";
-// import { LogLevel } from "react-virtuoso";
+import { isDev } from "@common/utils";
 import { App } from "./App";
+import { dbg } from "@common/debug";
 import "./i18n"; // Import translations on app root.
 
 import { font_1, font_2, font_3, font_4 } from "./assets";

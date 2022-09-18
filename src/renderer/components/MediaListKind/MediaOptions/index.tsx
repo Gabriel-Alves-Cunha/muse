@@ -7,7 +7,7 @@ import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as Close } from "react-icons/md";
 import { Dialog } from "@radix-ui/react-dialog";
 
-import { dbg, separatedByCommaOrSemiColorOrSpace } from "@common/utils";
+import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { ReactToElectronMessage } from "@common/enums";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@styles/global";
@@ -19,6 +19,7 @@ import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { deleteMedia } from "@utils/media";
 import { Button } from "@components/Button";
+import { dbg } from "@common/debug";
 
 import {
 	DialogTriggerToRemoveMedia,

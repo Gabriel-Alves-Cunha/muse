@@ -15,7 +15,7 @@ import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
 import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 import {
 	getConvertingList,
 	setConvertingList,

@@ -2,7 +2,7 @@ import type { Media, Path } from "@common/@types/generalTypes";
 
 import { ReactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { mediaPlayerCard } from "@components/FlipCard";
+import { mediaPlayerCardId } from "@components/FlipCard";
 import { infoToast } from "@styles/global";
 import { Header } from "./Header";
 import { t } from "@components/I18n";
@@ -31,7 +31,7 @@ export function Lyrics({ media, path }: Props) {
 // Helper functions:
 
 export function flipMediaPlayerCard(): void {
-	document.getElementById(mediaPlayerCard)?.classList.toggle("active");
+	document.getElementById(mediaPlayerCardId)?.classList.toggle("active");
 }
 
 /////////////////////////////////////////

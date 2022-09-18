@@ -8,10 +8,10 @@ import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
 import { emptyString } from "@common/empty";
-import { FlipCard } from "@components/FlipCard";
+import { FlipCard, mediaPlayerCardId } from "@components/FlipCard";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 import {
 	PlaylistActions,
 	usePlaylists,
@@ -29,6 +29,7 @@ import { SquareImage, Wrapper, Info } from "./styles";
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
+// Helper constants:
 
 export const useProgress = create<Progress>(() => ({
 	currentTime: 0,
@@ -38,13 +39,9 @@ export const useProgress = create<Progress>(() => ({
 const { setState: setProgress } = useProgress;
 
 ///////////////////////////////////////
-///////////////////////////////////////
-///////////////////////////////////////
-// Main function:
 
-const currentPlayingPathSelector = (
-	state: ReturnType<typeof useCurrentPlaying.getState>,
-) => state.path;
+const pathSelector = (state: ReturnType<typeof useCurrentPlaying.getState>) =>
+	state.path;
 
 ///////////////////////////////////////
 
@@ -52,12 +49,17 @@ const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByName;
 
 ///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+// Main function:
 
 export function MediaPlayer() {
-	const path = useCurrentPlaying(currentPlayingPathSelector);
 	const mainList = usePlaylists(mainListSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
+	const path = useCurrentPlaying(pathSelector);
 	const isSeekingRef = useRef(false);
+
+	const media = mainList.get(path);
 
 	function handleProgress(audio: HTMLAudioElement): void {
 		const { duration, currentTime } = audio;
@@ -68,7 +70,11 @@ export function MediaPlayer() {
 			setProgress({ percentage: (currentTime / duration) * 100 });
 	}
 
-	const media = mainList.get(path);
+	useEffect(function flipMediaPlayerCardToNormalPlayer() {
+		console.log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
+
+		document.getElementById(mediaPlayerCardId)?.classList.remove("active");
+	}, [audioRef.current?.src]);
 
 	useEffect(() => {
 		const audio = audioRef.current;
@@ -114,7 +120,7 @@ export function MediaPlayer() {
 	}, [media, path]);
 
 	return (
-		<Wrapper aria-label="Media player" title="Media player">
+		<Wrapper>
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
@@ -132,6 +138,8 @@ export function MediaPlayer() {
 	);
 }
 
+/////////////////////////////////////////
+/////////////////////////////////////////
 /////////////////////////////////////////
 // Helper functions:
 
@@ -191,14 +199,10 @@ function handleLoadedData(
 			path,
 		});
 
-	// Maybe set audio currentTime to last played time:
+	// Maybe set audio.currentTime to last stopped time:
 	const lastTime = getCurrentPlaying().currentTime;
-	if (lastTime > 30 /* seconds */) {
-		dbg(
-			`Audio has loaded metadata. Setting currentTime to ${lastTime} seconds.`,
-		);
+	if (lastTime > 30 /* seconds */)
 		audio.currentTime = lastTime;
-	}
 }
 
 /////////////////////////////////////////

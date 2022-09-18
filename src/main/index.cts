@@ -18,10 +18,11 @@ import {
 	app,
 } from "electron";
 
-import { capitalizedAppName, dbg, isDev } from "@common/utils";
+import { capitalizedAppName, isDev } from "@common/utils";
 import { assertUnreachable, time } from "@utils/utils";
 import { emptyString } from "@common/empty";
 import { logoPath } from "./utils.cjs";
+import { dbg } from "@common/debug";
 import {
 	ElectronIpcMainProcessNotification,
 	ElectronToReactMessage,

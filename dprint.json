@@ -4,7 +4,7 @@
 		"https://plugins.dprint.dev/json-0.15.6.wasm"
 	],
 	"excludes": ["node_modules", "*-lock.json", "dist", "build"],
-	"includes": ["*.{ts,tsx,js,jsx,json,cts}"],
+	"includes": ["*.{ts,tsx,js,jsx,json,cts,cjs}"],
 	"indentWidth": 2,
 	"lineWidth": 80,
 	"useTabs": true,

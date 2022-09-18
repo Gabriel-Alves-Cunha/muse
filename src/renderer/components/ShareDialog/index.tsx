@@ -10,12 +10,12 @@ import { setSettings, useSettings } from "@contexts/settings";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
-import { dbg } from "@common/utils";
 import { t } from "@components/I18n";
 
 import { CloseDialogTrigger, StyledDialogShareContent, Canvas } from "./styles";
 import { StyledDialogBlurOverlay } from "../MediaListKind/MediaOptions/styles";
 import { Loading } from "@styles/appStyles";
+import { dbg } from "@common/debug";
 
 const { createServer } = electron.share;
 

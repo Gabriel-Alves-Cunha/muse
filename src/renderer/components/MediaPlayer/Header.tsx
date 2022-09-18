@@ -3,12 +3,11 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
 import { type CSSProperties, useState } from "react";
 import { BsJournal as NoLyrics } from "react-icons/bs";
+import { RingLoader } from "react-spinners";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdFavorite as Favorite,
 } from "react-icons/md";
-import UseAnimations from "react-useanimations";
-import loading from "react-useanimations/lib/loading";
 
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
 import { t } from "@components/I18n";
@@ -63,15 +62,8 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 		>
 			{media?.lyrics ?
 				<LyricsPresent size={16} /> :
-				isLoadingLyrics === true ?
-				(
-					<UseAnimations
-						wrapperStyle={putOnTop}
-						strokeColor="white"
-						animation={loading}
-						size={30}
-					/>
-				) :
+				isLoadingLyrics ?
+				<RingLoader cssOverride={putOnTop} color="white" size={30} /> :
 				<NoLyrics size={16} />}
 		</CircledIconButton>
 	);

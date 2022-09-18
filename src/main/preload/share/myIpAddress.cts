@@ -1,6 +1,6 @@
 import { networkInterfaces } from "node:os";
 
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

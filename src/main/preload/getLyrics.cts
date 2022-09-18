@@ -1,8 +1,9 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
 import { lyricApiKey, lyricsAPI } from "@main/utils.cjs";
-import { dbg, stringifyJson } from "@common/utils";
+import { stringifyJson } from "@common/utils";
 import { emptyString } from "@common/empty";
+import { dbg } from "@common/debug";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

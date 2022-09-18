@@ -3,14 +3,11 @@ import type { Base64, Media, Path } from "@common/@types/generalTypes";
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { statSync } from "node:fs";
 
+import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
 import { emptyString } from "@common/empty";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
-import {
-	randomBackgroundColorForConsole,
-	formatDuration,
-	dbg,
-} from "@common/utils";
+import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
 

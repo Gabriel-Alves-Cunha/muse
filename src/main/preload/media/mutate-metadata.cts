@@ -17,12 +17,13 @@ import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
 import { checkOrThrow, validator } from "@common/args-validator";
-import { dbg, dbgTests, eraseImg } from "@common/utils";
 import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { doesPathExists } from "../file.cjs";
 import { isBase64Image } from "@main/utils.cjs";
 import { emptyString } from "@common/empty";
+import { eraseImg } from "@common/utils";
+import { dbg } from "@common/debug";
 
 const { error } = console;
 
@@ -76,7 +77,7 @@ async function handleImageMetadata(
 	// if imageURL === "erase img" => erase img so we
 	// don't keep getting an error on the browser.
 	if (imageURL === eraseImg) {
-		dbgTests("Erasing picture.");
+		dbg("Erasing picture.");
 		file.tag.pictures = [];
 
 		return;

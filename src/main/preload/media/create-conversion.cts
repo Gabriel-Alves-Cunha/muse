@@ -10,13 +10,14 @@ import sanitize from "sanitize-filename";
 
 import { deleteFile, doesPathExists } from "../file.cjs";
 import { checkOrThrow, validator } from "@common/args-validator";
-import { type AllowedMedias, dbg } from "@common/utils";
 import { ElectronToReactMessage } from "@common/enums";
+import { type AllowedMedias } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg.cjs";
 import { getBasename } from "@common/path";
 import { dirs } from "@main/utils.cjs";
+import { dbg } from "@common/debug";
 
 const { error, log } = console;
 

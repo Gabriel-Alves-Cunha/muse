@@ -11,7 +11,7 @@ import { ProgressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
 import { Progress } from "@components/Progress";
 import { Button } from "@components/Button";
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 import {
 	useDownloadingList,
 	setDownloadingList,

@@ -1,5 +1,3 @@
-import { debug } from "debug";
-
 const { trunc, floor, random } = Math;
 const { isNaN } = Number;
 
@@ -11,12 +9,6 @@ const { isNaN } = Number;
 export const isDev = process.env.NODE_ENV === "development";
 
 export const capitalizedAppName = "Muse";
-
-export const dbgPlaylists = debug("muse:playlists");
-export const dbgTests = debug("muse:tests");
-export const dbg = debug("muse");
-
-dbg("\uD834\uDD60 Hello from the debug side! \uD834\uDD60");
 
 /////////////////////////////////////////
 

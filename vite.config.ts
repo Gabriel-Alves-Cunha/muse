@@ -20,11 +20,11 @@ export default defineConfig(({ mode }) => {
 			environment: "happy-dom",
 			dir: "./tests",
 			logHeapUsage: true,
-			coverage: {
-				// reporter: ["html", "text"],
-				reporter: ["text"],
-				// all: true,
-			},
+			// coverage: {
+			// 	// reporter: ["html", "text"],
+			// 	reporter: ["text"],
+			// 	// all: true,
+			// },
 			exclude: [
 				...configDefaults.exclude,
 				"**/seeLeakedVariables.ts",
@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
 		},
 
 		define: isTest ? {} : { "import.meta.vitest": "undefined" },
-		// @ts-ignore => This is giving an error cause of VitestUserConfig type... but it works.
+		// @ts-ignore => This gives an error cause of VitestUserConfig type, but it works.
 		plugins: [react()],
 		root: rendererPath,
 		envDir: "./",
@@ -47,19 +47,17 @@ export default defineConfig(({ mode }) => {
 			outDir: outputRendererBuildDirectory,
 			chunkSizeWarningLimit: 1_000,
 			reportCompressedSize: false,
-			sourcemap: !isProd,
 			emptyOutDir: true,
 			minify: "esbuild",
 			target: "esnext",
+			sourcemap: true,
 			rollupOptions: {
-				// The 'debug' pkg is already on nodeJS, no need to compile it:
-				external: ["debug"],
 				output: {
 					assetFileNames: "assets/[name].[ext]",
 					entryFileNames: "[name].js",
 					chunkFileNames: "[name].js",
 					minifyInternalExports: true,
-					sourcemap: !isProd,
+					sourcemap: true,
 					compact: isProd,
 					format: "esm",
 				},
@@ -67,9 +65,9 @@ export default defineConfig(({ mode }) => {
 		},
 
 		esbuild: {
-			sourcemap: !isProd,
 			treeShaking: true,
 			target: "esnext",
+			sourcemap: true,
 			format: "esm",
 		},
 

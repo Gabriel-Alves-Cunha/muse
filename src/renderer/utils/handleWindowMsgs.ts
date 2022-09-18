@@ -9,7 +9,6 @@ import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
 import { emptyString } from "@common/empty";
 import { deleteMedia } from "./media";
-import { dbg } from "@common/utils";
 import {
 	searchLocalComputerForMedias,
 	PlaylistActions,
@@ -17,6 +16,7 @@ import {
 	getMainList,
 	WhatToDo,
 } from "@contexts/usePlaylists";
+import { dbg } from "@common/debug";
 
 const { transformPathsToMedias } = electron.media;
 

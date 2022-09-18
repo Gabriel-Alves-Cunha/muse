@@ -4,7 +4,7 @@ import Koa from "koa";
 
 import { myIp, unableToShareMediasError } from "./myIpAddress.cjs";
 import { router } from "./routes.cjs";
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

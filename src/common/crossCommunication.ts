@@ -4,7 +4,7 @@ import type {
 	MsgObjectReactToElectron,
 } from "@common/@types/electron-window";
 
-import { dbg } from "./utils.js";
+import { dbg } from "./debug";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

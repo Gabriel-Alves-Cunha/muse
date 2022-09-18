@@ -5,7 +5,7 @@ import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
 import { assertUnreachable, time } from "./utils";
-import { dbgPlaylists } from "@common/utils";
+import { dbgPlaylists } from "@common/debug";
 
 const { assert } = console;
 

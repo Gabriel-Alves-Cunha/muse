@@ -9,8 +9,8 @@ import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { type AllowedMedias, dbg, isDev } from "@common/utils";
 import { deleteFile, doesPathExists } from "../file.cjs";
+import { type AllowedMedias, isDev } from "@common/utils";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
@@ -20,6 +20,7 @@ import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { writeTags } from "./mutate-metadata.cjs";
 import { dirs } from "@main/utils.cjs";
+import { dbg } from "@common/debug";
 
 const { error, log } = console;
 

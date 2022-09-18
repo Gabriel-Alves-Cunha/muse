@@ -1,4 +1,5 @@
-import { dbg, stringifyJson } from "@common/utils";
+import { stringifyJson } from "@common/utils";
+import { dbg } from "@common/debug";
 
 const { random, floor } = Math;
 

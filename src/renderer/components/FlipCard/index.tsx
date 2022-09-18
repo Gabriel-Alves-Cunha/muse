@@ -7,7 +7,7 @@ import { Wrapper } from "./styles";
 /////////////////////////////////////////
 // Constants:
 
-export const mediaPlayerCard = "media-player-flip-card";
+export const mediaPlayerCardId = "media-player-flip-card";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -16,7 +16,7 @@ export const mediaPlayerCard = "media-player-flip-card";
 
 export function FlipCard({ cardFront, cardBack }: Props) {
 	return (
-		<Wrapper id={mediaPlayerCard} className="flip-card">
+		<Wrapper id={mediaPlayerCardId} className="flip-card">
 			<div className="flip-card-inner">
 				<div className="flip-card-front">{cardFront}</div>
 				<div className="flip-card-back">{cardBack}</div>

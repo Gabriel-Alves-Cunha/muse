@@ -15,7 +15,7 @@ import { assertUnreachable } from "@utils/utils";
 import { createServer } from "./preload/share/server.cjs";
 import { writeTags } from "./preload/media/mutate-metadata.cjs";
 import { dirs } from "./utils.cjs";
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 import {
 	type MsgWithSource,
 	sendMsgToClient,

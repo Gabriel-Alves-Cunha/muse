@@ -1,4 +1,4 @@
-import { dbg } from "@common/utils";
+import { dbg } from "@common/debug";
 
 const modifierKeys = Object.freeze(
 	[
