@@ -7,7 +7,7 @@ import { useTitle } from "@hooks/useTitle";
 import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 
-import { Loading } from "@styles/appStyles";
+import { Loading } from "@components/Loading";
 import {
 	ResultContainer,
 	LoadingWrapper,

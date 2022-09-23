@@ -7,6 +7,7 @@
 * CHANGE: from react to solidjs/preact
 * CHANGE: from i18 to ? solid-primitives
 * CHANGE: from radix-ui to hope-ui (solid js)
+* ADD: detect (avail port to share)
 
 ################## NOTES ##################
 

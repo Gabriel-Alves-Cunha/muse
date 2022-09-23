@@ -27,6 +27,7 @@ import {
 	ElectronIpcMainProcessNotification,
 	ElectronToReactMessage,
 } from "@common/enums";
+import { readdirSync } from "node:fs";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -78,7 +79,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 			width: 800,
 
 			webPreferences: {
-				preload: join(__dirname, "preload.cjs"),
+				preload: join("./", "preload.cjs"),
 				allowRunningInsecureContent: false,
 				contextIsolation: true, // <-- Needed to use contextBridge
 				nodeIntegration: true,
@@ -130,6 +131,11 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 		const url = isDev ?
 			"http://localhost:3000" :
 			pathToFileURL(join(__dirname, "..", "renderer", "index.html")).toString();
+
+		console.log(readdirSync(__dirname), {
+			__dirname,
+			appPath: app.getAppPath(),
+		});
 
 		await window.loadURL(url);
 

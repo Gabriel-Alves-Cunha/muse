@@ -18,8 +18,8 @@ export default defineConfig(({ mode }) => {
 		test: {
 			includeSource: ["src/**/*.{js,ts}"],
 			environment: "happy-dom",
-			dir: "./tests",
 			logHeapUsage: true,
+			dir: "./tests",
 			// coverage: {
 			// 	// reporter: ["html", "text"],
 			// 	reporter: ["text"],
@@ -36,7 +36,9 @@ export default defineConfig(({ mode }) => {
 			],
 		},
 
-		define: isTest ? {} : { "import.meta.vitest": "undefined" },
+		define: isTest ?
+			{} :
+			{ "process.env": process.env ?? "", "import.meta.vitest": "undefined" },
 		// @ts-ignore => This gives an error cause of VitestUserConfig type, but it works.
 		plugins: [react()],
 		root: rendererPath,

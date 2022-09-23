@@ -392,27 +392,6 @@ export const GlobalCSS = globalCss({
 		"::selection": { background: "$accent", color: "#fff" },
 
 		"::-webkit-scrollbar": { display: "none" },
-
-		".tooltip": {
-			size: "auto",
-
-			opacity: "1 !important",
-			p: "3px 8px",
-			br: 0,
-
-			whiteSpace: "nowrap",
-			ff: "$primary",
-			lh: "normal",
-			ta: "center",
-			fs: "1rem",
-			c: "#fff",
-			fw: 500,
-
-			pointerEvents: "none",
-			transition: "none",
-
-			"&::before, &::after": { content: "none" },
-		},
 	},
 });
 

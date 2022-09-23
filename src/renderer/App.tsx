@@ -17,6 +17,7 @@ import { Navbar } from "@components/Navbar";
 import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";
+import { Loading } from "@components/Loading";
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -61,6 +62,7 @@ function Main() {
 	return (
 		<Content>
 			<Navbar />
+			<Loading />
 
 			<PageToShow />
 
@@ -85,6 +87,8 @@ function PageToShow() {
 	return pages[page];
 }
 
+//////////////////////////////////////////
+//////////////////////////////////////////
 //////////////////////////////////////////
 // Do once on app start:
 

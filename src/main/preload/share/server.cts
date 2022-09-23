@@ -1,4 +1,5 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
+import type { AddressInfo } from "node:net";
 
 import Koa from "koa";
 
@@ -11,16 +12,11 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 // Setup singleton server:
 
-const port = 3_111;
-const url: QRCodeURL = `http://${myIp}:${port}`;
 // Exporting for testing porpuses.
-export const app = new Koa()
-	.use(router.routes())
-	.use(router.allowedMethods())
+export const app = new Koa().use(router.routes()).use(router.allowedMethods())
 	.on("error", (err: Error) => {
 		throw err;
-	})
-	.on("listen", () => dbg(`Listening on url: ${url}`));
+	});
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -37,19 +33,28 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 
 	console.log({ ctx: app.context });
 
+	let url = "" as QRCodeURL;
 	const server = app
 		.on("close", () => dbg("Closing server"))
 		.on("error", (err: Error) => {
 			throw err;
 		})
-		.listen(port);
+		.listen(0, () => {
+			const osAssignedPort = (server.address() as AddressInfo).port;
+			url = `http://${myIp}:${osAssignedPort}`;
+
+			dbg(`Listening on url: ${url}`);
+		});
 
 	/////////////////////////////////////////////
 
 	const clientServerAPI: ClientServerAPI = Object.freeze({
-		addListener: (event: string, listener: (...args: unknown[]) => void) =>
-			server.addListener(event, listener),
-		close: () => server.close(),
+		addListener(event: string, listener: (...args: unknown[]) => void) {
+			server.addListener(event, listener);
+		},
+		close() {
+			server.close();
+		},
 		url,
 	});
 

@@ -1,3 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	* {
+		transition-property: "color, background-color, border-color, box-shadow, -webkit-scrollbar-track, -webkit-scrollbar-thumb, caret-color";
+		transition-timing-function: "ease";
+		transition-duration: "0.25s";
+	}
+
+	button: {
+		-webkit-app-region: no-drag;
+	}
+
+	/* assistant-300 - latin */
+	@font-face: {
+		fontfamily: "Assistant";
+		fontstyle: "normal";
+		fontweight: 300;
+		src: url("./assets/assistant-v16-latin-300.woff2") format("woff2");
+	};
+
+	/* assistant-regular-400 - latin */
+	@font-face: {
+		fontfamily: "Assistant";
+		fontstyle: "normal";
+		fontweight: 400;
+		src: url("./assets/assistant-v16-latin-regular.woff2") format("woff2");
+	};
+
+	/* assistant-500 - latin */
+	@font-face: {
+		fontfamily: "Assistant";
+		fontstyle: "normal";
+		fontweight: 500;
+		src: url("./assets/assistant-v16-latin-500.woff2") format("woff2");
+	};
+
+	/* source-sans-pro-regular-400 - latin */
+	@font-face: {
+		fontfamily: "Source Sans Pro";
+		fontstyle: "normal";
+		fontweight: 400;
+		src: url("./assets/source-sans-pro-v21-latin-regular.woff2") format("woff2");
+	};
+}
+
+@layer components {
+	.grid-template-for-content-wrapper: {
+		grid-template: "nav main-area media-player" 100vw / 65px 1fr minmax(
+				200px,
+				25vw
+			);
+
+		@media (min-width: 640px) : {
+			grid-template:
+				"nav main-area" 1fr / 35px 1fr
+				"media-player" 70px / 1fr;
+		}
+	}
+
+	.no-transition * {
+		/* maybe add !important */
+		transition: none;
+	}
+}
