@@ -8,6 +8,8 @@
 * CHANGE: from i18 to ? solid-primitives
 * CHANGE: from radix-ui to hope-ui (solid js)
 * ADD: detect (avail port to share)
+* ADD: electron setProgressBar
+* FIX: gh-actions is always overwriting latest release!!
 
 ################## NOTES ##################
 

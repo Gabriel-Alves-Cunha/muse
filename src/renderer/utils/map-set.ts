@@ -16,7 +16,8 @@ export function getFirstKey<Key>(
 
 ////////////////////////////////////////////////
 
-const getLastOf = (iteratorFn: "entries" | "keys" | "values") =>
+const getLastOf =
+	(iteratorFn: "entries" | "keys" | "values") =>
 	<K, V>(map: ReadonlyMap<K, V> | ReadonlySet<K>) => {
 		const mapIterator = map[iteratorFn]();
 		let curr;

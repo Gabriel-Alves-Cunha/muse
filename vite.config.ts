@@ -6,13 +6,8 @@ import { defineConfig } from "vite";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
-const outputRendererBuildDirectory = resolve(__dirname, "./build/renderer");
-const rendererPath = resolve(__dirname, "./src/renderer");
-
 export default defineConfig(({ mode }) => {
-	const isDev = mode === "development";
 	const isTest = mode === "test";
-	const isProd = !isTest && !isDev;
 
 	const config: ViteUserConfig & VitestUserConfig = {
 		test: {
@@ -39,76 +34,29 @@ export default defineConfig(({ mode }) => {
 		define: isTest ?
 			{} :
 			{ "process.env": process.env ?? "", "import.meta.vitest": "undefined" },
+		server: { port: 3_000 },
+		root: "./src/renderer",
 		// @ts-ignore => This gives an error cause of VitestUserConfig type, but it works.
 		plugins: [react()],
-		root: rendererPath,
 		envDir: "./",
 		base: "./",
 
-		build: {
-			outDir: outputRendererBuildDirectory,
-			chunkSizeWarningLimit: 1_000,
-			reportCompressedSize: false,
-			emptyOutDir: true,
-			minify: "esbuild",
-			target: "esnext",
-			sourcemap: true,
-			rollupOptions: {
-				output: {
-					assetFileNames: "assets/[name].[ext]",
-					entryFileNames: "[name].js",
-					chunkFileNames: "[name].js",
-					minifyInternalExports: true,
-					sourcemap: true,
-					compact: isProd,
-					format: "esm",
-				},
-			},
-		},
-
-		esbuild: {
-			treeShaking: true,
-			target: "esnext",
-			sourcemap: true,
-			format: "esm",
-		},
-
-		css: { devSourcemap: true },
-
 		resolve: {
 			alias: [
-				{ find: "@renderer", replacement: resolve(__dirname, "src/renderer") },
-				{ find: "@common", replacement: resolve(__dirname, "src/common") },
-				{ find: "@main", replacement: resolve(__dirname, "src/main") },
-				{ find: "@tests", replacement: resolve(__dirname, "tests") },
-				{
-					find: "@contexts",
-					replacement: resolve(__dirname, "src/renderer/contexts"),
-				},
 				{
 					find: "@components",
-					replacement: resolve(__dirname, "src/renderer/components"),
+					replacement: resolve("src/renderer/components"),
 				},
-				{
-					find: "@styles",
-					replacement: resolve(__dirname, "src/renderer/styles"),
-				},
-				{
-					find: "@routes",
-					replacement: resolve(__dirname, "src/renderer/routes"),
-				},
-				{
-					find: "@utils",
-					replacement: resolve(__dirname, "src/renderer/utils"),
-				},
-				{
-					find: "@hooks",
-					replacement: resolve(__dirname, "src/renderer/hooks"),
-				},
-				{
-					find: "@modules",
-					replacement: resolve(__dirname, "src/renderer/modules"),
-				},
+				{ find: "@contexts", replacement: resolve("src/renderer/contexts") },
+				{ find: "@modules", replacement: resolve("src/renderer/modules") },
+				{ find: "@styles", replacement: resolve("src/renderer/styles") },
+				{ find: "@routes", replacement: resolve("src/renderer/routes") },
+				{ find: "@utils", replacement: resolve("src/renderer/utils") },
+				{ find: "@hooks", replacement: resolve("src/renderer/hooks") },
+				{ find: "@renderer", replacement: resolve("src/renderer") },
+				{ find: "@common", replacement: resolve("src/common") },
+				{ find: "@main", replacement: resolve("src/main") },
+				{ find: "@tests", replacement: resolve("tests") },
 			],
 		},
 	};

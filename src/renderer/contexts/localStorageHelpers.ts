@@ -12,27 +12,26 @@ import { areObjectKeysEqual } from "@utils/object";
 
 export const setCurrentPlayingOnLocalStorage: Plugin<CurrentPlaying> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	(f, _name) =>
-		(set, get, store) => {
-			const newSetter: typeof set = (
-				newCurrentPlaying: Partial<CurrentPlaying>,
-				replace,
-			) => {
-				const previousState = get();
-				const areStatesEqual = areObjectKeysEqual(
-					newCurrentPlaying,
-					previousState,
-				);
+	(f, _name) => (set, get, store) => {
+		const newSetter: typeof set = (
+			newCurrentPlaying: Partial<CurrentPlaying>,
+			replace,
+		) => {
+			const previousState = get();
+			const areStatesEqual = areObjectKeysEqual(
+				newCurrentPlaying,
+				previousState,
+			);
 
-				set(newCurrentPlaying, replace);
+			set(newCurrentPlaying, replace);
 
-				if (!areStatesEqual) setLocalStorage(keys.currentPlaying, get());
-			};
-
-			store.setState = newSetter;
-
-			return f(newSetter, get, store);
+			if (!areStatesEqual) setLocalStorage(keys.currentPlaying, get());
 		};
+
+		store.setState = newSetter;
+
+		return f(newSetter, get, store);
+	};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -40,27 +39,23 @@ export const setCurrentPlayingOnLocalStorage: Plugin<CurrentPlaying> =
 
 export const setPlayOptionsOnLocalStorage: Plugin<PlayOptions> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	(f, _name) =>
-		(set, get, store) => {
-			const newSetter: typeof set = (
-				newPlayOptions: Partial<PlayOptions>,
-				replace,
-			) => {
-				const previousState = get();
-				const areStatesEqual = areObjectKeysEqual(
-					newPlayOptions,
-					previousState,
-				);
+	(f, _name) => (set, get, store) => {
+		const newSetter: typeof set = (
+			newPlayOptions: Partial<PlayOptions>,
+			replace,
+		) => {
+			const previousState = get();
+			const areStatesEqual = areObjectKeysEqual(newPlayOptions, previousState);
 
-				set(newPlayOptions, replace);
+			set(newPlayOptions, replace);
 
-				if (!areStatesEqual) setLocalStorage(keys.playOptions, get());
-			};
-
-			store.setState = newSetter;
-
-			return f(newSetter, get, store);
+			if (!areStatesEqual) setLocalStorage(keys.playOptions, get());
 		};
+
+		store.setState = newSetter;
+
+		return f(newSetter, get, store);
+	};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -68,25 +63,24 @@ export const setPlayOptionsOnLocalStorage: Plugin<PlayOptions> =
 
 export const setPlaylistsOnLocalStorage: Plugin<UsePlaylistsActions> =
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	(f, _name) =>
-		(set, get, store) => {
-			const newSetter: typeof set = (
-				args: ArgsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
-				replace: boolean,
-			) => {
-				(["favorites", "history"] as const).forEach(key => {
-					if (Object.hasOwn(args, key))
-						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-						setLocalStorage(keys[key], args[key]!);
-				});
+	(f, _name) => (set, get, store) => {
+		const newSetter: typeof set = (
+			args: ArgsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
+			replace: boolean,
+		) => {
+			(["favorites", "history"] as const).forEach(key => {
+				if (Object.hasOwn(args, key))
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					setLocalStorage(keys[key], args[key]!);
+			});
 
-				set(args, replace);
-			};
-
-			store.setState = newSetter;
-
-			return f(newSetter, get, store);
+			set(args, replace);
 		};
+
+		store.setState = newSetter;
+
+		return f(newSetter, get, store);
+	};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

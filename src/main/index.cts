@@ -3,9 +3,11 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { Values } from "@common/@types/utils.js";
 
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
-import { join, normalize } from "node:path";
+import { clearLine, cursorTo } from "node:readline";
+import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { autoUpdater } from "electron-updater";
+import { error } from "node:console";
 import {
 	BrowserWindow,
 	Notification,
@@ -19,7 +21,7 @@ import {
 } from "electron";
 
 import { capitalizedAppName, isDev } from "@common/utils";
-import { assertUnreachable, time } from "@utils/utils";
+import { assertUnreachable } from "@utils/utils";
 import { emptyString } from "@common/empty";
 import { logoPath } from "./utils.cjs";
 import { dbg } from "@common/debug";
@@ -27,7 +29,6 @@ import {
 	ElectronIpcMainProcessNotification,
 	ElectronToReactMessage,
 } from "@common/enums";
-import { readdirSync } from "node:fs";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -37,21 +38,18 @@ import { readdirSync } from "node:fs";
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater
-	.on("update-not-available", info =>
-		dbg("Update not available:", info))
+	.on("update-not-available", info => dbg("Update not available:", info))
 	.on("update-downloaded", info => dbg("Update downloaded:", info))
-	.on("update-available", info =>
-		dbg("Update available:", info))
+	.on("update-available", info => dbg("Update available:", info))
 	.on("checking-for-update", () => dbg("Checking for update..."))
-	.on("error", err =>
-		dbg("Error in auto-updater. ", err))
-	.on(
-		"download-progress",
-		progressObj =>
-			dbg(
-				`Download speed:  ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
-			),
-	);
+	.on("error", err => dbg("Error in auto-updater. ", err))
+	.on("download-progress", progressObj => {
+		cursorTo(process.stdout, 0);
+		clearLine(process.stdout, 0);
+		process.stdout.write(
+			`Download speed: ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
+		);
+	});
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -64,83 +62,77 @@ let tray: Tray | undefined;
 /////////////////////////////////////////
 
 async function createElectronWindow(): Promise<BrowserWindow> {
-	return await time(async () => {
-		const window = new BrowserWindow({
-			title: capitalizedAppName,
-			titleBarStyle: "hidden",
-			icon: logoPath,
+	const window = new BrowserWindow({
+		title: capitalizedAppName,
+		titleBarStyle: "hidden",
+		icon: logoPath,
 
-			frame: false,
-			show: false,
+		frame: false,
+		show: false,
 
-			minHeight: 500,
-			minWidth: 315,
-			height: 600,
-			width: 800,
+		minHeight: 500,
+		minWidth: 315,
+		height: 600,
+		width: 800,
 
-			webPreferences: {
-				preload: join("./", "preload.cjs"),
-				allowRunningInsecureContent: false,
-				contextIsolation: true, // <-- Needed to use contextBridge
-				nodeIntegration: true,
-				webSecurity: true,
-				webgl: false,
-			},
-		})
-			.once("ready-to-show", () => {
-				window.show();
-				window.focus();
-			});
-
-		/////////////////////////////////////////
-		/////////////////////////////////////////
-		// Setup Electron global keyboard shortcuts:
-
-		const menu = new Menu();
-
-		menu.append(
-			new MenuItem({
-				label: "Refresh Page",
-				submenu: [{
-					click: () => window.reload(),
-					accelerator: "f5",
-					role: "reload",
-				}],
-			}),
-		);
-
-		menu.append(
-			new MenuItem({
-				label: "Open/close Dev Tools",
-				submenu: [{
-					click: () =>
-						window
-							.webContents
-							.toggleDevTools(),
-					accelerator: "CommandOrControl+shift+i",
-					role: "toggleDevTools",
-				}],
-			}),
-		);
-
-		Menu.setApplicationMenu(menu);
-
-		/////////////////////////////////////////
-		/////////////////////////////////////////
-
-		const url = isDev ?
-			"http://localhost:3000" :
-			pathToFileURL(join(__dirname, "..", "renderer", "index.html")).toString();
-
-		console.log(readdirSync(__dirname), {
-			__dirname,
-			appPath: app.getAppPath(),
+		webPreferences: {
+			preload: resolve(app.getAppPath(), "preload.cjs"),
+			allowRunningInsecureContent: false,
+			contextIsolation: true, // <-- Needed to use contextBridge
+			nodeIntegration: true,
+			webSecurity: true,
+			webgl: false,
+		},
+	})
+		.once("ready-to-show", () => {
+			window.show();
+			window.focus();
 		});
 
-		await window.loadURL(url);
+	/////////////////////////////////////////
+	/////////////////////////////////////////
+	// Setup Electron global keyboard shortcuts:
 
-		return window;
-	}, "createElectronWindow");
+	const menu = new Menu();
+
+	menu.append(
+		new MenuItem({
+			label: "Refresh Page",
+			submenu: [{
+				click: () => window.reload(),
+				accelerator: "f5",
+				role: "reload",
+			}],
+		}),
+	);
+
+	menu.append(
+		new MenuItem({
+			label: "Open/close Dev Tools",
+			submenu: [{
+				click() {
+					window.webContents.isDevToolsOpened() ?
+						window.webContents.closeDevTools() :
+						window.webContents.openDevTools({ mode: "detach" });
+				},
+				role: "toggleDevTools",
+				accelerator: "f12",
+			}],
+		}),
+	);
+
+	Menu.setApplicationMenu(menu);
+
+	/////////////////////////////////////////
+	/////////////////////////////////////////
+
+	const url = isDev ?
+		"http://localhost:3000" :
+		pathToFileURL(resolve("renderer", "index.html")).toString();
+
+	await window.loadURL(url);
+
+	return window;
 }
 
 app
@@ -169,22 +161,18 @@ app
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
 		// Some APIs can only be used after this event occurs:
-		// TODO: there is something wrong with this lib:
 		if (isDev) {
 			const devtoolsInstaller = await import("electron-devtools-installer");
 			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-			// @ts-ignore => this is a workaround for a bug in the lib:
-			const { default: installExtension } = devtoolsInstaller.default;
-
-			dbg({ installExtension });
+			// const { default: installExtension } = devtoolsInstaller.default;
+			const installExtension = devtoolsInstaller.default;
 
 			await installExtension(REACT_DEVELOPER_TOOLS, {
 				loadExtensionOptions: { allowFileAccess: true },
-			}) // @ts-ignore => this is a workaround for a bug in the lib
+			})
 				.then(name => dbg(`Added Extension: ${name}`))
-				// @ts-ignore => this is a workaround for a bug in the lib
 				.catch(err =>
-					console.error("An error occurred while installing extension: ", err)
+					error("An error occurred while installing extension: ", err)
 				);
 		}
 
@@ -251,8 +239,8 @@ app
 						.show();
 				})
 				.startWatching();
-		} catch (error) {
-			console.error(error);
+		} catch (e) {
+			error(e);
 		}
 
 		/////////////////////////////////////////
@@ -260,9 +248,8 @@ app
 		// This will immediately download an update,
 		// then install when the app quits.
 		setTimeout(
-			async () =>
-				await autoUpdater.checkForUpdatesAndNotify().catch(console.error),
-			5_000,
+			async () => await autoUpdater.checkForUpdatesAndNotify().catch(error),
+			10_000,
 		);
 	});
 
@@ -311,7 +298,14 @@ ipcMain.on(
 			}
 
 			case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
-				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
+				const window = BrowserWindow.getFocusedWindow()?.webContents;
+
+				if (!window) return;
+
+				window.isDevToolsOpened() ?
+					window.closeDevTools() :
+					window.openDevTools({ mode: "detach" });
+
 				break;
 			}
 
@@ -321,7 +315,7 @@ ipcMain.on(
 			}
 
 			default: {
-				console.error(
+				error(
 					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
 					event,
 				);

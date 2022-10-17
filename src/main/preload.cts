@@ -44,14 +44,14 @@ dbg("process.env.LYRIC_API_KEY =", process.env.LYRIC_API_KEY);
 
 // Expose methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object:
-const visibleElectronAPI: VisibleElectron = Object.freeze({
+const visibleElectronAPI: VisibleElectron = {
 	fs: { getFullPathOfFilesForFilesInThisDirectory, deleteFile, readDir },
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
 	lyric: { searchForLyricsAndImage },
 	share: { createServer },
 	os: { dirs },
-});
+};
 
 contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 

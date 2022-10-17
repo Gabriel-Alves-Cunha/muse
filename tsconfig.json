@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
-		"noPropertyAccessFromIndexSignature": true,
+		"noPropertyAccessFromIndexSignature": false,
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
 		"strictPropertyInitialization": true,
 		"noFallthroughCasesInSwitch": true,
 		"exactOptionalPropertyTypes": true,
-		"noUncheckedIndexedAccess": true,
+		"noUncheckedIndexedAccess": false,
 		"experimentalDecorators": false,
 		"strictFunctionTypes": true,
 		"strictBindCallApply": true,
@@ -23,10 +23,10 @@
 		"noImplicitAny": true,
 		"alwaysStrict": true,
 		"skipLibCheck": true,
-		"target": "ESNext",
-		"jsx": "react-jsx",
-		"module": "ESNext",
 		"sourceMap": false,
+		"target": "ESNext",
+		"module": "ESNext",
+		"jsx": "react-jsx",
 		"baseUrl": "./",
 		"allowJs": true,
 		"checkJs": true,
@@ -68,7 +68,7 @@
 			],
 			"@tests/*": [
 				"tests/*"
-			],
+			]
 		},
 		"lib": [
 			"DOM.Iterable",
@@ -78,7 +78,7 @@
 	},
 	"include": [
 		"tests",
-		"src",
+		"src"
 	],
 	"exclude": [
 		"**/node_modules",

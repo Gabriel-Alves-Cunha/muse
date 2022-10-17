@@ -337,7 +337,9 @@ export async function writeTags(
 	);
 }
 
-interface WriteTagsData extends Tags {
-	readonly downloadImg?: boolean;
-	readonly isNewMedia?: boolean;
-}
+type WriteTagsData = Readonly<
+	Tags & {
+		downloadImg?: boolean;
+		isNewMedia?: boolean;
+	}
+>;

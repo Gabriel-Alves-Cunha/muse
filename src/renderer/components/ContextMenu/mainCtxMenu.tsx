@@ -28,7 +28,7 @@ export const MainCtxMenu = () => (
 		<Item onSelect={toggleDeveloperTools}>
 			<Translator path="ctxMenus.toggleDevTools" />
 
-			<RightSlot>Ctrl+Shift+i</RightSlot>
+			<RightSlot>f12</RightSlot>
 		</Item>
 	</>
 );

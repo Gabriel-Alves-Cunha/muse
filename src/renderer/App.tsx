@@ -16,8 +16,8 @@ import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
 import { Home } from "@routes/Home";
 
-import "react-toastify/dist/ReactToastify.min.css";
 import { Loading } from "@components/Loading";
+import "react-toastify/dist/ReactToastify.min.css";
 
 //////////////////////////////////////////
 //////////////////////////////////////////

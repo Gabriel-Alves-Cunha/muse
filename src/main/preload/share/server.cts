@@ -13,7 +13,9 @@ import { dbg } from "@common/debug";
 // Setup singleton server:
 
 // Exporting for testing porpuses.
-export const app = new Koa().use(router.routes()).use(router.allowedMethods())
+export const app = new Koa()
+	.use(router.routes())
+	.use(router.allowedMethods())
 	.on("error", (err: Error) => {
 		throw err;
 	});

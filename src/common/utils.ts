@@ -5,7 +5,6 @@ const { isNaN } = Number;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-// @ts-ignore => `NODE_ENV` has to be accessed by dot notation:
 export const isDev = process.env.NODE_ENV === "development";
 
 export const capitalizedAppName = "Muse";
@@ -46,7 +45,7 @@ export function formatDuration(time?: number): Readonly<string> {
 		days = floor(time / 86_400);
 
 	return ((days > 0 ? days + "d " : "") +
-		(Number(hour) > 0 ? hour + ":" : "") +
+		(+hour > 0 ? hour + ":" : "") + // +hour === Number(hour)
 		(minutes + ":" + seconds));
 }
 
@@ -56,8 +55,7 @@ const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 export function makeRandomString(length = 15): Readonly<string> {
 	const randomString = Array
-		.from({ length }, () =>
-			chars.charAt(floor(random() * chars.length)))
+		.from({ length }, () => chars.charAt(floor(random() * chars.length)))
 		.join("");
 
 	return randomString;
