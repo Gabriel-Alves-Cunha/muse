@@ -51,6 +51,9 @@
 			"@routes/*": [
 				"src/renderer/routes/*"
 			],
+			"@assets/*": [
+				"src/renderer/assets/*"
+			],
 			"@utils/*": [
 				"src/renderer/utils/*"
 			],

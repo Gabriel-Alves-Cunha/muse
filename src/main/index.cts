@@ -128,7 +128,8 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 
 	const url = isDev ?
 		"http://localhost:3000" :
-		pathToFileURL(resolve("renderer", "index.html")).toString();
+		pathToFileURL(resolve(app.getAppPath(), "..", "renderer", "index.html"))
+			.toString();
 
 	await window.loadURL(url);
 
@@ -164,6 +165,7 @@ app
 		if (isDev) {
 			const devtoolsInstaller = await import("electron-devtools-installer");
 			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
+			// @ts-ignore => This error occurs when not bundling.
 			// const { default: installExtension } = devtoolsInstaller.default;
 			const installExtension = devtoolsInstaller.default;
 

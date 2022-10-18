@@ -4,7 +4,7 @@ copyright: Copyright MIT 2022 Gabriel Alves Cunha
 
 files: "build/"
 
-icon: "./src/renderer/assets/icons/256x256.png"
+icon: "./src/renderer/assets/256x256.png"
 
 linux:
   category: AudioVideo

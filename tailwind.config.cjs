@@ -6,7 +6,10 @@ module.exports = {
 			animation: { loading: "rotating 1s ease infinite" },
 			keyframes: { rotating: { to: { transform: "rotate(1turn)" } } },
 		},
-		fontFamily: { primary: ["Assistant"], secondary: ["Source Sans Pro"] },
+		fontFamily: {
+			secondary: ["Source Sans Pro", "sans-serif"],
+			primary: ["Assistant", "sans-serif"],
+		},
 	},
 	plugins: [],
 };

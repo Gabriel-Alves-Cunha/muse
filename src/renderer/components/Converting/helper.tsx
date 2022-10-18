@@ -133,7 +133,7 @@ const ConvertBox = (
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Readonly<Path>,
-): Readonly<MessagePort> {
+): MessagePort {
 	const convertingList = getConvertingList();
 
 	dbg("Trying to create a new conversion...", { convertingList });

@@ -16,7 +16,12 @@ function findExternals(): string[] {
 }
 
 const config: UserProvidedConfigProps = {
-	electronEsbuildExternalPackages: ["fluent-ffmpeg"], // findExternals(),
+	electronEsbuildExternalPackages: // findExternals(),
+		[
+			"electron-devtools-installer",
+			"./lib-cov/fluent-ffmpeg",
+			"fluent-ffmpeg",
+		], // findExternals(),
 	electronEntryFilePath: "src/main/index.cts",
 	preloadFilePath: "src/main/preload.cts",
 };

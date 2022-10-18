@@ -17,8 +17,12 @@ import {
 } from "./styles";
 
 export function FullExampleCtxMenu() {
-	const [bookmarksChecked, setBookmarksChecked] = useState(true);
-	const [urlsChecked, setUrlsChecked] = useState(false);
+	const [bookmarksChecked, setBookmarksChecked] = useState<
+		boolean | "indeterminate"
+	>(true);
+	const [urlsChecked, setUrlsChecked] = useState<boolean | "indeterminate">(
+		false,
+	);
 	const [person, setPerson] = useState("pedro");
 
 	return (

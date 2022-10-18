@@ -1,26 +1,25 @@
 # Muse
 
 <h1 align="center">
-	<img src="src/renderer/assets/icons/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
+ <img src="src/renderer/assets/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
 </h1>
 
 > Just a simple, Electron-React app, to download audio from YouTube and play them.
 
 ## Table of contents
 
-- [Layout](#Layout)
-- [Tecnologies](#Tecnologies)
+- [Technologies](#🛠_Technologies)
 - [Features](#Features)
-- [Installing](#Installing)
-- [Requirements](#Requirements)
-- [Contributing](#Contributing)
+- [Installing](#🚀_Installing)
+- [Requirements](#💻_Requirements)
+- [Contributing](#📫_Contributing)
 - [Author](#Author)
-- [License](#License)
+- [License](#📝_License)
 
 ## Screenshots
 
 <h1 align="center">
-  <img src="screenshots/home.png" alt="Muse's home page wich is divide in three main parts, from left to right: the navigation, the main, wich contains the media list, and the media player." />
+  <img src="screenshots/home.png" alt="Muse's home page which is divided into three main parts, from left to right: the navigation, the main, which contains the media list, and the media player." />
 </h1>
 
 <h1 align="center">
@@ -31,9 +30,9 @@
   <img src="screenshots/download.png" alt="Muse's download page." />
 </h1>
 
-### 🛠 Tecnologies
+### 🛠 Technologies
 
-The following tools were used on this project construction:
+The following tools were used in this project construction:
 
 - [Koa](https://koajs.com/)
 - [Vite](https://vitejs.dev/)
@@ -49,43 +48,42 @@ The following tools were used on this project construction:
 - [Ytdl Core](https://github.com/fent/node-ytdl-core)
 - [React Icons](https://react-icons.github.io/react-icons/)
 - [Node TagLib Sharp](https://github.com/benrr101/node-taglib-sharp)
-- [Fluent ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
+- [Fluent FFmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 
 ## Features
 
-* Copy an URL and see a message asking if you want to download
-an 'mp3' version of the media.
+- Copy an URL and see a message asking if you want to download
+  an 'mp3' version of the media.
+  📫
+- Share media with devices on the same WiFi network.
 
-* Share medias with devices on the same WiFi network.
+- Get the media's lyrics.
 
-* Get a media's lyrics.
-
-* App auto updates when new version is available.
+- App auto-updates when a new version is available.
 
 ## 🚀 Installing
 
 To install and run Muse, follow these steps:
 
-* Linux  
-  Download 'Muse-***version***.AppImage' from the releases page;
-  Once downloaded, you need to make it an executable. On your terminal, run: `chmod a+x Muse-*.AppImage`.
+- Linux  
+  Download 'Muse-**_version_**.AppImage' from the releases page;
+  Once downloaded, you need to make it an executable. On your terminal, run `chmod a+x Muse-*.AppImage`.
   Now you can run Muse: `./Muse-*.AppImage`
 
 ## Develop
 
 To install and run Muse, follow these steps:
 
-```bash
+```sh
 git clone https://github.com/Gabriel-Alves-Cunha/muse --depth 1
 ```
 
-```bash
+```sh
 # Install dependencies
 yarn
 ```
 
-
-```bash
+```sh
 # Start app:
 yarn dev
 ```
@@ -98,7 +96,7 @@ For development, before everything, verify that:
 
 ## 📫 Contributing
 
-To contribute with Muse, follow these steps:
+To contribute to Muse, follow these steps:
 
 1. Fork this repo.
 2. Create a branch: `git checkout -b <my_branch_name>`.

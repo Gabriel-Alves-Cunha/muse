@@ -12,7 +12,7 @@ import { dbg } from "./debug";
 
 export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
-	electronPort?: Readonly<MessagePort>,
+	electronPort?: MessagePort,
 ): void => {
 	dbg("Sending message to backend:", { msg, electronPort });
 

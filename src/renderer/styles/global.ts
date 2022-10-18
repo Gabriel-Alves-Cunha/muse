@@ -337,27 +337,21 @@ export const GlobalCSS = globalCss({
 			fontWeight: 300,
 			// This shit is the hacky way I found to get the fonts to load
 			// both on development and production with Vite!
-			src: `url('./assets/${
-				isDev ? "fonts/" : ""
-			}assistant-v16-latin-300.woff2') format('woff2')`,
+			src: "url('./assets/assistant-v16-latin-300.woff2') format('woff2')",
 		},
 		/* assistant-regular-400 - latin */
 		{
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 400,
-			src: `url('./assets/${
-				isDev ? "fonts/" : ""
-			}assistant-v16-latin-regular.woff2') format('woff2')`,
+			src: "url('./assets/assistant-v16-latin-regular.woff2') format('woff2')",
 		},
 		/* assistant-500 - latin */
 		{
 			fontFamily: "Assistant",
 			fontStyle: "normal",
 			fontWeight: 500,
-			src: `url('./assets/${
-				isDev ? "fonts/" : ""
-			}assistant-v16-latin-500.woff2') format('woff2')`,
+			src: "url('./assets/assistant-v16-latin-500.woff2') format('woff2')",
 		},
 
 		/* source-sans-pro-regular-400 - latin */
@@ -365,9 +359,8 @@ export const GlobalCSS = globalCss({
 			fontFamily: "Source Sans Pro",
 			fontStyle: "normal",
 			fontWeight: 400,
-			src: `url('./assets/${
-				isDev ? "fonts/" : ""
-			}source-sans-pro-v21-latin-regular.woff2') format('woff2')`,
+			src:
+				"url('./assets/source-sans-pro-v21-latin-regular.woff2') format('woff2')",
 		},
 	],
 

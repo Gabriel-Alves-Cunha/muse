@@ -119,9 +119,7 @@ const DownloadingBox = (
  * Electron to enable 2 way communication between it
  * and React.
  */
-export function createNewDownload(
-	downloadInfo: DownloadInfo,
-): Readonly<MessagePort> {
+export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	const downloadingList = getDownloadingList();
 
 	dbg("Trying to create a new download...", { downloadingList });

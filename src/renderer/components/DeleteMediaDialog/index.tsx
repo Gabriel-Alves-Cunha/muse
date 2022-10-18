@@ -10,10 +10,7 @@ import {
 	FlexRow,
 } from "@components/MediaListKind/MediaOptions/styles";
 
-const warningSvg = new URL(
-	"../../../assets/icons/warning.svg",
-	import.meta.url,
-);
+import warningSvg from "@assets/warning.svg";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -31,7 +28,7 @@ export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 				</StyledTitle>
 
 				<FlexRow>
-					<img src={warningSvg.href} alt="Warning sign." id="warning" />
+					<img src={warningSvg} alt="Warning sign." id="warning" />
 
 					<CloseDialog
 						onPointerUp={handleMediaDeletion}
