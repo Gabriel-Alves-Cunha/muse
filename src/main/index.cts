@@ -166,13 +166,15 @@ app
 			const devtoolsInstaller = await import("electron-devtools-installer");
 			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
 			// @ts-ignore => This error occurs when not bundling.
-			// const { default: installExtension } = devtoolsInstaller.default;
-			const installExtension = devtoolsInstaller.default;
+			const { default: installExtension } = devtoolsInstaller.default;
+			// const installExtension = devtoolsInstaller.default;
 
 			await installExtension(REACT_DEVELOPER_TOOLS, {
 				loadExtensionOptions: { allowFileAccess: true },
 			})
+				// @ts-ignore => This error occurs when not bundling.
 				.then(name => dbg(`Added Extension: ${name}`))
+				// @ts-ignore => This error occurs when not bundling.
 				.catch(err =>
 					error("An error occurred while installing extension: ", err)
 				);
