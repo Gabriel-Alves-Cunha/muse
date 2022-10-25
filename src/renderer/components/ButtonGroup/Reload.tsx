@@ -7,26 +7,43 @@ import {
 } from "@contexts/usePlaylists";
 
 import { ButtonFromGroup } from "./styles";
+import { ButtonOfGroup } from ".";
 
 const isLoadingMediasSelector = (
 	state: ReturnType<typeof usePlaylists.getState>,
 ) => state.isLoadingMedias;
 
+// export function Reload({ className }: Props) {
+// 	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
+//
+// 	return (
+// 		<ButtonFromGroup
+// 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
+// 			aria-label={t("tooltips.reloadAllMedias")}
+// 			onPointerUp={searchLocalComputerForMedias}
+// 			title={t("tooltips.reloadAllMedias")}
+// 		>
+// 			<ReloadIcon size={17} />
+// 		</ButtonFromGroup>
+// 	);
+// }
+
 export function Reload({ className }: Props) {
 	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
 
 	return (
-		<ButtonFromGroup
+		<ButtonOfGroup
 			className={"reload " + className + (isLoadingMedias ? " reloading" : "")}
-			aria-label={t("tooltips.reloadAllMedias")}
 			onPointerUp={searchLocalComputerForMedias}
 			title={t("tooltips.reloadAllMedias")}
 		>
 			<ReloadIcon size={17} />
-		</ButtonFromGroup>
+		</ButtonOfGroup>
 	);
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 

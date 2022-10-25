@@ -15,15 +15,20 @@ function findExternals(): string[] {
 	return [...externals];
 }
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 const config: UserProvidedConfigProps = {
 	electronEsbuildExternalPackages: // findExternals(),
 		[
 			"electron-devtools-installer",
 			"./lib-cov/fluent-ffmpeg",
-			"fluent-ffmpeg",
-		], // findExternals(),
+			// "fluent-ffmpeg",
+		],
 	electronEntryFilePath: "src/main/index.cts",
 	preloadFilePath: "src/main/preload.cts",
+	esbuildConfig: {
+		define: { isDev: String(isDevelopment) },
+	},
 };
 
 export default config;

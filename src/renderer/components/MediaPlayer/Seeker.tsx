@@ -5,13 +5,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { formatDuration, mapTo } from "@common/utils";
 import { useProgress } from ".";
 
-import {
-	SeekerContainer,
-	ProgressWrapper,
-	ProgressThumb,
-	Duration,
-} from "./styles";
-
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -42,7 +35,8 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 		function setTimerTooltip({ offsetX }: PointerEvent): void {
 			if (audio === null) return;
 
-			const time = offsetX / timeline.getBoundingClientRect().width *
+			const time = offsetX /
+				timeline.getBoundingClientRect().width *
 				audio.duration;
 			const left = offsetX - (35 >> 1); // 35 is the width of the tooltip.
 			// Also, (35 >> 1) is the half of the width (binary divide by 2).
@@ -86,27 +80,35 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 	}, [audio, isDurationValid, isSeeking]);
 
 	return (
-		<SeekerContainer>
-			<ProgressWrapper
-				css={{ cursor: isDurationValid ? "pointer" : "default" }}
+		<div className="flex flex-col w-full px-3 gap-2">
+			<div
+				className={"group relative block w-full h-1 bg-main " +
+						isDurationValid ?
+					"cursor-pointer" :
+					"cursor-default"}
 				// onPointerUp={e => seek(e, audio)}
 				// onPointerMove={setTimerTooltip}
 				ref={progressWrapperRef}
 			>
 				<span // Timer tooltip
-					style={isDurationValid ? {} : { display: "none" }}
+					className={"group-hover:progress group-focus:progress " +
+							isDurationValid ?
+						"hidden" :
+						""}
 					ref={timeTooltipRef}
 				/>
 
 				<Progress />
-			</ProgressWrapper>
+			</div>
 
-			<Duration>
+			<div className="flex justify-between items-center">
 				<CurrentTime />
 
-				<p>{formatedDuration}</p>
-			</Duration>
-		</SeekerContainer>
+				<p className="text-icon-media-player font-primary tracking-wide text-center bg-transparent border-none">
+					{formatedDuration}
+				</p>
+			</div>
+		</div>
 	);
 }
 
@@ -122,11 +124,15 @@ const percentageSelector = (state: ReturnType<typeof useProgress.getState>) =>
 
 const Progress = () => {
 	const percentage = useProgress(percentageSelector);
+	document.documentElement.style.setProperty(
+		"--progress-width",
+		// !NaN => true (in case is not present), everything else is false:
+		`${!percentage ? 0 : percentage}%`,
+	);
 
 	return (
-		<ProgressThumb
-			// !NaN => true (in case is not present), everything else is false:
-			css={{ width: `${!percentage ? 0 : percentage}%` }}
+		<div
+			className={"relative bg-accent h-full w-[var(--progress-width)]"}
 		/>
 	);
 };

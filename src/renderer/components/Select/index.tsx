@@ -1,45 +1,55 @@
-import { Root, Value } from "@radix-ui/react-select";
+import type { ValuesOf } from "@common/@types/utils";
+
+import {
+	Trigger,
+	Content,
+	Value,
+	Root,
+} from "@radix-ui/react-select";
 
 import { assertUnreachable } from "@utils/utils";
 import { HeaderButtons } from "./HeaderButtons";
-
-import { Content, Trigger } from "./styles";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Enums:
 
-export enum ContentOfSelectEnum {
-	HEADER_BUTTONS,
-}
-
-const { HEADER_BUTTONS } = ContentOfSelectEnum;
+export const ContentOfSelectEnum = {
+	HEADER_BUTTONS: 1,
+} as const;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
-export const Select = <Options extends string>(
+export const Select = (
 	{
-		content = HEADER_BUTTONS,
+		content = ContentOfSelectEnum.HEADER_BUTTONS,
 		triggerClassName = "",
 		triggerTitle = "",
 		children,
 		setValue,
 		tooltip,
 		value,
-	}: Props<Options>,
+	}: Props,
 ) => (
 	<Root value={value} onValueChange={setValue}>
-		<Trigger className={triggerClassName} aria-label={tooltip} title={tooltip}>
+		<Trigger
+			className={triggerClassName +
+				" relative justify-center items-center cursor-pointer bg-none border-none no-transition"}
+			aria-label={tooltip}
+			title={tooltip}
+		>
 			<Value>{triggerTitle}</Value>
 
 			{children}
 		</Trigger>
 
-		<Content>{contentToShow(content)}</Content>
+		<Content className="bg-select overflow-hidden rounded-md z-50 shadow-md">
+			{contentToShow(content)}
+		</Content>
 	</Root>
 );
 
@@ -48,14 +58,14 @@ export const Select = <Options extends string>(
 /////////////////////////////////////////
 // Helper function:
 
-function contentToShow<Options extends string>(
-	content: NonNullable<Props<Options>["content"]>,
+function contentToShow(
+	content: ValuesOf<typeof ContentOfSelectEnum>,
 ) {
 	switch (content) {
 		// case FULL_EXAMPLE:
 		// 	return <FullExampleSelectButton />;
 
-		case HEADER_BUTTONS:
+		case ContentOfSelectEnum.HEADER_BUTTONS:
 			return <HeaderButtons />;
 
 		default:
@@ -68,14 +78,23 @@ function contentToShow<Options extends string>(
 /////////////////////////////////////////
 // Types:
 
-type Props<Options extends string> = Readonly<
+type Props = Readonly<
 	{
+		content?: ValuesOf<typeof ContentOfSelectEnum>;
 		triggerClassName: string | undefined;
-		setValue: (value: Options) => void;
-		content?: ContentOfSelectEnum;
+		setValue: (value: string) => void;
 		children: React.ReactNode;
 		triggerTitle?: string;
 		tooltip: string;
-		value: Options;
+		value: string;
 	}
 >;
+
+// export const Label = styled(RadixLabel, {
+// 	pl: 25,
+//
+// 	c: "$ctx-menu-text",
+// 	ff: "$secondary",
+// 	lh: 25,
+// 	fs: 12,
+// });

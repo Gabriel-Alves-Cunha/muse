@@ -3,23 +3,19 @@ import type { Path } from "@common/@types/generalTypes";
 import { ReactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
+import { ValuesOf } from "@common/@types/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Constants:
 
-enum Status {
-	FAILURE,
-	PENDING,
-	SUCCESS,
-}
-
-const { SUCCESS, FAILURE, PENDING } = Status;
+const Status = { SUCCESS: 10, FAILURE: 20, PENDING: 30 } as const;
+const { FAILURE, PENDING, SUCCESS } = Status;
 
 /////////////////////////////////////////////
 
-const cache: Map<Path, Status> = new Map();
+const cache: Map<Path, ValuesOf<typeof Status>> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -35,7 +31,8 @@ export function ImgWithFallback(
 
 	if (cacheStatus === FAILURE || cacheStatus === PENDING) return Fallback;
 
-	if (cacheStatus === SUCCESS) return <img src={mediaImg} />;
+	if (cacheStatus === SUCCESS)
+		return <img className="object-cover h-11 rounded-xl before:hidden" src={mediaImg} />;
 
 	cache.set(mediaPath, PENDING);
 
@@ -58,8 +55,8 @@ export function ImgWithFallback(
 		});
 
 		sendMsgToBackend({
-			type: ReactToElectronMessage.WRITE_TAG,
 			thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
+			type: ReactToElectronMessage.WRITE_TAG,
 			mediaPath,
 		});
 
@@ -71,7 +68,14 @@ export function ImgWithFallback(
 	img.src = mediaImg;
 
 	return cache.get(mediaPath) === SUCCESS ?
-		<img src={mediaImg} loading="lazy" decoding="async" /> :
+		(
+			<img
+				className="object-cover h-11 rounded-xl before:hidden"
+				decoding="async"
+				loading="lazy"
+				src={mediaImg}
+			/>
+		) :
 		(Fallback);
 }
 

@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 
 import { stringifyJson } from "@common/utils";
+import { getObjectLength } from "@utils/object";
 
 // Mocking window.localStorage
 class LocalStorageMock {
@@ -11,7 +12,7 @@ class LocalStorageMock {
 	}
 
 	get length() {
-		return Object.keys(this.#store).length;
+		return getObjectLength(this.#store);
 	}
 
 	clear() {
@@ -19,12 +20,9 @@ class LocalStorageMock {
 	}
 
 	key(index: number): string | null {
-		const keys = Object.keys(this.#store);
+		if (index > this.length) return null;
 
-		if (index > keys.length) return null;
-
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		return keys[index]!;
+		return this.#store[index];
 	}
 
 	getItem(key: string) {

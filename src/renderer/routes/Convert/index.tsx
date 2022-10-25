@@ -8,13 +8,12 @@ import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
-import { Button } from "@components/Button";
+import { Button } from "@components/Button/Button";
+import { Box } from "@components/Box";
 import {
 	type ConvertInfo,
 	useNewConvertions,
 } from "@components/Converting/helper";
-
-import { Box } from "./styles";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -66,7 +65,7 @@ export function Convert() {
 			<Box>
 				<Button
 					onPointerUp={openNativeUI_ChooseFiles}
-					className="notransition"
+					className="no-transition"
 					variant="large"
 				>
 					<ConvertIcon size={18} />

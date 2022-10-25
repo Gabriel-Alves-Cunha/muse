@@ -1,13 +1,11 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
-import { homedir } from "node:os";
 import { resolve } from "node:path";
+import { homedir } from "node:os";
 
-import { isDev } from "@common/utils";
-
-// This path has to be like this cause of the transpiling of
-// Typescript -> Javascript output dir is different for 'main'
-// compared to 'electron' (confirm with the log):
+// This path has to be like this because of the bundling
+// process. This way it handles both cases: dev and prod.
+// @ts-ignore => isDev is a globally defined boolean.
 export const logoPath = isDev ?
 	resolve("src", "renderer", "assets", "icons", "logo.png") :
 	resolve("muse.png");
@@ -15,11 +13,11 @@ export const logoPath = isDev ?
 /////////////////////////////////////////
 
 const homeDir = homedir();
-export const dirs = Object.freeze({
+export const dirs = {
 	documents: resolve(homeDir, "Documents"),
 	downloads: resolve(homeDir, "Downloads"),
 	music: resolve(homeDir, "Music"),
-});
+};
 
 /////////////////////////////////////////
 

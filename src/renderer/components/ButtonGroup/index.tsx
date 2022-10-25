@@ -5,6 +5,7 @@ import { SortBy } from "./SortBy";
 import { Clean } from "./Clean";
 
 import { Wrapper } from "./styles";
+import { ComponentProps } from "react";
 
 const reload_ = "reload";
 const sortBy_ = "sortBy";
@@ -22,10 +23,46 @@ export function ButtonGroup(buttons: Buttons) {
 				<SortBy className={additionalClasses(sortBy_, buttons)} />
 			)}
 
-			{buttons.clean && <Clean
-				className={additionalClasses(clean_, buttons)}
-			/>}
+			{buttons.clean && (
+				<Clean
+					className={additionalClasses(clean_, buttons)}
+				/>
+			)}
 		</Wrapper>
+	);
+}
+
+export function GroupedButton(buttons: Buttons) {
+	return (
+		<div className="relative flex justify-center items-center bg-none no-transition hover:bg-button-hover [&_svg]:hover:text-white [&_.reload_svg]:animate-spin first:rounded-l-xl last:rounded-r-xl">
+			{/* Order matters here: */}
+			{buttons.reload && (
+				<Reload
+					className={additionalClasses(reload_, buttons)}
+				/>
+			)}
+
+			{buttons.sortBy && (
+				<SortBy className={additionalClasses(sortBy_, buttons)} />
+			)}
+
+			{buttons.clean && (
+				<Clean
+					className={additionalClasses(clean_, buttons)}
+				/>
+			)}
+		</div>
+	);
+}
+
+export function ButtonOfGroup({ children, ...props }: ButtonOfGroupProps) {
+	return (
+		<button
+			className="relative flex justify-center items-center bg-button border-none px-5 h-10 transition-colors ease-in-out duration-200 cursor-pointer active:scale-95"
+			{...props}
+		>
+			{children}
+		</button>
 	);
 }
 
@@ -88,8 +125,14 @@ function additionalClasses(button: OneOf<Buttons>, buttons: Buttons) {
 }
 
 /////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 // Types:
 
 type Buttons = Readonly<
 	{ reload?: boolean; sortBy?: boolean; clean?: boolean; }
 >;
+
+/////////////////////////////////////////////
+
+type ButtonOfGroupProps = React.ButtonHTMLAttributes<HTMLButtonElement>;

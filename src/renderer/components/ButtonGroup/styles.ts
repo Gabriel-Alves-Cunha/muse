@@ -34,7 +34,7 @@ export const Wrapper = styled("div", {
 		h: "$$height",
 
 		cursor: "pointer",
-		bg: "$bg-button",
+		bg: "$bg-button", // TODO: falta isso no tailwind
 		b: "none",
 		px: 20,
 
@@ -52,11 +52,11 @@ export const Wrapper = styled("div", {
 		"&.last": { borderBottomRightRadius: 12, borderTopRightRadius: 12 },
 
 		"&:hover, &:focus": {
-			bg: "$bg-button-hover",
+			bg: "$bg-button-hover", // TODO: Falta isso no tailwind
 
 			"& svg": { c: "white" },
 
-			"&.reload svg": { animation: `${spin} 0.7s linear` },
+			"&.reload svg": { animation: `${spin} 0.7s linear` }, // TODO: isso no tailwind... tenho q ver...
 		},
 
 		"&:active": {

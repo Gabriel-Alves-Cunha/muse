@@ -1,6 +1,6 @@
 import type { MediaBeingDownloaded } from ".";
 import type { DownloadInfo } from "@common/@types/generalTypes";
-import type { Values } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/utils";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 
@@ -10,7 +10,7 @@ import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
 import { Progress } from "@components/Progress";
-import { Button } from "@components/Button";
+import { Button } from "@components/Button/Button";
 import { dbg } from "@common/debug";
 import {
 	useDownloadingList,
@@ -284,5 +284,5 @@ type DownloadingBoxProps = Readonly<
 /////////////////////////////////////////////
 
 interface PartialExceptStatus extends Partial<MediaBeingDownloaded> {
-	status: Values<typeof ProgressStatus>;
+	status: ValuesOf<typeof ProgressStatus>;
 }

@@ -1,23 +1,21 @@
 import { dbg } from "@common/debug";
 
-const modifierKeys = Object.freeze(
-	[
-		"SymbolLock",
-		"ScrollLock",
-		"AltGraph",
-		"CapsLock",
-		"Control",
-		"NumLock",
-		"Symbol",
-		"FnLock",
-		"Hyper",
-		"Shift",
-		"Super",
-		"Meta",
-		"Alt",
-		"Fn",
-	] as const,
-);
+const modifierKeys = [
+	"SymbolLock",
+	"ScrollLock",
+	"AltGraph",
+	"CapsLock",
+	"Control",
+	"NumLock",
+	"Symbol",
+	"FnLock",
+	"Hyper",
+	"Shift",
+	"Super",
+	"Meta",
+	"Alt",
+	"Fn",
+] as const;
 
 export function isAModifierKeyPressed(
 	event: KeyboardEvent,

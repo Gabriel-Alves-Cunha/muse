@@ -1,9 +1,12 @@
 import { BsCheck2 as CheckIcon } from "react-icons/bs";
-import { ItemText } from "@radix-ui/react-select";
+import {
+	ItemIndicator,
+	ItemText,
+	Viewport,
+	Item,
+} from "@radix-ui/react-select";
 
 import { Translator } from "@components/I18n";
-
-import { Viewport, Item, ItemIndicator } from "./styles";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -12,13 +15,16 @@ import { Viewport, Item, ItemIndicator } from "./styles";
 
 // The values have to follow `type SelectedList`!!
 export const HeaderButtons = () => (
-	<Viewport className="notransition">
-		<Item value="Name">
+	<Viewport className="no-transition p-1">
+		<Item
+			className="unset-all relative flex items-center h-6 cursor-pointer rounded-sm text-ctx-menu-item font-secondary tracking-wide text-base leading-none select-none data-[disabled]:text-disabled pointer-events-none focus:text-ctx-menu-item-focus bg-ctx-menu-item-focus"
+			value="Name"
+		>
 			<ItemText>
 				<Translator path="sortTypes.name" />
 			</ItemText>
 
-			<ItemIndicator>
+			<ItemIndicator className="absolute inline-flex justify-center items-center w-6 left-0">
 				<CheckIcon />
 			</ItemIndicator>
 		</Item>

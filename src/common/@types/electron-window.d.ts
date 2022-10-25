@@ -1,5 +1,5 @@
 import type { DownloadInfo, Media, Path } from "./generalTypes";
-import type { DeepReadonly, Values } from "./utils";
+import type { DeepReadonly, ValuesOf } from "./utils";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { ClientServerAPI } from "@main/preload/share";
 import type { LyricsResponse } from "@main/preload/getLyrics.js";
@@ -28,7 +28,7 @@ export type VisibleElectron = DeepReadonly<
 		os: { dirs: { documents: Path; downloads: Path; music: Path; }; };
 		notificationApi: {
 			sendNotificationToElectronIpcMainProcess(
-				type: Values<typeof ElectronIpcMainProcessNotification>,
+				type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
 			): void;
 		};
 		fs: {

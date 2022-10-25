@@ -2,7 +2,7 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
+import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { memo } from "react";
 import create from "zustand";
 
@@ -15,20 +15,9 @@ import { PlaylistList } from "@contexts/usePlaylists";
 import { t } from "@components/I18n";
 import {
 	addToAllSelectedMedias,
-	toggleSelectedMedia,
 	getAllSelectedMedias,
+	toggleSelectedMedia,
 } from "@contexts/useAllSelectedMedias";
-
-import { StyledDialogBlurOverlay } from "./MediaOptions/styles";
-import {
-	rowWrapperClassName,
-	PlayButton,
-	RowWrapper,
-	SubTitle,
-	Title,
-	Info,
-	Img,
-} from "./styles";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -60,8 +49,9 @@ export const setIsCtxMenuOpen = (bool: boolean) =>
 export function selectMediaByEvent(
 	e: React.PointerEvent<HTMLSpanElement>,
 ): void {
+	// TODO: see if this selector still works.
 	const mediaClickedMediaPath = (e.nativeEvent.target as HTMLElement)
-		.closest<HTMLDivElement>(rowWrapperClassName)
+		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
 
 	if (!mediaClickedMediaPath)
@@ -95,35 +85,39 @@ function selectOrPlayMedia(
 
 const Row = memo(
 	({ media, path }: RowProps) => (
-		<RowWrapper
+		<div
 			className={(getAllSelectedMedias().has(path) === true ?
 				"selected " :
-				"") + (getCurrentPlaying().path === path ? "playing " : "")}
+				"") +
+				(getCurrentPlaying().path === path ? "playing " : "") +
+				"row-wrapper"}
 			data-path={path}
 		>
-			<PlayButton
+			<button
+				className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
 				onPointerUp={e => selectOrPlayMedia(e, path)}
-				aria-label={t("tooltips.playThisMedia")}
 				title={t("tooltips.playThisMedia")}
 			>
-				<Img>
+				<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
 					<ImgWithFallback
 						Fallback={<MusicNote size="1.4rem" />}
 						mediaImg={media.image}
 						mediaPath={path}
 					/>
-				</Img>
+				</div>
 
-				<Info>
-					<Title>{media.title}</Title>
+				<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
+					<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
+						{media.title}
+					</p>
 
-					<SubTitle className="row">
+					<p className="font-primary tracking-wide text-sm font-medium text-muted">
 						{media.duration}
 						&emsp;|&emsp;
 						{media.artist}
-					</SubTitle>
-				</Info>
-			</PlayButton>
+					</p>
+				</div>
+			</button>
 
 			<Dialog modal>
 				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
@@ -131,12 +125,13 @@ const Row = memo(
 				</DialogTrigger>
 
 				<DialogPortal>
-					<StyledDialogBlurOverlay>
+					{/* backdropFilter: blur(2px); */}
+					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show">
 						<MediaOptionsModal media={media} path={path} />
-					</StyledDialogBlurOverlay>
+					</Overlay>
 				</DialogPortal>
 			</Dialog>
-		</RowWrapper>
+		</div>
 	),
 	(prev, next) =>
 		prev.media.title === next.media.title &&

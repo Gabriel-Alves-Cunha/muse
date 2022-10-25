@@ -1,6 +1,6 @@
 import type { ClipboardExtended } from "./clipboardExtended.cjs";
 import type { DownloadInfo } from "@common/@types/generalTypes";
-import type { Values } from "@common/@types/utils.js";
+import type { ValuesOf } from "@common/@types/utils.js";
 
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
 import { clearLine, cursorTo } from "node:readline";
@@ -20,7 +20,7 @@ import {
 	app,
 } from "electron";
 
-import { capitalizedAppName, isDev } from "@common/utils";
+import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
 import { emptyString } from "@common/empty";
 import { logoPath } from "./utils.cjs";
@@ -110,11 +110,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 		new MenuItem({
 			label: "Open/close Dev Tools",
 			submenu: [{
-				click() {
-					window.webContents.isDevToolsOpened() ?
-						window.webContents.closeDevTools() :
-						window.webContents.openDevTools({ mode: "detach" });
-				},
+				click: () => window.webContents.toggleDevTools(),
 				role: "toggleDevTools",
 				accelerator: "f12",
 			}],
@@ -126,6 +122,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 	/////////////////////////////////////////
 	/////////////////////////////////////////
 
+	// @ts-ignore => isDev is a globally defined boolean.
 	const url = isDev ?
 		"http://localhost:3000" :
 		pathToFileURL(resolve(app.getAppPath(), "..", "renderer", "index.html"))
@@ -162,6 +159,7 @@ app
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
 		// Some APIs can only be used after this event occurs:
+		// @ts-ignore => isDev is a globally defined boolean.
 		if (isDev) {
 			const devtoolsInstaller = await import("electron-devtools-installer");
 			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
@@ -279,7 +277,7 @@ ipcMain.on(
 
 ipcMain.on(
 	"notify",
-	(event, type: Values<typeof ElectronIpcMainProcessNotification>): void => {
+	(event, type: ValuesOf<typeof ElectronIpcMainProcessNotification>): void => {
 		switch (type) {
 			case ElectronIpcMainProcessNotification.QUIT_APP: {
 				app.quit();
@@ -302,14 +300,7 @@ ipcMain.on(
 			}
 
 			case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
-				const window = BrowserWindow.getFocusedWindow()?.webContents;
-
-				if (!window) return;
-
-				window.isDevToolsOpened() ?
-					window.closeDevTools() :
-					window.openDevTools({ mode: "detach" });
-
+				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
 				break;
 			}
 

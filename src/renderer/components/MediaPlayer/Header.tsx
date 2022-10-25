@@ -10,6 +10,7 @@ import {
 } from "react-icons/md";
 
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
+import { CircleIconButton } from "@components/CircleIconButton";
 import { t } from "@components/I18n";
 import {
 	PlaylistActions,
@@ -17,8 +18,6 @@ import {
 	usePlaylists,
 	WhatToDo,
 } from "@contexts/usePlaylists";
-
-import { CircledIconButton, OptionsAndAlbum, Album } from "./styles";
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -54,7 +53,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 	}
 
 	return (
-		<CircledIconButton
+		<CircleIconButton
 			aria-label={t("tooltips.toggleOpenLyrics")}
 			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
@@ -65,7 +64,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 				isLoadingLyrics ?
 				<RingLoader cssOverride={putOnTop} color="white" size={30} /> :
 				<NoLyrics size={16} />}
-		</CircledIconButton>
+		</CircleIconButton>
 	);
 }
 
@@ -81,20 +80,22 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 	const isFavorite = favorites.has(path);
 
 	return (
-		<OptionsAndAlbum>
+		<div className="flex justify-between items-center">
 			<LoadOrToggleLyrics media={media} path={path} />
 
-			<Album>{displayTitle === true ? media?.title : media?.album}</Album>
+			<div className="w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium">
+				{displayTitle === true ? media?.title : media?.album}
+			</div>
 
-			<CircledIconButton
+			<CircleIconButton
 				aria-label={t("tooltips.toggleFavorite")}
 				onPointerUp={() => toggleFavorite(path)}
 				title={t("tooltips.toggleFavorite")}
 				disabled={media === undefined}
 			>
 				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
-			</CircledIconButton>
-		</OptionsAndAlbum>
+			</CircleIconButton>
+		</div>
 	);
 };
 

@@ -2,13 +2,13 @@ import i18n, { type InitOptions } from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-import { isDev } from "@common/utils";
 import { translations } from "./locales";
 
 const i18nConfig: InitOptions = {
 	defaultNS: "translations", // Default namespace, we can use 'translations'.
 	resources: translations, // Our translations.
 	fallbackLng: "en-US", // Default lang if not detected.
+	// @ts-ignore => isDev is a globally defined boolean.
 	debug: isDev,
 	// lng: "en-US", // To force a language in dev!
 

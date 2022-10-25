@@ -3,11 +3,9 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { ReactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { mediaPlayerCardId } from "@components/FlipCard";
-import { infoToast } from "@styles/global";
+import { infoToast } from "@components/toasts";
 import { Header } from "./Header";
 import { t } from "@components/I18n";
-
-import { LyricsCardWrapper, LyricsHolder } from "./styles";
 
 const { searchForLyricsAndImage } = electron.lyric;
 
@@ -15,13 +13,19 @@ const { searchForLyricsAndImage } = electron.lyric;
 
 export function Lyrics({ media, path }: Props) {
 	return (
-		<LyricsCardWrapper>
+		<div className="relative w-full h-full">
 			<Header media={media} path={path} displayTitle />
 
-			<LyricsHolder>
-				<p>{media?.lyrics}</p>
-			</LyricsHolder>
-		</LyricsCardWrapper>
+			<div className="relative w-full h-full mt-8 scroll scroll-1 scroll-white overflow-x-hidden">
+				{
+					/* whiteSpace: "pre-line", // break on new line!
+						wordWrap: "break-word" */
+				}
+				<p className="relative mb-24 whitespace-pre-line font-primary tracking-wide leading-6 text-left text-white font-medium">
+					{media?.lyrics}
+				</p>
+			</div>
+		</div>
 	);
 }
 

@@ -2,14 +2,13 @@ import { ToastContainer } from "react-toastify";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
+import { MainGridContainer } from "@components/MainGridContainer";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { ShareDialog } from "@components/ShareDialog";
 import { Favorites } from "@routes/Favorites";
-import { GlobalCSS } from "@styles/global";
 import { Download } from "@routes/Download";
-import { Content } from "@styles/appStyles";
 import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
@@ -25,8 +24,6 @@ import "react-toastify/dist/ReactToastify.min.css";
 // Main function:
 
 export function App() {
-	GlobalCSS();
-
 	return (
 		<>
 			<ToastContainer
@@ -60,14 +57,14 @@ export function App() {
 
 function Main() {
 	return (
-		<Content>
+		<MainGridContainer>
 			<Navbar />
 			<Loading />
 
 			<PageToShow />
 
 			<MediaPlayer />
-		</Content>
+		</MainGridContainer>
 	);
 }
 

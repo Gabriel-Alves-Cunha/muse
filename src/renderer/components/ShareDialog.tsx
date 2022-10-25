@@ -2,7 +2,8 @@ import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server.cjs";
 
 import { useCallback, useEffect, useState } from "react";
-import { MdClose as Close } from "react-icons/md";
+import { MdClose as CloseIcon } from "react-icons/md";
+import { Content, Close } from "@radix-ui/react-dialog";
 import { toCanvas } from "qrcode";
 import { Dialog } from "@radix-ui/react-dialog";
 
@@ -10,12 +11,11 @@ import { setSettings, useSettings } from "@contexts/settings";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
-import { t } from "@components/I18n";
-
-import { CloseDialogTrigger, StyledDialogShareContent, Canvas } from "./styles";
-import { StyledDialogBlurOverlay } from "../MediaListKind/MediaOptions/styles";
 import { Loading } from "@components/Loading";
 import { dbg } from "@common/debug";
+import { t } from "@components/I18n";
+
+import { StyledDialogBlurOverlay } from "./MediaListKind/MediaOptions/styles";
 
 const { createServer } = electron.share;
 
@@ -78,7 +78,8 @@ export function ShareDialog() {
 	useEffect(() => {
 		function closeShareDialogOnEsc(e: KeyboardEvent) {
 			if (
-				e.key === "Escape" && isDialogOpen === true &&
+				e.key === "Escape" &&
+				isDialogOpen === true &&
 				isAModifierKeyPressed(e) === false
 			)
 				closePopover(server?.close);
@@ -114,26 +115,39 @@ export function ShareDialog() {
 		<Dialog modal open={isDialogOpen} onOpenChange={handleDialogOpenStates}>
 			<StyledDialogBlurOverlay />
 
-			<StyledDialogShareContent className="notransition">
-				<CloseDialogTrigger
-					aria-label={t("tooltips.closeShareScreen")}
+			<Content className="absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition">
+				<Close
+					className="absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5"
 					title={t("tooltips.closeShareScreen")}
 					onPointerUp={() =>
-						closePopover(server?.close)}
+						closePopover(
+							server
+								?.close,
+						)}
+					// zIndex: 155,
 				>
-					<Close />
-				</CloseDialogTrigger>
+					<CloseIcon className="fill-accent" />
+				</Close>
 
-				<div>
-					<p>{t("dialogs.sharingMedia")}{plural}:</p>
+				<div className="relative w-80 p-2">
+					<p className="relative mt-6 font-primary tracking-wider text-xl text-normal font-medium overflow-ellipsis whitespace-nowrap overflow-hidden">
+						{t("dialogs.sharingMedia")}
+						{plural}:
+					</p>
 
-					<ol>{namesOfFilesToShare(filesToShare)}</ol>
+					<ol className="list-item relative h-32 mt-4 overflow-x-hidden scroll scroll-1">
+						{namesOfFilesToShare(filesToShare)}
+					</ol>
 				</div>
 
-				<Canvas ref={onCanvasElementMakeQRCode} id={qrID}>
+				<canvas
+					className="relative w-80 -h80 rounded-xl"
+					ref={onCanvasElementMakeQRCode}
+					id={qrID}
+				>
 					<Loading />
-				</Canvas>
-			</StyledDialogShareContent>
+				</canvas>
+			</Content>
 		</Dialog>
 	);
 }
@@ -152,7 +166,17 @@ function closePopover(closeServerFunction?: () => void): void {
 /////////////////////////////////////////
 
 const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
-	Array.from(filesToShare, path => <li key={path}>{getBasename(path)}</li>);
+	Array.from(
+		filesToShare,
+		path => (
+			<li
+				className="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
+				key={path}
+			>
+				{getBasename(path)}
+			</li>
+		),
+	);
 
 /////////////////////////////////////////
 

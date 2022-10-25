@@ -1,7 +1,7 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
-import { PopoverContent, PopoverRoot } from "@components/Popover";
+import { PopoverContent, PopoverRoot } from "@components/Popover/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
 import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
@@ -19,11 +19,10 @@ import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyArray } from "@utils/array";
 
-import { NothingFound, Highlight, Title, Info } from "./styles";
 import { Img, PlayButton, RowWrapper } from "../MediaListKind/styles";
 import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
-import { RightSlot } from "@components/ContextMenu/styles";
 import { emptyString } from "@common/empty";
+import { RightSlot } from "@components/ContextMenu/styles";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -114,7 +113,8 @@ export function Input() {
 	useEffect(() => {
 		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent): void {
 			if (
-				e.key === "Escape" && getSearcher().isInputOnFocus === true &&
+				e.key === "Escape" &&
+				getSearcher().isInputOnFocus === true &&
 				isAModifierKeyPressed(e) === false
 			) {
 				setSearcher(defaultSearcher);
@@ -132,11 +132,16 @@ export function Input() {
 
 	return (
 		<>
-			<label htmlFor="search-songs">
+			<label
+				className="absolute flex items-center w-[85%] h-10 left-7 bottom-0 right-0 top-0 m-auto p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider font-normal text-base cursor-default transition-label hover:active-label focus:active-label focus-within:active-label"
+				htmlFor="search-songs"
+			>
 				<Translator path="labels.searchForSongs" />
 			</label>
 
 			<input
+				// flex: 1 => occupy all remaining width
+				className="absolute flex items-center flex-1 h-9 left-[38px] bottom-0 right-0 top-0 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-none border-none"
 				onFocus={() => setIsInputOnFocus(true)}
 				onChange={setSearchTerm}
 				value={searchTerm}
@@ -188,9 +193,10 @@ export function Results() {
 				>
 					{nothingFound ?
 						(
-							<NothingFound>
+							// zIndex: 100
+							<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-48 rounded-xl p-3 shadow-popover bg-popover z-10 text-icon-deactivated font-secondary tracking-wide text-base text-center font-medium">
 								Nothing was found for &quot;{searchTerm}&quot;
-							</NothingFound>
+							</div>
 						) :
 						foundSomething ?
 						(results.map(([path, media]) => (
@@ -230,15 +236,16 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 					/>
 				</Img>
 
-				<Info>
-					<Title>
+				{/* size: "calc(100% - 5px)" */}
+				<div className="flex flex-col items-start justify-center flex-1 m-1 overflow-hidden">
+					<p className="pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium">
 						{media.title.slice(0, index)}
-						<Highlight>
+						<span className="bg-highlight text-white">
 							{media.title.slice(index, index + highlight.length)}
-						</Highlight>
+						</span>
 						{media.title.slice(index + highlight.length)}
-					</Title>
-				</Info>
+					</p>
+				</div>
 			</PlayButton>
 
 			<Dialog modal>

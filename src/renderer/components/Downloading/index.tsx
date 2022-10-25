@@ -1,11 +1,11 @@
 import type { DownloadInfo } from "@common/@types/generalTypes";
-import type { Values } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import create from "zustand";
 
-import { PopoverRoot, PopoverContent } from "@components/Popover";
+import { PopoverRoot, PopoverContent } from "@components/Popover/Popover";
 import { ReactToElectronMessage } from "@common/enums";
 import { createNewDownload, Popup } from "./helper";
 import { useDownloadingList } from "@contexts/downloadList";
@@ -104,7 +104,7 @@ export function Downloading() {
 
 export type MediaBeingDownloaded = Readonly<
 	{
-		status: Values<typeof ProgressStatus>;
+		status: ValuesOf<typeof ProgressStatus>;
 		percentage: number;
 		port: MessagePort;
 		imageURL: string;

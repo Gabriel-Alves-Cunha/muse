@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { MediaBeingDownloaded } from "@components/Downloading";
+import type { AllowedMedias } from "@common/utils";
 import type { MediaUrl } from "@contexts/downloadList";
 import type { Readable } from "node:stream";
 
@@ -10,7 +11,6 @@ import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { deleteFile, doesPathExists } from "../file.cjs";
-import { type AllowedMedias, isDev } from "@common/utils";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
@@ -142,6 +142,7 @@ export async function createDownload(
 			}
 
 			// Log progress to node console if in development:
+			// @ts-ignore => isDev is a globally defined boolean.
 			if (isDev) {
 				const secondsDownloading = (Date.now() - startTime) / 1_000;
 				const estimatedDownloadTime =
@@ -151,13 +152,13 @@ export async function createDownload(
 				cursorTo(process.stdout, 0);
 				clearLine(process.stdout, 0);
 
-				process.stdout.write(`${
-					percentage.toFixed(2)
-				}% downloaded, (${
-					prettyBytes(downloaded)
-				} / ${prettyTotal}). Running for: ${
-					secondsDownloading.toFixed(2)
-				} seconds. ETA: ${estimatedDownloadTime} seconds.`);
+				process.stdout.write(
+					`${percentage.toFixed(2)}% downloaded, (${
+						prettyBytes(downloaded)
+					} / ${prettyTotal}). Running for: ${
+						secondsDownloading.toFixed(2)
+					} seconds. ETA: ${estimatedDownloadTime} seconds.`,
+				);
 			}
 		})
 		/////////////////////////////////////////////

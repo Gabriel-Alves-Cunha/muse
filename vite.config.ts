@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
+	const isDevelopment = mode === "development";
 	const isTest = mode === "test";
 
 	const config: UserConfig = {
@@ -31,8 +32,12 @@ export default defineConfig(({ mode }) => {
 		},
 
 		define: isTest ?
-			{} :
-			{ "process.env": process.env ?? "", "import.meta.vitest": "undefined" },
+			{ isDev: isDevelopment } :
+			{
+				"process.env": process.env ?? "{}",
+				"import.meta.vitest": "undefined",
+				isDev: isDevelopment,
+			},
 		server: { port: 3_000 },
 		root: "./src/renderer",
 		plugins: [react()],

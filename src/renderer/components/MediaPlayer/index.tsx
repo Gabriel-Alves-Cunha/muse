@@ -4,11 +4,11 @@ import { type MutableRefObject, useEffect, useRef } from "react";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import create from "zustand";
 
+import { FlipCard, mediaPlayerCardId } from "@components/FlipCard";
 import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
 import { emptyString } from "@common/empty";
-import { FlipCard, mediaPlayerCardId } from "@components/FlipCard";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
 import { dbg } from "@common/debug";
@@ -23,8 +23,6 @@ import {
 	getCurrentPlaying,
 	playNextMedia,
 } from "@contexts/useCurrentPlaying";
-
-import { SquareImage, Wrapper, Info } from "./styles";
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -120,7 +118,8 @@ export function MediaPlayer() {
 	}, [media, path]);
 
 	return (
-		<Wrapper>
+		// grid-media-player
+		<aside className="relative inline-block justify-items-center items-center justify-self-center self-start h-[calc(100vh-var(--top-decorations-height))] w-full p-3 [&_svg]:text-icon-media-player">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
@@ -134,7 +133,7 @@ export function MediaPlayer() {
 					/>
 				}
 			/>
-		</Wrapper>
+		</aside>
 	);
 }
 
@@ -147,20 +146,31 @@ const Player = ({ media, audio, path, isSeeking }: PlayerProps) => (
 	<>
 		<Header media={media} path={path} />
 
-		<SquareImage>
-			<div>
+		<div className="grid relative self-center bg-none border-none mt-[25%] mx-[10%] mb-0 rounded-2xl after:content-[''] after:block after:pb-full">
+			<div className="absolute flex flex-col justify-center items-center w-full h-full rounded-2xl">
 				<ImgWithFallback
 					Fallback={<MusicNote size={13} />}
 					mediaImg={media?.image}
 					mediaPath={path}
 				/>
 			</div>
-		</SquareImage>
+		</div>
 
-		<Info>
-			<span id="title">{media?.title}</span>
-			<span id="subtitle">{media?.artist}</span>
-		</Info>
+		<div className="flex flex-col justify-center items-center h-[10vh] w-full mt-[3vh]">
+			<span
+				className="flex justify-center items-center w-full text-icon-media-player flex-wrap font-secondary tracking-wide text-center overflow-y-hidden text-xl font-medium"
+				id="title"
+			>
+				{media?.title}
+			</span>
+
+			<span
+				className="flex justify-center items-center w-full text-icon-media-player flex-wrap font-secondary tracking-wide text-center overflow-y-hidden text-sm font-normal"
+				id="subtitle"
+			>
+				{media?.artist}
+			</span>
+		</div>
 
 		<ControlsAndSeeker audio={audio} isSeeking={isSeeking} />
 	</>

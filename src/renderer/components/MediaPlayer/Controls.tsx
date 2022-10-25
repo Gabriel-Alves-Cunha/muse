@@ -12,6 +12,7 @@ import {
 	IoPlaySharp as Play,
 } from "react-icons/io5";
 
+import { CircleIconButton } from "@components/CircleIconButton";
 import { SeekerWrapper } from "./Seeker";
 import { t } from "@components/I18n";
 import {
@@ -25,13 +26,6 @@ import {
 	playNextMedia,
 } from "@contexts/useCurrentPlaying";
 
-import {
-	ControlsAndSeekerContainer,
-	ControlsButtonsWrapper,
-	CircledIconButton,
-	ControlsWrapper,
-} from "./styles";
-
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -42,31 +36,31 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 	const isThereAMedia = !(audio !== null && audio.src.length > 0);
 
 	return (
-		<ControlsAndSeekerContainer>
+		<div className="absolute flex flex-col bottom-10 w-full">
 			<SeekerWrapper audio={audio} isSeeking={isSeeking} />
 
-			<ControlsButtonsWrapper>
-				<CircledIconButton
+			<div className="flex justify-between items-center mt-[10%]">
+				<CircleIconButton
 					aria-label={t("tooltips.toggleLoopThisMedia")}
 					title={t("tooltips.toggleLoopThisMedia")}
 					onPointerUp={toggleLoopMedia}
 					disabled={isThereAMedia}
 				>
 					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
-				</CircledIconButton>
+				</CircleIconButton>
 
 				<Controls audio={audio} isDisabled={isThereAMedia} />
 
-				<CircledIconButton
+				<CircleIconButton
 					aria-label={t("tooltips.toggleRandom")}
 					title={t("tooltips.toggleRandom")}
 					onPointerUp={toggleRandom}
 					disabled={isThereAMedia}
 				>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
-				</CircledIconButton>
-			</ControlsButtonsWrapper>
-		</ControlsAndSeekerContainer>
+				</CircleIconButton>
+			</div>
+		</div>
 	);
 }
 
@@ -93,15 +87,15 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	}, [audio]);
 
 	return (
-		<CircledIconButton
+		<CircleIconButton
 			aria-label={t("tooltips.playPause")}
 			title={t("tooltips.playPause")}
 			onPointerUp={togglePlayPause}
 			disabled={isDisabled}
-			size="large"
+			variant="large"
 		>
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
-		</CircledIconButton>
+		</CircleIconButton>
 	);
 }
 
@@ -110,27 +104,27 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 /////////////////////////////////////////
 
 export const Controls = ({ isDisabled, audio }: ControlsProps) => (
-	<ControlsWrapper>
-		<CircledIconButton
+	<div className="relative flex justify-center items-center w-[120px]">
+		<CircleIconButton
 			aria-label={t("tooltips.playPreviousTrack")}
 			title={t("tooltips.playPreviousTrack")}
 			onPointerUp={playPreviousMedia}
 			disabled={isDisabled}
 		>
 			<Previous />
-		</CircledIconButton>
+		</CircleIconButton>
 
 		<PlayPauseButton isDisabled={isDisabled} audio={audio} />
 
-		<CircledIconButton
+		<CircleIconButton
 			aria-label={t("tooltips.playNextTrack")}
 			title={t("tooltips.playNextTrack")}
 			onPointerUp={playNextMedia}
 			disabled={isDisabled}
 		>
 			<Next />
-		</CircledIconButton>
-	</ControlsWrapper>
+		</CircleIconButton>
+	</div>
 );
 
 /////////////////////////////////////////

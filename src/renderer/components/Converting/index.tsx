@@ -2,7 +2,7 @@ import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
-import { PopoverRoot, PopoverContent } from "@components/Popover";
+import { PopoverRoot, PopoverContent } from "@components/Popover/Popover";
 import { ReactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";

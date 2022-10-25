@@ -1,16 +1,13 @@
-import { Dialog } from "@radix-ui/react-dialog";
+import { Dialog, Overlay, Title } from "@radix-ui/react-dialog";
 
 import { resetAllAppData } from "@utils/app";
 import { reloadWindow } from "@components/MediaListKind/helper";
 import { Translator } from "@components/I18n";
 
-import { SubTitle } from "@components/MediaListKind/styles";
 import { Center } from "./styles";
 import {
-	StyledDialogBlurOverlay,
 	StyledDialogContent,
 	CloseDialog,
-	StyledTitle,
 } from "../MediaListKind/MediaOptions/styles";
 
 /////////////////////////////////////////////
@@ -21,14 +18,17 @@ import {
 export function ErrorFallback({ description }: ErrorBoundaryProps) {
 	return (
 		<Dialog modal open>
-			<StyledDialogBlurOverlay />
+			<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
 
 			<StyledDialogContent>
 				<Center>
-					<StyledTitle>
+					<Title className="">
 						<Translator path="errors.mediaListKind.errorTitle" />
-					</StyledTitle>
-					<SubTitle>{description}</SubTitle>
+					</Title>
+
+					<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
+						{description}
+					</p>
 
 					<CloseDialog
 						onPointerUp={() => {

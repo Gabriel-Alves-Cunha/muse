@@ -36,10 +36,12 @@ import {
 import { ListWrapper, EmptyList, Footer as StyledFooter } from "./styles";
 import { ErrorFallback } from "../ErrorFallback";
 
+import noMediaFoundPng from "@assets/not-found.png";
+
 /////////////////////////////////////////
 
 // href="https://www.flaticon.com/free-icons/error" =>
-const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
+// const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -177,7 +179,7 @@ const Footer = () => <StyledFooter />;
 
 const EmptyPlaceholder = () => (
 	<EmptyList>
-		<img src={noMediaFoundPng.href} alt={t("alts.noMediasFound")} />
+		<img src={noMediaFoundPng} alt={t("alts.noMediasFound")} />
 
 		<Translator path="alts.noMediasFound" />
 	</EmptyList>
@@ -189,7 +191,8 @@ const components = { EmptyPlaceholder, Header: Footer, Footer };
 
 function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
 	if (
-		e.ctrlKey === true && e.key === "a" &&
+		e.ctrlKey === true &&
+		e.key === "a" &&
 		isAModifierKeyPressed(e, ["Control"]) === false
 	) {
 		e.preventDefault();

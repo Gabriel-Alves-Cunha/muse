@@ -4,13 +4,20 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { type RefObject, type ChangeEvent, useEffect, useRef } from "react";
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
 import { MdOutlineDelete as Remove } from "react-icons/md";
-import { MdClose as Close } from "react-icons/md";
-import { Dialog } from "@radix-ui/react-dialog";
+import { MdClose as CloseIcon } from "react-icons/md";
+import {
+	Description,
+	Content,
+	Trigger,
+	Dialog,
+	Title,
+	Close,
+} from "@radix-ui/react-dialog";
 
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
-import { ReactToElectronMessage } from "@common/enums";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
-import { errorToast, successToast } from "@styles/global";
+import { errorToast, successToast } from "@components/toasts";
+import { ReactToElectronMessage } from "@common/enums";
 import { areArraysEqualByValue } from "@utils/array";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { sendMsgToBackend } from "@common/crossCommunication";
@@ -18,21 +25,9 @@ import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { deleteMedia } from "@utils/media";
-import { Button } from "@components/Button";
+import { FlexRow } from "@components/FlexRow";
+import { Button } from "@components/Button/Button";
 import { dbg } from "@common/debug";
-
-import {
-	DialogTriggerToRemoveMedia,
-	StyledDialogContent,
-	StyledDescription,
-	TextAreaInput,
-	StyledTitle,
-	CloseDialog,
-	Fieldset,
-	FlexRow,
-	Input,
-	Label,
-} from "./styles";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -52,7 +47,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 		{ target: { files } }: ChangeEvent<HTMLInputElement>,
 	) {
 		if (
-			imageButtonRef.current === null || imageInputRef.current === null ||
+			imageButtonRef.current === null ||
+			imageInputRef.current === null ||
 			files === null ||
 			files.length === 0
 		)
@@ -93,29 +89,38 @@ export function MediaOptionsModal({ media, path }: Props) {
 	}, [media, path]);
 
 	return (
-		<StyledDialogContent ref={contentWrapperRef}>
-			<StyledTitle>
+		<Content
+			className="unset-all fixed grid center max-w-md min-w-[300px] p-8 bg-dialog z-20 rounded"
+			ref={contentWrapperRef}
+		>
+			<Title className="unset-all font-primary tracking-wide text-2xl text-normal font-medium">
 				<Translator path="dialogs.mediaOptions.title" />
-			</StyledTitle>
+			</Title>
 
-			<StyledDescription>
+			<Description className="mt-3 mx-0 mb-5 font-secondary text-gray tracking-wide text-base">
 				<Translator path="dialogs.mediaOptions.description" />
-			</StyledDescription>
+			</Description>
 
-			<CloseDialog
-				aria-label={t("tooltips.closeDialog")}
+			<Close
+				// outline: "initial"; h-9; rounded
+				className="unset-all flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold absolute right-2 top-2 rounded-full hover:bg-icon-button-hovered focus:bg-icon-button-hovered"
 				title={t("tooltips.closeDialog")}
 				ref={closeButtonRef}
-				id="close-icon"
 			>
-				<Close />
-			</CloseDialog>
+				<CloseIcon className="fill-accent-light" />
+			</Close>
 
 			{Object.entries(options(media)).map(([option, value]) => (
-				<Fieldset key={option}>
-					<Label htmlFor={option}>
+				<fieldset
+					className="unset-all flex items-center h-9 gap-5 mb-4"
+					key={option}
+				>
+					<label
+						className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
+						htmlFor={option}
+					>
 						<Translator path={`labels.${option as Options}`} />
-					</Label>
+					</label>
 
 					{option === "image" ?
 						/////////////////////////////////////////////
@@ -143,24 +148,32 @@ export function MediaOptionsModal({ media, path }: Props) {
 						/////////////////////////////////////////////
 						// Handle text input with line feeds:
 						option === "lyrics" ?
-						<TextAreaInput defaultValue={format(value)} id={option} /> :
 						(
-							<Input
+							<textarea
+								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
+								defaultValue={format(value)}
+								id={option}
+							/>
+						) :
+						(
+							<input
+								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
 								readOnly={isChangeable(option) === false}
 								defaultValue={format(value)}
 								id={option}
 							/>
 						)}
-				</Fieldset>
+				</fieldset>
 			))}
 
 			<FlexRow>
 				<Dialog modal>
-					<DialogTriggerToRemoveMedia className="notransition">
+					{/* line-height: 35px; // same as height */}
+					<Trigger className="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition">
 						<Translator path="buttons.deleteMedia" />
 
 						<Remove />
-					</DialogTriggerToRemoveMedia>
+					</Trigger>
 
 					<DeleteMediaDialogContent
 						handleMediaDeletion={() =>
@@ -168,7 +181,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 					/>
 				</Dialog>
 
-				<CloseDialog
+				<Close
+					className="unset-all flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold bg-[#ddf4e5] text-[#2c6e4f] hover:bg-[#c6dbce] focus:bg-[#c6dbce]"
 					onPointerUp={() =>
 						changeMediaMetadata(
 							contentWrapperRef,
@@ -177,12 +191,11 @@ export function MediaOptionsModal({ media, path }: Props) {
 							path,
 							media,
 						)}
-					id="save-changes"
 				>
 					<Translator path="buttons.saveChanges" />
-				</CloseDialog>
+				</Close>
 			</FlexRow>
-		</StyledDialogContent>
+		</Content>
 	);
 }
 
@@ -261,7 +274,8 @@ function changeMetadataIfAllowed(
 					// If `oldValue` is falsy AND `newValue` is
 					// empty, there's nothing to do, so just return:
 					if (
-						key !== id || oldValue === newValue ||
+						key !== id ||
+						oldValue === newValue ||
 						(!oldValue && newValue === emptyString)
 					)
 						return;

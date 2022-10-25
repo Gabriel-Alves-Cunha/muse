@@ -2,9 +2,8 @@ import { stringifyJson } from "@common/utils";
 
 type ErrorWithMessage = { message: string; };
 
-function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
-	return typeof error === "object" && error !== null && "message" in error;
-}
+const isErrorWithMessage = (error: unknown): error is ErrorWithMessage =>
+	typeof error === "object" && error !== null && "message" in error;
 
 function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 	if (isErrorWithMessage(maybeError)) return maybeError;
@@ -17,6 +16,5 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 	}
 }
 
-export function getErrorMessage(error: unknown): string {
-	return toErrorWithMessage(error).message;
-}
+export const getErrorMessage = (error: unknown): string =>
+	toErrorWithMessage(error).message;

@@ -25,7 +25,7 @@ export type TypeOfMapValue<T> = T extends Map<unknown, infer V> ? V : never;
 
 ////////////////////////////////////////////
 
-export type Values<Obj> = Obj[keyof Obj];
+export type ValuesOf<Obj> = Obj[keyof Obj];
 
 ////////////////////////////////////////////
 

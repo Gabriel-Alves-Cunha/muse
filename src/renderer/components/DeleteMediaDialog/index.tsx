@@ -1,16 +1,15 @@
 import { Root } from "@radix-ui/react-portal";
 
 import { Translator } from "@components/I18n";
+import { Content, Title } from "@radix-ui/react-dialog";
 
 import {
 	StyledDialogBlurOverlay,
-	StyledDialogContent,
-	StyledTitle,
 	CloseDialog,
-	FlexRow,
 } from "@components/MediaListKind/MediaOptions/styles";
 
 import warningSvg from "@assets/warning.svg";
+import { FlexRow } from "@components/FlexRow";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -22,10 +21,10 @@ export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 		<Root>
 			<StyledDialogBlurOverlay />
 
-			<StyledDialogContent className="delete-media">
-				<StyledTitle className="subtitle">
+			<Content className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show delete-media-overlay">
+				<Title className="text-lg first-letter:text-3xl first-letter:font-normal">
 					<Translator path="dialogs.deleteMedia.subtitle" />
-				</StyledTitle>
+				</Title>
 
 				<FlexRow>
 					<img src={warningSvg} alt="Warning sign." id="warning" />
@@ -41,7 +40,7 @@ export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 						<Translator path="buttons.cancel" />
 					</CloseDialog>
 				</FlexRow>
-			</StyledDialogContent>
+			</Content>
 		</Root>
 	);
 }

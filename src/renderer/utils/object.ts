@@ -1,10 +1,10 @@
-export function areObjectKeysEqual(object1: Obj, object2: Obj): boolean {
-	const object2Lenght = Object.keys(object2).length;
-	const keys1 = Object.keys(object1);
+export function areObjectKeysEqual(obj_1: Obj, obj_2: Obj): boolean {
+	const obj_2_lenght = getObjectLength(obj_2);
+	const obj_1_lenght = getObjectLength(obj_1);
 
-	if (keys1.length !== object2Lenght) return false;
+	if (obj_1_lenght !== obj_2_lenght) return false;
 
-	for (const key of keys1) if (object1[key] !== object2[key]) return false;
+	for (const key in obj_1) if (obj_1[key] !== obj_2[key]) return false;
 
 	return true;
 }
@@ -17,6 +17,24 @@ export function getObjectDeepKeys(obj: Obj): string[] {
 		.filter(key => obj[key] instanceof Object)
 		.map(key => getObjectDeepKeys(obj[key] as Obj).map(k => `${key}.${k}`))
 		.reduce((x, y) => x.concat(y), Object.keys(obj));
+}
+
+//////////////////////////////////////////
+
+export function isObjectEmpty(obj: Obj): boolean {
+	for (const _ in obj) return false;
+	return true;
+}
+
+//////////////////////////////////////////
+
+export function getObjectLength(obj: Obj): number {
+	let length = 0;
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	for (const _ in obj) ++length;
+
+	return length;
 }
 
 //////////////////////////////////////////

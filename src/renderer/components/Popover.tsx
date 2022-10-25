@@ -1,9 +1,6 @@
-import type { VariantProps, ComponentProps } from "@stitches/react";
-
-import { type Ref, type ReactNode, forwardRef } from "react";
+import { type Ref, forwardRef, BaseHTMLAttributes } from "react";
+import { Content } from "@radix-ui/react-popover";
 import { Root } from "@radix-ui/react-popover";
-
-import { StyledContent } from "./styles";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -14,10 +11,9 @@ export const PopoverRoot = Root;
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-// Main function:
+// Main function:size
 
 /** Usage:
- *
  * ``` javascript
  * import { Popover, PopoverTrigger, PopoverContent } from "@components";
  *
@@ -33,9 +29,25 @@ export const PopoverContent = forwardRef((
 	{ children, size, ...props }: Props,
 	forwardedRef: Ref<HTMLDivElement>,
 ): JSX.Element => (
-	<StyledContent size={size} sideOffset={10} {...props} ref={forwardedRef}>
+	<Content
+		// 	"& > p": {
+		// 		pos: "relative",
+		//
+		// 		c: "$deactivated-icon",
+		// 		ff: "$secondary",
+		// 		ls: "0.03rem",
+		// 		fs: "1.05rem",
+		// 		ta: "center",
+		// 		fw: 500,
+		// 	},
+		className={"flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1 focus:shadow-popover focus:outline-none " +
+			size}
+		sideOffset={10}
+		{...props}
+		ref={forwardedRef}
+	>
 		{children}
-	</StyledContent>
+	</Content>
 ));
 PopoverContent.displayName = "PopoverContent";
 
@@ -44,7 +56,11 @@ PopoverContent.displayName = "PopoverContent";
 /////////////////////////////////////////
 // Types:
 
-interface Props extends ComponentProps<typeof StyledContent> {
-	readonly size: NonNullable<VariantProps<typeof StyledContent>["size"]>;
-	readonly children: ReactNode;
+interface Props extends BaseHTMLAttributes<HTMLDivElement> {
+	readonly children: React.ReactNode;
+	readonly size:
+		| "nothing-found-for-convertions-or-downloads"
+		| "nothing-found-for-search-media"
+		| "convertions-or-downloads"
+		| "search-media-results";
 }
