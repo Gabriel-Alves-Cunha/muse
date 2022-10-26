@@ -5,7 +5,7 @@
 @layer base {
 	:root {
 		--down-decorations-height: 20px;
-		--top-decorations-height: 20px;
+		--top-decorations-height: 27px;
 
 		/* .theme-light { */
 		/* Colors */
@@ -259,11 +259,6 @@
 		}
 	}
 
-	.no-transition * {
-		/* maybe add !important */
-		transition: none;
-	}
-
 	.perspective-10 {
 		perspective: 1000px;
 	}
@@ -510,6 +505,63 @@
 	.delete-media-overlay {
 		@apply w-80 h-5;
 	}
+
+	.has-items span {
+		@apply absolute w-4 h-4 -right-2 top-0 bg-green-700 rounded-full;
+	}
+
+	.has-items span::before {
+		@apply content-[attr(data-length)] relative justify-center items-center flex w-full h-full -right-[1px] font-secondary tracking-wide text-white font-medium text-xs;
+	}
+
+	.ctx-trigger:focus,
+	.ctx-trigger:hover {
+		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
+	}
+
+	.ctx-trigger:focus svg,
+	.ctx-trigger:hover svg {
+		@apply text-ctx-menu-item-focus;
+	}
+
+	.ctx-trigger:disabled {
+		@apply text-disabled pointer-events-none;
+	}
+
+	.ctx-trigger:disabled svg {
+		@apply text-disabled;
+	}
+
+	.fall-away {
+		animation: fall-away 600ms ease;
+	}
+
+	.move-up {
+		animation: move-up 400ms ease 200ms forwards;
+	}
+
+	.app-drag-region {
+		-webkit-app-region: drag;
+		user-select: none;
+	}
+
+	.down-decorations-p p {
+		@apply flex h-full text-alternative font-secondary tracking-wide text-sm text-center font-medium;
+	}
+
+	.trigger-search-media {
+		@apply absolute top-1/4 right-1;
+	}
+
+	.trigger-search-media:hover,
+	.trigger-search-media:focus {
+		@apply bg-media-player-icon-button-hovered;
+	}
+
+	.trigger-search-media:hover svg,
+	.trigger-search-media:focus svg {
+		color: inherit; /* keep same color */
+	}
 }
 
 @keyframes overlay-show {
@@ -518,5 +570,34 @@
 	}
 	100% {
 		opacity: 1;
+	}
+}
+
+@keyframes fall-away {
+	0% {
+		transform: rotateZ(0deg);
+		opacity: 1;
+		top: 0;
+	}
+
+	25% {
+		transform: rotateZ(-15deg);
+	}
+
+	100% {
+		transform: rotateZ(-5deg);
+		opacity: 0;
+		top: 200;
+	}
+}
+
+@keyframes move-up {
+	0% {
+		transform: translateY(0px);
+	}
+
+	100% {
+		/* -73 is the (height + 1 * gap): */
+		transform: translateY(-73px);
 	}
 }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
-import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
+import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
@@ -148,7 +148,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	return (
 		<ListWrapper ref={listRef}>
 			<ContextMenu
-				content={CtxContentEnum.MEDIA_OPTIONS}
+				content={ctxContentEnum.MEDIA_OPTIONS}
 				onContextMenu={selectMediaByEvent}
 				setIsOpen={setIsCtxMenuOpen}
 			>

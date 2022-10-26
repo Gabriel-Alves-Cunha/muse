@@ -23,8 +23,8 @@ export const closeWindow = () =>
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-
-export const imageUrl = new URL(
-	"../../assets/logo.svg?width=16",
-	import.meta.url,
-);
+// 
+// export const imageUrl = new URL(
+// 	"../../assets/logo.svg?width=16",
+// 	import.meta.url,
+// );

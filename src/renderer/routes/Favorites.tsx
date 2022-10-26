@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
 import { MediaListKind } from "@components/MediaListKind";
+import { GroupedButton } from "@components/GroupedButton";
 import { PlaylistList } from "@contexts/usePlaylists";
-import { ButtonGroup } from "@components/ButtonGroup";
 import { SearchMedia } from "@components/SearchMedia";
 import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
@@ -27,7 +27,7 @@ export function Favorites() {
 			<Header>
 				<SearchMedia />
 
-				<ButtonGroup clean />
+				<GroupedButton clean />
 			</Header>
 
 			<MediaListKind />

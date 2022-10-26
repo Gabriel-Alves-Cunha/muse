@@ -2,15 +2,14 @@ import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
-import { PopoverRoot, PopoverContent } from "@components/Popover/Popover";
+import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { errorToast } from "@styles/global";
+import { errorToast } from "@components/toasts";
 import { emptyMap } from "@common/empty";
 import { t } from "@components/I18n";
-
-import { StyledPopoverTrigger } from "../Downloading/styles";
+import { Trigger } from "@radix-ui/react-popover";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -55,15 +54,14 @@ export function Converting() {
 
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-			<StyledPopoverTrigger
+			<Trigger
 				className={convertingListSize > 0 ? "has-items " : ""}
-				aria-label={t("tooltips.showAllConvertingMedias")}
 				title={t("tooltips.showAllConvertingMedias")}
 			>
 				<span data-length={convertingListSize}></span>
 
 				<Convert size={20} />
-			</StyledPopoverTrigger>
+			</Trigger>
 
 			<PopoverContent
 				size={convertingListSize === 0 ?

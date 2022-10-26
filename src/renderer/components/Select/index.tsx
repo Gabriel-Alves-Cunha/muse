@@ -78,12 +78,12 @@ function contentToShow(
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<
+type Props<T> = Readonly<
 	{
 		content?: ValuesOf<typeof ContentOfSelectEnum>;
 		triggerClassName: string | undefined;
-		setValue: (value: string) => void;
 		children: React.ReactNode;
+		setValue(value: T): void;
 		triggerTitle?: string;
 		tooltip: string;
 		value: string;

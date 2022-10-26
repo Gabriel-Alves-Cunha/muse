@@ -1,6 +1,7 @@
 import { FiTrash as CleanIcon } from "react-icons/fi";
 
 import { assertUnreachable } from "@utils/utils";
+import { ButtonOfGroup } from "./ButtonOfGroup";
 import { getFromList } from "@components/MediaListKind/helper";
 import { t } from "@components/I18n";
 import {
@@ -9,17 +10,14 @@ import {
 	PlaylistList,
 } from "@contexts/usePlaylists";
 
-import { ButtonFromGroup } from "./styles";
-
 export const Clean = ({ className }: Props) => (
-	<ButtonFromGroup
-		aria-label={t("tooltips.cleanList")}
+	<ButtonOfGroup
 		title={t("tooltips.cleanList")}
 		onPointerUp={cleanProperList}
 		className={className}
 	>
 		<CleanIcon size={18} />
-	</ButtonFromGroup>
+	</ButtonOfGroup>
 );
 
 /////////////////////////////////////////////

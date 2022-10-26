@@ -1,6 +1,6 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { errorToast, successToast } from "@styles/global";
+import { errorToast, successToast } from "@components/toasts";
 import { getBasename } from "@common/path";
 import { t } from "@components/I18n";
 import {

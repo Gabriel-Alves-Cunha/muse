@@ -1,112 +1,14 @@
-import { Trigger } from "@radix-ui/react-dialog";
 import {
 	ItemIndicator as CtxItemIndicator,
 	CheckboxItem as CtxCheckboxItem,
 	RadioItem as CtxRadioItem,
 	Separator as CtxSeparator,
 	Trigger as CtxTrigger,
-	Content as CtxContent,
 	Label as CtxLabel,
 	Item as CtxItem,
 } from "@radix-ui/react-context-menu";
 
-import { styled } from "@styles/global";
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export const Content = styled(CtxContent, {
-	minWidth: 220,
-
-	bg: "$bg-ctx-menu",
-	zIndex: 200,
-	br: 6,
-	p: 5,
-
-	boxShadow: `0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-	0px 10px 20px -15px rgba(22, 23, 24, 0.2)`,
-});
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export const itemStyles = styled("div", {
-	all: "unset",
-
-	pos: "relative",
-	d: "flex",
-	alignItems: "center",
-	h: 25,
-
-	cursor: "pointer",
-	p: "0 5px",
-	pl: 25,
-	br: 3,
-
-	c: "$ctx-menu-item-text",
-	ff: "$secondary",
-	ls: "0.03rem",
-	fs: 15,
-	lh: 1,
-
-	userSelect: "none",
-
-	"&[data-disabled]": {
-		c: "$ctx-menu-item-text-disabled",
-		pointerEvents: "none",
-	},
-
-	"&:hover, &:focus": {
-		c: "$ctx-menu-item-text-focus",
-		bg: "$ctx-menu-item-bg-focus",
-	},
-});
-
-export const TriggerToDeleteMedia = styled(Trigger, {
-	all: "unset",
-
-	pos: "relative",
-	d: "flex",
-	alignItems: "center",
-	// Account for padding:
-	w: "calc(100% - 25px - 5px)",
-	h: 25,
-
-	cursor: "pointer",
-	border: "none",
-	p: "0 5px",
-	pl: 25,
-	br: 3,
-
-	c: "$ctx-menu-item-text",
-	ff: "$secondary",
-	ls: "0.03rem",
-	fs: 15,
-	lh: 1,
-
-	userSelect: "none",
-
-	"&:focus, &:hover": {
-		c: "$ctx-menu-item-text-focus",
-		bg: "$ctx-menu-item-bg-focus",
-
-		"& svg": { color: "$ctx-menu-item-text-focus" },
-	},
-
-	"&:disabled": {
-		c: "$ctx-menu-item-text-disabled",
-		pointerEvents: "none",
-
-		"& svg": { color: "$ctx-menu-item-text-disabled" },
-	},
-});
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
+// DONE
 export const RightSlot = styled("div", {
 	ml: "auto",
 	pl: 20,

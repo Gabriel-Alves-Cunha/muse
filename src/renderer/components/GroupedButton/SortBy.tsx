@@ -37,9 +37,9 @@ export function SortBy({ className }: Props) {
 
 	return (
 		<Select
-			setValue={setSelectedList as (value: SelectedList) => void}
 			tooltip={t("tooltips.sortBy")}
 			triggerClassName={className}
+			setValue={setSelectedList}
 			value={selectedList}
 		>
 			<SortIcon size={19} />

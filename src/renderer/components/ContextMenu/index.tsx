@@ -1,28 +1,27 @@
 import { type ReactNode } from "react";
 
-import { Root, Trigger } from "@radix-ui/react-context-menu";
+import { Content, Root, Trigger } from "@radix-ui/react-context-menu";
 
 import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
 import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
 import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
 import { assertUnreachable } from "@utils/utils";
 import { MainCtxMenu } from "./mainCtxMenu";
-
-import { Content } from "./styles";
+import { ValuesOf } from "@common/@types/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export enum CtxContentEnum {
-	SEARCH_MEDIA_OPTIONS,
-	MEDIA_OPTIONS,
-	FULL_EXAMPLE,
-	MAIN,
-}
+export const ctxContentEnum = {
+	SEARCH_MEDIA_OPTIONS: 2,
+	MEDIA_OPTIONS: 3,
+	FULL_EXAMPLE: 4,
+	MAIN: 5,
+} as const;
 
 const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN, SEARCH_MEDIA_OPTIONS } =
-	CtxContentEnum;
+	ctxContentEnum;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -36,7 +35,10 @@ export const ContextMenu = (
 	<Root onOpenChange={setIsOpen} modal>
 		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
-		<Content loop className="notransition">
+		<Content
+			className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
+			loop
+		>
 			{contentToShow(content, isAllDisabled)}
 		</Content>
 	</Root>
@@ -78,7 +80,7 @@ type Props = Readonly<
 	{
 		onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
 		setIsOpen?: (newIsOpen: boolean) => void;
-		content?: CtxContentEnum;
+		content?: ValuesOf<typeof ctxContentEnum>;
 		isAllDisabled?: boolean;
 		children: ReactNode;
 	}

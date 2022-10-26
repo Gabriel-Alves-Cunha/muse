@@ -3,19 +3,19 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
+import { Trigger } from "@radix-ui/react-popover";
 import create from "zustand";
 
-import { PopoverRoot, PopoverContent } from "@components/Popover/Popover";
+import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessage } from "@common/enums";
 import { createNewDownload, Popup } from "./helper";
 import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { emptyString } from "@common/empty";
-import { errorToast } from "@styles/global";
-
-import { StyledPopoverTrigger } from "./styles";
+import { errorToast } from "@components/toasts";
 import { t } from "@components/I18n";
+
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -73,16 +73,15 @@ export function Downloading() {
 
 	return (
 		<PopoverRoot modal open={isOpen} onOpenChange={setIsOpen}>
-			<StyledPopoverTrigger
+			<Trigger
 				className={(downloadingListSize > 0 ? "has-items " : "") +
-					(isOpen === true ? "active " : "")}
-				aria-label={t("tooltips.showAllDownloadingMedias")}
+					(isOpen === true ? "active " : "") + "relative flex justify-center items-center cursor-pointer bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "}
 				title={t("tooltips.showAllDownloadingMedias")}
 			>
 				<span data-length={downloadingListSize}></span>
 
 				<DownloadingIcon size={20} />
-			</StyledPopoverTrigger>
+			</Trigger>
 
 			<PopoverContent
 				size={downloadingListSize === 0 ?

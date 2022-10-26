@@ -1,6 +1,9 @@
-import { type Ref, forwardRef, BaseHTMLAttributes } from "react";
-import { Content } from "@radix-ui/react-popover";
-import { Root } from "@radix-ui/react-popover";
+import { type Ref, forwardRef } from "react";
+import {
+	type PopperContentProps,
+	Content,
+	Root,
+} from "@radix-ui/react-popover";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -56,7 +59,7 @@ PopoverContent.displayName = "PopoverContent";
 /////////////////////////////////////////
 // Types:
 
-interface Props extends BaseHTMLAttributes<HTMLDivElement> {
+interface Props extends PopperContentProps {
 	readonly children: React.ReactNode;
 	readonly size:
 		| "nothing-found-for-convertions-or-downloads"

@@ -6,8 +6,7 @@ import {
 	usePlaylists,
 } from "@contexts/usePlaylists";
 
-import { ButtonFromGroup } from "./styles";
-import { ButtonOfGroup } from ".";
+import { ButtonOfGroup } from "./ButtonOfGroup";
 
 const isLoadingMediasSelector = (
 	state: ReturnType<typeof usePlaylists.getState>,

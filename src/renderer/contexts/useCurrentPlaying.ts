@@ -23,11 +23,11 @@ import {
 ////////////////////////////////////////////////
 // Constants:
 
-const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
+const defaultCurrentPlaying: CurrentPlaying = {
 	listType: PlaylistList.MAIN_LIST,
 	path: emptyString,
 	currentTime: 0,
-});
+};
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
 	subscribeWithSelector(setCurrentPlayingOnLocalStorage(

@@ -4,33 +4,9 @@ import { Reload } from "./Reload";
 import { SortBy } from "./SortBy";
 import { Clean } from "./Clean";
 
-import { Wrapper } from "./styles";
-import { ComponentProps } from "react";
-
 const reload_ = "reload";
 const sortBy_ = "sortBy";
 const clean_ = "clean";
-
-export function ButtonGroup(buttons: Buttons) {
-	return (
-		<Wrapper className="notransition">
-			{/* Order matters here: */}
-			{buttons.reload && (
-				<Reload className={additionalClasses(reload_, buttons)} />
-			)}
-
-			{buttons.sortBy && (
-				<SortBy className={additionalClasses(sortBy_, buttons)} />
-			)}
-
-			{buttons.clean && (
-				<Clean
-					className={additionalClasses(clean_, buttons)}
-				/>
-			)}
-		</Wrapper>
-	);
-}
 
 export function GroupedButton(buttons: Buttons) {
 	return (
@@ -55,16 +31,6 @@ export function GroupedButton(buttons: Buttons) {
 	);
 }
 
-export function ButtonOfGroup({ children, ...props }: ButtonOfGroupProps) {
-	return (
-		<button
-			className="relative flex justify-center items-center bg-button border-none px-5 h-10 transition-colors ease-in-out duration-200 cursor-pointer active:scale-95"
-			{...props}
-		>
-			{children}
-		</button>
-	);
-}
 
 /////////////////////////////////////////////
 // Helper functions:
@@ -135,4 +101,4 @@ type Buttons = Readonly<
 
 /////////////////////////////////////////////
 
-type ButtonOfGroupProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
+

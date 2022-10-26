@@ -4,7 +4,7 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 
-import { errorToast, infoToast, successToast } from "@styles/global";
+import { errorToast, infoToast, successToast } from "@components/toasts";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";

@@ -57,7 +57,7 @@ module.exports = {
 				"media-player-icon-button-hovered":
 					"var(--bg-media-player-icon-button-hovered)",
 				"icon-button-hovered": "var(--bg-icon-button-hovered)",
-				
+
 				"button-hover": "var(--bg-button-hover)",
 				highlight: "var(--bg-highlight)",
 				selected: "var(--bg-selected)",

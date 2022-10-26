@@ -10,7 +10,7 @@ import { ElectronIpcMainProcessNotification } from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { DialogTrigger } from "@components/DialogTrigger";
+import { DialogTrigger } from "@components/DialogTrigger/DialogTrigger";
 import { PlaylistList } from "@contexts/usePlaylists";
 import { t } from "@components/I18n";
 import {

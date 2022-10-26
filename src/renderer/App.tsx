@@ -10,12 +10,12 @@ import { ShareDialog } from "@components/ShareDialog";
 import { Favorites } from "@routes/Favorites";
 import { Download } from "@routes/Download";
 import { History } from "@routes/History";
+import { Loading } from "@components/Loading";
 import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
 import { Home } from "@routes/Home";
 
-import { Loading } from "@components/Loading";
 import "react-toastify/dist/ReactToastify.min.css";
 
 //////////////////////////////////////////

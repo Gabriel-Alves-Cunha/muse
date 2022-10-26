@@ -8,14 +8,14 @@ import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { useEffect, useRef } from "react";
 import create from "zustand";
 
-import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
+import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { selectMediaByEvent } from "@components/MediaListKind/helper";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { t, Translator } from "@components/I18n";
-import { DialogTrigger } from "@components/DialogTrigger";
+import { DialogTrigger } from "@components/DialogTrigger/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyArray } from "@utils/array";
 
@@ -178,7 +178,7 @@ export function Results() {
 
 	return (
 		<ContextMenu
-			content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
+			content={ctxContentEnum.SEARCH_MEDIA_OPTIONS}
 			onContextMenu={selectMediaByEvent}
 			isAllDisabled={nothingFound}
 		>

@@ -1,6 +1,6 @@
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
-import { Dialog } from "@radix-ui/react-dialog";
+import { Dialog, Trigger } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
@@ -10,12 +10,11 @@ import { getSearcher } from "@components/SearchMedia/helper";
 import { getMainList } from "@contexts/usePlaylists";
 import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
+import { Item } from "./Item";
 import {
 	setAllSelectedMedias,
 	getAllSelectedMedias,
 } from "@contexts/useAllSelectedMedias";
-
-import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -25,15 +24,18 @@ import { RightSlot, Item, TriggerToDeleteMedia } from "./styles";
 export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => (
 	<>
 		<Dialog modal>
-			<TriggerToDeleteMedia disabled={isAllDisabled}>
+			<Trigger
+				className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
+				disabled={isAllDisabled}
+			>
 				<>
 					<Translator path="ctxMenus.deleteMedia" />
 
-					<RightSlot>
+					<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
 						<Trash />
-					</RightSlot>
+					</div>
 				</>
-			</TriggerToDeleteMedia>
+			</Trigger>
 
 			<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
 		</Dialog>
@@ -41,15 +43,17 @@ export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => (
 		<Item onSelect={shareMedias} disabled={isAllDisabled}>
 			<Translator path="ctxMenus.shareMedia" />
 
-			<RightSlot>
+			<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
 				<Share />
-			</RightSlot>
+			</div>
 		</Item>
 
 		<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
 			<Translator path="ctxMenus.selectAllMedias" />
 
-			<RightSlot>Ctrl+A</RightSlot>
+			<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+				Ctrl+A
+			</div>
 		</Item>
 
 		<Item onSelect={searchForLyrics} disabled={isAllDisabled}>

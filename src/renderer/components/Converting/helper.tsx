@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/generalTypes";
 import { AiOutlineClose as Cancel } from "react-icons/ai";
 import create from "zustand";
 
-import { errorToast, infoToast, successToast } from "@styles/global";
+import { errorToast, infoToast, successToast } from "@components/toasts";
 import { type AllowedMedias, formatDuration } from "@common/utils";
 import { type ProgressProps, progressIcons } from "@components/Progress";
 import { assertUnreachable } from "@utils/utils";
@@ -22,11 +22,8 @@ import {
 	useConvertingList,
 } from "@contexts/convertList";
 
-import { CancelButton, ConvertionProgress } from "./styles";
 import {
 	handleSingleItemDeleteAnimation,
-	TitleAndCancelWrapper,
-	ItemWrapper,
 } from "../Downloading/styles";
 
 /////////////////////////////////////////////
@@ -97,11 +94,14 @@ const ConvertBox = (
 		path,
 	}: ConvertBoxProps,
 ) => (
-	<ItemWrapper className="item">
-		<TitleAndCancelWrapper>
-			<p>{`${getBasename(path)}.${toExtension}`}</p>
+	<div className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none">
+		<div className="relative flex justify-start items-center w-[90%] h-4 mb-2">
+			<p className="text-alternative whitespace-nowrap font-primary text-sm text-left overflow-hidden w-[90%]">
+				{`${getBasename(path)}.${toExtension}`}
+			</p>
 
-			<CancelButton
+			<button
+				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none"
 				onPointerUp={e =>
 					handleSingleItemDeleteAnimation(
 						e,
@@ -109,21 +109,20 @@ const ConvertBox = (
 						!isDownloadList,
 						path,
 					)}
-				aria-label={t("tooltips.cancelConversion")}
 				title={t("tooltips.cancelConversion")}
-				className="notransition"
 			>
-				<Cancel size={12} />
-			</CancelButton>
-		</TitleAndCancelWrapper>
+				<Cancel className="w-3 h-3 fill-gray-600" />
+			</button>
+		</div>
 
-		<ConvertionProgress>
+		<div className="flex justify-between whitespace-nowrap text-muted font-primary text-sm tracking-wide overflow-hidden text-left">
 			{`${t("infos.converted")} ${formatDuration(timeConverted)} s / ${
 				prettyBytes(sizeConverted)
 			}`}
-			<span>{progressIcons.get(status)}</span>
-		</ConvertionProgress>
-	</ItemWrapper>
+
+			<span className="text-white mr-1">{progressIcons.get(status)}</span>
+		</div>
+	</div>
 );
 
 /////////////////////////////////////////////
