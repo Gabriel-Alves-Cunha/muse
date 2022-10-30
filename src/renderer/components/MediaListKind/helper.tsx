@@ -1,16 +1,16 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
+import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { memo } from "react";
 import create from "zustand";
 
-import { ElectronIpcMainProcessNotification } from "@common/enums";
+import { electronIpcMainProcessNotification } from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { DialogTrigger } from "@components/DialogTrigger/DialogTrigger";
+import { DialogTrigger } from "@components/DialogTrigger";
 import { PlaylistList } from "@contexts/usePlaylists";
 import { t } from "@components/I18n";
 import {
@@ -46,7 +46,7 @@ export const setIsCtxMenuOpen = (bool: boolean) =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function selectMediaByEvent(
+export function selectMediaByPointerEvent(
 	e: React.PointerEvent<HTMLSpanElement>,
 ): void {
 	// TODO: see if this selector still works.
@@ -126,9 +126,9 @@ const Row = memo(
 
 				<DialogPortal>
 					{/* backdropFilter: blur(2px); */}
-					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show">
-						<MediaOptionsModal media={media} path={path} />
-					</Overlay>
+					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
+
+					<MediaOptionsModal media={media} path={path} />
 				</DialogPortal>
 			</Dialog>
 		</div>
@@ -166,7 +166,7 @@ export const itemContent = (
 /////////////////////////////////////////
 
 export const reloadWindow = (): void =>
-	notify(ElectronIpcMainProcessNotification.RELOAD_WINDOW);
+	notify(electronIpcMainProcessNotification.RELOAD_WINDOW);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

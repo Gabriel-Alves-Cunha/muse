@@ -1,10 +1,10 @@
 import type { MetadataToChange } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { type RefObject, type ChangeEvent, useEffect, useRef } from "react";
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as CloseIcon } from "react-icons/md";
+import { useEffect, useRef } from "react";
 import {
 	Description,
 	Content,
@@ -17,16 +17,16 @@ import {
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { errorToast, successToast } from "@components/toasts";
-import { ReactToElectronMessage } from "@common/enums";
+import { reactToElectronMessage } from "@common/enums";
 import { areArraysEqualByValue } from "@utils/array";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
-import { deleteMedia } from "@utils/media";
+import { deleteFile } from "@utils/deleteFile";
 import { FlexRow } from "@components/FlexRow";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
@@ -44,7 +44,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 
 	function handleSelectedFile(
-		{ target: { files } }: ChangeEvent<HTMLInputElement>,
+		{ target: { files } }: React.ChangeEvent<HTMLInputElement>,
 	) {
 		if (
 			imageButtonRef.current === null ||
@@ -205,21 +205,21 @@ export function MediaOptionsModal({ media, path }: Props) {
 // Helper functions:
 
 async function handleMediaDeletion(
-	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
+	closeButtonRef: Readonly<React.RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
 ): Promise<void> {
 	if (closeButtonRef.current === null) return;
 
 	closeEverything(closeButtonRef.current);
 
-	await deleteMedia(mediaPath);
+	await deleteFile(mediaPath);
 }
 
 /////////////////////////////////////////////
 
 function changeMediaMetadata(
-	contentWrapperRef: Readonly<RefObject<HTMLDivElement>>,
-	closeButtonRef: Readonly<RefObject<HTMLButtonElement>>,
+	contentWrapperRef: Readonly<React.RefObject<HTMLDivElement>>,
+	closeButtonRef: Readonly<React.RefObject<HTMLButtonElement>>,
 	imageFilePath: Readonly<Path>,
 	mediaPath: Readonly<Path>,
 	media: Readonly<Media>,
@@ -329,7 +329,7 @@ function changeMetadataIfAllowed(
 	// Send message to Electron to execute the function writeTag() in the main process:
 	if (isThereAnythingToChange)
 		sendMsgToBackend({
-			type: ReactToElectronMessage.WRITE_TAG,
+			type: reactToElectronMessage.WRITE_TAG,
 			thingsToChange,
 			mediaPath,
 		});
@@ -347,16 +347,14 @@ const options = (
 
 // Translating to the names that our API that changes
 // the metadata recognizes (on "main/preload/media/mutate-metadata.ts"):
-const allowedOptionToChange = Object.freeze(
-	{
-		artist: "albumArtists",
-		image: "imageURL",
-		lyrics: "lyrics",
-		genres: "genres",
-		album: "album",
-		title: "title",
-	} as const,
-);
+const allowedOptionToChange = {
+	artist: "albumArtists",
+	image: "imageURL",
+	lyrics: "lyrics",
+	genres: "genres",
+	album: "album",
+	title: "title",
+} as const;
 
 /////////////////////////////////////////////
 

@@ -3,7 +3,6 @@ import type { Path } from "@common/@types/generalTypes";
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
-import { availableThemes } from "@components/ThemeToggler";
 import { emptySet } from "@common/empty";
 
 ////////////////////////////////////////////////
@@ -15,7 +14,6 @@ const settingsKey = "muse:settings";
 const defaultValues: Settings = {
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
-	theme: availableThemes[0],
 	filesToShare: emptySet,
 	maxSizeOfHistory: 100,
 };
@@ -44,7 +42,10 @@ export const { getState: getSettings, setState: setSettings } = useSettings;
 useSettings.subscribe(
 	state => state,
 	function writeToLocalStorage(newSettings): void {
-		window.localStorage.setItem(settingsKey, JSON.stringify(newSettings));
+		window.localStorage.setItem(
+			settingsKey,
+			JSON.stringify(newSettings),
+		);
 	},
 );
 
@@ -57,7 +58,6 @@ export type Settings = Readonly<
 	{
 		assureMediaSizeIsGreaterThan60KB: boolean;
 		ignoreMediaWithLessThan60Seconds: boolean;
-		theme: typeof availableThemes[number];
 		filesToShare: ReadonlySet<Path>;
 		maxSizeOfHistory: number;
 	}

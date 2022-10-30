@@ -8,11 +8,9 @@ const sizeSelector = (
 export function NumberOfMediasSelected() {
 	const numberOfMediasSelected = useAllSelectedMedias(sizeSelector);
 
-	return (
+	return numberOfMediasSelected === 0 ? null : (
 		<p>
-			{numberOfMediasSelected === 0 ?
-				"" :
-				`${numberOfMediasSelected} ${t("decorations.selected")}`}
+			{numberOfMediasSelected} {t("decorations.selected")}
 		</p>
 	);
 }

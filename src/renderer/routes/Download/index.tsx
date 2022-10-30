@@ -6,7 +6,7 @@ import { t, Translator } from "@components/I18n";
 import { useTitle } from "@hooks/useTitle";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 
 ////////////////////////////////////////////////

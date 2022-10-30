@@ -1,20 +1,21 @@
 import { IoIosArrowForward as RightArrow } from "react-icons/io";
-import { Root, RadioGroup } from "@radix-ui/react-context-menu";
 import { MdCheck as Check } from "react-icons/md";
 import { BsDot as Dot } from "react-icons/bs";
 import { useState } from "react";
-
 import {
 	ItemIndicator,
 	CheckboxItem,
-	TriggerItem,
-	RadioItem,
-	RightSlot,
+	RadioGroup,
 	Separator,
+	RadioItem,
 	Content,
+	Trigger,
 	Label,
-	Item,
-} from "./styles";
+	Root,
+} from "@radix-ui/react-context-menu";
+
+import { Right } from "@components/Decorations/RightSlot";
+import { Item } from "./Item";
 
 export function FullExampleCtxMenu() {
 	const [bookmarksChecked, setBookmarksChecked] = useState<
@@ -28,24 +29,25 @@ export function FullExampleCtxMenu() {
 	return (
 		<>
 			<Item>
-				Back <RightSlot>{"⌘+["}</RightSlot>
+				Back <Right>{"⌘+["}</Right>
 			</Item>
 
 			<Item disabled>
-				Foward <RightSlot>{"⌘+]"}</RightSlot>
+				Foward <Right>{"⌘+]"}</Right>
 			</Item>
 
 			<Root>
-				<TriggerItem>
+				<Trigger>
 					More Tools
-					<RightSlot>
+
+					<Right>
 						<RightArrow size={15} />
-					</RightSlot>
-				</TriggerItem>
+					</Right>
+				</Trigger>
 
 				<Content alignOffset={-5}>
 					<Item>
-						Save Page As… <RightSlot>⌘+S</RightSlot>
+						Save Page As… <Right>⌘+S</Right>
 					</Item>
 
 					<Item>Create Shortcut…</Item>
@@ -66,7 +68,7 @@ export function FullExampleCtxMenu() {
 				<ItemIndicator>
 					<Check size={15} />
 				</ItemIndicator>
-				Show Bookmarks <RightSlot>⌘+B</RightSlot>
+				Show Bookmarks <Right>⌘+B</Right>
 			</CheckboxItem>
 
 			<CheckboxItem checked={urlsChecked} onCheckedChange={setUrlsChecked}>

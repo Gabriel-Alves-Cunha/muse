@@ -1,7 +1,7 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { type MutableRefObject, useEffect, useRef } from "react";
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
+import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { FlipCard, mediaPlayerCardId } from "@components/FlipCard";
@@ -118,8 +118,7 @@ export function MediaPlayer() {
 	}, [media, path]);
 
 	return (
-		// grid-media-player
-		<aside className="relative inline-block justify-items-center items-center justify-self-center self-start h-[calc(100vh-var(--top-decorations-height))] w-full p-3 [&_svg]:text-icon-media-player">
+		<aside className="grid-area-media-player relative inline-block justify-items-center items-center justify-self-center self-start h-[calc(100vh-var(--top-decorations-height))] w-full p-3 [&_svg]:text-icon-media-player">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
@@ -247,7 +246,7 @@ type Progress = Readonly<{ currentTime: number; percentage: number; }>;
 
 type PlayerProps = Readonly<
 	{
-		isSeeking: MutableRefObject<boolean>;
+		isSeeking: React.MutableRefObject<boolean>;
 		audio: HTMLAudioElement | null;
 		media: Media | undefined;
 		path: Path;

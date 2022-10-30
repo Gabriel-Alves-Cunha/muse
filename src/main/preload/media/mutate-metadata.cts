@@ -17,7 +17,7 @@ import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
 import { checkOrThrow, validator } from "@common/args-validator";
-import { ElectronToReactMessage } from "@common/enums";
+import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { doesPathExists } from "../file.cjs";
 import { isBase64Image } from "@main/utils.cjs";
@@ -59,7 +59,7 @@ async function handleImageMetadata(
 
 			// Send error to client:
 			sendMsgToClient({
-				type: ElectronToReactMessage.ERROR,
+				type: electronToReactMessage.ERROR,
 				error: err as Error,
 			});
 		}
@@ -239,25 +239,25 @@ async function talkToClientSoItCanGetTheNewMedia(
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
+				type: electronToReactMessage.ADD_ONE_MEDIA,
 				mediaPath: newPathOfFile,
 			});
 
 			// and remove old one
 			sendMsgToClient({
-				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
+				type: electronToReactMessage.REMOVE_ONE_MEDIA,
 				mediaPath,
 			});
 		} catch (error) {
 			// Send error to react process: (error renaming file => file has old path)
 			sendMsgToClient({
-				type: ElectronToReactMessage.ERROR,
+				type: electronToReactMessage.ERROR,
 				error: error as Error,
 			});
 
 			// Since there was an error, let's at least refresh media:
 			sendMsgToClient({
-				type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
+				type: electronToReactMessage.REFRESH_ONE_MEDIA,
 				mediaPath,
 			});
 		} finally {
@@ -271,12 +271,12 @@ async function talkToClientSoItCanGetTheNewMedia(
 	/////////////////////////////////////////////
 	else if (isNewMedia)
 		// Add the new media:
-		sendMsgToClient({ type: ElectronToReactMessage.ADD_ONE_MEDIA, mediaPath });
+		sendMsgToClient({ type: electronToReactMessage.ADD_ONE_MEDIA, mediaPath });
 	/////////////////////////////////////////////
 	// If everything else fails, at least refresh media:
 	else
 		sendMsgToClient({
-			type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
+			type: electronToReactMessage.REFRESH_ONE_MEDIA,
 			mediaPath,
 		});
 }

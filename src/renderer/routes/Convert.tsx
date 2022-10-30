@@ -8,7 +8,7 @@ import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button";
 import { Box } from "@components/Box";
 import {
 	type ConvertInfo,

@@ -1,24 +1,22 @@
-import { emptyString } from "./empty";
+import type { Path } from "./@types/generalTypes";
 
 /**
  * These are not a bulletproof fns, but for the purpose of
  * getting the allowedMedias, it is ok, faster than NodeJS's.
  */
-export function getBasename(filename: Readonly<string>): Readonly<string> {
-	return filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ??
-		emptyString;
-}
+export const getBasename = (filename: Path): string =>
+	filename.split("\\").pop()?.split("/").pop()?.split(".")[0] ?? "";
 
 /////////////////////////////////////////
 
 export function getPathWithoutExtension(
-	filename: Readonly<string>,
-): Readonly<string> {
-	const lastIndex = filename.indexOf(".") === -1 ?
+	filename: Path,
+): string {
+	const index = filename.indexOf(".") === -1 ?
 		filename.length :
 		filename.indexOf(".");
 
-	return filename.slice(0, lastIndex);
+	return filename.slice(0, index);
 }
 
 /////////////////////////////////////////
@@ -27,14 +25,15 @@ export function getPathWithoutExtension(
  * This doesn't handle files with only extensions,
  * e.g.: '.gitignore' will result in ''.
  */
-export function getLastExtension(filename: Readonly<string>): Readonly<string> {
-	return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-}
+export const getLastExtension = (
+	filename: Path,
+): string => filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
 
 /////////////////////////////////////////
 
-export function getBasenameAndExtension(
-	filename: Readonly<string>,
-): Readonly<[string, string]> {
-	return [getBasename(filename), getLastExtension(filename)] as const;
-}
+export const getBasenameAndLastExtension = (
+	filename: Path,
+): readonly [string, string] => [
+	getBasename(filename),
+	getLastExtension(filename),
+];

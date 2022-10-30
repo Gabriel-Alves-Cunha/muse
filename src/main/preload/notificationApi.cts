@@ -2,10 +2,10 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { ipcRenderer } from "electron";
 
-import { ElectronIpcMainProcessNotification } from "@common/enums";
+import { electronIpcMainProcessNotification } from "@common/enums";
 
 export function sendNotificationToElectronIpcMainProcess(
-	type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
+	type: ValuesOf<typeof electronIpcMainProcessNotification>,
 ): void {
 	ipcRenderer.send("notify", type);
 }

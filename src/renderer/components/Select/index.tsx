@@ -15,8 +15,8 @@ import { HeaderButtons } from "./HeaderButtons";
 /////////////////////////////////////////
 // Enums:
 
-export const ContentOfSelectEnum = {
-	HEADER_BUTTONS: 1,
+export const contentOfSelectEnum = {
+	GROUPED_BUTTON_SORT_BY: 1,
 } as const;
 
 /////////////////////////////////////////
@@ -26,12 +26,12 @@ export const ContentOfSelectEnum = {
 
 export const Select = (
 	{
-		content = ContentOfSelectEnum.HEADER_BUTTONS,
 		triggerClassName = "",
 		triggerTitle = "",
 		children,
 		setValue,
 		tooltip,
+		content,
 		value,
 	}: Props,
 ) => (
@@ -42,7 +42,9 @@ export const Select = (
 			aria-label={tooltip}
 			title={tooltip}
 		>
-			<Value>{triggerTitle}</Value>
+			<Value className="pl-6 text-ctx-menu-item font-secondary leading-6 text-xs">
+				{triggerTitle}
+			</Value>
 
 			{children}
 		</Trigger>
@@ -59,13 +61,13 @@ export const Select = (
 // Helper function:
 
 function contentToShow(
-	content: ValuesOf<typeof ContentOfSelectEnum>,
+	content: ValuesOf<typeof contentOfSelectEnum>,
 ) {
 	switch (content) {
 		// case FULL_EXAMPLE:
 		// 	return <FullExampleSelectButton />;
 
-		case ContentOfSelectEnum.HEADER_BUTTONS:
+		case contentOfSelectEnum.GROUPED_BUTTON_SORT_BY:
 			return <HeaderButtons />;
 
 		default:
@@ -78,10 +80,10 @@ function contentToShow(
 /////////////////////////////////////////
 // Types:
 
-type Props<T> = Readonly<
+type Props<T = unknown> = Readonly<
 	{
-		content?: ValuesOf<typeof ContentOfSelectEnum>;
-		triggerClassName: string | undefined;
+		content: ValuesOf<typeof contentOfSelectEnum>;
+		triggerClassName?: string;
 		children: React.ReactNode;
 		setValue(value: T): void;
 		triggerTitle?: string;
@@ -89,12 +91,3 @@ type Props<T> = Readonly<
 		value: string;
 	}
 >;
-
-// export const Label = styled(RadixLabel, {
-// 	pl: 25,
-//
-// 	c: "$ctx-menu-text",
-// 	ff: "$secondary",
-// 	lh: 25,
-// 	fs: 12,
-// });

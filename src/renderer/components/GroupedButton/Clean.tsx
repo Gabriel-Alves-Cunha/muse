@@ -10,11 +10,10 @@ import {
 	PlaylistList,
 } from "@contexts/usePlaylists";
 
-export const Clean = ({ className }: Props) => (
+export const Clean = () => (
 	<ButtonOfGroup
 		title={t("tooltips.cleanList")}
 		onPointerUp={cleanProperList}
-		className={className}
 	>
 		<CleanIcon size={18} />
 	</ButtonOfGroup>
@@ -39,8 +38,3 @@ function cleanProperList() {
 			assertUnreachable(fromList);
 	}
 }
-
-/////////////////////////////////////////////
-// Types:
-
-type Props = Readonly<{ className?: string; }>;

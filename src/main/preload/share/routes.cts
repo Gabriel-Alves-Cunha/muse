@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/generalTypes";
 import { createReadStream } from "node:fs";
 import Router from "koa-router";
 
-import { getBasenameAndExtension } from "@common/path";
+import { getBasenameAndLastExtension } from "@common/path";
 import { prettyPrintStringArray } from "@utils/array";
 
 export const router = new Router();
@@ -97,7 +97,7 @@ const downloadOneByIndex: Middleware = async (ctx, next) => {
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
 
-	ctx.attachment(getBasenameAndExtension(filePath).join("."));
+	ctx.attachment(getBasenameAndLastExtension(filePath).join("."));
 	ctx.set("Content-Type", "application/octet-stream");
 
 	const fileContents = createReadStream(filePath);

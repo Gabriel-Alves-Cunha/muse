@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { ReactToElectronMessage } from "@common/enums";
+import { reactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { mediaPlayerCardId } from "@components/FlipCard";
 import { infoToast } from "@components/toasts";
@@ -63,7 +63,7 @@ export async function searchAndOpenLyrics(
 		);
 
 		sendMsgToBackend({
-			type: ReactToElectronMessage.WRITE_TAG,
+			type: reactToElectronMessage.WRITE_TAG,
 			// dprint-ignore
 			thingsToChange: [
 				{ whatToChange: "album", newValue: albumName },

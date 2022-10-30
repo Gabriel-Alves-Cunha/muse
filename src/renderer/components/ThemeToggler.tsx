@@ -3,16 +3,17 @@ import {
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
-import { type Settings, setSettings, useSettings } from "@contexts/settings";
 import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
+const htmlDataset = document.documentElement.dataset;
+
 export const availableThemes = [
-	"theme-light",
-	"theme-dark",
+	"light",
+	"dark",
 ] as const;
 
 /////////////////////////////////////////
@@ -20,27 +21,20 @@ export const availableThemes = [
 /////////////////////////////////////////
 // Main function:
 
-const themeSelector = (state: ReturnType<typeof useSettings.getState>) =>
-	state.theme;
-
 export function ThemeToggler() {
-	const currTheme = useSettings(themeSelector);
-	const nextTheme: Settings["theme"] = currTheme === availableThemes[0] ?
+	const currTheme = htmlDataset.theme as Theme;
+	const newTheme = currTheme === availableThemes[0] ?
 		availableThemes[1] :
 		availableThemes[0];
 
 	function toggleTheme() {
-		document.documentElement.classList.remove(currTheme);
-		document.documentElement.classList.add(nextTheme);
-
-		setSettings({ theme: nextTheme });
+		htmlDataset.theme = newTheme;
 	}
 
 	return (
 		<button
-			// TODO
-			className="relative flex justify-center items-center w-12 h-12 cursor-pointer bg-none border-none text-dea???? "
 			title={t("tooltips.toggleTheme")}
+			className="toggle-theme-button"
 			onPointerUp={toggleTheme}
 		>
 			{currTheme === availableThemes[0] ?
@@ -53,18 +47,6 @@ export function ThemeToggler() {
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-// Styles:
+// Types:
 
-// const ThemeButton = styled("button", {
-// 	pos: "relative",
-// 	dflex: "center",
-// 	size: 50,
-//
-// 	cursor: "pointer",
-// 	bg: "none",
-// 	b: "none",
-//
-// 	c: "$deactivated-icon",
-//
-// 	"&:hover, &:focus": { c: "$active-icon" },
-// });
+type Theme = typeof availableThemes[number];

@@ -1,17 +1,10 @@
-import type { BaseHTMLAttributes } from "react";
+export const MainGridContainer = (
+	{ className = "", ...props }: Props,
+) => (
+	<div
+		className={"grid-template-for-content-wrapper " + className}
+		{...props}
+	/>
+);
 
-// TODO
-export function MainGridContainer({ children, className = "", ...props }: Props) {
-	return (
-		<div
-			className={"grid-template-for-content-wrapper " + className}
-			{...props}
-		>
-			{children}
-		</div>
-	);
-}
-
-interface Props extends BaseHTMLAttributes<HTMLDivElement> {
-	readonly children: React.ReactNode;
-}
+type Props = React.BaseHTMLAttributes<HTMLDivElement>;

@@ -10,6 +10,7 @@ import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import { t, Translator } from "@components/I18n";
+import { ErrorFallback } from "../ErrorFallback";
 import {
 	getAllSelectedMedias,
 	deselectAllMedias,
@@ -24,7 +25,7 @@ import {
 } from "@contexts/usePlaylists";
 import {
 	computeHistoryItemKey,
-	selectMediaByEvent,
+	selectMediaByPointerEvent,
 	setIsCtxMenuOpen,
 	computeItemKey,
 	isCtxMenuOpen,
@@ -33,15 +34,8 @@ import {
 	useFromList,
 } from "./helper";
 
-import { ListWrapper, EmptyList, Footer as StyledFooter } from "./styles";
-import { ErrorFallback } from "../ErrorFallback";
-
-import noMediaFoundPng from "@assets/not-found.png";
-
-/////////////////////////////////////////
-
 // href="https://www.flaticon.com/free-icons/error" =>
-// const noMediaFoundPng = new URL("../../assets/not-found.png", import.meta.url);
+import noMediaFoundPng from "@assets/not-found.png";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -146,10 +140,10 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	}, []);
 
 	return (
-		<ListWrapper ref={listRef}>
+		<div className="max-w-2xl h-[80vh]" ref={listRef}>
 			<ContextMenu
 				content={ctxContentEnum.MEDIA_OPTIONS}
-				onContextMenu={selectMediaByEvent}
+				onContextMenu={selectMediaByPointerEvent}
 				setIsOpen={setIsCtxMenuOpen}
 			>
 				<Virtuoso
@@ -166,7 +160,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					noValidate
 				/>
 			</ContextMenu>
-		</ListWrapper>
+		</div>
 	);
 }
 
@@ -175,14 +169,18 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 /////////////////////////////////////////
 // Helper functions:
 
-const Footer = () => <StyledFooter />;
+const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
 const EmptyPlaceholder = () => (
-	<EmptyList>
-		<img src={noMediaFoundPng} alt={t("alts.noMediasFound")} />
+	<div className="relative flex justify-center items-center w-[95%] h-[95%] text-alternative font-secondary tracking-wider text-lg font-medium">
+		<img
+			alt={t("alts.noMediasFound")}
+			className="w-14 h-14 mr-5"
+			src={noMediaFoundPng}
+		/>
 
 		<Translator path="alts.noMediasFound" />
-	</EmptyList>
+	</div>
 );
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };

@@ -1,9 +1,9 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
-import { type CSSProperties, useState } from "react";
 import { BsJournal as NoLyrics } from "react-icons/bs";
 import { RingLoader } from "react-spinners";
+import { useState } from "react";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdFavorite as Favorite,
@@ -36,8 +36,6 @@ function toggleFavorite(path: Readonly<Path>): void {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const putOnTop: CSSProperties = { position: "absolute" };
-
 export const openLyrics = true;
 
 function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
@@ -54,7 +52,6 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 
 	return (
 		<CircleIconButton
-			aria-label={t("tooltips.toggleOpenLyrics")}
 			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
 			disabled={media === undefined}
@@ -62,7 +59,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 			{media?.lyrics ?
 				<LyricsPresent size={16} /> :
 				isLoadingLyrics ?
-				<RingLoader cssOverride={putOnTop} color="white" size={30} /> :
+				<RingLoader className="absolute text-white w-8 h-8" /> :
 				<NoLyrics size={16} />}
 		</CircleIconButton>
 	);

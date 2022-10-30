@@ -1,4 +1,4 @@
-import { ElectronIpcMainProcessNotification } from "@common/enums";
+import { electronIpcMainProcessNotification } from "@common/enums";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -8,23 +8,18 @@ const notify =
 /////////////////////////////////////////////
 
 export const toggleMaximize = () =>
-	notify(ElectronIpcMainProcessNotification.TOGGLE_MAXIMIZE);
+	notify(electronIpcMainProcessNotification.TOGGLE_MAXIMIZE);
 
 /////////////////////////////////////////////
 
 export const minimizeWindow = () =>
-	notify(ElectronIpcMainProcessNotification.MINIMIZE);
+	notify(electronIpcMainProcessNotification.MINIMIZE);
 
 /////////////////////////////////////////////
 
 export const closeWindow = () =>
-	notify(ElectronIpcMainProcessNotification.QUIT_APP);
+	notify(electronIpcMainProcessNotification.QUIT_APP);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// 
-// export const imageUrl = new URL(
-// 	"../../assets/logo.svg?width=16",
-// 	import.meta.url,
-// );

@@ -69,7 +69,7 @@ export function sleep(ms: number, logFn?: () => void): Promise<void> {
 
 /////////////////////////////////////////
 
-export function stringifyJson(obj: unknown) {
+export function stringifyJson<T>(obj: T) {
 	return JSON.stringify(obj, null, 2);
 }
 

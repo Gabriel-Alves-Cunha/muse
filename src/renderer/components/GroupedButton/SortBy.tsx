@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { assertUnreachable } from "@utils/utils";
 import { PlaylistList } from "@contexts/usePlaylists";
 import { setFromList } from "@components/MediaListKind/helper";
-import { Select } from "@components/Select";
+import { contentOfSelectEnum, Select } from "@components/Select";
 import { t } from "@components/I18n";
 
 /////////////////////////////////////////////
@@ -12,7 +12,7 @@ import { t } from "@components/I18n";
 /////////////////////////////////////////////
 // Types:
 
-export function SortBy({ className }: Props) {
+export function SortBy() {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
 
 	useEffect(() => {
@@ -21,7 +21,6 @@ export function SortBy({ className }: Props) {
 
 		switch (selectedList) {
 			case "Name":
-				homeList = PlaylistList.MAIN_LIST;
 				break;
 
 			case "Date":
@@ -37,8 +36,8 @@ export function SortBy({ className }: Props) {
 
 	return (
 		<Select
+			content={contentOfSelectEnum.GROUPED_BUTTON_SORT_BY}
 			tooltip={t("tooltips.sortBy")}
-			triggerClassName={className}
 			setValue={setSelectedList}
 			value={selectedList}
 		>
@@ -46,14 +45,5 @@ export function SortBy({ className }: Props) {
 		</Select>
 	);
 }
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Types:
-
-type Props = Readonly<{ className?: string; }>;
-
-/////////////////////////////////////////////
 
 type SelectedList = "Name" | "Date";

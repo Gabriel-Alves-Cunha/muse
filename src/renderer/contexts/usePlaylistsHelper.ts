@@ -33,7 +33,7 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const searchDirectoryResult = async (): Promise<readonly string[]> =>
+export const searchDirectoryResult = async (): Promise<readonly Path[]> =>
 	await time(
 		async () =>
 			(await Promise.allSettled([
@@ -43,7 +43,7 @@ export const searchDirectoryResult = async (): Promise<readonly string[]> =>
 			]))
 				.map(p => (p.status === "fulfilled" ? p.value : false))
 				.filter(Boolean)
-				.flat() as readonly string[],
+				.flat() as readonly Path[],
 		"searchDirectoryResult",
 	);
 
@@ -52,16 +52,16 @@ export const searchDirectoryResult = async (): Promise<readonly string[]> =>
 ////////////////////////////////////////////////
 
 export const searchDirectoryForMedias = async (
-	directory: string,
-): Promise<readonly string[]> => getAllowedMedias(await readDir(directory));
+	directory: Path,
+): Promise<readonly Path[]> => getAllowedMedias(await readDir(directory));
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
 export const getAllowedMedias = (
-	filenames: readonly string[],
-): readonly string[] =>
+	filenames: readonly Path[],
+): readonly Path[] =>
 	filenames.filter(name =>
 		allowedMedias.some(ext => ext === getLastExtension(name))
 	);
@@ -90,7 +90,8 @@ export function sortByDate(list: MainList): ReadonlySet<Path> {
 ////////////////////////////////////////////////
 
 export function sortByName(list: MainList): MainList {
-	const listAsArrayOfPaths = Array.from(list) // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const listAsArrayOfPaths = Array
+		.from(list) // eslint-disable-next-line @typescript-eslint/no-unused-vars
 		.sort(([_, prevMedia], [__, nextMedia]) => {
 			const prevTitle = prevMedia.title.toLocaleLowerCase();
 			const nextTitle = nextMedia.title.toLocaleLowerCase();

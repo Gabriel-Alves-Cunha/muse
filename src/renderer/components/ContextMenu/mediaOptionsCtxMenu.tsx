@@ -6,9 +6,9 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
 import { shareMedias } from "./searchMediaOptionsCtxMenu";
-import { deleteMedia } from "@utils/media";
 import { getMainList } from "@contexts/usePlaylists";
 import { openLyrics } from "@components/MediaPlayer/Header";
+import { deleteFile } from "@utils/deleteFile";
 import { Translator } from "@components/I18n";
 import { Item } from "./Item";
 import {
@@ -70,7 +70,7 @@ export function MediaOptionsCtxMenu() {
 export async function deleteMedias(): Promise<void> {
 	const promises = Array.from(
 		getAllSelectedMedias(),
-		path => deleteMedia(path),
+		path => deleteFile(path),
 	);
 
 	await Promise.all(promises);

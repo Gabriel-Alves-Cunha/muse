@@ -26,8 +26,8 @@ import { emptyString } from "@common/empty";
 import { logoPath } from "./utils.cjs";
 import { dbg } from "@common/debug";
 import {
-	ElectronIpcMainProcessNotification,
-	ElectronToReactMessage,
+	electronIpcMainProcessNotification,
+	electronToReactMessage,
 } from "@common/enums";
 
 /////////////////////////////////////////
@@ -232,7 +232,7 @@ app
 							// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
 							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							electronWindow!.webContents.send(
-								ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+								electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 								downloadInfo,
 							);
 
@@ -264,11 +264,11 @@ app
 
 // Relay message from electronWindow to ipcRenderer:
 ipcMain.on(
-	ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+	electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 	(_e, downloadValues: DownloadInfo) => {
 		dbg("ipcMain received data from electronWindow:", downloadValues);
 
-		ipcMain.emit(ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD, downloadValues);
+		ipcMain.emit(electronToReactMessage.CREATE_A_NEW_DOWNLOAD, downloadValues);
 	},
 );
 
@@ -277,14 +277,14 @@ ipcMain.on(
 
 ipcMain.on(
 	"notify",
-	(event, type: ValuesOf<typeof ElectronIpcMainProcessNotification>): void => {
+	(event, type: ValuesOf<typeof electronIpcMainProcessNotification>): void => {
 		switch (type) {
-			case ElectronIpcMainProcessNotification.QUIT_APP: {
+			case electronIpcMainProcessNotification.QUIT_APP: {
 				app.quit();
 				break;
 			}
 
-			case ElectronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
+			case electronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
 				const focusedWindow = BrowserWindow.getFocusedWindow();
 				if (!focusedWindow) break;
 
@@ -294,17 +294,17 @@ ipcMain.on(
 				break;
 			}
 
-			case ElectronIpcMainProcessNotification.MINIMIZE: {
+			case electronIpcMainProcessNotification.MINIMIZE: {
 				BrowserWindow.getFocusedWindow()?.minimize();
 				break;
 			}
 
-			case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
+			case electronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
 				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
 				break;
 			}
 
-			case ElectronIpcMainProcessNotification.RELOAD_WINDOW: {
+			case electronIpcMainProcessNotification.RELOAD_WINDOW: {
 				BrowserWindow.getFocusedWindow()?.reload();
 				break;
 			}

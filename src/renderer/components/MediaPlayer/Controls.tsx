@@ -1,4 +1,4 @@
-import { type MutableRefObject, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	MdRepeatOne as RepeatOne,
 	MdShuffleOn as RandomOn,
@@ -88,7 +88,6 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 
 	return (
 		<CircleIconButton
-			aria-label={t("tooltips.playPause")}
 			title={t("tooltips.playPause")}
 			onPointerUp={togglePlayPause}
 			disabled={isDisabled}
@@ -137,7 +136,7 @@ type ControlsProps = Readonly<{ isDisabled: boolean; audio: Audio; }>;
 /////////////////////////////////////////
 
 export type RefToAudioAndSeeker = Readonly<
-	{ audio: Audio; isSeeking: MutableRefObject<boolean>; }
+	{ audio: Audio; isSeeking: React.MutableRefObject<boolean>; }
 >;
 
 /////////////////////////////////////////

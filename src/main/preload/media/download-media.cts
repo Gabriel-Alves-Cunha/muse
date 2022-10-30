@@ -12,9 +12,9 @@ import ytdl from "ytdl-core";
 
 import { deleteFile, doesPathExists } from "../file.cjs";
 import { checkOrThrow, validator } from "@common/args-validator";
-import { ElectronToReactMessage } from "@common/enums";
+import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { ProgressStatus } from "@common/enums";
+import { progressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg.cjs";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
@@ -89,7 +89,7 @@ export async function createDownload(
 
 		// Send a msg to the client that the download failed:
 		const msg: Partial<MediaBeingDownloaded> & { error: Error; } = {
-			status: ProgressStatus.FAILED,
+			status: progressStatus.FAILED,
 			error: new Error(info),
 		};
 		electronPort!.postMessage(msg);
@@ -136,7 +136,7 @@ export async function createDownload(
 
 				// Send a message to client that we're successfully starting a download:
 				const msg: Partial<MediaBeingDownloaded> = {
-					status: ProgressStatus.ACTIVE,
+					status: progressStatus.ACTIVE,
 				};
 				electronPort!.postMessage(msg);
 			}
@@ -175,7 +175,7 @@ export async function createDownload(
 
 			// Tell the client the download was successfully canceled:
 			const msg: Partial<MediaBeingDownloaded> = {
-				status: ProgressStatus.CANCEL,
+				status: progressStatus.CANCEL,
 			};
 			electronPort!.postMessage(msg);
 
@@ -201,7 +201,7 @@ export async function createDownload(
 
 			// Tell the client the download was successfull:
 			const msg: Partial<MediaBeingDownloaded> = {
-				status: ProgressStatus.SUCCESS,
+				status: progressStatus.SUCCESS,
 			};
 			electronPort!.postMessage(msg);
 
@@ -220,7 +220,7 @@ export async function createDownload(
 
 			// Tell client to add a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
+				type: electronToReactMessage.ADD_ONE_MEDIA,
 				mediaPath: saveSite,
 			});
 
@@ -239,7 +239,7 @@ export async function createDownload(
 
 			// Tell the client the download threw an error:
 			const msg: Partial<MediaBeingDownloaded> & { error: Error; } = {
-				status: ProgressStatus.FAILED,
+				status: progressStatus.FAILED,
 				error: new Error(err.message),
 			};
 			electronPort!.postMessage(msg);

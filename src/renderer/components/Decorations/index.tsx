@@ -8,8 +8,6 @@ import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
 import { MediasInfo } from "@components/Decorations/MediasInfo";
-import { RightSlot } from "./RightSlot";
-import { LeftSlot } from "./LeftSlot";
 import { usePage } from "@contexts/page";
 import { t } from "@components/I18n";
 import {
@@ -25,7 +23,7 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 
 export const DecorationsTop = () => (
-	<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main app-drag-region">
+	<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main app-drag-region ">
 		{/* ^ window-draggable-region */}
 		<div className="flex justify-center items-center ml-2">
 			<img
@@ -45,31 +43,29 @@ export const DecorationsTop = () => (
 /////////////////////////////////////////////
 
 export const DecorationsDown = () => (
-	<footer className="relative flex justify-between items-center h-[var(--down-decorations-height)] w-screen bottom-0 select-none bg-scrollbar down-decorations-p">
-		<LeftSlot>
+	<footer className="decorations-down">
+		<div className="decorations-down-left">
 			<NumberOfMedias />
 
 			<MediasInfo />
-		</LeftSlot>
+		</div>
 
-		<RightSlot>
+		<div className="decorations-down-right">
 			<NumberOfMediasSelected />
-		</RightSlot>
+		</div>
 	</footer>
 );
 
 /////////////////////////////////////////////
 
 const WindowButton = (
-	{ className = "", children, ...props }: WindowButtonProps,
+	{ className = "", ...props }: WindowButtonProps,
 ) => (
 	<button
 		className={"relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none " +
 			className}
 		{...props}
-	>
-		{children}
-	</button>
+	/>
 );
 
 /////////////////////////////////////////////
@@ -77,7 +73,7 @@ const WindowButton = (
 const Buttons = () => (
 	<div className="flex flex-row-reverse ml-auto h-full bg-none transition-none">
 		<WindowButton
-			className="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white"
+			className="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white no-transition"
 			title={t("tooltips.closeWindow")}
 			onPointerUp={closeWindow}
 		>
@@ -117,7 +113,4 @@ function AppNamePlusFolder() {
 /////////////////////////////////////////////
 // Types:
 
-interface WindowButtonProps
-	extends React.BaseHTMLAttributes<HTMLButtonElement> {
-	readonly children: React.ReactNode;
-}
+type WindowButtonProps = React.BaseHTMLAttributes<HTMLButtonElement>;

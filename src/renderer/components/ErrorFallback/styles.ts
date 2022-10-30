@@ -1,46 +1,36 @@
-import { Trigger } from "@radix-ui/react-dialog";
+export {};
 
-import { styled } from "@styles/global";
+// export const ErrorMsg = styled("pre", {
+// 	margin: "20px 0",
+//
+// 	ff: "$secondary",
+// 	ls: "0.035rem",
+// 	fs: "0.8rem",
+// 	c: "red",
+// 	fw: 500,
+// });
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export const ErrorMsg = styled("pre", {
-	margin: "20px 0",
-
-	ff: "$secondary",
-	ls: "0.035rem",
-	fs: "0.8rem",
-	c: "red",
-	fw: 500,
-});
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export const TriggerOptions = styled(Trigger, {
-	pos: "relative",
-	d: "flex", // row
-	justifyContent: "center",
-	alignItems: "center",
-
-	c: "$deactivated-icon",
-	cursor: "pointer",
-	bg: "none",
-	br: "50%",
-	b: "none",
-	m: 5,
-
-	transition: "$bgc",
-
-	"&:hover, &:focus": { transition: "$bgc", bg: "$icon-button-hovered" },
-
-	// Hack to make the height the same size as the width:
-	"&::before": {
-		content: "",
-		float: "left",
-		pt: "100%", // ratio of 1:1
-	},
-});
+// export const TriggerOptions = styled(Trigger, {
+// 	pos: "relative",
+// 	d: "flex", // row
+// 	justifyContent: "center",
+// 	alignItems: "center",
+//
+// 	c: "$deactivated-icon",
+// 	cursor: "pointer",
+// 	bg: "none",
+// 	br: "50%",
+// 	b: "none",
+// 	m: 5,
+//
+// 	transition: "$bgc",
+//
+// 	"&:hover, &:focus": { transition: "$bgc", bg: "$icon-button-hovered" },
+//
+// 	// Hack to make the height the same size as the width:
+// 	"&::before": {
+// 		content: "",
+// 		float: "left",
+// 		pt: "100%", // ratio of 1:1
+// 	},
+// });

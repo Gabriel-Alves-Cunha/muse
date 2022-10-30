@@ -1,15 +1,15 @@
 import { MdCompareArrows as Convert } from "react-icons/md";
 import { useEffect, useState } from "react";
+import { Trigger } from "@radix-ui/react-popover";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { ReactToElectronMessage } from "@common/enums";
+import { reactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@components/toasts";
 import { emptyMap } from "@common/empty";
 import { t } from "@components/I18n";
-import { Trigger } from "@radix-ui/react-popover";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -31,7 +31,7 @@ export function Converting() {
 
 				// Sending port so we can communicate with electron:
 				sendMsgToBackend(
-					{ type: ReactToElectronMessage.CONVERT_MEDIA },
+					{ type: reactToElectronMessage.CONVERT_MEDIA },
 					electronPort,
 				);
 			} catch (error) {
@@ -55,12 +55,13 @@ export function Converting() {
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
-				className={convertingListSize > 0 ? "has-items " : ""}
+				className={(convertingListSize > 0 ? "has-items " : "") +
+					"flex justify-center items-center w-11 h-11"}
 				title={t("tooltips.showAllConvertingMedias")}
 			>
 				<span data-length={convertingListSize}></span>
 
-				<Convert size={20} />
+				<Convert className="w-5 h-5 text-icon-deactivated" />
 			</Trigger>
 
 			<PopoverContent

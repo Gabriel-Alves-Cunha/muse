@@ -1,41 +1,39 @@
 import type { Media, Path } from "@common/@types/generalTypes";
+import type { ValuesOf } from "@common/@types/utils";
 
+import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
-import { PopoverContent, PopoverRoot } from "@components/Popover/Popover";
+import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
-import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { selectMediaByEvent } from "@components/MediaListKind/helper";
+import { selectMediaByPointerEvent } from "@components/MediaListKind/helper";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { t, Translator } from "@components/I18n";
 import { DialogTrigger } from "@components/DialogTrigger/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
-import { emptyArray } from "@utils/array";
-
-import { Img, PlayButton, RowWrapper } from "../MediaListKind/styles";
-import { StyledDialogBlurOverlay } from "@components/MediaListKind/MediaOptions/styles";
 import { emptyString } from "@common/empty";
-import { RightSlot } from "@components/ContextMenu/styles";
+import { emptyArray } from "@utils/array";
+import { Right } from "@components/Decorations/RightSlot";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export enum SearchStatus {
-	FOUND_SOMETHING,
-	DOING_NOTHING,
-	NOTHING_FOUND,
-	SEARCHING,
-}
+export const searchStatus = {
+	FOUND_SOMETHING: 2,
+	DOING_NOTHING: 3,
+	NOTHING_FOUND: 4,
+	SEARCHING: 5,
+} as const;
 
-const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING } = SearchStatus;
+const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING } = searchStatus;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -153,7 +151,7 @@ export function Input() {
 			/>
 
 			{getSearcher().isInputOnFocus === false && (
-				<RightSlot id="search">Alt+s</RightSlot>
+				<Right id="search">Alt+s</Right>
 			)}
 		</>
 	);
@@ -179,7 +177,7 @@ export function Results() {
 	return (
 		<ContextMenu
 			content={ctxContentEnum.SEARCH_MEDIA_OPTIONS}
-			onContextMenu={selectMediaByEvent}
+			onContextMenu={selectMediaByPointerEvent}
 			isAllDisabled={nothingFound}
 		>
 			<PopoverRoot open={shouldPopoverOpen}>
@@ -189,7 +187,7 @@ export function Results() {
 						"search-media-results"}
 					onPointerDownOutside={setDefaultSearch}
 					onOpenAutoFocus={mantainFocusOnInput}
-					className="notransition"
+					className="transition-none"
 				>
 					{nothingFound ?
 						(
@@ -222,19 +220,21 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (
-		<RowWrapper data-path={path}>
-			<PlayButton
-				aria-label={t("tooltips.playThisMedia")}
+		<div
+			className="unset-all box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow "
+			data-path={path}
+		>
+			<button
 				onPointerUp={() => playThisMedia(path)}
 				title={t("tooltips.playThisMedia")}
 			>
-				<Img>
+				<div>
 					<ImgWithFallback
 						Fallback={<MusicNote size={13} />}
 						mediaImg={media.image}
 						mediaPath={path}
 					/>
-				</Img>
+				</div>
 
 				{/* size: "calc(100% - 5px)" */}
 				<div className="flex flex-col items-start justify-center flex-1 m-1 overflow-hidden">
@@ -243,10 +243,11 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 						<span className="bg-highlight text-white">
 							{media.title.slice(index, index + highlight.length)}
 						</span>
+
 						{media.title.slice(index + highlight.length)}
 					</p>
 				</div>
-			</PlayButton>
+			</button>
 
 			<Dialog modal>
 				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
@@ -254,12 +255,12 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 				</DialogTrigger>
 
 				<DialogPortal>
-					<StyledDialogBlurOverlay>
-						<MediaOptionsModal media={media} path={path} />
-					</StyledDialogBlurOverlay>
+					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
+
+					<MediaOptionsModal media={media} path={path} />
 				</DialogPortal>
 			</Dialog>
-		</RowWrapper>
+		</div>
 	);
 }
 
@@ -271,7 +272,7 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 type Searcher = Readonly<
 	{
 		results: readonly [Path, Media][];
-		searchStatus: SearchStatus;
+		searchStatus: ValuesOf<typeof searchStatus>;
 		isInputOnFocus: boolean;
 		searchTerm: string;
 		highlight: string;

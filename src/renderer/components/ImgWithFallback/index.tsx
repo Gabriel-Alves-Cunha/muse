@@ -1,6 +1,6 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { ReactToElectronMessage } from "@common/enums";
+import { reactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 import { ValuesOf } from "@common/@types/utils";
@@ -10,12 +10,13 @@ import { ValuesOf } from "@common/@types/utils";
 /////////////////////////////////////////////
 // Constants:
 
-const Status = { SUCCESS: 10, FAILURE: 20, PENDING: 30 } as const;
-const { FAILURE, PENDING, SUCCESS } = Status;
+const status = { SUCCESS: 2, FAILURE: 3, PENDING: 4 } as const;
+
+const { FAILURE, PENDING, SUCCESS } = status;
 
 /////////////////////////////////////////////
 
-const cache: Map<Path, ValuesOf<typeof Status>> = new Map();
+const cache: Map<Path, ValuesOf<typeof status>> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -29,54 +30,59 @@ export function ImgWithFallback(
 
 	const cacheStatus = cache.get(mediaPath);
 
-	if (cacheStatus === FAILURE || cacheStatus === PENDING) return Fallback;
+	if (cacheStatus === undefined) {
+		cache.set(mediaPath, PENDING);
+
+		let img: HTMLImageElement | null = new Image();
+
+		img.onload = () => {
+			cache.set(mediaPath, SUCCESS);
+
+			img = null;
+		};
+
+		img.onerror = ev => {
+			console.error("Failed image; going to erasing it...", {
+				mediaPath,
+				mediaImg,
+				ev,
+			});
+
+			sendMsgToBackend({
+				thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
+				type: reactToElectronMessage.WRITE_TAG,
+				mediaPath,
+			});
+
+			cache.set(mediaPath, FAILURE);
+
+			img = null;
+		};
+
+		img.src = mediaImg;
+
+		return cache.get(mediaPath) === SUCCESS ?
+			(
+				<img
+					className="object-cover h-11 rounded-xl before:hidden"
+					decoding="async"
+					loading="lazy"
+					src={mediaImg}
+				/>
+			) :
+			(Fallback);
+	}
 
 	if (cacheStatus === SUCCESS)
-		return <img className="object-cover h-11 rounded-xl before:hidden" src={mediaImg} />;
-
-	cache.set(mediaPath, PENDING);
-
-	let img: HTMLImageElement | null = new Image();
-
-	img.onload = () => {
-		cache.set(mediaPath, SUCCESS);
-		// console.log(
-		// 	`%c"${media.path}" img loaded with success`,
-		// 	"font-weight: bold; color: blue;",
-		// );
-		img = null;
-	};
-
-	img.onerror = async ev => {
-		console.error("Failed image; going to erasing it...", {
-			mediaPath,
-			mediaImg,
-			ev,
-		});
-
-		sendMsgToBackend({
-			thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
-			type: ReactToElectronMessage.WRITE_TAG,
-			mediaPath,
-		});
-
-		cache.set(mediaPath, FAILURE);
-
-		img = null;
-	};
-
-	img.src = mediaImg;
-
-	return cache.get(mediaPath) === SUCCESS ?
-		(
+		return (
 			<img
 				className="object-cover h-11 rounded-xl before:hidden"
-				decoding="async"
-				loading="lazy"
 				src={mediaImg}
 			/>
-		) :
-		(Fallback);
+		);
+
+	// else cacheStatus === FAILURE || cacheStatus === PENDING
+	return Fallback;
 }
 
 /////////////////////////////////////////////

@@ -2,13 +2,13 @@ import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
-import { ElectronToReactMessage } from "@common/enums";
+import { electronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
 import { emptyString } from "@common/empty";
-import { deleteMedia } from "./media";
+import { deleteFile } from "./deleteFile";
 import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
@@ -68,7 +68,7 @@ const {
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
 	ERROR,
-} = ElectronToReactMessage;
+} = electronToReactMessage;
 
 //////////////////////////////////////////
 
@@ -134,7 +134,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			await deleteMedia(mediaPath);
+			await deleteFile(mediaPath);
 			break;
 		}
 

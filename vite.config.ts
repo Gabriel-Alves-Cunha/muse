@@ -40,7 +40,12 @@ export default defineConfig(({ mode }) => {
 			},
 		server: { port: 3_000 },
 		root: "./src/renderer",
-		plugins: [react()],
+		plugins: [
+			react(),
+			// typescript({
+			// 	typescript: ttsc,
+			// }),
+		],
 		envDir: "./",
 		base: "./",
 

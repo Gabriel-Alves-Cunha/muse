@@ -16,7 +16,7 @@ export type Media = DeepReadonly<
 	}
 >;
 
-export type DownloadInfo = DeepReadonly<
+export type DownloadInfo = Readonly<
 	{
 		extension: AllowedMedias;
 		imageURL: string;

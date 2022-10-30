@@ -2,7 +2,7 @@ import type { Page } from "@common/@types/generalTypes";
 
 import {
 	MdOutlineVideoLibrary as Home,
-	MdOutlineSettings as Settings,
+	// MdOutlineSettings as Settings,
 	MdFavoriteBorder as Favorites,
 	MdCloudDownload as Download,
 	MdSwapHoriz as Convert,
@@ -22,12 +22,12 @@ import { t } from "@components/I18n";
 // Main function:
 
 export const Navbar = () => (
-	<nav className="grid-area-nav flex flex-col justify-between items-center w-16 h-[calc(100vh-var(--top-decorations-height))] bg-navbar first:mt-10 last:mb-10 no-transition">
+	<nav className="nav">
 		<ThemeToggler />
 
 		<ButtonsForPages />
 
-		<div className="flex flex-col justify-center items-center w-full">
+		<div className="min-h-max flex flex-col justify-center items-center w-full">
 			<Converting />
 
 			<Downloading />
@@ -40,14 +40,13 @@ export const Navbar = () => (
 /////////////////////////////////////////
 // Constants:
 
-const icons: Readonly<Record<Page, JSX.Element>> = Object.freeze({
+const icons: Readonly<Record<Page, JSX.Element>> = {
 	Favorites: <Favorites />,
 	Download: <Download />,
-	Settings: <Settings />,
 	History: <History />,
 	Convert: <Convert />,
 	Home: <Home />,
-});
+} as const;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -58,15 +57,11 @@ function ButtonsForPages() {
 	const currPage = usePage().page;
 
 	return (
-		<div className="flex flex-col justify-center items-center w-full">
+		<div className="buttons-for-pages">
 			{pages.map(page => (
 				<button
-					title={`${t("tooltips.goto")}${t(`pages.${page}`)}`}
-					className={page === currPage ?
-						"active" :
-						"" +
-						" flex justify-center items-center h-11 w-11 cursor-pointer bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active"}
-					// eslint-disable-next-line react/no-unknown-property
+					title={t("tooltips.goto") + t(`pages.${page}`)}
+					className={page === currPage ? "active" : ""}
 					onPointerUp={() => setPage({ page })}
 					key={page}
 				>

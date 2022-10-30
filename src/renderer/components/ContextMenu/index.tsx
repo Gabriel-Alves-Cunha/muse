@@ -1,4 +1,5 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
+import type { ValuesOf } from "@common/@types/utils";
 
 import { Content, Root, Trigger } from "@radix-ui/react-context-menu";
 
@@ -7,7 +8,6 @@ import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
 import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
 import { assertUnreachable } from "@utils/utils";
 import { MainCtxMenu } from "./mainCtxMenu";
-import { ValuesOf } from "@common/@types/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

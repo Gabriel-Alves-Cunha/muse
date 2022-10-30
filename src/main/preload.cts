@@ -7,7 +7,7 @@ import type {
 import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
-import { ElectronToReactMessage, ReactToElectronMessage } from "@common/enums";
+import { electronToReactMessage, reactToElectronMessage } from "@common/enums";
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi.cjs";
 import { searchForLyricsAndImage } from "./preload/getLyrics.cjs";
 import { transformPathsToMedias } from "./preload/media/create-media.cjs";
@@ -60,10 +60,10 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
 // Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
-	ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+	electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 	(_event, downloadValues) =>
 		sendMsgToClient({
-			type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+			type: electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 			downloadInfo: downloadValues,
 		}),
 );
@@ -95,7 +95,7 @@ async function handleMsgsFromRendererProcess(
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD: {
+		case reactToElectronMessage.CREATE_A_NEW_DOWNLOAD: {
 			if (electronPort === undefined) {
 				console.error("There should be an electronPort to download a media!");
 				break;
@@ -114,7 +114,7 @@ async function handleMsgsFromRendererProcess(
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.CONVERT_MEDIA: {
+		case reactToElectronMessage.CONVERT_MEDIA: {
 			if (electronPort === undefined) {
 				console.error("There should be an electronPort to convert a media!");
 				break;
@@ -133,7 +133,7 @@ async function handleMsgsFromRendererProcess(
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.WRITE_TAG: {
+		case reactToElectronMessage.WRITE_TAG: {
 			const { mediaPath, thingsToChange } = msg;
 
 			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
@@ -150,7 +150,7 @@ async function handleMsgsFromRendererProcess(
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.ERROR: {
+		case reactToElectronMessage.ERROR: {
 			console.error(
 				"TODO: maybe do something with this error...?\n",
 				msg.error,

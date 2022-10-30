@@ -1,6 +1,6 @@
-import { type Ref, forwardRef } from "react";
+import { forwardRef } from "react";
 import {
-	type PopperContentProps,
+	type PopoverContentProps,
 	Content,
 	Root,
 } from "@radix-ui/react-popover";
@@ -28,39 +28,26 @@ export const PopoverRoot = Root;
  * );
  * ```
  */
-export const PopoverContent = forwardRef((
-	{ children, size, ...props }: Props,
-	forwardedRef: Ref<HTMLDivElement>,
-): JSX.Element => (
-	<Content
-		// 	"& > p": {
-		// 		pos: "relative",
-		//
-		// 		c: "$deactivated-icon",
-		// 		ff: "$secondary",
-		// 		ls: "0.03rem",
-		// 		fs: "1.05rem",
-		// 		ta: "center",
-		// 		fw: 500,
-		// 	},
-		className={"flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1 focus:shadow-popover focus:outline-none " +
-			size}
-		sideOffset={10}
-		{...props}
-		ref={forwardedRef}
-	>
-		{children}
-	</Content>
-));
-PopoverContent.displayName = "PopoverContent";
+export const PopoverContent = forwardRef(function PopoverContent(
+	{ size, ...props }: Props,
+	forwardedRef: React.Ref<HTMLDivElement>,
+): JSX.Element {
+	return (
+		<Content
+			className={"popover " + size}
+			sideOffset={10}
+			{...props}
+			ref={forwardedRef}
+		/>
+	);
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
 
-interface Props extends PopperContentProps {
-	readonly children: React.ReactNode;
+interface Props extends PopoverContentProps {
 	readonly size:
 		| "nothing-found-for-convertions-or-downloads"
 		| "nothing-found-for-search-media"

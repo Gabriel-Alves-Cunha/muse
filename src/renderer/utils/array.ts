@@ -1,4 +1,4 @@
-export const emptyArray: readonly never[] = Object.freeze([]);
+export const emptyArray: readonly never[] = [];
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

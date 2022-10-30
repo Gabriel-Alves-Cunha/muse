@@ -13,6 +13,6 @@
 	"include": [
 		"../renderer/assets/**/*",
 		"../common/**/*",
-		"../main/**/*",
+		"../main/**/*"
 	]
 }

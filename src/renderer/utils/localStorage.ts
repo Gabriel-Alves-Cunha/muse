@@ -7,21 +7,17 @@ import type { History } from "@contexts/usePlaylists";
 import { assertUnreachable } from "./utils";
 import { dbgPlaylists } from "@common/debug";
 
-const { assert } = console;
-
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Constants:
 
-export const keyPrefix = "@muse:";
-
 export const keys = {
-	sortedByDate: `${keyPrefix}playlist:sortedByDate`,
-	currentPlaying: `${keyPrefix}currentPlaying`,
-	favorites: `${keyPrefix}playlist:favorites`,
-	history: `${keyPrefix}playlist:history`,
-	playOptions: `${keyPrefix}playOptions`,
+	sortedByDate: "@muse:playlist:sortedByDate",
+	currentPlaying: "@muse:currentPlaying",
+	favorites: "@muse:playlist:favorites",
+	history: "@muse:playlist:history",
+	playOptions: "@muse:playOptions",
 } as const;
 
 ////////////////////////////////////////////////
@@ -57,12 +53,6 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 
 		switch (key) {
 			case keys.favorites: {
-				assert(
-					Array.isArray(item),
-					"favorites from storage must be an array:",
-					item,
-				);
-
 				const newFavorites = new Set(item as Path[]);
 
 				dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
@@ -71,12 +61,6 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 			}
 
 			case keys.history: {
-				assert(
-					Array.isArray(item),
-					"history from storage must be an array:",
-					item,
-				);
-
 				const newHistory: History = new Map(item as HistoryShape);
 
 				dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
@@ -85,12 +69,6 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 			}
 
 			case keys.sortedByDate: {
-				assert(
-					Array.isArray(item),
-					"sortedByDate from storage must be an array:",
-					item,
-				);
-
 				const newSortedByDate = new Set(item as Path[]);
 
 				dbgPlaylists(

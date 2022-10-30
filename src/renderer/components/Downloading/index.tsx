@@ -7,28 +7,27 @@ import { Trigger } from "@radix-ui/react-popover";
 import create from "zustand";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { ReactToElectronMessage } from "@common/enums";
 import { createNewDownload, Popup } from "./helper";
+import { reactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { ProgressStatus } from "@common/enums";
+import { progressStatus } from "@common/enums";
 import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
 import { t } from "@components/I18n";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Constants:
 
-const defaultDownloadInfo: DownloadInfo = Object.freeze({
+const defaultDownloadInfo: DownloadInfo = {
 	imageURL: emptyString,
 	artist: emptyString,
 	title: emptyString,
 	url: emptyString,
 	extension: "mp3",
-});
+} as const;
 
 export const useDownloadInfo = create(() => defaultDownloadInfo);
 
@@ -55,7 +54,7 @@ export function Downloading() {
 
 			// Sending port so we can communicate with Electron:
 			sendMsgToBackend(
-				{ type: ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
+				{ type: reactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
 				electronPort,
 			);
 		} catch (error) {
@@ -75,7 +74,8 @@ export function Downloading() {
 		<PopoverRoot modal open={isOpen} onOpenChange={setIsOpen}>
 			<Trigger
 				className={(downloadingListSize > 0 ? "has-items " : "") +
-					(isOpen === true ? "active " : "") + "relative flex justify-center items-center cursor-pointer bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "}
+					(isOpen === true ? "active " : "") +
+					"relative flex justify-center items-center bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "}
 				title={t("tooltips.showAllDownloadingMedias")}
 			>
 				<span data-length={downloadingListSize}></span>
@@ -103,7 +103,7 @@ export function Downloading() {
 
 export type MediaBeingDownloaded = Readonly<
 	{
-		status: ValuesOf<typeof ProgressStatus>;
+		status: ValuesOf<typeof progressStatus>;
 		percentage: number;
 		port: MessagePort;
 		imageURL: string;

@@ -1,39 +1,38 @@
-export const ProgressStatus = {
-	WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
-		"waiting for confirmation from electron",
-	SUCCESS: "success",
-	ACTIVE: "active",
-	CANCEL: "cancel",
-	FAILED: "failed",
+export const progressStatus = {
+	WAITING_FOR_CONFIRMATION_FROM_ELECTRON: 2,
+	SUCCESS: 3,
+	ACTIVE: 4,
+	CANCEL: 5,
+	FAILED: 6,
 } as const;
 
 /////////////////////////////////////////////
 
-export const ReactToElectronMessage = {
-	CREATE_A_NEW_DOWNLOAD: "create a new download",
-	CONVERT_MEDIA: "convert media",
-	WRITE_TAG: "write tag",
-	ERROR: "error",
+export const reactToElectronMessage = {
+	CREATE_A_NEW_DOWNLOAD: 2,
+	CONVERT_MEDIA: 3,
+	WRITE_TAG: 4,
+	ERROR: 5,
 } as const;
 
 /////////////////////////////////////////////
 
-export const ElectronToReactMessage = {
-	DELETE_ONE_MEDIA_FROM_COMPUTER: "delete one media from computer",
-	CREATE_A_NEW_DOWNLOAD: "create a new download",
-	REFRESH_ALL_MEDIA: "refresh all media",
-	REFRESH_ONE_MEDIA: "refresh one media",
-	REMOVE_ONE_MEDIA: "remove one media",
-	ADD_ONE_MEDIA: "add one media",
-	ERROR: "error",
+export const electronToReactMessage = {
+	DELETE_ONE_MEDIA_FROM_COMPUTER: "2",
+	CREATE_A_NEW_DOWNLOAD: "3",
+	REFRESH_ALL_MEDIA: "4",
+	REFRESH_ONE_MEDIA: "5",
+	REMOVE_ONE_MEDIA: "6",
+	ADD_ONE_MEDIA: "7",
+	ERROR: "8",
 } as const;
 
 /////////////////////////////////////////////
 
-export const ElectronIpcMainProcessNotification = {
-	TOGGLE_DEVELOPER_TOOLS: "toggle dev tools",
-	TOGGLE_MAXIMIZE: "toggle maximize",
-	RELOAD_WINDOW: "reload window",
-	MINIMIZE: "minimize",
-	QUIT_APP: "quit app",
+export const electronIpcMainProcessNotification = {
+	TOGGLE_DEVELOPER_TOOLS: 2,
+	TOGGLE_MAXIMIZE: 3,
+	RELOAD_WINDOW: 4,
+	MINIMIZE: 5,
+	QUIT_APP: 6,
 } as const;

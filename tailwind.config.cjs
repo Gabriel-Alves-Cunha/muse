@@ -11,7 +11,9 @@ module.exports = {
 			colors: {
 				/* Colors */
 				"ctx-menu-separator": "var(--ctx-menu-separator)",
+				"selected-border": "var(--selected-border)",
 				"input-disabled": "var(--input-disabled)",
+				"playing-border": "var(--playing-border)",
 				active: "var(--active)",
 
 				"accent-light": "var(--accent-light)",
@@ -46,8 +48,6 @@ module.exports = {
 				input: "var(--text-input)",
 			},
 			borderColor: {
-				selected: "var(--border-selected)",
-				playing: "var(--border-playing)",
 				input: "var(--border-input)",
 			},
 			backgroundColor: {

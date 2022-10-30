@@ -7,10 +7,10 @@ import { AiOutlineClose as Cancel } from "react-icons/ai";
 import { errorToast, infoToast, successToast } from "@components/toasts";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
-import { ProgressStatus } from "@common/enums";
+import { progressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
 import { Progress } from "@components/Progress";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 import {
 	useDownloadingList,
@@ -18,11 +18,8 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import { CancelButton } from "@components/Converting/styles";
 import {
 	handleSingleItemDeleteAnimation,
-	TitleAndCancelWrapper,
-	ItemWrapper,
 } from "./styles";
 
 /////////////////////////////////////////////
@@ -66,8 +63,8 @@ function cleanAllDoneDownloads(): void {
 	getDownloadingList().forEach((download, url) => {
 		if (
 			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
-			download.status !== ProgressStatus.ACTIVE
+				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== progressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);
 	});
@@ -82,11 +79,15 @@ export const isDownloadList = true;
 const DownloadingBox = (
 	{ downloadingIndex, download, url }: DownloadingBoxProps,
 ) => (
-	<ItemWrapper key={url}>
-		<TitleAndCancelWrapper>
+	<div
+		className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none"
+		key={url}
+	>
+		<div className="relative flex justify-start items-center w-[90%] h-4 mb-2">
 			<p>{download.title}</p>
 
-			<CancelButton
+			<button
+				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none"
 				onPointerUp={e =>
 					handleSingleItemDeleteAnimation(
 						e,
@@ -94,20 +95,18 @@ const DownloadingBox = (
 						isDownloadList,
 						url,
 					)}
-				aria-label={t("tooltips.cancelDownload")}
-				className="cancel-button notransition"
 				title={t("tooltips.cancelDownload")}
 			>
 				<Cancel size={12} />
-			</CancelButton>
-		</TitleAndCancelWrapper>
+			</button>
+		</div>
 
 		<Progress
 			percent_0_to_100={download.percentage}
 			status={download.status}
 			showStatus
 		/>
-	</ItemWrapper>
+	</div>
 );
 
 /////////////////////////////////////////////
@@ -146,7 +145,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// Creating a new DownloadingMedia and adding it to the list:
 	setDownloadingList(
 		new Map(downloadingList).set(url, {
-			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			status: progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 			port: frontEndPort,
 			percentage: 0,
 			imageURL,
@@ -201,7 +200,7 @@ function handleUpdateDownloadingList(
 
 	// Handle status:
 	switch (data.status) {
-		case ProgressStatus.FAILED: {
+		case progressStatus.FAILED: {
 			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
 			console.assert(data.error, "data.error should exist!");
 
@@ -215,27 +214,23 @@ function handleUpdateDownloadingList(
 			break;
 		}
 
-		case ProgressStatus.SUCCESS: {
+		case progressStatus.SUCCESS: {
 			successToast(`${t("toasts.downloadSuccess")}"${thisDownload.title}"!`);
 
 			cancelDownloadAndOrRemoveItFromList(url);
 			break;
 		}
 
-		case ProgressStatus.CANCEL: {
+		case progressStatus.CANCEL: {
 			infoToast(`${t("toasts.downloadCanceled")}"${thisDownload.title}"!`);
 
 			cancelDownloadAndOrRemoveItFromList(url);
 			break;
 		}
 
-		case ProgressStatus.ACTIVE:
-			break;
-
+		case progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+		case progressStatus.ACTIVE:
 		case undefined:
-			break;
-
-		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
 			break;
 
 		default:
@@ -261,7 +256,7 @@ export function cancelDownloadAndOrRemoveItFromList(
 		);
 
 	// Cancel download:
-	if (download.status === ProgressStatus.ACTIVE)
+	if (download.status === progressStatus.ACTIVE)
 		download.port.postMessage({ destroy: true, url });
 
 	// Update downloading list:
@@ -284,5 +279,5 @@ type DownloadingBoxProps = Readonly<
 /////////////////////////////////////////////
 
 interface PartialExceptStatus extends Partial<MediaBeingDownloaded> {
-	status: ValuesOf<typeof ProgressStatus>;
+	status: ValuesOf<typeof progressStatus>;
 }

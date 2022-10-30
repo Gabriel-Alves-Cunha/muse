@@ -14,8 +14,7 @@ import { emptySet } from "@common/empty";
 import { Loading } from "@components/Loading";
 import { dbg } from "@common/debug";
 import { t } from "@components/I18n";
-
-import { StyledDialogBlurOverlay } from "./MediaListKind/MediaOptions/styles";
+import { BlurOverlay } from "./BlurOverlay";
 
 const { createServer } = electron.share;
 
@@ -113,7 +112,7 @@ export function ShareDialog() {
 
 	return (
 		<Dialog modal open={isDialogOpen} onOpenChange={handleDialogOpenStates}>
-			<StyledDialogBlurOverlay />
+			<BlurOverlay />
 
 			<Content className="absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition">
 				<Close
@@ -141,7 +140,7 @@ export function ShareDialog() {
 				</div>
 
 				<canvas
-					className="relative w-80 -h80 rounded-xl"
+					className="relative w-80 h-80 rounded-xl"
 					ref={onCanvasElementMakeQRCode}
 					id={qrID}
 				>

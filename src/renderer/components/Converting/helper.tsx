@@ -9,12 +9,12 @@ import { type AllowedMedias, formatDuration } from "@common/utils";
 import { type ProgressProps, progressIcons } from "@components/Progress";
 import { assertUnreachable } from "@utils/utils";
 import { isDownloadList } from "@components/Downloading/helper";
-import { ProgressStatus } from "@common/enums";
+import { progressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
 import { emptyMap } from "@common/empty";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 import {
 	getConvertingList,
@@ -76,8 +76,8 @@ function cleanAllDoneConvertions(): void {
 	getConvertingList().forEach((download, url) => {
 		if (
 			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
-			download.status !== ProgressStatus.ACTIVE
+				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== progressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
 	});
@@ -101,7 +101,7 @@ const ConvertBox = (
 			</p>
 
 			<button
-				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none"
+				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered no-transition"
 				onPointerUp={e =>
 					handleSingleItemDeleteAnimation(
 						e,
@@ -154,7 +154,7 @@ export function createNewConvertion(
 	// Add new conversion to the list:
 	setConvertingList(
 		new Map(convertingList).set(path, {
-			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			status: progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 			toExtension: convertInfo.toExtension,
 			port: frontEndPort,
 			timeConverted: 0,
@@ -201,7 +201,7 @@ export function cancelConversionAndOrRemoveItFromList(
 		);
 
 	// Cancel conversion
-	if (mediaBeingConverted.status === ProgressStatus.ACTIVE)
+	if (mediaBeingConverted.status === progressStatus.ACTIVE)
 		mediaBeingConverted.port.postMessage({ destroy: true, path });
 
 	// Remove from converting list
@@ -240,7 +240,7 @@ function handleUpdateConvertingList(
 
 	// Handle status:
 	switch (data.status) {
-		case ProgressStatus.FAILED: {
+		case progressStatus.FAILED: {
 			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
 			console.assert(data.error, "data.error should exist!");
 
@@ -254,27 +254,23 @@ function handleUpdateConvertingList(
 			break;
 		}
 
-		case ProgressStatus.SUCCESS: {
+		case progressStatus.SUCCESS: {
 			successToast(`${t("toasts.conversionSuccess")}"${path}"!`);
 
 			cancelConversionAndOrRemoveItFromList(path);
 			break;
 		}
 
-		case ProgressStatus.CANCEL: {
+		case progressStatus.CANCEL: {
 			infoToast(`${t("toasts.conversionCanceled")}"${path}"!`);
 
 			cancelConversionAndOrRemoveItFromList(path);
 			break;
 		}
 
-		case ProgressStatus.ACTIVE:
-			break;
-
+		case progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+		case progressStatus.ACTIVE:
 		case undefined:
-			break;
-
-		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
 			break;
 
 		default:
@@ -315,7 +311,7 @@ export type ConvertInfo = Readonly<{ toExtension: AllowedMedias; }>;
 /////////////////////////////////////////////
 
 interface PartialExceptStatus extends Partial<MediaBeingConverted> {
-	status: ValuesOf<typeof ProgressStatus>;
+	status: ValuesOf<typeof progressStatus>;
 }
 
 /////////////////////////////////////////////

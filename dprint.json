@@ -1,6 +1,6 @@
 {
 	"plugins": [
-		"https://plugins.dprint.dev/typescript-0.73.1.wasm",
+		"https://plugins.dprint.dev/typescript-0.76.0.wasm",
 		"https://plugins.dprint.dev/json-0.15.6.wasm"
 	],
 	"excludes": ["node_modules", "*-lock.json", "dist", "build"],
