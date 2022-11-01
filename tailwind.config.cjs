@@ -33,7 +33,6 @@ module.exports = {
 				"icon-window-button": "var(--icon-window-button)",
 				"icon-media-player": "var(--icon-media-player)",
 				"icon-deactivated": "var(--icon-deactivated)",
-				"icon-active": "var(--icon-active)",
 			},
 			textColor: {
 				"ctx-menu-item-focus": "var(--text-ctx-menu-item-focus)",

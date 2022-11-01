@@ -1,8 +1,8 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
-import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
+import { Dialog, DialogPortal } from "@radix-ui/react-dialog";
 import { memo } from "react";
 import create from "zustand";
 
@@ -18,6 +18,7 @@ import {
 	getAllSelectedMedias,
 	toggleSelectedMedia,
 } from "@contexts/useAllSelectedMedias";
+import { BlurOverlay } from "@components/BlurOverlay";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -47,10 +48,10 @@ export const setIsCtxMenuOpen = (bool: boolean) =>
 /////////////////////////////////////////
 
 export function selectMediaByPointerEvent(
-	e: React.PointerEvent<HTMLSpanElement>,
+	{ nativeEvent: { target } }: React.PointerEvent<HTMLSpanElement>,
 ): void {
 	// TODO: see if this selector still works.
-	const mediaClickedMediaPath = (e.nativeEvent.target as HTMLElement)
+	const mediaClickedMediaPath = (target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
 
@@ -62,8 +63,7 @@ export function selectMediaByPointerEvent(
 
 /////////////////////////////////////////
 
-export const rightClick = 2;
-export const leftClick = 0;
+export const rightClick = 2, leftClick = 0;
 
 function selectOrPlayMedia(
 	e: React.PointerEvent<HTMLButtonElement>,
@@ -84,61 +84,61 @@ function selectOrPlayMedia(
 /////////////////////////////////////////////
 
 const Row = memo(
-	({ media, path }: RowProps) => (
-		<div
-			className={(getAllSelectedMedias().has(path) === true ?
-				"selected " :
-				"") +
-				(getCurrentPlaying().path === path ? "playing " : "") +
-				"row-wrapper"}
-			data-path={path}
-		>
-			<button
-				className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
-				onPointerUp={e => selectOrPlayMedia(e, path)}
-				title={t("tooltips.playThisMedia")}
+	function Row({ media, path }: RowProps) {
+		return (
+			<div
+				className={(getAllSelectedMedias().has(path) === true ?
+					"selected " :
+					"") +
+					(getCurrentPlaying().path === path ? "playing " : "") +
+					"row-wrapper"}
+				data-path={path}
 			>
-				<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
-					<ImgWithFallback
-						Fallback={<MusicNote size="1.4rem" />}
-						mediaImg={media.image}
-						mediaPath={path}
-					/>
-				</div>
+				<button
+					className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
+					onPointerUp={e => selectOrPlayMedia(e, path)}
+					title={t("tooltips.playThisMedia")}
+				>
+					<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
+						<ImgWithFallback
+							Fallback={<MusicNote size="1.4rem" />}
+							mediaImg={media.image}
+							mediaPath={path}
+						/>
+					</div>
 
-				<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
-					<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
-						{media.title}
-					</p>
+					<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
+						<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
+							{media.title}
+						</p>
 
-					<p className="font-primary tracking-wide text-sm font-medium text-muted">
-						{media.duration}
-						&emsp;|&emsp;
-						{media.artist}
-					</p>
-				</div>
-			</button>
+						<p className="font-primary tracking-wide text-sm font-medium text-muted">
+							{media.duration}
+							&emsp;|&emsp;
+							{media.artist}
+						</p>
+					</div>
+				</button>
 
-			<Dialog modal>
-				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
-					<Dots size={17} />
-				</DialogTrigger>
+				<Dialog modal>
+					<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
+						<Dots size={17} />
+					</DialogTrigger>
 
-				<DialogPortal>
-					{/* backdropFilter: blur(2px); */}
-					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
+					<DialogPortal>
+						<BlurOverlay />
 
-					<MediaOptionsModal media={media} path={path} />
-				</DialogPortal>
-			</Dialog>
-		</div>
-	),
+						<MediaOptionsModal media={media} path={path} />
+					</DialogPortal>
+				</Dialog>
+			</div>
+		);
+	},
 	(prev, next) =>
 		prev.media.title === next.media.title &&
 		prev.media.artist === next.media.artist &&
 		prev.media.duration === next.media.duration,
 );
-Row.displayName = "Row";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

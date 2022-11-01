@@ -5,10 +5,10 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { SiConvertio as ConvertIcon } from "react-icons/si";
 
 import { t, Translator } from "@components/I18n";
-import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
+import { Main } from "@components/Main";
 import { Box } from "@components/Box";
 import {
 	type ConvertInfo,
@@ -61,7 +61,7 @@ export function Convert() {
 	////////////////////////////////////////////////
 
 	return (
-		<MainArea>
+		<Main>
 			<Box>
 				<Button
 					onPointerUp={openNativeUI_ChooseFiles}
@@ -81,7 +81,7 @@ export function Convert() {
 					<Translator path="buttons.convert" />
 				</Button>
 			</Box>
-		</MainArea>
+		</Main>
 	);
 }
 

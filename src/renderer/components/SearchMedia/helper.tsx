@@ -16,11 +16,10 @@ import { selectMediaByPointerEvent } from "@components/MediaListKind/helper";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { t, Translator } from "@components/I18n";
-import { DialogTrigger } from "@components/DialogTrigger/DialogTrigger";
+import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyString } from "@common/empty";
 import { emptyArray } from "@utils/array";
-import { Right } from "@components/Decorations/RightSlot";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -39,13 +38,13 @@ const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING } = searchStatus;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const defaultSearcher: Searcher = Object.freeze({
+const defaultSearcher: Searcher = {
 	searchStatus: DOING_NOTHING,
 	searchTerm: emptyString,
 	highlight: emptyString,
 	isInputOnFocus: false,
 	results: emptyArray,
-});
+};
 
 const useSearcher = create<Searcher>()(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -151,7 +150,9 @@ export function Input() {
 			/>
 
 			{getSearcher().isInputOnFocus === false && (
-				<Right id="search">Alt+s</Right>
+				<span className="absolute flex justify-center items-center right-3 text-normal" id="search">
+					Alt+s
+				</span>
 			)}
 		</>
 	);
@@ -271,8 +272,8 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 
 type Searcher = Readonly<
 	{
-		results: readonly [Path, Media][];
 		searchStatus: ValuesOf<typeof searchStatus>;
+		results: readonly [Path, Media][];
 		isInputOnFocus: boolean;
 		searchTerm: string;
 		highlight: string;

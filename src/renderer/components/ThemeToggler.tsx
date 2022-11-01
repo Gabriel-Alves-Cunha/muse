@@ -4,6 +4,7 @@ import {
 } from "react-icons/md";
 
 import { t } from "@components/I18n";
+import { useState } from "react";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -22,13 +23,14 @@ export const availableThemes = [
 // Main function:
 
 export function ThemeToggler() {
-	const currTheme = htmlDataset.theme as Theme;
+	const [currTheme, setCurrTheme] = useState(htmlDataset.theme as Theme);
 	const newTheme = currTheme === availableThemes[0] ?
 		availableThemes[1] :
 		availableThemes[0];
 
 	function toggleTheme() {
 		htmlDataset.theme = newTheme;
+		setCurrTheme(newTheme);
 	}
 
 	return (

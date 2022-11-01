@@ -106,12 +106,11 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 					case PlaylistList.HISTORY: {
 						const unsortedList: [Path, DateAsNumber][] = [];
+						const mainList = getMainList();
 
 						(list as History).forEach((dates, path) =>
 							dates.forEach(date => unsortedList.push([path, date]))
 						);
-
-						const mainList = getMainList();
 
 						const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
 							.sort((a, b) => b[1] - a[1]) // sorted by date

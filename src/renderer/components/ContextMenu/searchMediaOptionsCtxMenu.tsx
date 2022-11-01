@@ -25,16 +25,14 @@ export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => (
 	<>
 		<Dialog modal>
 			<Trigger
-				className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
+				className="group ctx-trigger"
 				disabled={isAllDisabled}
 			>
-				<>
-					<Translator path="ctxMenus.deleteMedia" />
+				<Translator path="ctxMenus.deleteMedia" />
 
-					<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-						<Trash />
-					</div>
-				</>
+				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+					<Trash />
+				</div>
 			</Trigger>
 
 			<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />

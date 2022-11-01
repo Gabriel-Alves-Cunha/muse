@@ -23,7 +23,7 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 
 export const DecorationsTop = () => (
-	<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main app-drag-region ">
+	<header className="decorations-top">
 		{/* ^ window-draggable-region */}
 		<div className="flex justify-center items-center ml-2">
 			<img
@@ -62,7 +62,7 @@ const WindowButton = (
 	{ className = "", ...props }: WindowButtonProps,
 ) => (
 	<button
-		className={"relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none " +
+		className={"relative flex justify-center items-center h-full w-12 hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none " +
 			className}
 		{...props}
 	/>
@@ -102,7 +102,7 @@ function AppNamePlusFolder() {
 	const { page } = usePage();
 
 	return (
-		<div className="absolute flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light sm:hidden">
+		<div className="absolute hidden sm:flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light ">
 			{capitalizedAppName} • {page}
 		</div>
 	);

@@ -118,7 +118,7 @@ export function MediaPlayer() {
 	}, [media, path]);
 
 	return (
-		<aside className="grid-area-media-player relative inline-block justify-items-center items-center justify-self-center self-start h-[calc(100vh-var(--top-decorations-height))] w-full p-3 [&_svg]:text-icon-media-player">
+		<aside className="media-player">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard

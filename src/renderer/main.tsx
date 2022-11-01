@@ -5,12 +5,8 @@ import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
 import { App } from "./App";
 import "./i18n"; // Import translations on app root.
 
-// @ts-ignore => isDev is a globally defined boolean.
 if (isDev) {
 	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
-
-	// @ts-ignore => Setting Virtuoso log level
-	// globalThis.VIRTUOSO_LOG_LEVEL = LogLevel.DEBUG;
 
 	// document.designMode = "on";
 }
@@ -19,7 +15,7 @@ if (isDev) {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const container = document.getElementById("root") as HTMLElement;
+const container = document.getElementById("root") as HTMLDivElement;
 const root = createRoot(container);
 
 root.render(
@@ -27,3 +23,13 @@ root.render(
 		<App />
 	</StrictMode>,
 );
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Global types:
+
+declare global {
+	// eslint-disable-next-line no-var
+	var isDev: boolean;
+}

@@ -75,7 +75,7 @@ export function Downloading() {
 			<Trigger
 				className={(downloadingListSize > 0 ? "has-items " : "") +
 					(isOpen === true ? "active " : "") +
-					"relative flex justify-center items-center bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "}
+					"relative flex justify-center items-center w-full aspect-square border-none text-icon-deactivated text-base hover:text-active focus:text-active"}
 				title={t("tooltips.showAllDownloadingMedias")}
 			>
 				<span data-length={downloadingListSize}></span>

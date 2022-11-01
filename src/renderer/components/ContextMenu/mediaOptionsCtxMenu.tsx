@@ -24,8 +24,8 @@ export function MediaOptionsCtxMenu() {
 		<>
 			<Dialog modal>
 				<Trigger
+					className="group ctx-trigger"
 					aria-disabled={isDisabled}
-					className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
 				>
 					<>
 						<Translator path="ctxMenus.deleteMedia" />

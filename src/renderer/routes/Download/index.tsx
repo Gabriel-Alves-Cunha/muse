@@ -4,10 +4,10 @@ import { useEffect } from "react";
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
 import { t, Translator } from "@components/I18n";
 import { useTitle } from "@hooks/useTitle";
-import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
 import { Button } from "@components/Button";
 import { Header } from "@components/Header";
+import { Main } from "@components/Main";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -18,14 +18,14 @@ export function Download() {
 	useTitle(t("titles.download"));
 
 	return (
-		<MainArea className="flex flex-col scroll scroll-2">
+		<Main className="scroll scroll-2">
 			<Header>
 				<SearcherWrapper />
 				<IsLoading />
 			</Header>
 
 			<Result />
-		</MainArea>
+		</Main>
 	);
 }
 

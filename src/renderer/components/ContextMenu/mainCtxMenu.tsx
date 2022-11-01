@@ -3,7 +3,7 @@ import { Item, Separator } from "@radix-ui/react-context-menu";
 import { electronIpcMainProcessNotification } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 import { Translator } from "@components/I18n";
-import { Right } from "@components/Decorations/RightSlot";
+import { Right } from "./Right";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;

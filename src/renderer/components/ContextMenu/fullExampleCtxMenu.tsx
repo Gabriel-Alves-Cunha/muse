@@ -14,7 +14,7 @@ import {
 	Root,
 } from "@radix-ui/react-context-menu";
 
-import { Right } from "@components/Decorations/RightSlot";
+import { Right } from "./Right";
 import { Item } from "./Item";
 
 export function FullExampleCtxMenu() {

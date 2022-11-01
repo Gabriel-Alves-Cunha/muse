@@ -6,6 +6,8 @@
 	:root {
 		--down-decorations-height: 20px;
 		--top-decorations-height: 27px;
+		--main-height: 100vh - var(--down-decorations-height) -
+			var(--top-decorations-height);
 
 		/* Default theme: light */
 		/* Colors */
@@ -13,7 +15,7 @@
 		--selected-border: #4b00e038;
 		--playing-border: #f4a1a9;
 		--input-disabled: lightgray;
-		--active: #344880;
+		--active: #4a00e0;
 
 		--accent-light: #9381ff;
 		--accent: #9882ac;
@@ -32,7 +34,6 @@
 		--icon-deactivated: dimgray;
 		--icon-window-button: black;
 		--icon-media-player: #fff;
-		--icon-active: #4a00e0;
 
 		/* Text */
 		--text-ctx-menu-item-focus: #fff;
@@ -92,10 +93,10 @@
 		--selected-border: #4d4d4d;
 		--playing-border: #c04569;
 		--input-disabled: gray;
-		--active: #0072f5;
+		--active: #ff7be9;
 
 		--accent-light: #f4a1a9;
-		--accent: #c04569;
+		--accent: #e94374;
 
 		/* Scrollbar colors */
 		--scrollbar-thumb-hover: #565d61;
@@ -111,7 +112,6 @@
 		--icon-media-player: #f3f3ee;
 		--icon-deactivated: #6272a4;
 		--icon-window-button: #fff;
-		--icon-active: #4a00e0;
 
 		/* Text */
 		--text-ctx-menu-item-focus: #fff;
@@ -167,7 +167,8 @@
 
 	* {
 		transition-property: color, background-color, border-color, box-shadow,
-			-webkit-scrollbar-track, -webkit-scrollbar-thumb, caret-color;
+			-webkit-scrollbar-track, -webkit-scrollbar-thumb, -webkit-scrollbar,
+			caret-color;
 		transition-timing-function: ease;
 		transition-duration: 0.25s;
 	}
@@ -176,7 +177,7 @@
 	*::after,
 	*::before {
 		text-rendering: optimizeLegibility;
-		box-sizing: inherit;
+		box-sizing: border-box;
 
 		overscroll-behavior: none;
 	}
@@ -186,15 +187,10 @@
 	}
 
 	body {
-		position: fixed;
-		line-height: 1.5;
-		height: 100%;
-		width: 100%;
+		@apply fixed leading-normal h-full w-full overflow-hidden;
 
-		/* contain-intrinsic-size: auto; */
 		contain-intrinsic-size: 1px 5000px;
 		content-visibility: auto;
-		overflow: hidden;
 	}
 
 	body::-webkit-scrollbar {
@@ -243,39 +239,95 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* Grid */
+	/* Grid disposition */
 
-	.grid-area-media-player {
+	.grid-container {
+		@apply grid relative w-screen;
+		height: calc(var(--main-height));
+
+		grid-template-columns: [nav] 56px [main] calc(100vw - 220px - 56px) [media-player] 220px;
+		grid-template-areas: "nav main media-player";
+	}
+
+	/* Navbar */
+
+	.nav {
+		grid-area: nav;
+		height: calc(var(--main-height));
+
+		@apply text-icon-deactivated flex flex-col justify-between items-center py-5 bg-navbar no-transition;
+	}
+
+	.nav button:hover,
+	.nav button:focus {
+		@apply text-active;
+	}
+
+	.buttons-for-pages {
+		@apply flex flex-col justify-center items-center w-full;
+	}
+
+	.buttons-for-pages button {
+		@apply flex justify-center items-center h-11 bg-none border-none text-icon-deactivated text-base;
+	}
+
+	.buttons-for-pages button:hover,
+	.buttons-for-pages button:focus {
+		@apply text-active;
+	}
+
+	.buttons-for-pages button.active {
+		@apply text-active;
+	}
+
+	/* Main */
+
+	.main {
+		grid-area: main;
+		height: calc(var(--main-height));
+
+		@apply flex flex-col p-[5%] pt-0 bg-main;
+	}
+
+	/* MediaPlayer */
+
+	.media-player {
 		grid-area: media-player;
+		height: calc(var(--main-height));
 
-		@apply inline-block justify-self-center self-center w-screen h-16;
+		@apply flex flex-col justify-center items-center p-3;
 	}
 
-	.grid-area-main {
-		grid-area: main-area;
+	.media-player svg {
+		@apply text-icon-media-player;
 	}
 
-	.grid-template-for-content-wrapper {
-		display: grid;
-		grid-template: "nav main-area media-player" 100vw / 65px 1fr minmax(
-				200px,
-				25vw
-			);
-		width: 100vw;
-		height: calc(
-			100vh - var(--top-decorations-height) - var(--down-decorations-height)
-		);
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
 
-		margin-top: var(--top-decorations-height);
-		background: var(--bg-main);
+	/* DecorationsTop */
+
+	.decorations-top {
+		@apply relative flex h-[var(--top-decorations-height)] w-screen bg-main app-drag-region;
 	}
 
-	@media (min-width: 640px) {
-		.grid-template-for-content-wrapper {
-			grid-template:
-				[row1-start] "nav main-area" 1fr / 35px 1fr [row1-end]
-				[row2-start] "media-player" 70px / 1fr [row2-start];
-		}
+	/* DecorationsDown */
+
+	.decorations-down {
+		@apply relative flex justify-between items-center h-[var(--down-decorations-height)] w-screen select-none bg-scrollbar;
+	}
+
+	.decorations-down p {
+		@apply flex h-full text-alternative font-secondary tracking-wide text-sm text-center font-medium;
+	}
+
+	.decorations-down-left {
+		@apply flex justify-center items-center gap-4 first:pl-4;
+	}
+
+	.decorations-down-right {
+		@apply flex justify-center items-center gap-4 last:pr-4;
 	}
 
 	/* ********************************** */
@@ -295,6 +347,12 @@
 	.animation-move-up {
 		animation: move-up 400ms ease 200ms forwards;
 	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Miscellaneous */
 
 	/* ********************************** */
 	/* ********************************** */
@@ -482,19 +540,6 @@
 		@apply border-active bg-active text-white;
 	}
 
-	.file-present {
-		background: rgb(0, 255, 89);
-		color: black;
-
-		transition: border-color 200ms ease;
-	}
-
-	.file-present:hover,
-	.file-present:focus {
-		background: var(--active);
-		color: white;
-	}
-
 	/* ********************************** */
 	/* ********************************** */
 	/* ********************************** */
@@ -508,6 +553,21 @@
 	.grouped-button:hover,
 	.grouped-button:focus {
 		@apply bg-button-hover text-white;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* MediaOptionsModal */
+
+	.file-present {
+		@apply transition-border-color text-black bg-[rgb(0,255,89)];
+	}
+
+	.file-present:hover,
+	.file-present:focus {
+		@apply bg-active text-white;
 	}
 
 	/* ********************************** */
@@ -553,20 +613,12 @@
 			)`, */
 	}
 
-	.active-label {
-		left: -30px;
-		top: -180%;
-
-		color: var(--active);
-		cursor: default;
-	}
-
 	.list-decimal-zero {
 		list-style: decimal-leading-zero inside;
 	}
 
 	.active-icon {
-		@apply text-icon-active;
+		@apply text-active;
 	}
 
 	.delete-media {
@@ -590,6 +642,16 @@
 		@apply w-80 h-5;
 	}
 
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* ContextMenu */
+
+	.ctx-trigger {
+		@apply unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none;
+	}
+
 	.ctx-trigger:focus,
 	.ctx-trigger:hover {
 		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
@@ -607,6 +669,10 @@
 	.ctx-trigger:disabled svg {
 		@apply text-disabled;
 	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
 
 	.trigger-search-media {
 		@apply absolute top-1/4 right-1;
@@ -638,56 +704,44 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* DecorationsDown */
+	/* SearchMedia */
 
-	.decorations-down {
-		@apply relative flex justify-between items-center h-[var(--down-decorations-height)] w-screen bottom-0 select-none bg-scrollbar;
+	.search-media-wrapper {
+		@apply relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none transition-all ease-out duration-200;
 	}
 
-	.decorations-down p {
-		@apply flex h-full text-alternative font-secondary tracking-wide text-sm text-center font-medium;
+	.search-media-wrapper:hover,
+	.search-media-wrapper:focus {
+		@apply border-active;
 	}
 
-	.decorations-down-left {
-		@apply flex justify-center items-center gap-4 last:pr-4;
-	}
-
-	.decorations-down-right {
-		@apply flex justify-center items-center gap-4 first:pl-4;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* Navbar */
-
-	.nav {
-		grid-area: nav;
-
-		@apply text-icon-deactivated flex flex-col justify-between items-center sm:w-11 md:w-16 h-[calc(100vh-var(--top-decorations-height)-var(--down-decorations-height))] bg-navbar no-transition;
-	}
-
-	.nav button:hover,
-	.nav button:focus {
+	.search-media-wrapper:hover svg,
+	.search-media-wrapper:focus svg {
 		@apply text-active;
 	}
 
-	.buttons-for-pages {
-		@apply flex flex-col justify-center items-center w-full;
+	.search-media-wrapper:hover label,
+	.search-media-wrapper:focus label {
+		@apply -top-[180%] -left-7 text-active cursor-default;
 	}
 
-	.buttons-for-pages button {
-		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
+	.search-media-wrapper svg {
+		@apply text-input cursor-default ml-2;
 	}
 
-	.buttons-for-pages button:hover,
-	.buttons-for-pages button:focus {
-		@apply text-icon-active;
+	.search-media-wrapper label {
+		@apply absolute flex items-center w-[85%] h-10 left-7 bottom-0 right-0 top-0 m-auto p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider text-base;
+
+		transition-property: color, top, left;
+		transition: ease 250ms;
 	}
 
-	.buttons-for-pages button.active {
-		@apply text-icon-active;
+	.active-label {
+		@apply -top-[180%] -left-7 text-active cursor-default;
+	}
+
+	.search-media-wrapper input {
+		@apply absolute flex items-center flex-1 h-9 left-[38px] bottom-0 right-0 top-0 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base outline-none bg-transparent border-none;
 	}
 
 	/* ********************************** */
@@ -702,7 +756,7 @@
 
 	.toggle-theme-button:hover,
 	.toggle-theme-button:focus {
-		@apply hover:text-icon-active focus:text-icon-active;
+		@apply hover:text-active focus:text-active;
 	}
 
 	/* ********************************** */
@@ -803,12 +857,6 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* MainArea */
-
-	.main-area header {
-		@apply sm:justify-center;
-	}
-
 	/* ********************************** */
 	/* ********************************** */
 	/* ********************************** */
@@ -857,3 +905,7 @@
 		transform: translateY(-73px);
 	}
 }
+
+/* ********************************** */
+/* ********************************** */
+/* ********************************** */

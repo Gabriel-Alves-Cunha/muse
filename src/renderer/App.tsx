@@ -1,8 +1,9 @@
+import type { Page } from "@common/@types/generalTypes";
+
 import { ToastContainer } from "react-toastify";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
-import { MainGridContainer } from "@components/MainGridContainer";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
@@ -22,59 +23,44 @@ import "react-toastify/dist/ReactToastify.min.css";
 //////////////////////////////////////////
 // Main function:
 
-export function App() {
-	return (
-		<>
-			<ToastContainer
-				hideProgressBar={false}
-				position="top-right"
-				autoClose={5_000}
-				pauseOnFocusLoss
-				closeOnClick
-				pauseOnHover
-				newestOnTop
-				draggable
-			/>
+export const App = () => (
+	<>
+		<ToastContainer
+			hideProgressBar={false}
+			position="top-right"
+			autoClose={5_000}
+			pauseOnFocusLoss
+			closeOnClick
+			pauseOnHover
+			newestOnTop
+			draggable
+		/>
 
-			<ShareDialog />
+		<ShareDialog />
 
-			<DecorationsTop />
+		<DecorationsTop />
 
-			<ContextMenu>
-				<Main />
-			</ContextMenu>
-
-			<DecorationsDown />
-		</>
-	);
-}
-
-//////////////////////////////////////////
-//////////////////////////////////////////
-//////////////////////////////////////////
-// Helper functions:
-
-function Main() {
-	return (
-		<MainGridContainer>
+		<ContextMenu className="grid-container">
 			<Navbar />
 
 			<PageToShow />
 
 			<MediaPlayer />
-		</MainGridContainer>
-	);
-}
+		</ContextMenu>
+
+		<DecorationsDown />
+	</>
+);
 
 //////////////////////////////////////////
 
-const pages = {
+const pages: Readonly<Record<Page, JSX.Element>> = {
 	Favorites: <Favorites />,
 	Download: <Download />,
 	Convert: <Convert />,
 	History: <History />,
 	Home: <Home />,
-} as const;
+};
 
 function PageToShow() {
 	const { page } = usePage();

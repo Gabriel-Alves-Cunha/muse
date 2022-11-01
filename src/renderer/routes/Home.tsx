@@ -1,9 +1,9 @@
 import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
 import { SearchMedia } from "@components/SearchMedia";
-import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
 import { Header } from "@components/Header";
+import { Main } from "@components/Main";
 import { t } from "@components/I18n";
 
 ////////////////////////////////////////////////
@@ -15,7 +15,7 @@ export function Home() {
 	useTitle(t("titles.home"));
 
 	return (
-		<MainArea>
+		<Main>
 			<Header>
 				<SearchMedia />
 
@@ -23,6 +23,6 @@ export function Home() {
 			</Header>
 
 			<MediaListKind isHome />
-		</MainArea>
+		</Main>
 	);
 }

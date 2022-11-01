@@ -5,10 +5,10 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="Content-Security-Policy"
-			content="default-src 'self' data: blob: file:; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' http: data:; media-src 'self' atom: blob:; connect-src *" />
+			content="default-src 'unsafe-inline' 'self' data: blob: file:; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' http: data:; media-src 'self' atom: blob:; connect-src *" />
 
 		<script>
-			// Setting or getting theme before styles are applied.
+			/* Setting or getting theme before styles are applied. */
 
 			const storagedOrDefaultTheme = localStorage.getItem("theme") ?? "light";
 

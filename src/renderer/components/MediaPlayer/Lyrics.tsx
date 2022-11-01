@@ -1,8 +1,8 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { reactToElectronMessage } from "@common/enums";
-import { sendMsgToBackend } from "@common/crossCommunication";
 import { mediaPlayerCardId } from "@components/FlipCard";
+import { sendMsgToBackend } from "@common/crossCommunication";
 import { infoToast } from "@components/toasts";
 import { Header } from "./Header";
 import { t } from "@components/I18n";
@@ -35,7 +35,7 @@ export function Lyrics({ media, path }: Props) {
 // Helper functions:
 
 export function flipMediaPlayerCard(): void {
-	document.getElementById(mediaPlayerCardId)?.classList.toggle("active");
+	document.getElementById(mediaPlayerCardId)?.classList.toggle("flip-active");
 }
 
 /////////////////////////////////////////

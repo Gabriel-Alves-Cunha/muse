@@ -29,11 +29,21 @@ const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN, SEARCH_MEDIA_OPTIONS } =
 // Main function:
 
 export const ContextMenu = (
-	{ children, content = MAIN, onContextMenu, setIsOpen, isAllDisabled = false }:
-		Props,
+	{
+		isAllDisabled = false,
+		content = MAIN,
+		className = "",
+		onContextMenu,
+		setIsOpen,
+		children,
+	}: Props,
 ) => (
 	<Root onOpenChange={setIsOpen} modal>
-		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
+		<Trigger asChild onContextMenuCapture={onContextMenu}>
+			<div className={className}>
+				{children}
+			</div>
+		</Trigger>
 
 		<Content
 			className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
@@ -79,9 +89,10 @@ function contentToShow(
 type Props = Readonly<
 	{
 		onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
-		setIsOpen?: (newIsOpen: boolean) => void;
 		content?: ValuesOf<typeof ctxContentEnum>;
+		setIsOpen?: (newIsOpen: boolean) => void;
 		isAllDisabled?: boolean;
 		children: ReactNode;
+		className?: string;
 	}
 >;

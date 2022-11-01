@@ -56,12 +56,12 @@ export function Converting() {
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
 				className={(convertingListSize > 0 ? "has-items " : "") +
-					"flex justify-center items-center w-11 h-11"}
+					"flex justify-center items-center w-full aspect-square border-none text-icon-deactivated text-base hover:text-active focus:text-active"}
 				title={t("tooltips.showAllConvertingMedias")}
 			>
 				<span data-length={convertingListSize}></span>
 
-				<Convert className="w-5 h-5 text-icon-deactivated" />
+				<Convert size={20} />
 			</Trigger>
 
 			<PopoverContent
