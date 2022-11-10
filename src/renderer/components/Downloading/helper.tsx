@@ -10,7 +10,7 @@ import { assertUnreachable } from "@utils/utils";
 import { progressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
 import { Progress } from "@components/Progress";
-import { Button } from "@components/Button";
+import { Button } from "@components/Button/Button";
 import { dbg } from "@common/debug";
 import {
 	useDownloadingList,

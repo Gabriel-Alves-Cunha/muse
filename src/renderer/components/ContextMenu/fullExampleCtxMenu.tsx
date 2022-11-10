@@ -14,8 +14,8 @@ import {
 	Root,
 } from "@radix-ui/react-context-menu";
 
-import { Right } from "./Right";
-import { Item } from "./Item";
+import { CtxMenuItemRightSlot } from "./CtxMenuItemRightSlot";
+import { CtxMenuItem } from "./CtxMenuItem";
 
 export function FullExampleCtxMenu() {
 	const [bookmarksChecked, setBookmarksChecked] = useState<
@@ -28,34 +28,34 @@ export function FullExampleCtxMenu() {
 
 	return (
 		<>
-			<Item>
-				Back <Right>{"⌘+["}</Right>
-			</Item>
+			<CtxMenuItem>
+				Back <CtxMenuItemRightSlot>{"⌘+["}</CtxMenuItemRightSlot>
+			</CtxMenuItem>
 
-			<Item disabled>
-				Foward <Right>{"⌘+]"}</Right>
-			</Item>
+			<CtxMenuItem disabled>
+				Foward <CtxMenuItemRightSlot>{"⌘+]"}</CtxMenuItemRightSlot>
+			</CtxMenuItem>
 
 			<Root>
 				<Trigger>
 					More Tools
 
-					<Right>
+					<CtxMenuItemRightSlot>
 						<RightArrow size={15} />
-					</Right>
+					</CtxMenuItemRightSlot>
 				</Trigger>
 
 				<Content alignOffset={-5}>
-					<Item>
-						Save Page As… <Right>⌘+S</Right>
-					</Item>
+					<CtxMenuItem>
+						Save Page As… <CtxMenuItemRightSlot>⌘+S</CtxMenuItemRightSlot>
+					</CtxMenuItem>
 
-					<Item>Create Shortcut…</Item>
-					<Item>Name Window…</Item>
+					<CtxMenuItem>Create Shortcut…</CtxMenuItem>
+					<CtxMenuItem>Name Window…</CtxMenuItem>
 
 					<Separator />
 
-					<Item>Developer Tools</Item>
+					<CtxMenuItem>Developer Tools</CtxMenuItem>
 				</Content>
 			</Root>
 
@@ -68,7 +68,7 @@ export function FullExampleCtxMenu() {
 				<ItemIndicator>
 					<Check size={15} />
 				</ItemIndicator>
-				Show Bookmarks <Right>⌘+B</Right>
+				Show Bookmarks <CtxMenuItemRightSlot>⌘+B</CtxMenuItemRightSlot>
 			</CheckboxItem>
 
 			<CheckboxItem checked={urlsChecked} onCheckedChange={setUrlsChecked}>

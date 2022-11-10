@@ -1,0 +1,40 @@
+.popover {
+	@apply flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll-1;
+	display: flex;
+	flex-direction: column;
+
+	background: var(--bg-popover);
+	border-radius: 0.75rem;
+	overflow-x: hidden;
+	gap: 0.75rem;
+
+	box-shadow: var(--shadow-popover);
+	z-index: 10;
+
+	&:hover,
+	&:focus {
+		@apply shadow-popover outline-none;
+	}
+
+	p {
+		@apply relative text-icon-deactivated font-secondary tracking-wide text-center font-medium;
+	}
+
+	/* Popover sizes */
+
+	&.nothing-found-for-convertions-or-downloads {
+		@apply h-28 w-64 overflow-hidden;
+	}
+
+	&.nothing-found-for-search-media {
+		@apply max-h-24 min-h-[3rem] w-80;
+	}
+
+	&.convertions-or-downloads {
+		@apply h-80 w-64;
+	}
+
+	&.search-media-results {
+		@apply absolute h-64 w-80 top-24 left-[calc(64px+3.5vw)];
+	}
+}

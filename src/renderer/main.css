@@ -375,53 +375,7 @@
 		user-select: none;
 	}
 
-	/* Scrollbar */
 
-	.scroll {
-		scrollbar-gutter: stable;
-		overflow-y: auto;
-	}
-
-	.scroll-2 {
-		scrollbar-width: 4px;
-	}
-
-	.scroll-1 {
-		scrollbar-width: 2px;
-	}
-
-	.scroll-white {
-		scrollbar-gutter: stable;
-		overflow-y: auto;
-	}
-
-	.scroll-white::-webkit-scrollbar-track {
-		background: white;
-	}
-
-	.scroll-white::-webkit-scrollbar-thumb {
-		background: white;
-	}
-
-	.scroll-white::-webkit-scrollbar-thumb:hover {
-		background: white;
-	}
-
-	.scroll::-webkit-scrollbar {
-		display: block;
-	}
-
-	.scroll::-webkit-scrollbar-track {
-		background: var(--scrollbar);
-	}
-
-	.scroll::-webkit-scrollbar-thumb {
-		background: var(--scrollbar-thumb);
-	}
-
-	.scroll::-webkit-scrollbar-thumb:hover {
-		background: var(--scrollbar-thumb-hover);
-	}
 
 	/* ********************************** */
 	/* ********************************** */
@@ -507,43 +461,6 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* Button */
-
-	.button {
-		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-normal;
-	}
-
-	.button:hover,
-	.button:focus {
-		@apply bg-accent text-white;
-	}
-
-	.button-large {
-		width: 300px;
-
-		margin: 40px auto 0;
-		padding: 16px;
-
-		border-radius: 8px;
-	}
-
-	.button-medium {
-		@apply w-full h-12 mt-5 mx-auto mb-0 p-2 rounded;
-	}
-
-	.button-input {
-		@apply hidden w-[calc(100%-115px)] h-9 border-2 border-solid border-input rounded-xl transition-bc-bg;
-	}
-
-	.button-input:hover,
-	.button-input:focus {
-		@apply border-active bg-active text-white;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
 	/* GroupedButton */
 
 	.grouped-button {
@@ -568,20 +485,6 @@
 	.file-present:hover,
 	.file-present:focus {
 		@apply bg-active text-white;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* Converting */
-
-	.has-items span {
-		@apply absolute w-4 h-4 -right-2 top-0 bg-green-700 rounded-full;
-	}
-
-	.has-items span::before {
-		@apply content-[attr(data-length)] relative justify-center items-center flex w-full h-full -right-[1px] font-secondary tracking-wide text-white font-medium text-xs;
 	}
 
 	/* ********************************** */
@@ -640,34 +543,6 @@
 
 	.delete-media-overlay {
 		@apply w-80 h-5;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* ContextMenu */
-
-	.ctx-trigger {
-		@apply unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none;
-	}
-
-	.ctx-trigger:focus,
-	.ctx-trigger:hover {
-		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
-	}
-
-	.ctx-trigger:focus svg,
-	.ctx-trigger:hover svg {
-		@apply text-ctx-menu-item-focus;
-	}
-
-	.ctx-trigger:disabled {
-		@apply text-disabled pointer-events-none;
-	}
-
-	.ctx-trigger:disabled svg {
-		@apply text-disabled;
 	}
 
 	/* ********************************** */
@@ -815,51 +690,6 @@
 	.dialog-trigger:focus svg {
 		@apply text-normal bg-icon-button-hovered;
 	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* Popover */
-
-	.popover {
-		@apply flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll-1;
-	}
-
-	.popover:focus,
-	.popover.hover {
-		@apply shadow-popover outline-none;
-	}
-
-	.popover p {
-		@apply relative text-icon-deactivated font-secondary tracking-wide text-center font-medium;
-	}
-
-	/* Popover sizes */
-
-	.nothing-found-for-convertions-or-downloads {
-		@apply h-28 w-64 overflow-hidden;
-	}
-
-	.nothing-found-for-search-media {
-		@apply max-h-24 min-h-[3rem] w-80;
-	}
-
-	.convertions-or-downloads {
-		@apply h-80 w-64;
-	}
-
-	.search-media-results {
-		@apply absolute h-64 w-80 top-24 left-[calc(64px+3.5vw)];
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
 }
 
 /* ********************************** */

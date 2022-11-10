@@ -1,0 +1,129 @@
+.convert-box-wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 15rem;
+	padding: 0.5rem;
+	height: 4rem;
+
+	border: 1px solid;
+	border-radius: 0.375rem;
+}
+
+.convert-box-left {
+	position: relative;
+	display: flex;
+	justify-content: start;
+	align-items: center;
+	height: 1rem;
+	width: 90%;
+
+	margin-bottom: 0.5rem;
+
+	& p {
+		font-family: var(--font-primary);
+		color: var(--text-alternative);
+		line-height: 1.25rem;
+		white-space: nowrap;
+		font-size: 0.875rem;
+		text-align: left;
+
+		overflow: hidden;
+		width: 90%;
+	}
+
+	& button {
+		position: absolute;
+		display: flex;
+		height: 1.25rem;
+		width: 1.25rem;
+		right: -1.25rem;
+
+		border-radius: 50%;
+		background: none;
+		cursor: pointer;
+		border: none;
+
+		&:hover,
+		&:focus {
+			background: var(--bg-icon-button-hovered);
+		}
+
+		& svg {
+			height: 0.75rem;
+			width: 0.75rem;
+
+			fill: #4b5563;
+		}
+	}
+}
+
+.convert-box-right {
+	display: flex;
+	justify-content: space-between;
+
+	font-family: var(--font-primary);
+	color: var(--text-muted);
+	letter-spacing: 0.025em;
+	line-height: 1.25rem;
+	white-space: nowrap;
+	font-size: 0.875rem;
+	text-align: left;
+
+	overflow: hidden;
+
+	& span {
+		margin-right: 0.25rem;
+
+		color: white;
+	}
+}
+
+.popover-trigger {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+
+	aspect-ratio: 1 / 1;
+	border: none;
+
+	color: var(--icon-deactivated);
+	line-height: 1.5rem;
+	font-size: 1rem;
+
+	&:hover,
+	&:focus {
+		color: var(--active);
+	}
+
+	&.has-items span {
+		position: absolute;
+		height: 1rem;
+		width: 1rem;
+
+		right: -0.5rem;
+		top: 0;
+
+		border-radius: 50%;
+		background: rgb(21, 128, 61);
+
+		&::before {
+			content: attr(data-length);
+			position: relative;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
+			width: 100%;
+			right: -1px;
+
+			font-family: var(--font-secondary);
+			letter-spacing: 0.025em;
+			font-size: 0.75rem;
+			line-height: 1rem;
+			font-weight: 500;
+			color: white;
+		}
+	}
+}

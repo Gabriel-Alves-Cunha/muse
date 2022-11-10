@@ -7,7 +7,7 @@ import { SiConvertio as ConvertIcon } from "react-icons/si";
 import { t, Translator } from "@components/I18n";
 import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
-import { Button } from "@components/Button";
+import { Button } from "@components/Button/Button";
 import { Main } from "@components/Main";
 import { Box } from "@components/Box";
 import {

@@ -3,7 +3,7 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
-import { PopoverContent, PopoverRoot } from "@components/Popover";
+import { PopoverContent, PopoverRoot } from "@components/Popover/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
 import { useEffect, useRef } from "react";

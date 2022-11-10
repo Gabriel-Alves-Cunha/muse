@@ -94,14 +94,13 @@ const ConvertBox = (
 		path,
 	}: ConvertBoxProps,
 ) => (
-	<div className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none">
-		<div className="relative flex justify-start items-center w-[90%] h-4 mb-2">
-			<p className="text-alternative whitespace-nowrap font-primary text-sm text-left overflow-hidden w-[90%]">
+	<div className="convert-box-wrapper no-transition">
+		<div className="convert-box-left">
+			<p>
 				{`${getBasename(path)}.${toExtension}`}
 			</p>
 
 			<button
-				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered no-transition"
 				onPointerUp={e =>
 					handleSingleItemDeleteAnimation(
 						e,
@@ -111,16 +110,16 @@ const ConvertBox = (
 					)}
 				title={t("tooltips.cancelConversion")}
 			>
-				<Cancel className="w-3 h-3 fill-gray-600" />
+				<Cancel />
 			</button>
 		</div>
 
-		<div className="flex justify-between whitespace-nowrap text-muted font-primary text-sm tracking-wide overflow-hidden text-left">
+		<div className="convert-box-right">
 			{`${t("infos.converted")} ${formatDuration(timeConverted)} s / ${
 				prettyBytes(sizeConverted)
 			}`}
 
-			<span className="text-white mr-1">{progressIcons.get(status)}</span>
+			<span>{progressIcons.get(status)}</span>
 		</div>
 	</div>
 );

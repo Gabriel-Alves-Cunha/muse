@@ -1,0 +1,301 @@
+:root {
+	--down-decorations-height: 20px;
+	--top-decorations-height: 27px;
+	--main-height: 100vh - var(--down-decorations-height) -
+		var(--top-decorations-height);
+
+	// Fonts
+	--font-secondary: "Source Sans Pro", sans-serif;
+	--font-primary: Assistant, sans-serif;
+
+	/* Default theme: light */
+	/* Colors */
+	--ctx-menu-separator: #d7d3e2;
+	--selected-border: #4b00e038;
+	--playing-border: #f4a1a9;
+	--input-disabled: lightgray;
+	--active: #4a00e0;
+
+	--accent-light: #9381ff;
+	--accent: #9882ac;
+
+	/* Scrollbar colors */
+	--scrollbar-thumb-hover: #555;
+	--scrollbar-thumb: #888;
+	--scrollbar: #f1f1f1;
+
+	/* Linear gradient colors */
+	--lingrad-bottom: #4a00e0;
+	--lingrad-top: #8e2de2;
+
+	/* Icon colors */
+	--icon-media-player-disabled: #e0e6ee7a;
+	--icon-deactivated: dimgray;
+	--icon-window-button: black;
+	--icon-media-player: #fff;
+
+	/* Text */
+	--text-ctx-menu-item-focus: #fff;
+	--text-ctx-menu-item: #5747a6;
+	--text-ctx-menu: #7a797d;
+
+	--text-placeholder: #a3a3a3;
+	--text-alternative: #a3a3a3;
+	--text-disabled: #d3d3d5;
+	--text-normal: #0c0910;
+	--text-muted: #113047;
+	--text-input: #111111;
+
+	/* Border */
+	--border-input: #e0e0e0;
+
+	/* Background */
+	--bg-ctx-menu-item-focus: #6c56d0;
+	--bg-ctx-menu: #fff;
+
+	--bg-media-player-icon-button-hovered: #fff4;
+	--bg-icon-button-hovered: #88888857;
+
+	--bg-button-hover: #8e2de2;
+	--bg-selected: #aac1ff70;
+	--bg-highlight: #9381ff;
+	--bg-popover: #f9f6f5;
+	--bg-button: #f9f6f5;
+	--bg-navbar: #f9f6f5;
+	--bg-media: #f9f6f5;
+	--bg-main: #f9f6f5;
+	--bg-playing: #fff;
+	--bg-dialog: #fff;
+	--bg-select: #fff;
+
+	/* Shadows */
+	--shadow-dialog: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+
+	--shadow-media-player-img: rgba(255, 255, 255, 0.3) 0 0 20px;
+
+	--shadow-row-wrapper: rgba(0, 0, 0, 0.16) 0 0 6px;
+
+	--shadow-reflect: 0px 50px 70px rgba(0, 0, 0, 0.3),
+		0px 10px 10px rgba(0, 0, 0, 0.1);
+
+	/* Shadow colors */
+	--shadow-glow-around-component: 7px 7px 14px #b1b1b1, -7px -7px 14px #fff;
+
+	--shadow-popover: 0 0 8px rgba(0, 0, 0, 0.2);
+	/* } */
+}
+
+html[data-theme="dark"] {
+	/* Colors */
+	--ctx-menu-separator: #d7d3e2;
+	--selected-border: #4d4d4d;
+	--playing-border: #c04569;
+	--input-disabled: gray;
+	--active: #ff7be9;
+
+	--accent-light: #f4a1a9;
+	--accent: #e94374;
+
+	/* Scrollbar colors */
+	--scrollbar-thumb-hover: #565d61;
+	--scrollbar-thumb: #454a4d;
+	--scrollbar: #202324;
+
+	/* Linear gradient colors */
+	--lingrad-bottom: #0b3866;
+	--lingrad-top: #103783;
+
+	/* Icon colors */
+	--icon-media-player-disabled: #e0e6ee7a;
+	--icon-media-player: #f3f3ee;
+	--icon-deactivated: #6272a4;
+	--icon-window-button: #fff;
+
+	/* Text */
+	--text-ctx-menu-item-focus: #fff;
+	--text-ctx-menu-item: #5747a6;
+	--text-ctx-menu: #7a797d;
+
+	--text-placeholder: #a3a3a3;
+	--text-alternative: #a3a3a3;
+	--text-disabled: #d3d3d5;
+	--text-normal: #f6f6f6;
+	--text-muted: #ccb69b;
+	--text-input: #f5f5f5;
+
+	/* Border */
+	--border-input: #4d4d4d;
+
+	/* Background */
+	--bg-ctx-menu-item-focus: #6c56d0;
+	--bg-ctx-menu: #fff;
+
+	--bg-media-player-icon-button-hovered: #fff4;
+	--bg-icon-button-hovered: #fff2;
+
+	--bg-button-hover: #08368d;
+	--bg-highlight: #c04569;
+	--bg-selected: #252121;
+	--bg-popover: #182825;
+	--bg-navbar: #191a21;
+	--bg-button: #191a21;
+	--bg-dialog: #182825;
+	--bg-playing: black;
+	--bg-media: #191a21;
+	--bg-main: #191a21;
+	/* Falta esse: */
+	--bg-select: #fff;
+
+	/* Shadows */
+	--shadow-dialog: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+		hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+
+	--shadow-media-player-img: rgba(0, 0, 0, 0.3) 0 0 20px;
+
+	--shadow-row-wrapper: rgba(255, 255, 255, 0.16) 0 0 6px;
+
+	--shadow-reflect: 0px 50px 70px rgba(0, 0, 0, 0.3),
+		0px 10px 10px rgba(0, 0, 0, 0.1);
+
+	/* Shadow colors */
+	--shadow-glow-around-component: 7px 7px 14px #b1b1b1, -7px -7px 14px #fff;
+
+	--shadow-popover: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+* {
+	transition-property: color, background-color, border-color, box-shadow,
+		-webkit-scrollbar-track, -webkit-scrollbar-thumb, -webkit-scrollbar,
+		caret-color;
+	transition: ease 0.25s;
+
+	text-rendering: optimizeLegibility;
+	overscroll-behavior: none;
+	box-sizing: border-box;
+
+	&::after,
+	&::before {
+		box-sizing: border-box;
+	}
+}
+
+html {
+	caret-color: var(--accent);
+	overflow: hidden;
+
+	::selection {
+		background: var(--accent);
+		color: white;
+	}
+}
+
+body {
+	@apply fixed leading-normal h-full w-full overflow-hidden;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+
+	line-height: 1.5;
+	overflow: hidden;
+
+	contain-intrinsic-size: 1px 5000px;
+	content-visibility: auto;
+
+	.no-transition * {
+		transition: none !important;
+	}
+
+	/* Scrollbar */
+
+	.scroll {
+		scrollbar-gutter: stable;
+		overflow-y: auto;
+	}
+
+	.scroll-2 {
+		scrollbar-width: 4px;
+	}
+
+	.scroll-1 {
+		scrollbar-width: 2px;
+	}
+
+	.scroll-white {
+		scrollbar-gutter: stable;
+		overflow-y: auto;
+	}
+
+	.scroll-white::-webkit-scrollbar-track {
+		background: white;
+	}
+
+	.scroll-white::-webkit-scrollbar-thumb {
+		background: white;
+	}
+
+	.scroll-white::-webkit-scrollbar-thumb:hover {
+		background: white;
+	}
+
+	.scroll::-webkit-scrollbar {
+		display: block;
+	}
+
+	.scroll::-webkit-scrollbar-track {
+		background: var(--scrollbar);
+	}
+
+	.scroll::-webkit-scrollbar-thumb {
+		background: var(--scrollbar-thumb);
+	}
+
+	.scroll::-webkit-scrollbar-thumb:hover {
+		background: var(--scrollbar-thumb-hover);
+	}
+}
+
+body::-webkit-scrollbar {
+	padding: 0;
+	margin: 0;
+
+	display: none;
+}
+
+button {
+	-webkit-app-region: no-drag;
+	background: transparent;
+	border: none;
+}
+
+/* assistant-300 - latin */
+@font-face {
+	font-family: "Assistant";
+	font-style: normal;
+	font-weight: 300;
+	src: url("./assets/assistant-v16-latin-300.woff2") format("woff2");
+}
+
+/* assistant-regular-400 - latin */
+@font-face {
+	font-family: "Assistant";
+	font-style: normal;
+	font-weight: 400;
+	src: url("./assets/assistant-v16-latin-regular.woff2") format("woff2");
+}
+
+/* assistant-500 - latin */
+@font-face {
+	font-family: "Assistant";
+	font-style: normal;
+	font-weight: 500;
+	src: url("./assets/assistant-v16-latin-500.woff2") format("woff2");
+}
+
+/* source-sans-pro-regular-400 - latin */
+@font-face {
+	font-family: "Source Sans Pro";
+	font-style: normal;
+	font-weight: 400;
+	src: url("./assets/source-sans-pro-v21-latin-regular.woff2") format("woff2");
+}

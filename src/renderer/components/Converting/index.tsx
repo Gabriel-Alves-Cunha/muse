@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Trigger } from "@radix-ui/react-popover";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
-import { PopoverRoot, PopoverContent } from "@components/Popover";
+import { PopoverRoot, PopoverContent } from "@components/Popover/Popover";
 import { reactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
@@ -23,6 +23,7 @@ export function Converting() {
 	const convertingListSize = useConvertingList(convertingListSizeSelector);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
+	const hasItemsClass = convertingListSize > 0 ? "has-items " : "";
 
 	useEffect(() => {
 		newConvertions.forEach((newConvertion, path) => {
@@ -55,8 +56,7 @@ export function Converting() {
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
-				className={(convertingListSize > 0 ? "has-items " : "") +
-					"flex justify-center items-center w-full aspect-square border-none text-icon-deactivated text-base hover:text-active focus:text-active"}
+				className={hasItemsClass + "popover-trigger"}
 				title={t("tooltips.showAllConvertingMedias")}
 			>
 				<span data-length={convertingListSize}></span>

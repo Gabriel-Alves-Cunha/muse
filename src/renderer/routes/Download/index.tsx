@@ -5,7 +5,7 @@ import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
 import { t, Translator } from "@components/I18n";
 import { useTitle } from "@hooks/useTitle";
 import { Loading } from "@components/Loading";
-import { Button } from "@components/Button";
+import { Button } from "@components/Button/Button";
 import { Header } from "@components/Header";
 import { Main } from "@components/Main";
 

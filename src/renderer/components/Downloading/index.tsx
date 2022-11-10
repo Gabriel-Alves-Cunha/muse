@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Trigger } from "@radix-ui/react-popover";
 import create from "zustand";
 
-import { PopoverRoot, PopoverContent } from "@components/Popover";
+import { PopoverRoot, PopoverContent } from "@components/Popover/Popover";
 import { createNewDownload, Popup } from "./helper";
 import { reactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";

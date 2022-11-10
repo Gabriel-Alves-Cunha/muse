@@ -26,7 +26,7 @@ import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { deleteFile } from "@utils/deleteFile";
 import { FlexRow } from "@components/FlexRow";
-import { Button } from "@components/Button";
+import { Button } from "@components/Button/Button";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////

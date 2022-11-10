@@ -46,7 +46,7 @@ export const ContextMenu = (
 		</Trigger>
 
 		<Content
-			className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
+			className="ctx-menu-content no-transition"
 			loop
 		>
 			{contentToShow(content, isAllDisabled)}
@@ -90,7 +90,7 @@ type Props = Readonly<
 	{
 		onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
 		content?: ValuesOf<typeof ctxContentEnum>;
-		setIsOpen?: (newIsOpen: boolean) => void;
+		setIsOpen?(newIsOpen: boolean): void;
 		isAllDisabled?: boolean;
 		children: ReactNode;
 		className?: string;
