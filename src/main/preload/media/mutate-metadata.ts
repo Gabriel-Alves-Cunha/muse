@@ -19,8 +19,8 @@ import { getBasename, getLastExtension } from "@common/path";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { doesPathExists } from "../file.cjs";
-import { isBase64Image } from "@main/utils.cjs";
+import { doesPathExists } from "../file";
+import { isBase64Image } from "@main/utils";
 import { emptyString } from "@common/empty";
 import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
@@ -93,7 +93,7 @@ async function handleImageMetadata(
 
 	// else, it's an image file path
 	if (await doesPathExists(imageURL)) {
-		const base64 = await readFile(imageURL, { encoding: "base64" }) as Base64;
+		const base64 = (await readFile(imageURL, { encoding: "base64" })) as Base64;
 
 		dbg({ base64 });
 
@@ -107,7 +107,7 @@ export async function downloadThumbnail(
 	url: Readonly<string>,
 ): Promise<Picture[]> {
 	return new Promise((resolve, reject) =>
-		get(url, async res => {
+		get(url, async (res) => {
 			const byteVector = await ByteVector.fromStream(res);
 			const mimeType = res.headers["content-type"] ?? emptyString;
 
@@ -121,11 +121,10 @@ export async function downloadThumbnail(
 			dbg("Header of thumbnail download and picture =", { res, picture });
 
 			resolve([picture]);
-		})
-			.on("error", e => {
-				error("Got error getting image on Electron side!\n\n", e);
-				return reject(e);
-			})
+		}).on("error", (e) => {
+			error("Got error getting image on Electron side!\n\n", e);
+			return reject(e);
+		}),
 	);
 }
 
@@ -306,21 +305,18 @@ export async function writeTags(
 		);
 	}
 
-	const newPathOfFile = data.title ?
-		handleTitle(file, mediaPath, data.title) :
-		emptyString;
+	const newPathOfFile = data.title
+		? handleTitle(file, mediaPath, data.title)
+		: emptyString;
 
 	if (data.albumArtists !== undefined)
 		handleAlbumArtists(file, data.albumArtists);
 
-	if (data.genres !== undefined)
-		handleGenres(file, data.genres);
+	if (data.genres !== undefined) handleGenres(file, data.genres);
 
-	if (data.album !== undefined)
-		handleAlbum(file, data.album);
+	if (data.album !== undefined) handleAlbum(file, data.album);
 
-	if (data.lyrics !== undefined)
-		handleLyrics(file, data.lyrics);
+	if (data.lyrics !== undefined) handleLyrics(file, data.lyrics);
 
 	dbg("New file tags =", file.tag);
 

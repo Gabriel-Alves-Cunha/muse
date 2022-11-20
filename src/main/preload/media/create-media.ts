@@ -46,9 +46,9 @@ async function createMedia(
 
 			if (ignoreMediaWithLessThan60Seconds === true && durationInSeconds < 60)
 				return reject(
-					`Skipping "${path}" because the duration is ${
-						durationInSeconds.toPrecision(2)
-					} s (less than 60 s)!`,
+					`Skipping "${path}" because the duration is ${durationInSeconds.toPrecision(
+						2,
+					)} s (less than 60 s)!`,
 				);
 
 			if (assureMediaSizeIsGreaterThan60KB === true && length < 60_000)
@@ -68,9 +68,10 @@ async function createMedia(
 			}
 
 			const media: Media = {
-				image: picture !== undefined && mimeType ?
-					(`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64) :
-					emptyString,
+				image:
+					picture !== undefined && mimeType
+						? (`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64)
+						: emptyString,
 				duration: formatDuration(durationInSeconds),
 				artist: albumArtists[0] ?? emptyString,
 				birthTime: statSync(path).birthtimeMs,
@@ -96,23 +97,22 @@ export async function transformPathsToMedias(
 	return time(async () => {
 		console.groupCollapsed("Creating medias...");
 
-		const promises = paths.map(path =>
+		const promises = paths.map((path) =>
 			createMedia(
 				path,
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			)
-				.catch(e =>
-					console.error(
-						`There was a possible error creating media of path: "${path}".\n\n`,
-						e,
-					)
-				)
+			).catch((e) =>
+				console.error(
+					`There was a possible error creating media of path: "${path}".\n\n`,
+					e,
+				),
+			),
 		);
 
 		// Run promises in parallel:
 		const medias = (await Promise.allSettled(promises))
-			.map(p => (p.status === "fulfilled" ? p.value : false))
+			.map((p) => (p.status === "fulfilled" ? p.value : false))
 			.filter(Boolean) as [Path, Media][];
 
 		console.groupEnd();

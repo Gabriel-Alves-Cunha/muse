@@ -3,8 +3,8 @@ import type { AddressInfo } from "node:net";
 
 import Koa from "koa";
 
-import { myIp, unableToShareMediasError } from "./myIpAddress.cjs";
-import { router } from "./routes.cjs";
+import { myIp, unableToShareMediasError } from "./myIpAddress";
+import { router } from "./routes";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
@@ -68,10 +68,8 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 /////////////////////////////////////////////
 // Types:
 
-export type ClientServerAPI = Readonly<
-	{
-		addListener(event: string, listener: (...args: unknown[]) => void): void;
-		url: QRCodeURL;
-		close(): void;
-	}
->;
+export type ClientServerAPI = Readonly<{
+	addListener(event: string, listener: (...args: unknown[]) => void): void;
+	url: QRCodeURL;
+	close(): void;
+}>;

@@ -10,16 +10,16 @@ import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { deleteFile, doesPathExists } from "../file.cjs";
+import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
-import { fluent_ffmpeg } from "./ffmpeg.cjs";
+import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
-import { writeTags } from "./mutate-metadata.cjs";
-import { dirs } from "@main/utils.cjs";
+import { writeTags } from "./mutate-metadata";
+import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
 
 const { error, log } = console;
@@ -73,8 +73,14 @@ export async function createOrCancelDownload(
 export async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
-	{ electronPort, extension, imageURL, title, url, artist = emptyString }:
-		CreateDownload,
+	{
+		electronPort,
+		extension,
+		imageURL,
+		title,
+		url,
+		artist = emptyString,
+	}: CreateDownload,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
 
@@ -88,7 +94,7 @@ export async function createDownload(
 		error(info);
 
 		// Send a msg to the client that the download failed:
-		const msg: Partial<MediaBeingDownloaded> & { error: Error; } = {
+		const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
 			status: progressStatus.FAILED,
 			error: new Error(info),
 		};
@@ -145,19 +151,20 @@ export async function createDownload(
 			// @ts-ignore => isDev is a globally defined boolean.
 			if (isDev) {
 				const secondsDownloading = (Date.now() - startTime) / 1_000;
-				const estimatedDownloadTime =
-					(secondsDownloading / (percentage / 100) - secondsDownloading)
-						.toFixed(2);
+				const estimatedDownloadTime = (
+					secondsDownloading / (percentage / 100) -
+					secondsDownloading
+				).toFixed(2);
 
 				cursorTo(process.stdout, 0);
 				clearLine(process.stdout, 0);
 
 				process.stdout.write(
-					`${percentage.toFixed(2)}% downloaded, (${
-						prettyBytes(downloaded)
-					} / ${prettyTotal}). Running for: ${
-						secondsDownloading.toFixed(2)
-					} seconds. ETA: ${estimatedDownloadTime} seconds.`,
+					`${percentage.toFixed(2)}% downloaded, (${prettyBytes(
+						downloaded,
+					)} / ${prettyTotal}). Running for: ${secondsDownloading.toFixed(
+						2,
+					)} seconds. ETA: ${estimatedDownloadTime} seconds.`,
 				);
 			}
 		})
@@ -231,14 +238,14 @@ export async function createDownload(
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("error", async err => {
+		.on("error", async (err) => {
 			error(`Error downloading file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
 			await deleteFile(saveSite);
 
 			// Tell the client the download threw an error:
-			const msg: Partial<MediaBeingDownloaded> & { error: Error; } = {
+			const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
 				status: progressStatus.FAILED,
 				error: new Error(err.message),
 			};
@@ -273,14 +280,12 @@ export async function createDownload(
 /////////////////////////////////////////////
 // Types:
 
-export type CreateDownload = Readonly<
-	{
-		electronPort?: MessagePort;
-		extension?: AllowedMedias;
-		imageURL?: string;
-		destroy?: boolean;
-		artist?: string;
-		title?: string;
-		url: string;
-	}
->;
+export type CreateDownload = Readonly<{
+	electronPort?: MessagePort;
+	extension?: AllowedMedias;
+	imageURL?: string;
+	destroy?: boolean;
+	artist?: string;
+	title?: string;
+	url: string;
+}>;

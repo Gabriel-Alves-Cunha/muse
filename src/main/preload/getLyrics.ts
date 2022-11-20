@@ -1,6 +1,6 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
-import { lyricApiKey, lyricsAPI } from "@main/utils.cjs";
+import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { stringifyJson } from "@common/utils";
 import { emptyString } from "@common/empty";
 import { dbg } from "@common/debug";
@@ -29,9 +29,10 @@ export async function searchForLyricsAndImage(
 ): Promise<LyricsResponse> {
 	if (!mediaTitle || !mediaArtist)
 		throw new Error(
-			`Required argument is empty: ${
-				stringifyJson({ mediaArtist, mediaTitle })
-			}`,
+			`Required argument is empty: ${stringifyJson({
+				mediaArtist,
+				mediaTitle,
+			})}`,
 		);
 
 	dbg({ mediaTitle, getImage, mediaArtist });
@@ -68,23 +69,19 @@ async function queryForPossibleLyric(
 		lyrics: "1", // 1 for true, 0 for false.
 		// Limit (Max 50):
 		limit: "1",
-	})
-		.toString();
+	}).toString();
 
-	const jsonRes =
-		await (await fetch(`${lyricsAPI}?${params}`, { headers, method })).json() as
-			| Track
-			| ErrorResponse;
+	const jsonRes = (await (
+		await fetch(`${lyricsAPI}?${params}`, { headers, method })
+	).json()) as Track | ErrorResponse;
 
 	dbg({ queryForPossibleLyric: jsonRes });
 
-	if (jsonRes.success === false)
-		throw new Error(jsonRes.error);
+	if (jsonRes.success === false) throw new Error(jsonRes.error);
 
 	const [track] = jsonRes.result;
 
-	if (!track || !track.api_lyrics)
-		throw new Error("No lyrics found!");
+	if (!track || !track.api_lyrics) throw new Error("No lyrics found!");
 
 	const {
 		api_lyrics: lyricURL,
@@ -108,7 +105,7 @@ async function queryForPossibleLyric(
 async function queryForLyric(lyricURL: string): Promise<string> {
 	dbg(`Querying for lyricURL = "${lyricURL}".`);
 
-	const jsonRes = await (await fetch(lyricURL, { method, headers })).json() as
+	const jsonRes = (await (await fetch(lyricURL, { method, headers })).json()) as
 		| QueryForLyricsSuccessResponse
 		| ErrorResponse;
 
@@ -128,8 +125,9 @@ async function queryForLyric(lyricURL: string): Promise<string> {
 async function queryForImage(imageURL: Readonly<string>): Promise<Base64> {
 	dbg(`Querying for lyricURL = "${imageURL}".`);
 
-	const blob = await (await fetch(imageURL, { redirect: "follow", method }))
-		.blob();
+	const blob = await (
+		await fetch(imageURL, { redirect: "follow", method })
+	).blob();
 
 	const base64 = await blobToBase64(blob);
 
@@ -165,7 +163,7 @@ interface PossibleLyrics {
 /////////////////////////////////////////
 
 interface QueryForLyricsSuccessResponse {
-	readonly result: { lyrics: string; };
+	readonly result: { lyrics: string };
 	readonly success: true;
 }
 
@@ -175,7 +173,7 @@ interface QueryForLyricsSuccessResponse {
 interface Track {
 	readonly success: true;
 	readonly result: readonly [
-		{ api_lyrics: string; track: string; album: string; cover: string; },
+		{ api_lyrics: string; track: string; album: string; cover: string },
 	];
 }
 

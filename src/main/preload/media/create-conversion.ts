@@ -8,16 +8,16 @@ import { createReadStream } from "node:fs";
 import { dirname, join } from "node:path";
 import sanitize from "sanitize-filename";
 
-import { deleteFile, doesPathExists } from "../file.cjs";
+import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { type AllowedMedias } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
-import { fluent_ffmpeg } from "./ffmpeg.cjs";
+import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
-import { dirs } from "@main/utils.cjs";
 import { dbg } from "@common/debug";
+import { dirs } from "@main/utils";
 
 const { error, log } = console;
 
@@ -85,13 +85,12 @@ export async function convertToAudio(
 			path.endsWith(toExtension!) ||
 			(await doesPathExists(pathWithNewExtension))
 		) {
-			const info =
-				`File "${path}" already is "${toExtension}"! Conversion canceled.`;
+			const info = `File "${path}" already is "${toExtension}"! Conversion canceled.`;
 
 			error(info);
 
 			// Send a msg to the client that the download failed:
-			const msg: Partial<MediaBeingConverted> & { error: Error; } = {
+			const msg: Partial<MediaBeingConverted> & { error: Error } = {
 				status: progressStatus.FAILED,
 				error: new Error(info),
 			};
@@ -127,30 +126,32 @@ export async function convertToAudio(
 			// To react:
 			if (interval === undefined) {
 				// ^ Only in the firt time this setInterval is called!
-				interval = setInterval(() =>
-					electronPort!.postMessage({
-						sizeConverted: targetSize,
-						timeConverted: timemark,
-					}), 500);
+				interval = setInterval(
+					() =>
+						electronPort!.postMessage({
+							sizeConverted: targetSize,
+							timeConverted: timemark,
+						}),
+					500,
+				);
 
 				// Send a message to client that we're starting a conversion:
 				const msg: Partial<MediaBeingConverted> = {
 					status: progressStatus.ACTIVE,
 				};
-				electronPort!
-					.postMessage(msg);
+				electronPort!.postMessage(msg);
 			}
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("error", async err => {
+		.on("error", async (err) => {
 			error(`Error converting file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
 			await deleteFile(saveSite);
 
 			// Tell the client the conversion threw an error:
-			const msg: Partial<MediaBeingConverted> & { error: Error; } = {
+			const msg: Partial<MediaBeingConverted> & { error: Error } = {
 				status: progressStatus.FAILED,
 				error: new Error(err.message),
 			};
@@ -256,15 +257,13 @@ export async function convertToAudio(
 ////////////////////////////////////////////
 // Types:
 
-export type CreateConversion = Readonly<
-	{
-		toExtension?: AllowedMedias;
-		electronPort?: MessagePort;
-		destroy?: boolean;
-		path: Path;
-	}
->;
+export type CreateConversion = Readonly<{
+	toExtension?: AllowedMedias;
+	electronPort?: MessagePort;
+	destroy?: boolean;
+	path: Path;
+}>;
 
 /////////////////////////////////////////////
 
-type Progress = Readonly<{ targetSize: number; timemark: number; }>;
+type Progress = Readonly<{ targetSize: number; timemark: number }>;

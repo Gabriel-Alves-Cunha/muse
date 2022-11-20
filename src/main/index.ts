@@ -1,6 +1,6 @@
-import type { ClipboardExtended } from "./clipboardExtended.cjs";
+import type { ClipboardExtended } from "./clipboardExtended";
 import type { DownloadInfo } from "@common/@types/generalTypes";
-import type { ValuesOf } from "@common/@types/utils.js";
+import type { ValuesOf } from "@common/@types/utils";
 
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
 import { clearLine, cursorTo } from "node:readline";
@@ -23,7 +23,7 @@ import {
 import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
 import { emptyString } from "@common/empty";
-import { logoPath } from "./utils.cjs";
+import { logoPath } from "./utils";
 import { dbg } from "@common/debug";
 import {
 	electronIpcMainProcessNotification,
@@ -38,12 +38,12 @@ import {
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater
-	.on("update-not-available", info => dbg("Update not available:", info))
-	.on("update-downloaded", info => dbg("Update downloaded:", info))
-	.on("update-available", info => dbg("Update available:", info))
+	.on("update-not-available", (info) => dbg("Update not available:", info))
+	.on("update-downloaded", (info) => dbg("Update downloaded:", info))
+	.on("update-available", (info) => dbg("Update available:", info))
 	.on("checking-for-update", () => dbg("Checking for update..."))
-	.on("error", err => dbg("Error in auto-updater. ", err))
-	.on("download-progress", progressObj => {
+	.on("error", (err) => dbg("Error in auto-updater. ", err))
+	.on("download-progress", (progressObj) => {
 		cursorTo(process.stdout, 0);
 		clearLine(process.stdout, 0);
 		process.stdout.write(
@@ -83,11 +83,10 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 			webSecurity: true,
 			webgl: false,
 		},
-	})
-		.once("ready-to-show", () => {
-			window.show();
-			window.focus();
-		});
+	}).once("ready-to-show", () => {
+		window.show();
+		window.focus();
+	});
 
 	/////////////////////////////////////////
 	/////////////////////////////////////////
@@ -98,22 +97,26 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 	menu.append(
 		new MenuItem({
 			label: "Refresh Page",
-			submenu: [{
-				click: () => window.reload(),
-				accelerator: "f5",
-				role: "reload",
-			}],
+			submenu: [
+				{
+					click: () => window.reload(),
+					accelerator: "f5",
+					role: "reload",
+				},
+			],
 		}),
 	);
 
 	menu.append(
 		new MenuItem({
 			label: "Open/close Dev Tools",
-			submenu: [{
-				click: () => window.webContents.toggleDevTools(),
-				role: "toggleDevTools",
-				accelerator: "f12",
-			}],
+			submenu: [
+				{
+					click: () => window.webContents.toggleDevTools(),
+					role: "toggleDevTools",
+					accelerator: "f12",
+				},
+			],
 		}),
 	);
 
@@ -123,10 +126,11 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 	/////////////////////////////////////////
 
 	// @ts-ignore => isDev is a globally defined boolean.
-	const url = isDev ?
-		"http://localhost:3000" :
-		pathToFileURL(resolve(app.getAppPath(), "..", "renderer", "index.html"))
-			.toString();
+	const url = isDev
+		? "http://localhost:3000"
+		: pathToFileURL(
+				resolve(app.getAppPath(), "..", "renderer", "index.html"),
+		  ).toString();
 
 	await window.loadURL(url);
 
@@ -171,10 +175,10 @@ app
 				loadExtensionOptions: { allowFileAccess: true },
 			})
 				// @ts-ignore => This error occurs when not bundling.
-				.then(name => dbg(`Added Extension: ${name}`))
+				.then((name) => dbg(`Added Extension: ${name}`))
 				// @ts-ignore => This error occurs when not bundling.
-				.catch(err =>
-					error("An error occurred while installing extension: ", err)
+				.catch((err) =>
+					error("An error occurred while installing extension: ", err),
 				);
 		}
 
@@ -200,7 +204,7 @@ app
 		// when we copy a link to the clipboard:
 		try {
 			// This has to be imported after app is open.
-			const extendedClipboard = (await import("./clipboardExtended.cjs"))
+			const extendedClipboard = (await import("./clipboardExtended.js"))
 				.extendedClipboard as ClipboardExtended;
 
 			extendedClipboard
@@ -209,8 +213,11 @@ app
 
 					if (!isUrlValid(url)) return;
 
-					const { title, thumbnails, media: { artist = emptyString } } =
-						(await getBasicInfo(url)).videoDetails;
+					const {
+						title,
+						thumbnails,
+						media: { artist = emptyString },
+					} = (await getBasicInfo(url)).videoDetails;
 
 					new Notification({
 						title: "Click to download this media as 'mp3'",
@@ -288,9 +295,9 @@ ipcMain.on(
 				const focusedWindow = BrowserWindow.getFocusedWindow();
 				if (!focusedWindow) break;
 
-				focusedWindow.isMaximized() ?
-					focusedWindow.unmaximize() :
-					focusedWindow.maximize();
+				focusedWindow.isMaximized()
+					? focusedWindow.unmaximize()
+					: focusedWindow.maximize();
 				break;
 			}
 

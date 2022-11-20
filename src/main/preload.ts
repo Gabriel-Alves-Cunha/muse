@@ -8,13 +8,13 @@ import { contextBridge, ipcRenderer } from "electron";
 import { getBasicInfo } from "ytdl-core";
 
 import { electronToReactMessage, reactToElectronMessage } from "@common/enums";
-import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi.cjs";
-import { searchForLyricsAndImage } from "./preload/getLyrics.cjs";
-import { transformPathsToMedias } from "./preload/media/create-media.cjs";
+import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
+import { searchForLyricsAndImage } from "./preload/getLyrics";
+import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
-import { createServer } from "./preload/share/server.cjs";
-import { writeTags } from "./preload/media/mutate-metadata.cjs";
-import { dirs } from "./utils.cjs";
+import { createServer } from "./preload/share/server";
+import { writeTags } from "./preload/media/mutate-metadata";
+import { dirs } from "./utils";
 import { dbg } from "@common/debug";
 import {
 	type MsgWithSource,
@@ -24,16 +24,16 @@ import {
 import {
 	type CreateConversion,
 	createOrCancelConvert,
-} from "./preload/media/create-conversion.cjs";
+} from "./preload/media/create-conversion";
 import {
 	type CreateDownload,
 	createOrCancelDownload,
-} from "./preload/media/download-media.cjs";
+} from "./preload/media/download-media";
 import {
 	getFullPathOfFilesForFilesInThisDirectory,
 	deleteFile,
 	readDir,
-} from "./preload/file.cjs";
+} from "./preload/file";
 
 // @ts-ignore => will test if it exists
 dbg("process.env.LYRIC_API_KEY =", process.env.LYRIC_API_KEY);
@@ -61,8 +61,7 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 // Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
 	electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-	(_event, downloadValues) =>
-		sendMsgToClient({
+	(_event, downloadValues) => sendMsgToClient({
 			type: electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 			downloadInfo: downloadValues,
 		}),
@@ -101,7 +100,7 @@ async function handleMsgsFromRendererProcess(
 				break;
 			}
 
-			electronPort.onmessage = async ({ data }: { data: CreateDownload; }) =>
+			electronPort.onmessage = async ({ data }: { data: CreateDownload }) =>
 				await createOrCancelDownload({ ...data, electronPort });
 
 			electronPort.addEventListener("close", logThatPortIsClosing);
@@ -120,7 +119,7 @@ async function handleMsgsFromRendererProcess(
 				break;
 			}
 
-			electronPort.onmessage = ({ data }: { data: CreateConversion; }) =>
+			electronPort.onmessage = ({ data }: { data: CreateConversion }) =>
 				createOrCancelConvert({ ...data, electronPort });
 
 			electronPort.addEventListener("close", logThatPortIsClosing);
@@ -138,7 +137,7 @@ async function handleMsgsFromRendererProcess(
 
 			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
 			thingsToChange.forEach(({ whatToChange, newValue }) =>
-				Reflect.set(data, whatToChange, newValue)
+				Reflect.set(data, whatToChange, newValue),
 			);
 
 			dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", { msg });
@@ -164,8 +163,7 @@ async function handleMsgsFromRendererProcess(
 
 		default: {
 			console.error(
-				`There is no method to handle this event.data: (${typeof event
-					.data}) '`,
+				`There is no method to handle this event.data: (${typeof event.data}) '`,
 				event.data,
 				"'\nEvent =",
 				event,

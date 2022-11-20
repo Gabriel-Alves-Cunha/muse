@@ -50,7 +50,7 @@ Object.assign(clipboard, {
 			if (
 				isTextDiff(
 					this.previousText,
-					this.previousText = clipboard.readText(),
+					(this.previousText = clipboard.readText()),
 				)
 			)
 				clipboardEmitter.emit("text-changed");
@@ -83,7 +83,8 @@ export { clipboard as extendedClipboard };
 // Types:
 
 export interface ClipboardExtended
-	extends Electron.Clipboard, ClipboardExtension {}
+	extends Electron.Clipboard,
+		ClipboardExtension {}
 
 interface ClipboardExtension {
 	watcherId: NodeJS.Timer | undefined;

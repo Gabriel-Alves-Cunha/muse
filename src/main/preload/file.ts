@@ -11,18 +11,19 @@ import { join } from "node:path";
 export async function getFullPathOfFilesForFilesInThisDirectory(
 	dir: Path,
 ): Promise<readonly Path[]> {
-	return (await readDir(dir).catch(err => {
-		console.error(err);
-		return [];
-	}))
-		.map(filename => join(dir, filename));
+	return (
+		await readDir(dir).catch((err) => {
+			console.error(err);
+			return [];
+		})
+	).map((filename) => join(dir, filename));
 }
 
 ///////////////////////////////////////////
 
 /** Infallible async function. */
 export async function readDir(dir: Path): Promise<readonly Path[]> {
-	return await readdir(dir).catch(err => {
+	return await readdir(dir).catch((err) => {
 		console.error(err);
 		return [];
 	});
@@ -32,15 +33,19 @@ export async function readDir(dir: Path): Promise<readonly Path[]> {
 
 /** Infallible async function. */
 export async function deleteFile(path: Path): Promise<boolean> {
-	return unlink(path).then(() => true).catch(err => {
-		console.error(err);
-		return false;
-	});
+	return unlink(path)
+		.then(() => true)
+		.catch((err) => {
+			console.error(err);
+			return false;
+		});
 }
 
 ///////////////////////////////////////////
 
 /** Infallible async function. */
 export async function doesPathExists(path: Path): Promise<boolean> {
-	return access(path).then(() => true).catch(() => false);
+	return access(path)
+		.then(() => true)
+		.catch(() => false);
 }
