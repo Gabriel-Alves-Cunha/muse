@@ -69,6 +69,7 @@ export function ImgWithFallback({
 				decoding="async"
 				loading="lazy"
 				src={mediaImg}
+				alt=""
 			/>
 		) : (
 			Fallback
@@ -80,6 +81,7 @@ export function ImgWithFallback({
 			<img
 				className="object-cover h-11 rounded-xl before:hidden"
 				src={mediaImg}
+				alt=""
 			/>
 		);
 

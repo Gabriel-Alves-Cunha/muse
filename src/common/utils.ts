@@ -36,15 +36,15 @@ export function formatDuration(time?: number): Readonly<string> {
 	if (time === undefined || isNaN(time) || !isFinite(time)) return "00:00";
 	time = trunc(time);
 
-	const hour = ("0" + (floor(time / 3_600) % 24)).slice(-2),
-		minutes = ("0" + (floor(time / 60) % 60)).slice(-2),
-		seconds = ("0" + (time % 60)).slice(-2),
-		days = floor(time / 86_400);
+	const hour = (`0${(floor(time / 3_600) % 24)}`).slice(-2);
+	const minutes = (`0${(floor(time / 60) % 60)}`).slice(-2);
+	const seconds = (`0${(time % 60)}`).slice(-2);
+	const days = floor(time / 86_400);
 
 	return (
-		(days > 0 ? days + "d " : "") +
-		(+hour > 0 ? hour + ":" : "") + // +hour === Number(hour)
-		(minutes + ":" + seconds)
+		(days > 0 ? `${days}d ` : "") +
+		(+hour > 0 ? `${hour}:` : "") + // +hour === Number(hour)
+		(`${minutes}:${seconds}`)
 	);
 }
 

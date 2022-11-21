@@ -48,7 +48,7 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 
 		dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
 
-		if (!item || !value) return undefined;
+		if (!(item && value)) return undefined;
 
 		switch (key) {
 			case keys.favorites: {

@@ -86,9 +86,7 @@ const Row = memo(
 	({ media, path }: RowProps) => (
 		<div
 			className={
-				(getAllSelectedMedias().has(path) === true ? "selected " : "") +
-				(getCurrentPlaying().path === path ? "playing " : "") +
-				"row-wrapper"
+				`${(getAllSelectedMedias().has(path) === true ? "selected " : "")}${(getCurrentPlaying().path === path ? "playing " : "")}row-wrapper`
 			}
 			data-path={path}
 		>

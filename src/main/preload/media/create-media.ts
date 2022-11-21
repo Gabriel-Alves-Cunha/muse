@@ -59,7 +59,9 @@ async function createMedia(
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////
 
-			let picture: IPicture | undefined, mimeType: string | undefined, error;
+			let picture: IPicture | undefined;
+			let mimeType: string | undefined;
+			let error;
 			try {
 				picture = pictures[0];
 				mimeType = picture?.mimeType;

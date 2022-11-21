@@ -399,7 +399,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 						default:
 							assertUnreachable(action);
 					}
-				}, "setPlaylists with: " + stringifyJson(action)),
+				}, `setPlaylists with: ${stringifyJson(action)}`),
 		})),
 	),
 );

@@ -9,7 +9,7 @@ const { random, floor } = Math;
 
 /** [min, max) */
 export function getRandomInt(min: number, max: number): number {
-	if (!Number.isFinite(min) || !Number.isFinite(max))
+	if (!(Number.isFinite(min) && Number.isFinite(max)))
 		throw new Error(
 			`getRandomInt() received \`min = ${min}\` wich is not a finite number!`,
 		);

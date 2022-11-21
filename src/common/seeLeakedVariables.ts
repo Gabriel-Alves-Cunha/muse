@@ -58,7 +58,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 			const isFromBrowser = browserGlobals.includes(key);
 			const isIgnored = ignoredGlobals.includes(key);
 
-			return !isFromBrowser && !isIgnored;
+			return !(isFromBrowser || isIgnored);
 		});
 
 		return runtimeGlobals;

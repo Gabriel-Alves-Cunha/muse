@@ -40,6 +40,7 @@ module.exports = {
 				"ctx-menu-item": "var(--text-ctx-menu-item)",
 				"ctx-menu": "var(--text-ctx-menu)",
 
+				"decorations-down": "var(--text-decorations-down)",
 				placeholder: "var(--text-placeholder)",
 				alternative: "var(--text-alternative)",
 				disabled: "var(--text-disabled)",

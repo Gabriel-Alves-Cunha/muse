@@ -7,7 +7,7 @@ import { type DialogTriggerProps, Trigger } from "@radix-ui/react-dialog";
 
 export const DialogTrigger = ({ className = "", tooltip, ...props }: Props) => (
 	<Trigger
-		className={"dialog-trigger " + className}
+		className={`dialog-trigger ${className}`}
 		title={tooltip}
 		{...props}
 	/>

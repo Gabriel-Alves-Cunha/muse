@@ -27,7 +27,7 @@ export async function searchForLyricsAndImage(
 	mediaArtist: string,
 	getImage: boolean,
 ): Promise<LyricsResponse> {
-	if (!mediaTitle || !mediaArtist)
+	if (!(mediaTitle && mediaArtist))
 		throw new Error(
 			`Required argument is empty: ${stringifyJson({
 				mediaArtist,
@@ -81,7 +81,7 @@ async function queryForPossibleLyric(
 
 	const [track] = jsonRes.result;
 
-	if (!track || !track.api_lyrics) throw new Error("No lyrics found!");
+	if (!(track?.api_lyrics)) throw new Error("No lyrics found!");
 
 	const {
 		api_lyrics: lyricURL,

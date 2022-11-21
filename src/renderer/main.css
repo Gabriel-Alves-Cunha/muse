@@ -42,8 +42,9 @@
 		--text-ctx-menu-item: #5747a6;
 		--text-ctx-menu: #7a797d;
 
+		--text-decorations-down: #0f172a;
 		--text-placeholder: #a3a3a3;
-		--text-alternative: #0f172a;
+		--text-alternative: #a3a3a3;
 		--text-disabled: #d3d3d5;
 		--text-normal: #0c0910;
 		--text-muted: #113047;
@@ -122,6 +123,7 @@
 		--text-ctx-menu-item: #5747a6;
 		--text-ctx-menu: #7a797d;
 
+		--text-decorations-down: #e4e1e1;
 		--text-placeholder: #a3a3a3;
 		--text-alternative: #e4e1e1;
 		--text-disabled: #d3d3d5;
@@ -715,7 +717,7 @@
 	}
 
 	.decorations-down p {
-		@apply flex h-full text-alternative font-secondary tracking-wide text-sm text-center font-medium;
+		@apply flex h-full text-decorations-down font-secondary tracking-wide text-sm text-center font-medium;
 	}
 
 	.decorations-down-left {

@@ -19,7 +19,7 @@ export function areArraysEqualByValue<T>(
 	a: readonly T[],
 	b: readonly T[],
 ): boolean {
-	if (!a || !b) return false;
+	if (!(a && b)) return false;
 	// Are references equal?
 	if (a === b) return true;
 	if (a.length !== b.length) return false;
