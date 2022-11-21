@@ -42,8 +42,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
 
 	async function loadAndOrToggleLyrics(): Promise<void> {
-		if (media?.lyrics)
-			return flipMediaPlayerCard();
+		if (media?.lyrics) return flipMediaPlayerCard();
 
 		setIsLoadingLyrics(true);
 		await searchAndOpenLyrics(media, path, openLyrics);
@@ -56,11 +55,13 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 			onPointerUp={loadAndOrToggleLyrics}
 			disabled={media === undefined}
 		>
-			{media?.lyrics ?
-				<LyricsPresent size={16} /> :
-				isLoadingLyrics ?
-				<RingLoader className="absolute text-white w-8 h-8" /> :
-				<NoLyrics size={16} />}
+			{media?.lyrics ? (
+				<LyricsPresent size={16} />
+			) : isLoadingLyrics ? (
+				<RingLoader className="absolute text-white w-8 h-8" />
+			) : (
+				<NoLyrics size={16} />
+			)}
 		</CircleIconButton>
 	);
 }
@@ -101,11 +102,14 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 /////////////////////////////////////////
 // Types:
 
-type HeaderProps = Readonly<
-	{ media: Media | undefined; displayTitle?: boolean; path: Path; }
->;
+type HeaderProps = Readonly<{
+	media: Media | undefined;
+	displayTitle?: boolean;
+	path: Path;
+}>;
 /////////////////////////////////////////
 
-type LoadOrToggleLyricsProps = Readonly<
-	{ media: Media | undefined; path: Path; }
->;
+type LoadOrToggleLyricsProps = Readonly<{
+	media: Media | undefined;
+	path: Path;
+}>;

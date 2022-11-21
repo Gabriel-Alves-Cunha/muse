@@ -26,8 +26,7 @@ export const keys = {
 
 export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 	setTimeout(() => {
-		if (value instanceof Map || value instanceof Set)
-			value = [...value];
+		if (value instanceof Map || value instanceof Set) value = [...value];
 
 		const json = JSON.stringify(value);
 
@@ -71,10 +70,7 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 			case keys.sortedByDate: {
 				const newSortedByDate = new Set(item as Path[]);
 
-				dbgPlaylists(
-					"getFromLocalStorage: newSortedByDate =",
-					newSortedByDate,
-				);
+				dbgPlaylists("getFromLocalStorage: newSortedByDate =", newSortedByDate);
 
 				return newSortedByDate;
 			}

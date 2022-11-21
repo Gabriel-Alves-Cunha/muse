@@ -17,10 +17,8 @@ export function Lyrics({ media, path }: Props) {
 			<Header media={media} path={path} displayTitle />
 
 			<div className="relative w-full h-full mt-8 scroll scroll-1 scroll-white overflow-x-hidden">
-				{
-					/* whiteSpace: "pre-line", // break on new line!
-						wordWrap: "break-word" */
-				}
+				{/* whiteSpace: "pre-line", // break on new line!
+						wordWrap: "break-word" */}
 				<p className="relative mb-24 whitespace-pre-line font-primary tracking-wide leading-6 text-left text-white font-medium">
 					{media?.lyrics}
 				</p>
@@ -67,8 +65,8 @@ export async function searchAndOpenLyrics(
 			// dprint-ignore
 			thingsToChange: [
 				{ whatToChange: "album", newValue: albumName },
-				{ whatToChange: "imageURL",	newValue: image	},
-				{ whatToChange: "lyrics", newValue: lyric }
+				{ whatToChange: "imageURL", newValue: image },
+				{ whatToChange: "lyrics", newValue: lyric },
 			],
 			mediaPath,
 		});
@@ -88,4 +86,4 @@ export async function searchAndOpenLyrics(
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ media: Media | undefined; path: Path; }>;
+type Props = Readonly<{ media: Media | undefined; path: Path }>;

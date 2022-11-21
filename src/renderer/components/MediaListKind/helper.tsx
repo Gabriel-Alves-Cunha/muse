@@ -54,8 +54,7 @@ export function selectMediaByPointerEvent(
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
 
-	if (!mediaClickedMediaPath)
-		return console.info("No 'data-path' found!");
+	if (!mediaClickedMediaPath) return console.info("No 'data-path' found!");
 
 	addToAllSelectedMedias(mediaClickedMediaPath);
 }
@@ -86,16 +85,16 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => (
 		<div
-			className={(getAllSelectedMedias().has(path) === true ?
-				"selected " :
-				"") +
+			className={
+				(getAllSelectedMedias().has(path) === true ? "selected " : "") +
 				(getCurrentPlaying().path === path ? "playing " : "") +
-				"row-wrapper"}
+				"row-wrapper"
+			}
 			data-path={path}
 		>
 			<button
 				className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
-				onPointerUp={e => selectOrPlayMedia(e, path)}
+				onPointerUp={(e) => selectOrPlayMedia(e, path)}
 				title={t("tooltips.playThisMedia")}
 			>
 				<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
@@ -173,20 +172,18 @@ export const reloadWindow = (): void =>
 /////////////////////////////////////////////
 // Types:
 
-type RowProps = Readonly<{ media: Media; path: Path; }>;
+type RowProps = Readonly<{ media: Media; path: Path }>;
 
 /////////////////////////////////////////////
 
-type FromList = Readonly<
-	{
-		fromList: Exclude<
-			PlaylistList,
-			PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
-		>;
-		homeList: Extract<
-			PlaylistList,
-			PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
-		>;
-		isHome: boolean;
-	}
->;
+type FromList = Readonly<{
+	fromList: Exclude<
+		PlaylistList,
+		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+	>;
+	homeList: Extract<
+		PlaylistList,
+		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+	>;
+	isHome: boolean;
+}>;

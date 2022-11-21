@@ -4,7 +4,7 @@ import { Clean } from "./Clean";
 
 export function GroupedButton(buttons: Buttons) {
 	return (
-		<div className="first:rounded-l-xl last:rounded-r-xl only:rounded-full">
+		<div className="flex">
 			{buttons.reload && <Reload />}
 
 			{buttons.sortBy && <SortBy />}
@@ -19,6 +19,8 @@ export function GroupedButton(buttons: Buttons) {
 /////////////////////////////////////////////
 // Types:
 
-type Buttons = Readonly<
-	{ reload?: boolean; sortBy?: boolean; clean?: boolean; }
->;
+type Buttons = Readonly<{
+	reload?: boolean;
+	sortBy?: boolean;
+	clean?: boolean;
+}>;

@@ -36,9 +36,9 @@ export function Converting() {
 				);
 			} catch (error) {
 				errorToast(
-					`${t("toasts.conversionError.beforePath")}"${path}"${
-						t("toasts.conversionError.afterPath")
-					}`,
+					`${t("toasts.conversionError.beforePath")}"${path}"${t(
+						"toasts.conversionError.afterPath",
+					)}`,
 				);
 
 				console.error(error);
@@ -55,8 +55,10 @@ export function Converting() {
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
-				className={(convertingListSize > 0 ? "has-items " : "") +
-					"flex justify-center items-center w-11 h-11"}
+				className={
+					(convertingListSize > 0 ? "has-items " : "") +
+					"flex justify-center items-center w-11 h-11"
+				}
 				title={t("tooltips.showAllConvertingMedias")}
 			>
 				<span data-length={convertingListSize}></span>
@@ -65,9 +67,11 @@ export function Converting() {
 			</Trigger>
 
 			<PopoverContent
-				size={convertingListSize === 0 ?
-					"nothing-found-for-convertions-or-downloads" :
-					"convertions-or-downloads"}
+				size={
+					convertingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}
 				side="right"
 				align="end"
 			>

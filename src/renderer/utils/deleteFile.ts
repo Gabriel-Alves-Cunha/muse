@@ -24,8 +24,8 @@ export async function deleteFile(path: Path): Promise<void> {
 		});
 	} else
 		errorToast(
-			`${t("toasts.mediaDeletionError.beforePath")}"${path}"${
-				t("toasts.mediaDeletionError.afterPath")
-			}`,
+			`${t("toasts.mediaDeletionError.beforePath")}"${path}"${t(
+				"toasts.mediaDeletionError.afterPath",
+			)}`,
 		);
 }

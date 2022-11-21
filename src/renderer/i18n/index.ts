@@ -20,9 +20,8 @@ const i18nConfig: InitOptions = {
 i18n
 	.use(LanguageDetector) // Uses the lang detector of your browser.
 	.use(initReactI18next) // Uses i18n's specific pkg for React.
-	.init(i18nConfig, err => {
-		if (err)
-			console.error("Something went wrong loading translations!", err);
+	.init(i18nConfig, (err) => {
+		if (err) console.error("Something went wrong loading translations!", err);
 	}); // Uses our configuration.
 
 export default i18n;

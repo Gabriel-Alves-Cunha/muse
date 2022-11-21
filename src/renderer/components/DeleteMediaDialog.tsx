@@ -46,4 +46,4 @@ export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ handleMediaDeletion: () => void; }>;
+type Props = Readonly<{ handleMediaDeletion: () => void }>;

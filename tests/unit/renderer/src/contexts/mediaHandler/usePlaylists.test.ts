@@ -110,10 +110,11 @@ it("should play the next media", () => {
 		expect(
 			getMainList().size,
 			"mainList.size at the start should be equal to numberOfMedias!",
-		)
-			.toBe(numberOfMedias);
-		expect(getFavorites().size, "favorites.size at the start should be 0!")
-			.toBe(0);
+		).toBe(numberOfMedias);
+		expect(
+			getFavorites().size,
+			"favorites.size at the start should be 0!",
+		).toBe(0);
 		expect(getHistory().size, "history.length at the start should be 0!").toBe(
 			0,
 		);
@@ -122,15 +123,13 @@ it("should play the next media", () => {
 		expect(
 			firstMediaPath,
 			`There should be a firstMediaPath = "${firstMediaPath}"!`,
-		)
-			.toBeTruthy();
+		).toBeTruthy();
 
 		playThisMedia(firstMediaPath, PlaylistList.MAIN_LIST);
 		expect(
 			getCurrentPlaying().path,
 			"currentPlaying().path should be equal to firstMediaPath!",
-		)
-			.toBe(firstMediaPath);
+		).toBe(firstMediaPath);
 		expect(getHistory().size, "history().length should be 1 here!").toBe(1);
 	}
 
@@ -146,20 +145,20 @@ it("should play the next media", () => {
 		expect(
 			getCurrentPlaying().path,
 			`\ncurrentPlaying().path before playing the next media should be the prevMediaPath = "${currMediaPath}"!\n`,
-		)
-			.toBe(currMediaPath);
+		).toBe(currMediaPath);
 
 		playNextMedia();
 
 		expect(
 			getCurrentPlaying().path,
 			`currentPlaying().path after playing the next media should be the expectedMediaPath = "${expectedMediaPath}".\nprevMediaPath = "${currMediaPath}"!\n`,
-		)
-			.toBe(expectedMediaPath);
+		).toBe(expectedMediaPath);
 	}
 
-	expect(getHistory().size, `history().length should be ${numberOfMedias}!`)
-		.toBe(numberOfMedias);
+	expect(
+		getHistory().size,
+		`history().length should be ${numberOfMedias}!`,
+	).toBe(numberOfMedias);
 });
 
 /////////////////////////////////////////////

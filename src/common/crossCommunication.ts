@@ -16,9 +16,9 @@ export const sendMsgToBackend = (
 ): void => {
 	dbg("Sending message to backend:", { msg, electronPort });
 
-	electronPort ?
-		window.postMessage({ msg, source: reactSource }, "*", [electronPort]) :
-		window.postMessage({ msg, source: reactSource }, "*");
+	electronPort
+		? window.postMessage({ msg, source: reactSource }, "*", [electronPort])
+		: window.postMessage({ msg, source: reactSource }, "*");
 };
 
 /////////////////////////////////////////
@@ -40,4 +40,4 @@ export const reactSource = "muse-react";
 /////////////////////////////////////////
 // Types:
 
-export type MsgWithSource<T> = DeepReadonly<{ source: string; msg: T; }>;
+export type MsgWithSource<T> = DeepReadonly<{ source: string; msg: T }>;

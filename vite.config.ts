@@ -31,13 +31,13 @@ export default defineConfig(({ mode }) => {
 			],
 		},
 
-		define: isTest ?
-			{ isDev: isDevelopment } :
-			{
-				"process.env": process.env ?? "{}",
-				"import.meta.vitest": "undefined",
-				isDev: isDevelopment,
-			},
+		define: isTest
+			? { isDev: isDevelopment }
+			: {
+					"process.env": process.env ?? "{}",
+					"import.meta.vitest": "undefined",
+					isDev: isDevelopment,
+			  },
 		server: { port: 3_000 },
 		root: "./src/renderer",
 		plugins: [

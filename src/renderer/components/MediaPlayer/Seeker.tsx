@@ -13,11 +13,14 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 
-	const { formatedDuration, isDurationValid } = useMemo(() => ({
-		formatedDuration: formatDuration(audio?.duration),
-		// @ts-ignore => It will give false if duration is undefined:
-		isDurationValid: audio?.duration > 0,
-	}), [audio?.duration]);
+	const { formatedDuration, isDurationValid } = useMemo(
+		() => ({
+			formatedDuration: formatDuration(audio?.duration),
+			// @ts-ignore => It will give false if duration is undefined:
+			isDurationValid: audio?.duration > 0,
+		}),
+		[audio?.duration],
+	);
 
 	useEffect(() => {
 		// dprint-ignore
@@ -35,9 +38,8 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 		function setTimerTooltip({ offsetX }: PointerEvent): void {
 			if (audio === null) return;
 
-			const time = offsetX /
-				timeline.getBoundingClientRect().width *
-				audio.duration;
+			const time =
+				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
 			const left = offsetX - (35 >> 1); // 35 is the width of the tooltip.
 			// Also, (35 >> 1) is the half of the width (binary divide by 2).
 
@@ -49,8 +51,8 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 			if (audio === null || isNaN(audio.duration) || !isFinite(audio.duration))
 				return;
 
-			const desiredTime = (offsetX / timeline.getBoundingClientRect().width) *
-				audio.duration;
+			const desiredTime =
+				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
 			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
 
 			useProgress.setState({ percentage });
@@ -58,7 +60,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 
 		timeline.addEventListener("pointermove", setTimerTooltip);
 
-		timeline.addEventListener("pointerdown", e => {
+		timeline.addEventListener("pointerdown", (e) => {
 			// Make sure that event is captured even if pointer moves away from timeline rect bounds:
 			timeline.setPointerCapture(e.pointerId);
 
@@ -66,35 +68,42 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 			seek(e);
 
 			timeline.addEventListener("pointermove", seek);
-			timeline.addEventListener("pointerup", e => {
-				timeline.removeEventListener("pointermove", seek);
+			timeline.addEventListener(
+				"pointerup",
+				(e) => {
+					timeline.removeEventListener("pointermove", seek);
 
-				isSeeking.current = false;
+					isSeeking.current = false;
 
-				const desiredTime = (e
-					.offsetX / timeline.getBoundingClientRect().width) * audio.duration;
+					const desiredTime =
+						(e.offsetX / timeline.getBoundingClientRect().width) *
+						audio.duration;
 
-				audio.currentTime = desiredTime;
-			}, { once: true });
+					audio.currentTime = desiredTime;
+				},
+				{ once: true },
+			);
 		});
 	}, [audio, isDurationValid, isSeeking]);
 
 	return (
 		<div className="flex flex-col w-full px-3 gap-2">
 			<div
-				className={"group relative block w-full h-1 bg-main " +
-						isDurationValid ?
-					"cursor-pointer" :
-					"cursor-default"}
+				className={
+					"group relative block w-full h-1 bg-main " + isDurationValid
+						? "cursor-pointer"
+						: "cursor-default"
+				}
 				// onPointerUp={e => seek(e, audio)}
 				// onPointerMove={setTimerTooltip}
 				ref={progressWrapperRef}
 			>
 				<span // Timer tooltip
-					className={"group-hover:progress group-focus:progress " +
-							isDurationValid ?
-						"hidden" :
-						""}
+					className={
+						"group-hover:progress group-focus:progress " + isDurationValid
+							? "hidden"
+							: ""
+					}
 					ref={timeTooltipRef}
 				/>
 
@@ -131,9 +140,7 @@ const Progress = () => {
 	);
 
 	return (
-		<div
-			className={"relative bg-accent h-full w-[var(--progress-width)]"}
-		/>
+		<div className={"relative bg-accent h-full w-[var(--progress-width)]"} />
 	);
 };
 

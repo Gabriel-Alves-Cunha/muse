@@ -12,16 +12,13 @@ import { areObjectKeysEqual } from "@utils/object";
 
 export const setCurrentPlayingOnLocalStorage: SetLocalStoragePlugin<
 	CurrentPlaying
-> = fn => (set, get, store) => {
+> = (fn) => (set, get, store) => {
 	const newSetter: typeof set = (
 		newCurrentPlaying: Partial<CurrentPlaying>,
 		replace,
 	) => {
 		const previousState = get();
-		const areStatesEqual = areObjectKeysEqual(
-			newCurrentPlaying,
-			previousState,
-		);
+		const areStatesEqual = areObjectKeysEqual(newCurrentPlaying, previousState);
 
 		set(newCurrentPlaying, replace);
 
@@ -37,25 +34,24 @@ export const setCurrentPlayingOnLocalStorage: SetLocalStoragePlugin<
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const setPlayOptionsOnLocalStorage: SetLocalStoragePlugin<
-	PlayOptions
-> = fn => (set, get, store) => {
-	const newSetter: typeof set = (
-		newPlayOptions: Partial<PlayOptions>,
-		replace,
-	) => {
-		const previousState = get();
-		const areStatesEqual = areObjectKeysEqual(newPlayOptions, previousState);
+export const setPlayOptionsOnLocalStorage: SetLocalStoragePlugin<PlayOptions> =
+	(fn) => (set, get, store) => {
+		const newSetter: typeof set = (
+			newPlayOptions: Partial<PlayOptions>,
+			replace,
+		) => {
+			const previousState = get();
+			const areStatesEqual = areObjectKeysEqual(newPlayOptions, previousState);
 
-		set(newPlayOptions, replace);
+			set(newPlayOptions, replace);
 
-		if (!areStatesEqual) setLocalStorage(keys.playOptions, get());
+			if (!areStatesEqual) setLocalStorage(keys.playOptions, get());
+		};
+
+		store.setState = newSetter;
+
+		return fn(newSetter, get, store);
 	};
-
-	store.setState = newSetter;
-
-	return fn(newSetter, get, store);
-};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -63,14 +59,15 @@ export const setPlayOptionsOnLocalStorage: SetLocalStoragePlugin<
 
 export const setPlaylistsOnLocalStorage: SetLocalStoragePlugin<
 	UsePlaylistsActions
-> = fn => (set, get, store) => {
+> = (fn) => (set, get, store) => {
 	const newSetter: typeof set = (
 		args: PlaylistsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
 		replace: boolean,
 	) => {
-		(["favorites", "history"] as const).forEach(key =>
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			args[key] && setLocalStorage(keys[key], args[key]!)
+		(["favorites", "history"] as const).forEach(
+			(key) =>
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				args[key] && setLocalStorage(keys[key], args[key]!),
 		);
 
 		set(args, replace);

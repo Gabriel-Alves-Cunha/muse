@@ -61,9 +61,9 @@ export function Downloading() {
 			console.error(error);
 
 			errorToast(
-				`${t("toasts.downloadError.beforePath")}"${downloadInfo.title}"${
-					t("toasts.downloadError.afterPath")
-				}`,
+				`${t("toasts.downloadError.beforePath")}"${downloadInfo.title}"${t(
+					"toasts.downloadError.afterPath",
+				)}`,
 			);
 		}
 
@@ -73,9 +73,11 @@ export function Downloading() {
 	return (
 		<PopoverRoot modal open={isOpen} onOpenChange={setIsOpen}>
 			<Trigger
-				className={(downloadingListSize > 0 ? "has-items " : "") +
+				className={
+					(downloadingListSize > 0 ? "has-items " : "") +
 					(isOpen === true ? "active " : "") +
-					"relative flex justify-center items-center bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "}
+					"relative flex justify-center items-center bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "
+				}
 				title={t("tooltips.showAllDownloadingMedias")}
 			>
 				<span data-length={downloadingListSize}></span>
@@ -84,9 +86,11 @@ export function Downloading() {
 			</Trigger>
 
 			<PopoverContent
-				size={downloadingListSize === 0 ?
-					"nothing-found-for-convertions-or-downloads" :
-					"convertions-or-downloads"}
+				size={
+					downloadingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}
 				side="right"
 				align="end"
 			>
@@ -101,12 +105,10 @@ export function Downloading() {
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingDownloaded = Readonly<
-	{
-		status: ValuesOf<typeof progressStatus>;
-		percentage: number;
-		port: MessagePort;
-		imageURL: string;
-		title: string;
-	}
->;
+export type MediaBeingDownloaded = Readonly<{
+	status: ValuesOf<typeof progressStatus>;
+	percentage: number;
+	port: MessagePort;
+	imageURL: string;
+	title: string;
+}>;

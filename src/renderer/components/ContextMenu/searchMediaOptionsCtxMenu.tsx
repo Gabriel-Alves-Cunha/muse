@@ -82,7 +82,7 @@ function selectAllMediasOnSearchResult(): void {
 function searchForLyrics(): void {
 	const allMedias = getMainList();
 
-	getAllSelectedMedias().forEach(async path => {
+	getAllSelectedMedias().forEach(async (path) => {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);
@@ -94,4 +94,4 @@ function searchForLyrics(): void {
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ isAllDisabled: boolean; }>;
+type Props = Readonly<{ isAllDisabled: boolean }>;

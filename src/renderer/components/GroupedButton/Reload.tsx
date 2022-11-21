@@ -20,7 +20,7 @@ export function Reload() {
 			onPointerUp={searchLocalComputerForMedias}
 			title={t("tooltips.reloadAllMedias")}
 		>
-			<ReloadIcon size={17} />
+			<ReloadIcon size={17} className="fill-white" />
 		</ButtonOfGroup>
 	);
 }

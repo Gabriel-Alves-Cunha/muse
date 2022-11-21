@@ -18,9 +18,10 @@ const defaultValues: Settings = {
 	maxSizeOfHistory: 100,
 };
 const savedSettings = window.localStorage.getItem(settingsKey);
-const settingsToApply = savedSettings === null ?
-	defaultValues :
-	(JSON.parse(savedSettings) as Settings);
+const settingsToApply =
+	savedSettings === null
+		? defaultValues
+		: (JSON.parse(savedSettings) as Settings);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -29,7 +30,7 @@ const settingsToApply = savedSettings === null ?
 
 export const useSettings = create<Settings>()(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	subscribeWithSelector((_set, _get, _api) => (settingsToApply)),
+	subscribeWithSelector((_set, _get, _api) => settingsToApply),
 );
 
 export const { getState: getSettings, setState: setSettings } = useSettings;
@@ -40,12 +41,9 @@ export const { getState: getSettings, setState: setSettings } = useSettings;
 // Helper function:
 
 useSettings.subscribe(
-	state => state,
+	(state) => state,
 	function writeToLocalStorage(newSettings): void {
-		window.localStorage.setItem(
-			settingsKey,
-			JSON.stringify(newSettings),
-		);
+		window.localStorage.setItem(settingsKey, JSON.stringify(newSettings));
 	},
 );
 
@@ -54,11 +52,9 @@ useSettings.subscribe(
 ////////////////////////////////////////////////
 // Types:
 
-export type Settings = Readonly<
-	{
-		assureMediaSizeIsGreaterThan60KB: boolean;
-		ignoreMediaWithLessThan60Seconds: boolean;
-		filesToShare: ReadonlySet<Path>;
-		maxSizeOfHistory: number;
-	}
->;
+export type Settings = Readonly<{
+	assureMediaSizeIsGreaterThan60KB: boolean;
+	ignoreMediaWithLessThan60Seconds: boolean;
+	filesToShare: ReadonlySet<Path>;
+	maxSizeOfHistory: number;
+}>;

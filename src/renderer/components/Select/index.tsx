@@ -1,14 +1,16 @@
 import type { ValuesOf } from "@common/@types/utils";
 
 import {
+	Viewport,
 	Trigger,
 	Content,
+	Portal,
 	Value,
 	Root,
 } from "@radix-ui/react-select";
 
+import { SelectOrderOptions } from "./SelectOrderOptions";
 import { assertUnreachable } from "@utils/utils";
-import { HeaderButtons } from "./HeaderButtons";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -16,7 +18,7 @@ import { HeaderButtons } from "./HeaderButtons";
 // Enums:
 
 export const contentOfSelectEnum = {
-	GROUPED_BUTTON_SORT_BY: 1,
+	GROUPED_BUTTON_SORT_BY: 2,
 } as const;
 
 /////////////////////////////////////////
@@ -24,22 +26,18 @@ export const contentOfSelectEnum = {
 /////////////////////////////////////////
 // Main function:
 
-export const Select = (
-	{
-		triggerClassName = "",
-		triggerTitle = "",
-		children,
-		setValue,
-		tooltip,
-		content,
-		value,
-	}: Props,
-) => (
+export const Select = ({
+	triggerClassName = "",
+	triggerTitle = "",
+	children,
+	setValue,
+	tooltip,
+	content,
+	value,
+}: Props) => (
 	<Root value={value} onValueChange={setValue}>
 		<Trigger
-			className={triggerClassName +
-				" relative justify-center items-center cursor-pointer bg-none border-none no-transition"}
-			aria-label={tooltip}
+			className={`relative flex justify-center items-center cursor-pointer bg-none border-none ${triggerClassName}`}
 			title={tooltip}
 		>
 			<Value className="pl-6 text-ctx-menu-item font-secondary leading-6 text-xs">
@@ -49,9 +47,11 @@ export const Select = (
 			{children}
 		</Trigger>
 
-		<Content className="bg-select overflow-hidden rounded-md z-50 shadow-md">
-			{contentToShow(content)}
-		</Content>
+		<Portal>
+			<Content className="select-content">
+				<Viewport className="no-transition p-1">{contentToShow(content)}</Viewport>
+			</Content>
+		</Portal>
 	</Root>
 );
 
@@ -60,15 +60,13 @@ export const Select = (
 /////////////////////////////////////////
 // Helper function:
 
-function contentToShow(
-	content: ValuesOf<typeof contentOfSelectEnum>,
-) {
+function contentToShow(content: ValuesOf<typeof contentOfSelectEnum>) {
 	switch (content) {
 		// case FULL_EXAMPLE:
 		// 	return <FullExampleSelectButton />;
 
 		case contentOfSelectEnum.GROUPED_BUTTON_SORT_BY:
-			return <HeaderButtons />;
+			return <SelectOrderOptions />;
 
 		default:
 			return assertUnreachable(content);
@@ -80,14 +78,12 @@ function contentToShow(
 /////////////////////////////////////////
 // Types:
 
-type Props<T = unknown> = Readonly<
-	{
-		content: ValuesOf<typeof contentOfSelectEnum>;
-		triggerClassName?: string;
-		children: React.ReactNode;
-		setValue(value: T): void;
-		triggerTitle?: string;
-		tooltip: string;
-		value: string;
-	}
->;
+type Props<T = unknown> = Readonly<{
+	content: ValuesOf<typeof contentOfSelectEnum>;
+	triggerClassName?: string;
+	children: React.ReactNode;
+	setValue(value: T): void;
+	triggerTitle?: string;
+	tooltip: string;
+	value: string;
+}>;

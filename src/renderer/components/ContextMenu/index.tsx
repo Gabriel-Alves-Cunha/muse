@@ -28,10 +28,13 @@ const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN, SEARCH_MEDIA_OPTIONS } =
 /////////////////////////////////////////////
 // Main function:
 
-export const ContextMenu = (
-	{ children, content = MAIN, onContextMenu, setIsOpen, isAllDisabled = false }:
-		Props,
-) => (
+export const ContextMenu = ({
+	children,
+	content = MAIN,
+	onContextMenu,
+	setIsOpen,
+	isAllDisabled = false,
+}: Props) => (
 	<Root onOpenChange={setIsOpen} modal>
 		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
 
@@ -76,12 +79,10 @@ function contentToShow(
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<
-	{
-		onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
-		setIsOpen?: (newIsOpen: boolean) => void;
-		content?: ValuesOf<typeof ctxContentEnum>;
-		isAllDisabled?: boolean;
-		children: ReactNode;
-	}
->;
+type Props = Readonly<{
+	onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
+	setIsOpen?: (newIsOpen: boolean) => void;
+	content?: ValuesOf<typeof ctxContentEnum>;
+	isAllDisabled?: boolean;
+	children: ReactNode;
+}>;

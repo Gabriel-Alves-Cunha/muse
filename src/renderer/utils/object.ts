@@ -12,10 +12,9 @@ export function areObjectKeysEqual(obj_1: Obj, obj_2: Obj): boolean {
 //////////////////////////////////////////
 
 export function getObjectDeepKeys(obj: Obj): string[] {
-	return Object
-		.keys(obj)
-		.filter(key => obj[key] instanceof Object)
-		.map(key => getObjectDeepKeys(obj[key] as Obj).map(k => `${key}.${k}`))
+	return Object.keys(obj)
+		.filter((key) => obj[key] instanceof Object)
+		.map((key) => getObjectDeepKeys(obj[key] as Obj).map((k) => `${key}.${k}`))
 		.reduce((x, y) => x.concat(y), Object.keys(obj));
 }
 

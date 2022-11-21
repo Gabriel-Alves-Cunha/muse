@@ -1,10 +1,10 @@
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
+import { contentOfSelectEnum, Select } from "@components/Select";
 import { assertUnreachable } from "@utils/utils";
 import { PlaylistList } from "@contexts/usePlaylists";
 import { setFromList } from "@components/MediaListKind/helper";
-import { contentOfSelectEnum, Select } from "@components/Select";
 import { t } from "@components/I18n";
 
 /////////////////////////////////////////////
@@ -23,9 +23,10 @@ export function SortBy() {
 			case "Name":
 				break;
 
-			case "Date":
+			case "Date": {
 				homeList = PlaylistList.SORTED_BY_DATE;
 				break;
+			}
 
 			default:
 				assertUnreachable(selectedList);
@@ -36,12 +37,13 @@ export function SortBy() {
 
 	return (
 		<Select
+			triggerClassName="bg-button-hover px-5 h-9 transition-colors ease-linear active:scale-95 first:rounded-l-xl last:rounded-r-xl only:rounded-full"
 			content={contentOfSelectEnum.GROUPED_BUTTON_SORT_BY}
 			tooltip={t("tooltips.sortBy")}
 			setValue={setSelectedList}
 			value={selectedList}
 		>
-			<SortIcon size={19} />
+			<SortIcon size={19} className="fill-white" />
 		</Select>
 	);
 }

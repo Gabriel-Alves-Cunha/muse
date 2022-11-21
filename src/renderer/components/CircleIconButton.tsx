@@ -1,6 +1,8 @@
-export const CircleIconButton = (
-	{ className = "", variant = "small", ...props }: Props,
-) => (
+export const CircleIconButton = ({
+	className = "",
+	variant = "small",
+	...props
+}: Props) => (
 	<button
 		className={`circle-icon-button circle-icon-button-${variant} ${className}`}
 		{...props}

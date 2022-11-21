@@ -6,6 +6,9 @@
 	:root {
 		--down-decorations-height: 20px;
 		--top-decorations-height: 27px;
+		--main-grid-height: calc(
+			100vh - var(--top-decorations-height) - var(--down-decorations-height)
+		);
 
 		/* Default theme: light */
 		/* Colors */
@@ -176,7 +179,8 @@
 	*::after,
 	*::before {
 		text-rendering: optimizeLegibility;
-		box-sizing: inherit;
+		box-sizing: border-box;
+		/* box-sizing: inherit; */
 
 		overscroll-behavior: none;
 	}
@@ -188,8 +192,8 @@
 	body {
 		position: fixed;
 		line-height: 1.5;
-		height: 100%;
-		width: 100%;
+		/* height: 100%; */
+		/* width: 100%; */
 
 		/* contain-intrinsic-size: auto; */
 		contain-intrinsic-size: 1px 5000px;
@@ -207,34 +211,34 @@
 
 	/* assistant-300 - latin */
 	@font-face {
+		src: url("./assets/assistant-v16-latin-300.woff2") format("woff2");
 		font-family: "Assistant";
 		font-style: normal;
 		font-weight: 300;
-		src: url("./assets/assistant-v16-latin-300.woff2") format("woff2");
 	}
 
 	/* assistant-regular-400 - latin */
 	@font-face {
+		src: url("./assets/assistant-v16-latin-regular.woff2") format("woff2");
 		font-family: "Assistant";
 		font-style: normal;
 		font-weight: 400;
-		src: url("./assets/assistant-v16-latin-regular.woff2") format("woff2");
 	}
 
 	/* assistant-500 - latin */
 	@font-face {
+		src: url("./assets/assistant-v16-latin-500.woff2") format("woff2");
 		font-family: "Assistant";
 		font-style: normal;
 		font-weight: 500;
-		src: url("./assets/assistant-v16-latin-500.woff2") format("woff2");
 	}
 
 	/* source-sans-pro-regular-400 - latin */
 	@font-face {
+		src: url("./assets/source-sans-pro-v21-latin-regular.woff2") format("woff2");
 		font-family: "Source Sans Pro";
 		font-style: normal;
 		font-weight: 400;
-		src: url("./assets/source-sans-pro-v21-latin-regular.woff2") format("woff2");
 	}
 }
 
@@ -247,12 +251,14 @@
 
 	.grid-area-media-player {
 		grid-area: media-player;
+		height: var(--main-grid-height);
 
-		@apply inline-block justify-self-center self-center w-screen h-16;
+		@apply inline-block justify-self-center self-center w-screen;
 	}
 
 	.grid-area-main {
 		grid-area: main-area;
+		height: var(--main-grid-height);
 	}
 
 	.grid-template-for-content-wrapper {
@@ -261,10 +267,8 @@
 				200px,
 				25vw
 			);
+		height: var(--main-grid-height);
 		width: 100vw;
-		height: calc(
-			100vh - var(--top-decorations-height) - var(--down-decorations-height)
-		);
 
 		margin-top: var(--top-decorations-height);
 		background: var(--bg-main);
@@ -388,12 +392,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	.transition-label {
-		transition-property: color, top, left;
-		transition-timing-function: ease;
-		transition-duration: 200ms;
-	}
-
+	.transition-shadow:focus-visible,
 	.transition-shadow:hover,
 	.transition-shadow:focus,
 	.active-shadow {
@@ -455,6 +454,7 @@
 		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-normal;
 	}
 
+	.button:focus-visible,
 	.button:hover,
 	.button:focus {
 		@apply bg-accent text-white;
@@ -477,6 +477,7 @@
 		@apply hidden w-[calc(100%-115px)] h-9 border-2 border-solid border-input rounded-xl transition-bc-bg;
 	}
 
+	.button-input:focus-visible,
 	.button-input:hover,
 	.button-input:focus {
 		@apply border-active bg-active text-white;
@@ -489,6 +490,7 @@
 		transition: border-color 200ms ease;
 	}
 
+	.file-present:focus-visible,
 	.file-present:hover,
 	.file-present:focus {
 		background: var(--active);
@@ -505,6 +507,7 @@
 		@apply relative flex justify-center items-center bg-none no-transition;
 	}
 
+	.grouped-button:focus-visible,
 	.grouped-button:hover,
 	.grouped-button:focus {
 		@apply bg-button-hover text-white;
@@ -574,10 +577,8 @@
 		color: white;
 	}
 
-	.delete-media:hover {
-		background: #821e20;
-	}
-
+	.delete-media:focus-visible,
+	.delete-media:hover,
 	.delete-media:focus {
 		background: #821e20;
 	}
@@ -590,11 +591,13 @@
 		@apply w-80 h-5;
 	}
 
+	.ctx-trigger:focus-visible,
 	.ctx-trigger:focus,
 	.ctx-trigger:hover {
 		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
 	}
 
+	.ctx-trigger:focus-visible svg,
 	.ctx-trigger:focus svg,
 	.ctx-trigger:hover svg {
 		@apply text-ctx-menu-item-focus;
@@ -608,18 +611,33 @@
 		@apply text-disabled;
 	}
 
-	.trigger-search-media {
-		@apply absolute top-1/4 right-1;
+	.search-media * {
+		transition-timing-function: ease;
+		transition-duration: 200ms;
+		transition-property: all;
 	}
 
-	.trigger-search-media:hover,
-	.trigger-search-media:focus {
-		@apply bg-media-player-icon-button-hovered;
+	.search-media:focus-visible,
+	.search-media:focus-within,
+	.search-media:hover,
+	.search-media:focus {
+		@apply border-active cursor-text;
 	}
 
-	.trigger-search-media:hover svg,
-	.trigger-search-media:focus svg {
-		color: inherit; /* keep same color */
+	.search-media:focus-visible svg,
+	.search-media:focus-within svg,
+	.search-media:hover svg,
+	.search-media:focus svg {
+		@apply text-active;
+	}
+
+	.search-media:focus-visible label,
+	.search-media:focus-within label,
+	.search-media:hover label,
+	.search-media:focus label {
+		transform: translate(-44px, -31px);
+
+		@apply text-active;
 	}
 
 	.selected-row {
@@ -632,6 +650,47 @@
 
 	.list {
 		@apply scroll-2;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Select */
+
+	.select-content {
+		background: var(--bg-select);
+		border-radius: 6px;
+		overflow: hidden;
+
+		box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+			0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+	}
+
+	.select-item {
+		display: flex;
+		position: relative;
+		align-items: center;
+		height: 25px;
+
+		padding: 0 35px 0 25px;
+		border-radius: 3px;
+		user-select: none;
+
+		color: #7d52c9;
+		font-size: 13px;
+		line-height: 1;
+	}
+
+	.select-item[data-disabled] {
+		pointer-events: none;
+		color: #d5d4d7;
+	}
+
+	.select-item[data-highlighted] {
+		background: #6e56cf;
+		color: var(--bg-select);
+		outline: none;
 	}
 
 	/* ********************************** */
@@ -664,10 +723,12 @@
 
 	.nav {
 		grid-area: nav;
+		height: var(--main-grid-height);
 
-		@apply text-icon-deactivated flex flex-col justify-between items-center sm:w-11 md:w-16 h-[calc(100vh-var(--top-decorations-height)-var(--down-decorations-height))] bg-navbar no-transition;
+		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition;
 	}
 
+	.nav button:focus-visible,
 	.nav button:hover,
 	.nav button:focus {
 		@apply text-active;
@@ -681,6 +742,7 @@
 		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
 	}
 
+	.buttons-for-pages button:focus-visible,
 	.buttons-for-pages button:hover,
 	.buttons-for-pages button:focus {
 		@apply text-icon-active;
@@ -700,6 +762,7 @@
 		@apply flex justify-center items-center w-11 h-11 bg-none border-none text-icon-deactivated;
 	}
 
+	.toggle-theme-button:focus-visible,
 	.toggle-theme-button:hover,
 	.toggle-theme-button:focus {
 		@apply hover:text-icon-active focus:text-icon-active;
@@ -715,6 +778,7 @@
 		@apply relative flex justify-center items-center cursor-pointer bg-none rounded-full border-none;
 	}
 
+	.circle-icon-button:focus-visible,
 	.circle-icon-button:focus,
 	.circle-icon-button:hover {
 		@apply bg-icon-button-hovered;
@@ -752,11 +816,13 @@
 		@apply unset-all relative flex justify-center items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full border-none no-transition;
 	}
 
+	.dialog-trigger:focus-visible,
 	.dialog-trigger:hover,
 	.dialog-trigger:focus {
 		@apply bg-icon-button-hovered;
 	}
 
+	.dialog-trigger:focus-visible svg,
 	.dialog-trigger:hover svg,
 	.dialog-trigger:focus svg {
 		@apply text-normal bg-icon-button-hovered;
@@ -772,8 +838,9 @@
 		@apply flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll-1;
 	}
 
+	.popover:focus-visible,
 	.popover:focus,
-	.popover.hover {
+	.popover:hover {
 		@apply shadow-popover outline-none;
 	}
 
@@ -804,10 +871,6 @@
 	/* ********************************** */
 
 	/* MainArea */
-
-	.main-area header {
-		@apply sm:justify-center;
-	}
 
 	/* ********************************** */
 	/* ********************************** */

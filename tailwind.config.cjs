@@ -70,11 +70,9 @@ module.exports = {
 				media: "var(--bg-media)",
 				main: "var(--bg-main)",
 			},
-			boxShadowColor: {
+			boxShadow: {
 				glow: "var(--shadow-glow-around-component)",
 				popover: "var(--shadow-popover)",
-			},
-			boxShadow: {
 				reflect:
 					"0px 50px 70px rgba(0, 0, 0, 0.3), 0px 10px 10px rgba(0, 0, 0, 0.1)",
 			},

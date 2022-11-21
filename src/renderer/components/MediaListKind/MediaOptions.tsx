@@ -43,9 +43,9 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 
-	function handleSelectedFile(
-		{ target: { files } }: React.ChangeEvent<HTMLInputElement>,
-	) {
+	function handleSelectedFile({
+		target: { files },
+	}: React.ChangeEvent<HTMLInputElement>) {
 		if (
 			imageButtonRef.current === null ||
 			imageInputRef.current === null ||
@@ -122,11 +122,11 @@ export function MediaOptionsModal({ media, path }: Props) {
 						<Translator path={`labels.${option as Options}`} />
 					</label>
 
-					{option === "image" ?
+					{option === "image" ? (
 						/////////////////////////////////////////////
 						/////////////////////////////////////////////
 						// Handle file input for image:
-						(<Button
+						<Button
 							onPointerUp={openNativeUI_ChooseFiles}
 							className="notransition"
 							ref={imageButtonRef}
@@ -143,26 +143,24 @@ export function MediaOptionsModal({ media, path }: Props) {
 							/>
 
 							<Translator path="buttons.selectImg" />
-						</Button>) :
-						/////////////////////////////////////////////
-						/////////////////////////////////////////////
-						// Handle text input with line feeds:
-						option === "lyrics" ?
-						(
-							<textarea
-								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								defaultValue={format(value)}
-								id={option}
-							/>
-						) :
-						(
-							<input
-								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								readOnly={isChangeable(option) === false}
-								defaultValue={format(value)}
-								id={option}
-							/>
-						)}
+						</Button>
+					) : /////////////////////////////////////////////
+					/////////////////////////////////////////////
+					// Handle text input with line feeds:
+					option === "lyrics" ? (
+						<textarea
+							className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
+							defaultValue={format(value)}
+							id={option}
+						/>
+					) : (
+						<input
+							className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
+							readOnly={isChangeable(option) === false}
+							defaultValue={format(value)}
+							id={option}
+						/>
+					)}
 				</fieldset>
 			))}
 
@@ -177,7 +175,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 					<DeleteMediaDialogContent
 						handleMediaDeletion={() =>
-							handleMediaDeletion(closeButtonRef, path)}
+							handleMediaDeletion(closeButtonRef, path)
+						}
 					/>
 				</Dialog>
 
@@ -190,7 +189,8 @@ export function MediaOptionsModal({ media, path }: Props) {
 							imageFilePathRef.current,
 							path,
 							media,
-						)}
+						)
+					}
 				>
 					<Translator path="buttons.saveChanges" />
 				</Close>
@@ -263,7 +263,8 @@ function changeMetadataIfAllowed(
 		for (const element of children.children)
 			if (
 				(element instanceof HTMLInputElement ||
-					element instanceof HTMLTextAreaElement) && element.disabled === false
+					element instanceof HTMLTextAreaElement) &&
+				element.disabled === false
 			) {
 				if (isChangeable(element.id) === false) continue;
 
@@ -284,7 +285,7 @@ function changeMetadataIfAllowed(
 					if (oldValue instanceof Array) {
 						const newValueAsArray: string[] = newValue
 							.split(separatedByCommaOrSemiColorOrSpace)
-							.map(v => v.trim())
+							.map((v) => v.trim())
 							.filter(Boolean);
 
 						// If newValueAsArray is `[""]`, then we need to remove the empty string:
@@ -339,9 +340,17 @@ function changeMetadataIfAllowed(
 
 /////////////////////////////////////////////
 
-const options = (
-	{ duration, artist, album, genres, title, size, image, lyrics }: Media,
-) => ({ size, duration, title, album, artist, genres, lyrics, image } as const);
+const options = ({
+	duration,
+	artist,
+	album,
+	genres,
+	title,
+	size,
+	image,
+	lyrics,
+}: Media) =>
+	({ size, duration, title, album, artist, genres, lyrics, image }) as const;
 
 /////////////////////////////////////////////
 
@@ -370,11 +379,9 @@ const closeEverything = (element: HTMLButtonElement): void => element.click();
 const format = (
 	value: string | readonly string[] | number | undefined,
 ): undefined | string | number => {
-	if (value instanceof Array)
-		return value.join(", ");
+	if (value instanceof Array) return value.join(", ");
 
-	if (typeof value === "number")
-		return prettyBytes(value);
+	if (typeof value === "number") return prettyBytes(value);
 
 	return value;
 };
@@ -384,13 +391,11 @@ const format = (
 /////////////////////////////////////////////
 // Types:
 
-export type WhatToChange = Readonly<
-	{
-		whatToSend: ChangeOptionsToSend;
-		whatToChange: ChangeOptions;
-		current: string;
-	}
->;
+export type WhatToChange = Readonly<{
+	whatToSend: ChangeOptionsToSend;
+	whatToChange: ChangeOptions;
+	current: string;
+}>;
 
 /////////////////////////////////////////////
 
@@ -404,4 +409,4 @@ type Options = keyof ReturnType<typeof options>;
 
 /////////////////////////////////////////////
 
-type Props = Readonly<{ media: Media; path: Path; }>;
+type Props = Readonly<{ media: Media; path: Path }>;

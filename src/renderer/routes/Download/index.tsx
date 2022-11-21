@@ -37,9 +37,10 @@ const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
 
 ////////////////////////////////////////////////
 
-const errorAndUrlSelectors = (
-	{ error, url }: ReturnType<typeof useSearchInfo.getState>,
-) => ({ error, url });
+const errorAndUrlSelectors = ({
+	error,
+	url,
+}: ReturnType<typeof useSearchInfo.getState>) => ({ error, url });
 
 ////////////////////////////////////////////////
 
@@ -55,7 +56,8 @@ function SearcherWrapper() {
 	return (
 		<div className="relative flex justify-start items-center w-[80%] h-16">
 			<div className="group relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none transition-all ease-out duration-200 focus-within:border-active hover:border-active focus:border-active">
-				<SearchIcon className="w-5 h-5 \
+				<SearchIcon
+					className="w-5 h-5 \
 group-focus:border-active
 group-focus:text-active
 
@@ -63,11 +65,14 @@ group-focus-within:border-active
 
 group-hover:border-active
 
-text-input cursor-default mx-3" />
+text-input cursor-default mx-3"
+				/>
 
 				<label
-					className={(url ? "active-label" : "") +
-						" absolute flex items-center w-[90%] h-10 bottom-0 left-9 right-0 top-0 m-auto p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider text-base font-normal transition-label"}
+					className={
+						(url ? "active-label" : "") +
+						" absolute flex items-center w-[90%] h-10 bottom-0 left-9 right-0 top-0 m-auto p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider text-base font-normal transition-label"
+					}
 					htmlFor="searcher:url"
 				>
 					<Translator path="labels.pasteVideoURL" />
@@ -131,8 +136,9 @@ const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 function IsLoading() {
 	const isLoading = useSearchInfo(isLoadingSelector);
 
-	return <div className="w-6 h-6 ml-3">{isLoading === true && <Loading />}
-	</div>;
+	return (
+		<div className="w-6 h-6 ml-3">{isLoading === true && <Loading />}</div>
+	);
 }
 
 ////////////////////////////////////////////////
@@ -144,25 +150,23 @@ function Result() {
 	// Only need to change on `result`'s change:
 	const { imageURL, title } = useSearchInfo(resultSelector);
 
-	return title.length > 0 ?
-		(
-			<div className="flex flex-col mb-5 mt-8">
-				<img
-					className="object-cover h-44 w-80 shadow-reflect reflect-img transition-transform hover:transition-scale hover:scale-110 focus:scale-x-110"
-					alt={t("alts.videoThumbnail")}
-					src={imageURL}
-				/>
+	return title.length > 0 ? (
+		<div className="flex flex-col mb-5 mt-8">
+			<img
+				className="object-cover h-44 w-80 shadow-reflect reflect-img transition-transform hover:transition-scale hover:scale-110 focus:scale-x-110"
+				alt={t("alts.videoThumbnail")}
+				src={imageURL}
+			/>
 
-				<p className="my-8 mx-4 font-primary text-center text-lg text-normal">
-					{title}
-				</p>
+			<p className="my-8 mx-4 font-primary text-center text-lg text-normal">
+				{title}
+			</p>
 
-				<Button variant="large" onPointerUp={downloadMedia}>
-					<Translator path="buttons.download" />
-				</Button>
-			</div>
-		) :
-		null;
+			<Button variant="large" onPointerUp={downloadMedia}>
+				<Translator path="buttons.download" />
+			</Button>
+		</div>
+	) : null;
 }
 // function Result() {
 // 	// Only need to change on `result`'s change:

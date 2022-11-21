@@ -32,4 +32,4 @@ type TranslationPath = DotNestedKeys<Translations["translations"]>;
 
 /////////////////////////////////////////////
 
-type Props = Readonly<{ path: TranslationPath; }>;
+type Props = Readonly<{ path: TranslationPath }>;

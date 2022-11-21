@@ -10,7 +10,11 @@ export function MediasInfo() {
 
 	let allFilesSize = 0;
 
-	mainList.forEach(({ size }) => allFilesSize += size);
+	mainList.forEach(({ size }) => (allFilesSize += size));
 
-	return <p>{t("decorations.size")}: {prettyBytes(allFilesSize)}</p>;
+	return (
+		<p>
+			{t("decorations.size")}: {prettyBytes(allFilesSize)}
+		</p>
+	);
 }

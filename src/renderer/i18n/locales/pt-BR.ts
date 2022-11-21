@@ -5,7 +5,7 @@ export const pt_BR_Translations: Translations = Object.freeze({
 		dialogs: {
 			mediaOptions: {
 				description:
-					"Faça alterações aos metadados da sua media aqui. Clique em \"Salvar\" quando terminar.",
+					'Faça alterações aos metadados da sua media aqui. Clique em "Salvar" quando terminar.',
 				title: "Edite/Veja informações da media",
 			},
 			deleteMedia: {
@@ -71,7 +71,7 @@ export const pt_BR_Translations: Translations = Object.freeze({
 			mediaMetadataNotSaved:
 				"Error ao salvar novos metadados. Veja o console pressionando Ctrl+Shift+i.",
 			assureMediaHasArtistMetadata:
-				"Deve haver \"Artista\" nos metadados da media!",
+				'Deve haver "Artista" nos metadados da media!',
 			mediaMetadataSaved: "Novos metadados salvos.",
 			convertAlreadyExists: "Já há uma conversão de ",
 			downloadAlreadyExists: "Já há uma transferência de ",

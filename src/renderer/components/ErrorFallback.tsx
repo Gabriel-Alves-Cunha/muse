@@ -10,7 +10,7 @@ import { Translator } from "@components/I18n";
 /////////////////////////////////////////////
 // Main function:
 
-export const ErrorFallback = ({ description }: ErrorBoundaryProps) =>
+export const ErrorFallback = ({ description }: ErrorBoundaryProps) => (
 	<Dialog modal open>
 		<BlurOverlay />
 
@@ -40,11 +40,12 @@ export const ErrorFallback = ({ description }: ErrorBoundaryProps) =>
 				<Translator path="buttons.reloadWindow" />
 			</Close>
 		</Content>
-	</Dialog>;
+	</Dialog>
+);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-type ErrorBoundaryProps = Readonly<{ description: string; }>;
+type ErrorBoundaryProps = Readonly<{ description: string }>;

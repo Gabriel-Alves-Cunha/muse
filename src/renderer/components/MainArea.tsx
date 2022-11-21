@@ -1,7 +1,9 @@
 export const MainArea = ({ className = "", ...props }: Props) => (
 	<main
-		className={"grid-area-main relative inline-block self-stretch w-full h-full p-[5%] pt-0 main-area " +
-			className}
+		className={
+			"grid-area-main relative flex flex-col px-[5%] py-3 " +
+			className
+		}
 		{...props}
 	/>
 );

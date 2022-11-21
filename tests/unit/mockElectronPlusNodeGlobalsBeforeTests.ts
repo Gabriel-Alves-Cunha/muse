@@ -62,13 +62,13 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 	vi.stubGlobal("document", {
 		getElementById: vi.fn().mockImplementation(
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			(_elementId: string) => ({ loop: true } as HTMLAudioElement),
+			(_elementId: string) => ({ loop: true }) as HTMLAudioElement,
 		),
 		// createElement: vi.fn(),
 	});
 
 	vi.stubGlobal("window", {
-		postMessage: vi.fn().mockImplementation(function() {
+		postMessage: vi.fn().mockImplementation(function () {
 			console.log(
 				"%cwindow.postMessage arguments =",
 				"color:blue",

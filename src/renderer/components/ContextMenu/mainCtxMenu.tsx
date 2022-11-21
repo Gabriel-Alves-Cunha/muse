@@ -3,7 +3,7 @@ import { Item, Separator } from "@radix-ui/react-context-menu";
 import { electronIpcMainProcessNotification } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 import { Translator } from "@components/I18n";
-import { Right } from "@components/Decorations/RightSlot";
+import { RightSlot } from "./RightSlot";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -21,7 +21,7 @@ export const MainCtxMenu = () => (
 		<Item onSelect={selectAllMedias}>
 			<Translator path="ctxMenus.selectAllMedias" />
 
-			<Right>Ctrl+A</Right>
+			<RightSlot>Ctrl+A</RightSlot>
 		</Item>
 
 		<Separator />
@@ -29,7 +29,7 @@ export const MainCtxMenu = () => (
 		<Item onSelect={toggleDeveloperTools}>
 			<Translator path="ctxMenus.toggleDevTools" />
 
-			<Right>f12</Right>
+			<RightSlot>f12</RightSlot>
 		</Item>
 	</>
 );

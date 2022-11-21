@@ -5,7 +5,7 @@ export const emptyArray: readonly never[] = [];
 /////////////////////////////////////////////
 
 export function prettyPrintStringArray<T>(arr: readonly T[]): string {
-	const s = arr.map(item => `"${item}"`).join(",");
+	const s = arr.map((item) => `"${item}"`).join(",");
 
 	return `[${s}]`;
 }
@@ -24,5 +24,5 @@ export function areArraysEqualByValue<T>(
 	if (a === b) return true;
 	if (a.length !== b.length) return false;
 
-	return a.every(v => b.includes(v));
+	return a.every((v) => b.includes(v));
 }

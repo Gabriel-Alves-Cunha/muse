@@ -68,11 +68,14 @@ export function MediaPlayer() {
 			setProgress({ percentage: (currentTime / duration) * 100 });
 	}
 
-	useEffect(function flipMediaPlayerCardToNormalPlayer() {
-		console.log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
+	useEffect(
+		function flipMediaPlayerCardToNormalPlayer() {
+			console.log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
 
-		document.getElementById(mediaPlayerCardId)?.classList.remove("active");
-	}, [audioRef.current?.src]);
+			document.getElementById(mediaPlayerCardId)?.classList.remove("active");
+		},
+		[audioRef.current?.src],
+	);
 
 	useEffect(() => {
 		const audio = audioRef.current;
@@ -210,8 +213,7 @@ function handleLoadedData(
 
 	// Maybe set audio.currentTime to last stopped time:
 	const lastTime = getCurrentPlaying().currentTime;
-	if (lastTime > 30 /* seconds */)
-		audio.currentTime = lastTime;
+	if (lastTime > 30 /* seconds */) audio.currentTime = lastTime;
 }
 
 /////////////////////////////////////////
@@ -219,9 +221,7 @@ function handleLoadedData(
 function handleEnded(audio: HTMLAudioElement): void {
 	dbg(
 		`Audio ended, playing ${
-			audio.loop === true ?
-				"again because it's on loop." :
-				"next media."
+			audio.loop === true ? "again because it's on loop." : "next media."
 		}`,
 	);
 
@@ -240,15 +240,13 @@ async function handleAudioCanPlay(audio: HTMLAudioElement): Promise<void> {
 /////////////////////////////////////////
 // Types:
 
-type Progress = Readonly<{ currentTime: number; percentage: number; }>;
+type Progress = Readonly<{ currentTime: number; percentage: number }>;
 
 /////////////////////////////////////////
 
-type PlayerProps = Readonly<
-	{
-		isSeeking: React.MutableRefObject<boolean>;
-		audio: HTMLAudioElement | null;
-		media: Media | undefined;
-		path: Path;
-	}
->;
+type PlayerProps = Readonly<{
+	isSeeking: React.MutableRefObject<boolean>;
+	audio: HTMLAudioElement | null;
+	media: Media | undefined;
+	path: Path;
+}>;

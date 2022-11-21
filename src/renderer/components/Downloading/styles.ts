@@ -51,9 +51,9 @@ export function handleSingleItemDeleteAnimation(
 	isDownloadList: Readonly<boolean>,
 	url: Readonly<string>,
 ): void {
-	const items = document.querySelectorAll(".ItemWrapperClass") as NodeListOf<
-		HTMLDivElement
-	>;
+	const items = document.querySelectorAll(
+		".ItemWrapperClass",
+	) as NodeListOf<HTMLDivElement>;
 
 	//////////////////////////////////////////
 
@@ -79,17 +79,17 @@ export function handleSingleItemDeleteAnimation(
 
 	// Add event listener to the itemClicked to remove the animation:
 	itemClicked.addEventListener("animationend", () => {
-		isDownloadList ?
-			cancelDownloadAndOrRemoveItFromList(url) :
-			cancelConversionAndOrRemoveItFromList(url);
+		isDownloadList
+			? cancelDownloadAndOrRemoveItFromList(url)
+			: cancelConversionAndOrRemoveItFromList(url);
 	});
 	itemClicked.addEventListener("animationcancel", () => {
 		// This is so users can just click the cancel
 		// button and imediately leave the popup, wich
 		// cancels the animation!
 
-		isDownloadList ?
-			cancelDownloadAndOrRemoveItFromList(url) :
-			cancelConversionAndOrRemoveItFromList(url);
+		isDownloadList
+			? cancelDownloadAndOrRemoveItFromList(url)
+			: cancelConversionAndOrRemoveItFromList(url);
 	});
 }

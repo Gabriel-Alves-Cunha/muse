@@ -13,9 +13,11 @@ import { progressStatus } from "@common/enums";
 //////////////////////////////////////////
 // Main function:
 
-export const Progress = (
-	{ percent_0_to_100, showStatus, status }: ProgressProps,
-) => (
+export const Progress = ({
+	percent_0_to_100,
+	showStatus,
+	status,
+}: ProgressProps) => (
 	<div className="flex items-center w-[98%] h-4 [&_svg]:ml-2 [&_svg]:fill-black">
 		<progress
 			className="appearance-none border-none transition-width duration-300 ease-linear w-48 h-1 value"
@@ -43,10 +45,7 @@ export const progressIcons: ReadonlyMap<
 	[progressStatus.ACTIVE, <Downloading size={15} key="active" />],
 	[progressStatus.CANCEL, <Canceled size={15} key="canceled" />],
 	[progressStatus.SUCCESS, <Success size={15} key="success" />],
-	[
-		progressStatus.FAILED,
-		<Failed size={15} key="failed" />,
-	],
+	[progressStatus.FAILED, <Failed size={15} key="failed" />],
 ]);
 
 /////////////////////////////////////////
@@ -54,10 +53,8 @@ export const progressIcons: ReadonlyMap<
 //////////////////////////////////////////
 // Types:
 
-export type ProgressProps = Readonly<
-	{
-		status: ValuesOf<typeof progressStatus>;
-		percent_0_to_100: number;
-		showStatus: boolean;
-	}
->;
+export type ProgressProps = Readonly<{
+	status: ValuesOf<typeof progressStatus>;
+	percent_0_to_100: number;
+	showStatus: boolean;
+}>;

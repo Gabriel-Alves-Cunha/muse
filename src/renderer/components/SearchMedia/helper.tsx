@@ -6,21 +6,21 @@ import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import create from "zustand";
 
 import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
+import { selectMediaByPointerEvent } from "@components/MediaListKind/helper";
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { selectMediaByPointerEvent } from "@components/MediaListKind/helper";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { t, Translator } from "@components/I18n";
-import { DialogTrigger } from "@components/DialogTrigger/DialogTrigger";
+import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyString } from "@common/empty";
 import { emptyArray } from "@utils/array";
-import { Right } from "@components/Decorations/RightSlot";
+import { RightSlot } from "@components/ContextMenu/RightSlot";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -33,7 +33,8 @@ export const searchStatus = {
 	SEARCHING: 5,
 } as const;
 
-const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING } = searchStatus;
+const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING, SEARCHING } =
+	searchStatus;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -59,11 +60,11 @@ export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 /////////////////////////////////////////
 
 useSearcher.subscribe(
-	state => state.highlight,
+	(state) => state.highlight,
 	function searchForMedias(highlight): void {
-		// setSearcher({ results: emptyArray, searchStatus: SEARCHING });
-
 		if (highlight.length < 2) return;
+
+		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
 
 		const results = searchMedia(highlight);
 		const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
@@ -99,11 +100,12 @@ const setDefaultSearch = () => setSearcher(defaultSearcher);
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const searchTermSelector = (state: ReturnType<typeof useSearcher.getState>) =>
-	state.searchTerm;
+const searchInputSelector = (
+	state: ReturnType<typeof useSearcher.getState>,
+) => ({ searchTerm: state.searchTerm, isInputOnFocus: state.isInputOnFocus });
 
 export function Input() {
-	const searchTerm = useSearcher(searchTermSelector);
+	const { searchTerm, isInputOnFocus } = useSearcher(searchInputSelector);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	/////////////////////////////////////////
@@ -131,7 +133,7 @@ export function Input() {
 	return (
 		<>
 			<label
-				className="absolute flex items-center w-[85%] h-10 left-7 bottom-0 right-0 top-0 m-auto p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider font-normal text-base cursor-default transition-label hover:active-label focus:active-label focus-within:active-label"
+				className="absolute flex items-center h-9 left-[2.7rem] bottom-0 right-0 top-0 p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider font-normal text-base cursor-default pointer-events-none"
 				htmlFor="search-songs"
 			>
 				<Translator path="labels.searchForSongs" />
@@ -139,8 +141,9 @@ export function Input() {
 
 			<input
 				// flex: 1 => occupy all remaining width
-				className="absolute flex items-center flex-1 h-9 left-[38px] bottom-0 right-0 top-0 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-none border-none"
+				className="flex items-center flex-1 h-9 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-transparent border-none"
 				onFocus={() => setIsInputOnFocus(true)}
+				onBlur={() => setIsInputOnFocus(false)}
 				onChange={setSearchTerm}
 				value={searchTerm}
 				spellCheck="false"
@@ -150,9 +153,7 @@ export function Input() {
 				accessKey="s"
 			/>
 
-			{getSearcher().isInputOnFocus === false && (
-				<Right id="search">Alt+s</Right>
-			)}
+			{!isInputOnFocus && <RightSlot id="search">Alt+s</RightSlot>}
 		</>
 	);
 }
@@ -182,30 +183,29 @@ export function Results() {
 		>
 			<PopoverRoot open={shouldPopoverOpen}>
 				<PopoverContent
-					size={nothingFound ?
-						"nothing-found-for-search-media" :
-						"search-media-results"}
+					size={
+						nothingFound
+							? "nothing-found-for-search-media"
+							: "search-media-results"
+					}
 					onPointerDownOutside={setDefaultSearch}
 					onOpenAutoFocus={mantainFocusOnInput}
 					className="transition-none"
 				>
-					{nothingFound ?
-						(
-							// zIndex: 100
-							<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-48 rounded-xl p-3 shadow-popover bg-popover z-10 text-icon-deactivated font-secondary tracking-wide text-base text-center font-medium">
-								Nothing was found for &quot;{searchTerm}&quot;
-							</div>
-						) :
-						foundSomething ?
-						(results.map(([path, media]) => (
+					{nothingFound ? (
+						<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-icon-deactivated font-secondary tracking-wider text-base text-center font-medium">
+							Nothing was found for &quot;{searchTerm}&quot;
+						</div>
+					) : foundSomething ? (
+						results.map(([path, media]) => (
 							<MediaSearchRow
 								highlight={highlight}
 								media={media}
 								path={path}
 								key={path}
 							/>
-						))) :
-						undefined}
+						))
+					) : undefined}
 				</PopoverContent>
 			</PopoverRoot>
 		</ContextMenu>
@@ -269,21 +269,21 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 /////////////////////////////////////////
 // Types:
 
-type Searcher = Readonly<
-	{
-		results: readonly [Path, Media][];
-		searchStatus: ValuesOf<typeof searchStatus>;
-		isInputOnFocus: boolean;
-		searchTerm: string;
-		highlight: string;
-	}
->;
+type Searcher = Readonly<{
+	results: readonly [Path, Media][];
+	searchStatus: ValuesOf<typeof searchStatus>;
+	isInputOnFocus: boolean;
+	searchTerm: string;
+	highlight: string;
+}>;
 
 /////////////////////////////////////////
 
-type MediaSearchRowProps = Readonly<
-	{ highlight: string; media: Media; path: Path; }
->;
+type MediaSearchRowProps = Readonly<{
+	highlight: string;
+	media: Media;
+	path: Path;
+}>;
 
 /////////////////////////////////////////
 

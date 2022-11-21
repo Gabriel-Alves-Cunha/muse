@@ -7,5 +7,9 @@ const sizeSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 export function NumberOfMedias() {
 	const numberOfMedias = usePlaylists(sizeSelector);
 
-	return <p>{numberOfMedias} {t("decorations.medias")}</p>;
+	return (
+		<p>
+			{numberOfMedias} {t("decorations.medias")}
+		</p>
+	);
 }

@@ -22,9 +22,7 @@ import {
 	useConvertingList,
 } from "@contexts/convertList";
 
-import {
-	handleSingleItemDeleteAnimation,
-} from "../Downloading/styles";
+import { handleSingleItemDeleteAnimation } from "../Downloading/styles";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -42,31 +40,26 @@ export const useNewConvertions = create<NewConvertions>(() => ({
 export function Popup() {
 	const { convertingList } = useConvertingList();
 
-	return (convertingList.size > 0 ?
-		(
-			<>
-				<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
-					<Translator path="buttons.cleanFinished" />
-				</Button>
+	return convertingList.size > 0 ? (
+		<>
+			<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
+				<Translator path="buttons.cleanFinished" />
+			</Button>
 
-				{Array.from(
-					convertingList,
-					([path, convertingMedia], index) => (
-						<ConvertBox
-							mediaBeingConverted={convertingMedia}
-							convertionIndex={index}
-							path={path}
-							key={path}
-						/>
-					),
-				)}
-			</>
-		) :
-		(
-			<p>
-				<Translator path="infos.noConversionsInProgress" />
-			</p>
-		));
+			{Array.from(convertingList, ([path, convertingMedia], index) => (
+				<ConvertBox
+					mediaBeingConverted={convertingMedia}
+					convertionIndex={index}
+					path={path}
+					key={path}
+				/>
+			))}
+		</>
+	) : (
+		<p>
+			<Translator path="infos.noConversionsInProgress" />
+		</p>
+	);
 }
 
 /////////////////////////////////////////////
@@ -87,13 +80,11 @@ function cleanAllDoneConvertions(): void {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const ConvertBox = (
-	{
-		mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
-		convertionIndex,
-		path,
-	}: ConvertBoxProps,
-) => (
+const ConvertBox = ({
+	mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
+	convertionIndex,
+	path,
+}: ConvertBoxProps) => (
 	<div className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none">
 		<div className="relative flex justify-start items-center w-[90%] h-4 mb-2">
 			<p className="text-alternative whitespace-nowrap font-primary text-sm text-left overflow-hidden w-[90%]">
@@ -102,13 +93,14 @@ const ConvertBox = (
 
 			<button
 				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered no-transition"
-				onPointerUp={e =>
+				onPointerUp={(e) =>
 					handleSingleItemDeleteAnimation(
 						e,
 						convertionIndex,
 						!isDownloadList,
 						path,
-					)}
+					)
+				}
 				title={t("tooltips.cancelConversion")}
 			>
 				<Cancel className="w-3 h-3 fill-gray-600" />
@@ -116,9 +108,9 @@ const ConvertBox = (
 		</div>
 
 		<div className="flex justify-between whitespace-nowrap text-muted font-primary text-sm tracking-wide overflow-hidden text-left">
-			{`${t("infos.converted")} ${formatDuration(timeConverted)} s / ${
-				prettyBytes(sizeConverted)
-			}`}
+			{`${t("infos.converted")} ${formatDuration(
+				timeConverted,
+			)} s / ${prettyBytes(sizeConverted)}`}
 
 			<span className="text-white mr-1">{progressIcons.get(status)}</span>
 		</div>
@@ -246,7 +238,7 @@ function handleUpdateConvertingList(
 
 			errorToast(
 				`${t("toasts.conversionFailed")}${path}"! ${
-					(data as typeof data & { error: Error; }).error.message
+					(data as typeof data & { error: Error }).error.message
 				}`,
 			);
 
@@ -284,29 +276,25 @@ function handleUpdateConvertingList(
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingConverted = Readonly<
-	{
-		status: ProgressProps["status"];
-		toExtension: AllowedMedias;
-		sizeConverted: number;
-		timeConverted: number;
-		port: MessagePort;
-	}
->;
+export type MediaBeingConverted = Readonly<{
+	status: ProgressProps["status"];
+	toExtension: AllowedMedias;
+	sizeConverted: number;
+	timeConverted: number;
+	port: MessagePort;
+}>;
 
 /////////////////////////////////////////////
 
-type ConvertBoxProps = Readonly<
-	{
-		mediaBeingConverted: MediaBeingConverted;
-		convertionIndex: number;
-		path: Path;
-	}
->;
+type ConvertBoxProps = Readonly<{
+	mediaBeingConverted: MediaBeingConverted;
+	convertionIndex: number;
+	path: Path;
+}>;
 
 /////////////////////////////////////////////
 
-export type ConvertInfo = Readonly<{ toExtension: AllowedMedias; }>;
+export type ConvertInfo = Readonly<{ toExtension: AllowedMedias }>;
 
 /////////////////////////////////////////////
 
@@ -316,6 +304,6 @@ interface PartialExceptStatus extends Partial<MediaBeingConverted> {
 
 /////////////////////////////////////////////
 
-type NewConvertions = Readonly<
-	{ newConvertions: ReadonlyMap<Path, ConvertInfo>; }
->;
+type NewConvertions = Readonly<{
+	newConvertions: ReadonlyMap<Path, ConvertInfo>;
+}>;

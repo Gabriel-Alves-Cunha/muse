@@ -11,7 +11,7 @@ import { time } from "@utils/utils";
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path>; }>()(
+export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path> }>()(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
 );
@@ -28,23 +28,23 @@ export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 
 if (import.meta.vitest === undefined)
 	useAllSelectedMedias.subscribe(
-		state => state.medias,
+		(state) => state.medias,
 		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
 			time(() => {
 				// Has to be this order:
-				prevSelectedMedias.forEach(path =>
-					document.querySelectorAll(`[data-path="${path}"]`)?.forEach(
-						element => {
+				prevSelectedMedias.forEach((path) =>
+					document
+						.querySelectorAll(`[data-path="${path}"]`)
+						?.forEach((element) => {
 							if (selectedMedias.has(path)) return;
 
 							element.classList.remove("selected");
-						},
-					)
+						}),
 				);
-				selectedMedias.forEach(path =>
-					document.querySelectorAll(`[data-path="${path}"]`)?.forEach(element =>
-						element.classList.add("selected")
-					)
+				selectedMedias.forEach((path) =>
+					document
+						.querySelectorAll(`[data-path="${path}"]`)
+						?.forEach((element) => element.classList.add("selected")),
 				);
 			}, "handleDecorateMediasRow");
 		},
@@ -55,9 +55,9 @@ if (import.meta.vitest === undefined)
 export function toggleSelectedMedia(path: Path): void {
 	time(
 		() =>
-			getAllSelectedMedias().has(path) ?
-				removeFromAllSelectedMedias(path) :
-				addToAllSelectedMedias(path),
+			getAllSelectedMedias().has(path)
+				? removeFromAllSelectedMedias(path)
+				: addToAllSelectedMedias(path),
 		"toggleSelectedMedia",
 	);
 }

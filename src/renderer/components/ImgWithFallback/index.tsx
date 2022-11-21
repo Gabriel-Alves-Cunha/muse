@@ -23,9 +23,11 @@ const cache: Map<Path, ValuesOf<typeof status>> = new Map();
 /////////////////////////////////////////////
 // Main function:
 
-export function ImgWithFallback(
-	{ mediaPath, Fallback, mediaImg }: Props,
-): JSX.Element {
+export function ImgWithFallback({
+	mediaPath,
+	Fallback,
+	mediaImg,
+}: Props): JSX.Element {
 	if (!mediaImg?.length) return Fallback;
 
 	const cacheStatus = cache.get(mediaPath);
@@ -41,7 +43,7 @@ export function ImgWithFallback(
 			img = null;
 		};
 
-		img.onerror = ev => {
+		img.onerror = (ev) => {
 			console.error("Failed image; going to erasing it...", {
 				mediaPath,
 				mediaImg,
@@ -61,16 +63,16 @@ export function ImgWithFallback(
 
 		img.src = mediaImg;
 
-		return cache.get(mediaPath) === SUCCESS ?
-			(
-				<img
-					className="object-cover h-11 rounded-xl before:hidden"
-					decoding="async"
-					loading="lazy"
-					src={mediaImg}
-				/>
-			) :
-			(Fallback);
+		return cache.get(mediaPath) === SUCCESS ? (
+			<img
+				className="object-cover h-11 rounded-xl before:hidden"
+				decoding="async"
+				loading="lazy"
+				src={mediaImg}
+			/>
+		) : (
+			Fallback
+		);
 	}
 
 	if (cacheStatus === SUCCESS)
@@ -88,6 +90,8 @@ export function ImgWithFallback(
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<
-	{ Fallback: JSX.Element; mediaImg: string | undefined; mediaPath: Path; }
->;
+type Props = Readonly<{
+	Fallback: JSX.Element;
+	mediaImg: string | undefined;
+	mediaPath: Path;
+}>;

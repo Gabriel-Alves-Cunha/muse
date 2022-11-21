@@ -53,7 +53,7 @@ it("should capitalize a string", () => {
 		"",
 	]);
 
-	const result = strings.map(str => capitalize(str));
+	const result = strings.map((str) => capitalize(str));
 
 	expect(result).toStrictEqual([
 		"1 cup of water",
@@ -87,7 +87,7 @@ it("should get a random integer between min (included) and max (not included)", 
 	results1.push(...additional);
 	results2.push(...additional);
 
-	results1.forEach(result => assert(Number.isInteger(result)));
+	results1.forEach((result) => assert(Number.isInteger(result)));
 
 	expect(results1).not.toStrictEqual(results2);
 });
@@ -99,7 +99,7 @@ it("should throw an error when trying to get a random integer between min (inclu
 		() => getRandomInt(10, NaN),
 	];
 
-	fns.forEach(fn => expect(fn).toThrowError());
+	fns.forEach((fn) => expect(fn).toThrowError());
 });
 
 /////////////////////////////////////////////

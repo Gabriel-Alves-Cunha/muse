@@ -9,8 +9,8 @@ const { dependencies, devDependencies } = packageJSON;
 function findExternals(): string[] {
 	const externals: Set<string> = new Set();
 
-	Object.keys(devDependencies).forEach(pkg => externals.add(pkg));
-	Object.keys(dependencies).forEach(pkg => externals.add(pkg));
+	Object.keys(devDependencies).forEach((pkg) => externals.add(pkg));
+	Object.keys(dependencies).forEach((pkg) => externals.add(pkg));
 
 	return [...externals];
 }
@@ -24,8 +24,8 @@ const config: UserProvidedConfigProps = {
 			"./lib-cov/fluent-ffmpeg",
 			// "fluent-ffmpeg",
 		],
-	electronEntryFilePath: "src/main/index.cts",
-	preloadFilePath: "src/main/preload.cts",
+	electronEntryFilePath: "src/main/index.ts",
+	preloadFilePath: "src/main/preload.ts",
 	esbuildConfig: {
 		define: { isDev: String(isDevelopment) },
 	},

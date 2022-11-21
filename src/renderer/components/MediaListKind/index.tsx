@@ -1,5 +1,6 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
+import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
@@ -24,8 +25,8 @@ import {
 	getMainList,
 } from "@contexts/usePlaylists";
 import {
-	computeHistoryItemKey,
 	selectMediaByPointerEvent,
+	computeHistoryItemKey,
 	setIsCtxMenuOpen,
 	computeItemKey,
 	isCtxMenuOpen,
@@ -33,9 +34,6 @@ import {
 	itemContent,
 	useFromList,
 } from "./helper";
-
-// href="https://www.flaticon.com/free-icons/error" =>
-import noMediaFoundPng from "@assets/not-found.png";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -78,10 +76,11 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			time(() => {
 				switch (listName) {
 					case PlaylistList.MAIN_LIST:
-						return Array.from(
-							list as MainList,
-							([path, media]) => [path, media, 0],
-						);
+						return Array.from(list as MainList, ([path, media]) => [
+							path,
+							media,
+							0,
+						]);
 
 					case PlaylistList.SORTED_BY_DATE:
 					case PlaylistList.FAVORITES: {
@@ -89,7 +88,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
 							list as ReadonlySet<Path>,
-							path => {
+							(path) => {
 								const media = mainList.get(path);
 
 								if (media === undefined)
@@ -108,7 +107,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 						const unsortedList: [Path, DateAsNumber][] = [];
 
 						(list as History).forEach((dates, path) =>
-							dates.forEach(date => unsortedList.push([path, date]))
+							dates.forEach((date) => unsortedList.push([path, date])),
 						);
 
 						const mainList = getMainList();
@@ -140,16 +139,18 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	}, []);
 
 	return (
-		<div className="max-w-2xl h-[80vh]" ref={listRef}>
+		<div className="max-w-2xl h-full" ref={listRef}>
 			<ContextMenu
-				content={ctxContentEnum.MEDIA_OPTIONS}
 				onContextMenu={selectMediaByPointerEvent}
+				content={ctxContentEnum.MEDIA_OPTIONS}
 				setIsOpen={setIsCtxMenuOpen}
 			>
 				<Virtuoso
-					computeItemKey={listName === PlaylistList.HISTORY ?
-						computeHistoryItemKey :
-						computeItemKey}
+					computeItemKey={
+						listName === PlaylistList.HISTORY
+							? computeHistoryItemKey
+							: computeItemKey
+					}
 					totalCount={listAsArrayOfAMap.length}
 					itemContent={itemContent}
 					data={listAsArrayOfAMap}
@@ -172,12 +173,13 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
 const EmptyPlaceholder = () => (
-	<div className="relative flex justify-center items-center w-[95%] h-[95%] text-alternative font-secondary tracking-wider text-lg font-medium">
-		<img
+	<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
+		{/* <img
 			alt={t("alts.noMediasFound")}
 			className="w-14 h-14 mr-5"
 			src={noMediaFoundPng}
-		/>
+		/> */}
+		<NoMediaFound className="w-14 h-14 mr-5" />
 
 		<Translator path="alts.noMediasFound" />
 	</div>
@@ -210,4 +212,4 @@ function handleDeselectAllMedias() {
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ isHome?: boolean | undefined; }>;
+type Props = Readonly<{ isHome?: boolean | undefined }>;

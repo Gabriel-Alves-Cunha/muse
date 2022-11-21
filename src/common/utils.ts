@@ -42,9 +42,11 @@ export function formatDuration(time?: number): Readonly<string> {
 		seconds = ("0" + (time % 60)).slice(-2),
 		days = floor(time / 86_400);
 
-	return ((days > 0 ? days + "d " : "") +
+	return (
+		(days > 0 ? days + "d " : "") +
 		(+hour > 0 ? hour + ":" : "") + // +hour === Number(hour)
-		(minutes + ":" + seconds));
+		(minutes + ":" + seconds)
+	);
 }
 
 /////////////////////////////////////////
@@ -52,9 +54,9 @@ export function formatDuration(time?: number): Readonly<string> {
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 export function makeRandomString(length = 15): Readonly<string> {
-	const randomString = Array
-		.from({ length }, () => chars.charAt(floor(random() * chars.length)))
-		.join("");
+	const randomString = Array.from({ length }, () =>
+		chars.charAt(floor(random() * chars.length)),
+	).join("");
 
 	return randomString;
 }
@@ -64,7 +66,7 @@ export function makeRandomString(length = 15): Readonly<string> {
 export function sleep(ms: number, logFn?: () => void): Promise<void> {
 	logFn?.();
 
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /////////////////////////////////////////
@@ -98,9 +100,7 @@ export function randomBackgroundColorForConsole(): () => string {
 	return () => {
 		if (index >= colors.length) index = 0;
 
-		const color = `color: ${colors[index]
-			?.[0]}; background-color: ${colors[index]
-			?.[1]}; border-radius: 2px; padding: 2px 4px; font-weight: bold;`;
+		const color = `color: ${colors[index]?.[0]}; background-color: ${colors[index]?.[1]}; border-radius: 2px; padding: 2px 4px; font-weight: bold;`;
 
 		++index;
 

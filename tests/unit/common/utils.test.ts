@@ -23,7 +23,9 @@ it("should get path without extension. #getPathWithoutExtension", () => {
 		".gitignore",
 	];
 
-	const pathsWithNoExtension = paths.map(path => getPathWithoutExtension(path));
+	const pathsWithNoExtension = paths.map((path) =>
+		getPathWithoutExtension(path),
+	);
 
 	expect(pathsWithNoExtension).toStrictEqual([
 		"/home/music/hello",
@@ -42,8 +44,8 @@ it("should get path without extension. #getPathWithoutExtension", () => {
 it("should format duration in seconds to something like: '00:00:00'. #formatDuration", () => {
 	const durationsInSeconds = [234567, 2345678, 123, 6543, 224, 900, undefined];
 
-	const durationsFormated = durationsInSeconds.map(time =>
-		formatDuration(time)
+	const durationsFormated = durationsInSeconds.map((time) =>
+		formatDuration(time),
 	);
 
 	expect(durationsFormated).toStrictEqual([
@@ -71,7 +73,7 @@ it("should get the basename of a path. #getBasename", () => {
 		".gitignore",
 	];
 
-	const basenames = paths.map(path => getBasename(path));
+	const basenames = paths.map((path) => getBasename(path));
 
 	expect(basenames).toStrictEqual(["hello", "how", "are", "you", "bye", ""]);
 });
@@ -91,7 +93,7 @@ it("should get the extension of a file. #getLastExtension", () => {
 		"",
 	];
 
-	const extensions = paths.map(path => getLastExtension(path));
+	const extensions = paths.map((path) => getLastExtension(path));
 
 	expect(extensions).toStrictEqual(["mp3", "", "js", "webp", "", "", ""]);
 });

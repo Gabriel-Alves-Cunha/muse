@@ -14,7 +14,7 @@ import {
 	Root,
 } from "@radix-ui/react-context-menu";
 
-import { Right } from "@components/Decorations/RightSlot";
+import { RightSlot } from "./RightSlot";
 import { Item } from "./Item";
 
 export function FullExampleCtxMenu() {
@@ -29,25 +29,24 @@ export function FullExampleCtxMenu() {
 	return (
 		<>
 			<Item>
-				Back <Right>{"⌘+["}</Right>
+				Back <RightSlot>{"⌘+["}</RightSlot>
 			</Item>
 
 			<Item disabled>
-				Foward <Right>{"⌘+]"}</Right>
+				Foward <RightSlot>{"⌘+]"}</RightSlot>
 			</Item>
 
 			<Root>
 				<Trigger>
 					More Tools
-
-					<Right>
+					<RightSlot>
 						<RightArrow size={15} />
-					</Right>
+					</RightSlot>
 				</Trigger>
 
 				<Content alignOffset={-5}>
 					<Item>
-						Save Page As… <Right>⌘+S</Right>
+						Save Page As… <RightSlot>⌘+S</RightSlot>
 					</Item>
 
 					<Item>Create Shortcut…</Item>
@@ -68,7 +67,7 @@ export function FullExampleCtxMenu() {
 				<ItemIndicator>
 					<Check size={15} />
 				</ItemIndicator>
-				Show Bookmarks <Right>⌘+B</Right>
+				Show Bookmarks <RightSlot>⌘+B</RightSlot>
 			</CheckboxItem>
 
 			<CheckboxItem checked={urlsChecked} onCheckedChange={setUrlsChecked}>

@@ -58,7 +58,7 @@ function ButtonsForPages() {
 
 	return (
 		<div className="buttons-for-pages">
-			{pages.map(page => (
+			{pages.map((page) => (
 				<button
 					title={t("tooltips.goto") + t(`pages.${page}`)}
 					className={page === currPage ? "active" : ""}

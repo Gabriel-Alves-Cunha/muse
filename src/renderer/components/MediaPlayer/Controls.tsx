@@ -131,13 +131,14 @@ export const Controls = ({ isDisabled, audio }: ControlsProps) => (
 /////////////////////////////////////////
 // Types:
 
-type ControlsProps = Readonly<{ isDisabled: boolean; audio: Audio; }>;
+type ControlsProps = Readonly<{ isDisabled: boolean; audio: Audio }>;
 
 /////////////////////////////////////////
 
-export type RefToAudioAndSeeker = Readonly<
-	{ audio: Audio; isSeeking: React.MutableRefObject<boolean>; }
->;
+export type RefToAudioAndSeeker = Readonly<{
+	audio: Audio;
+	isSeeking: React.MutableRefObject<boolean>;
+}>;
 
 /////////////////////////////////////////
 

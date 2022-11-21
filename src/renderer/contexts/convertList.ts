@@ -82,6 +82,6 @@ export const setConvertingList = (
 ////////////////////////////////////////////////
 // Types:
 
-export type ConvertingList = Readonly<
-	{ convertingList: ReadonlyMap<Path, MediaBeingConverted>; }
->;
+export type ConvertingList = Readonly<{
+	convertingList: ReadonlyMap<Path, MediaBeingConverted>;
+}>;

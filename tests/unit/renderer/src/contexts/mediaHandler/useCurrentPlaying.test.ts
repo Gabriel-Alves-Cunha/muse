@@ -80,16 +80,15 @@ describe("Testing useCurrentPlaying", () => {
 		expect(
 			getCurrentPlaying().path,
 			"currentPlaying().path at the start should be set to the initialIndex path!",
-		)
-			.toBe(testArray[initialIndex]![0]);
+		).toBe(testArray[initialIndex]![0]);
 
 		testArray.forEach((_, index) => {
 			expect(getHistory().size, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
 
-			const expectedPath = testArray.at(initialIndex - 1 - index)?.[0] ??
-				lastMediaPath;
+			const expectedPath =
+				testArray.at(initialIndex - 1 - index)?.[0] ?? lastMediaPath;
 
 			const expected: CurrentPlaying = {
 				listType: PlaylistList.MAIN_LIST,
@@ -112,8 +111,7 @@ describe("Testing useCurrentPlaying", () => {
 		expect(
 			getCurrentPlaying().path,
 			"currentPlaying().path at the start should be set to the firstMediaPath!",
-		)
-			.toBe(firstMediaPath);
+		).toBe(firstMediaPath);
 
 		testArray.forEach((_, index) => {
 			playNextMedia();
@@ -123,12 +121,11 @@ describe("Testing useCurrentPlaying", () => {
 
 			expect(
 				expectedMediaPath,
-				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${testArray
-					.at(index)
-					?.[0]}
+				`expectedMediaPath should be equal to currMediaPath!\nprevious media path: ${
+					testArray.at(index)?.[0]
+				}
 				`,
-			)
-				.toEqual(currMediaPath);
+			).toEqual(currMediaPath);
 		});
 	});
 });

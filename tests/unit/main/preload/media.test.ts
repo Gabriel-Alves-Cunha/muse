@@ -43,8 +43,7 @@ describe("It should account for the switch possibilities and the message sending
 			expect(
 				file.tag.title,
 				"The FIRST check to see if the 'title' has changed.",
-			)
-				.toBe(data.title);
+			).toBe(data.title);
 
 			// Clean up:
 			// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -58,8 +57,7 @@ describe("It should account for the switch possibilities and the message sending
 				expect(
 					file.tag.title,
 					"The SECOND check to see if the 'title' has changed.",
-				)
-					.toBe(data.title);
+				).toBe(data.title);
 
 				// And change the title back to a default value so that git
 				// doesn't trigger a file change:
@@ -67,8 +65,7 @@ describe("It should account for the switch possibilities and the message sending
 				expect(
 					file.tag.title,
 					"The THIRD check to see if the 'title' has changed back to default value.",
-				)
-					.toBe(undefined); // That's what the lib returns. instead of an empty string...
+				).toBe(undefined); // That's what the lib returns. instead of an empty string...
 
 				// Clean up:
 				// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -86,8 +83,7 @@ describe("It should account for the switch possibilities and the message sending
 				expect(
 					await doesPathExists(mediaPath),
 					"There should be a mediaPath renamed back to it's original path before tests were run!",
-				)
-					.toBe(true);
+				).toBe(true);
 			} catch (error) {
 				console.error(error);
 			}
@@ -107,8 +103,7 @@ describe("It should account for the switch possibilities and the message sending
 		expect(
 			file.tag.albumArtists,
 			"The FIRST check to see if the 'albumArtists' has changed.",
-		)
-			.toStrictEqual(data.albumArtists);
+		).toStrictEqual(data.albumArtists);
 
 		// Clean up:
 		// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -122,8 +117,7 @@ describe("It should account for the switch possibilities and the message sending
 			expect(
 				file.tag.albumArtists,
 				"The SECOND check to see if 'albumArtists' has changed.",
-			)
-				.toStrictEqual(data.albumArtists);
+			).toStrictEqual(data.albumArtists);
 
 			// And change the albumArtists back to a default value so that git
 			// doesn't trigger a file change:
@@ -131,8 +125,7 @@ describe("It should account for the switch possibilities and the message sending
 			expect(
 				file.tag.albumArtists.length,
 				"The THIRD check to see if 'albumArtists' has changed back to it's default value.",
-			)
-				.toBe(0);
+			).toBe(0);
 
 			// Clean up:
 			// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -152,8 +145,10 @@ describe("It should account for the switch possibilities and the message sending
 		await writeTags(mediaPath, data);
 
 		const file = MediaFile.createFromPath(mediaPath);
-		expect(file.tag.album, "The FIRST check to see if 'album' has changed.")
-			.toBe(data.album);
+		expect(
+			file.tag.album,
+			"The FIRST check to see if 'album' has changed.",
+		).toBe(data.album);
 
 		// Clean up:
 		// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -164,8 +159,10 @@ describe("It should account for the switch possibilities and the message sending
 		{
 			// Open file again to see if the change persisted:
 			const file = MediaFile.createFromPath(mediaPath);
-			expect(file.tag.album, "The SECOND check to see if 'album' has changed.")
-				.toBe(data.album);
+			expect(
+				file.tag.album,
+				"The SECOND check to see if 'album' has changed.",
+			).toBe(data.album);
 
 			// And change the album back to a default value so that git
 			// doesn't trigger a file change:
@@ -173,8 +170,7 @@ describe("It should account for the switch possibilities and the message sending
 			expect(
 				file.tag.album,
 				"The THIRD check to see if 'album' has changed back to default value.",
-			)
-				.toBe(undefined); // That's what the lib returns. instead of an empty string...
+			).toBe(undefined); // That's what the lib returns. instead of an empty string...
 
 			// Clean up:
 			// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -199,8 +195,7 @@ describe("It should account for the switch possibilities and the message sending
 		expect(
 			file.tag.pictures[0]?.data.toBase64String(),
 			"`file.tag.pictures[0]?.data.toBase64String()` !== `imgContents`",
-		)
-			.toBe(imgContents);
+		).toBe(imgContents);
 
 		// Clean up:
 		// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -214,8 +209,7 @@ describe("It should account for the switch possibilities and the message sending
 			expect(
 				file.tag.pictures.length,
 				"At this point, there should be one picture.",
-			)
-				.toBe(1);
+			).toBe(1);
 
 			// Clean up:
 			// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.

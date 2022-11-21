@@ -28,15 +28,14 @@ export function Convert() {
 
 	////////////////////////////////////////////////
 
-	function handleSelectedFiles(
-		{ target: { files } }: ChangeEvent<HTMLInputElement>,
-	) {
+	function handleSelectedFiles({
+		target: { files },
+	}: ChangeEvent<HTMLInputElement>) {
 		if (!files?.length) return;
 
 		const map: Map<Path, ConvertInfo> = new Map();
 
-		for (const file of files)
-			map.set(file.webkitRelativePath, { toExtension });
+		for (const file of files) map.set(file.webkitRelativePath, { toExtension });
 
 		setSelectedFiles(map);
 	}

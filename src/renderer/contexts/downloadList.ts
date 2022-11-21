@@ -76,8 +76,8 @@ export const setDownloadingList = (
 ////////////////////////////////////////////////
 // Types:
 
-export type DownloadingList = Readonly<
-	{ downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>; }
->;
+export type DownloadingList = Readonly<{
+	downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>;
+}>;
 
 export type MediaUrl = Readonly<string>;

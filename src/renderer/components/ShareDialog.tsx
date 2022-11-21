@@ -46,7 +46,7 @@ export function ShareDialog() {
 		async (canvas: HTMLCanvasElement | null) => {
 			if (canvas === null || isDialogOpen === false || server === null) return;
 
-			await makeQrcode(server.url).catch(err => {
+			await makeQrcode(server.url).catch((err) => {
 				console.error("Error making QR Code.", err);
 				closePopover(server.close);
 			});
@@ -91,22 +91,25 @@ export function ShareDialog() {
 
 	/////////////////////////////////////////
 
-	useEffect(function createNewServer() {
-		const shouldDialogOpen = filesToShare.size > 0;
+	useEffect(
+		function createNewServer() {
+			const shouldDialogOpen = filesToShare.size > 0;
 
-		setIsDialogOpen(shouldDialogOpen);
+			setIsDialogOpen(shouldDialogOpen);
 
-		if (shouldDialogOpen === false) return;
+			if (shouldDialogOpen === false) return;
 
-		try {
-			const clientServerApi = createServer([...filesToShare]);
+			try {
+				const clientServerApi = createServer([...filesToShare]);
 
-			setServer(clientServerApi);
-		} catch (error) {
-			console.error(error);
-			closePopover();
-		}
-	}, [filesToShare]);
+				setServer(clientServerApi);
+			} catch (error) {
+				console.error(error);
+				closePopover();
+			}
+		},
+		[filesToShare],
+	);
 
 	/////////////////////////////////////////
 
@@ -119,10 +122,8 @@ export function ShareDialog() {
 					className="absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5"
 					title={t("tooltips.closeShareScreen")}
 					onPointerUp={() =>
-						closePopover(
-							server
-								?.close,
-						)}
+						closePopover(server?.close)
+					}
 					// zIndex: 155,
 				>
 					<CloseIcon className="fill-accent" />
@@ -165,17 +166,14 @@ function closePopover(closeServerFunction?: () => void): void {
 /////////////////////////////////////////
 
 const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
-	Array.from(
-		filesToShare,
-		path => (
-			<li
-				className="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
-				key={path}
-			>
-				{getBasename(path)}
-			</li>
-		),
-	);
+	Array.from(filesToShare, (path) => (
+		<li
+			className="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
+			key={path}
+		>
+			{getBasename(path)}
+		</li>
+	));
 
 /////////////////////////////////////////
 

@@ -68,9 +68,8 @@ export function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export async function deleteMedias(): Promise<void> {
-	const promises = Array.from(
-		getAllSelectedMedias(),
-		path => deleteFile(path),
+	const promises = Array.from(getAllSelectedMedias(), (path) =>
+		deleteFile(path),
 	);
 
 	await Promise.all(promises);
@@ -81,7 +80,7 @@ export async function deleteMedias(): Promise<void> {
 function searchForLyrics(): void {
 	const allMedias = getMainList();
 
-	getAllSelectedMedias().forEach(async path => {
+	getAllSelectedMedias().forEach(async (path) => {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);

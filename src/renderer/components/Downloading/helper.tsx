@@ -18,9 +18,7 @@ import {
 	getDownloadingList,
 } from "@contexts/downloadList";
 
-import {
-	handleSingleItemDeleteAnimation,
-} from "./styles";
+import { handleSingleItemDeleteAnimation } from "./styles";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -29,31 +27,26 @@ import {
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
 
-	return (downloadingList.size > 0 ?
-		(
-			<>
-				<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
-					<Translator path="buttons.cleanFinished" />
-				</Button>
+	return downloadingList.size > 0 ? (
+		<>
+			<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
+				<Translator path="buttons.cleanFinished" />
+			</Button>
 
-				{Array.from(
-					downloadingList,
-					([url, downloadingMedia], index) => (
-						<DownloadingBox
-							download={downloadingMedia}
-							downloadingIndex={index}
-							url={url}
-							key={url}
-						/>
-					),
-				)}
-			</>
-		) :
-		(
-			<p>
-				<Translator path="infos.noDownloadsInProgress" />
-			</p>
-		));
+			{Array.from(downloadingList, ([url, downloadingMedia], index) => (
+				<DownloadingBox
+					download={downloadingMedia}
+					downloadingIndex={index}
+					url={url}
+					key={url}
+				/>
+			))}
+		</>
+	) : (
+		<p>
+			<Translator path="infos.noDownloadsInProgress" />
+		</p>
+	);
 }
 
 /////////////////////////////////////////////
@@ -76,9 +69,11 @@ function cleanAllDoneDownloads(): void {
 
 export const isDownloadList = true;
 
-const DownloadingBox = (
-	{ downloadingIndex, download, url }: DownloadingBoxProps,
-) => (
+const DownloadingBox = ({
+	downloadingIndex,
+	download,
+	url,
+}: DownloadingBoxProps) => (
 	<div
 		className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none"
 		key={url}
@@ -88,13 +83,14 @@ const DownloadingBox = (
 
 			<button
 				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none"
-				onPointerUp={e =>
+				onPointerUp={(e) =>
 					handleSingleItemDeleteAnimation(
 						e,
 						downloadingIndex,
 						isDownloadList,
 						url,
-					)}
+					)
+				}
 				title={t("tooltips.cancelDownload")}
 			>
 				<Cancel size={12} />
@@ -205,9 +201,9 @@ function handleUpdateDownloadingList(
 			console.assert(data.error, "data.error should exist!");
 
 			errorToast(
-				`${t("toasts.downloadError.beforePath")}"${thisDownload.title}"${
-					t("toasts.downloadError.afterPath")
-				} ${(data as typeof data & { error: Error; }).error.message}`,
+				`${t("toasts.downloadError.beforePath")}"${thisDownload.title}"${t(
+					"toasts.downloadError.afterPath",
+				)} ${(data as typeof data & { error: Error }).error.message}`,
 			);
 
 			cancelDownloadAndOrRemoveItFromList(url);
@@ -272,9 +268,11 @@ export function cancelDownloadAndOrRemoveItFromList(
 /////////////////////////////////////////////
 // Types:
 
-type DownloadingBoxProps = Readonly<
-	{ download: MediaBeingDownloaded; downloadingIndex: number; url: string; }
->;
+type DownloadingBoxProps = Readonly<{
+	download: MediaBeingDownloaded;
+	downloadingIndex: number;
+	url: string;
+}>;
 
 /////////////////////////////////////////////
 

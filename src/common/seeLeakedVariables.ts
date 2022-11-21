@@ -54,7 +54,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 		if (browserGlobals.length === 0) collectBrowserGlobals();
 
 		// Grab all the globals filtering out variables we don't care about (noise).
-		const runtimeGlobals = Object.keys(window).filter(key => {
+		const runtimeGlobals = Object.keys(window).filter((key) => {
 			const isFromBrowser = browserGlobals.includes(key);
 			const isIgnored = ignoredGlobals.includes(key);
 

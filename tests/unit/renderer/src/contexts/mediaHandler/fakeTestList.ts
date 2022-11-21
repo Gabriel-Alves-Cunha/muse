@@ -8,24 +8,22 @@ export const numberOfMedias = 30;
 
 // Make a test list full of fake medias sorted by path:
 export const testArray = Object.freeze(
-	Array
-		.from({ length: numberOfMedias }, (_, index) => {
-			const title = `Test Title - ${index}`;
-			const media: Media = {
-				duration: formatDuration(index + 10),
-				birthTime: Date.now(),
-				artist: emptyString,
-				lyrics: emptyString,
-				album: emptyString,
-				image: emptyString,
-				size: 3_000,
-				genres: [],
-				title,
-			};
+	Array.from({ length: numberOfMedias }, (_, index) => {
+		const title = `Test Title - ${index}`;
+		const media: Media = {
+			duration: formatDuration(index + 10),
+			birthTime: Date.now(),
+			artist: emptyString,
+			lyrics: emptyString,
+			album: emptyString,
+			image: emptyString,
+			size: 3_000,
+			genres: [],
+			title,
+		};
 
-			return [`home/Music/test/${title}.mp3`, media] as const;
-		})
-		.sort((a, b) => a[0].localeCompare(b[0])),
+		return [`home/Music/test/${title}.mp3`, media] as const;
+	}).sort((a, b) => a[0].localeCompare(b[0])),
 );
 
 export const testList: ReadonlyMap<string, Media> = Object.freeze(
