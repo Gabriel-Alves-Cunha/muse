@@ -2,14 +2,13 @@ import type { AllowedMedias } from "@common/utils";
 import type { Path } from "@common/@types/generalTypes";
 
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
-import { SiConvertio as ConvertIcon } from "react-icons/si";
+import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
 
 import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
-import { Box } from "@components/Box";
 import {
 	type ConvertInfo,
 	useNewConvertions,
@@ -61,17 +60,18 @@ export function Convert() {
 
 	return (
 		<MainArea>
-			<Box>
+			<div className="flex justify-center items-center ">
 				<Button
 					onPointerUp={openNativeUI_ChooseFiles}
 					className="no-transition"
-					variant="large"
+					variant="circle"
 				>
 					<ConvertIcon size={18} />
 
 					<input
 						onChange={handleSelectedFiles}
 						accept="video/*,audio/*"
+						className="hidden"
 						ref={inputRef}
 						type="file"
 						multiple
@@ -79,7 +79,7 @@ export function Convert() {
 
 					<Translator path="buttons.convert" />
 				</Button>
-			</Box>
+			</div>
 		</MainArea>
 	);
 }

@@ -12,7 +12,7 @@ import {
 
 export const Clean = () => (
 	<ButtonOfGroup title={t("tooltips.cleanList")} onPointerUp={cleanProperList}>
-		<CleanIcon size={18} className="fill-white" />
+		<CleanIcon size={17} className="stroke-white" />
 	</ButtonOfGroup>
 );
 

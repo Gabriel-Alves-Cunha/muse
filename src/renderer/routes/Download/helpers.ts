@@ -48,7 +48,7 @@ export function downloadMedia(): void {
 ////////////////////////////////////////////////
 
 export async function search(url: Readonly<string>): Promise<void> {
-	if (url.length < 8) return;
+	if (url.length < 16) return;
 
 	dbg(`Searching for "${url}".`);
 

@@ -42,7 +42,7 @@ const sizeSelector = (state: ReturnType<typeof useDownloadingList.getState>) =>
 
 export function Downloading() {
 	const downloadingListSize = useDownloadingList(sizeSelector);
-	const [isOpen, setIsOpen] = useState(false);
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const downloadInfo = useDownloadInfo();
 
 	useEffect(() => {
@@ -71,18 +71,16 @@ export function Downloading() {
 	}, [downloadInfo.title, downloadInfo]);
 
 	return (
-		<PopoverRoot modal open={isOpen} onOpenChange={setIsOpen}>
+		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
-				className={
-					(downloadingListSize > 0 ? "has-items " : "") +
-					(isOpen === true ? "active " : "") +
-					"relative flex justify-center items-center bg-none border-none text-icon-deactivated text-base hover:text-icon-active focus:text-icon-active "
-				}
+				className={`${
+					downloadingListSize > 0 ? "has-items" : ""
+				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
 				title={t("tooltips.showAllDownloadingMedias")}
 			>
-				<span data-length={downloadingListSize}></span>
+				<span data-length={downloadingListSize} />
 
-				<DownloadingIcon size={20} />
+				<DownloadingIcon className="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
 			</Trigger>
 
 			<PopoverContent

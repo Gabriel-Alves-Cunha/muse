@@ -139,7 +139,8 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	}, []);
 
 	return (
-		<div className="max-w-2xl h-full" ref={listRef}>
+		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
+		<div className="max-w-2xl h-[87%]" ref={listRef}>
 			<ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
 				content={ctxContentEnum.MEDIA_OPTIONS}

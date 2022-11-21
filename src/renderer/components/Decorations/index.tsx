@@ -4,13 +4,13 @@ import {
 	VscClose as Close,
 } from "react-icons/vsc";
 
+import { toggleMaximize, minimizeWindow, closeWindow } from "./helper";
 import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
 import { MediasInfo } from "@components/Decorations/MediasInfo";
 import { usePage } from "@contexts/page";
 import { t } from "@components/I18n";
-import { toggleMaximize, minimizeWindow, closeWindow } from "./helper";
 
 import imageUrl from "@assets/logo.svg";
 
@@ -19,7 +19,7 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 
 export const DecorationsTop = () => (
-	<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main app-drag-region ">
+	<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main">
 		{/* ^ window-draggable-region */}
 		<div className="flex justify-center items-center ml-2">
 			<img alt={t("alts.museLogo")} src={imageUrl} height={24} width={24} />
@@ -51,10 +51,7 @@ export const DecorationsDown = () => (
 
 const WindowButton = ({ className = "", ...props }: WindowButtonProps) => (
 	<button
-		className={
-			"relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none " +
-			className
-		}
+		className={`relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none ${className}`}
 		{...props}
 	/>
 );

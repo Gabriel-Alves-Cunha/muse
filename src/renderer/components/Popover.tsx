@@ -34,7 +34,7 @@ export const PopoverContent = forwardRef(function PopoverContent(
 ): JSX.Element {
 	return (
 		<Content
-			className={"popover " + size}
+			className={`popover ${size}`}
 			sideOffset={10}
 			{...props}
 			ref={forwardedRef}

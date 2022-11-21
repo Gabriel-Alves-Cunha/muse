@@ -6,7 +6,7 @@ export const Button = forwardRef(function Button(
 ) {
 	return (
 		<button
-			className={`button button-${variant} ${className}`}
+			className={`button ${variant} ${className}`}
 			{...props}
 			ref={forwardedRef}
 		/>
@@ -19,5 +19,5 @@ export const Button = forwardRef(function Button(
 // Types:
 
 interface Props extends React.BaseHTMLAttributes<HTMLButtonElement> {
-	readonly variant: "large" | "medium" | "input";
+	readonly variant: "large" | "medium" | "input" | "circle";
 }

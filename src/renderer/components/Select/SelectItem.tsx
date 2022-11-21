@@ -21,7 +21,7 @@ export const SelectItem = forwardRef(
 				<ItemText>{title}</ItemText>
 
 				<ItemIndicator className="absolute inline-flex justify-center items-center w-6 left-0">
-					<CheckIcon className="bg-select" />
+					<CheckIcon className="bg-transparent" />
 				</ItemIndicator>
 			</Item>
 		);

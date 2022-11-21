@@ -59,6 +59,7 @@
 		--bg-media-player-icon-button-hovered: #fff4;
 		--bg-icon-button-hovered: #88888857;
 
+		--bg-decorations-down: #cdc3ff;
 		--bg-button-hover: #8e2de2;
 		--bg-selected: #aac1ff70;
 		--bg-highlight: #9381ff;
@@ -138,6 +139,7 @@
 		--bg-media-player-icon-button-hovered: #fff4;
 		--bg-icon-button-hovered: #fff2;
 
+		--bg-decorations-down: #3c3d47;
 		--bg-button-hover: #08368d;
 		--bg-highlight: #c04569;
 		--bg-selected: #252121;
@@ -192,8 +194,6 @@
 	body {
 		position: fixed;
 		line-height: 1.5;
-		/* height: 100%; */
-		/* width: 100%; */
 
 		/* contain-intrinsic-size: auto; */
 		contain-intrinsic-size: 1px 5000px;
@@ -460,7 +460,7 @@
 		@apply bg-accent text-white;
 	}
 
-	.button-large {
+	.button.large {
 		width: 300px;
 
 		margin: 40px auto 0;
@@ -469,12 +469,16 @@
 		border-radius: 8px;
 	}
 
-	.button-medium {
+	.button.medium {
 		@apply w-full h-12 mt-5 mx-auto mb-0 p-2 rounded;
 	}
 
-	.button-input {
+	.button.input {
 		@apply hidden w-[calc(100%-115px)] h-9 border-2 border-solid border-input rounded-xl transition-bc-bg;
+	}
+
+	.button.circle {
+		@apply w-72 h-72 rounded-full border-[1px];
 	}
 
 	.button-input:focus-visible,
@@ -554,14 +558,6 @@
 				color-stop(40%, transparent),
 				to(rgba(255, 255, 255, 0.1))
 			)`, */
-	}
-
-	.active-label {
-		left: -30px;
-		top: -180%;
-
-		color: var(--active);
-		cursor: default;
 	}
 
 	.list-decimal-zero {
@@ -676,6 +672,7 @@
 		padding: 0 35px 0 25px;
 		border-radius: 3px;
 		user-select: none;
+		cursor: pointer;
 
 		color: #7d52c9;
 		font-size: 13px;
@@ -688,8 +685,8 @@
 	}
 
 	.select-item[data-highlighted] {
-		background: #6e56cf;
 		color: var(--bg-select);
+		background: #6e56cf;
 		outline: none;
 	}
 
@@ -700,11 +697,11 @@
 	/* DecorationsDown */
 
 	.decorations-down {
-		@apply relative flex justify-between items-center h-[var(--down-decorations-height)] w-screen bottom-0 select-none bg-scrollbar;
+		@apply relative flex justify-between items-center h-[var(--down-decorations-height)] w-screen bottom-0 select-none bg-decorations-down px-4;
 	}
 
 	.decorations-down p {
-		@apply flex h-full text-alternative font-secondary tracking-wide text-sm text-center font-medium;
+		@apply flex h-full text-slate-900 font-secondary tracking-wide text-sm text-center font-medium;
 	}
 
 	.decorations-down-left {
@@ -851,7 +848,7 @@
 	/* Popover sizes */
 
 	.nothing-found-for-convertions-or-downloads {
-		@apply h-28 w-64 overflow-hidden;
+		@apply flex items-center justify-center h-28 w-64 overflow-hidden;
 	}
 
 	.nothing-found-for-search-media {

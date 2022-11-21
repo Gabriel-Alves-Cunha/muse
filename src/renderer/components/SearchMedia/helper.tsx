@@ -6,7 +6,7 @@ import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { PopoverContent, PopoverRoot } from "@components/Popover";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
@@ -15,12 +15,13 @@ import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { t, Translator } from "@components/I18n";
 import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyString } from "@common/empty";
 import { emptyArray } from "@utils/array";
 import { RightSlot } from "@components/ContextMenu/RightSlot";
+import { BaseInput } from "@components/BaseInput";
+import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -131,30 +132,21 @@ export function Input() {
 	/////////////////////////////////////////
 
 	return (
-		<>
-			<label
-				className="absolute flex items-center h-9 left-[2.7rem] bottom-0 right-0 top-0 p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider font-normal text-base cursor-default pointer-events-none"
-				htmlFor="search-songs"
-			>
-				<Translator path="labels.searchForSongs" />
-			</label>
-
-			<input
-				// flex: 1 => occupy all remaining width
-				className="flex items-center flex-1 h-9 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-transparent border-none"
-				onFocus={() => setIsInputOnFocus(true)}
-				onBlur={() => setIsInputOnFocus(false)}
-				onChange={setSearchTerm}
-				value={searchTerm}
-				spellCheck="false"
-				id="search-songs"
-				autoCorrect="off"
-				ref={inputRef}
-				accessKey="s"
-			/>
-
-			{!isInputOnFocus && <RightSlot id="search">Alt+s</RightSlot>}
-		</>
+		<BaseInput
+			RightSlot={
+				isInputOnFocus ? null : <RightSlot id="search">Alt+s</RightSlot>
+			}
+			onFocus={() => setIsInputOnFocus(true)}
+			onBlur={() => setIsInputOnFocus(false)}
+			label={t("labels.searchForSongs")}
+			onChange={setSearchTerm}
+			value={searchTerm}
+			spellCheck="false"
+			id="search-songs"
+			autoCorrect="off"
+			ref={inputRef}
+			accessKey="s"
+		/>
 	);
 }
 
@@ -270,8 +262,8 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 // Types:
 
 type Searcher = Readonly<{
-	results: readonly [Path, Media][];
 	searchStatus: ValuesOf<typeof searchStatus>;
+	results: readonly [Path, Media][];
 	isInputOnFocus: boolean;
 	searchTerm: string;
 	highlight: string;
