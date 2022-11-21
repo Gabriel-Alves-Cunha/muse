@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
 import type { Media, Path } from "@common/@types/generalTypes";
 

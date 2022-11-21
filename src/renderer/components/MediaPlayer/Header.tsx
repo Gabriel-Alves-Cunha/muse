@@ -82,14 +82,13 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 			<LoadOrToggleLyrics media={media} path={path} />
 
 			<div className="w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium">
-				{displayTitle === true ? media?.title : media?.album}
+				{displayTitle ? media?.title : media?.album}
 			</div>
 
 			<CircleIconButton
-				aria-label={t("tooltips.toggleFavorite")}
 				onPointerUp={() => toggleFavorite(path)}
 				title={t("tooltips.toggleFavorite")}
-				disabled={media === undefined}
+				disabled={!media}
 			>
 				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
 			</CircleIconButton>

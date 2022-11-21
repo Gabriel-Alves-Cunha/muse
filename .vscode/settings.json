@@ -1,6 +1,6 @@
 {
 	"[typescript]": {
-		"editor.defaultFormatter": "dprint.dprint"
+		"editor.defaultFormatter": "rome.rome"
 	},
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "rome.rome"

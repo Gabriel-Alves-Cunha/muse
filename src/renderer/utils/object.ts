@@ -37,8 +37,16 @@ export function getObjectLength(obj: Obj): number {
 }
 
 //////////////////////////////////////////
+
+export function withoutProperty<T>(obj: Obj<T>, property: string) {
+	const { [property]: unused, ...rest } = obj;
+
+	return rest;
+}
+
+//////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
 // Types:
 
-type Obj = Record<string, unknown>;
+type Obj<T = unknown> = Record<string, T>;

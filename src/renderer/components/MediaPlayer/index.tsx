@@ -79,7 +79,7 @@ export function MediaPlayer() {
 
 	useEffect(() => {
 		const audio = audioRef.current;
-		if (audio === null || media === undefined) return;
+		if (!(audio && media)) return;
 
 		const lambdaHandleLoadedData = () => handleLoadedData(audio, path, media);
 		const lambdaHandleAudioCanPlay = () => handleAudioCanPlay(audio);
@@ -121,7 +121,7 @@ export function MediaPlayer() {
 	}, [media, path]);
 
 	return (
-		<aside className="grid-area-media-player relative inline-block justify-items-center items-center justify-self-center self-start h-[calc(100vh-var(--top-decorations-height))] w-full p-3 [&_svg]:text-icon-media-player">
+		<aside className="aside">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
@@ -148,14 +148,12 @@ const Player = ({ media, audio, path, isSeeking }: PlayerProps) => (
 	<>
 		<Header media={media} path={path} />
 
-		<div className="grid relative self-center bg-none border-none mt-[25%] mx-[10%] mb-0 rounded-2xl after:content-[''] after:block after:pb-full">
-			<div className="absolute flex flex-col justify-center items-center w-full h-full rounded-2xl">
-				<ImgWithFallback
-					Fallback={<MusicNote size={13} />}
-					mediaImg={media?.image}
-					mediaPath={path}
-				/>
-			</div>
+		<div className="aspect-square rounded-2xl flex items-center justify-center w-full shadow-reflect mt-[25%]">
+			<ImgWithFallback
+				Fallback={<MusicNote size={30} />}
+				mediaImg={media?.image}
+				mediaPath={path}
+			/>
 		</div>
 
 		<div className="flex flex-col justify-center items-center h-[10vh] w-full mt-[3vh]">
@@ -225,7 +223,7 @@ function handleEnded(audio: HTMLAudioElement): void {
 		}`,
 	);
 
-	if (audio.loop === false) playNextMedia();
+	if (!audio.loop) playNextMedia();
 }
 
 /////////////////////////////////////////

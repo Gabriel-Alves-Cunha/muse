@@ -37,7 +37,7 @@ export function SortBy() {
 
 	return (
 		<Select
-			triggerClassName="bg-button-hover px-5 h-9 transition-colors ease-linear active:scale-95 first:rounded-l-xl last:rounded-r-xl only:rounded-full" // Same as ButtonOfGroup.
+			triggerClassName="grouped-button" // Same as ButtonOfGroup.
 			content={contentOfSelectEnum.GROUPED_BUTTON_SORT_BY}
 			tooltip={t("tooltips.sortBy")}
 			setValue={setSelectedList}

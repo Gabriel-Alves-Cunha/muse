@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 
 import { stringifyJson } from "@common/utils";
-import { getObjectLength } from "@utils/object";
+import { getObjectLength, withoutProperty } from "@utils/object";
 
 // Mocking window.localStorage
 class LocalStorageMock {
@@ -22,7 +22,8 @@ class LocalStorageMock {
 	key(index: number): string | null {
 		if (index > this.length) return null;
 
-		return this.#store[index];
+		const keys = Object.keys(this.#store);
+		return keys[index] || null;
 	}
 
 	getItem(key: string) {
@@ -30,11 +31,11 @@ class LocalStorageMock {
 	}
 
 	setItem(key: string, value: string) {
-		this.#store[key] = String(value);
+		this.#store[key] = value;
 	}
 
 	removeItem(key: string) {
-		delete this.#store[key];
+		this.#store = withoutProperty(this.#store, key);
 	}
 }
 
@@ -60,20 +61,20 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 	vi.stubGlobal("localStorage", new LocalStorageMock());
 
 	vi.stubGlobal("document", {
-		getElementById: vi.fn().mockImplementation(
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			(_elementId: string) => ({ loop: true }) as HTMLAudioElement,
-		),
+		getElementById: vi
+			.fn()
+			.mockImplementation(
+				(_elementId: string) => ({ loop: true }) as HTMLAudioElement,
+			),
 		// createElement: vi.fn(),
 	});
 
 	vi.stubGlobal("window", {
-		postMessage: vi.fn().mockImplementation(function () {
+		postMessage: vi.fn().mockImplementation(function (...args: unknown[]) {
 			console.log(
 				"%cwindow.postMessage arguments =",
 				"color:blue",
-				// eslint-disable-next-line prefer-rest-params
-				stringifyJson(arguments),
+				stringifyJson(args),
 			);
 		}),
 		requestAnimationFrame: vi.fn().mockImplementation((cb: () => void) => cb()),

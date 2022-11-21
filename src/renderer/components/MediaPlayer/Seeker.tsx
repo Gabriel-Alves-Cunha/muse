@@ -23,20 +23,21 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 	);
 
 	useEffect(() => {
-		// dprint-ignore
 		if (
-			progressWrapperRef.current === null ||
-			timeTooltipRef.current === null ||
-			isDurationValid === false ||
-			audio === null
+			!(
+				progressWrapperRef.current &&
+				timeTooltipRef.current &&
+				isDurationValid &&
+				audio
+			)
 		)
 			return;
 
-		const timeline = progressWrapperRef.current;
 		const timerTooltip = timeTooltipRef.current;
+		const timeline = progressWrapperRef.current;
 
 		function setTimerTooltip({ offsetX }: PointerEvent): void {
-			if (audio === null) return;
+			if (!audio) return;
 
 			const time =
 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
@@ -48,8 +49,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 		}
 
 		function seek({ offsetX }: PointerEvent): void {
-			if (audio === null || isNaN(audio.duration) || !isFinite(audio.duration))
-				return;
+			if (!audio || isNaN(audio.duration) || !isFinite(audio.duration)) return;
 
 			const desiredTime =
 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
@@ -87,35 +87,29 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 	}, [audio, isDurationValid, isSeeking]);
 
 	return (
-		<div className="flex flex-col w-full px-3 gap-2">
+		<div className="flex flex-col w-full gap-2">
 			<div
-				className={
-					"group relative block w-full h-1 bg-main " + isDurationValid
-						? "cursor-pointer"
-						: "cursor-default"
-				}
+				className={`group relative block w-full h-1 bg-main ${
+					isDurationValid ? "cursor-pointer" : "cursor-default"
+				}`}
 				// onPointerUp={e => seek(e, audio)}
 				// onPointerMove={setTimerTooltip}
 				ref={progressWrapperRef}
 			>
 				<span // Timer tooltip
-					className={
-						"group-hover:progress group-focus:progress " + isDurationValid
-							? "hidden"
-							: ""
-					}
+					className={`group-hover:progress group-focus:progress ${
+						isDurationValid ? "hidden" : ""
+					}`}
 					ref={timeTooltipRef}
 				/>
 
 				<Progress />
 			</div>
 
-			<div className="flex justify-between items-center">
+			<div className="flex justify-between items-center text-icon-media-player font-primary text-center text-lg">
 				<CurrentTime />
 
-				<p className="text-icon-media-player font-primary tracking-wide text-center bg-transparent border-none">
-					{formatedDuration}
-				</p>
+				<p>{formatedDuration}</p>
 			</div>
 		</div>
 	);
@@ -136,7 +130,7 @@ const Progress = () => {
 	document.documentElement.style.setProperty(
 		"--progress-width",
 		// !NaN => true (in case is not present), everything else is false:
-		`${!percentage ? 0 : percentage}%`,
+		`${percentage ? percentage : 0}%`,
 	);
 
 	return (

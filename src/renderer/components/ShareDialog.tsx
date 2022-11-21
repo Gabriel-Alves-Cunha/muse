@@ -1,5 +1,5 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
-import type { ClientServerAPI } from "@main/preload/share/server.cjs";
+import type { ClientServerAPI } from "@main/preload/share/server";
 
 import { useCallback, useEffect, useState } from "react";
 import { MdClose as CloseIcon } from "react-icons/md";

@@ -27,15 +27,15 @@
 		--scrollbar: #f1f1f1;
 
 		/* Linear gradient colors */
-		--lingrad-bottom: #4a00e0;
-		--lingrad-top: #8e2de2;
+		--lingrad-bottom: #8b0e9e;
+		--lingrad-top: #330892;
 
 		/* Icon colors */
 		--icon-media-player-disabled: #e0e6ee7a;
 		--icon-deactivated: dimgray;
 		--icon-window-button: black;
 		--icon-media-player: #fff;
-		--icon-active: #4a00e0;
+		--icon-active: #330892;
 
 		/* Text */
 		--text-ctx-menu-item-focus: #fff;
@@ -43,7 +43,7 @@
 		--text-ctx-menu: #7a797d;
 
 		--text-placeholder: #a3a3a3;
-		--text-alternative: #a3a3a3;
+		--text-alternative: #0f172a;
 		--text-disabled: #d3d3d5;
 		--text-normal: #0c0910;
 		--text-muted: #113047;
@@ -60,7 +60,7 @@
 		--bg-icon-button-hovered: #88888857;
 
 		--bg-decorations-down: #cdc3ff;
-		--bg-button-hover: #8e2de2;
+		--bg-button-hover: #330892;
 		--bg-selected: #aac1ff70;
 		--bg-highlight: #9381ff;
 		--bg-popover: #f9f6f5;
@@ -123,7 +123,7 @@
 		--text-ctx-menu: #7a797d;
 
 		--text-placeholder: #a3a3a3;
-		--text-alternative: #a3a3a3;
+		--text-alternative: #e4e1e1;
 		--text-disabled: #d3d3d5;
 		--text-normal: #f6f6f6;
 		--text-muted: #ccb69b;
@@ -252,8 +252,6 @@
 	.grid-area-media-player {
 		grid-area: media-player;
 		height: var(--main-grid-height);
-
-		@apply inline-block justify-self-center self-center w-screen;
 	}
 
 	.grid-area-main {
@@ -320,6 +318,10 @@
 		-webkit-app-region: drag;
 		user-select: none;
 	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
 
 	/* Scrollbar */
 
@@ -508,13 +510,13 @@
 	/* GroupedButton */
 
 	.grouped-button {
-		@apply relative flex justify-center items-center bg-none no-transition;
+		@apply relative flex justify-center items-center bg-button-hover border-none px-5 h-9 transition-colors ease-linear cursor-pointer active:scale-95 first:rounded-l-xl last:rounded-r-xl;
 	}
 
 	.grouped-button:focus-visible,
 	.grouped-button:hover,
 	.grouped-button:focus {
-		@apply bg-button-hover text-white;
+		@apply opacity-80;
 	}
 
 	/* ********************************** */
@@ -534,6 +536,18 @@
 	/* ********************************** */
 	/* ********************************** */
 	/* ********************************** */
+
+	.selected-row {
+		@apply outline-none outline-selected-border -outline-offset-2 bg-selected;
+	}
+
+	.playing-row {
+		@apply outline-none outline-playing-border -outline-offset-2 bg-playing;
+	}
+
+	.list {
+		@apply scroll-2;
+	}
 
 	.single-button {
 		height: 40px;
@@ -587,6 +601,12 @@
 		@apply w-80 h-5;
 	}
 
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Context Menu */
+
 	.ctx-trigger:focus-visible,
 	.ctx-trigger:focus,
 	.ctx-trigger:hover {
@@ -606,6 +626,12 @@
 	.ctx-trigger:disabled svg {
 		@apply text-disabled;
 	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Search Media */
 
 	.search-media * {
 		transition-timing-function: ease;
@@ -634,18 +660,6 @@
 		transform: translate(-44px, -31px);
 
 		@apply text-active;
-	}
-
-	.selected-row {
-		@apply outline-none outline-selected-border -outline-offset-2 bg-selected;
-	}
-
-	.playing-row {
-		@apply outline-none outline-playing-border -outline-offset-2 bg-playing;
-	}
-
-	.list {
-		@apply scroll-2;
 	}
 
 	/* ********************************** */
@@ -701,7 +715,7 @@
 	}
 
 	.decorations-down p {
-		@apply flex h-full text-slate-900 font-secondary tracking-wide text-sm text-center font-medium;
+		@apply flex h-full text-alternative font-secondary tracking-wide text-sm text-center font-medium;
 	}
 
 	.decorations-down-left {
@@ -782,11 +796,11 @@
 	}
 
 	.circle-icon-button:disabled {
-		@apply bg-none cursor-default;
+		@apply bg-none cursor-default pointer-events-none;
 	}
 
 	.circle-icon-button:disabled svg {
-		@apply text-icon-deactivated;
+		@apply text-icon-media-player-disabled;
 	}
 
 	.circle-icon-button svg {
@@ -795,11 +809,11 @@
 
 	/* CircleIconButton variants */
 
-	.circle-icon-button-small {
+	.circle-icon-button.small {
 		@apply h-8 w-8;
 	}
 
-	.circle-icon-button-large {
+	.circle-icon-button.large {
 		@apply h-12 w-12;
 	}
 
@@ -867,7 +881,15 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* MainArea */
+	/* Media Player */
+
+	.aside {
+		@apply grid-area-media-player relative inline-block justify-items-center items-center w-full justify-self-center self-start p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom [&_svg]:text-icon-media-player ;
+	}
+
+	.aside svg * {
+		@apply text-icon-media-player
+	}
 
 	/* ********************************** */
 	/* ********************************** */
@@ -884,6 +906,7 @@
 	0% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 1;
 	}

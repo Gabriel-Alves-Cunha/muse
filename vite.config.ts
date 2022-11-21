@@ -1,7 +1,5 @@
-import type { UserConfig } from "vite";
-
+import { type UserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
-import { defineConfig } from "vite";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 
@@ -10,11 +8,11 @@ export default defineConfig(({ mode }) => {
 	const isTest = mode === "test";
 
 	const config: UserConfig = {
+		// @ts-ignore => I can't get this type to work :(
 		test: {
 			includeSource: ["src/**/*.{js,ts}"],
 			environment: "happy-dom",
 			logHeapUsage: true,
-			dir: "./tests",
 			// coverage: {
 			// 	// reporter: ["html", "text"],
 			// 	reporter: ["text"],
@@ -23,7 +21,6 @@ export default defineConfig(({ mode }) => {
 			exclude: [
 				...configDefaults.exclude,
 				"**/seeLeakedVariables.ts",
-				"**/.eslintrc.{js,cjs}",
 				"**/styles.ts",
 				"**/global.ts",
 				"coverage/**",
@@ -40,13 +37,7 @@ export default defineConfig(({ mode }) => {
 			  },
 		server: { port: 3_000 },
 		root: "./src/renderer",
-		plugins: [
-			react(),
-			// typescript({
-			// 	typescript: ttsc,
-			// }),
-		],
-		envDir: "./",
+		plugins: [react()],
 		base: "./",
 
 		resolve: {
@@ -69,18 +60,6 @@ export default defineConfig(({ mode }) => {
 			],
 		},
 	};
-
-	// console.dir(
-	// 	{ isTest, isDev, config },
-	// 	{
-	// 		maxStringLength: 1_000,
-	// 		maxArrayLength: 40,
-	// 		compact: false,
-	// 		sorted: false,
-	// 		colors: true,
-	// 		depth: 10,
-	// 	}
-	// );
 
 	return config;
 });

@@ -33,7 +33,7 @@ import {
 export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
 
-	const isThereAMedia = !(audio !== null && audio.src.length > 0);
+	const isThereAMedia = !(audio && audio.src.length > 0);
 
 	return (
 		<div className="absolute flex flex-col bottom-10 w-full">
@@ -41,7 +41,6 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 
 			<div className="flex justify-between items-center mt-[10%]">
 				<CircleIconButton
-					aria-label={t("tooltips.toggleLoopThisMedia")}
 					title={t("tooltips.toggleLoopThisMedia")}
 					onPointerUp={toggleLoopMedia}
 					disabled={isThereAMedia}
@@ -52,7 +51,6 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 				<Controls audio={audio} isDisabled={isThereAMedia} />
 
 				<CircleIconButton
-					aria-label={t("tooltips.toggleRandom")}
 					title={t("tooltips.toggleRandom")}
 					onPointerUp={toggleRandom}
 					disabled={isThereAMedia}
@@ -75,7 +73,7 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	const setIsPausedToTrue = () => setIsPaused(true);
 
 	useEffect(() => {
-		if (audio === null) return;
+		if (!audio) return;
 
 		audio.addEventListener("pause", setIsPausedToTrue);
 		audio.addEventListener("play", setIsPausedToFalse);
@@ -105,7 +103,6 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 export const Controls = ({ isDisabled, audio }: ControlsProps) => (
 	<div className="relative flex justify-center items-center w-[120px]">
 		<CircleIconButton
-			aria-label={t("tooltips.playPreviousTrack")}
 			title={t("tooltips.playPreviousTrack")}
 			onPointerUp={playPreviousMedia}
 			disabled={isDisabled}
@@ -116,7 +113,6 @@ export const Controls = ({ isDisabled, audio }: ControlsProps) => (
 		<PlayPauseButton isDisabled={isDisabled} audio={audio} />
 
 		<CircleIconButton
-			aria-label={t("tooltips.playNextTrack")}
 			title={t("tooltips.playNextTrack")}
 			onPointerUp={playNextMedia}
 			disabled={isDisabled}
@@ -136,8 +132,8 @@ type ControlsProps = Readonly<{ isDisabled: boolean; audio: Audio }>;
 /////////////////////////////////////////
 
 export type RefToAudioAndSeeker = Readonly<{
-	audio: Audio;
 	isSeeking: React.MutableRefObject<boolean>;
+	audio: Audio;
 }>;
 
 /////////////////////////////////////////

@@ -18,6 +18,10 @@ export const Button = forwardRef(function Button(
 /////////////////////////////////////////////
 // Types:
 
-interface Props extends React.BaseHTMLAttributes<HTMLButtonElement> {
+interface Props
+	extends React.DetailedHTMLProps<
+		React.ButtonHTMLAttributes<HTMLButtonElement>,
+		HTMLButtonElement
+	> {
 	readonly variant: "large" | "medium" | "input" | "circle";
 }

@@ -17,7 +17,7 @@ const defaultValues: Settings = {
 	filesToShare: emptySet,
 	maxSizeOfHistory: 100,
 };
-const savedSettings = window.localStorage.getItem(settingsKey);
+const savedSettings = localStorage.getItem(settingsKey);
 const settingsToApply =
 	savedSettings === null
 		? defaultValues
@@ -43,7 +43,7 @@ export const { getState: getSettings, setState: setSettings } = useSettings;
 useSettings.subscribe(
 	(state) => state,
 	function writeToLocalStorage(newSettings): void {
-		window.localStorage.setItem(settingsKey, JSON.stringify(newSettings));
+		localStorage.setItem(settingsKey, JSON.stringify(newSettings));
 	},
 );
 

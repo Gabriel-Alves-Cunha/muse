@@ -13,7 +13,7 @@ import { File as MediaFile } from "node-taglib-sharp";
 import { getThumbnail, anotherMediaPath } from "./utils";
 import { eraseImg, makeRandomString } from "@common/utils";
 
-const { writeTags } = await import("@main/preload/media/mutate-metadata.cjs");
+const { writeTags } = await import("@main/preload/media/mutate-metadata");
 
 //////////////////////////////////////
 //////////////////////////////////////

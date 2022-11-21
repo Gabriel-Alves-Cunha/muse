@@ -14,9 +14,9 @@ import { join } from "node:path";
 
 import { mediaPath, mediaPicture, test_assetsDir } from "./utils";
 import { eraseImg, makeRandomString } from "@common/utils";
-import { doesPathExists } from "@main/preload/file.cjs";
+import { doesPathExists } from "@main/preload/file";
 
-const { writeTags } = await import("@main/preload/media/mutate-metadata.cjs");
+const { writeTags } = await import("@main/preload/media/mutate-metadata");
 
 //////////////////////////////////////
 //////////////////////////////////////

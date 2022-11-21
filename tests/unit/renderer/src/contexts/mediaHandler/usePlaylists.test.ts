@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import type { Media } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";

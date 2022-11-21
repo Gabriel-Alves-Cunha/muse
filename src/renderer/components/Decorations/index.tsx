@@ -51,7 +51,7 @@ export const DecorationsDown = () => (
 
 const WindowButton = ({ className = "", ...props }: WindowButtonProps) => (
 	<button
-		className={`relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none ${className}`}
+		className={`relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 transition-none text-icon-window-button hover:bg-icon-button-hovered focus:bg-icon-button-hovered ${className}`}
 		{...props}
 	/>
 );
@@ -59,13 +59,12 @@ const WindowButton = ({ className = "", ...props }: WindowButtonProps) => (
 /////////////////////////////////////////////
 
 const Buttons = () => (
-	<div className="flex flex-row-reverse ml-auto h-full bg-none transition-none">
+	<div className="flex ml-auto h-full bg-transparent">
 		<WindowButton
-			className="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white no-transition"
-			title={t("tooltips.closeWindow")}
-			onPointerUp={closeWindow}
+			title={t("tooltips.toggleMinimizeWindow")}
+			onPointerUp={minimizeWindow}
 		>
-			<Close size={16} />
+			<Minimize size={16} />
 		</WindowButton>
 
 		<WindowButton
@@ -76,10 +75,11 @@ const Buttons = () => (
 		</WindowButton>
 
 		<WindowButton
-			title={t("tooltips.toggleMinimizeWindow")}
-			onPointerUp={minimizeWindow}
+			className="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white no-transition"
+			title={t("tooltips.closeWindow")}
+			onPointerUp={closeWindow}
 		>
-			<Minimize size={16} />
+			<Close size={16} />
 		</WindowButton>
 	</div>
 );
