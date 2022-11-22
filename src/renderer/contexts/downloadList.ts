@@ -1,6 +1,6 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 
-import create from "zustand";
+import { observable } from "@legendapp/state";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -56,28 +56,13 @@ import create from "zustand";
 ////////////////////////////////////////////////
 // Main functions:
 
-export const useDownloadingList = create<DownloadingList>(() => ({
-	downloadingList: new Map(),
-}));
-
-////////////////////////////////////////////////
-
-export const getDownloadingList = () =>
-	useDownloadingList.getState().downloadingList;
-
-////////////////////////////////////////////////
-
-export const setDownloadingList = (
-	downloadingList: DownloadingList["downloadingList"],
-) => useDownloadingList.setState({ downloadingList });
+export const downloadingList = observable<DownloadingList>(new Map());
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type DownloadingList = Readonly<{
-	downloadingList: ReadonlyMap<MediaUrl, MediaBeingDownloaded>;
-}>;
+export type DownloadingList = Map<MediaUrl, MediaBeingDownloaded>;
 
 export type MediaUrl = Readonly<string>;

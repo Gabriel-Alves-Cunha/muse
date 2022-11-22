@@ -17,6 +17,7 @@ export const reactToElectronMessage = {
 
 /////////////////////////////////////////////
 
+// Since message passing needs to be a string, I'm doing this already:
 export const electronToReactMessage = {
 	DELETE_ONE_MEDIA_FROM_COMPUTER: "2",
 	CREATE_A_NEW_DOWNLOAD: "3",

@@ -1,5 +1,6 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
+import { batch, lockObservable, observable } from "@legendapp/state";
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
@@ -9,7 +10,6 @@ import { assertUnreachable, time } from "@utils/utils";
 import { emptyMap, emptySet } from "@common/empty";
 import { stringifyJson } from "@common/utils";
 import { dbgPlaylists } from "@common/debug";
-import { getSettings } from "@contexts/settings";
 import { getFirstKey } from "@utils/map-set";
 import {
 	searchDirectoryResult,
@@ -17,6 +17,7 @@ import {
 	sortByDate,
 	sortByName,
 } from "./usePlaylistsHelper";
+import { settings } from "./settings";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -36,10 +37,69 @@ export type UsePlaylistsActions = Readonly<{
 	history: History;
 }>;
 
+export type PlaylistsStatesAndActions = Readonly<{
+	isLoadingMedias: boolean;
+
+	sortedByDate: {list:Set<Path>};
+	favorites: ReadonlySet<Path>;
+	sortedByName: MainList;
+	history: { list: History; add(path: Path): void; clear(): void };
+}>;
+
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main function:
+
+// export const playlistsStates = observable<PlaylistsStatesAndActions>({
+// 	isLoadingMedias: false,
+// 
+// 	sortedByName: new Map(),
+// 	sortedByDate: new Set(),
+// 	favorites: new Set(),
+// 	history: {
+// 		list: new Map(),
+// 		add(path: Path) {
+// 			lockObservable(playlistsStates, false); // unlock;
+// 
+// 			batch(() => {
+// 				const maxSizeOfHistory = settings.maxSizeOfHistory.peek();
+// 				const historyList = playlistsStates.history.list;
+// 				const dates: DateAsNumber[] = [];
+// 
+// 				// Add to history if there isn't one yet:
+// 				const historyOfDates = historyList.get(path);
+// 				historyOfDates === undefined
+// 					? dates.unshift(Date.now())
+// 					: dates.unshift(...historyOfDates, Date.now());
+// 
+// 				// history has a max size of `maxSizeOfHistory`:
+// 				if (dates.length > maxSizeOfHistory) dates.length = maxSizeOfHistory;
+// 
+// 				historyList.set(path, dates);
+// 
+// 				// history has a max size of `maxSizeOfHistory`:
+// 				if (historyList.size > maxSizeOfHistory)
+// 					// Remove the first element (the oldest):
+// 					historyList.delete(getFirstKey(historyList));
+// 
+// 				dbgPlaylists(
+// 					"setPlaylists on 'UPDATE_HISTORY'\u279D'ADD_ONE_MEDIA'. newHistory =",
+// 					historyList,
+// 				);
+// 			});
+// 
+// 			lockObservable(playlistsStates, true); // lock
+// 		},
+// 		clear() {
+// 			lockObservable(playlistsStates, false); // lock
+// 			playlistsStates.history.list.clear();
+// 			lockObservable(playlistsStates, true); // lock
+// 		},
+// 	},
+// });
+// 
+// lockObservable(playlistsStates, true); // lock
 
 export const usePlaylists = create<UsePlaylistsActions>()(
 	subscribeWithSelector(
@@ -66,7 +126,7 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 									////////////////////////////////////////////////
 
 									case PlaylistActions.ADD_ONE_MEDIA: {
-										const { maxSizeOfHistory } = getSettings();
+										const maxSizeOfHistory = settings.maxSizeOfHistory.peek();
 										const { history } = get();
 										const { path } = action;
 
@@ -78,20 +138,17 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 											? dates.unshift(Date.now())
 											: dates.unshift(...historyOfDates, Date.now());
 
+										if (dates.length > maxSizeOfHistory)
+											dates.length = maxSizeOfHistory;
+
 										const newHistory = new Map(history).set(path, dates);
 
 										// history has a max size of `maxSizeOfHistory`:
 										if (newHistory.size > maxSizeOfHistory) {
-											// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 											const firstPath = getFirstKey(newHistory)!;
 											// remove the first element:
 											newHistory.delete(firstPath);
 										}
-
-										newHistory.forEach((dates) => {
-											if (dates.length > maxSizeOfHistory)
-												dates.length = maxSizeOfHistory;
-										});
 
 										set({ history: newHistory });
 
@@ -297,18 +354,16 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 										// If the media in the favorites list is not on
 										// action.list, remove it from the favorites:
-										favorites.forEach((path) => {
+										for (const path of favorites)
 											if (!action.list.has(path)) newFavorites.delete(path);
-										});
 
 										if (favorites.size !== newFavorites.size)
 											set({ favorites: newFavorites });
 
 										// If the media in the history list is not on
 										// action.list, remove it from the favorites:
-										history.forEach((_, path) => {
+										for (const [path] of history)
 											if (!action.list.has(path)) newHistory.delete(path);
-										});
 
 										if (history.size !== newHistory.size)
 											set({ history: newHistory });
@@ -497,7 +552,7 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 		const {
 			assureMediaSizeIsGreaterThan60KB,
 			ignoreMediaWithLessThan60Seconds,
-		} = getSettings();
+		} = settings.peek();
 
 		const newMainList: MainList = new Map(
 			await transformPathsToMedias(
@@ -544,11 +599,10 @@ export function searchMedia(highlight: string): [Path, Media][] {
 	return time(() => {
 		const medias: [Path, Media][] = [];
 
-		getMainList().forEach(
-			(media, path) =>
-				unDiacritic(media.title).includes(highlight) &&
-				medias.push([path, media]),
-		);
+		for (const [path, media] of getMainList()) {
+			unDiacritic(media.title).includes(highlight);
+			medias.push([path, media]);
+		}
 
 		return medias;
 	}, `searchMedia('${highlight}')`);

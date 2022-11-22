@@ -1,5 +1,6 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
+import { useObserveEffect, useSelector } from "@legendapp/state/react";
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -27,12 +28,11 @@ import {
 import {
 	selectMediaByPointerEvent,
 	computeHistoryItemKey,
-	setIsCtxMenuOpen,
 	computeItemKey,
 	isCtxMenuOpen,
 	reloadWindow,
 	itemContent,
-	useFromList,
+	fromListState,
 } from "./helper";
 
 /////////////////////////////////////////
@@ -61,7 +61,10 @@ export const MediaListKind = ({ isHome }: Props) => (
 // Main function:
 
 function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
-	const { fromList, homeList } = useFromList();
+	const { fromList, homeList } = useSelector(() => ({
+		fromList: fromListState.fromList.get(),
+		homeList: fromListState.homeList.get(),
+	}));
 	const listRef = useRef<HTMLDivElement>(null);
 
 	// isHome is used to determine which list to use
@@ -106,9 +109,8 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					case PlaylistList.HISTORY: {
 						const unsortedList: [Path, DateAsNumber][] = [];
 
-						(list as History).forEach((dates, path) =>
-							dates.forEach((date) => unsortedList.push([path, date])),
-						);
+						for (const [path, dates] of list as History)
+							for (const date of dates) unsortedList.push([path, date]);
 
 						const mainList = getMainList();
 
@@ -129,7 +131,9 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 	useOnClickOutside(listRef, handleDeselectAllMedias);
 
-	useEffect(() => useFromList.setState({ isHome }), [isHome]);
+	useObserveEffect(fromListState.isHome, () => {
+		fromListState.isHome.set(isHome);
+	});
 
 	useEffect(() => {
 		document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
@@ -144,7 +148,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			<ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
 				content={ctxContentEnum.MEDIA_OPTIONS}
-				setIsOpen={setIsCtxMenuOpen}
+				setIsOpen={isCtxMenuOpen.set}
 			>
 				<Virtuoso
 					computeItemKey={
@@ -175,11 +179,6 @@ const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
 const EmptyPlaceholder = () => (
 	<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
-		{/* <img
-			alt={t("alts.noMediasFound")}
-			className="w-14 h-14 mr-5"
-			src={noMediaFoundPng}
-		/> */}
 		<NoMediaFound className="w-14 h-14 mr-5" />
 
 		<Translator path="alts.noMediasFound" />
@@ -204,7 +203,7 @@ function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
 /////////////////////////////////////////
 
 function handleDeselectAllMedias() {
-	if (isCtxMenuOpen() === false && getAllSelectedMedias().size > 0)
+	if (isCtxMenuOpen.peek() === false && getAllSelectedMedias().size > 0)
 		deselectAllMedias();
 }
 

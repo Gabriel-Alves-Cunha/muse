@@ -4,11 +4,11 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { electronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
-import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
-import { getSettings } from "@contexts/settings";
+import { downloadInfo } from "@components/Downloading";
 import { emptyString } from "@common/empty";
 import { deleteFile } from "./deleteFile";
+import { settings } from "@contexts/settings";
 import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
@@ -83,18 +83,18 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		case CREATE_A_NEW_DOWNLOAD: {
 			dbg("[handleWindowMsgs()] Create a new download:", msg.downloadInfo);
-			setDownloadInfo(msg.downloadInfo);
+			downloadInfo.set(msg.downloadInfo);
 			break;
 		}
 
 		//////////////////////////////////////////
 
 		case ADD_ONE_MEDIA: {
-			const { mediaPath } = msg;
 			const {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			} = getSettings();
+			} = settings.peek();
+			const { mediaPath } = msg;
 
 			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
 
@@ -164,7 +164,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			const {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			} = getSettings();
+			} = settings.peek();
 
 			const refreshedMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias(

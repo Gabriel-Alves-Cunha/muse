@@ -1,3 +1,4 @@
+import { useSelector } from "@legendapp/state/react";
 import {
 	VscChromeMaximize as Maximize,
 	VscChromeMinimize as Minimize,
@@ -9,7 +10,7 @@ import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
 import { MediasInfo } from "@components/Decorations/MediasInfo";
-import { usePage } from "@contexts/page";
+import { page } from "@contexts/page";
 import { t } from "@components/I18n";
 
 import imageUrl from "@assets/logo.svg";
@@ -87,11 +88,11 @@ const Buttons = () => (
 /////////////////////////////////////////////
 
 function AppNamePlusFolder() {
-	const { page } = usePage();
+	const currPage = useSelector(() => page.get());
 
 	return (
 		<div className="absolute flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light sm:hidden">
-			{capitalizedAppName} • {page}
+			{capitalizedAppName} • {currPage}
 		</div>
 	);
 }
@@ -101,4 +102,7 @@ function AppNamePlusFolder() {
 /////////////////////////////////////////////
 // Types:
 
-type WindowButtonProps = React.BaseHTMLAttributes<HTMLButtonElement>;
+type WindowButtonProps = React.DetailedHTMLProps<
+	React.ButtonHTMLAttributes<HTMLButtonElement>,
+	HTMLButtonElement
+>;

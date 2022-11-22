@@ -1,9 +1,8 @@
-################## TODOS ##################
+################## TODO ##################
 
 * FIX: choose a font with I and L different!!
 * FIX: tests!
 * ADD: select with mouse moving!!
-* CHANGE: from stitches to tailwind (smaller bundle and less js)
 * CHANGE: from react to solidjs/preact
 * CHANGE: from i18 to ? solid-primitives
 * CHANGE: from radix-ui to hope-ui (solid js)
@@ -13,13 +12,4 @@
 
 ################## NOTES ##################
 
-1. `const { getState: getPage } = usePage;
-		// and then:
-		getPage().page
-	 ` is not reactive!
-
-2. `const { isLoadingMedias } = usePlaylists();`
-		will rerender not only with `isLoadingMedias`,
-		you have to use a select function.
-
-3. If ever needed, see last.fm for lyrics, or lrc
+1. If ever needed, see last.fm for lyrics, or lrc

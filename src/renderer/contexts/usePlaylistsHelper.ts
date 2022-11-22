@@ -72,7 +72,6 @@ export const getAllowedMedias = (filenames: readonly Path[]): readonly Path[] =>
 
 export function sortByDate(list: MainList): ReadonlySet<Path> {
 	const listAsArrayOfPaths = Array.from(list)
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		.sort(([_, prevMedia], [__, nextMedia]) => {
 			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
 			if (prevMedia.birthTime < nextMedia.birthTime) return -1;
@@ -89,8 +88,8 @@ export function sortByDate(list: MainList): ReadonlySet<Path> {
 ////////////////////////////////////////////////
 
 export function sortByName(list: MainList): MainList {
-	const listAsArrayOfPaths = Array.from(list) // eslint-disable-next-line @typescript-eslint/no-unused-vars
-		.sort(([_, prevMedia], [__, nextMedia]) => {
+	const listAsArrayOfPaths = Array.from(list).sort(
+		([_, prevMedia], [__, nextMedia]) => {
 			const prevTitle = prevMedia.title.toLocaleLowerCase();
 			const nextTitle = nextMedia.title.toLocaleLowerCase();
 
@@ -98,7 +97,8 @@ export function sortByName(list: MainList): MainList {
 			if (prevTitle < nextTitle) return -1;
 			// a must be equal to b:
 			return 0;
-		});
+		},
+	);
 
 	return new Map(listAsArrayOfPaths);
 }

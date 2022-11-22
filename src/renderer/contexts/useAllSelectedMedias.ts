@@ -1,25 +1,15 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import { observable, observe } from "@legendapp/state";
 
 import { getSortedByDate } from "./usePlaylists";
-import { emptySet } from "@common/empty";
 import { time } from "@utils/utils";
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path> }>()(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
-);
-
-export const getAllSelectedMedias = () =>
-	useAllSelectedMedias.getState().medias;
-export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
-	useAllSelectedMedias.setState({ medias });
+export const selectedMedias = observable<Set<Path>>(new Set());
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
@@ -27,35 +17,36 @@ export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 // Handle media selection:
 
 if (import.meta.vitest === undefined)
-	useAllSelectedMedias.subscribe(
-		(state) => state.medias,
-		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
-			time(() => {
-				// Has to be this order:
-				prevSelectedMedias.forEach((path) =>
-					document
-						.querySelectorAll(`[data-path="${path}"]`)
-						?.forEach((element) => {
-							if (selectedMedias.has(path)) return;
+	observe<typeof selectedMedias>(function handleDecorateMediasRow({
+		previous: prevSelectedMedias,
+	}): void {
+		time(() => {
+			// Has to be this order: first prev then current!!!
+			if (prevSelectedMedias)
+				for (const path of prevSelectedMedias.get())
+					for (const element of document.querySelectorAll(
+						`[data-path="${path}"]`,
+					)) {
+						if (selectedMedias.has(path)) return;
 
-							element.classList.remove("selected");
-						}),
-				);
-				selectedMedias.forEach((path) =>
-					document
-						.querySelectorAll(`[data-path="${path}"]`)
-						?.forEach((element) => element.classList.add("selected")),
-				);
-			}, "handleDecorateMediasRow");
-		},
-	);
+						element.classList.remove("selected");
+					}
+
+			// This observe will automatically track selectedMedias for changes
+			for (const path of selectedMedias.get())
+				for (const element of document.querySelectorAll(
+					`[data-path="${path}"]`,
+				))
+					element.classList.add("selected");
+		}, "handleDecorateMediasRow");
+	});
 
 ///////////////////////////////////////////////////
 
 export function toggleSelectedMedia(path: Path): void {
 	time(
 		() =>
-			getAllSelectedMedias().has(path)
+			selectedMedias.peek().has(path)
 				? removeFromAllSelectedMedias(path)
 				: addToAllSelectedMedias(path),
 		"toggleSelectedMedia",
@@ -65,32 +56,29 @@ export function toggleSelectedMedia(path: Path): void {
 ///////////////////////////////////////////////////
 
 export function addToAllSelectedMedias(path: Path): void {
-	const allSelectedMedias = getAllSelectedMedias();
+	const allSelectedMedias = selectedMedias.get();
 
 	if (allSelectedMedias.has(path)) return;
 
-	setAllSelectedMedias(new Set(allSelectedMedias).add(path));
+	allSelectedMedias.add(path);
 }
 
 ///////////////////////////////////////////////////
 
 export function removeFromAllSelectedMedias(path: Path): void {
-	const allSelectedMedias = getAllSelectedMedias();
+	const allSelectedMedias = selectedMedias.get();
 
 	if (!allSelectedMedias.has(path)) return;
 
-	const newSet = new Set(allSelectedMedias);
-	newSet.delete(path);
-
-	setAllSelectedMedias(newSet);
+	allSelectedMedias.delete(path);
 }
 
 ///////////////////////////////////////////////////
 
 export function deselectAllMedias(): void {
-	if (getAllSelectedMedias().size === 0) return;
+	if (selectedMedias.peek().size === 0) return;
 
-	setAllSelectedMedias(emptySet);
+	selectedMedias.get().clear();
 }
 
 ///////////////////////////////////////////////////
@@ -98,7 +86,7 @@ export function deselectAllMedias(): void {
 export function selectAllMedias(): void {
 	const sortedByDate = getSortedByDate();
 
-	if (getAllSelectedMedias().size === sortedByDate.size) return;
+	if (selectedMedias.peek().size === sortedByDate.size) return;
 
-	setAllSelectedMedias(sortedByDate);
+	selectedMedias.set(sortedByDate);
 }

@@ -4,7 +4,6 @@ import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { memo } from "react";
-import create from "zustand";
 
 import { electronIpcMainProcessNotification } from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
@@ -18,6 +17,7 @@ import {
 	getAllSelectedMedias,
 	toggleSelectedMedia,
 } from "@contexts/useAllSelectedMedias";
+import { observable } from "@legendapp/state";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -26,22 +26,15 @@ const notify =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const useFromList = create<FromList>(() => ({
+export const fromListState = observable({
 	homeList: PlaylistList.MAIN_LIST,
 	fromList: PlaylistList.FAVORITES,
 	isHome: true,
-}));
-
-export const { getState: getFromList, setState: setFromList } = useFromList;
+});
 
 /////////////////////////////////////////
 
-const useIsCtxMenuOpen = create(() => ({ isCtxMenuOpen: false }));
-
-export const isCtxMenuOpen = () => useIsCtxMenuOpen.getState().isCtxMenuOpen;
-
-export const setIsCtxMenuOpen = (bool: boolean) =>
-	useIsCtxMenuOpen.setState({ isCtxMenuOpen: bool });
+export const isCtxMenuOpen = observable(false);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -69,7 +62,7 @@ function selectOrPlayMedia(
 	mediaPath: Path,
 ): void {
 	if (e.button !== leftClick || e.ctrlKey === false) {
-		const { fromList, homeList, isHome } = getFromList();
+		const { fromList, homeList, isHome } = fromListState.peek();
 		const list = isHome === true ? homeList : fromList;
 
 		return playThisMedia(mediaPath, list);
@@ -85,9 +78,9 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => (
 		<div
-			className={
-				`${(getAllSelectedMedias().has(path) === true ? "selected " : "")}${(getCurrentPlaying().path === path ? "playing " : "")}row-wrapper`
-			}
+			className={`${
+				getAllSelectedMedias().has(path) === true ? "selected " : ""
+			}${getCurrentPlaying().path === path ? "playing " : ""}row-wrapper`}
 			data-path={path}
 		>
 			<button

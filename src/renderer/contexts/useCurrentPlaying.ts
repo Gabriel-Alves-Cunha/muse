@@ -1,13 +1,14 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import { persistObservable } from "@legendapp/state/persist";
+import { observable, observe } from "@legendapp/state";
 
-import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getFirstKey, getLastKey } from "@utils/map-set";
 import { getRandomInt, time } from "@utils/utils";
 import { getPlayOptions } from "./usePlayOptions";
 import { emptyString } from "@common/empty";
+import { keys } from "@utils/localStorage";
+import { dbg } from "@common/debug";
 import {
 	type MainList,
 	PlaylistActions,
@@ -21,26 +22,22 @@ import {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-// Constants:
+// Main :
 
-const defaultCurrentPlaying: CurrentPlaying = {
+const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: PlaylistList.MAIN_LIST,
 	path: emptyString,
 	currentTime: 0,
-};
+});
 
-export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(
-		setCurrentPlayingOnLocalStorage(
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			(_set, _get, _api) => defaultCurrentPlaying,
-			"currentPlaying",
-		),
-	),
-);
+export const currentPlaying = observable<CurrentPlaying>({
+	...defaultCurrentPlaying,
+});
 
-export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
-	useCurrentPlaying;
+// Persist this observable
+persistObservable(currentPlaying, {
+	local: keys.currentPlaying, // Unique name
+});
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -58,7 +55,7 @@ export function playThisMedia(
 		path,
 	});
 
-	setCurrentPlaying({ path, currentTime: 0, listType });
+	currentPlaying.set({ path, currentTime: 0, listType });
 }
 
 ////////////////////////////////////////////////
@@ -71,12 +68,10 @@ export function togglePlayPause(): void {
 
 ////////////////////////////////////////////////
 
-export function play(audio?: HTMLAudioElement): void {
-	(async () => {
-		audio !== undefined
-			? await audio.play()
-			: await (document.getElementById("audio") as HTMLAudioElement).play();
-	})();
+export async function play(audio?: HTMLAudioElement): Promise<void> {
+	audio === undefined
+		? await (document.getElementById("audio") as HTMLAudioElement).play()
+		: await audio.play();
 }
 
 ////////////////////////////////////////////////
@@ -88,14 +83,15 @@ export function pause(audio?: HTMLAudioElement): void {
 	audio.pause();
 	const currentTime = audio.currentTime;
 
-	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
+	if (currentTime > 60 /* seconds */)
+		currentPlaying.currentTime.set(currentTime);
 }
 
 ////////////////////////////////////////////////
 
 export function playPreviousMedia(): void {
 	time(() => {
-		const { path, listType } = getCurrentPlaying();
+		const { path, listType } = currentPlaying.peek();
 
 		if (path.length === 0)
 			return console.warn(
@@ -139,7 +135,11 @@ export function playPreviousMedia(): void {
 			path: prevMediaPath,
 		});
 
-		setCurrentPlaying({ path: prevMediaPath, currentTime: 0 });
+		currentPlaying.set({
+			listType: correctListType,
+			path: prevMediaPath,
+			currentTime: 0,
+		});
 	}, "playPreviousMedia");
 }
 
@@ -147,7 +147,7 @@ export function playPreviousMedia(): void {
 
 export function playNextMedia(): void {
 	time(() => {
-		const { path, listType } = getCurrentPlaying();
+		const { path, listType } = currentPlaying.peek();
 
 		if (path.length === 0)
 			return console.info(
@@ -202,7 +202,11 @@ export function playNextMedia(): void {
 			path: nextMediaPath,
 		});
 
-		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
+		currentPlaying.set({
+			listType: correctListType,
+			path: nextMediaPath,
+			currentTime: 0,
+		});
 	}, "playNextMedia");
 }
 
@@ -215,8 +219,8 @@ navigator?.mediaSession?.setActionHandler?.("previoustrack", () =>
 	playPreviousMedia(),
 );
 navigator?.mediaSession?.setActionHandler?.("nexttrack", () => playNextMedia());
+navigator?.mediaSession?.setActionHandler?.("play", async () => await play());
 navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
-navigator?.mediaSession?.setActionHandler?.("play", () => play());
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -228,17 +232,20 @@ navigator?.mediaSession?.setActionHandler?.("play", () => play());
 let prevTimerToSetMedia: NodeJS.Timeout | undefined;
 
 if (import.meta.vitest === undefined)
-	useCurrentPlaying.subscribe(
-		(state) => state.path,
-		function runSubscribedFunctions(path, prevPath) {
-			if (path.length === 0) return;
+	observe<typeof currentPlaying>(function runSubscribedFunctions({
+		previous,
+	}): void {
+		const path = currentPlaying.path.peek();
 
-			// Run functions:
-			setAudioSource(path, prevPath);
+		if (path.length === 0) return;
 
-			changeMediaSessionMetadata(path);
-		},
-	);
+		const prevPath = previous?.path.peek() ?? "";
+
+		// Run functions:
+		setAudioSource(path, prevPath);
+
+		changeMediaSessionMetadata(path);
+	});
 
 ////////////////////////////////////////////////
 
@@ -268,23 +275,21 @@ const playingClass = "playing";
  * Decorate the rows of current playing medias
  * and undecorate previous playing ones.
  */
-function handleDecorateMediaRow(path: Path, previousPath: Path) {
+function handleDecorateMediaRow(path: Path, previousPath: Path): void {
+	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 	const prevElements =
 		previousPath.length > 0
 			? document.querySelectorAll(`[data-path="${previousPath}"]`)
 			: null;
-	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
-	if (prevElements === null)
-		console.info(`No previous media row found for "${previousPath}!"`);
-	if (newElements === null)
-		return console.info(`No media row found for "${path}"!`);
+	if (!prevElements) dbg(`No previous media row found for "${previousPath}!"`);
+	if (newElements.length === 0) return dbg(`No media row found for "${path}"!`);
 
+	// Undecorate previous playing media row:
 	if (previousPath.length !== 0 && prevElements !== null)
-		// Undecorate previous playing media row:
-		prevElements.forEach((element) => element.classList.remove(playingClass));
+		for (const element of prevElements) element.classList.remove(playingClass);
 
-	newElements.forEach((element) => element.classList.add(playingClass));
+	for (const element of newElements) element.classList.add(playingClass);
 }
 
 ////////////////////////////////////////////////
@@ -311,6 +316,6 @@ function changeMediaSessionMetadata(path: Path): void {
 
 export type CurrentPlaying = Readonly<{
 	listType: PlaylistList;
-	path: Path;
 	currentTime: number;
+	path: Path;
 }>;

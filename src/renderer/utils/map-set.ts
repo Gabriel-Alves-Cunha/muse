@@ -3,7 +3,6 @@ export function getFirstKey<Key>(
 ): Key | undefined {
 	if (mapOrSet instanceof Map) {
 		const [key_] = mapOrSet as ReadonlyMap<Key, unknown>;
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const [key] = key_!;
 
 		return key;

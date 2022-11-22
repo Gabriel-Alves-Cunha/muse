@@ -1,18 +1,14 @@
-import create from "zustand";
-
-import { setPlayOptionsOnLocalStorage } from "./localStorageHelpers";
+import { observable } from "@legendapp/state";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main:
 
-export const usePlayOptions = create<PlayOptions>()(
-	setPlayOptionsOnLocalStorage(() => ({ random: false, loop: false })),
-);
-
-export const { getState: getPlayOptions, setState: setPlayOptions } =
-	usePlayOptions;
+export const playOptions = observable<PlayOptions>({
+	random: false,
+	loop: false,
+});
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -20,21 +16,21 @@ export const { getState: getPlayOptions, setState: setPlayOptions } =
 // Helper functions:
 
 export function toggleLoopMedia(): void {
-	const loop = !getPlayOptions().loop;
+	const loop = !playOptions.loop.peek();
 
 	(document.getElementById("audio") as HTMLAudioElement).loop = loop;
 
-	setPlayOptions({ loop });
+	playOptions.loop.set(loop);
 }
 
 ////////////////////////////////////////////////
 
 export const toggleRandom = () =>
-	setPlayOptions({ random: !getPlayOptions().random });
+	playOptions.random.set(!playOptions.random.peek());
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type PlayOptions = Readonly<{ random: boolean; loop: boolean }>;
+export type PlayOptions = { random: boolean; loop: boolean };
