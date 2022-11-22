@@ -1,26 +1,31 @@
-import { useObserveEffect, useSelector } from "@legendapp/state/react";
 import { MdCompareArrows as Convert } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trigger } from "@radix-ui/react-popover";
 
-import { newConvertions, createNewConvertion, Popup } from "./helper";
+import { useNewConvertions, createNewConvertion, Popup } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { reactToElectronMessage } from "@common/enums";
+import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { convertingList } from "@contexts/convertList";
 import { errorToast } from "@components/toasts";
+import { emptyMap } from "@common/empty";
 import { t } from "@components/I18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function Converting() {
-	const convertingListSize = useSelector(() => convertingList.size);
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+const convertingListSizeSelector = (
+	state: ReturnType<typeof useConvertingList.getState>,
+) => state.convertingList.size;
 
-	useObserveEffect(() => {
-		for (const [path, newConvertion] of newConvertions.get())
+export function Converting() {
+	const convertingListSize = useConvertingList(convertingListSizeSelector);
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+	const { newConvertions } = useNewConvertions();
+
+	useEffect(() => {
+		newConvertions.forEach((newConvertion, path) => {
 			try {
 				const electronPort = createNewConvertion(newConvertion, path);
 
@@ -38,18 +43,20 @@ export function Converting() {
 
 				console.error(error);
 			}
+		});
 
 		// In here, we've already handled all the files,
 		// so we can clear the list;
 		// We need the check to prevent an infinite loop.
-		if (newConvertions.peek().size !== 0) newConvertions.clear();
-	});
+		if (newConvertions.size !== 0)
+			useNewConvertions.setState({ newConvertions: emptyMap });
+	}, [newConvertions]);
 
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
 				className={`${
-					convertingListSize.get() > 0 ? "has-items" : ""
+					convertingListSize > 0 ? "has-items" : ""
 				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
 				title={t("tooltips.showAllConvertingMedias")}
 			>
@@ -60,7 +67,7 @@ export function Converting() {
 
 			<PopoverContent
 				size={
-					convertingListSize.get() === 0
+					convertingListSize === 0
 						? "nothing-found-for-convertions-or-downloads"
 						: "convertions-or-downloads"
 				}

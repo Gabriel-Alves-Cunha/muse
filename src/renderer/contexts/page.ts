@@ -1,19 +1,9 @@
-import { observable } from "@legendapp/state";
+import type { Page } from "@common/@types/generalTypes";
 
-// The order here is the order on the navbar:
-export const pages = [
-	"Home",
-	"Favorites",
-	"History",
-	"Download",
-	"Convert",
-] as const;
+import create from "zustand";
 
-export const page = observable<Page>("Home");
+export const usePage = create<Readonly<{ page: Page }>>(() => ({
+	page: "Home",
+}));
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Types:
-
-export type Page = typeof pages[number];
+export const { setState: setPage } = usePage;

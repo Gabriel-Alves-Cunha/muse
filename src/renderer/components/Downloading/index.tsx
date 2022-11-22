@@ -3,19 +3,14 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
-import {
-	useObservable,
-	useObserveEffect,
-	useSelector,
-} from "@legendapp/state/react";
-import { observable } from "@legendapp/state";
 import { Trigger } from "@radix-ui/react-popover";
+import create from "zustand";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { createNewDownload, Popup } from "./helper";
 import { reactToElectronMessage } from "@common/enums";
+import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { downloadingList } from "@contexts/downloadList";
 import { progressStatus } from "@common/enums";
 import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
@@ -26,37 +21,36 @@ import { t } from "@components/I18n";
 /////////////////////////////////////////////
 // Constants:
 
-const defaultDownloadInfo: DownloadInfo = Object.freeze({
+const defaultDownloadInfo: DownloadInfo = {
 	imageURL: emptyString,
 	artist: emptyString,
 	title: emptyString,
 	url: emptyString,
 	extension: "mp3",
-} as const);
+} as const;
 
-export const downloadInfo = observable<DownloadInfo>({
-	...defaultDownloadInfo,
-});
+export const useDownloadInfo = create(() => defaultDownloadInfo);
+
+export const { setState: setDownloadInfo } = useDownloadInfo;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+
+const sizeSelector = (state: ReturnType<typeof useDownloadingList.getState>) =>
+	state.downloadingList.size;
 
 export function Downloading() {
-	const { isPopoverOpen, downloadInfo_, downloadingListSize } = useObservable(
-		() => ({
-			downloadingListSize: downloadingList.size,
-			downloadInfo_: downloadInfo.get(),
-			isPopoverOpen: false,
-		}),
-	);
+	const downloadingListSize = useDownloadingList(sizeSelector);
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+	const downloadInfo = useDownloadInfo();
 
-	useObserveEffect(() => {
-		if (downloadInfo_.url.get().length === 0) return;
+	useEffect(() => {
+		if (downloadInfo.url.length === 0) return;
 
 		// For each new `downloadInfo`, start a new download:
 		try {
-			const electronPort = createNewDownload(downloadInfo_.get());
+			const electronPort = createNewDownload(downloadInfo);
 
 			// Sending port so we can communicate with Electron:
 			sendMsgToBackend(
@@ -67,20 +61,20 @@ export function Downloading() {
 			console.error(error);
 
 			errorToast(
-				`${t("toasts.downloadError.beforePath")}"${
-					downloadInfo_.title.peek()
-				}"${t("toasts.downloadError.afterPath")}`,
+				`${t("toasts.downloadError.beforePath")}"${downloadInfo.title}"${t(
+					"toasts.downloadError.afterPath",
+				)}`,
 			);
 		}
 
-		downloadInfo.set({ ...defaultDownloadInfo });
-	});
+		setDownloadInfo(defaultDownloadInfo);
+	}, [downloadInfo.title, downloadInfo]);
 
 	return (
-		<PopoverRoot modal open={isPopoverOpen.get()} onOpenChange={isPopoverOpen.set}>
+		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<Trigger
 				className={`${
-					downloadingListSize.get() > 0 ? "has-items" : ""
+					downloadingListSize > 0 ? "has-items" : ""
 				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
 				title={t("tooltips.showAllDownloadingMedias")}
 			>

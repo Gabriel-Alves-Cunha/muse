@@ -136,9 +136,9 @@ async function handleMsgsFromRendererProcess(
 			const { mediaPath, thingsToChange } = msg;
 
 			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
-
-			for (const { newValue, whatToChange } of thingsToChange)
-				Reflect.set(data, whatToChange, newValue);
+			thingsToChange.forEach(({ whatToChange, newValue }) =>
+				Reflect.set(data, whatToChange, newValue),
+			);
 
 			dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", { msg });
 

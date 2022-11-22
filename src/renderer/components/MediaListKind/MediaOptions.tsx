@@ -34,8 +34,6 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 // Main function:
 
-const mediaOptionsForm = "media-options-form";
-
 export function MediaOptionsModal({ media, path }: Props) {
 	const contentWrapperRef = useRef<HTMLDivElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -112,61 +110,59 @@ export function MediaOptionsModal({ media, path }: Props) {
 				<CloseIcon className="fill-accent-light" />
 			</Close>
 
-			<form id={mediaOptionsForm}>
-				{Object.entries(options(media)).map(([option, value]) => (
-					<fieldset
-						className="unset-all flex items-center h-9 gap-5 mb-4"
-						key={option}
+			{Object.entries(options(media)).map(([option, value]) => (
+				<fieldset
+					className="unset-all flex items-center h-9 gap-5 mb-4"
+					key={option}
+				>
+					<label
+						className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
+						htmlFor={option}
 					>
-						<label
-							className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
-							htmlFor={option}
-						>
-							<Translator path={`labels.${option as Options}`} />
-						</label>
+						<Translator path={`labels.${option as Options}`} />
+					</label>
 
-						{option === "image" ? (
-							/////////////////////////////////////////////
-							/////////////////////////////////////////////
-							// Handle file input for image:
-							<Button
-								onPointerUp={openNativeUI_ChooseFiles}
-								className="notransition"
-								ref={imageButtonRef}
-								variant="input"
-								id={option}
-							>
-								<SearchImage size={18} />
-
-								<input
-									onChange={handleSelectedFile}
-									ref={imageInputRef}
-									accept="image/*"
-									type="file"
-								/>
-
-								<Translator path="buttons.selectImg" />
-							</Button>
-						) : /////////////////////////////////////////////
+					{option === "image" ? (
 						/////////////////////////////////////////////
-						// Handle text input with line feeds:
-						option === "lyrics" ? (
-							<textarea
-								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								defaultValue={format(value)}
-								id={option}
-							/>
-						) : (
+						/////////////////////////////////////////////
+						// Handle file input for image:
+						<Button
+							onPointerUp={openNativeUI_ChooseFiles}
+							className="notransition"
+							ref={imageButtonRef}
+							variant="input"
+							id={option}
+						>
+							<SearchImage size={18} />
+
 							<input
-								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								readOnly={isChangeable(option) === false}
-								defaultValue={format(value)}
-								id={option}
+								onChange={handleSelectedFile}
+								ref={imageInputRef}
+								accept="image/*"
+								type="file"
 							/>
-						)}
-					</fieldset>
-				))}
-			</form>
+
+							<Translator path="buttons.selectImg" />
+						</Button>
+					) : /////////////////////////////////////////////
+					/////////////////////////////////////////////
+					// Handle text input with line feeds:
+					option === "lyrics" ? (
+						<textarea
+							className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
+							defaultValue={format(value)}
+							id={option}
+						/>
+					) : (
+						<input
+							className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
+							readOnly={isChangeable(option) === false}
+							defaultValue={format(value)}
+							id={option}
+						/>
+					)}
+				</fieldset>
+			))}
 
 			<FlexRow>
 				<Dialog modal>
@@ -258,16 +254,9 @@ function changeMetadataIfAllowed(
 	media: Readonly<Media>,
 ): Readonly<boolean> {
 	const thingsToChange: MetadataToChange = [];
-	const formData = new FormData(
-		document.getElementById(mediaOptionsForm) as HTMLFormElement,
-	);
 
 	if (imageFilePath.length > 0)
 		thingsToChange.push({ whatToChange: "imageURL", newValue: imageFilePath });
-
-	for (const [name, value] of formData.entries()) {
-		console.log(name, value);
-	}
 
 	// This shit is to get all the inputs:
 	for (const children of contentWrapper.children)
@@ -282,7 +271,7 @@ function changeMetadataIfAllowed(
 				const id = element.id as ChangeOptions;
 				const newValue = element.value.trim();
 
-				for (const [key, oldValue] of Object.entries(media)) {
+				Object.entries(media).forEach(([key, oldValue]) => {
 					// If `oldValue` is falsy AND `newValue` is
 					// empty, there's nothing to do, so just return:
 					if (
@@ -290,7 +279,7 @@ function changeMetadataIfAllowed(
 						oldValue === newValue ||
 						(!oldValue && newValue === emptyString)
 					)
-						continue;
+						return;
 
 					// We need to handle the case where the key is an array, as in "genres":
 					if (oldValue instanceof Array) {
@@ -304,14 +293,11 @@ function changeMetadataIfAllowed(
 							newValueAsArray.pop();
 
 						// If both arrays are equal by values, we don't need to change anything:
-						if (areArraysEqualByValue(newValueAsArray, oldValue)) {
-							console.log(
+						if (areArraysEqualByValue(newValueAsArray, oldValue))
+							return console.log(
 								`Values of "${id}" are equal, not gonna change anything:`,
 								{ newValueAsArray, oldValue },
 							);
-
-							continue;
-						}
 
 						dbg("Changing metadata from client side (oldValue is an array):", {
 							newValueAsArray,
@@ -336,7 +322,7 @@ function changeMetadataIfAllowed(
 					});
 
 					thingsToChange.push({ whatToChange, newValue });
-				}
+				});
 			}
 
 	const isThereAnythingToChange = thingsToChange.length > 0;
@@ -357,12 +343,12 @@ function changeMetadataIfAllowed(
 const options = ({
 	duration,
 	artist,
-	lyrics,
-	genres,
 	album,
+	genres,
 	title,
-	image,
 	size,
+	image,
+	lyrics,
 }: Media) =>
 	({ size, duration, title, album, artist, genres, lyrics, image }) as const;
 
@@ -382,7 +368,7 @@ const allowedOptionToChange = {
 /////////////////////////////////////////////
 
 const isChangeable = (option: string): option is ChangeOptions =>
-	option in allowedOptionToChange;
+	Object.keys(allowedOptionToChange).includes(option);
 
 /////////////////////////////////////////////
 

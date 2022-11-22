@@ -55,7 +55,7 @@ describe("Testing useCurrentPlaying", () => {
 	/////////////////////////////////////////////
 
 	it("should set the currentPlaying media", () => {
-		for (const [path] of testList) {
+		testList.forEach((_, path) => {
 			playThisMedia(path, PlaylistList.MAIN_LIST);
 
 			const expected: CurrentPlaying = {
@@ -65,7 +65,7 @@ describe("Testing useCurrentPlaying", () => {
 			};
 
 			expect(expected).toEqual(getCurrentPlaying());
-		}
+		});
 	});
 
 	/////////////////////////////////////////////
@@ -80,8 +80,7 @@ describe("Testing useCurrentPlaying", () => {
 			"currentPlaying().path at the start should be set to the initialIndex path!",
 		).toBe(testArray[initialIndex]![0]);
 
-		let index = 0;
-		for (const _ of testArray) {
+		testArray.forEach((_, index) => {
 			expect(getHistory().size, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
@@ -98,9 +97,7 @@ describe("Testing useCurrentPlaying", () => {
 			expect(expected, "The expected currentPlaying is wrong!").toEqual(
 				getCurrentPlaying(),
 			);
-
-			++index;
-		}
+		});
 	});
 
 	/////////////////////////////////////////////
@@ -114,8 +111,7 @@ describe("Testing useCurrentPlaying", () => {
 			"currentPlaying().path at the start should be set to the firstMediaPath!",
 		).toBe(firstMediaPath);
 
-		let index = 0;
-		for (const _ of testArray) {
+		testArray.forEach((_, index) => {
 			playNextMedia();
 
 			const currMediaPath = getCurrentPlaying().path;
@@ -128,8 +124,6 @@ describe("Testing useCurrentPlaying", () => {
 				}
 				`,
 			).toEqual(currMediaPath);
-
-			++index;
-		}
+		});
 	});
 });

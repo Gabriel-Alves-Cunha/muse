@@ -2,10 +2,13 @@ import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
 import { Dialog, Trigger } from "@radix-ui/react-dialog";
 
-import { deleteMedias, searchForLyrics } from "./mediaOptionsCtxMenu";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
+import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
+import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "@components/SearchMedia/helper";
+import { getMainList } from "@contexts/usePlaylists";
 import { setSettings } from "@contexts/settings";
+import { openLyrics } from "@components/MediaPlayer/Header";
 import { Translator } from "@components/I18n";
 import { Item } from "./Item";
 import {
@@ -71,8 +74,19 @@ export const shareMedias = () =>
 
 function selectAllMediasOnSearchResult(): void {
 	const paths = getSearcher().results.map(([path]) => path);
-
 	setAllSelectedMedias(new Set(paths));
+}
+
+/////////////////////////////////////////////
+
+function searchForLyrics(): void {
+	const allMedias = getMainList();
+
+	getAllSelectedMedias().forEach(async (path) => {
+		const media = allMedias.get(path);
+
+		await searchAndOpenLyrics(media, path, !openLyrics);
+	});
 }
 
 /////////////////////////////////////////////

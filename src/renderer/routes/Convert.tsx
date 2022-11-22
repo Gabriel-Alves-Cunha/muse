@@ -1,18 +1,17 @@
 import type { AllowedMedias } from "@common/utils";
 import type { Path } from "@common/@types/generalTypes";
 
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
-import { type ChangeEvent, useRef } from "react";
-import { batch, observable } from "@legendapp/state";
-import { useObserveEffect } from "@legendapp/state/react";
 
 import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
+import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
 import {
 	type ConvertInfo,
-	newConvertions,
+	useNewConvertions,
 } from "@components/Converting/helper";
 
 ////////////////////////////////////////////////
@@ -20,37 +19,25 @@ import {
 ////////////////////////////////////////////////
 // Main function:
 
-const convertStates = observable<ConvertStates>({
-	selectedFiles: new Map(),
-	toExtension: "mp3",
-});
-
-////////////////////////////////////////////////
-
-function handleSelectedFiles({
-	target: { files },
-}: ChangeEvent<HTMLInputElement>): void {
-	if (!files?.length) return;
-
-	batch(() => {
-		for (const file of files)
-			convertStates.selectedFiles.set(file.webkitRelativePath, {
-				toExtension: convertStates.toExtension.peek(),
-			});
-	});
-}
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-// Main function:
-
 export function Convert() {
+	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
+	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
-
 	useTitle(t("titles.convert"));
 
 	////////////////////////////////////////////////
+
+	function handleSelectedFiles({
+		target: { files },
+	}: ChangeEvent<HTMLInputElement>) {
+		if (!files?.length) return;
+
+		const map: Map<Path, ConvertInfo> = new Map();
+
+		for (const file of files) map.set(file.webkitRelativePath, { toExtension });
+
+		setSelectedFiles(map);
+	}
 
 	////////////////////////////////////////////////
 
@@ -59,15 +46,15 @@ export function Convert() {
 	////////////////////////////////////////////////
 
 	// Start converting
-	useObserveEffect(() => {
+	useEffect(() => {
 		// If there are selected files, convert them:
-		if (!(convertStates.selectedFiles.size > 0)) return;
+		if (!(selectedFiles.size > 0)) return;
 
 		// To start convert, add to the convertInfoList:
-		newConvertions.set(convertStates.selectedFiles);
+		useNewConvertions.setState({ newConvertions: selectedFiles });
 
-		convertStates.selectedFiles.clear();
-	});
+		setSelectedFiles(emptyMap);
+	}, [toExtension, selectedFiles]);
 
 	////////////////////////////////////////////////
 
@@ -102,7 +89,4 @@ export function Convert() {
 ////////////////////////////////////////////////
 // Types:
 
-type ConvertStates = {
-	selectedFiles: Map<Path, ConvertInfo>;
-	toExtension: AllowedMedias;
-};
+type SelectedFiles = ReadonlyMap<Path, ConvertInfo>;

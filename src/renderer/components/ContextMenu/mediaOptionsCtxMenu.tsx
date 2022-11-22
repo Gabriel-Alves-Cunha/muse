@@ -77,12 +77,12 @@ export async function deleteMedias(): Promise<void> {
 
 /////////////////////////////////////////////
 
-export async function searchForLyrics(): Promise<void> {
+function searchForLyrics(): void {
 	const allMedias = getMainList();
 
-	for (const path of getAllSelectedMedias()) {
+	getAllSelectedMedias().forEach(async (path) => {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);
-	}
+	});
 }

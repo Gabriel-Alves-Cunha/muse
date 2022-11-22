@@ -1,7 +1,7 @@
-import { observable } from "@legendapp/state";
+import create from "zustand";
 
+import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
-import { downloadInfo } from "@components/Downloading";
 import { emptyString } from "@common/empty";
 import { dbg } from "@common/debug";
 import { t } from "@components/I18n";
@@ -20,7 +20,9 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 	isLoading: false,
 });
 
-export const searchInfo = observable<SearcherInfo>({ ...defaultSearchInfo });
+export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
+
+export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -31,16 +33,16 @@ export function downloadMedia(): void {
 	const {
 		result: { artist, imageURL, title },
 		url,
-	} = searchInfo.peek();
+	} = searchInfo();
 
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
 	if (title.length === 0 || url.length === 0) return;
 
 	// Start download:
-	downloadInfo.set({ imageURL, title, url, artist, extension: "mp3" });
+	setDownloadInfo({ imageURL, title, url, artist });
 
 	// Reset values:
-	searchInfo.set({ ...defaultSearchInfo });
+	setSearchInfo(defaultSearchInfo);
 }
 
 ////////////////////////////////////////////////
@@ -50,12 +52,11 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 	dbg(`Searching for "${url}".`);
 
-	searchInfo.set((prev) => ({
-		...prev,
+	setSearchInfo({
 		result: defaultSearchInfo.result,
 		error: emptyString,
 		isLoading: true,
-	}));
+	});
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -67,16 +68,15 @@ export async function search(url: Readonly<string>): Promise<void> {
 			title,
 		};
 
-		searchInfo.set((prev) => ({ ...prev, isLoading: false, result }));
+		setSearchInfo({ isLoading: false, result });
 	} catch (error) {
-		searchInfo.set((prev) => ({
-			...prev,
+		setSearchInfo({
 			result: defaultSearchInfo.result,
 			isLoading: false,
 			error: getErrorMessage(error).includes("No video id found")
 				? t("errors.noVideoIdFound")
 				: t("errors.gettingMediaInfo"),
-		}));
+		});
 
 		console.error(error);
 	}
@@ -95,9 +95,9 @@ type UrlMediaMetadata = Readonly<{
 
 ////////////////////////////////////////////////
 
-type SearcherInfo = {
+type SearcherInfo = Readonly<{
 	result: UrlMediaMetadata;
 	isLoading: boolean;
 	error: string;
 	url: string;
-};
+}>;

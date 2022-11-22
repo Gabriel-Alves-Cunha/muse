@@ -9,8 +9,8 @@ const { dependencies, devDependencies } = packageJSON;
 function findExternals(): string[] {
 	const externals: Set<string> = new Set();
 
-	for (const pkg of Object.keys(devDependencies)) externals.add(pkg);
-	for (const pkg of Object.keys(dependencies)) externals.add(pkg);
+	Object.keys(devDependencies).forEach((pkg) => externals.add(pkg));
+	Object.keys(dependencies).forEach((pkg) => externals.add(pkg));
 
 	return [...externals];
 }

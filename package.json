@@ -77,8 +77,5 @@
 	"os": [
 		"windows",
 		"linux"
-	],
-	"dependencies": {
-		"@legendapp/state": "^0.21.18"
-	}
+	]
 }

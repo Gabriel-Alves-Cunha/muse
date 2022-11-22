@@ -11,7 +11,7 @@ const { random, floor } = Math;
 export function getRandomInt(min: number, max: number): number {
 	if (!(Number.isFinite(min) && Number.isFinite(max)))
 		throw new Error(
-			`getRandomInt() can't handle infinite numbers. Received \`min = ${min}\` and \`max = ${max}\`!`,
+			`getRandomInt() received \`min = ${min}\` wich is not a finite number!`,
 		);
 
 	return floor(min + random() * (max - min));

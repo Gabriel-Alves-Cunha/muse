@@ -164,13 +164,13 @@ it("should play the next media", () => {
 /////////////////////////////////////////////
 
 it("should play a chosen media", () => {
-	for (const _ of testArray) {
+	testArray.forEach(() => {
 		const randomMediaPath = testArray[getRandomInt(0, numberOfMedias)]![0];
 		expect(randomMediaPath).toBeTruthy();
 
 		playThisMedia(randomMediaPath, PlaylistList.MAIN_LIST);
 		expect(getCurrentPlaying().path).toBe(randomMediaPath);
-	}
+	});
 });
 
 /////////////////////////////////////////////

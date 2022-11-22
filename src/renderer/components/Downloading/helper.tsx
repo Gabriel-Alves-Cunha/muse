@@ -53,13 +53,14 @@ export function Popup() {
 // Helper functions for Popup:
 
 function cleanAllDoneDownloads(): void {
-	for (const [url, download] of getDownloadingList())
+	getDownloadingList().forEach((download, url) => {
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);
+	});
 }
 
 /////////////////////////////////////////////

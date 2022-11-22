@@ -1,5 +1,6 @@
 import type { AllowedMedias, eraseImg } from "../utils";
 import type { DeepReadonly } from "./utils";
+import type { pages } from "@utils/app";
 
 export type Media = DeepReadonly<{
 	birthTime: DateAsNumber;
@@ -27,6 +28,8 @@ export type ImageURL = typeof eraseImg | Base64 | (string & {});
 export type Base64 = `data:${string};base64,${string}`;
 
 export type QRCodeURL = `http://${string}:${number}`;
+
+export type Page = typeof pages[number];
 
 export type DateAsNumber = number;
 

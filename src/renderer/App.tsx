@@ -1,4 +1,3 @@
-import { observer, useSelector } from "@legendapp/state/react";
 import { ToastContainer } from "react-toastify";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
@@ -10,12 +9,11 @@ import { MediaPlayer } from "@components/MediaPlayer";
 import { ShareDialog } from "@components/ShareDialog";
 import { Favorites } from "@routes/Favorites";
 import { Download } from "@routes/Download";
-import { useTrace } from "@hooks/useTrace";
 import { History } from "@routes/History";
+import { usePage } from "@contexts/page";
 import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
 import { Home } from "@routes/Home";
-import { page } from "@contexts/page";
 
 import "react-toastify/dist/ReactToastify.min.css";
 
@@ -24,9 +22,7 @@ import "react-toastify/dist/ReactToastify.min.css";
 //////////////////////////////////////////
 // Main function:
 
-export const App = observer(function App() {
-	useTrace("App");
-
+export function App() {
 	return (
 		<>
 			<ToastContainer
@@ -45,19 +41,30 @@ export const App = observer(function App() {
 			<DecorationsTop />
 
 			<ContextMenu>
-				<MainGridContainer>
-					<Navbar />
-
-					<PageToRender />
-
-					<MediaPlayer />
-				</MainGridContainer>
+				<Main />
 			</ContextMenu>
 
 			<DecorationsDown />
 		</>
 	);
-});
+}
+
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+// Helper functions:
+
+function Main() {
+	return (
+		<MainGridContainer>
+			<Navbar />
+
+			<PageToShow />
+
+			<MediaPlayer />
+		</MainGridContainer>
+	);
+}
 
 //////////////////////////////////////////
 
@@ -69,12 +76,10 @@ const pages = {
 	Home: <Home />,
 } as const;
 
-//////////////////////////////////////////
+function PageToShow() {
+	const { page } = usePage();
 
-function PageToRender() {
-	const currPage = useSelector(() => page.get());
-
-	return pages[currPage];
+	return pages[page];
 }
 
 //////////////////////////////////////////

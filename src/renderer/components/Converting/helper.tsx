@@ -2,6 +2,7 @@ import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as Cancel } from "react-icons/ai";
+import create from "zustand";
 
 import { errorToast, infoToast, successToast } from "@components/toasts";
 import { type AllowedMedias, formatDuration } from "@common/utils";
@@ -9,38 +10,43 @@ import { type ProgressProps, progressIcons } from "@components/Progress";
 import { assertUnreachable } from "@utils/utils";
 import { isDownloadList } from "@components/Downloading/helper";
 import { progressStatus } from "@common/enums";
-import { convertingList } from "@contexts/convertList";
 import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
+import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
+import {
+	getConvertingList,
+	setConvertingList,
+	useConvertingList,
+} from "@contexts/convertList";
 
 import { handleSingleItemDeleteAnimation } from "../Downloading/styles";
-import { observable } from "@legendapp/state";
-import { useSelector, For } from "@legendapp/state/react";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Constants:
 
-export const newConvertions = observable<Map<Path, ConvertInfo>>(new Map());
+export const useNewConvertions = create<NewConvertions>(() => ({
+	newConvertions: emptyMap,
+}));
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
 export function Popup() {
-	const convertingList_ = useSelector(() => convertingList.get());
+	const { convertingList } = useConvertingList();
 
-	return convertingList_.size > 0 ? (
+	return convertingList.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
 				<Translator path="buttons.cleanFinished" />
 			</Button>
 
-			{Array.from(convertingList_, ([path, convertingMedia], index) => (
+			{Array.from(convertingList, ([path, convertingMedia], index) => (
 				<ConvertBox
 					mediaBeingConverted={convertingMedia}
 					convertionIndex={index}
@@ -60,13 +66,14 @@ export function Popup() {
 // Helper functions for Popup:
 
 function cleanAllDoneConvertions(): void {
-	for (const [url, download] of convertingList.peek())
+	getConvertingList().forEach((download, url) => {
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
+	});
 }
 
 /////////////////////////////////////////////
@@ -118,16 +125,16 @@ export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Readonly<Path>,
 ): MessagePort {
-	const convertingList_ = convertingList.peek();
+	const convertingList = getConvertingList();
 
-	dbg("Trying to create a new conversion...", { convertingList_ });
+	dbg("Trying to create a new conversion...", { convertingList });
 
-	if (convertingList_.has(path)) {
+	if (convertingList.has(path)) {
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		infoToast(info);
 
-		console.error(info, convertingList_);
+		console.error(info, convertingList);
 		throw new Error(info);
 	}
 
@@ -137,13 +144,15 @@ export function createNewConvertion(
 	const { port1: frontEndPort, port2: backEndPort } = new MessageChannel();
 
 	// Add new conversion to the list:
-	convertingList_.set(path, {
-		status: progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-		toExtension: convertInfo.toExtension,
-		port: frontEndPort,
-		timeConverted: 0,
-		sizeConverted: 0,
-	});
+	setConvertingList(
+		new Map(convertingList).set(path, {
+			status: progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			toExtension: convertInfo.toExtension,
+			port: frontEndPort,
+			timeConverted: 0,
+			sizeConverted: 0,
+		}),
+	);
 
 	// On every `postMessage` you have to send the path (as an ID)!
 	frontEndPort.postMessage({ toExtension: convertInfo.toExtension, path });
@@ -173,22 +182,26 @@ export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 export function cancelConversionAndOrRemoveItFromList(
 	path: Readonly<string>,
 ): void {
-	const convertingList_ = convertingList.peek();
+	const convertingList = getConvertingList();
 
-	const mediaBeingConverted = convertingList_.get(path);
+	const mediaBeingConverted = convertingList.get(path);
 
 	if (mediaBeingConverted === undefined)
 		return console.error(
 			`There should be a convertion with path "${path}"!\nconvertList =`,
-			convertingList_,
+			convertingList,
 		);
 
 	// Cancel conversion
 	if (mediaBeingConverted.status === progressStatus.ACTIVE)
 		mediaBeingConverted.port.postMessage({ destroy: true, path });
 
-	// Remove from converting list:
-	convertingList_.delete(path);
+	// Remove from converting list
+	const newConvertingList = new Map(convertingList);
+	newConvertingList.delete(path);
+
+	// Make React update:
+	setConvertingList(newConvertingList);
 }
 
 /////////////////////////////////////////////
@@ -198,22 +211,24 @@ function handleUpdateConvertingList(
 	{ data }: MessageEvent<PartialExceptStatus>,
 	path: Path,
 ): void {
-	const convertingList_ = convertingList.peek();
+	const convertingList = getConvertingList();
 
 	dbg(`Received a message from Electron on port for "${path}":`, {
-		convertingList_,
+		convertingList,
 		data,
 	});
 
 	// Assert that the download exists:
-	const thisConversion = convertingList_.get(path);
+	const thisConversion = convertingList.get(path);
 	if (thisConversion === undefined)
 		return console.error(
 			"Received a message from Electron but the path is not in the list!",
 		);
 
 	// Update `convertingList`:
-	convertingList_.set(path, { ...thisConversion, ...data });
+	setConvertingList(
+		new Map(convertingList).set(path, { ...thisConversion, ...data }),
+	);
 
 	// Handle status:
 	switch (data.status) {
@@ -286,3 +301,9 @@ export type ConvertInfo = Readonly<{ toExtension: AllowedMedias }>;
 interface PartialExceptStatus extends Partial<MediaBeingConverted> {
 	status: ValuesOf<typeof progressStatus>;
 }
+
+/////////////////////////////////////////////
+
+type NewConvertions = Readonly<{
+	newConvertions: ReadonlyMap<Path, ConvertInfo>;
+}>;

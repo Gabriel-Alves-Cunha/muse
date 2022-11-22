@@ -437,11 +437,6 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@legendapp/state@^0.21.18":
-  version "0.21.18"
-  resolved "https://registry.yarnpkg.com/@legendapp/state/-/state-0.21.18.tgz#4e9eea315f67750092477932a0dcfc39d678a89e"
-  integrity sha512-T4i7vWImP6F0AS1+AQbnia9CyUQbT1a/FFQN1oE7/5nGcKIBN7NnWVm4orzyL3OLRHQv84TBjf6RdaHmUgtOVw==
-
 "@malept/cross-spawn-promise@^1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@malept/cross-spawn-promise/-/cross-spawn-promise-1.1.1.tgz#504af200af6b98e198bce768bc1730c6936ae01d"

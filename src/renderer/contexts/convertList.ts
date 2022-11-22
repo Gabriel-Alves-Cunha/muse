@@ -1,7 +1,7 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { Path } from "@common/@types/generalTypes";
 
-import { observable } from "@legendapp/state";
+import create from "zustand";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -62,11 +62,26 @@ import { observable } from "@legendapp/state";
 ////////////////////////////////////////////////
 // Main functions:
 
-export const convertingList = observable<ConvertingList>(new Map());
+export const useConvertingList = create<ConvertingList>(() => ({
+	convertingList: new Map(),
+}));
+
+////////////////////////////////////////////////
+
+export const getConvertingList = () =>
+	useConvertingList.getState().convertingList;
+
+////////////////////////////////////////////////
+
+export const setConvertingList = (
+	convertingList: ConvertingList["convertingList"],
+) => useConvertingList.setState({ convertingList });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type ConvertingList = Map<Path, MediaBeingConverted>;
+export type ConvertingList = Readonly<{
+	convertingList: ReadonlyMap<Path, MediaBeingConverted>;
+}>;
