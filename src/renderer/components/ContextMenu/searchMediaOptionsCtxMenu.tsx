@@ -79,14 +79,14 @@ function selectAllMediasOnSearchResult(): void {
 
 /////////////////////////////////////////////
 
-function searchForLyrics(): void {
+export async function searchForLyrics(): Promise<void> {
 	const allMedias = getMainList();
 
-	getAllSelectedMedias().forEach(async (path) => {
+	for (const path of getAllSelectedMedias()) {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);
-	});
+	}
 }
 
 /////////////////////////////////////////////

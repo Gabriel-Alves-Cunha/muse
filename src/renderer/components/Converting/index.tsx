@@ -25,7 +25,7 @@ export function Converting() {
 	const { newConvertions } = useNewConvertions();
 
 	useEffect(() => {
-		newConvertions.forEach((newConvertion, path) => {
+		for (const [path, newConvertion] of newConvertions) {
 			try {
 				const electronPort = createNewConvertion(newConvertion, path);
 
@@ -43,7 +43,7 @@ export function Converting() {
 
 				console.error(error);
 			}
-		});
+		}
 
 		// In here, we've already handled all the files,
 		// so we can clear the list;

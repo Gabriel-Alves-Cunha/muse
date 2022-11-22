@@ -3,11 +3,8 @@ import { FiTrash as Trash } from "react-icons/fi";
 import { Trigger } from "@radix-ui/react-context-menu";
 import { Dialog } from "@radix-ui/react-dialog";
 
+import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
-import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
-import { shareMedias } from "./searchMediaOptionsCtxMenu";
-import { getMainList } from "@contexts/usePlaylists";
-import { openLyrics } from "@components/MediaPlayer/Header";
 import { deleteFile } from "@utils/deleteFile";
 import { Translator } from "@components/I18n";
 import { Item } from "./Item";
@@ -73,16 +70,4 @@ export async function deleteMedias(): Promise<void> {
 	);
 
 	await Promise.all(promises);
-}
-
-/////////////////////////////////////////////
-
-function searchForLyrics(): void {
-	const allMedias = getMainList();
-
-	getAllSelectedMedias().forEach(async (path) => {
-		const media = allMedias.get(path);
-
-		await searchAndOpenLyrics(media, path, !openLyrics);
-	});
 }

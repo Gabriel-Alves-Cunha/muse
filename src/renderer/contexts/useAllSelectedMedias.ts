@@ -32,20 +32,20 @@ if (import.meta.vitest === undefined)
 		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
 			time(() => {
 				// Has to be this order:
-				prevSelectedMedias.forEach((path) =>
-					document
-						.querySelectorAll(`[data-path="${path}"]`)
-						?.forEach((element) => {
-							if (selectedMedias.has(path)) return;
+				for (const path of prevSelectedMedias)
+					for (const element of document.querySelectorAll(
+						`[data-path="${path}"]`,
+					)) {
+						if (selectedMedias.has(path)) continue;
 
-							element.classList.remove("selected");
-						}),
-				);
-				selectedMedias.forEach((path) =>
-					document
-						.querySelectorAll(`[data-path="${path}"]`)
-						?.forEach((element) => element.classList.add("selected")),
-				);
+						element.classList.remove("selected");
+					}
+
+				for (const path of selectedMedias)
+					for (const element of document.querySelectorAll(
+						`[data-path="${path}"]`,
+					))
+						element.classList.add("selected");
 			}, "handleDecorateMediasRow");
 		},
 	);

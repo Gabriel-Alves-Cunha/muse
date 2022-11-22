@@ -88,10 +88,9 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 											newHistory.delete(firstPath);
 										}
 
-										newHistory.forEach((dates) => {
+										for (const [, dates] of newHistory)
 											if (dates.length > maxSizeOfHistory)
 												dates.length = maxSizeOfHistory;
-										});
 
 										set({ history: newHistory });
 
@@ -297,18 +296,16 @@ export const usePlaylists = create<UsePlaylistsActions>()(
 
 										// If the media in the favorites list is not on
 										// action.list, remove it from the favorites:
-										favorites.forEach((path) => {
+										for (const path of favorites)
 											if (!action.list.has(path)) newFavorites.delete(path);
-										});
 
 										if (favorites.size !== newFavorites.size)
 											set({ favorites: newFavorites });
 
 										// If the media in the history list is not on
 										// action.list, remove it from the favorites:
-										history.forEach((_, path) => {
+										for (const [path] of history)
 											if (!action.list.has(path)) newHistory.delete(path);
-										});
 
 										if (history.size !== newHistory.size)
 											set({ history: newHistory });
@@ -544,11 +541,10 @@ export function searchMedia(highlight: string): [Path, Media][] {
 	return time(() => {
 		const medias: [Path, Media][] = [];
 
-		getMainList().forEach(
-			(media, path) =>
-				unDiacritic(media.title).includes(highlight) &&
-				medias.push([path, media]),
-		);
+		for (const [path, media] of getMainList()) {
+			unDiacritic(media.title).includes(highlight);
+			medias.push([path, media]);
+		}
 
 		return medias;
 	}, `searchMedia('${highlight}')`);

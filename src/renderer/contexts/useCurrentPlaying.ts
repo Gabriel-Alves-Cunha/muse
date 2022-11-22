@@ -280,11 +280,11 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 	if (newElements === null)
 		return console.info(`No media row found for "${path}"!`);
 
+	// Undecorate previous playing media row:
 	if (previousPath.length !== 0 && prevElements !== null)
-		// Undecorate previous playing media row:
-		prevElements.forEach((element) => element.classList.remove(playingClass));
+		for (const element of prevElements) element.classList.remove(playingClass);
 
-	newElements.forEach((element) => element.classList.add(playingClass));
+	for (const element of newElements) element.classList.add(playingClass);
 }
 
 ////////////////////////////////////////////////

@@ -66,14 +66,14 @@ export function Popup() {
 // Helper functions for Popup:
 
 function cleanAllDoneConvertions(): void {
-	getConvertingList().forEach((download, url) => {
+	for (const [url, download] of getConvertingList()) {
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
-	});
+	}
 }
 
 /////////////////////////////////////////////

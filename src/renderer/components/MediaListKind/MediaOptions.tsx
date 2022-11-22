@@ -271,7 +271,7 @@ function changeMetadataIfAllowed(
 				const id = element.id as ChangeOptions;
 				const newValue = element.value.trim();
 
-				Object.entries(media).forEach(([key, oldValue]) => {
+				for (const [key, oldValue] of Object.entries(media)) {
 					// If `oldValue` is falsy AND `newValue` is
 					// empty, there's nothing to do, so just return:
 					if (
@@ -279,7 +279,7 @@ function changeMetadataIfAllowed(
 						oldValue === newValue ||
 						(!oldValue && newValue === emptyString)
 					)
-						return;
+						continue;
 
 					// We need to handle the case where the key is an array, as in "genres":
 					if (oldValue instanceof Array) {
@@ -293,11 +293,13 @@ function changeMetadataIfAllowed(
 							newValueAsArray.pop();
 
 						// If both arrays are equal by values, we don't need to change anything:
-						if (areArraysEqualByValue(newValueAsArray, oldValue))
-							return console.log(
+						if (areArraysEqualByValue(newValueAsArray, oldValue)) {
+							console.log(
 								`Values of "${id}" are equal, not gonna change anything:`,
 								{ newValueAsArray, oldValue },
 							);
+							continue;
+						}
 
 						dbg("Changing metadata from client side (oldValue is an array):", {
 							newValueAsArray,
@@ -322,7 +324,7 @@ function changeMetadataIfAllowed(
 					});
 
 					thingsToChange.push({ whatToChange, newValue });
-				});
+				}
 			}
 
 	const isThereAnythingToChange = thingsToChange.length > 0;
@@ -343,12 +345,12 @@ function changeMetadataIfAllowed(
 const options = ({
 	duration,
 	artist,
-	album,
 	genres,
-	title,
-	size,
-	image,
 	lyrics,
+	album,
+	title,
+	image,
+	size,
 }: Media) =>
 	({ size, duration, title, album, artist, genres, lyrics, image }) as const;
 
@@ -368,7 +370,7 @@ const allowedOptionToChange = {
 /////////////////////////////////////////////
 
 const isChangeable = (option: string): option is ChangeOptions =>
-	Object.keys(allowedOptionToChange).includes(option);
+	option in allowedOptionToChange;
 
 /////////////////////////////////////////////
 

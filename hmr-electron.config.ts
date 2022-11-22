@@ -1,19 +1,19 @@
 import type { UserProvidedConfigProps } from "hmr-electron";
 
-import packageJSON from "/home/gabriel/Documents/VSCode/my_projects/muse/package.json" assert {
-	type: "json",
-};
-
-const { dependencies, devDependencies } = packageJSON;
-
-function findExternals(): string[] {
-	const externals: Set<string> = new Set();
-
-	Object.keys(devDependencies).forEach((pkg) => externals.add(pkg));
-	Object.keys(dependencies).forEach((pkg) => externals.add(pkg));
-
-	return [...externals];
-}
+// import packageJSON from "/home/gabriel/Documents/VSCode/my_projects/muse/package.json" assert {
+// 	type: "json",
+// };
+//
+// const { dependencies, devDependencies } = packageJSON;
+//
+// function findExternals(): string[] {
+// 	const externals: Set<string> = new Set();
+//
+// 	for (const pkg of Object.keys(devDependencies)) externals.add(pkg);
+// 	for (const pkg of Object.keys(dependencies)) externals.add(pkg);
+//
+// 	return [...externals];
+// }
 
 const isDevelopment = process.env.NODE_ENV === "development";
 

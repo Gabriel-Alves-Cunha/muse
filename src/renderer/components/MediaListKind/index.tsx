@@ -106,15 +106,13 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					case PlaylistList.HISTORY: {
 						const unsortedList: [Path, DateAsNumber][] = [];
 
-						(list as History).forEach((dates, path) =>
-							dates.forEach((date) => unsortedList.push([path, date])),
-						);
+						for (const [path, dates] of list as History)
+							for (const date of dates) unsortedList.push([path, date]);
 
 						const mainList = getMainList();
 
 						const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
 							.sort((a, b) => b[1] - a[1]) // sorted by date
-							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							.map(([path, date]) => [path, mainList.get(path)!, date]);
 
 						return listAsArrayOfMap;

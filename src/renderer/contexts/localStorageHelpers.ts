@@ -64,11 +64,8 @@ export const setPlaylistsOnLocalStorage: SetLocalStoragePlugin<
 		args: PlaylistsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
 		replace: boolean,
 	) => {
-		(["favorites", "history"] as const).forEach(
-			(key) =>
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				args[key] && setLocalStorage(keys[key], args[key]!),
-		);
+		for (const key of ["favorites", "history"] as const)
+			args[key] && setLocalStorage(keys[key], args[key]!);
 
 		set(args, replace);
 	};

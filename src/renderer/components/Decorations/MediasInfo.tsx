@@ -10,7 +10,7 @@ export function MediasInfo() {
 
 	let allFilesSize = 0;
 
-	mainList.forEach(({ size }) => (allFilesSize += size));
+	for (const [, { size }] of mainList) allFilesSize += size;
 
 	return (
 		<p>

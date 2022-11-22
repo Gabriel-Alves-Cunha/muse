@@ -85,7 +85,7 @@ it("should get a random integer between min (included) and max (not included)", 
 	results1.push(...additional);
 	results2.push(...additional);
 
-	results1.forEach((result) => assert(Number.isInteger(result)));
+	for (const result of results1) assert(Number.isInteger(result));
 
 	expect(results1).not.toStrictEqual(results2);
 });
@@ -97,7 +97,7 @@ it("should throw an error when trying to get a random integer between min (inclu
 		() => getRandomInt(10, NaN),
 	];
 
-	fns.forEach((fn) => expect(fn).toThrowError());
+	for (const fn of fns) expect(fn).toThrowError();
 });
 
 /////////////////////////////////////////////
