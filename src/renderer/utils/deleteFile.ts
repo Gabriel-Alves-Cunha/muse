@@ -9,10 +9,10 @@ import {
 	WhatToDo,
 } from "@contexts/usePlaylists";
 
-const { deleteFile: ElectronDeleteFile } = electron.fs;
+const { deleteFile: electronDeleteFile } = electron.fs;
 
 export async function deleteFile(path: Path): Promise<void> {
-	const wasDeleteSuccessfull = await ElectronDeleteFile(path);
+	const wasDeleteSuccessfull = await electronDeleteFile(path);
 
 	if (wasDeleteSuccessfull === true) {
 		successToast(`${t("toasts.mediaDeletionSuccess")}"${getBasename(path)}"!`);

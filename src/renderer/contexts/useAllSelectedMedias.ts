@@ -12,7 +12,6 @@ import { time } from "@utils/utils";
 ///////////////////////////////////////////////////
 
 export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path> }>()(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
 );
 

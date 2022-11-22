@@ -29,7 +29,6 @@ const settingsToApply =
 // Main function:
 
 export const useSettings = create<Settings>()(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	subscribeWithSelector((_set, _get, _api) => settingsToApply),
 );
 

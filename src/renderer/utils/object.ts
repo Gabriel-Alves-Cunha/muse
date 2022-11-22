@@ -30,7 +30,6 @@ export function isObjectEmpty(obj: Obj): boolean {
 export function getObjectLength(obj: Obj): number {
 	let length = 0;
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for (const _ in obj) ++length;
 
 	return length;
@@ -39,7 +38,7 @@ export function getObjectLength(obj: Obj): number {
 //////////////////////////////////////////
 
 export function withoutProperty<T>(obj: Obj<T>, property: string) {
-	const { [property]: unused, ...rest } = obj;
+	const { [property]: _unused, ...rest } = obj;
 
 	return rest;
 }

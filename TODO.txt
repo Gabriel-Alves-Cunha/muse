@@ -1,9 +1,8 @@
-################## TODOS ##################
+################## TODO ##################
 
 * FIX: choose a font with I and L different!!
 * FIX: tests!
 * ADD: select with mouse moving!!
-* CHANGE: from stitches to tailwind (smaller bundle and less js)
 * CHANGE: from react to solidjs/preact
 * CHANGE: from i18 to ? solid-primitives
 * CHANGE: from radix-ui to hope-ui (solid js)
