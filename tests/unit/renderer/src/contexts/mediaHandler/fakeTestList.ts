@@ -23,14 +23,16 @@ export const testArray = Object.freeze(
 		};
 
 		return [`home/Music/test/${title}.mp3`, media] as const;
-	}).sort((a, b) => a[0].localeCompare(b[0])),
+	}),
 );
 
 export const testList: ReadonlyMap<string, Media> = Object.freeze(
-	new Map(testArray),
+	new Map([...testArray].sort((a, b) => a[0].localeCompare(b[0]))),
 );
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const lastMediaPath = testArray.at(-1)![0];
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const firstMediaPath = testArray[0]![0];
+export const arrayFromMainList = Object.freeze([...testList]);
+
+export const lastMediaPathFromTestArray = testArray.at(-1)![0];
+export const lastMediaPathFromMainList = testArray.at(-1)![0];
+export const firstMediaPathFromTestArray = testArray[0]![0];
+export const firstMediaPathFromMainList = testArray[0]![0];

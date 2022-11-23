@@ -3,7 +3,7 @@ import { prettyBytes } from "@common/prettyBytes";
 import { t } from "@components/I18n";
 
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByName;
+	state.sortedByNameAndMainList;
 
 export function MediasInfo() {
 	const mainList = usePlaylists(mainListSelector);

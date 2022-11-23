@@ -1,21 +1,21 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type { ValuesOf } from "@common/@types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
-import { getFirstKey, getLastKey } from "@utils/map-set";
 import { getRandomInt, time } from "@utils/utils";
 import { getPlayOptions } from "./usePlayOptions";
+import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
+import { getFirstKey } from "@utils/map-set";
 import {
 	type MainList,
-	PlaylistActions,
-	PlaylistList,
-	setPlaylists,
+	addToHistory,
 	getPlaylist,
 	getMainList,
-	WhatToDo,
+	History,
 } from "./usePlaylists";
 
 ////////////////////////////////////////////////
@@ -23,8 +23,8 @@ import {
 ////////////////////////////////////////////////
 // Constants:
 
-const defaultCurrentPlaying: CurrentPlaying = {
-	listType: PlaylistList.MAIN_LIST,
+export const defaultCurrentPlaying: CurrentPlaying = {
+	listType: playlistList.mainList,
 	path: emptyString,
 	currentTime: 0,
 };
@@ -47,36 +47,25 @@ export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
 ////////////////////////////////////////////////
 // Helper functions:
 
-export function playThisMedia(
+export const playThisMedia = (
 	path: Path,
-	listType: PlaylistList = PlaylistList.MAIN_LIST,
-): void {
-	// We need to update history:
-	setPlaylists({
-		whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-		type: WhatToDo.UPDATE_HISTORY,
-		path,
-	});
-
-	setCurrentPlaying({ path, currentTime: 0, listType });
-}
+	listType: ValuesOf<typeof playlistList> = playlistList.mainList,
+): void => setCurrentPlaying({ path, currentTime: 0, listType });
 
 ////////////////////////////////////////////////
 
-export function togglePlayPause(): void {
+export async function togglePlayPause(): Promise<void> {
 	const audio = document.getElementById("audio") as HTMLAudioElement;
 
-	audio.paused ? play(audio) : pause(audio);
+	audio.paused ? await play(audio) : pause(audio);
 }
 
 ////////////////////////////////////////////////
 
-export function play(audio?: HTMLAudioElement): void {
-	(async () => {
-		audio !== undefined
-			? await audio.play()
-			: await (document.getElementById("audio") as HTMLAudioElement).play();
-	})();
+export async function play(audio?: HTMLAudioElement): Promise<void> {
+	audio !== undefined
+		? await audio.play()
+		: await (document.getElementById("audio") as HTMLAudioElement).play();
 }
 
 ////////////////////////////////////////////////
@@ -93,6 +82,21 @@ export function pause(audio?: HTMLAudioElement): void {
 
 ////////////////////////////////////////////////
 
+function sortHistoryByDate() {
+	const unsortedList: [Path, DateAsNumber][] = [];
+
+	for (const [path, dates] of getPlaylist(playlistList.history) as History)
+		for (const date of dates) unsortedList.push([path, date]);
+
+	const mainList = getMainList();
+
+	const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
+		.sort((a, b) => b[1] - a[1]) // sorted by date
+		.map(([path, date]) => [path, mainList.get(path)!, date]);
+
+	return listAsArrayOfMap;
+}
+
 export function playPreviousMedia(): void {
 	time(() => {
 		const { path, listType } = getCurrentPlaying();
@@ -104,42 +108,21 @@ export function playPreviousMedia(): void {
 
 		// We don't play previous media if it's the history list:
 		const correctListType =
-			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
+			listType === playlistList.history ? playlistList.mainList : listType;
 
-		// Get the correct list:
-		const list = getPlaylist(correctListType) as Set<string> | MainList;
+		const history = sortHistoryByDate();
 
-		const [firstMediaPath] = list;
-		let prevMediaPath: Path = emptyString;
-
-		if (firstMediaPath === path) prevMediaPath = getLastKey(list) as Path;
-		else {
-			let prevPath = emptyString;
-
-			for (const newPath of list.keys()) {
-				if (path === newPath) {
-					prevMediaPath = prevPath;
-					break;
-				}
-
-				prevPath = newPath;
-			}
-		}
-
-		if (prevMediaPath.length === 0)
+		if (history.length < 2)
 			return console.error(
-				"There should be a prevMediaPath, but there isn't!",
-				{ prevMediaPath, listType, list },
+				"There should be at least 2 medias on history to be able to play a previous media, but there isn't!",
+				history,
 			);
 
-		// We need to update history:
-		setPlaylists({
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-			type: WhatToDo.UPDATE_HISTORY,
-			path: prevMediaPath,
-		});
+		// In the history list, the first is the newest.
+		// @ts-ignore => I garanteed above that a second media is present:
+		const [_firstMedia, [previousMediaPath]] = history;
 
-		setCurrentPlaying({ path: prevMediaPath, currentTime: 0 });
+		playThisMedia(previousMediaPath, correctListType);
 	}, "playPreviousMedia");
 }
 
@@ -154,9 +137,9 @@ export function playNextMedia(): void {
 				"A media needs to be currently selected to play a next media!",
 			);
 
-		// We don't play next media if it's the history list:
+		// We don't play next media if it's the history list, tho I'm not entirely sure this is needed:
 		const correctListType =
-			listType === PlaylistList.HISTORY ? PlaylistList.MAIN_LIST : listType;
+			listType === playlistList.history ? playlistList.mainList : listType;
 
 		// Get the correct list:
 		const list = getPlaylist(correctListType) as Set<string> | MainList;
@@ -186,21 +169,16 @@ export function playNextMedia(): void {
 				if (newPath === path) found = true;
 			}
 
+			// In case the currently playing is the last media, get the first:
 			if (nextMediaPath.length === 0) nextMediaPath = getFirstKey(list) as Path;
 		}
 
 		if (nextMediaPath.length === 0)
 			return console.warn("There should be a nextMediaPath, but there isn't!", {
+				currentPlaying: getCurrentPlaying(),
 				nextMediaPath,
 				list,
 			});
-
-		// We need to update history:
-		setPlaylists({
-			whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-			type: WhatToDo.UPDATE_HISTORY,
-			path: nextMediaPath,
-		});
 
 		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
 	}, "playNextMedia");
@@ -211,36 +189,32 @@ export function playNextMedia(): void {
 ////////////////////////////////////////////////
 // Register functions to window mediaSession:
 
-navigator?.mediaSession?.setActionHandler?.("previoustrack", () =>
-	playPreviousMedia(),
-);
-navigator?.mediaSession?.setActionHandler?.("nexttrack", () => playNextMedia());
+navigator?.mediaSession?.setActionHandler?.("previoustrack", playPreviousMedia);
+navigator?.mediaSession?.setActionHandler?.("play", async () => await play());
+navigator?.mediaSession?.setActionHandler?.("nexttrack", playNextMedia);
 navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
-navigator?.mediaSession?.setActionHandler?.("play", () => play());
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+useCurrentPlaying.subscribe(
+	(state) => state.path,
+	function updateHistoryAndSetAudioSource(newPath, prevPath) {
+		if (newPath.length === 0) return;
+
+		addToHistory(newPath);
+
+		setAudioSource(newPath, prevPath);
+	},
+);
+
 ////////////////////////////////////////////////
 // Handle what happens when the `currentPlaying.path` changes:
 
 // A timeout for in case the user changes media too fast:
 // we don't load the media until the timeout ends.
 let prevTimerToSetMedia: NodeJS.Timeout | undefined;
-
-if (import.meta.vitest === undefined)
-	useCurrentPlaying.subscribe(
-		(state) => state.path,
-		function runSubscribedFunctions(path, prevPath) {
-			if (path.length === 0) return;
-
-			// Run functions:
-			setAudioSource(path, prevPath);
-
-			changeMediaSessionMetadata(path);
-		},
-	);
-
-////////////////////////////////////////////////
 
 function setAudioSource(path: Path, prevPath: Path) {
 	clearTimeout(prevTimerToSetMedia);
@@ -250,6 +224,8 @@ function setAudioSource(path: Path, prevPath: Path) {
 	const timerToSetMedia = setTimeout(() => {
 		(document.getElementById("audio") as HTMLAudioElement).src =
 			mediaPathSuitableForElectron;
+
+		changeMediaSessionMetadata(path);
 
 		time(
 			() => handleDecorateMediaRow(path, prevPath),
@@ -284,6 +260,7 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 	if (previousPath.length !== 0 && prevElements !== null)
 		for (const element of prevElements) element.classList.remove(playingClass);
 
+	// Decorate new playing media row:
 	for (const element of newElements) element.classList.add(playingClass);
 }
 
@@ -310,7 +287,7 @@ function changeMediaSessionMetadata(path: Path): void {
 // Types:
 
 export type CurrentPlaying = Readonly<{
-	listType: PlaylistList;
-	path: Path;
+	listType: ValuesOf<typeof playlistList>;
 	currentTime: number;
+	path: Path;
 }>;

@@ -12,10 +12,10 @@ import { deleteFile } from "./deleteFile";
 import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
-	PlaylistActions,
-	setPlaylists,
+	addToMainList,
+	refreshMedia,
 	getMainList,
-	WhatToDo,
+	removeMedia,
 } from "@contexts/usePlaylists";
 
 const { transformPathsToMedias } = electron.media;
@@ -112,13 +112,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setPlaylists({
-				whatToDo: PlaylistActions.ADD_ONE_MEDIA,
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				newPath: emptyString,
-				path: mediaPath,
-				newMedia,
-			});
+			addToMainList(mediaPath, newMedia);
 			break;
 		}
 
@@ -153,43 +147,8 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
 
-			if (!getMainList().has(mediaPath)) {
-				console.warn(
-					`There should be a media with path = "${mediaPath}" to be refreshed, but there isn't!\nRefreshing all media instead.`,
-				);
-				await searchLocalComputerForMedias();
-				break;
-			}
+			await refreshMedia(mediaPath, emptyString);
 
-			const {
-				assureMediaSizeIsGreaterThan60KB,
-				ignoreMediaWithLessThan60Seconds,
-			} = getSettings();
-
-			const refreshedMediaInArray: readonly [Path, Media][] =
-				await transformPathsToMedias(
-					[mediaPath],
-					assureMediaSizeIsGreaterThan60KB,
-					ignoreMediaWithLessThan60Seconds,
-				);
-
-			const refreshedMedia = refreshedMediaInArray[0]?.[1];
-
-			if (refreshedMedia === undefined) {
-				console.error(
-					`I wasn't able to transform this path (${mediaPath}) to a media to be refreshed!\nRefreshing all media instead.`,
-				);
-				await searchLocalComputerForMedias();
-				break;
-			}
-
-			setPlaylists({
-				whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				newMedia: refreshedMedia,
-				newPath: emptyString,
-				path: mediaPath,
-			});
 			break;
 		}
 
@@ -207,11 +166,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 				break;
 			}
 
-			setPlaylists({
-				whatToDo: PlaylistActions.REMOVE_ONE_MEDIA_BY_PATH,
-				type: WhatToDo.UPDATE_MAIN_LIST,
-				path: mediaPath,
-			});
+			removeMedia(mediaPath);
 			break;
 		}
 

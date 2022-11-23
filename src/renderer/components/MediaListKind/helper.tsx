@@ -1,4 +1,5 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type { ValuesOf } from "@common/@types/utils";
 
 import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
@@ -6,12 +7,14 @@ import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { memo } from "react";
 import create from "zustand";
 
-import { electronIpcMainProcessNotification } from "@common/enums";
+import {
+	electronIpcMainProcessNotification,
+	playlistList,
+} from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { DialogTrigger } from "@components/DialogTrigger";
-import { PlaylistList } from "@contexts/usePlaylists";
 import { t } from "@components/I18n";
 import {
 	addToAllSelectedMedias,
@@ -27,8 +30,8 @@ const notify =
 /////////////////////////////////////////
 
 export const useFromList = create<FromList>(() => ({
-	homeList: PlaylistList.MAIN_LIST,
-	fromList: PlaylistList.FAVORITES,
+	fromList: playlistList.favorites,
+	homeList: playlistList.mainList,
 	isHome: true,
 }));
 
@@ -85,9 +88,9 @@ function selectOrPlayMedia(
 const Row = memo(
 	({ media, path }: RowProps) => (
 		<div
-			className={
-				`${(getAllSelectedMedias().has(path) === true ? "selected " : "")}${(getCurrentPlaying().path === path ? "playing " : "")}row-wrapper`
-			}
+			className={`${
+				getAllSelectedMedias().has(path) === true ? "selected " : ""
+			}${getCurrentPlaying().path === path ? "playing " : ""}row-wrapper`}
 			data-path={path}
 		>
 			<button
@@ -174,14 +177,16 @@ type RowProps = Readonly<{ media: Media; path: Path }>;
 
 /////////////////////////////////////////////
 
+type PlaylistList = ValuesOf<typeof playlistList>;
+
 type FromList = Readonly<{
 	fromList: Exclude<
 		PlaylistList,
-		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+		typeof playlistList.mainList | typeof playlistList.sortedByDate
 	>;
 	homeList: Extract<
 		PlaylistList,
-		PlaylistList.MAIN_LIST | PlaylistList.SORTED_BY_DATE
+		typeof playlistList.mainList | typeof playlistList.sortedByDate
 	>;
 	isHome: boolean;
 }>;

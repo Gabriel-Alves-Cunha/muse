@@ -1,9 +1,11 @@
+import type { ValuesOf } from "@common/@types/utils";
+
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { contentOfSelectEnum, Select } from "@components/Select";
 import { assertUnreachable } from "@utils/utils";
-import { PlaylistList } from "@contexts/usePlaylists";
+import { playlistList } from "@common/enums";
 import { setFromList } from "@components/MediaListKind/helper";
 import { t } from "@components/I18n";
 
@@ -17,14 +19,14 @@ export function SortBy() {
 
 	useEffect(() => {
 		// Default value:
-		let homeList = PlaylistList.MAIN_LIST;
+		let homeList: ValuesOf<typeof playlistList> = playlistList.mainList;
 
 		switch (selectedList) {
 			case "Name":
 				break;
 
 			case "Date": {
-				homeList = PlaylistList.SORTED_BY_DATE;
+				homeList = playlistList.sortedByDate;
 				break;
 			}
 
@@ -37,8 +39,8 @@ export function SortBy() {
 
 	return (
 		<Select
-			triggerClassName="grouped-button" // Same as ButtonOfGroup.
 			content={contentOfSelectEnum.GROUPED_BUTTON_SORT_BY}
+			triggerClassName="grouped-button" // Same as ButtonOfGroup.
 			tooltip={t("tooltips.sortBy")}
 			setValue={setSelectedList}
 			value={selectedList}

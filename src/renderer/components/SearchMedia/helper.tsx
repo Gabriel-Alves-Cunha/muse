@@ -50,7 +50,6 @@ const defaultSearcher: Searcher = Object.freeze({
 });
 
 const useSearcher = create<Searcher>()(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	subscribeWithSelector((_set, _get, _api) => defaultSearcher),
 );
 

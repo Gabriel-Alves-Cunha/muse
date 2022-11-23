@@ -49,7 +49,9 @@ export const Select = ({
 
 		<Portal>
 			<Content className="select-content">
-				<Viewport className="no-transition p-1">{contentToShow(content)}</Viewport>
+				<Viewport className="no-transition p-1">
+					{contentToShow(content)}
+				</Viewport>
 			</Content>
 		</Portal>
 	</Root>

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
-import { PlaylistList } from "@contexts/usePlaylists";
+import { playlistList } from "@common/enums";
 import { SearchMedia } from "@components/SearchMedia";
 import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
@@ -19,7 +19,7 @@ export function History() {
 	useTitle(t("titles.history"));
 
 	useEffect(() => {
-		setFromList({ fromList: PlaylistList.HISTORY });
+		setFromList({ fromList: playlistList.history });
 	}, []);
 
 	return (

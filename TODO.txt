@@ -1,7 +1,6 @@
 ################## TODO ##################
 
 * FIX: choose a font with I and L different!!
-* FIX: tests!
 * ADD: select with mouse moving!!
 * CHANGE: from react to solidjs/preact
 * CHANGE: from i18 to ? solid-primitives
@@ -9,6 +8,7 @@
 * ADD: detect (avail port to share)
 * ADD: electron setProgressBar
 * FIX: gh-actions is always overwriting latest release!!
+* DEV: refactor to get data from form on mediaListKind -> MediaOptions.
 
 ################## NOTES ##################
 
@@ -22,3 +22,5 @@
 		you have to use a select function.
 
 3. If ever needed, see last.fm for lyrics, or lrc
+
+4. If ever needed, make a data structure that has an indexed map.

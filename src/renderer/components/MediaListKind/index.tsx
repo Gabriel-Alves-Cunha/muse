@@ -12,6 +12,7 @@ import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import { t, Translator } from "@components/I18n";
 import { ErrorFallback } from "../ErrorFallback";
+import { playlistList } from "@common/enums";
 import {
 	getAllSelectedMedias,
 	deselectAllMedias,
@@ -21,7 +22,6 @@ import {
 	type MainList,
 	type History,
 	usePlaylists,
-	PlaylistList,
 	getMainList,
 } from "@contexts/usePlaylists";
 import {
@@ -75,15 +75,15 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 		() =>
 			time(() => {
 				switch (listName) {
-					case PlaylistList.MAIN_LIST:
+					case playlistList.mainList:
 						return Array.from(list as MainList, ([path, media]) => [
 							path,
 							media,
 							0,
 						]);
 
-					case PlaylistList.SORTED_BY_DATE:
-					case PlaylistList.FAVORITES: {
+					case playlistList.sortedByDate:
+					case playlistList.favorites: {
 						const mainList = getMainList();
 
 						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
@@ -103,7 +103,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 						return listAsArrayOfAMap;
 					}
 
-					case PlaylistList.HISTORY: {
+					case playlistList.history: {
 						const unsortedList: [Path, DateAsNumber][] = [];
 
 						for (const [path, dates] of list as History)
@@ -146,7 +146,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			>
 				<Virtuoso
 					computeItemKey={
-						listName === PlaylistList.HISTORY
+						listName === playlistList.history
 							? computeHistoryItemKey
 							: computeItemKey
 					}
@@ -173,11 +173,6 @@ const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
 const EmptyPlaceholder = () => (
 	<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
-		{/* <img
-			alt={t("alts.noMediasFound")}
-			className="w-14 h-14 mr-5"
-			src={noMediaFoundPng}
-		/> */}
 		<NoMediaFound className="w-14 h-14 mr-5" />
 
 		<Translator path="alts.noMediasFound" />

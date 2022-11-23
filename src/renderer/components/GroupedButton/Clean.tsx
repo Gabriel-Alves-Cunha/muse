@@ -2,13 +2,10 @@ import { FiTrash as CleanIcon } from "react-icons/fi";
 
 import { assertUnreachable } from "@utils/utils";
 import { ButtonOfGroup } from "./ButtonOfGroup";
+import { playlistList } from "@common/enums";
 import { getFromList } from "@components/MediaListKind/helper";
 import { t } from "@components/I18n";
-import {
-	cleanFavorites,
-	cleanHistory,
-	PlaylistList,
-} from "@contexts/usePlaylists";
+import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
 
 export const Clean = () => (
 	<ButtonOfGroup title={t("tooltips.cleanList")} onPointerUp={cleanProperList}>
@@ -23,13 +20,13 @@ function cleanProperList() {
 	const { fromList } = getFromList();
 
 	switch (fromList) {
-		case PlaylistList.FAVORITES: {
-			cleanFavorites();
+		case playlistList.favorites: {
+			clearFavorites();
 			break;
 		}
 
-		case PlaylistList.HISTORY: {
-			cleanHistory();
+		case playlistList.history: {
+			clearHistory();
 			break;
 		}
 

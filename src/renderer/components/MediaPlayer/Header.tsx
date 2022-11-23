@@ -10,31 +10,13 @@ import {
 } from "react-icons/md";
 
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
+import { toggleFavoriteMedia, usePlaylists } from "@contexts/usePlaylists";
 import { CircleIconButton } from "@components/CircleIconButton";
 import { t } from "@components/I18n";
-import {
-	PlaylistActions,
-	setPlaylists,
-	usePlaylists,
-	WhatToDo,
-} from "@contexts/usePlaylists";
 
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
-
-function toggleFavorite(path: Readonly<Path>): void {
-	if (path.length > 0)
-		setPlaylists({
-			whatToDo: PlaylistActions.TOGGLE_ONE_MEDIA,
-			type: WhatToDo.UPDATE_FAVORITES,
-			path,
-		});
-}
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
 
 export const openLyrics = true;
 
@@ -86,7 +68,7 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 			</div>
 
 			<CircleIconButton
-				onPointerUp={() => toggleFavorite(path)}
+				onPointerUp={() => toggleFavoriteMedia(path)}
 				title={t("tooltips.toggleFavorite")}
 				disabled={!media}
 			>

@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { FlipCard, mediaPlayerCardId } from "@components/FlipCard";
+import { refreshMedia, usePlaylists } from "@contexts/usePlaylists";
 import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
@@ -12,12 +13,6 @@ import { emptyString } from "@common/empty";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
 import { dbg } from "@common/debug";
-import {
-	PlaylistActions,
-	usePlaylists,
-	setPlaylists,
-	WhatToDo,
-} from "@contexts/usePlaylists";
 import {
 	useCurrentPlaying,
 	getCurrentPlaying,
@@ -44,7 +39,7 @@ const pathSelector = (state: ReturnType<typeof useCurrentPlaying.getState>) =>
 ///////////////////////////////////////
 
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByName;
+	state.sortedByNameAndMainList;
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -199,15 +194,9 @@ function handleLoadedData(
 ): void {
 	const formatedDuration = formatDuration(audio.duration);
 
+	// Updating the duration of media:
 	if (formatedDuration !== media.duration)
-		// Updating the duration of media:
-		setPlaylists({
-			newMedia: { ...media, duration: formatedDuration },
-			whatToDo: PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH,
-			type: WhatToDo.UPDATE_MAIN_LIST,
-			newPath: emptyString,
-			path,
-		});
+		refreshMedia(path, emptyString, { ...media, duration: formatedDuration });
 
 	// Maybe set audio.currentTime to last stopped time:
 	const lastTime = getCurrentPlaying().currentTime;

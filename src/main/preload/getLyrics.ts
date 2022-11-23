@@ -81,7 +81,7 @@ async function queryForPossibleLyric(
 
 	const [track] = jsonRes.result;
 
-	if (!(track?.api_lyrics)) throw new Error("No lyrics found!");
+	if (!track?.api_lyrics) throw new Error("No lyrics found!");
 
 	const {
 		api_lyrics: lyricURL,

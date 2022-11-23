@@ -36,3 +36,12 @@ export const electronIpcMainProcessNotification = {
 	MINIMIZE: 5,
 	QUIT_APP: 6,
 } as const;
+
+/////////////////////////////////////////////
+
+export const playlistList = {
+	mainList: "sortedByNameAndMainList",
+	sortedByDate: "sortedByDate",
+	favorites: "favorites",
+	history: "history",
+} as const;
