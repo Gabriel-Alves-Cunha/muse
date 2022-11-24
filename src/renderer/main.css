@@ -47,6 +47,7 @@
 		--text-alternative: #a3a3a3;
 		--text-disabled: #d3d3d5;
 		--text-normal: #0c0910;
+		--text-oposite: black;
 		--text-muted: #113047;
 		--text-input: #111111;
 
@@ -116,7 +117,7 @@
 		--icon-media-player: #f3f3ee;
 		--icon-deactivated: #6272a4;
 		--icon-window-button: #fff;
-		--icon-active: #4a00e0;
+		--icon-active: #e4e1e1;
 
 		/* Text */
 		--text-ctx-menu-item-focus: #fff;
@@ -128,6 +129,7 @@
 		--text-alternative: #e4e1e1;
 		--text-disabled: #d3d3d5;
 		--text-normal: #f6f6f6;
+		--text-oposite: white;
 		--text-muted: #ccb69b;
 		--text-input: #f5f5f5;
 
@@ -293,7 +295,7 @@
 	}
 
 	.animation-fall-away {
-		animation: fall-away 600ms ease;
+		animation: fall-away 600ms ease forwards;
 	}
 
 	.animation-move-up {
@@ -332,12 +334,12 @@
 		overflow-y: auto;
 	}
 
-	.scroll-2 {
-		scrollbar-width: 4px;
+	.scroll-2::-webkit-scrollbar {
+		width: 4px;
 	}
 
-	.scroll-1 {
-		scrollbar-width: 2px;
+	.scroll-1::-webkit-scrollbar {
+		width: 2px;
 	}
 
 	.scroll-white {
@@ -455,7 +457,7 @@
 	/* Button */
 
 	.button {
-		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-normal;
+		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-decorations-down text-lg;
 	}
 
 	.button:focus-visible,
@@ -525,14 +527,14 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* Converting */
+	/* Converting and Downloading */
 
 	.has-items span {
-		@apply absolute w-4 h-4 -right-2 top-0 bg-green-700 rounded-full;
+		@apply absolute w-[1.1rem] h-[1.1rem] -right-2 top-0 bg-green-700 rounded-full;
 	}
 
 	.has-items span::before {
-		@apply content-[attr(data-length)] relative justify-center items-center flex w-full h-full -right-[1px] font-secondary tracking-wide text-white font-medium text-xs;
+		@apply content-[attr(data-length)] relative flex justify-center items-center w-full h-full font-secondary tracking-wide text-white font-medium text-xs;
 	}
 
 	/* ********************************** */
@@ -668,6 +670,38 @@
 	/* ********************************** */
 	/* ********************************** */
 
+	/* ConvertBox */
+
+	.box {
+		@apply relative flex w-full h-[60px] border-2 border-solid border-input rounded-md p-2 tracking-wider font-primary text-placeholder;
+	}
+
+	.left {
+		@apply flex flex-col w-full overflow-hidden gap-1 leading-none justify-between;
+	}
+
+	.left p {
+		@apply text-muted whitespace-nowrap font-primary overflow-hidden;
+	}
+
+	.right {
+		@apply flex flex-col justify-between w-5 h-full items-center gap-1;
+	}
+
+	.right button {
+		@apply flex items-center justify-center w-5 h-5 cursor-pointer rounded-full no-transition [&_svg]:fill-[var(--text-alternative)];
+	}
+
+	.right button:focus-within,
+	.right button:hover,
+	.right button:focus {
+		@apply bg-icon-button-hovered [&_svg]:fill-[var(--text-oposite)];
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
 	/* Select */
 
 	.select-content {
@@ -741,9 +775,9 @@
 		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition;
 	}
 
-	.nav button:focus-visible,
-	.nav button:hover,
-	.nav button:focus {
+	.nav > button:focus-visible,
+	.nav > button:hover,
+	.nav > button:focus {
 		@apply text-active;
 	}
 
@@ -848,7 +882,7 @@
 	/* Popover */
 
 	.popover {
-		@apply flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll-1;
+		@apply flex flex-col p-1 gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1;
 	}
 
 	.popover:focus-visible,
@@ -857,7 +891,7 @@
 		@apply shadow-popover outline-none;
 	}
 
-	.popover p {
+	.popover > p {
 		@apply relative text-icon-deactivated font-secondary tracking-wide text-center font-medium;
 	}
 
@@ -886,11 +920,11 @@
 	/* Media Player */
 
 	.aside {
-		@apply grid-area-media-player relative inline-block justify-items-center items-center w-full justify-self-center self-start p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom [&_svg]:text-icon-media-player ;
+		@apply grid-area-media-player relative inline-block justify-items-center items-center w-full justify-self-center self-start p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom [&_svg]:text-icon-media-player;
 	}
 
 	.aside svg * {
-		@apply text-icon-media-player
+		@apply text-icon-media-player;
 	}
 
 	/* ********************************** */
@@ -916,8 +950,6 @@
 
 @keyframes fall-away {
 	0% {
-		transform: rotateZ(0deg);
-		opacity: 1;
 		top: 0;
 	}
 
@@ -928,17 +960,13 @@
 	100% {
 		transform: rotateZ(-5deg);
 		opacity: 0;
-		top: 200;
+		top: 200px;
 	}
 }
 
 @keyframes move-up {
-	0% {
-		transform: translateY(0px);
-	}
-
 	100% {
-		/* -73 is the (height + 1 * gap): */
-		transform: translateY(-73px);
+		/* -71 is the (height + 1 * gap): */
+		transform: translateY(-71px);
 	}
 }

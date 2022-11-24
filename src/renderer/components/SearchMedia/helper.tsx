@@ -184,7 +184,7 @@ export function Results() {
 					className="transition-none"
 				>
 					{nothingFound ? (
-						<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-icon-deactivated font-secondary tracking-wider text-base text-center font-medium">
+						<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
 							Nothing was found for &quot;{searchTerm}&quot;
 						</div>
 					) : foundSomething ? (

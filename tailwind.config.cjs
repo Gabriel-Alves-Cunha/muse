@@ -44,6 +44,7 @@ module.exports = {
 				placeholder: "var(--text-placeholder)",
 				alternative: "var(--text-alternative)",
 				disabled: "var(--text-disabled)",
+				oposite: "var(--text-oposite)",
 				normal: "var(--text-normal)",
 				muted: "var(--text-muted)",
 				input: "var(--text-input)",

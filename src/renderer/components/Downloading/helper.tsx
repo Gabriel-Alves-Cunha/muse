@@ -2,14 +2,14 @@ import type { MediaBeingDownloaded } from ".";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { AiOutlineClose as Cancel } from "react-icons/ai";
+import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 
 import { errorToast, infoToast, successToast } from "@components/toasts";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { progressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
-import { Progress } from "@components/Progress";
+import { Progress, progressIcons } from "@components/Progress";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 import {
@@ -74,15 +74,18 @@ const DownloadingBox = ({
 	download,
 	url,
 }: DownloadingBoxProps) => (
-	<div
-		className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none"
-		key={url}
-	>
-		<div className="relative flex justify-start items-center w-[90%] h-4 mb-2">
+	<div className="box">
+		<div className="left">
 			<p>{download.title}</p>
 
+			<Progress
+				percent_0_to_100={download.percentage}
+				status={download.status}
+			/>
+		</div>
+
+		<div className="right">
 			<button
-				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered transition-none"
 				onPointerUp={(e) =>
 					handleSingleItemDeleteAnimation(
 						e,
@@ -93,15 +96,11 @@ const DownloadingBox = ({
 				}
 				title={t("tooltips.cancelDownload")}
 			>
-				<Cancel size={12} />
+				<CancelIcon size={13} />
 			</button>
-		</div>
 
-		<Progress
-			percent_0_to_100={download.percentage}
-			status={download.status}
-			showStatus
-		/>
+			{progressIcons.get(download.status)}
+		</div>
 	</div>
 );
 

@@ -1,7 +1,7 @@
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import { AiOutlineClose as Cancel } from "react-icons/ai";
+import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 import create from "zustand";
 
 import { errorToast, infoToast, successToast } from "@components/toasts";
@@ -85,14 +85,17 @@ const ConvertBox = ({
 	convertionIndex,
 	path,
 }: ConvertBoxProps) => (
-	<div className="item relative flex flex-col w-60 h-16 border-[1px] border-solid border-opacity-70 rounded-md p-2 animate-none">
-		<div className="relative flex justify-start items-center w-[90%] h-4 mb-2">
-			<p className="text-alternative whitespace-nowrap font-primary text-sm text-left overflow-hidden w-[90%]">
-				{`${getBasename(path)}.${toExtension}`}
-			</p>
+	<div className="box">
+		<div className="left">
+			<p>{`${getBasename(path)}.${toExtension}`}</p>
 
+			{`${t("infos.converted")} ${formatDuration(
+				timeConverted,
+			)} / ${prettyBytes(sizeConverted)}`}
+		</div>
+
+		<div className="right">
 			<button
-				className="absolute flex w-5 h-5 -right-5 cursor-pointer bg-none rounded-full border-none hover:bg-icon-button-hovered focus:bg-icon-button-hovered no-transition"
 				onPointerUp={(e) =>
 					handleSingleItemDeleteAnimation(
 						e,
@@ -103,16 +106,10 @@ const ConvertBox = ({
 				}
 				title={t("tooltips.cancelConversion")}
 			>
-				<Cancel className="w-3 h-3 fill-gray-600" />
+				<CancelIcon size={13} />
 			</button>
-		</div>
 
-		<div className="flex justify-between whitespace-nowrap text-muted font-primary text-sm tracking-wide overflow-hidden text-left">
-			{`${t("infos.converted")} ${formatDuration(
-				timeConverted,
-			)} s / ${prettyBytes(sizeConverted)}`}
-
-			<span className="text-white mr-1">{progressIcons.get(status)}</span>
+			{progressIcons.get(status)}
 		</div>
 	</div>
 );

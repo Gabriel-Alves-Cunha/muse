@@ -1,4 +1,4 @@
-import { MdCompareArrows as Convert } from "react-icons/md";
+import { MdCompareArrows as ConvertIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { Trigger } from "@radix-ui/react-popover";
 
@@ -62,7 +62,7 @@ export function Converting() {
 			>
 				<span data-length={convertingListSize} />
 
-				<Convert className="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
+				<ConvertIcon className="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
 			</Trigger>
 
 			<PopoverContent
