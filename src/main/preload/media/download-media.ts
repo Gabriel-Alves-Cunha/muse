@@ -74,12 +74,12 @@ export async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
 	{
+		artist = emptyString,
 		electronPort,
 		extension,
 		imageURL,
 		title,
 		url,
-		artist = emptyString,
 	}: CreateDownload,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
@@ -128,7 +128,7 @@ export async function createDownload(
 			percentageToSend = percentage;
 
 			// To client:
-			if (interval === undefined) {
+			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort!.postMessage({ percentage: percentageToSend }),
@@ -148,7 +148,6 @@ export async function createDownload(
 			}
 
 			// Log progress to node console if in development:
-			// @ts-ignore => isDev is a globally defined boolean.
 			if (isDev) {
 				const secondsDownloading = (Date.now() - startTime) / 1_000;
 				const estimatedDownloadTime = (

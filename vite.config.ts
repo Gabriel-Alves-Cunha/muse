@@ -1,3 +1,6 @@
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
+
 import { type UserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
 import { resolve } from "node:path";

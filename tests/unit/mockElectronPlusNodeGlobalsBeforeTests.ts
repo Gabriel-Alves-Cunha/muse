@@ -3,6 +3,8 @@ import { vi } from "vitest";
 import { getObjectLength, withoutProperty } from "@utils/object";
 import { stringifyJson } from "@common/utils";
 
+const { log } = console;
+
 // Mocking window.localStorage
 class LocalStorageMock {
 	#store: Record<string, string>;
@@ -71,7 +73,7 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 
 	vi.stubGlobal("window", {
 		postMessage: vi.fn().mockImplementation(function (...args: unknown[]) {
-			console.log(
+			log(
 				"%cwindow.postMessage arguments =",
 				"color:blue",
 				stringifyJson(args),

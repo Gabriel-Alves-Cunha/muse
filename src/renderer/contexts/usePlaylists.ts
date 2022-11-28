@@ -25,6 +25,7 @@ import {
 import { playlistList } from "@common/enums";
 
 const { transformPathsToMedias } = electron.media;
+const { error, warn } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -148,8 +149,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			removeFromFavorites(path) {
 				const { favorites } = get();
 
-				if (!favorites.has(path))
-					return console.error("Media not found in favorites");
+				if (!favorites.has(path)) return error("Media not found in favorites");
 
 				const newFavorites = new Set(favorites);
 				newFavorites.delete(path);
@@ -177,7 +177,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 				} = get();
 
 				if (mainList.has(path))
-					return console.warn(
+					return warn(
 						`A media with path "${path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call this function with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
 					);
 
@@ -199,12 +199,12 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 				const newHistory = new Map(history);
 
 				if (!newMainList.delete(path))
-					return console.error(
+					return error(
 						`A media with path "${path}" does not exist at sortedByName.`,
 					);
 
 				if (!newSortedByDate.delete(path))
-					return console.error(
+					return error(
 						`A media with path "${path}" does not exist at newSortedByDate.`,
 					);
 
@@ -280,7 +280,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 				const oldMedia = mainList.get(path);
 
 				if (!oldMedia) {
-					console.warn(
+					warn(
 						`There should be a media with path = "${path}" to be refreshed, but there isn't!\nRefreshing all media instead.`,
 					);
 
@@ -310,7 +310,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 				const refreshedMedia = refreshedMediaInArray[0]?.[1];
 
 				if (refreshedMedia === undefined) {
-					console.error(
+					error(
 						`I wasn't able to transform this path (${path}) to a media to be refreshed!\nRefreshing all media instead.`,
 					);
 
@@ -434,8 +434,8 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 		);
 
 		replaceEntireMainList(newMainList);
-	} catch (error) {
-		console.error("Error on searchLocalComputerForMedias():", error);
+	} catch (err) {
+		error("Error on searchLocalComputerForMedias():", err);
 	} finally {
 		usePlaylists.setState({ isLoadingMedias: false });
 	}

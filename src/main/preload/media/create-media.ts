@@ -9,6 +9,8 @@ import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
 import { dbg } from "@common/debug";
 
+const { error, groupEnd, groupCollapsed } = console;
+
 /////////////////////////////////////////////
 
 const randomColor = randomBackgroundColorForConsole();
@@ -61,12 +63,12 @@ async function createMedia(
 
 			let picture: IPicture | undefined;
 			let mimeType: string | undefined;
-			let error;
+			let error: Error | undefined;
 			try {
 				picture = pictures[0];
 				mimeType = picture?.mimeType;
 			} catch (err) {
-				error = err;
+				error = err as Error;
 			}
 
 			const media: Media = {
@@ -97,27 +99,34 @@ export async function transformPathsToMedias(
 	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<readonly [Path, Media][]> {
 	return time(async () => {
-		console.groupCollapsed("Creating medias...");
+		groupCollapsed("Creating medias...");
 
-		const promises = paths.map((path) =>
-			createMedia(
-				path,
-				assureMediaSizeIsGreaterThan60KB,
-				ignoreMediaWithLessThan60Seconds,
-			).catch((e) =>
-				console.error(
-					`There was a possible error creating media of path: "${path}".\n\n`,
-					e,
+		const promises: Promise<void | readonly [Path, Media]>[] = [];
+
+		for (const path of paths)
+			promises.push(
+				createMedia(
+					path,
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				).catch((e) =>
+					error(
+						`There was a possible error creating media of path: "${path}".\n\n`,
+						e,
+					),
 				),
-			),
-		);
+			);
 
 		// Run promises in parallel:
-		const medias = (await Promise.allSettled(promises))
-			.map((p) => (p.status === "fulfilled" ? p.value : false))
-			.filter(Boolean) as [Path, Media][];
+		const fulfilledPromises = await Promise.allSettled(promises);
 
-		console.groupEnd();
+		const medias: [Path, Media][] = [];
+
+		for (const fulfilled of fulfilledPromises)
+			fulfilled.status === "fulfilled" &&
+				medias.push(fulfilled.value as [Path, Media]);
+
+		groupEnd();
 
 		return medias;
 	}, "transformPathsToMedias");

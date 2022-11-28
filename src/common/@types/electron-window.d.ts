@@ -16,9 +16,9 @@ import {
 /////////////////////////////////////////////
 
 declare global {
-	/* eslint-disable no-var */
 	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[] };
 	var electron: VisibleElectron;
+	var isDev: boolean;
 }
 
 /////////////////////////////////////////////

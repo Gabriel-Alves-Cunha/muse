@@ -41,11 +41,9 @@ export function formatDuration(time?: number): Readonly<string> {
 	const seconds = `0${time % 60}`.slice(-2);
 	const days = floor(time / 86_400);
 
-	return (
-		(days > 0 ? `${days}d ` : "") +
-		(+hour > 0 ? `${hour}:` : "") + // +hour === Number(hour)
-		`${minutes}:${seconds}`
-	);
+	return `${days > 0 ? `${days}d ` : ""}${
+		+hour > 0 ? `${hour}:` : ""
+	}${minutes}:${seconds}`;
 }
 
 /////////////////////////////////////////
@@ -70,9 +68,7 @@ export function sleep(ms: number, logFn?: () => void): Promise<void> {
 
 /////////////////////////////////////////
 
-export function stringifyJson<T>(obj: T) {
-	return JSON.stringify(obj, null, 2);
-}
+export const stringifyJson = <T>(obj: T) => JSON.stringify(obj, null, 2);
 
 /////////////////////////////////////////
 
@@ -111,4 +107,4 @@ type Color = readonly [color: string, backgroundColor: string];
 
 /////////////////////////////////////////
 
-export const eraseImg = "erase img";
+export const eraseImg = "eraseImg";

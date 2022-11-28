@@ -25,7 +25,7 @@ import { emptyString } from "@common/empty";
 import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
 
-const { error } = console;
+const { error, assert } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -163,42 +163,6 @@ export function createAndSaveImageOnMedia(
 
 /////////////////////////////////////////////
 
-function handleAlbumArtists(
-	file: MediaFile,
-	albumArtists: string | readonly string[],
-): void {
-	if (albumArtists instanceof Array)
-		file.tag.albumArtists = albumArtists as Mutable<string[]>;
-	else if (typeof albumArtists === "string")
-		file.tag.albumArtists = [albumArtists];
-
-	dbg({ "new file.tag.albumArtists": file.tag.albumArtists, albumArtists });
-}
-
-/////////////////////////////////////////////
-
-function handleGenres(file: MediaFile, genres: Readonly<string[]>): void {
-	file.tag.genres = genres as Mutable<string[]>;
-
-	dbg({ "new file.tag.genres": file.tag.genres, genres });
-}
-
-/////////////////////////////////////////////
-
-function handleAlbum(file: MediaFile, album: string): void {
-	file.tag.album = album;
-
-	dbg({ "new file.tag.album": file.tag.album, album });
-}
-
-/////////////////////////////////////////////
-
-function handleLyrics(file: MediaFile, lyrics: string): void {
-	file.tag.lyrics = lyrics;
-
-	dbg({ "new file.tag.lyrics": file.tag.lyrics, lyrics });
-}
-
 /////////////////////////////////////////////
 
 /** Returns a new file name if it exists, otherwise, just an empty string. */
@@ -287,7 +251,16 @@ async function talkToClientSoItCanGetTheNewMedia(
 
 export async function writeTags(
 	mediaPath: Path,
-	data: WriteTagsData,
+	{
+		albumArtists,
+		downloadImg,
+		isNewMedia,
+		imageURL,
+		genres,
+		lyrics,
+		album,
+		title,
+	}: WriteTagsData,
 ): Promise<void> {
 	// dbgTests("Writing tags to file:", { mediaPath, data });
 	checkOrThrow(checkForMediaPath(mediaPath));
@@ -295,28 +268,31 @@ export async function writeTags(
 	const file = MediaFile.createFromPath(mediaPath);
 
 	// Handle the tags:
-	if (data.imageURL || data.downloadImg === true) {
-		await handleImageMetadata(file, data.downloadImg, data.imageURL);
+	if (imageURL || downloadImg) {
+		await handleImageMetadata(file, downloadImg, imageURL);
 
-		console.assert(
+		assert(
 			file.tag.pictures.length === 1,
 			"No pictures added!",
 			file.tag.pictures,
 		);
 	}
 
-	const newPathOfFile = data.title
-		? handleTitle(file, mediaPath, data.title)
+	const newPathOfFile = title
+		? handleTitle(file, mediaPath, title)
 		: emptyString;
 
-	if (data.albumArtists !== undefined)
-		handleAlbumArtists(file, data.albumArtists);
+	if (albumArtists !== undefined)
+		if (albumArtists instanceof Array)
+			file.tag.albumArtists = albumArtists as Mutable<string[]>;
+		else if (typeof albumArtists === "string")
+			file.tag.albumArtists = [albumArtists];
 
-	if (data.genres !== undefined) handleGenres(file, data.genres);
+	if (genres !== undefined) file.tag.genres = genres as Mutable<string[]>;
 
-	if (data.album !== undefined) handleAlbum(file, data.album);
+	if (album !== undefined) file.tag.album = album;
 
-	if (data.lyrics !== undefined) handleLyrics(file, data.lyrics);
+	if (lyrics !== undefined) file.tag.lyrics = lyrics;
 
 	dbg("New file tags =", file.tag);
 
@@ -326,11 +302,7 @@ export async function writeTags(
 	file.dispose();
 	//
 
-	await talkToClientSoItCanGetTheNewMedia(
-		newPathOfFile,
-		mediaPath,
-		data.isNewMedia,
-	);
+	await talkToClientSoItCanGetTheNewMedia(newPathOfFile, mediaPath, isNewMedia);
 }
 
 type WriteTagsData = Readonly<

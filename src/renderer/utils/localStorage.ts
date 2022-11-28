@@ -7,6 +7,8 @@ import type { History } from "@contexts/usePlaylists";
 import { assertUnreachable } from "./utils";
 import { dbgPlaylists } from "@common/debug";
 
+const { error } = console;
+
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -97,8 +99,8 @@ export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
 			default:
 				return assertUnreachable(key);
 		}
-	} catch (error) {
-		console.error(error);
+	} catch (err) {
+		error(err);
 		return undefined;
 	}
 }

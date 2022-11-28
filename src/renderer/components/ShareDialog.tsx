@@ -16,6 +16,7 @@ import { Loading } from "@components/Loading";
 import { dbg } from "@common/debug";
 import { t } from "@components/I18n";
 
+const { error, assert } = console;
 const { createServer } = electron.share;
 
 /////////////////////////////////////////
@@ -47,7 +48,7 @@ export function ShareDialog() {
 			if (canvas === null || isDialogOpen === false || server === null) return;
 
 			await makeQrcode(server.url).catch((err) => {
-				console.error("Error making QR Code.", err);
+				error("Error making QR Code.", err);
 				closePopover(server.close);
 			});
 		},
@@ -103,8 +104,8 @@ export function ShareDialog() {
 				const clientServerApi = createServer([...filesToShare]);
 
 				setServer(clientServerApi);
-			} catch (error) {
-				console.error(error);
+			} catch (err) {
+				error(err);
 				closePopover();
 			}
 		},
@@ -182,7 +183,7 @@ async function makeQrcode(url: QRCodeURL): Promise<void> {
 
 	const canvasElement = document.getElementById(qrID) as HTMLCanvasElement;
 
-	console.assert(canvasElement, "There is no canvas element!");
+	assert(canvasElement, "There is no canvas element!");
 
 	await toCanvas(canvasElement, url, { errorCorrectionLevel: "H", width: 300 });
 }

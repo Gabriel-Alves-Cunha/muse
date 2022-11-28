@@ -5,6 +5,7 @@ import { getLastExtension } from "@common/path";
 import { allowedMedias } from "@common/utils";
 import { time } from "@utils/utils";
 
+const { log } = console;
 const {
 	fs: { readDir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },
@@ -21,7 +22,7 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 		// Faster than regex:
 		if (!(file.type.includes("audio") || file.type.includes("video"))) continue;
 
-		console.log(file);
+		log(file);
 
 		supportedFiles.push(file);
 	}
@@ -34,20 +35,20 @@ export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
 ////////////////////////////////////////////////
 
 export const searchDirectoryResult = async (): Promise<readonly Path[]> =>
-	await time(
-		async () =>
-			(
-				await Promise.allSettled([
-					getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
-					getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
-					getFullPathOfFilesForFilesInThisDirectory(dirs.music),
-				])
-			)
-				.map((p) => (p.status === "fulfilled" ? p.value : false))
-				.filter(Boolean)
-				.flat() as readonly Path[],
-		"searchDirectoryResult",
-	);
+	await time(async () => {
+		const resoledPromises = await Promise.allSettled([
+			getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
+			getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
+			getFullPathOfFilesForFilesInThisDirectory(dirs.music),
+		]);
+
+		const paths: Path[] = [];
+
+		for (const resolved of resoledPromises)
+			if (resolved.status === "fulfilled") paths.push(...resolved.value);
+
+		return paths;
+	}, "searchDirectoryResult");
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

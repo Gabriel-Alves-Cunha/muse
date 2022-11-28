@@ -1,8 +1,7 @@
-import type { ClipboardExtended } from "./clipboardExtended";
+import type { ClipboardExtended } from "./preload/clipboardExtended";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
 import { clearLine, cursorTo } from "node:readline";
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -10,7 +9,6 @@ import { autoUpdater } from "electron-updater";
 import { error } from "node:console";
 import {
 	BrowserWindow,
-	Notification,
 	nativeImage,
 	MenuItem,
 	protocol,
@@ -22,7 +20,6 @@ import {
 
 import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
-import { emptyString } from "@common/empty";
 import { logoPath } from "./utils";
 import { dbg } from "@common/debug";
 import {
@@ -99,9 +96,11 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 			label: "Refresh Page",
 			submenu: [
 				{
-					click: () => window.reload(),
 					accelerator: "f5",
 					role: "reload",
+					click() {
+						window.reload();
+					},
 				},
 			],
 		}),
@@ -112,9 +111,11 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 			label: "Open/close Dev Tools",
 			submenu: [
 				{
-					click: () => window.webContents.toggleDevTools(),
 					role: "toggleDevTools",
 					accelerator: "f12",
+					click() {
+						window.webContents.toggleDevTools();
+					},
 				},
 			],
 		}),
@@ -125,7 +126,6 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 	/////////////////////////////////////////
 	/////////////////////////////////////////
 
-	// @ts-ignore => isDev is a globally defined boolean.
 	const url = isDev
 		? "http://localhost:3000"
 		: pathToFileURL(
@@ -149,8 +149,7 @@ app
 		// dock icon is clicked and there are no other windows open.
 		if (BrowserWindow.getAllWindows().length === 0) createElectronWindow();
 	})
-	.whenReady()
-	.then(async () => {
+	.on("ready", async () => {
 		// This is so Electron can load local media files:
 		protocol.registerFileProtocol("atom", (request, callback) => {
 			const url = request.url.substring(7);
@@ -163,7 +162,6 @@ app
 		// This method will be called when Electron has finished
 		// initialization and is ready to create browser windows.
 		// Some APIs can only be used after this event occurs:
-		// @ts-ignore => isDev is a globally defined boolean.
 		if (isDev) {
 			const devtoolsInstaller = await import("electron-devtools-installer");
 			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
@@ -200,61 +198,7 @@ app
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		// This is to make Electron show a notification
-		// when we copy a link to the clipboard:
-		try {
-			// This has to be imported after app is open.
-			const extendedClipboard = (await import("./clipboardExtended.js"))
-				.extendedClipboard as ClipboardExtended;
-
-			extendedClipboard
-				.on("text-changed", async () => {
-					const url = extendedClipboard.readText("clipboard");
-
-					if (!isUrlValid(url)) return;
-
-					const {
-						title,
-						thumbnails,
-						media: { artist = emptyString },
-					} = (await getBasicInfo(url)).videoDetails;
-
-					new Notification({
-						title: "Click to download this media as 'mp3'",
-						timeoutType: "never",
-						urgency: "normal",
-						icon: logoPath,
-						silent: true,
-						body: title,
-					})
-						.on("click", () => {
-							const downloadInfo: DownloadInfo = {
-								imageURL: thumbnails.at(-1)?.url ?? emptyString,
-								extension: "mp3",
-								artist,
-								title,
-								url,
-							};
-
-							// Send msg to ipcMain, wich in turn will relay to ipcRenderer:
-							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-							electronWindow!.webContents.send(
-								electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-								downloadInfo,
-							);
-
-							dbg("Clicked notification and sent data:", downloadInfo);
-						})
-						.show();
-				})
-				.startWatching();
-		} catch (e) {
-			error(e);
-		}
-
-		/////////////////////////////////////////
-
-		// This will immediately download an update,
+		// This will download an update,
 		// then install when the app quits.
 		setTimeout(
 			async () => await autoUpdater.checkForUpdatesAndNotify().catch(error),
@@ -269,61 +213,66 @@ app
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-// Relay message from electronWindow to ipcRenderer:
-ipcMain.on(
-	electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-	(_e, downloadValues: DownloadInfo) => {
-		dbg("ipcMain received data from electronWindow:", downloadValues);
+ipcMain
+	.on(
+		// Relay message from electronWindow to ipcRenderer:
+		electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+		(_, downloadValues: DownloadInfo) => {
+			dbg("ipcMain received data from electronWindow:", downloadValues);
 
-		ipcMain.emit(electronToReactMessage.CREATE_A_NEW_DOWNLOAD, downloadValues);
-	},
-);
+			ipcMain.emit(
+				electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+				downloadValues,
+			);
+		},
+	)
+	/////////////////////////////////////////
+	.on(
+		"notify",
+		(
+			event,
+			type: ValuesOf<typeof electronIpcMainProcessNotification>,
+		): void => {
+			const focusedWindow = BrowserWindow.getFocusedWindow();
 
-/////////////////////////////////////////
-/////////////////////////////////////////
+			switch (type) {
+				case electronIpcMainProcessNotification.QUIT_APP: {
+					app.quit();
+					break;
+				}
 
-ipcMain.on(
-	"notify",
-	(event, type: ValuesOf<typeof electronIpcMainProcessNotification>): void => {
-		switch (type) {
-			case electronIpcMainProcessNotification.QUIT_APP: {
-				app.quit();
-				break;
+				case electronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
+					if (!focusedWindow) break;
+
+					focusedWindow.isMaximized()
+						? focusedWindow.unmaximize()
+						: focusedWindow.maximize();
+					break;
+				}
+
+				case electronIpcMainProcessNotification.MINIMIZE: {
+					focusedWindow?.minimize();
+					break;
+				}
+
+				case electronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
+					focusedWindow?.webContents.toggleDevTools();
+					break;
+				}
+
+				case electronIpcMainProcessNotification.RELOAD_WINDOW: {
+					focusedWindow?.reload();
+					break;
+				}
+
+				default: {
+					error(
+						"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
+						event,
+					);
+
+					assertUnreachable(type);
+				}
 			}
-
-			case electronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
-				const focusedWindow = BrowserWindow.getFocusedWindow();
-				if (!focusedWindow) break;
-
-				focusedWindow.isMaximized()
-					? focusedWindow.unmaximize()
-					: focusedWindow.maximize();
-				break;
-			}
-
-			case electronIpcMainProcessNotification.MINIMIZE: {
-				BrowserWindow.getFocusedWindow()?.minimize();
-				break;
-			}
-
-			case electronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
-				BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools();
-				break;
-			}
-
-			case electronIpcMainProcessNotification.RELOAD_WINDOW: {
-				BrowserWindow.getFocusedWindow()?.reload();
-				break;
-			}
-
-			default: {
-				error(
-					"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
-					event,
-				);
-
-				assertUnreachable(type);
-			}
-		}
-	},
-);
+		},
+	);

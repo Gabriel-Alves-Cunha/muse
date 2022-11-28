@@ -79,12 +79,6 @@
 			"DOM"
 		]
 	},
-	"plugins": [
-		{
-			"functional": true, // test function type
-			"numeric": true // test `isNaN()` and `isFinite()`
-		}
-	],
 	"include": [
 		"tests",
 		"src"

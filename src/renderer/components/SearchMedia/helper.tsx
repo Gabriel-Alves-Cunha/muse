@@ -18,7 +18,7 @@ import { ImgWithFallback } from "@components/ImgWithFallback";
 import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyString } from "@common/empty";
-import { emptyArray } from "@utils/array";
+import { emptyArray } from "@common/empty";
 import { RightSlot } from "@components/ContextMenu/RightSlot";
 import { BaseInput } from "@components/BaseInput";
 import { t } from "@components/I18n";
@@ -157,12 +157,25 @@ const mantainFocusOnInput = (e: Event) => e.preventDefault();
 
 export function Results() {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
+	const resultsJSXs: JSX.Element[] = [];
 
 	/////////////////////////////////////////
 
 	const foundSomething = searchStatus === FOUND_SOMETHING;
 	const nothingFound = searchStatus === NOTHING_FOUND;
 	const shouldPopoverOpen = foundSomething || nothingFound;
+
+	/////////////////////////////////////////
+
+	for (const [path, media] of results)
+		resultsJSXs.push(
+			<MediaSearchRow
+				highlight={highlight}
+				media={media}
+				path={path}
+				key={path}
+			/>,
+		);
 
 	/////////////////////////////////////////
 
@@ -188,14 +201,7 @@ export function Results() {
 							Nothing was found for &quot;{searchTerm}&quot;
 						</div>
 					) : foundSomething ? (
-						results.map(([path, media]) => (
-							<MediaSearchRow
-								highlight={highlight}
-								media={media}
-								path={path}
-								key={path}
-							/>
-						))
+						resultsJSXs
 					) : undefined}
 				</PopoverContent>
 			</PopoverRoot>

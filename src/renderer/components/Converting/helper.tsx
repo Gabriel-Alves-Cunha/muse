@@ -24,6 +24,8 @@ import {
 
 import { handleSingleItemDeleteAnimation } from "../Downloading/styles";
 
+const { error, assert } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -131,7 +133,7 @@ export function createNewConvertion(
 
 		infoToast(info);
 
-		console.error(info, convertingList);
+		error(info, convertingList);
 		throw new Error(info);
 	}
 
@@ -184,7 +186,7 @@ export function cancelConversionAndOrRemoveItFromList(
 	const mediaBeingConverted = convertingList.get(path);
 
 	if (mediaBeingConverted === undefined)
-		return console.error(
+		return error(
 			`There should be a convertion with path "${path}"!\nconvertList =`,
 			convertingList,
 		);
@@ -218,7 +220,7 @@ function handleUpdateConvertingList(
 	// Assert that the download exists:
 	const thisConversion = convertingList.get(path);
 	if (thisConversion === undefined)
-		return console.error(
+		return error(
 			"Received a message from Electron but the path is not in the list!",
 		);
 
@@ -231,7 +233,7 @@ function handleUpdateConvertingList(
 	switch (data.status) {
 		case progressStatus.FAILED: {
 			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
-			console.assert(data.error, "data.error should exist!");
+			assert(data.error, "data.error should exist!");
 
 			errorToast(
 				`${t("toasts.conversionFailed")}${path}"! ${

@@ -18,6 +18,8 @@ import { doesPathExists } from "@main/preload/file";
 
 const { writeTags } = await import("@main/preload/media/mutate-metadata");
 
+const { error } = console;
+
 //////////////////////////////////////
 //////////////////////////////////////
 //////////////////////////////////////
@@ -84,8 +86,8 @@ describe("It should account for the switch possibilities and the message sending
 					await doesPathExists(mediaPath),
 					"There should be a mediaPath renamed back to it's original path before tests were run!",
 				).toBe(true);
-			} catch (error) {
-				console.error(error);
+			} catch (err) {
+				error(err);
 			}
 		}
 	});

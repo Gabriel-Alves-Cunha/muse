@@ -1,11 +1,14 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { AddressInfo } from "node:net";
 
+import { error } from "node:console";
 import Koa from "koa";
 
 import { myIp, unableToShareMediasError } from "./myIpAddress";
 import { router } from "./routes";
 import { dbg } from "@common/debug";
+
+const { log } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -16,9 +19,7 @@ import { dbg } from "@common/debug";
 export const app = new Koa()
 	.use(router.routes())
 	.use(router.allowedMethods())
-	.on("error", (err: Error) => {
-		throw err;
-	});
+	.on("error", error);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -26,14 +27,14 @@ export const app = new Koa()
 // Main function:
 
 export function createServer(filepaths: readonly Path[]): ClientServerAPI {
-	if (myIp.length === 0) throw unableToShareMediasError;
+	if (myIp.length === 0) throw new Error(unableToShareMediasError);
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
 
 	app.context["filepaths"] = filepaths;
 
-	console.log({ ctx: app.context });
+	log({ ctx: app.context });
 
 	let url = "" as QRCodeURL;
 	const server = app

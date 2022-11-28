@@ -16,6 +16,8 @@ import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
 import { t } from "@components/I18n";
 
+const { error } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -57,8 +59,8 @@ export function Downloading() {
 				{ type: reactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
 				electronPort,
 			);
-		} catch (error) {
-			console.error(error);
+		} catch (err) {
+			error(err);
 
 			errorToast(
 				`${t("toasts.downloadError.beforePath")}"${downloadInfo.title}"${t(

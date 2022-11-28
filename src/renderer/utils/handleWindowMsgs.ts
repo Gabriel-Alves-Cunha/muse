@@ -19,6 +19,7 @@ import {
 } from "@contexts/usePlaylists";
 
 const { transformPathsToMedias } = electron.media;
+const { log, error } = console;
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -29,7 +30,7 @@ function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
 
-	if (event.dataTransfer === null) return;
+	if (!event.dataTransfer) return;
 
 	event.dataTransfer.dropEffect = "copy";
 	// ^ Style the drag-and-drop as a "copy file" operation.
@@ -41,13 +42,13 @@ function listenToDropEvent(event: Readonly<DragEvent>): void {
 	event.stopPropagation();
 	event.preventDefault();
 
-	if (event.dataTransfer === null) return;
+	if (!event.dataTransfer) return;
 
 	const fileList = event.dataTransfer.files;
 	const files = getMediaFiles(fileList);
 
-	console.log({ fileList, files });
-	console.error("@TODO: handle these files droped!", files);
+	log({ fileList, files });
+	error("@TODO: handle these files droped!", files);
 }
 
 //////////////////////////////////////////
@@ -107,8 +108,8 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			const newMedia = newMediaInArray[0]?.[1];
 
-			if (newMedia === undefined) {
-				console.error(`Could not transform "${mediaPath}" to a media.`);
+			if (!newMedia) {
+				error(`Could not transform "${mediaPath}" to a media.`);
 				break;
 			}
 
@@ -124,7 +125,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
 			if (!getMainList().has(mediaPath)) {
-				console.error("Could not find media to delete.");
+				error("Could not find media to delete.");
 				break;
 			}
 
@@ -160,7 +161,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
 			if (!getMainList().has(mediaPath)) {
-				console.error(
+				error(
 					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
 				);
 				break;
@@ -173,7 +174,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		//////////////////////////////////////////
 
 		case ERROR: {
-			console.error("@TODO: ERROR", { error: msg.error });
+			error("@TODO: ERROR", { error: msg.error });
 
 			break;
 		}
@@ -181,7 +182,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 		//////////////////////////////////////////
 
 		default: {
-			console.error(
+			error(
 				`There is no method to handle this event.data: (${typeof msg}) '`,
 				msg,
 				"'\nEvent =",

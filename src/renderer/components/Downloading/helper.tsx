@@ -20,6 +20,8 @@ import {
 
 import { handleSingleItemDeleteAnimation } from "./styles";
 
+const { error, assert } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -127,7 +129,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		infoToast(info);
 
-		console.error(info, downloadingList);
+		error(info, downloadingList);
 		throw new Error(info);
 	}
 
@@ -184,7 +186,7 @@ function handleUpdateDownloadingList(
 	// Assert that the download exists:
 	const thisDownload = downloadingList.get(url);
 	if (thisDownload === undefined)
-		return console.error(
+		return error(
 			"Received a message from Electron but the url is not in the list!",
 		);
 
@@ -197,7 +199,7 @@ function handleUpdateDownloadingList(
 	switch (data.status) {
 		case progressStatus.FAILED: {
 			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
-			console.assert(data.error, "data.error should exist!");
+			assert(data.error, "data.error should exist!");
 
 			errorToast(
 				`${t("toasts.downloadError.beforePath")}"${thisDownload.title}"${t(
@@ -245,7 +247,7 @@ export function cancelDownloadAndOrRemoveItFromList(
 	const download = downloadingList.get(url);
 
 	if (download === undefined)
-		return console.error(
+		return error(
 			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
 			downloadingList,
 		);

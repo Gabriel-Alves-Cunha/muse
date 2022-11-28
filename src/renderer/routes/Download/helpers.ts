@@ -7,6 +7,7 @@ import { dbg } from "@common/debug";
 import { t } from "@components/I18n";
 
 const { getBasicInfo } = electron.media;
+const { error } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -69,16 +70,16 @@ export async function search(url: Readonly<string>): Promise<void> {
 		};
 
 		setSearchInfo({ isLoading: false, result });
-	} catch (error) {
+	} catch (err) {
 		setSearchInfo({
 			result: defaultSearchInfo.result,
 			isLoading: false,
-			error: getErrorMessage(error).includes("No video id found")
+			error: getErrorMessage(err).includes("No video id found")
 				? t("errors.noVideoIdFound")
 				: t("errors.gettingMediaInfo"),
 		});
 
-		console.error(error);
+		error(err);
 	}
 }
 

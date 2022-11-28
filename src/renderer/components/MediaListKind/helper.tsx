@@ -25,6 +25,8 @@ import {
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
+const { log } = console;
+
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -57,7 +59,7 @@ export function selectMediaByPointerEvent(
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
 
-	if (!mediaClickedMediaPath) return console.info("No 'data-path' found!");
+	if (!mediaClickedMediaPath) return log("No 'data-path' found!");
 
 	addToAllSelectedMedias(mediaClickedMediaPath);
 }

@@ -11,6 +11,8 @@ import { errorToast } from "@components/toasts";
 import { emptyMap } from "@common/empty";
 import { t } from "@components/I18n";
 
+const { error } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -34,14 +36,14 @@ export function Converting() {
 					{ type: reactToElectronMessage.CONVERT_MEDIA },
 					electronPort,
 				);
-			} catch (error) {
+			} catch (err) {
 				errorToast(
 					`${t("toasts.conversionError.beforePath")}"${path}"${t(
 						"toasts.conversionError.afterPath",
 					)}`,
 				);
 
-				console.error(error);
+				error(err);
 			}
 		}
 

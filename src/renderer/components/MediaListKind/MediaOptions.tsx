@@ -29,6 +29,8 @@ import { FlexRow } from "@components/FlexRow";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 
+const { log, error } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -238,8 +240,8 @@ function changeMediaMetadata(
 
 		if (hasAnythingChanged === true)
 			successToast(t("toasts.mediaMetadataSaved"));
-	} catch (error) {
-		console.error(error);
+	} catch (err) {
+		error(err);
 
 		errorToast(t("toasts.mediaMetadataNotSaved"));
 	}
@@ -294,10 +296,10 @@ function changeMetadataIfAllowed(
 
 						// If both arrays are equal by values, we don't need to change anything:
 						if (areArraysEqualByValue(newValueAsArray, oldValue)) {
-							console.log(
-								`Values of "${id}" are equal, not gonna change anything:`,
-								{ newValueAsArray, oldValue },
-							);
+							log(`Values of "${id}" are equal, not gonna change anything:`, {
+								newValueAsArray,
+								oldValue,
+							});
 							continue;
 						}
 

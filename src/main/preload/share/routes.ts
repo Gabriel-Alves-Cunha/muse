@@ -7,6 +7,8 @@ import Router from "koa-router";
 import { getBasenameAndLastExtension } from "@common/path";
 import { prettyPrintStringArray } from "@utils/array";
 
+const { log } = console;
+
 export const router = new Router();
 
 const mainUrlPath = "/download/medias/";
@@ -33,7 +35,7 @@ const downloadAll: Middleware = async (ctx, next) => {
 
 	<body>
 		<script>
-			console.log("Downloading medias...");
+log("Downloading medias...");
 
 			function getBasename(filename) {
 				return filename.split("\\U+005C").pop()?.split("/").pop()?.split(".")[0] ?? "";
@@ -79,9 +81,8 @@ router.get("/", downloadAll);
 const downloadOneByIndex: Middleware = async (ctx, next) => {
 	const filepaths: readonly Path[] = ctx["filepaths"];
 
-	console.log("filepaths from middleware downloadOneByIndex:", filepaths);
+	log("filepaths from middleware downloadOneByIndex:", filepaths);
 
-	// @ts-ignore => It's fine to access by dot notation:
 	const index = Number(ctx.params.index);
 
 	if (Number.isNaN(index))
@@ -110,8 +111,3 @@ const downloadOneByIndex: Middleware = async (ctx, next) => {
 };
 
 router.get(`${mainUrlPath}:index`, downloadOneByIndex);
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Types:

@@ -18,6 +18,8 @@ import {
 	History,
 } from "./usePlaylists";
 
+const { log, warn, error, info } = console;
+
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -102,7 +104,7 @@ export function playPreviousMedia(): void {
 		const { path, listType } = getCurrentPlaying();
 
 		if (path.length === 0)
-			return console.warn(
+			return warn(
 				"A media needs to be currently selected to play a previous media!",
 			);
 
@@ -113,7 +115,7 @@ export function playPreviousMedia(): void {
 		const history = sortHistoryByDate();
 
 		if (history.length < 2)
-			return console.error(
+			return error(
 				"There should be at least 2 medias on history to be able to play a previous media, but there isn't!",
 				history,
 			);
@@ -133,7 +135,7 @@ export function playNextMedia(): void {
 		const { path, listType } = getCurrentPlaying();
 
 		if (path.length === 0)
-			return console.info(
+			return info(
 				"A media needs to be currently selected to play a next media!",
 			);
 
@@ -174,7 +176,7 @@ export function playNextMedia(): void {
 		}
 
 		if (nextMediaPath.length === 0)
-			return console.warn("There should be a nextMediaPath, but there isn't!", {
+			return warn("There should be a nextMediaPath, but there isn't!", {
 				currentPlaying: getCurrentPlaying(),
 				nextMediaPath,
 				list,
@@ -252,9 +254,8 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
 	if (prevElements === null)
-		console.info(`No previous media row found for "${previousPath}!"`);
-	if (newElements === null)
-		return console.info(`No media row found for "${path}"!`);
+		info(`No previous media row found for "${previousPath}!"`);
+	if (newElements === null) return info(`No media row found for "${path}"!`);
 
 	// Undecorate previous playing media row:
 	if (previousPath.length !== 0 && prevElements !== null)

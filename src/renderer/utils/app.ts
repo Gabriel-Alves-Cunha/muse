@@ -1,3 +1,5 @@
+const { log } = console;
+
 // The order here is the order on the navbar:
 export const pages = [
 	"Home",
@@ -12,7 +14,7 @@ export const pages = [
 ////////////////////////////////////////////////
 
 export function resetAllAppData(): void {
-	console.log("Resetting all app data...");
+	log("Resetting all app data...");
 
 	localStorage.clear();
 }

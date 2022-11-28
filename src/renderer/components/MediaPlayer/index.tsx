@@ -19,6 +19,8 @@ import {
 	playNextMedia,
 } from "@contexts/useCurrentPlaying";
 
+const { log, error } = console;
+
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -65,7 +67,7 @@ export function MediaPlayer() {
 
 	useEffect(
 		function flipMediaPlayerCardToNormalPlayer() {
-			console.log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
+			log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
 
 			document.getElementById(mediaPlayerCardId)?.classList.remove("active");
 		},
@@ -177,8 +179,8 @@ const logInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
 const logAbort = (): void => dbg("Audio was aborted.");
 const logClose = (): void => dbg("Audio was closed.");
 const logSecurityPolicyViolation = (e: Readonly<Event>): void =>
-	console.error("Audio has a security policy violation:", e);
-const logError = (e: Readonly<Event>): void => console.error("Audio error:", e);
+	error("Audio has a security policy violation:", e);
+const logError = (e: Readonly<Event>): void => error("Audio error:", e);
 const logStalled = (e: Readonly<Event>): void =>
 	dbg(
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",

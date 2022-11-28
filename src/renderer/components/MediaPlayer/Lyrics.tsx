@@ -8,6 +8,7 @@ import { Header } from "./Header";
 import { t } from "@components/I18n";
 
 const { searchForLyricsAndImage } = electron.lyric;
+const { error } = console;
 
 /////////////////////////////////////////
 
@@ -69,11 +70,11 @@ export async function searchAndOpenLyrics(
 			],
 			mediaPath,
 		});
-	} catch (error) {
-		if ((error as Error).message.includes("No lyrics found"))
+	} catch (err) {
+		if ((err as Error).message.includes("No lyrics found"))
 			infoToast(`${t("toasts.noLyricsFound")}"${media.title}"!`);
 
-		console.error(error);
+		error(err);
 	}
 
 	if (media.lyrics.length > 0 && openLyrics === true)

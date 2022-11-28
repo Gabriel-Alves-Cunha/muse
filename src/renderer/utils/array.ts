@@ -1,13 +1,9 @@
-export const emptyArray: readonly never[] = [];
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-
 export function prettyPrintStringArray<T>(arr: readonly T[]): string {
-	const s = arr.map((item) => `"${item}"`).join(",");
+	const prettyStrings = [];
 
-	return `[${s}]`;
+	for (const item of arr) prettyStrings.push(`"${item}"`);
+
+	return `[${prettyStrings.join(",")}]`;
 }
 
 /////////////////////////////////////////////

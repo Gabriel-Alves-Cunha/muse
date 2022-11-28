@@ -5,7 +5,6 @@ import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
 import { App } from "./App";
 import "./i18n"; // Import translations on app root.
 
-// @ts-ignore => isDev is a globally defined boolean.
 if (isDev) {
 	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
 
@@ -19,10 +18,7 @@ if (isDev) {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const container = document.getElementById("root") as HTMLElement;
-const root = createRoot(container);
-
-root.render(
+createRoot(document.getElementById("root") as HTMLElement).render(
 	<StrictMode>
 		<App />
 	</StrictMode>,

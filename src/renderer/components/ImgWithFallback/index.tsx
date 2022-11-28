@@ -5,6 +5,8 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 import { ValuesOf } from "@common/@types/utils";
 
+const { error } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -44,7 +46,7 @@ export function ImgWithFallback({
 		};
 
 		img.onerror = (ev) => {
-			console.error("Failed image; going to erasing it...", {
+			error("Failed image; going to erasing it...", {
 				mediaPath,
 				mediaImg,
 				ev,

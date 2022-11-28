@@ -4,6 +4,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import { translations } from "./locales";
 
+const { error } = console;
+
 const i18nConfig: InitOptions = {
 	defaultNS: "translations", // Default namespace, we can use 'translations'.
 	resources: translations, // Our translations.
@@ -21,7 +23,7 @@ i18n
 	.use(LanguageDetector) // Uses the lang detector of your browser.
 	.use(initReactI18next) // Uses i18n's specific pkg for React.
 	.init(i18nConfig, (err) => {
-		if (err) console.error("Something went wrong loading translations!", err);
+		if (err) error("Something went wrong loading translations!", err);
 	}); // Uses our configuration.
 
 export default i18n;

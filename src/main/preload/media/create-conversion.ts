@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { Readable } from "node:stream";
 import type { Path } from "@common/@types/generalTypes";
@@ -16,8 +14,8 @@ import { sendMsgToClient } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
-import { dbg } from "@common/debug";
 import { dirs } from "@main/utils";
+import { dbg } from "@common/debug";
 
 const { error, log } = console;
 
@@ -124,7 +122,7 @@ export async function convertToAudio(
 			// timemark: the timestamp of the current frame in seconds
 
 			// To react:
-			if (interval === undefined) {
+			if (!interval) {
 				// ^ Only in the firt time this setInterval is called!
 				interval = setInterval(
 					() =>

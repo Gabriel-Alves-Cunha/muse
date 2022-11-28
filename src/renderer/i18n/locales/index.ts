@@ -5,6 +5,8 @@ import { pt_BR_Translations } from "./pt-BR";
 import { en_US_Translations } from "./en-US";
 import { getObjectDeepKeys } from "@utils/object";
 
+const { error } = console;
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -30,7 +32,7 @@ if (isDev) {
 	);
 
 	if (!areEqual)
-		console.error(
+		error(
 			{ pt_BR_TranslationsKeys, en_US_TranslationsKeys },
 			"Are translation keys the same?",
 			areEqual,

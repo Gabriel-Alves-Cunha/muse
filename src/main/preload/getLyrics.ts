@@ -5,14 +5,16 @@ import { stringifyJson } from "@common/utils";
 import { emptyString } from "@common/empty";
 import { dbg } from "@common/debug";
 
+const { error } = console;
+
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Constants:
 
 const headers = {
+	"x-happi-key": lyricApiKey ?? emptyString,
 	"content-type": "application/json",
-	"x-happi-key": lyricApiKey,
 };
 
 const method = "GET";
@@ -66,7 +68,7 @@ async function queryForPossibleLyric(
 		// Text to search:
 		q: `${mediaTitle}, ${mediaArtist}`,
 		// Return only tracks with lyrics:
-		lyrics: "1", // 1 for true, 0 for false.
+		lyrics: "1", // "1" for true, "0" for false.
 		// Limit (Max 50):
 		limit: "1",
 	}).toString();
@@ -112,7 +114,7 @@ async function queryForLyric(lyricURL: string): Promise<string> {
 	dbg({ queryForLyricJSONResponse: jsonRes });
 
 	if (jsonRes.success === false) {
-		console.error(jsonRes.error);
+		error(jsonRes.error);
 
 		return emptyString;
 	}

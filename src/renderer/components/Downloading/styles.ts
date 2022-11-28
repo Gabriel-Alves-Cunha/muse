@@ -9,13 +9,13 @@ export function handleSingleItemDeleteAnimation(
 	e: React.PointerEvent<HTMLButtonElement>,
 	downloadingOrConvertionIndex: number,
 	isDownloadList: boolean,
-	url: string
+	url: string,
 ): void {
 	const items = document.querySelectorAll(
-		boxClass
+		boxClass,
 	) as NodeListOf<HTMLDivElement>;
 	const itemClicked = (e.target as HTMLElement).closest(
-		boxClass
+		boxClass,
 	) as HTMLDivElement;
 
 	//////////////////////////////////////////

@@ -26,9 +26,5 @@ export const isBase64Image = (str: string): str is Base64 =>
 
 /////////////////////////////////////////
 
-console.log("VITE_LYRIC_API_KEY =", process.env.VITE_LYRIC_API_KEY);
-
-// TODO: I don't know how to put this api key in .env and get Vite+elecrun to pick it up!!
-export const lyricApiKey =
-	"1996d0wcfWZB02aebwtkAYhcnERFnAbOGlDiIPWDNdnh3K0955cZpHov";
-export const lyricsAPI = "https://api.happi.dev/v1/music";
+export const lyricApiKey = process.env.LYRIC_API_KEY;
+export const lyricsAPI = process.env.LYRIC_API;

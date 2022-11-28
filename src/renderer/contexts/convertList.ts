@@ -4,6 +4,8 @@ import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
+const { error } = console;
+
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -48,7 +50,7 @@ const testConvertingMedia: [Path, MediaBeingConverted][] = Array.from(
 			}
 
 			default:
-				console.error("Error: random1_5 is not in range [0, 5]", random1_5);
+				error("Error: random1_5 is not in range [0, 5]", random1_5);
 				status = progressStatus.SUCCESS;
 				break;
 		}

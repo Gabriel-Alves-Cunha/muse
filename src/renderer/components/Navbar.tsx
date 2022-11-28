@@ -55,19 +55,19 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 
 function ButtonsForPages() {
 	const currPage = usePage().page;
+	const buttons: JSX.Element[] = [];
 
-	return (
-		<div className="buttons-for-pages">
-			{pages.map((page) => (
-				<button
-					title={t("tooltips.goto") + t(`pages.${page}`)}
-					className={page === currPage ? "active" : ""}
-					onPointerUp={() => setPage({ page })}
-					key={page}
-				>
-					{icons[page]}
-				</button>
-			))}
-		</div>
-	);
+	for (const page of pages)
+		buttons.push(
+			<button
+				title={t("tooltips.goto") + t(`pages.${page}`)}
+				className={page === currPage ? "active" : ""}
+				onPointerUp={() => setPage({ page })}
+				key={page}
+			>
+				{icons[page]}
+			</button>,
+		);
+
+	return <div className="buttons-for-pages">{buttons}</div>;
 }
