@@ -2,11 +2,11 @@ import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { Readable } from "node:stream";
 import type { Path } from "@common/@types/generalTypes";
 
-import { createReadStream } from "node:fs";
+import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import {log, error} from "node:console";
 import sanitize from "sanitize-filename";
 
-import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { type AllowedMedias } from "@common/utils";
@@ -14,10 +14,10 @@ import { sendMsgToClient } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
+import { deleteFile } from "../file";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
 
-const { error, log } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -47,15 +47,13 @@ const mediasConverting: Map<Path, Readable> = new Map();
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export async function createOrCancelConvert(
-	args: CreateConversion,
-): Promise<void> {
+export function createOrCancelConvert(args: CreateConversion): void {
 	checkOrThrow(checkForPath(args));
 
 	if (!mediasConverting.has(args.path)) {
 		checkOrThrow(checkArgsToConvertToAudio(args));
 
-		return await convertToAudio(args);
+		convertToAudio(args).then();
 	} else if (args.destroy) mediasConverting.get(args.path)!.emit("destroy");
 }
 
@@ -67,7 +65,7 @@ export async function convertToAudio(
 	// (has to be) done before calling this function.
 	{ electronPort, toExtension, path }: CreateConversion,
 ): Promise<void> {
-	dbg(`Attempting to covert "${path}".`);
+	dbg(`Attempting to convert "${path}".`);
 
 	const titleWithExtension = sanitize(`${getBasename(path)}.${toExtension}`);
 
@@ -79,18 +77,17 @@ export async function convertToAudio(
 		const pathWithNewExtension = join(dirname(path), titleWithExtension);
 
 		// And that there already doesn't exists one:
-		if (
-			path.endsWith(toExtension!) ||
-			(await doesPathExists(pathWithNewExtension))
-		) {
-			const info = `File "${path}" already is "${toExtension}"! Conversion canceled.`;
+		if (path.endsWith(toExtension!) || existsSync(pathWithNewExtension)) {
+			const err = new Error(
+				`File "${path}" already is "${toExtension}"! Conversion canceled.`,
+			);
 
-			error(info);
+			error(err);
 
 			// Send a msg to the client that the download failed:
 			const msg: Partial<MediaBeingConverted> & { error: Error } = {
 				status: progressStatus.FAILED,
-				error: new Error(info),
+				error: err,
 			};
 			electronPort!.postMessage(msg);
 
@@ -142,11 +139,11 @@ export async function convertToAudio(
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("error", async (err) => {
+		.on("error", (err) => {
 			error(`Error converting file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
-			await deleteFile(saveSite);
+			deleteFile(saveSite).then();
 
 			// Tell the client the conversion threw an error:
 			const msg: Partial<MediaBeingConverted> & { error: Error } = {
@@ -165,7 +162,7 @@ export async function convertToAudio(
 				"Convertion threw an error. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				await doesPathExists(saveSite),
+				existsSync(saveSite),
 			);
 		})
 		/////////////////////////////////////////////
@@ -207,14 +204,14 @@ export async function convertToAudio(
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("destroy", async () => {
+		.on("destroy", () => {
 			log(
 				`%cDestroy was called on readStream for converter! path: ${path}`,
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
 
 			// Delete the file since it was canceled:
-			await deleteFile(saveSite);
+			deleteFile(saveSite).then();
 
 			// Tell the client the conversion was successfully canceled:
 			const msg: Partial<MediaBeingConverted> = {
@@ -224,8 +221,8 @@ export async function convertToAudio(
 
 			// Clean up:
 			mediasConverting.delete(path);
-			// I only found it to work when I send it with an Error:
 			readStream.destroy(
+				// I only found it to work when I send it with an Error:
 				new Error(
 					"This readStream is being destroyed because the ffmpeg is being destroyed.",
 				),
@@ -237,7 +234,7 @@ export async function convertToAudio(
 				"Convertion was destroyed. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				await doesPathExists(saveSite),
+				existsSync(saveSite),
 			);
 		})
 		/////////////////////////////////////////////

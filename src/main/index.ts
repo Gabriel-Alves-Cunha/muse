@@ -1,4 +1,3 @@
-import type { ClipboardExtended } from "./preload/clipboardExtended";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
@@ -58,7 +57,7 @@ let tray: Tray | undefined;
 
 /////////////////////////////////////////
 
-async function createElectronWindow(): Promise<BrowserWindow> {
+function createElectronWindow(): BrowserWindow {
 	const window = new BrowserWindow({
 		title: capitalizedAppName,
 		titleBarStyle: "hidden",
@@ -132,7 +131,7 @@ async function createElectronWindow(): Promise<BrowserWindow> {
 				resolve(app.getAppPath(), "..", "renderer", "index.html"),
 		  ).toString();
 
-	await window.loadURL(url);
+	window.loadURL(url).then();
 
 	return window;
 }
@@ -185,7 +184,7 @@ app
 
 		// This variable is needed to hold a reference to the window,
 		// so it doesn't get garbge collected:
-		electronWindow = await createElectronWindow();
+		electronWindow = createElectronWindow();
 
 		/////////////////////////////////////////
 		/////////////////////////////////////////

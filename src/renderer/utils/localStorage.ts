@@ -4,10 +4,11 @@ import type { PlayOptions } from "@contexts/usePlayOptions";
 import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
+
 import { assertUnreachable } from "./utils";
 import { dbgPlaylists } from "@common/debug";
+import { error } from "@utils/log";
 
-const { error } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

@@ -1,11 +1,12 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
+import { error } from "node:console";
+
 import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { stringifyJson } from "@common/utils";
 import { emptyString } from "@common/empty";
 import { dbg } from "@common/debug";
 
-const { error } = console;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -113,7 +114,7 @@ async function queryForLyric(lyricURL: string): Promise<string> {
 
 	dbg({ queryForLyricJSONResponse: jsonRes });
 
-	if (jsonRes.success === false) {
+	if (!jsonRes.success) {
 		error(jsonRes.error);
 
 		return emptyString;

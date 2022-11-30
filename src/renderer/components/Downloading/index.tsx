@@ -14,9 +14,9 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
 import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
+import { error } from "@utils/log";
 import { t } from "@components/I18n";
 
-const { error } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

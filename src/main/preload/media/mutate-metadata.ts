@@ -5,7 +5,9 @@ import type { Mutable } from "@common/@types/utils";
 import type { Tags } from "@common/@types/electron-window";
 
 import { readFile, rename } from "node:fs/promises";
+import { error, assert } from "node:console";
 import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
 import { get } from "node:https";
 import {
 	File as MediaFile,
@@ -19,13 +21,11 @@ import { getBasename, getLastExtension } from "@common/path";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { doesPathExists } from "../file";
 import { isBase64Image } from "@main/utils";
 import { emptyString } from "@common/empty";
 import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
 
-const { error, assert } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -92,7 +92,7 @@ async function handleImageMetadata(
 	/////////////////////////////////////////////
 
 	// else, it's an image file path
-	if (await doesPathExists(imageURL)) {
+	if (existsSync(imageURL)) {
 		const base64 = (await readFile(imageURL, { encoding: "base64" })) as Base64;
 
 		dbg({ base64 });
@@ -103,10 +103,10 @@ async function handleImageMetadata(
 
 /////////////////////////////////////////////
 
-export async function downloadThumbnail(
+export const downloadThumbnail = async (
 	url: Readonly<string>,
-): Promise<Picture[]> {
-	return new Promise((resolve, reject) =>
+): Promise<Picture[]> =>
+	new Promise((resolve, reject) =>
 		get(url, async (res) => {
 			const byteVector = await ByteVector.fromStream(res);
 			const mimeType = res.headers["content-type"] ?? emptyString;
@@ -115,7 +115,7 @@ export async function downloadThumbnail(
 				byteVector,
 				PictureType.Media,
 				mimeType,
-				"This thumbnail was download when this media was downloaded.",
+				"This thumbnail was downloaded with this media.",
 			);
 
 			dbg("Header of thumbnail download and picture =", { res, picture });
@@ -126,7 +126,6 @@ export async function downloadThumbnail(
 			return reject(e);
 		}),
 	);
-}
 
 /////////////////////////////////////////////
 
@@ -150,7 +149,7 @@ export function createAndSaveImageOnMedia(
 		ByteVector.fromBase64String(txtForByteVector),
 		PictureType.Media,
 		mimeType,
-		"This image was download when this media was downloaded.",
+		"This image was downloaded with this media.",
 	);
 
 	file.tag.pictures = [picture];
@@ -226,9 +225,9 @@ async function talkToClientSoItCanGetTheNewMedia(
 		} finally {
 			dbg(
 				"Was file renamed?",
-				await doesPathExists(newPathOfFile),
+				existsSync(newPathOfFile),
 				"Does old file remains?",
-				await doesPathExists(mediaPath),
+				existsSync(mediaPath),
 			);
 		}
 	/////////////////////////////////////////////
@@ -278,9 +277,7 @@ export async function writeTags(
 		);
 	}
 
-	const newPathOfFile = title
-		? handleTitle(file, mediaPath, title)
-		: emptyString;
+	const newFilePath = title ? handleTitle(file, mediaPath, title) : emptyString;
 
 	if (albumArtists !== undefined)
 		if (albumArtists instanceof Array)
@@ -302,7 +299,7 @@ export async function writeTags(
 	file.dispose();
 	//
 
-	await talkToClientSoItCanGetTheNewMedia(newPathOfFile, mediaPath, isNewMedia);
+	await talkToClientSoItCanGetTheNewMedia(newFilePath, mediaPath, isNewMedia);
 }
 
 type WriteTagsData = Readonly<

@@ -9,6 +9,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 
 import { setSettings, useSettings } from "@contexts/settings";
 import { isAModifierKeyPressed } from "@utils/keyboard";
+import { error, assert } from "@utils/log";
 import { BlurOverlay } from "./BlurOverlay";
 import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
@@ -16,7 +17,6 @@ import { Loading } from "@components/Loading";
 import { dbg } from "@common/debug";
 import { t } from "@components/I18n";
 
-const { error, assert } = console;
 const { createServer } = electron.share;
 
 /////////////////////////////////////////

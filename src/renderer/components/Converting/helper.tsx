@@ -11,6 +11,7 @@ import { assertUnreachable } from "@utils/utils";
 import { isDownloadList } from "@components/Downloading/helper";
 import { progressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
+import { error, assert } from "@utils/log";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
 import { emptyMap } from "@common/empty";
@@ -24,7 +25,6 @@ import {
 
 import { handleSingleItemDeleteAnimation } from "../Downloading/styles";
 
-const { error, assert } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -25,11 +25,11 @@ import { t, Translator } from "@components/I18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { deleteFile } from "@utils/deleteFile";
+import { log, error } from "@utils/log";
 import { FlexRow } from "@components/FlexRow";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 
-const { log, error } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -1,4 +1,4 @@
-const { log } = console;
+import { log } from "@utils/log";
 
 const logPlaylists = process.env.DEBUG?.includes("muse:playlists");
 const logGeneralDebug = process.env.DEBUG?.includes("muse");

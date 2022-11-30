@@ -1,16 +1,16 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import type { MediaBeingDownloaded } from "@components/Downloading";
 import type { AllowedMedias } from "@common/utils";
 import type { MediaUrl } from "@contexts/downloadList";
 import type { Readable } from "node:stream";
 
 import { cursorTo, clearLine } from "node:readline";
+import { error, log } from"node:console";
+import { existsSync } from "node:fs";
+import { stdout } from"node:process";
 import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { deleteFile, doesPathExists } from "../file";
 import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
@@ -18,11 +18,11 @@ import { progressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
+import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
 
-const { error, log } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -55,15 +55,13 @@ const currentDownloads: Map<MediaUrl, Readable> = new Map();
 /////////////////////////////////////////////
 // Entry function:
 
-export async function createOrCancelDownload(
-	args: CreateDownload,
-): Promise<void> {
+export function createOrCancelDownload(args: CreateDownload): void {
 	checkOrThrow(checkForURL(args));
 
 	if (!currentDownloads.has(args.url)) {
 		checkOrThrow(checkArgsToCreateDownload(args));
 
-		return await createDownload(args);
+		createDownload(args).then();
 	} else if (args.destroy) currentDownloads.get(args.url)!.emit("destroy");
 }
 
@@ -88,15 +86,17 @@ export async function createDownload(
 	const saveSite = join(dirs.music, titleWithExtension);
 
 	// Assert file doesn't already exists:
-	if (await doesPathExists(saveSite)) {
-		const info = `File "${saveSite}" already exists! Canceling download.`;
+	if (existsSync(saveSite)) {
+		const err = new Error(
+			`File "${saveSite}" already exists! Canceling download.`,
+		);
 
-		error(info);
+		error(err);
 
 		// Send a msg to the client that the download failed:
 		const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
 			status: progressStatus.FAILED,
-			error: new Error(info),
+			error: err,
 		};
 		electronPort!.postMessage(msg);
 
@@ -117,7 +117,7 @@ export async function createDownload(
 
 	// ytdl will 'end' the stream for me.
 	const readStream = ytdl(url, {
-		requestOptions: { maxRetries: 0 },
+		requestOptions: { maxRetries: 1 },
 		quality: "highestaudio",
 	})
 		/////////////////////////////////////////////
@@ -155,10 +155,10 @@ export async function createDownload(
 					secondsDownloading
 				).toFixed(2);
 
-				cursorTo(process.stdout, 0);
-				clearLine(process.stdout, 0);
+				cursorTo(stdout, 0);
+				clearLine(stdout, 0);
 
-				process.stdout.write(
+				stdout.write(
 					`${percentage.toFixed(2)}% downloaded, (${prettyBytes(
 						downloaded,
 					)} / ${prettyTotal}). Running for: ${secondsDownloading.toFixed(
@@ -194,7 +194,7 @@ export async function createDownload(
 				"Download was destroyed. Deleting stream from currentDownloads:",
 				currentDownloads,
 				"Does the downloaded file still exists?",
-				await doesPathExists(saveSite),
+				existsSync(saveSite),
 			);
 		})
 		/////////////////////////////////////////////
@@ -212,17 +212,13 @@ export async function createDownload(
 			electronPort!.postMessage(msg);
 
 			// Download media image and put it on the media metadata:
-			try {
-				await writeTags(saveSite, {
-					albumArtists: [artist],
-					imageURL: imageURL!,
-					downloadImg: true,
-					isNewMedia: true,
-					title: title!,
-				});
-			} catch (err) {
-				error(err);
-			}
+			await writeTags(saveSite, {
+				albumArtists: [artist],
+				imageURL: imageURL!,
+				downloadImg: true,
+				isNewMedia: true,
+				title: title!,
+			}).catch(error);
 
 			// Tell client to add a new media...
 			sendMsgToClient({
@@ -260,7 +256,7 @@ export async function createDownload(
 				"Download threw an error. Deleting stream from currentDownloads:",
 				currentDownloads,
 				"Does the downloaded file still exists?",
-				await doesPathExists(saveSite),
+				existsSync(saveSite),
 			);
 		});
 

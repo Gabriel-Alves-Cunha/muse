@@ -7,6 +7,7 @@ import type {
 
 import { contextBridge, ipcRenderer, Notification } from "electron";
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
+import { error } from "node:console";
 
 import { electronToReactMessage, reactToElectronMessage } from "@common/enums";
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
@@ -38,9 +39,6 @@ import {
 	readDir,
 } from "./preload/file";
 
-const { error } = console;
-
-dbg("electron process.env.LYRIC_API_KEY =", process.env.LYRIC_API_KEY);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

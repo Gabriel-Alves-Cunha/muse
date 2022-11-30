@@ -9,9 +9,9 @@ import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "@components/toasts";
 import { emptyMap } from "@common/empty";
+import { error } from "@utils/log";
 import { t } from "@components/I18n";
 
-const { error } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

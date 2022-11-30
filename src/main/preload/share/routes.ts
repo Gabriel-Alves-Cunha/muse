@@ -2,12 +2,12 @@ import type { Middleware } from "koa";
 import type { Path } from "@common/@types/generalTypes";
 
 import { createReadStream } from "node:fs";
+import {log} from "node:console";
 import Router from "koa-router";
 
 import { getBasenameAndLastExtension } from "@common/path";
 import { prettyPrintStringArray } from "@utils/array";
 
-const { log } = console;
 
 export const router = new Router();
 
@@ -85,7 +85,7 @@ const downloadOneByIndex: Middleware = async (ctx, next) => {
 
 	const index = Number(ctx.params.index);
 
-	if (Number.isNaN(index))
+	if (isNaN(index))
 		throw new Error(`Index not present on params. index = ${index}.`);
 
 	const filePath = filepaths[index];

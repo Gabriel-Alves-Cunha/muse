@@ -5,7 +5,6 @@ import { homedir } from "node:os";
 
 // This path has to be like this because of the bundling
 // process. This way it handles both cases: dev and prod.
-// @ts-ignore => isDev is a globally defined boolean.
 export const logoPath = isDev
 	? resolve("src", "renderer", "assets", "icons", "logo.png")
 	: resolve("muse.png");

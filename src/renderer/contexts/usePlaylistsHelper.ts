@@ -4,8 +4,8 @@ import type { Path } from "@common/@types/generalTypes";
 import { getLastExtension } from "@common/path";
 import { allowedMedias } from "@common/utils";
 import { time } from "@utils/utils";
+import { log } from "@utils/log";
 
-const { log } = console;
 const {
 	fs: { readDir, getFullPathOfFilesForFilesInThisDirectory },
 	os: { dirs },

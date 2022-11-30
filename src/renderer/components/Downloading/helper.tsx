@@ -5,11 +5,12 @@ import type { ValuesOf } from "@common/@types/utils";
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 
 import { errorToast, infoToast, successToast } from "@components/toasts";
+import { Progress, progressIcons } from "@components/Progress";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { progressStatus } from "@common/enums";
 import { t, Translator } from "@components/I18n";
-import { Progress, progressIcons } from "@components/Progress";
+import { error, assert } from "@utils/log";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 import {
@@ -20,7 +21,6 @@ import {
 
 import { handleSingleItemDeleteAnimation } from "./styles";
 
-const { error, assert } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

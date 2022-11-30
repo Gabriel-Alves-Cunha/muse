@@ -10,6 +10,7 @@ import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
 import { emptyString } from "@common/empty";
+import { log, error } from "@utils/log";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
 import { dbg } from "@common/debug";
@@ -19,7 +20,6 @@ import {
 	playNextMedia,
 } from "@contexts/useCurrentPlaying";
 
-const { log, error } = console;
 
 ///////////////////////////////////////
 ///////////////////////////////////////

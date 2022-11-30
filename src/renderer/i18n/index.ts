@@ -3,8 +3,8 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import { translations } from "./locales";
+import { error } from "@utils/log";
 
-const { error } = console;
 
 const i18nConfig: InitOptions = {
 	defaultNS: "translations", // Default namespace, we can use 'translations'.

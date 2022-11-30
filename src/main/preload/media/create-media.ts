@@ -1,5 +1,6 @@
 import type { Base64, Media, Path } from "@common/@types/generalTypes";
 
+import { error, groupEnd, groupCollapsed } from "node:console";
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { statSync } from "node:fs";
 
@@ -8,8 +9,6 @@ import { emptyString } from "@common/empty";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
 import { dbg } from "@common/debug";
-
-const { error, groupEnd, groupCollapsed } = console;
 
 /////////////////////////////////////////////
 
@@ -20,9 +19,9 @@ const randomColor = randomBackgroundColorForConsole();
 /////////////////////////////////////////////
 
 async function createMedia(
-	path: Readonly<Path>,
-	assureMediaSizeIsGreaterThan60KB: Readonly<boolean>,
-	ignoreMediaWithLessThan60Seconds: Readonly<boolean>,
+	path: Path,
+	assureMediaSizeIsGreaterThan60KB: boolean,
+	ignoreMediaWithLessThan60Seconds: boolean,
 ): Promise<readonly [Path, Media]> {
 	return new Promise((resolve, reject) => {
 		const basename = getBasename(path);
@@ -46,14 +45,14 @@ async function createMedia(
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////
 
-			if (ignoreMediaWithLessThan60Seconds === true && durationInSeconds < 60)
+			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60)
 				return reject(
 					`Skipping "${path}" because the duration is ${durationInSeconds.toPrecision(
 						2,
 					)} s (less than 60 s)!`,
 				);
 
-			if (assureMediaSizeIsGreaterThan60KB === true && length < 60_000)
+			if (assureMediaSizeIsGreaterThan60KB && length < 60_000)
 				return reject(
 					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`,
 				);
@@ -73,7 +72,7 @@ async function createMedia(
 
 			const media: Media = {
 				image:
-					picture !== undefined && mimeType
+					picture && mimeType
 						? (`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64)
 						: emptyString,
 				duration: formatDuration(durationInSeconds),
@@ -88,7 +87,7 @@ async function createMedia(
 
 			dbg(`%c${basename}`, randomColor(), { media, picture, mimeType, error });
 
-			return resolve([path, media]);
+			resolve([path, media]);
 		}, `createMedia('${basename}')`);
 	});
 }

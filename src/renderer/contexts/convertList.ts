@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
-const { error } = console;
+import { error } from "@utils/log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

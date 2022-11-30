@@ -1,4 +1,4 @@
-const { log } = console;
+import { log } from "@utils/log";
 
 // The order here is the order on the navbar:
 export const pages = [

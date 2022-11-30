@@ -1,11 +1,12 @@
 import type { Media, Page } from "@common/@types/generalTypes";
 
+
 import { areArraysEqualByValue } from "@utils/array";
 import { pt_BR_Translations } from "./pt-BR";
 import { en_US_Translations } from "./en-US";
 import { getObjectDeepKeys } from "@utils/object";
+import { error } from "@utils/log";
 
-const { error } = console;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

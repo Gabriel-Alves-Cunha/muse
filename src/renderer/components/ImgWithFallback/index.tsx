@@ -4,8 +4,7 @@ import { reactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 import { ValuesOf } from "@common/@types/utils";
-
-const { error } = console;
+import { error } from "@utils/log";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -45,7 +44,7 @@ export function ImgWithFallback({
 			img = null;
 		};
 
-		img.onerror = (ev) => {
+		img.onerror = ev => {
 			error("Failed image; going to erasing it...", {
 				mediaPath,
 				mediaImg,

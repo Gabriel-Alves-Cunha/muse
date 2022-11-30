@@ -2,8 +2,8 @@ import { vi } from "vitest";
 
 import { getObjectLength, withoutProperty } from "@utils/object";
 import { stringifyJson } from "@common/utils";
+import { log } from "@utils/log";
 
-const { log } = console;
 
 // Mocking window.localStorage
 class LocalStorageMock {

@@ -23,7 +23,7 @@ function getMyIpAddress(): Readonly<string> {
 			.filter((item) => !item?.internal && item?.family === "IPv4")
 			.find(Boolean)?.address ?? "";
 
-	if (myIp.length === 0) throw new Error(unableToShareMediasError);
+	if (!myIp) throw new Error(unableToShareMediasError);
 
 	return myIp;
 }

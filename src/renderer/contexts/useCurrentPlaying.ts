@@ -6,6 +6,7 @@ import create from "zustand";
 
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getRandomInt, time } from "@utils/utils";
+import { warn, error, info } from "@utils/log";
 import { getPlayOptions } from "./usePlayOptions";
 import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
@@ -17,8 +18,6 @@ import {
 	getMainList,
 	History,
 } from "./usePlaylists";
-
-const { log, warn, error, info } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

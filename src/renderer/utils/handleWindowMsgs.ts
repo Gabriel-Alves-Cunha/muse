@@ -1,6 +1,7 @@
 import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
+
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { electronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
@@ -8,6 +9,7 @@ import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
 import { emptyString } from "@common/empty";
+import { log, error } from "@utils/log";
 import { deleteFile } from "./deleteFile";
 import { dbg } from "@common/debug";
 import {
@@ -19,7 +21,6 @@ import {
 } from "@contexts/usePlaylists";
 
 const { transformPathsToMedias } = electron.media;
-const { log, error } = console;
 
 //////////////////////////////////////////
 //////////////////////////////////////////

@@ -1,14 +1,15 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
+
 import { reactToElectronMessage } from "@common/enums";
 import { mediaPlayerCardId } from "@components/FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { infoToast } from "@components/toasts";
 import { Header } from "./Header";
+import { error } from "@utils/log";
 import { t } from "@components/I18n";
 
 const { searchForLyricsAndImage } = electron.lyric;
-const { error } = console;
 
 /////////////////////////////////////////
 

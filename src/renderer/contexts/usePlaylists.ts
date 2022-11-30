@@ -8,24 +8,24 @@ import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
 import { getFromLocalStorage, keys } from "@utils/localStorage";
 import { assertUnreachable, time } from "@utils/utils";
+import { emptyMap, emptySet } from "@common/empty";
+import { playlistList } from "@common/enums";
+import { dbgPlaylists } from "@common/debug";
+import { error, warn } from "@utils/log";
+import { getSettings } from "@contexts/settings";
+import { getFirstKey } from "@utils/map-set";
 import {
 	getAllSelectedMedias,
 	setAllSelectedMedias,
 } from "./useAllSelectedMedias";
-import { emptyMap, emptySet } from "@common/empty";
-import { dbgPlaylists } from "@common/debug";
-import { getSettings } from "@contexts/settings";
-import { getFirstKey } from "@utils/map-set";
 import {
 	searchDirectoryResult,
 	getAllowedMedias,
 	sortByDate,
 	sortByName,
 } from "./usePlaylistsHelper";
-import { playlistList } from "@common/enums";
 
 const { transformPathsToMedias } = electron.media;
-const { error, warn } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

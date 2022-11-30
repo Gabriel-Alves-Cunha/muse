@@ -1,11 +1,11 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { readdir, unlink, access } from "node:fs/promises";
+import { readdir, unlink } from "node:fs/promises";
 import { join } from "node:path";
+import {error} from "node:console";
 
 import { emptyArray } from "@common/empty";
 
-const { error } = console;
 
 ///////////////////////////////////////////
 ///////////////////////////////////////////
@@ -44,13 +44,4 @@ export async function deleteFile(path: Path): Promise<boolean> {
 			error(err);
 			return false;
 		});
-}
-
-///////////////////////////////////////////
-
-/** Infallible async function. */
-export async function doesPathExists(path: Path): Promise<boolean> {
-	return access(path)
-		.then(() => true)
-		.catch(() => false);
 }

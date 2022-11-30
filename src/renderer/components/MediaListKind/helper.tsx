@@ -7,15 +7,16 @@ import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { memo } from "react";
 import create from "zustand";
 
-import {
-	electronIpcMainProcessNotification,
-	playlistList,
-} from "@common/enums";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { DialogTrigger } from "@components/DialogTrigger";
+import { log } from "@utils/log";
 import { t } from "@components/I18n";
+import {
+	electronIpcMainProcessNotification,
+	playlistList,
+} from "@common/enums";
 import {
 	addToAllSelectedMedias,
 	getAllSelectedMedias,
@@ -25,7 +26,6 @@ import {
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
 
-const { log } = console;
 
 /////////////////////////////////////////
 /////////////////////////////////////////

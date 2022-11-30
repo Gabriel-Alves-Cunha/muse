@@ -3,11 +3,11 @@ import create from "zustand";
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { emptyString } from "@common/empty";
+import { error } from "@utils/log";
 import { dbg } from "@common/debug";
 import { t } from "@components/I18n";
 
 const { getBasicInfo } = electron.media;
-const { error } = console;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
