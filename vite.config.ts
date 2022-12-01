@@ -4,7 +4,7 @@
 import { type UserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
 import { resolve } from "node:path";
-import react from "@vitejs/plugin-react";
+import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig(({ mode }) => {
 	const isDevelopment = mode === "development";
@@ -38,9 +38,9 @@ export default defineConfig(({ mode }) => {
 					"import.meta.vitest": "undefined",
 					isDev: isDevelopment,
 			  },
+		plugins: [solidPlugin()],
 		server: { port: 3_000 },
 		root: "./src/renderer",
-		plugins: [react()],
 		base: "./",
 
 		resolve: {
@@ -50,10 +50,9 @@ export default defineConfig(({ mode }) => {
 					replacement: resolve("src/renderer/components"),
 				},
 				{ find: "@contexts", replacement: resolve("src/renderer/contexts") },
-				{ find: "@modules", replacement: resolve("src/renderer/modules") },
 				{ find: "@assets", replacement: resolve("src/renderer/assets") },
-				{ find: "@styles", replacement: resolve("src/renderer/styles") },
 				{ find: "@routes", replacement: resolve("src/renderer/routes") },
+				{ find: "@icons", replacement: resolve("src/renderer/icons") },
 				{ find: "@utils", replacement: resolve("src/renderer/utils") },
 				{ find: "@hooks", replacement: resolve("src/renderer/hooks") },
 				{ find: "@renderer", replacement: resolve("src/renderer") },

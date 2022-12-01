@@ -1,15 +1,15 @@
-import { createRoot } from "react-dom/client";
-import { StrictMode } from "react";
+import { I18nContext } from "@solid-primitives/i18n";
+import { Router } from "@solidjs/router";
+import { render } from "solid-js/web";
 
 import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
+import { lang } from "./i18n";
 import { App } from "./App";
-import "./i18n"; // Import translations on app root.
 
 if (isDev) {
 	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
 
-	// @ts-ignore => Setting Virtuoso log level
-	// globalThis.VIRTUOSO_LOG_LEVEL = LogLevel.DEBUG;
+	setTimeout(() => window.runtimeGlobalsChecker.getRuntimeGlobals(), 5_000);
 
 	// document.designMode = "on";
 }
@@ -18,8 +18,13 @@ if (isDev) {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-createRoot(document.getElementById("root") as HTMLElement).render(
-	<StrictMode>
-		<App />
-	</StrictMode>,
+render(
+	() => (
+		<Router>
+			<I18nContext.Provider value={lang}>
+				<App />
+			</I18nContext.Provider>
+		</Router>
+	),
+	document.getElementById("root") as HTMLElement
 );

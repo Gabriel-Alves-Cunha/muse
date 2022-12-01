@@ -1,6 +1,6 @@
 import { Translations } from ".";
 
-export const en_US_Translations: Translations = Object.freeze({
+export const en_US_Translations: Translations = {
 	translations: {
 		dialogs: {
 			mediaOptions: {
@@ -142,4 +142,4 @@ export const en_US_Translations: Translations = Object.freeze({
 			home: "List of all audios",
 		},
 	},
-});
+} as const;

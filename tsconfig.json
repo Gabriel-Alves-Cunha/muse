@@ -8,6 +8,7 @@
 		"exactOptionalPropertyTypes": true,
 		"noUncheckedIndexedAccess": true,
 		"experimentalDecorators": false,
+		"jsxImportSource": "solid-js",
 		"strictFunctionTypes": true,
 		"strictBindCallApply": true,
 		"noUnusedParameters": true,
@@ -26,14 +27,15 @@
 		"sourceMap": false,
 		"target": "ESNext",
 		"module": "ESNext",
-		"jsx": "react-jsx",
+		"jsx": "preserve",
 		"baseUrl": "./",
 		"allowJs": true,
 		"checkJs": true,
 		"pretty": true,
 		"strict": true,
 		"types": [
-			"vitest/importMeta"
+			"vitest/importMeta",
+			"vite/client"
 		],
 		"paths": {
 			"@components/*": [
@@ -41,12 +43,6 @@
 			],
 			"@contexts/*": [
 				"src/renderer/contexts/*"
-			],
-			"@modules/*": [
-				"src/renderer/modules/*"
-			],
-			"@styles/*": [
-				"src/renderer/styles/*"
 			],
 			"@routes/*": [
 				"src/renderer/routes/*"
@@ -59,6 +55,9 @@
 			],
 			"@hooks/*": [
 				"src/renderer/hooks/*"
+			],
+			"@icons/*": [
+				"src/renderer/icons/*"
 			],
 			"@renderer/*": [
 				"src/renderer/*"

@@ -251,6 +251,41 @@
 	/* ********************************** */
 	/* ********************************** */
 
+	/* Close button */
+
+	.dialog-close-button {
+		@apply absolute rounded-full w-4 h-4 flex justify-center items-center;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Dialog */
+
+	.dialog {
+		@apply relative;
+	}
+
+	/* Dialog overlay */
+	.dialog::backdrop {
+		@apply opacity-75 bg-black;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Overlay */
+
+	.overlay {
+		@apply absolute w-screen h-screen opacity-75 bg-black pointer-events-none;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
 	/* Grid */
 
 	.grid-area-media-player {

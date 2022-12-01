@@ -1,86 +1,55 @@
-import { ToastContainer } from "react-toastify";
+import { Component, createSignal } from "solid-js";
 
-import { DecorationsDown, DecorationsTop } from "@components/Decorations";
+import { Routes, Route } from "@solidjs/router";
+import { Toaster } from "solid-toast";
+import { lazy } from "solid-js";
+
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
-import { MainGridContainer } from "@components/MainGridContainer";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
-import { ContextMenu } from "@components/ContextMenu";
-import { MediaPlayer } from "@components/MediaPlayer";
-import { ShareDialog } from "@components/ShareDialog";
-import { Favorites } from "@routes/Favorites";
-import { Download } from "@routes/Download";
-import { History } from "@routes/History";
-import { usePage } from "@contexts/page";
-import { Convert } from "@routes/Convert";
-import { Navbar } from "@components/Navbar";
-import { Home } from "@routes/Home";
+import { Dialog } from "@components/Dialog";
 
-import "react-toastify/dist/ReactToastify.min.css";
+const Home = lazy(() => import("./pages/Home"));
 
-//////////////////////////////////////////
-//////////////////////////////////////////
-//////////////////////////////////////////
-// Main function:
+export const App: Component = () => {
+	const [isOpen, setIsOpen] = createSignal(true);
 
-export function App() {
 	return (
 		<>
-			<ToastContainer
-				hideProgressBar={false}
+			<Toaster
 				position="top-right"
-				autoClose={5_000}
-				pauseOnFocusLoss
-				closeOnClick
-				pauseOnHover
-				newestOnTop
-				draggable
+				gutter={8}
+				toastOptions={{
+					// Add a delay before the toast is removed
+					// This can be used to time the toast exit animation
+					unmountDelay: 200,
+					duration: 5_000,
+				}}
 			/>
 
-			<ShareDialog />
+			<Dialog isOpen={isOpen()} onOpenChange={setIsOpen}>
+				Oi
+			</Dialog>
+
+			{/* <ShareDialog />
 
 			<DecorationsTop />
 
 			<ContextMenu>
-				<Main />
+			<MainGridContainer>
+				<Navbar />
+
+				<Routes>
+					<Route path="/" component={Home} />
+				</Routes>
+
+				<MediaPlayer />
+			</MainGridContainer>
 			</ContextMenu>
 
-			<DecorationsDown />
+			<DecorationsDown /> */}
 		</>
 	);
-}
-
-//////////////////////////////////////////
-//////////////////////////////////////////
-//////////////////////////////////////////
-// Helper functions:
-
-function Main() {
-	return (
-		<MainGridContainer>
-			<Navbar />
-
-			<PageToShow />
-
-			<MediaPlayer />
-		</MainGridContainer>
-	);
-}
-
-//////////////////////////////////////////
-
-const pages = {
-	Favorites: <Favorites />,
-	Download: <Download />,
-	Convert: <Convert />,
-	History: <History />,
-	Home: <Home />,
-} as const;
-
-function PageToShow() {
-	const { page } = usePage();
-
-	return pages[page];
-}
+};
 
 //////////////////////////////////////////
 //////////////////////////////////////////

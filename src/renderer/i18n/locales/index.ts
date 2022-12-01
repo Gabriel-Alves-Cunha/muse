@@ -1,12 +1,10 @@
 import type { Media, Page } from "@common/@types/generalTypes";
 
-
 import { areArraysEqualByValue } from "@utils/array";
 import { pt_BR_Translations } from "./pt-BR";
 import { en_US_Translations } from "./en-US";
 import { getObjectDeepKeys } from "@utils/object";
 import { error } from "@utils/log";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -15,15 +13,14 @@ import { error } from "@utils/log";
 
 // Make sure to use the apropriate abreviations!!
 // https://support.mozilla.org/pt-BR/kb/abreviacao-de-localizacao
-export const translations = Object.freeze({
+export const translations = {
 	"pt-BR": pt_BR_Translations,
 	"en-US": en_US_Translations,
-});
+} as const;
 
 /////////////////////////////////////////////
 
 // Assure all translations are complete:
-// @ts-ignore => isDev is a globally defined boolean.
 if (isDev) {
 	const pt_BR_TranslationsKeys = getObjectDeepKeys(pt_BR_Translations);
 	const en_US_TranslationsKeys = getObjectDeepKeys(en_US_Translations);

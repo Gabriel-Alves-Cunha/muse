@@ -1,8 +1,6 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server";
 
-import { useCallback, useEffect, useState } from "react";
-import { MdClose as CloseIcon } from "react-icons/md";
 import { Content, Close } from "@radix-ui/react-dialog";
 import { toCanvas } from "qrcode";
 import { Dialog } from "@radix-ui/react-dialog";
@@ -12,6 +10,7 @@ import { isAModifierKeyPressed } from "@utils/keyboard";
 import { error, assert } from "@utils/log";
 import { BlurOverlay } from "./BlurOverlay";
 import { getBasename } from "@common/path";
+import { CloseIcon } from "@icons/CloseIcon";
 import { emptySet } from "@common/empty";
 import { Loading } from "@components/Loading";
 import { dbg } from "@common/debug";
@@ -169,8 +168,7 @@ function closePopover(closeServerFunction?: () => void): void {
 const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
 	Array.from(filesToShare, (path) => (
 		<li
-			className="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
-			key={path}
+			class="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
 		>
 			{getBasename(path)}
 		</li>
