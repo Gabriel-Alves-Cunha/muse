@@ -2,7 +2,7 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import create from "solid-zustand";
 
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getRandomInt, time } from "@utils/utils";
@@ -64,7 +64,7 @@ export async function togglePlayPause(): Promise<void> {
 ////////////////////////////////////////////////
 
 export async function play(audio?: HTMLAudioElement): Promise<void> {
-	audio !== undefined
+	audio
 		? await audio.play()
 		: await (document.getElementById("audio") as HTMLAudioElement).play();
 }
@@ -72,8 +72,7 @@ export async function play(audio?: HTMLAudioElement): Promise<void> {
 ////////////////////////////////////////////////
 
 export function pause(audio?: HTMLAudioElement): void {
-	if (audio === undefined)
-		audio = document.getElementById("audio") as HTMLAudioElement;
+	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
@@ -147,7 +146,7 @@ export function playNextMedia(): void {
 
 		let nextMediaPath = emptyString;
 
-		if (getPlayOptions().random) {
+		if (getPlayOptions().isRandom) {
 			const randomIndex = getRandomInt(0, list.size);
 
 			let index = 0;
@@ -252,12 +251,11 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 			: null;
 	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
-	if (prevElements === null)
-		info(`No previous media row found for "${previousPath}!"`);
-	if (newElements === null) return info(`No media row found for "${path}"!`);
+	if (!prevElements) info(`No previous media row found for "${previousPath}!"`);
+	if (!newElements) return info(`No media row found for "${path}"!`);
 
 	// Undecorate previous playing media row:
-	if (previousPath.length !== 0 && prevElements !== null)
+	if (previousPath.length !== 0 && prevElements)
 		for (const element of prevElements) element.classList.remove(playingClass);
 
 	// Decorate new playing media row:
@@ -267,11 +265,11 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 ////////////////////////////////////////////////
 
 function changeMediaSessionMetadata(path: Path): void {
-	if (navigator?.mediaSession === undefined) return;
+	if (!navigator?.mediaSession) return;
 
 	const media = getMainList().get(path);
 
-	if (media === undefined) return;
+	if (!media) return;
 
 	navigator.mediaSession.metadata = new MediaMetadata({
 		artwork: [{ src: media.image }],

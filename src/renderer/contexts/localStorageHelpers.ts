@@ -64,8 +64,8 @@ export const setPlaylistsOnLocalStorage: SetLocalStoragePlugin<
 		args: PlaylistsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
 		replace: boolean,
 	) => {
-		for (const key of ["favorites", "history"] as const)
-			args[key] && setLocalStorage(keys[key], args[key]!);
+		args[favorites] && setLocalStorage(keys[favorites], args[favorites]);
+		args[history] && setLocalStorage(keys[history], args[history]);
 
 		set(args, replace);
 	};
@@ -74,6 +74,9 @@ export const setPlaylistsOnLocalStorage: SetLocalStoragePlugin<
 
 	return fn(newSetter, get, store);
 };
+
+const favorites = "favorites";
+const history = "history";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

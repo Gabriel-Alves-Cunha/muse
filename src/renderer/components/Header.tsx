@@ -1,8 +1,10 @@
-export const Header = ({ className, ...props }: Props) => (
+import type { Component, JSX } from "solid-js";
+
+export const Header: Component<JSX.HTMLAttributes<HTMLElement>> = (props) => (
 	<header
-		className={`relative flex justify-start items-center h-14 gap-4 mb-[5%] ${className}`}
+		class={`relative flex justify-start items-center h-14 gap-4 mb-[5%] ${
+			props.class ?? ""
+		}`}
 		{...props}
 	/>
 );
-
-type Props = React.BaseHTMLAttributes<HTMLHeadElement>;

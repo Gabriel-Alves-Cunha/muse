@@ -1,63 +1,67 @@
-import { BsShareFill as Share } from "react-icons/bs";
-import { FiTrash as Trash } from "react-icons/fi";
-import { Trigger } from "@radix-ui/react-context-menu";
-import { Dialog } from "@radix-ui/react-dialog";
+import type { Component } from "solid-js";
+
+import { useI18n } from "@solid-primitives/i18n";
 
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
-import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
+import { DeleteMediaDialog } from "../DeleteMediaDialog";
 import { deleteFile } from "@utils/deleteFile";
-import { Translator } from "@components/I18n";
+import { TrashIcon } from "@icons/TrashIcon";
+import { ShareIcon } from "@icons/ShareIcon";
+import { Dialog } from "../Dialog";
 import { Item } from "./Item";
 import {
 	getAllSelectedMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 
-export function MediaOptionsCtxMenu() {
+export const MediaOptionsCtxMenu: Component = () => {
 	// If there is none selected, disable:
 	const isDisabled = getAllSelectedMedias().size === 0;
+	const [t] = useI18n();
 
 	return (
 		<>
-			<Dialog modal>
+			<>
 				<Trigger
 					aria-disabled={isDisabled}
-					className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
+					class="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
 				>
 					<>
-						<Translator path="ctxMenus.deleteMedia" />
+						{t("ctxMenus.deleteMedia")}
 
-						<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-							<Trash />
+						<div class="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+							<TrashIcon />
 						</div>
 					</>
 				</Trigger>
 
-				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
-			</Dialog>
+				<Dialog.Content modal>
+					<DeleteMediaDialog handleMediaDeletion={deleteMedias} />
+				</Dialog.Content>
+			</>
 
 			<Item onSelect={shareMedias} disabled={isDisabled}>
-				<Translator path="ctxMenus.shareMedia" />
+				{t("ctxMenus.shareMedia")}
 
-				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-					<Share />
+				<div class="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+					<ShareIcon />
 				</div>
 			</Item>
 
 			<Item onSelect={selectAllMedias}>
-				<Translator path="ctxMenus.selectAllMedias" />
+				{t("ctxMenus.selectAllMedias")}
 
-				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+				<div class="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
 					Ctrl+A
 				</div>
 			</Item>
 
 			<Item onSelect={searchForLyrics} disabled={isDisabled}>
-				<Translator path="ctxMenus.searchForLyrics" />
+				{t("ctxMenus.searchForLyrics")}
 			</Item>
 		</>
 	);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -69,5 +73,5 @@ export async function deleteMedias(): Promise<void> {
 		deleteFile(path),
 	);
 
-	await Promise.all(promises);
+	await Promise.allSettled(promises);
 }

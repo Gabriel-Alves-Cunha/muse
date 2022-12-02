@@ -1,7 +1,7 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 import type { ValuesOf } from "@common/@types/utils";
 
-import create from "zustand";
+import create from "solid-zustand";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

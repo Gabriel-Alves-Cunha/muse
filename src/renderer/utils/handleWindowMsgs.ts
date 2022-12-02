@@ -1,7 +1,6 @@
 import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
-
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { electronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";

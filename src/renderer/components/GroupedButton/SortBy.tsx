@@ -1,13 +1,13 @@
 import type { ValuesOf } from "@common/@types/utils";
 
-import { MdOutlineSort as SortIcon } from "react-icons/md";
-import { useEffect, useState } from "react";
+import { createEffect, createSignal } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
 
-import { contentOfSelectEnum, Select } from "@components/Select";
+import { contentOfSelectEnum, Select } from "../Select";
 import { assertUnreachable } from "@utils/utils";
 import { playlistList } from "@common/enums";
-import { setFromList } from "@components/MediaListKind/helper";
-import { t } from "@components/I18n";
+import { setFromList } from "../MediaListKind/helper";
+import { SortIcon } from "@icons/SortIcon";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -15,13 +15,14 @@ import { t } from "@components/I18n";
 // Types:
 
 export function SortBy() {
-	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
+	const [selectedList, setSelectedList] = createSignal<SelectedList>("Name");
+	const [t] = useI18n();
 
-	useEffect(() => {
-		// Default value:
+	createEffect(() => {
 		let homeList: ValuesOf<typeof playlistList> = playlistList.mainList;
+		const list = selectedList();
 
-		switch (selectedList) {
+		switch (list) {
 			case "Name":
 				break;
 
@@ -31,21 +32,21 @@ export function SortBy() {
 			}
 
 			default:
-				assertUnreachable(selectedList);
+				assertUnreachable(list);
 		}
 
 		setFromList({ homeList });
-	}, [selectedList]);
+	});
 
 	return (
 		<Select
 			content={contentOfSelectEnum.GROUPED_BUTTON_SORT_BY}
-			triggerClassName="grouped-button" // Same as ButtonOfGroup.
 			tooltip={t("tooltips.sortBy")}
+			triggerClass="grouped-button" // Same as ButtonOfGroup.
 			setValue={setSelectedList}
-			value={selectedList}
+			value={selectedList()}
 		>
-			<SortIcon size={19} className="fill-white" />
+			<SortIcon class="w-5 h-5 fill-white" />
 		</Select>
 	);
 }

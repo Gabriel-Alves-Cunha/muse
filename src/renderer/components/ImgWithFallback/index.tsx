@@ -1,4 +1,5 @@
 import type { Path } from "@common/@types/generalTypes";
+import type { JSX } from "solid-js";
 
 import { reactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
@@ -33,7 +34,7 @@ export function ImgWithFallback({
 
 	const cacheStatus = cache.get(mediaPath);
 
-	if (cacheStatus === undefined) {
+	if (!cacheStatus) {
 		cache.set(mediaPath, PENDING);
 
 		let img: HTMLImageElement | null = new Image();
@@ -44,7 +45,7 @@ export function ImgWithFallback({
 			img = null;
 		};
 
-		img.onerror = ev => {
+		img.onerror = (ev) => {
 			error("Failed image; going to erasing it...", {
 				mediaPath,
 				mediaImg,
@@ -66,7 +67,7 @@ export function ImgWithFallback({
 
 		return cache.get(mediaPath) === SUCCESS ? (
 			<img
-				className="object-cover h-11 rounded-xl before:hidden"
+				class="object-cover h-11 rounded-xl before:hidden"
 				decoding="async"
 				loading="lazy"
 				src={mediaImg}
@@ -80,7 +81,7 @@ export function ImgWithFallback({
 	if (cacheStatus === SUCCESS)
 		return (
 			<img
-				className="object-cover h-11 rounded-xl before:hidden"
+				class="object-cover h-11 rounded-xl before:hidden"
 				src={mediaImg}
 				alt=""
 			/>
@@ -94,7 +95,7 @@ export function ImgWithFallback({
 // Types:
 
 type Props = Readonly<{
-	Fallback: JSX.Element;
 	mediaImg: string | undefined;
+	Fallback: JSX.Element;
 	mediaPath: Path;
 }>;

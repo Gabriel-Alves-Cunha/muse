@@ -24,11 +24,7 @@ export function isAModifierKeyPressed(
 	for (const key of modifierKeys) {
 		if (except.includes(key)) continue;
 
-		if (event.getModifierState(key)) {
-			dbg("Modifier key pressed =", key);
-
-			return true;
-		}
+		if (event.getModifierState(key)) return true;
 	}
 
 	return false;

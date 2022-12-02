@@ -15,7 +15,7 @@ const {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function getMediaFiles(fileList: Readonly<FileList>): readonly File[] {
+export function getMediaFiles(fileList: FileList): readonly File[] {
 	const supportedFiles: File[] = [];
 
 	for (const file of fileList) {

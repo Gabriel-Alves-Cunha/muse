@@ -1,8 +1,9 @@
-export const MainGridContainer = ({ className = "", ...props }: Props) => (
-	<div
-		className={`grid-template-for-content-wrapper ${className}`}
-		{...props}
-	/>
-);
+import type { Component, JSX } from "solid-js";
 
-type Props = React.BaseHTMLAttributes<HTMLDivElement>;
+export const MainGridContainer: Component<JSX.HTMLAttributes<HTMLDivElement>> =
+	(props) => (
+		<div
+			class={`grid-template-for-content-wrapper ${props.class ?? ""}`}
+			{...props}
+		/>
+	);

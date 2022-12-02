@@ -1,18 +1,19 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
-import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
-import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { memo } from "react";
-import create from "zustand";
+import { Component, createSignal } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
+import { Portal } from "solid-js/web";
+import create from "solid-zustand";
 
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
+import { VerticalDotsIcon } from "@icons/VerticalDotsIcon";
 import { ImgWithFallback } from "@components/ImgWithFallback";
-import { DialogTrigger } from "@components/DialogTrigger";
+import { MusicNoteIcon } from "@icons/MusicNoteIcon";
+import { BlurOverlay } from "@components/BlurOverlay";
+import { Dialog } from "../Dialog";
 import { log } from "@utils/log";
-import { t } from "@components/I18n";
 import {
 	electronIpcMainProcessNotification,
 	playlistList,
@@ -25,7 +26,6 @@ import {
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
-
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -51,11 +51,9 @@ export const setIsCtxMenuOpen = (bool: boolean) =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function selectMediaByPointerEvent(
-	e: React.PointerEvent<HTMLSpanElement>,
-): void {
+export function selectMediaByPointerEvent(e: PointerEvent): void {
 	// TODO: see if this selector still works.
-	const mediaClickedMediaPath = (e.nativeEvent.target as HTMLElement)
+	const mediaClickedMediaPath = (e.target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
 
@@ -69,10 +67,7 @@ export function selectMediaByPointerEvent(
 export const rightClick = 2;
 export const leftClick = 0;
 
-function selectOrPlayMedia(
-	e: React.PointerEvent<HTMLButtonElement>,
-	mediaPath: Path,
-): void {
+function selectOrPlayMedia(e: PointerEvent, mediaPath: Path): void {
 	if (e.button !== leftClick || e.ctrlKey === false) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome === true ? homeList : fromList;
@@ -87,60 +82,61 @@ function selectOrPlayMedia(
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const Row = memo(
-	({ media, path }: RowProps) => (
+const Row: Component<RowProps> = (props) => {
+	const [isMediaOptionsOpen, setIsMediaOptionsOpen] = createSignal(false);
+	const [t] = useI18n();
+
+	return (
 		<div
-			className={`${
-				getAllSelectedMedias().has(path) === true ? "selected " : ""
-			}${getCurrentPlaying().path === path ? "playing " : ""}row-wrapper`}
-			data-path={path}
+			class={`${
+				getAllSelectedMedias().has(props.path) === true ? "selected " : ""
+			}${getCurrentPlaying().path === props.path ? "playing " : ""}row-wrapper`}
+			data-path={props.path}
 		>
 			<button
-				className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
-				onPointerUp={(e) => selectOrPlayMedia(e, path)}
+				class="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
+				onPointerUp={(e) => selectOrPlayMedia(e, props.path)}
 				title={t("tooltips.playThisMedia")}
 			>
-				<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
+				<div class="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
 					<ImgWithFallback
-						Fallback={<MusicNote size="1.4rem" />}
-						mediaImg={media.image}
-						mediaPath={path}
+						Fallback={<MusicNoteIcon class="w-5 h-5" />}
+						mediaImg={props.media.image}
+						mediaPath={props.path}
 					/>
 				</div>
 
-				<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
-					<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
-						{media.title}
+				<div class="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
+					<p class="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
+						{props.media.title}
 					</p>
 
-					<p className="font-primary tracking-wide text-sm font-medium text-muted">
-						{media.duration}
+					<p class="font-primary tracking-wide text-sm font-medium text-muted">
+						{props.media.duration}
 						&emsp;|&emsp;
-						{media.artist}
+						{props.media.artist}
 					</p>
 				</div>
 			</button>
 
-			<Dialog modal>
-				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
-					<Dots size={17} />
-				</DialogTrigger>
+			<button title={t("tooltips.openMediaOptions")}>
+				<VerticalDotsIcon class="w-4 h-4" />
+			</button>
 
-				<DialogPortal>
-					{/* backdropFilter: blur(2px); */}
-					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
+			<Portal>
+				<Dialog.Content
+					onOpenChange={setIsMediaOptionsOpen}
+					isOpen={isMediaOptionsOpen()}
+					modal
+				>
+					<BlurOverlay />
 
-					<MediaOptionsModal media={media} path={path} />
-				</DialogPortal>
-			</Dialog>
+					<MediaOptionsModal media={props.media} path={props.path} />
+				</Dialog.Content>
+			</Portal>
 		</div>
-	),
-	(prev, next) =>
-		prev.media.title === next.media.title &&
-		prev.media.artist === next.media.artist &&
-		prev.media.duration === next.media.duration,
-);
-Row.displayName = "Row";
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -175,13 +171,13 @@ export const reloadWindow = (): void =>
 /////////////////////////////////////////////
 // Types:
 
-type RowProps = Readonly<{ media: Media; path: Path }>;
+type RowProps = { media: Media; path: Path };
 
 /////////////////////////////////////////////
 
 type PlaylistList = ValuesOf<typeof playlistList>;
 
-type FromList = Readonly<{
+type FromList = {
 	fromList: Exclude<
 		PlaylistList,
 		typeof playlistList.mainList | typeof playlistList.sortedByDate
@@ -191,4 +187,4 @@ type FromList = Readonly<{
 		typeof playlistList.mainList | typeof playlistList.sortedByDate
 	>;
 	isHome: boolean;
-}>;
+};

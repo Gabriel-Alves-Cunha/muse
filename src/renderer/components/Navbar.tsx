@@ -1,37 +1,36 @@
+import type { Component, JSX } from "solid-js";
 import type { Page } from "@common/@types/generalTypes";
 
-import {
-	MdOutlineVideoLibrary as Home,
-	// MdOutlineSettings as Settings,
-	MdFavoriteBorder as Favorites,
-	MdCloudDownload as Download,
-	MdSwapHoriz as Convert,
-	MdHistory as History,
-} from "react-icons/md";
+import { useI18n } from "@solid-primitives/i18n";
+
+import { DownloadIcon } from "@icons/DownloadIcon";
+import { HistoryIcon } from "@icons/HistoryIcon";
+import { HeartIcon } from "@icons/HeartIcon";
+import { HomeIcon } from "@icons/HomeIcon";
+import { SwapIcon } from "@icons/SwapIcon";
 
 import { setPage, usePage } from "@contexts/page";
 import { ThemeToggler } from "@components/ThemeToggler";
-import { Downloading } from "@components/Downloading";
-import { Converting } from "@components/Converting";
+// import { Downloading } from "@components/Downloading";
+// import { Converting } from "@components/Converting";
 import { pages } from "@utils/app";
-import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
-export const Navbar = () => (
-	<nav className="nav">
+export const Navbar: Component = () => (
+	<nav class="nav">
 		<ThemeToggler />
 
 		<ButtonsForPages />
 
-		<div className="min-h-max flex flex-col justify-center items-center w-full">
+		{/* <div class="min-h-max flex flex-col justify-center items-center w-full">
 			<Converting />
 
 			<Downloading />
-		</div>
+		</div> */}
 	</nav>
 );
 
@@ -41,11 +40,11 @@ export const Navbar = () => (
 // Constants:
 
 const icons: Readonly<Record<Page, JSX.Element>> = {
-	Favorites: <Favorites />,
-	Download: <Download />,
-	History: <History />,
-	Convert: <Convert />,
-	Home: <Home />,
+	Download: <DownloadIcon />,
+	Favorites: <HeartIcon />,
+	History: <HistoryIcon />,
+	Convert: <SwapIcon />,
+	Home: <HomeIcon />,
 } as const;
 
 /////////////////////////////////////////
@@ -56,18 +55,18 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 function ButtonsForPages() {
 	const currPage = usePage().page;
 	const buttons: JSX.Element[] = [];
+	const [t] = useI18n();
 
 	for (const page of pages)
 		buttons.push(
 			<button
 				title={t("tooltips.goto") + t(`pages.${page}`)}
-				className={page === currPage ? "active" : ""}
+				class={page === currPage ? "active" : ""}
 				onPointerUp={() => setPage({ page })}
-				key={page}
 			>
 				{icons[page]}
 			</button>,
 		);
 
-	return <div className="buttons-for-pages">{buttons}</div>;
+	return <div class="buttons-for-pages">{buttons}</div>;
 }

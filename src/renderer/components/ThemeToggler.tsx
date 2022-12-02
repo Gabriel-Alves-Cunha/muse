@@ -1,10 +1,8 @@
-import { useState } from "react";
-import {
-	MdLightbulbOutline as Light,
-	MdLightbulb as Dark,
-} from "react-icons/md";
+import { MoonIcon as Dark } from "@icons/MoonIcon";
+import { SunIcon as Light } from "@icons/SunIcon";
 
-import { t } from "@components/I18n";
+import { createSignal } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -20,26 +18,27 @@ export const availableThemes = ["light", "dark"] as const;
 // Main function:
 
 export function ThemeToggler() {
-	const [theme, setTheme] = useState(htmlDataset.theme as Theme);
+	const [theme, setTheme] = createSignal(htmlDataset.theme as Theme);
+	const [t] = useI18n();
 
-	const newTheme =
-		theme === availableThemes[0] ? availableThemes[1] : availableThemes[0];
+	const newTheme = () =>
+		theme() === availableThemes[0] ? availableThemes[1] : availableThemes[0];
 
 	function toggleTheme() {
-		htmlDataset.theme = newTheme;
-		setTheme(newTheme);
+		htmlDataset.theme = newTheme();
+		setTheme(newTheme());
 	}
 
 	return (
 		<button
 			title={t("tooltips.toggleTheme")}
-			className="toggle-theme-button"
+			class="toggle-theme-button"
 			onPointerUp={toggleTheme}
 		>
-			{theme === availableThemes[0] ? (
-				<Dark size="20px" />
+			{theme() === availableThemes[0] ? (
+				<Dark class="w-5 h-5" />
 			) : (
-				<Light size="20px" />
+				<Light class="w-5 h-5" />
 			)}
 		</button>
 	);

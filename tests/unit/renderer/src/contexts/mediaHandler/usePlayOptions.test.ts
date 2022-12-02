@@ -39,14 +39,14 @@ describe("Testing usePlayOptions", () => {
 	/////////////////////////////////////////////
 
 	it("should get a new playOptions with .isRandom set", () => {
-		setPlayOptions({ random: true });
+		setPlayOptions({ isRandom: true });
 
 		expect(
 			getPlayOptions(),
 			"playOptions should have { random: true }!",
 		).toHaveProperty("random", true);
 
-		setPlayOptions({ random: false });
+		setPlayOptions({ isRandom: false });
 
 		expect(
 			getPlayOptions(),

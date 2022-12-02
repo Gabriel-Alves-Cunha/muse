@@ -1,13 +1,5 @@
+import type { Component, JSX } from "solid-js";
 import type { ValuesOf } from "@common/@types/utils";
-
-import {
-	Viewport,
-	Trigger,
-	Content,
-	Portal,
-	Value,
-	Root,
-} from "@radix-ui/react-select";
 
 import { SelectOrderOptions } from "./SelectOrderOptions";
 import { assertUnreachable } from "@utils/utils";
@@ -26,35 +18,23 @@ export const contentOfSelectEnum = {
 /////////////////////////////////////////
 // Main function:
 
-export const Select = ({
-	triggerClassName = "",
-	triggerTitle = "",
-	children,
-	setValue,
-	tooltip,
-	content,
-	value,
-}: Props) => (
-	<Root value={value} onValueChange={setValue}>
-		<Trigger
-			className={`relative flex justify-center items-center cursor-pointer bg-none border-none ${triggerClassName}`}
-			title={tooltip}
+export const Select: Component<Props> = (props) => (
+	<select value={props.value} onChange={props.setValue}>
+		<button
+			class={`relative flex justify-center items-center cursor-pointer bg-none border-none ${props.triggerClass}`}
+			title={props.tooltip}
 		>
-			<Value className="pl-6 text-ctx-menu-item font-secondary leading-6 text-xs">
-				{triggerTitle}
-			</Value>
+			<p class="pl-6 text-ctx-menu-item font-secondary leading-6 text-xs">
+				{props.triggerTitle}
+			</p>
 
-			{children}
-		</Trigger>
+			{props.children}
+		</button>
 
-		<Portal>
-			<Content className="select-content">
-				<Viewport className="no-transition p-1">
-					{contentToShow(content)}
-				</Viewport>
-			</Content>
-		</Portal>
-	</Root>
+		<div class="select-content no-transition p-1">
+			{contentToShow(props.content)}
+		</div>
+	</select>
 );
 
 /////////////////////////////////////////
@@ -82,9 +62,9 @@ function contentToShow(content: ValuesOf<typeof contentOfSelectEnum>) {
 
 type Props<T = unknown> = Readonly<{
 	content: ValuesOf<typeof contentOfSelectEnum>;
-	triggerClassName?: string;
-	children: React.ReactNode;
 	setValue(value: T): void;
+	children: JSX.Element;
+	triggerClass?: string;
 	triggerTitle?: string;
 	tooltip: string;
 	value: string;

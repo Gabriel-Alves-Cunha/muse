@@ -2,7 +2,7 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import create from "solid-zustand";
 
 import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";

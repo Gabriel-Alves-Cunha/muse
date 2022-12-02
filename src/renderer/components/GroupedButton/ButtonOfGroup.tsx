@@ -1,8 +1,7 @@
-export const ButtonOfGroup = ({
-	className = "",
-	...props
-}: ButtonOfGroupProps) => (
-	<button className={`grouped-button ${className} `} {...props} />
+import type { Component, JSX } from "solid-js";
+
+export const ButtonOfGroup: Component<ButtonOfGroupProps> = (props) => (
+	<button class={`grouped-button ${props.class ?? ""} `} {...props} />
 );
 
-type ButtonOfGroupProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
+type ButtonOfGroupProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>;

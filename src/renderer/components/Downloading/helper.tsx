@@ -2,14 +2,15 @@ import type { MediaBeingDownloaded } from ".";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { AiOutlineClose as CancelIcon } from "react-icons/ai";
+import { Component, Index, Show } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
 
 import { errorToast, infoToast, successToast } from "@components/toasts";
 import { Progress, progressIcons } from "@components/Progress";
+import { CloseIcon as CancelIcon } from "@icons/CloseIcon";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { progressStatus } from "@common/enums";
-import { t, Translator } from "@components/I18n";
 import { error, assert } from "@utils/log";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
@@ -21,48 +22,47 @@ import {
 
 import { handleSingleItemDeleteAnimation } from "./styles";
 
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function Popup() {
+export const Popup: Component = () => {
 	const { downloadingList } = useDownloadingList();
+	const [t] = useI18n();
 
-	return downloadingList.size > 0 ? (
-		<>
+	return (
+		<Show
+			fallback={<p>{t("infos.noDownloadsInProgress")}</p>}
+			when={downloadingList.size > 0}
+		>
 			<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
-				<Translator path="buttons.cleanFinished" />
+				{t("buttons.cleanFinished")}
 			</Button>
 
-			{Array.from(downloadingList, ([url, downloadingMedia], index) => (
-				<DownloadingBox
-					download={downloadingMedia}
-					downloadingIndex={index}
-					url={url}
-					key={url}
-				/>
-			))}
-		</>
-	) : (
-		<p>
-			<Translator path="infos.noDownloadsInProgress" />
-		</p>
+			<Index each={[...downloadingList]}>
+				{(downloading, index) => (
+					<DownloadingBox
+						download={downloading()[1]}
+						downloadingIndex={index}
+						url={downloading()[0]}
+					/>
+				)}
+			</Index>
+		</Show>
 	);
-}
+};
 
 /////////////////////////////////////////////
 // Helper functions for Popup:
 
 function cleanAllDoneDownloads(): void {
-	for (const [url, download] of getDownloadingList()) {
+	for (const [url, download] of getDownloadingList())
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);
-	}
 }
 
 /////////////////////////////////////////////
@@ -71,40 +71,40 @@ function cleanAllDoneDownloads(): void {
 
 export const isDownloadList = true;
 
-const DownloadingBox = ({
-	downloadingIndex,
-	download,
-	url,
-}: DownloadingBoxProps) => (
-	<div className="box">
-		<div className="left">
-			<p>{download.title}</p>
+const DownloadingBox: Component<DownloadingBoxProps> = (props) => {
+	const [t] = useI18n();
 
-			<Progress
-				percent_0_to_100={download.percentage}
-				status={download.status}
-			/>
+	return (
+		<div class="box">
+			<div class="left">
+				<p>{props.download.title}</p>
+
+				<Progress
+					percent_0_to_100={props.download.percentage}
+					status={props.download.status}
+				/>
+			</div>
+
+			<div class="right">
+				<button
+					onPointerUp={(e) =>
+						handleSingleItemDeleteAnimation(
+							e,
+							props.downloadingIndex,
+							isDownloadList,
+							props.url,
+						)
+					}
+					title={t("tooltips.cancelDownload")}
+				>
+					<CancelIcon class="w-3 h-3" />
+				</button>
+
+				{progressIcons.get(props.download.status)}
+			</div>
 		</div>
-
-		<div className="right">
-			<button
-				onPointerUp={(e) =>
-					handleSingleItemDeleteAnimation(
-						e,
-						downloadingIndex,
-						isDownloadList,
-						url,
-					)
-				}
-				title={t("tooltips.cancelDownload")}
-			>
-				<CancelIcon size={13} />
-			</button>
-
-			{progressIcons.get(download.status)}
-		</div>
-	</div>
-);
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -117,6 +117,7 @@ const DownloadingBox = ({
  */
 export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	const downloadingList = getDownloadingList();
+	const [t] = useI18n();
 
 	dbg("Trying to create a new download...", { downloadingList });
 
@@ -177,6 +178,7 @@ function handleUpdateDownloadingList(
 	url: Readonly<string>,
 ): void {
 	const downloadingList = getDownloadingList();
+	const [t] = useI18n();
 
 	dbg(`Received a message from Electron on port for "${url}":`, {
 		downloadingList,
@@ -238,15 +240,13 @@ function handleUpdateDownloadingList(
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function cancelDownloadAndOrRemoveItFromList(
-	url: Readonly<string>,
-): void {
+export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 	const downloadingList = getDownloadingList();
 
 	// Assert that the download exists:
 	const download = downloadingList.get(url);
 
-	if (download === undefined)
+	if (!download)
 		return error(
 			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
 			downloadingList,

@@ -1,27 +1,9 @@
-import { forwardRef } from "react";
+import type { Component, JSX } from "solid-js";
 
-export const Button = forwardRef(function Button(
-	{ className = "", variant, ...props }: Props,
-	forwardedRef: React.Ref<HTMLButtonElement>,
-) {
-	return (
-		<button
-			className={`button ${variant} ${className}`}
-			{...props}
-			ref={forwardedRef}
-		/>
-	);
-});
+export const Button: Component<ButtonProps> = (props) => (
+	<button class={`button ${props.variant} ${props.class ?? ""}`} {...props} />
+);
 
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Types:
-
-interface Props
-	extends React.DetailedHTMLProps<
-		React.ButtonHTMLAttributes<HTMLButtonElement>,
-		HTMLButtonElement
-	> {
-	readonly variant: "large" | "medium" | "input" | "circle";
+interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+	variant: "large" | "medium" | "input" | "circle";
 }

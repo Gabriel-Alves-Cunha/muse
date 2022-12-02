@@ -1,11 +1,9 @@
 import { usePlaylists } from "@contexts/usePlaylists";
-import { t } from "@components/I18n";
-
-const sizeSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByDate.size;
+import { useI18n } from "@solid-primitives/i18n";
 
 export function NumberOfMedias() {
-	const numberOfMedias = usePlaylists(sizeSelector);
+	const numberOfMedias = usePlaylists((state) => state.sortedByDate.size);
+	const [t] = useI18n();
 
 	return (
 		<p>

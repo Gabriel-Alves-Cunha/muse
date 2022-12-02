@@ -2,7 +2,7 @@ import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import create from "zustand";
+import create from "solid-zustand";
 
 import { error } from "@utils/log";
 

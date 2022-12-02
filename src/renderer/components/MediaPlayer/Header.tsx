@@ -1,18 +1,15 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { BsJournalText as LyricsPresent } from "react-icons/bs";
-import { BsJournal as NoLyrics } from "react-icons/bs";
-import { RingLoader } from "react-spinners";
-import { useState } from "react";
-import {
-	MdFavoriteBorder as AddFavorite,
-	MdFavorite as Favorite,
-} from "react-icons/md";
+import { type Component, createSignal, Show } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
 
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
+import { JournalTextIcon as LyricsPresentIcon } from "@icons/JournalTextIcon";
 import { toggleFavoriteMedia, usePlaylists } from "@contexts/usePlaylists";
-import { CircleIconButton } from "@components/CircleIconButton";
-import { t } from "@components/I18n";
+import { JournalIcon as NoLyricsIcon } from "@icons/JournalIcon";
+import { CircleIconButton } from "../CircleIconButton";
+import { HeartIcon } from "@icons/HeartIcon";
+import { Spinner } from "../Spinner";
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -20,14 +17,15 @@ import { t } from "@components/I18n";
 
 export const openLyrics = true;
 
-function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
-	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
+const LoadOrToggleLyrics: Component<LoadOrToggleLyricsProps> = (props) => {
+	const [isLoadingLyrics, setIsLoadingLyrics] = createSignal(false);
+	const [t] = useI18n();
 
 	async function loadAndOrToggleLyrics(): Promise<void> {
-		if (media?.lyrics) return flipMediaPlayerCard();
+		if (props.media?.lyrics) return flipMediaPlayerCard();
 
 		setIsLoadingLyrics(true);
-		await searchAndOpenLyrics(media, path, openLyrics);
+		await searchAndOpenLyrics(props.media, props.path, openLyrics);
 		setIsLoadingLyrics(false);
 	}
 
@@ -35,44 +33,50 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 		<CircleIconButton
 			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
-			disabled={media === undefined}
+			disabled={props.media === undefined}
 		>
-			{media?.lyrics ? (
-				<LyricsPresent size={16} />
-			) : isLoadingLyrics ? (
-				<RingLoader className="absolute text-white w-8 h-8" />
-			) : (
-				<NoLyrics size={16} />
-			)}
+			<Show
+				when={props.media?.lyrics}
+				fallback={
+					<Show
+						fallback={<NoLyricsIcon class="w-4 h-4" />}
+						when={isLoadingLyrics()}
+					>
+						<Spinner class="absolute text-white w-4 h-4" />
+					</Show>
+				}
+			>
+				<LyricsPresentIcon class="w-4 h-4" />
+			</Show>
 		</CircleIconButton>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.favorites;
-
-export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
-	const favorites = usePlaylists(favoritesSelector);
-	const isFavorite = favorites.has(path);
+export const Header: Component<HeaderProps> = (props) => {
+	const favorites = usePlaylists((state) => state.favorites);
+	const isFavorite = () => favorites.has(props.path);
+	const [t] = useI18n();
 
 	return (
-		<div className="flex justify-between items-center">
-			<LoadOrToggleLyrics media={media} path={path} />
+		<div class="flex justify-between items-center">
+			<LoadOrToggleLyrics media={props.media} path={props.path} />
 
-			<div className="w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium">
-				{displayTitle ? media?.title : media?.album}
+			<div class="w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium">
+				{props.displayTitle ? props.media?.title : props.media?.album}
 			</div>
 
 			<CircleIconButton
-				onPointerUp={() => toggleFavoriteMedia(path)}
+				onPointerUp={() => toggleFavoriteMedia(props.path)}
 				title={t("tooltips.toggleFavorite")}
-				disabled={!media}
+				disabled={!props.media}
 			>
-				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
+				<Show when={isFavorite()} fallback={<HeartIcon class="w-4 h-4" />}>
+					<HeartIcon class="w-4 h-4 fill-red-600" />
+				</Show>
 			</CircleIconButton>
 		</div>
 	);
@@ -83,14 +87,14 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 /////////////////////////////////////////
 // Types:
 
-type HeaderProps = Readonly<{
+type HeaderProps = {
 	media: Media | undefined;
 	displayTitle?: boolean;
 	path: Path;
-}>;
+};
 /////////////////////////////////////////
 
-type LoadOrToggleLyricsProps = Readonly<{
+type LoadOrToggleLyricsProps = {
 	media: Media | undefined;
 	path: Path;
-}>;
+};

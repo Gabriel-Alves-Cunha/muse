@@ -1,12 +1,10 @@
 import { usePlaylists } from "@contexts/usePlaylists";
 import { prettyBytes } from "@common/prettyBytes";
-import { t } from "@components/I18n";
-
-const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByNameAndMainList;
+import { useI18n } from "@solid-primitives/i18n";
 
 export function MediasInfo() {
-	const mainList = usePlaylists(mainListSelector);
+	const mainList = usePlaylists((state) => state.sortedByNameAndMainList);
+	const [t] = useI18n();
 
 	let allFilesSize = 0;
 

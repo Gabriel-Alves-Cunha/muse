@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react";
+import { useI18n } from "@solid-primitives/i18n";
 import {
-	MdRepeatOne as RepeatOne,
-	MdShuffleOn as RandomOn,
-	MdShuffle as RandomOff,
-	MdRepeat as Repeat,
-} from "react-icons/md";
-import {
-	IoPlayBackSharp as Previous,
-	IoPlayForwardSharp as Next,
-	IoPauseSharp as Pause,
-	IoPlaySharp as Play,
-} from "react-icons/io5";
+	type Component,
+	type Accessor,
+	type Setter,
+	createSignal,
+	onMount,
+	Show,
+} from "solid-js";
 
 import { CircleIconButton } from "@components/CircleIconButton";
+import { ShuffleOffIcon } from "@icons/ShuffleOffIcon";
+import { RepeatOneIcon } from "@icons/RepeatOneIcon";
+import { ShuffleOnIcon } from "@icons/ShuffleOnIcon";
 import { SeekerWrapper } from "./Seeker";
-import { t } from "@components/I18n";
+import { RepeatIcon } from "@icons/RepeatIcon";
+import { PauseIcon } from "@icons/PauseIcon";
+import { RightIcon } from "@icons/RightIcon";
+import { LeftIcon } from "@icons/LeftIcon";
+import { PlayIcon } from "@icons/PlayIcon";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
@@ -30,112 +33,119 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
-	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
+export const ControlsAndSeeker: Component<RefToAudioAndSeeker> = (props) => {
+	const { isRandom, loop } = usePlayOptions();
+	const [t] = useI18n();
 
-	const isThereAMedia = !(audio && audio.src.length > 0);
+	const isThereAMedia = () => !(props.audio && props.audio.src.length > 0);
 
 	return (
-		<div className="absolute flex flex-col bottom-10 w-full">
-			<SeekerWrapper audio={audio} isSeeking={isSeeking} />
+		<div class="absolute flex flex-col bottom-10 w-full">
+			<SeekerWrapper
+				setIsSeeking={props.setIsSeeking}
+				isSeeking={props.isSeeking}
+				audio={props.audio}
+			/>
 
-			<div className="flex justify-between items-center mt-[10%]">
+			<div class="flex justify-between items-center mt-[10%]">
 				<CircleIconButton
 					title={t("tooltips.toggleLoopThisMedia")}
 					onPointerUp={toggleLoopMedia}
-					disabled={isThereAMedia}
+					disabled={isThereAMedia()}
 				>
-					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
+					<Show when={loop} fallback={<RepeatIcon class="w-4 h-4" />}>
+						<RepeatOneIcon class="w-4 h-4" />
+					</Show>
 				</CircleIconButton>
 
-				<Controls audio={audio} isDisabled={isThereAMedia} />
+				<Controls audio={props.audio} isDisabled={isThereAMedia()} />
 
 				<CircleIconButton
 					title={t("tooltips.toggleRandom")}
 					onPointerUp={toggleRandom}
-					disabled={isThereAMedia}
+					disabled={isThereAMedia()}
 				>
-					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
+					<Show when={isRandom} fallback={<ShuffleOffIcon class="w-4 h-4" />}>
+						<ShuffleOnIcon class="w-4 h-4" />
+					</Show>
 				</CircleIconButton>
 			</div>
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
-	const [isPaused, setIsPaused] = useState(true);
+const PlayPauseButton: Component<ControlsProps> = (props) => {
+	const [isPaused, setIsPaused] = createSignal(true);
+	const [t] = useI18n();
 
-	const setIsPausedToFalse = () => setIsPaused(false);
-	const setIsPausedToTrue = () => setIsPaused(true);
-
-	useEffect(() => {
-		if (!audio) return;
-
-		audio.addEventListener("pause", setIsPausedToTrue);
-		audio.addEventListener("play", setIsPausedToFalse);
-
-		return () => {
-			audio.removeEventListener("pause", setIsPausedToTrue);
-			audio.removeEventListener("play", setIsPausedToFalse);
-		};
-	}, [audio]);
+	onMount(() => {
+		props.audio!.addEventListener("pause", () => setIsPaused(true));
+		props.audio!.addEventListener("play", () => setIsPaused(false));
+	});
 
 	return (
 		<CircleIconButton
 			title={t("tooltips.playPause")}
 			onPointerUp={togglePlayPause}
-			disabled={isDisabled}
+			disabled={props.isDisabled}
 			variant="large"
 		>
-			{isPaused ? <Play size={25} /> : <Pause size={25} />}
+			<Show when={isPaused()} fallback={<PauseIcon class="w-5 h-5" />}>
+				<PlayIcon class="w-5 h-5" />
+			</Show>
 		</CircleIconButton>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Controls = ({ isDisabled, audio }: ControlsProps) => (
-	<div className="relative flex justify-center items-center w-[120px]">
-		<CircleIconButton
-			title={t("tooltips.playPreviousTrack")}
-			onPointerUp={playPreviousMedia}
-			disabled={isDisabled}
-		>
-			<Previous />
-		</CircleIconButton>
+export const Controls: Component<ControlsProps> = (props) => {
+	const [t] = useI18n();
 
-		<PlayPauseButton isDisabled={isDisabled} audio={audio} />
+	return (
+		<div class="relative flex justify-center items-center w-[120px]">
+			<CircleIconButton
+				title={t("tooltips.playPreviousTrack")}
+				onPointerUp={playPreviousMedia}
+				disabled={props.isDisabled}
+			>
+				<LeftIcon />
+			</CircleIconButton>
 
-		<CircleIconButton
-			title={t("tooltips.playNextTrack")}
-			onPointerUp={playNextMedia}
-			disabled={isDisabled}
-		>
-			<Next />
-		</CircleIconButton>
-	</div>
-);
+			<PlayPauseButton isDisabled={props.isDisabled} audio={props.audio} />
+
+			<CircleIconButton
+				title={t("tooltips.playNextTrack")}
+				onPointerUp={playNextMedia}
+				disabled={props.isDisabled}
+			>
+				<RightIcon />
+			</CircleIconButton>
+		</div>
+	);
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
 
-type ControlsProps = Readonly<{ isDisabled: boolean; audio: Audio }>;
+type ControlsProps = { isDisabled: boolean; audio: Audio };
 
 /////////////////////////////////////////
 
-export type RefToAudioAndSeeker = Readonly<{
-	isSeeking: React.MutableRefObject<boolean>;
+export type RefToAudioAndSeeker = {
+	setIsSeeking: Setter<boolean>;
+	isSeeking: Accessor<boolean>;
 	audio: Audio;
-}>;
+};
 
 /////////////////////////////////////////
 
-export type Audio = HTMLAudioElement | null;
+export type Audio = HTMLAudioElement | undefined;

@@ -1,22 +1,31 @@
-import { FiTrash as CleanIcon } from "react-icons/fi";
+import type { Component } from "solid-js";
 
+import { useI18n } from "@solid-primitives/i18n";
+
+import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
 import { assertUnreachable } from "@utils/utils";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
-import { getFromList } from "@components/MediaListKind/helper";
-import { t } from "@components/I18n";
-import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
+import { getFromList } from "../MediaListKind/helper";
+import { TrashIcon } from "@icons/TrashIcon";
 
-export const Clean = () => (
-	<ButtonOfGroup title={t("tooltips.cleanList")} onPointerUp={cleanProperList}>
-		<CleanIcon size={17} className="stroke-white" />
-	</ButtonOfGroup>
-);
+export const Clean: Component = () => {
+	const [t] = useI18n();
+
+	return (
+		<ButtonOfGroup
+			title={t("tooltips.cleanList")}
+			onPointerUp={cleanProperList}
+		>
+			<TrashIcon class="w-4 h-4 stroke-white" />
+		</ButtonOfGroup>
+	);
+};
 
 /////////////////////////////////////////////
 // Helper functions:
 
-function cleanProperList() {
+const cleanProperList = () => {
 	const { fromList } = getFromList();
 
 	switch (fromList) {
@@ -33,4 +42,4 @@ function cleanProperList() {
 		default:
 			assertUnreachable(fromList);
 	}
-}
+};

@@ -1,27 +1,28 @@
+import type { Component, JSX } from "solid-js";
 import type { Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
-import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
-import { PopoverContent, PopoverRoot } from "@components/Popover";
-import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
-import { useEffect, useRef } from "react";
-import create from "zustand";
+import { createSignal } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
+import create from "solid-zustand";
 
-import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
-import { selectMediaByPointerEvent } from "@components/MediaListKind/helper";
+import { ctxContentEnum, ContextMenu } from "../ContextMenu";
+import { PopoverContent, PopoverRoot } from "../Popover";
+import { selectMediaByPointerEvent } from "../MediaListKind/helper";
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
-import { isAModifierKeyPressed } from "@utils/keyboard";
-import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
-import { ImgWithFallback } from "@components/ImgWithFallback";
-import { DialogTrigger } from "@components/DialogTrigger";
+import { MediaOptionsModal } from "../MediaListKind/MediaOptions";
+import { VerticalDotsIcon } from "@icons/VerticalDotsIcon";
+import { ImgWithFallback } from "../ImgWithFallback";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
+import { MusicNoteIcon } from "@icons/MusicNoteIcon";
 import { emptyString } from "@common/empty";
 import { emptyArray } from "@common/empty";
-import { RightSlot } from "@components/ContextMenu/RightSlot";
-import { BaseInput } from "@components/BaseInput";
-import { t } from "@components/I18n";
+import { RightSlot } from "../ContextMenu/RightSlot";
+import { BaseInput } from "../BaseInput";
+import { Overlay } from "../BlurOverlay";
+import { Portal } from "solid-js/web";
+import { Dialog } from "../Dialog";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -79,8 +80,8 @@ useSearcher.subscribe(
 
 const setSearchTerm = (e: InputChange) =>
 	setSearcher({
-		highlight: unDiacritic(e.target.value),
-		searchTerm: e.target.value,
+		highlight: unDiacritic(e.currentTarget.value),
+		searchTerm: e.currentTarget.value,
 	});
 
 /////////////////////////////////////////
@@ -100,33 +101,34 @@ const setDefaultSearch = () => setSearcher(defaultSearcher);
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const searchInputSelector = (
-	state: ReturnType<typeof useSearcher.getState>,
-) => ({ searchTerm: state.searchTerm, isInputOnFocus: state.isInputOnFocus });
+export const Input: Component = () => {
+	const { searchTerm, isInputOnFocus } = useSearcher((state) => ({
+		isInputOnFocus: state.isInputOnFocus,
+		searchTerm: state.searchTerm,
+	}));
+	const [t] = useI18n();
 
-export function Input() {
-	const { searchTerm, isInputOnFocus } = useSearcher(searchInputSelector);
-	const inputRef = useRef<HTMLInputElement>(null);
+	let input: HTMLInputElement | undefined;
 
 	/////////////////////////////////////////
 
-	useEffect(() => {
-		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent): void {
-			if (
-				e.key === "Escape" &&
-				getSearcher().isInputOnFocus === true &&
-				isAModifierKeyPressed(e) === false
-			) {
-				setSearcher(defaultSearcher);
-				inputRef.current?.blur();
-			}
-		}
-
-		document.addEventListener("keyup", closeSearchMediaPopoverOnEsc);
-
-		return () =>
-			document.removeEventListener("keyup", closeSearchMediaPopoverOnEsc);
-	}, []);
+	// 	useEffect(() => {
+	// 		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent): void {
+	// 			if (
+	// 				e.key === "Escape" &&
+	// 				getSearcher().isInputOnFocus === true &&
+	// 				isAModifierKeyPressed(e) === false
+	// 			) {
+	// 				setSearcher(defaultSearcher);
+	// 				input?.blur();
+	// 			}
+	// 		}
+	//
+	// 		document.addEventListener("keyup", closeSearchMediaPopoverOnEsc);
+	//
+	// 		return () =>
+	// 			document.removeEventListener("keyup", closeSearchMediaPopoverOnEsc);
+	// 	}, []);
 
 	/////////////////////////////////////////
 
@@ -138,16 +140,15 @@ export function Input() {
 			onFocus={() => setIsInputOnFocus(true)}
 			onBlur={() => setIsInputOnFocus(false)}
 			label={t("labels.searchForSongs")}
-			onChange={setSearchTerm}
+			ref={input as HTMLInputElement}
+			oninput={setSearchTerm}
 			value={searchTerm}
-			spellCheck="false"
+			spellcheck={false}
 			id="search-songs"
-			autoCorrect="off"
-			ref={inputRef}
 			accessKey="s"
 		/>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -155,7 +156,7 @@ export function Input() {
 
 const mantainFocusOnInput = (e: Event) => e.preventDefault();
 
-export function Results() {
+export const Results: Component = () => {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
 	const resultsJSXs: JSX.Element[] = [];
 
@@ -169,12 +170,7 @@ export function Results() {
 
 	for (const [path, media] of results)
 		resultsJSXs.push(
-			<MediaSearchRow
-				highlight={highlight}
-				media={media}
-				path={path}
-				key={path}
-			/>,
+			<MediaSearchRow highlight={highlight} media={media} path={path} />,
 		);
 
 	/////////////////////////////////////////
@@ -194,10 +190,10 @@ export function Results() {
 					}
 					onPointerDownOutside={setDefaultSearch}
 					onOpenAutoFocus={mantainFocusOnInput}
-					className="transition-none"
+					class="transition-none"
 				>
 					{nothingFound ? (
-						<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
+						<div class="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
 							Nothing was found for &quot;{searchTerm}&quot;
 						</div>
 					) : foundSomething ? (
@@ -207,59 +203,62 @@ export function Results() {
 			</PopoverRoot>
 		</ContextMenu>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
-	const index = unDiacritic(media.title).indexOf(highlight);
+const MediaSearchRow: Component<MediaSearchRowProps> = (props) => {
+	const [isOpen, setIsOpen] = createSignal(false);
+	const [t] = useI18n();
+
+	const index = unDiacritic(props.media.title).indexOf(props.highlight);
 
 	return (
 		<div
-			className="unset-all box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow "
-			data-path={path}
+			class="unset-all box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow "
+			data-path={props.path}
 		>
 			<button
-				onPointerUp={() => playThisMedia(path)}
+				onPointerUp={() => playThisMedia(props.path)}
 				title={t("tooltips.playThisMedia")}
 			>
 				<div>
 					<ImgWithFallback
-						Fallback={<MusicNote size={13} />}
-						mediaImg={media.image}
-						mediaPath={path}
+						Fallback={<MusicNoteIcon class="w-3 h-3" />}
+						mediaImg={props.media.image}
+						mediaPath={props.path}
 					/>
 				</div>
 
 				{/* size: "calc(100% - 5px)" */}
-				<div className="flex flex-col items-start justify-center flex-1 m-1 overflow-hidden">
-					<p className="pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium">
-						{media.title.slice(0, index)}
-						<span className="bg-highlight text-white">
-							{media.title.slice(index, index + highlight.length)}
+				<div class="flex flex-col items-start justify-center flex-1 m-1 overflow-hidden">
+					<p class="pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium">
+						{props.media.title.slice(0, index)}
+						<span class="bg-highlight text-white">
+							{props.media.title.slice(index, index + props.highlight.length)}
 						</span>
 
-						{media.title.slice(index + highlight.length)}
+						{props.media.title.slice(index + props.highlight.length)}
 					</p>
 				</div>
 			</button>
 
-			<Dialog modal>
-				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
-					<Dots size={17} />
-				</DialogTrigger>
+			<button title={t("tooltips.openMediaOptions")}>
+				<VerticalDotsIcon class="w-4 h-4" />
+			</button>
 
-				<DialogPortal>
-					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
+			<Portal>
+				<Dialog.Content modal isOpen={isOpen()} onOpenChange={setIsOpen}>
+					<Overlay />
 
-					<MediaOptionsModal media={media} path={path} />
-				</DialogPortal>
-			</Dialog>
+					<MediaOptionsModal media={props.media} path={props.path} />
+				</Dialog.Content>
+			</Portal>
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -284,4 +283,6 @@ type MediaSearchRowProps = Readonly<{
 
 /////////////////////////////////////////
 
-type InputChange = Readonly<React.ChangeEvent<HTMLInputElement>>;
+interface InputChange {
+	currentTarget: HTMLInputElement;
+}

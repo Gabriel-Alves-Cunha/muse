@@ -1,12 +1,11 @@
 import { useAllSelectedMedias } from "@contexts/useAllSelectedMedias";
-import { t } from "@components/I18n";
-
-const sizeSelector = (
-	state: ReturnType<typeof useAllSelectedMedias.getState>,
-) => state.medias.size;
+import { useI18n } from "@solid-primitives/i18n";
 
 export function NumberOfMediasSelected() {
-	const numberOfMediasSelected = useAllSelectedMedias(sizeSelector);
+	const numberOfMediasSelected = useAllSelectedMedias(
+		(state) => state.medias.size,
+	);
+	const [t] = useI18n();
 
 	return numberOfMediasSelected === 0 ? null : (
 		<p>

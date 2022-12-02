@@ -4,9 +4,11 @@ import { Routes, Route } from "@solidjs/router";
 import { Toaster } from "solid-toast";
 import { lazy } from "solid-js";
 
-import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
-import { handleWindowMsgs } from "@utils/handleWindowMsgs";
+// import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
+// import { handleWindowMsgs } from "@utils/handleWindowMsgs";
+import { BlurOverlay } from "@components/BlurOverlay";
 import { Dialog } from "@components/Dialog";
+import { Navbar } from "@components/Navbar";
 
 const Home = lazy(() => import("./pages/Home"));
 
@@ -26,9 +28,16 @@ export const App: Component = () => {
 				}}
 			/>
 
-			<Dialog isOpen={isOpen()} onOpenChange={setIsOpen}>
+			<button class="w-5 h-3" onPointerUp={() => setIsOpen(true)}>
+				abrir
+			</button>
+
+			<Dialog.Content isOpen={isOpen()} onOpenChange={setIsOpen}>
+				<BlurOverlay />
 				Oi
-			</Dialog>
+			</Dialog.Content>
+
+			<Navbar />
 
 			{/* <ShareDialog />
 
@@ -56,8 +65,8 @@ export const App: Component = () => {
 //////////////////////////////////////////
 // Do once on app start:
 
-window.addEventListener("message", handleWindowMsgs);
-
-//////////////////////////////////////////
-
-await searchLocalComputerForMedias();
+// window.addEventListener("message", handleWindowMsgs);
+//
+// //////////////////////////////////////////
+//
+// await searchLocalComputerForMedias();

@@ -1,6 +1,6 @@
 import type { Page } from "@common/@types/generalTypes";
 
-import create from "zustand";
+import create from "solid-zustand";
 
 export const usePage = create<Readonly<{ page: Page }>>(() => ({
 	page: "Home",

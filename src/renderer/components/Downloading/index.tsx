@@ -1,10 +1,9 @@
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { MdDownloading as DownloadingIcon } from "react-icons/md";
-import { useEffect, useState } from "react";
-import { Trigger } from "@radix-ui/react-popover";
-import create from "zustand";
+import { createEffect, createSignal } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
+import create from "solid-zustand";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { createNewDownload, Popup } from "./helper";
@@ -12,11 +11,10 @@ import { reactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
+import { DownloadIcon } from "@icons/DownloadIcon";
 import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
 import { error } from "@utils/log";
-import { t } from "@components/I18n";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -39,15 +37,16 @@ export const { setState: setDownloadInfo } = useDownloadInfo;
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const sizeSelector = (state: ReturnType<typeof useDownloadingList.getState>) =>
-	state.downloadingList.size;
-
 export function Downloading() {
-	const downloadingListSize = useDownloadingList(sizeSelector);
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+	const [isPopoverOpen, setIsPopoverOpen] = createSignal(false);
 	const downloadInfo = useDownloadInfo();
+	const [t] = useI18n();
 
-	useEffect(() => {
+	const downloadingListSize = useDownloadingList(
+		(state) => state.downloadingList.size,
+	);
+
+	createEffect(() => {
 		if (downloadInfo.url.length === 0) return;
 
 		// For each new `downloadInfo`, start a new download:
@@ -70,7 +69,7 @@ export function Downloading() {
 		}
 
 		setDownloadInfo(defaultDownloadInfo);
-	}, [downloadInfo.title, downloadInfo]);
+	});
 
 	return (
 		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -82,7 +81,7 @@ export function Downloading() {
 			>
 				<span data-length={downloadingListSize} />
 
-				<DownloadingIcon className="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
+				<DownloadIcon class="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
 			</Trigger>
 
 			<PopoverContent

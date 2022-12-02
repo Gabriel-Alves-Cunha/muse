@@ -1,21 +1,22 @@
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import { AiOutlineClose as CancelIcon } from "react-icons/ai";
-import create from "zustand";
+import { type Component, Index, Show } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
+import create from "solid-zustand";
 
-import { errorToast, infoToast, successToast } from "@components/toasts";
+import { errorToast, infoToast, successToast } from "../toasts";
 import { type AllowedMedias, formatDuration } from "@common/utils";
-import { type ProgressProps, progressIcons } from "@components/Progress";
+import { type ProgressProps, progressIcons } from "../Progress";
 import { assertUnreachable } from "@utils/utils";
-import { isDownloadList } from "@components/Downloading/helper";
+import { isDownloadList } from "../Downloading/helper";
 import { progressStatus } from "@common/enums";
-import { t, Translator } from "@components/I18n";
 import { error, assert } from "@utils/log";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
+import { CloseIcon } from "@icons/CloseIcon";
 import { emptyMap } from "@common/empty";
-import { Button } from "@components/Button";
+import { Button } from "../Button";
 import { dbg } from "@common/debug";
 import {
 	getConvertingList,
@@ -24,7 +25,6 @@ import {
 } from "@contexts/convertList";
 
 import { handleSingleItemDeleteAnimation } from "../Downloading/styles";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -39,82 +39,84 @@ export const useNewConvertions = create<NewConvertions>(() => ({
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function Popup() {
+export const Popup: Component = () => {
 	const { convertingList } = useConvertingList();
+	const [t] = useI18n();
 
-	return convertingList.size > 0 ? (
-		<>
+	return (
+		<Show
+			fallback={<p>{t("infos.noConversionsInProgress")}</p>}
+			when={convertingList.size > 0}
+		>
 			<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
-				<Translator path="buttons.cleanFinished" />
+				{t("buttons.cleanFinished")}
 			</Button>
 
-			{Array.from(convertingList, ([path, convertingMedia], index) => (
-				<ConvertBox
-					mediaBeingConverted={convertingMedia}
-					convertionIndex={index}
-					path={path}
-					key={path}
-				/>
-			))}
-		</>
-	) : (
-		<p>
-			<Translator path="infos.noConversionsInProgress" />
-		</p>
+			<Index each={[...convertingList]}>
+				{(props, index) => (
+					<ConvertBox
+						mediaBeingConverted={props()[1]}
+						convertionIndex={index}
+						path={props()[0]}
+					/>
+				)}
+			</Index>
+		</Show>
 	);
-}
+};
 
 /////////////////////////////////////////////
 // Helper functions for Popup:
 
 function cleanAllDoneConvertions(): void {
-	for (const [url, download] of getConvertingList()) {
+	for (const [url, download] of getConvertingList())
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
-	}
 }
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const ConvertBox = ({
-	mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
-	convertionIndex,
-	path,
-}: ConvertBoxProps) => (
-	<div className="box">
-		<div className="left">
-			<p>{`${getBasename(path)}.${toExtension}`}</p>
+const ConvertBox: Component<ConvertBoxProps> = (props) => {
+	const [t] = useI18n();
 
-			{`${t("infos.converted")} ${formatDuration(
-				timeConverted,
-			)} / ${prettyBytes(sizeConverted)}`}
+	return (
+		<div class="box">
+			<div class="left">
+				<p>{`${getBasename(props.path)}.${
+					props.mediaBeingConverted.toExtension
+				}`}</p>
+
+				{`${t("infos.converted")} ${formatDuration(
+					props.mediaBeingConverted.timeConverted,
+				)} / ${prettyBytes(props.mediaBeingConverted.sizeConverted)}`}
+			</div>
+
+			<div class="right">
+				<button
+					onPointerUp={(e) =>
+						handleSingleItemDeleteAnimation(
+							e,
+							props.convertionIndex,
+							!isDownloadList,
+							props.path,
+						)
+					}
+					title={t("tooltips.cancelConversion")}
+				>
+					<CloseIcon class="w-3 h-3" />
+				</button>
+
+				{progressIcons.get(props.mediaBeingConverted.status)}
+			</div>
 		</div>
-
-		<div className="right">
-			<button
-				onPointerUp={(e) =>
-					handleSingleItemDeleteAnimation(
-						e,
-						convertionIndex,
-						!isDownloadList,
-						path,
-					)
-				}
-				title={t("tooltips.cancelConversion")}
-			>
-				<CancelIcon size={13} />
-			</button>
-
-			{progressIcons.get(status)}
-		</div>
-	</div>
-);
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -122,9 +124,10 @@ const ConvertBox = ({
 
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
-	path: Readonly<Path>,
+	path: Path,
 ): MessagePort {
 	const convertingList = getConvertingList();
+	const [t] = useI18n();
 
 	dbg("Trying to create a new conversion...", { convertingList });
 
@@ -211,6 +214,7 @@ function handleUpdateConvertingList(
 	path: Path,
 ): void {
 	const convertingList = getConvertingList();
+	const [t] = useI18n();
 
 	dbg(`Received a message from Electron on port for "${path}":`, {
 		convertingList,
@@ -219,7 +223,7 @@ function handleUpdateConvertingList(
 
 	// Assert that the download exists:
 	const thisConversion = convertingList.get(path);
-	if (thisConversion === undefined)
+	if (!thisConversion)
 		return error(
 			"Received a message from Electron but the path is not in the list!",
 		);
@@ -275,25 +279,25 @@ function handleUpdateConvertingList(
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingConverted = Readonly<{
+export type MediaBeingConverted = {
 	status: ProgressProps["status"];
 	toExtension: AllowedMedias;
 	sizeConverted: number;
 	timeConverted: number;
 	port: MessagePort;
-}>;
+};
 
 /////////////////////////////////////////////
 
-type ConvertBoxProps = Readonly<{
+type ConvertBoxProps = {
 	mediaBeingConverted: MediaBeingConverted;
 	convertionIndex: number;
 	path: Path;
-}>;
+};
 
 /////////////////////////////////////////////
 
-export type ConvertInfo = Readonly<{ toExtension: AllowedMedias }>;
+export type ConvertInfo = { toExtension: AllowedMedias };
 
 /////////////////////////////////////////////
 

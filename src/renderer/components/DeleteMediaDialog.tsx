@@ -1,9 +1,11 @@
-import { Close, Content, Title } from "@radix-ui/react-dialog";
-import { Root as Portal } from "@radix-ui/react-portal";
+import type { Component } from "solid-js";
+
+import { useI18n } from "@solid-primitives/i18n";
+import { Portal } from "solid-js/web";
 
 import { BlurOverlay } from "./BlurOverlay";
-import { Translator } from "@components/I18n";
-import { FlexRow } from "@components/FlexRow";
+import { FlexRow } from "./FlexRow";
+import { Dialog } from "./Dialog";
 
 import warningSvg from "@assets/warning.svg";
 
@@ -12,38 +14,41 @@ import warningSvg from "@assets/warning.svg";
 /////////////////////////////////////////////
 // Main function:
 
-export function DeleteMediaDialogContent({ handleMediaDeletion }: Props) {
+export const DeleteMediaDialog: Component<{
+	onOpenChange(newIsOpen: boolean): void;
+	handleMediaDeletion: () => void;
+	isOpen: boolean;
+}> = (props) => {
+	const [t] = useI18n();
+
 	return (
 		<Portal>
-			<BlurOverlay />
+			<Dialog.Content
+				onOpenChange={props.onOpenChange}
+				isOpen={props.isOpen}
+				class=""
+			>
+				<BlurOverlay />
 
-			<Content className="">
-				<Title className="text-lg first-letter:text-3xl first-letter:font-normal">
-					<Translator path="dialogs.deleteMedia.subtitle" />
-				</Title>
+				<h1 class="text-lg first-letter:text-3xl first-letter:font-normal">
+					{t("dialogs.deleteMedia.subtitle")}
+				</h1>
 
 				<FlexRow>
-					<img className="" src={warningSvg} alt="Warning sign." />
+					<img class="" src={warningSvg} alt="Warning sign." />
 
-					<Close
-						className="bg-red-600 text-white hover:bg-opacity-70 focus:bg-opacity-70"
-						onPointerUp={handleMediaDeletion}
+					<Dialog.Close
+						class="bg-red-600 text-white hover:bg-opacity-70 focus:bg-opacity-70"
+						onPointerUp={props.handleMediaDeletion}
 					>
-						<Translator path="buttons.confirm" />
-					</Close>
+						{t("buttons.confirm")}
+					</Dialog.Close>
 
-					<Close className="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70">
-						<Translator path="buttons.cancel" />
-					</Close>
+					<Dialog.Close class="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70">
+						{t("buttons.cancel")}
+					</Dialog.Close>
 				</FlexRow>
-			</Content>
+			</Dialog.Content>
 		</Portal>
 	);
-}
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Types:
-
-type Props = Readonly<{ handleMediaDeletion: () => void }>;
+};

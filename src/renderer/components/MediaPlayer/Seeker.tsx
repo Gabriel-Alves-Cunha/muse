@@ -1,6 +1,6 @@
 import type { RefToAudioAndSeeker } from "./Controls";
 
-import { useEffect, useMemo, useRef } from "react";
+import { type Component, createEffect, createSignal, onMount } from "solid-js";
 
 import { formatDuration, mapTo } from "@common/utils";
 import { useProgress } from ".";
@@ -9,144 +9,113 @@ import { useProgress } from ".";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
-	const progressWrapperRef = useRef<HTMLDivElement>(null);
-	const timeTooltipRef = useRef<HTMLSpanElement>(null);
+export const SeekerWrapper: Component<RefToAudioAndSeeker> = (props) => {
+	const [formatedDuration, setFormatedDuration] = createSignal("00:00");
+	const [isDurationValid, setIsDurationValid] = createSignal(false);
+	const [currentTime, percentage] = useProgress((state) => [
+		state.currentTime,
+		state.percentage,
+	]);
+	let progressWrapper: HTMLDivElement | undefined;
+	let timeTooltip: HTMLSpanElement | undefined;
 
-	const { formatedDuration, isDurationValid } = useMemo(
-		() => ({
-			formatedDuration: formatDuration(audio?.duration),
-			// @ts-ignore => It will give false if duration is undefined:
-			isDurationValid: audio?.duration > 0,
-		}),
-		[audio?.duration],
-	);
+	createEffect(() => {
+		document.documentElement.style.setProperty(
+			"--progress-width",
+			// !NaN => true (in case is not present), everything else is false:
+			`${percentage ? percentage : 0}%`,
+		);
+	});
 
-	useEffect(() => {
+	createEffect(() => {
+		setFormatedDuration(formatDuration(props.audio?.duration));
+		// @ts-ignore => It will give false if duration is undefined:
+		setIsDurationValid(props.audio?.duration > 0);
+	});
+
+	function setTimerTooltip({ offsetX }: PointerEvent): void {
+		if (!(timeTooltip && props.audio)) return;
+
+		const time =
+			(offsetX / timeTooltip.getBoundingClientRect().width) *
+			props.audio.duration;
+		const left = offsetX - (35 >> 1); // 35 is the width of the tooltip.
+		// Also, (35 >> 1) is the half of the width (binary divide by 2).
+
+		timeTooltip.textContent = formatDuration(time);
+		timeTooltip.style.left = `${left}px`;
+	}
+
+	function seek({ offsetX }: PointerEvent): void {
 		if (
-			!(
-				progressWrapperRef.current &&
-				timeTooltipRef.current &&
-				isDurationValid &&
-				audio
-			)
+			!(props.audio && timeTooltip) ||
+			isNaN(props.audio.duration) ||
+			!isFinite(props.audio.duration)
 		)
 			return;
 
-		const timerTooltip = timeTooltipRef.current;
-		const timeline = progressWrapperRef.current;
+		const desiredTime =
+			(offsetX / timeTooltip.getBoundingClientRect().width) *
+			props.audio.duration;
+		const percentage = mapTo(desiredTime, [0, props.audio.duration], [0, 100]);
 
-		function setTimerTooltip({ offsetX }: PointerEvent): void {
-			if (!audio) return;
+		useProgress.setState({ percentage });
+	}
 
-			const time =
-				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-			const left = offsetX - (35 >> 1); // 35 is the width of the tooltip.
-			// Also, (35 >> 1) is the half of the width (binary divide by 2).
+	onMount(() => {
+		timeTooltip!.addEventListener("pointermove", setTimerTooltip);
 
-			timerTooltip.textContent = formatDuration(time);
-			timerTooltip.style.left = `${left}px`;
-		}
+		timeTooltip!.addEventListener("pointerdown", (e) => {
+			// Make sure that event is captured even if pointer moves away from timeTooltip rect bounds:
+			timeTooltip!.setPointerCapture(e.pointerId);
 
-		function seek({ offsetX }: PointerEvent): void {
-			if (!audio || isNaN(audio.duration) || !isFinite(audio.duration)) return;
-
-			const desiredTime =
-				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
-
-			useProgress.setState({ percentage });
-		}
-
-		timeline.addEventListener("pointermove", setTimerTooltip);
-
-		timeline.addEventListener("pointerdown", (e) => {
-			// Make sure that event is captured even if pointer moves away from timeline rect bounds:
-			timeline.setPointerCapture(e.pointerId);
-
-			isSeeking.current = true;
+			props.setIsSeeking(true);
 			seek(e);
 
-			timeline.addEventListener("pointermove", seek);
-			timeline.addEventListener(
+			timeTooltip!.addEventListener("pointermove", seek);
+			timeTooltip!.addEventListener(
 				"pointerup",
 				(e) => {
-					timeline.removeEventListener("pointermove", seek);
+					timeTooltip!.removeEventListener("pointermove", seek);
 
-					isSeeking.current = false;
+					props.setIsSeeking(false);
 
 					const desiredTime =
-						(e.offsetX / timeline.getBoundingClientRect().width) *
-						audio.duration;
+						(e.offsetX / timeTooltip!.getBoundingClientRect().width) *
+						props.audio!.duration;
 
-					audio.currentTime = desiredTime;
+					props.audio!.currentTime = desiredTime;
 				},
 				{ once: true },
 			);
 		});
-	}, [audio, isDurationValid, isSeeking]);
+	});
 
 	return (
-		<div className="flex flex-col w-full gap-2">
+		<div class="flex flex-col w-full gap-2">
 			<div
-				className={`group relative block w-full h-1 bg-main ${
-					isDurationValid ? "cursor-pointer" : "cursor-default"
+				class={`group relative block w-full h-1 bg-main ${
+					isDurationValid() ? "cursor-pointer" : "cursor-default"
 				}`}
 				// onPointerUp={e => seek(e, audio)}
 				// onPointerMove={setTimerTooltip}
-				ref={progressWrapperRef}
+				ref={progressWrapper as HTMLDivElement}
 			>
 				<span // Timer tooltip
-					className={`group-hover:progress group-focus:progress ${
-						isDurationValid ? "hidden" : ""
+					class={`group-hover:progress group-focus:progress ${
+						isDurationValid() ? "hidden" : ""
 					}`}
-					ref={timeTooltipRef}
+					ref={timeTooltip as HTMLSpanElement}
 				/>
 
-				<Progress />
+				<div class={"relative bg-accent h-full w-[var(--progress-width)]"} />
 			</div>
 
-			<div className="flex justify-between items-center text-icon-media-player font-primary text-center text-lg">
-				<CurrentTime />
+			<div class="flex justify-between items-center text-icon-media-player font-primary text-center text-lg">
+				<p>{formatDuration(currentTime)}</p>
 
-				<p>{formatedDuration}</p>
+				<p>{formatedDuration()}</p>
 			</div>
 		</div>
 	);
-}
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Helper functions:
-
-const percentageSelector = (state: ReturnType<typeof useProgress.getState>) =>
-	state.percentage;
-
-/////////////////////////////////////////
-
-const Progress = () => {
-	const percentage = useProgress(percentageSelector);
-	document.documentElement.style.setProperty(
-		"--progress-width",
-		// !NaN => true (in case is not present), everything else is false:
-		`${percentage ? percentage : 0}%`,
-	);
-
-	return (
-		<div className={"relative bg-accent h-full w-[var(--progress-width)]"} />
-	);
-};
-
-/////////////////////////////////////////
-
-const currentTimeSelector = (state: ReturnType<typeof useProgress.getState>) =>
-	state.currentTime;
-
-/////////////////////////////////////////
-
-const CurrentTime = () => {
-	const currentTime = useProgress(currentTimeSelector);
-
-	return <p>{formatDuration(currentTime)}</p>;
 };

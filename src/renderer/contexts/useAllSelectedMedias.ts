@@ -1,7 +1,7 @@
 import type { Path } from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import create from "solid-zustand";
 
 import { getSortedByDate } from "./usePlaylists";
 import { emptySet } from "@common/empty";

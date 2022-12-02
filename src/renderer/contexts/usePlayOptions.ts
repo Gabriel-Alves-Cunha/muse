@@ -1,4 +1,4 @@
-import create from "zustand";
+import create from "solid-zustand";
 
 import { setPlayOptionsOnLocalStorage } from "./localStorageHelpers";
 
@@ -8,7 +8,7 @@ import { setPlayOptionsOnLocalStorage } from "./localStorageHelpers";
 // Main:
 
 export const usePlayOptions = create<PlayOptions>()(
-	setPlayOptionsOnLocalStorage(() => ({ random: false, loop: false })),
+	setPlayOptionsOnLocalStorage(() => ({ isRandom: false, loop: false })),
 );
 
 export const { getState: getPlayOptions, setState: setPlayOptions } =
@@ -30,11 +30,11 @@ export function toggleLoopMedia(): void {
 ////////////////////////////////////////////////
 
 export const toggleRandom = () =>
-	setPlayOptions({ random: !getPlayOptions().random });
+	setPlayOptions({ isRandom: !getPlayOptions().isRandom });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type PlayOptions = Readonly<{ random: boolean; loop: boolean }>;
+export type PlayOptions = Readonly<{ isRandom: boolean; loop: boolean }>;

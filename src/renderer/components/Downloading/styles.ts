@@ -6,7 +6,7 @@ const moveUp = "animation-move-up";
 const boxClass = ".box";
 
 export function handleSingleItemDeleteAnimation(
-	e: React.PointerEvent<HTMLButtonElement>,
+	e: PointerEvent,
 	downloadingOrConvertionIndex: number,
 	isDownloadList: boolean,
 	url: string,

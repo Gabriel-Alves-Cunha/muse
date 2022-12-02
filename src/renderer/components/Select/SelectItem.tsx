@@ -1,33 +1,17 @@
-import { BsCheck2 as CheckIcon } from "react-icons/bs";
-import { forwardRef } from "react";
-import {
-	type SelectItemProps,
-	ItemIndicator,
-	ItemText,
-	Item,
-} from "@radix-ui/react-select";
+import type { Component, JSX } from "solid-js";
 
-export const SelectItem = forwardRef(
-	(
-		{ title, className = "", ...props }: Props,
-		forwardedRef: React.Ref<HTMLDivElement>,
-	) => {
-		return (
-			<Item
-				className={`select-item ${className}`}
-				{...props}
-				ref={forwardedRef}
-			>
-				<ItemText>{title}</ItemText>
+import { CheckMarkIcon } from "@icons/CheckMarkIcon";
 
-				<ItemIndicator className="absolute inline-flex justify-center items-center w-6 left-0">
-					<CheckIcon className="bg-transparent" />
-				</ItemIndicator>
-			</Item>
-		);
-	},
-);
+export const SelectItem: Component<Props> = (props) => {
+	return (
+		<option class={`select-item ${props.class ?? ""}`} {...props}>
+			<div class="absolute inline-flex justify-center items-center w-6 left-0">
+				<CheckMarkIcon class="bg-transparent" />
+			</div>
 
-interface Props extends SelectItemProps {
-	readonly title: string;
-}
+			<p>{props.title}</p>
+		</option>
+	);
+};
+
+interface Props extends JSX.OptionHTMLAttributes<HTMLOptionElement> {}

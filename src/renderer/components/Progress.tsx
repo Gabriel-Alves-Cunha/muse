@@ -1,10 +1,11 @@
+import type { Component, JSX } from "solid-js";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { RiDownloadFill as DownloadingIcon } from "react-icons/ri";
-import { CgSearchLoading as LoadingIcon } from "react-icons/cg";
-import { AiOutlineCheck as SuccessIcon } from "react-icons/ai";
-import { TiCancel as CanceledIcon } from "react-icons/ti";
-import { MdError as FailedIcon } from "react-icons/md";
+import { CheckMarkIcon } from "@icons/CheckMarkIcon";
+import { DownloadIcon } from "@icons/DownloadIcon";
+import { SearchIcon } from "@icons/SearchIcon";
+import { CloseIcon } from "@icons/CloseIcon";
+import { ErrorIcon } from "@icons/ErrorIcon";
 
 import { progressStatus } from "@common/enums";
 
@@ -13,10 +14,12 @@ import { progressStatus } from "@common/enums";
 //////////////////////////////////////////
 // Main function:
 
-export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
+export const Progress: Component<ProgressProps> = (props) => (
 	<progress
-		className="appearance-none border-none transition-width duration-300 ease-linear w-48 h-1"
-		value={status === progressStatus.SUCCESS ? 100 : percent_0_to_100}
+		class="appearance-none border-none transition-width duration-300 ease-linear w-48 h-1"
+		value={
+			props.status === progressStatus.SUCCESS ? 100 : props.percent_0_to_100
+		}
 		max={100}
 	/>
 );
@@ -32,48 +35,26 @@ export const progressIcons: ReadonlyMap<
 > = new Map([
 	[
 		progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-		<LoadingIcon
-			className="fill-orange-400"
-			title="Waiting"
-			key="loading"
-			size={15}
-		/>,
+		<SearchIcon class="fill-orange-400 w-4 h-4" aria-labelledby="Waiting" />,
 	],
 	[
 		progressStatus.ACTIVE,
-		<DownloadingIcon
-			className="fill-teal-600"
-			title="Downloading"
-			key="active"
-			size={15}
+		<DownloadIcon
+			class="fill-teal-600 w-4 h-4"
+			aria-labelledby="Downloading"
 		/>,
 	],
 	[
 		progressStatus.CANCEL,
-		<CanceledIcon
-			className="fill-yellow-600"
-			title="Canceled"
-			key="canceled"
-			size={17}
-		/>,
+		<CloseIcon class="fill-yellow-600 w-4 h-4" aria-labelledby="Canceled" />,
 	],
 	[
 		progressStatus.SUCCESS,
-		<SuccessIcon
-			className="fill-green-500"
-			title="Success"
-			key="success"
-			size={15}
-		/>,
+		<CheckMarkIcon class="fill-green-500 w-4 h-4" aria-labelledby="Success" />,
 	],
 	[
 		progressStatus.FAILED,
-		<FailedIcon
-			className="fill-red-500"
-			title="Failed"
-			key="failed"
-			size={16}
-		/>,
+		<ErrorIcon class="fill-red-500 w-4 h-4" aria-labelledby="Failed" />,
 	],
 ]);
 

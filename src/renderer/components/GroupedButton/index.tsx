@@ -1,26 +1,28 @@
+import type { Component } from "solid-js";
+
 import { Reload } from "./Reload";
 import { SortBy } from "./SortBy";
 import { Clean } from "./Clean";
 
-export function GroupedButton(buttons: Buttons) {
+export const GroupedButton: Component<Buttons> = (props) => {
 	return (
-		<div className="flex">
-			{buttons.reload && <Reload />}
+		<div class="flex">
+			{props.reload && <Reload />}
 
-			{buttons.sortBy && <SortBy />}
+			{props.sortBy && <SortBy />}
 
-			{buttons.clean && <Clean />}
+			{props.clean && <Clean />}
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-type Buttons = Readonly<{
+type Buttons = {
 	reload?: boolean;
 	sortBy?: boolean;
 	clean?: boolean;
-}>;
+};

@@ -1,26 +1,25 @@
-import { MdAutorenew as ReloadIcon } from "react-icons/md";
+import type { Component } from "solid-js";
+
+import { useI18n } from "@solid-primitives/i18n";
 
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { t } from "@components/I18n";
+import { ReloadIcon } from "@icons/ReloadIcon";
 import {
 	searchLocalComputerForMedias,
 	usePlaylists,
 } from "@contexts/usePlaylists";
 
-const isLoadingMediasSelector = (
-	state: ReturnType<typeof usePlaylists.getState>,
-) => state.isLoadingMedias;
-
-export function Reload() {
-	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
+export const Reload: Component = () => {
+	const isLoadingMedias = usePlaylists((state) => state.isLoadingMedias);
+	const [t] = useI18n();
 
 	return (
 		<ButtonOfGroup
-			className={isLoadingMedias ? "animate-spin" : ""}
+			classList={{ "animate-spin": isLoadingMedias }}
 			onPointerUp={searchLocalComputerForMedias}
 			title={t("tooltips.reloadAllMedias")}
 		>
-			<ReloadIcon size={17} className="fill-white" />
+			<ReloadIcon class="w-4 h-4 fill-white" />
 		</ButtonOfGroup>
 	);
-}
+};

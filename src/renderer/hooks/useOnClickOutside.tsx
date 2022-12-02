@@ -2,7 +2,7 @@ import { onCleanup, onMount } from "solid-js";
 
 import { leftClick } from "@components/MediaListKind/helper";
 
-export const useOutsideClickHandler = (
+export const useOnClickOutside = (
 	ref: HTMLElement | null,
 	onOutsideClick: (event: PointerEvent) => void
 ) => {
