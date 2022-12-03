@@ -71,35 +71,35 @@ export const getAllowedMedias = (filenames: readonly Path[]): readonly Path[] =>
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByDate(list: MainList): ReadonlySet<Path> {
-	const listAsArrayOfPaths = Array.from(list)
-		.sort(([, prevMedia], [, nextMedia]) => {
-			if (prevMedia.birthTime > nextMedia.birthTime) return 1;
-			if (prevMedia.birthTime < nextMedia.birthTime) return -1;
-			// a must be equal to b:
-			return 0;
-		})
-		.map(([path]) => path);
+export const sortByDate = (list: MainList): Set<Path> =>
+	time(() => {
+		const listAsArrayOfPaths = [...list]
+			.sort(
+				([, { birthTime: prevBirthTime }], [, { birthTime: nextBirthTime }]) =>
+					prevBirthTime > nextBirthTime
+						? 1
+						: prevBirthTime < nextBirthTime
+						? -1
+						: 0,
+			)
+			.map(([path]) => path);
 
-	return new Set(listAsArrayOfPaths);
-}
+		return new Set(listAsArrayOfPaths);
+	}, "sortByDate");
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByName(list: MainList): MainList {
-	const listAsArrayOfPaths = Array.from(list).sort(
-		([, prevMedia], [, nextMedia]) => {
-			const prevTitle = prevMedia.title.toLocaleLowerCase();
-			const nextTitle = nextMedia.title.toLocaleLowerCase();
+export const sortByName = (list: MainList): MainList =>
+	time(() => {
+		const listAsArrayOfPaths = [...list].sort(
+			([, { title: prevTitle }], [, { title: nextTitle }]) =>
+				prevTitle.localeCompare(nextTitle, undefined, {
+					ignorePunctuation: true,
+					sensitivity: "base",
+				}),
+		);
 
-			if (prevTitle > nextTitle) return 1;
-			if (prevTitle < nextTitle) return -1;
-			// a must be equal to b:
-			return 0;
-		},
-	);
-
-	return new Map(listAsArrayOfPaths);
-}
+		return new Map(listAsArrayOfPaths);
+	}, "sortByName");

@@ -1,7 +1,11 @@
 import type { Component, JSX } from "solid-js";
 
 export const Button: Component<ButtonProps> = (props) => (
-	<button class={`button ${props.variant} ${props.class ?? ""}`} {...props} />
+	<button
+		class={`button ${props.variant} ${props.class ?? ""}`}
+		type="button"
+		{...props}
+	/>
 );
 
 interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {

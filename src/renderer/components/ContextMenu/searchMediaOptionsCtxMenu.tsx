@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import { Component, createSignal } from "solid-js";
 
 import { useI18n } from "@solid-primitives/i18n";
 
@@ -11,7 +11,6 @@ import { setSettings } from "@contexts/settings";
 import { openLyrics } from "../MediaPlayer/Header";
 import { TrashIcon } from "@icons/TrashIcon";
 import { ShareIcon } from "@icons/ShareIcon";
-import { Dialog } from "../Dialog";
 import { Item } from "./Item";
 import {
 	setAllSelectedMedias,
@@ -24,29 +23,33 @@ import {
 // Main function:
 
 export const SearchMediaOptionsCtxMenu: Component<Props> = (props) => {
+	const [isDeletMediaDialogOpen, setIsDeletMediaDialogOpen] =
+		createSignal(false);
 	const [t] = useI18n();
 
 	return (
 		<>
-			<>
-				<Trigger
-					class="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
-					disabled={props.isAllDisabled}
-				>
-					<>
-						{t("ctxMenus.deleteMedia")}
+			<Item onSelect={shareMedias} disabled={props.isAllDisabled}>
+				{t("ctxMenus.deleteMedia")}
 
-						<div class="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-							<TrashIcon />
-						</div>
-					</>
-				</Trigger>
+				<div class="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+					<TrashIcon />
+				</div>
 
-				<Dialog.Content modal>
-					<DeleteMediaDialog handleMediaDeletion={deleteMedias} />
-				</Dialog.Content>
-			</>
+				<DeleteMediaDialog
+					onOpenChange={setIsDeletMediaDialogOpen}
+					handleMediaDeletion={deleteMedias}
+					isOpen={isDeletMediaDialogOpen()}
+				/>
+			</Item>
 
+			<Item onSelect={shareMedias} disabled={props.isAllDisabled}>
+				{t("ctxMenus.shareMedia")}
+
+				<div class="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+					<ShareIcon />
+				</div>
+			</Item>
 			<Item onSelect={shareMedias} disabled={props.isAllDisabled}>
 				{t("ctxMenus.shareMedia")}
 

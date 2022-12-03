@@ -4,6 +4,7 @@ import { useI18n } from "@solid-primitives/i18n";
 
 import { electronIpcMainProcessNotification } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
+import { Separator } from "../Separator";
 import { RightSlot } from "./RightSlot";
 import { Item } from "./Item";
 

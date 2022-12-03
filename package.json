@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"@minht11/solid-virtual-container": "^0.2.1",
 		"@solid-primitives/i18n": "^1.1.2",
 		"@solidjs/router": "^0.5.1",
 		"@types/fluent-ffmpeg": "^2.1.20",
@@ -36,7 +37,6 @@
 		"cross-env": "^7.0.3",
 		"electron": "^22.0.0",
 		"electron-builder": "^23.6.0",
-		"electron-devtools-installer": "^3.2.0",
 		"electron-updater": "^5.3.0",
 		"fastest-validator": "^1.15.0",
 		"fluent-ffmpeg": "^2.1.2",
@@ -51,14 +51,12 @@
 		"sanitize-filename": "^1.6.3",
 		"solid-js": "^1.6.2",
 		"solid-toast": "^0.3.5",
-		"solid-zustand": "^1.5.0",
 		"tailwindcss": "^3.2.4",
 		"typescript": "^4.9.3",
 		"vite": "^3.2.4",
 		"vite-plugin-solid": "^2.4.0",
 		"vitest": "^0.25.3",
-		"ytdl-core": "^4.11.2",
-		"zustand": "4.1.4"
+		"ytdl-core": "^4.11.2"
 	},
 	"cpu": [
 		"x64"

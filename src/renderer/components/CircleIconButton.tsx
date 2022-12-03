@@ -5,6 +5,7 @@ export const CircleIconButton: Component<ButtonProps> = (props) => (
 		class={`circle-icon-button ${props.variant ?? "small"} ${
 			props.class ?? ""
 		}`}
+		type="button"
 		{...props}
 	/>
 );

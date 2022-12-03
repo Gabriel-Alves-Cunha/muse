@@ -1,13 +1,13 @@
+import type { InputChangeEvent } from "@common/@types/solid-js-helpers";
 import type { AllowedMedias } from "@common/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
-import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
+import { type Component, createEffect, createSignal } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
 
-import { t, Translator } from "@components/I18n";
 import { MainArea } from "@components/MainArea";
-import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
+import { SwapIcon } from "@icons/SwapIcon";
 import { Button } from "@components/Button";
 import {
 	type ConvertInfo,
@@ -19,70 +19,73 @@ import {
 ////////////////////////////////////////////////
 // Main function:
 
-export function Convert() {
-	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
-	const [toExtension] = useState<AllowedMedias>("mp3");
-	const inputRef = useRef<HTMLInputElement>(null);
-	useTitle(t("titles.convert"));
+export const Convert: Component = () => {
+	const [selectedFiles, setSelectedFiles] =
+		createSignal<SelectedFiles>(emptyMap);
+	const [toExtension] = createSignal<AllowedMedias>("mp3");
+	const [t] = useI18n();
+
+	let inputRef: HTMLInputElement | undefined;
 
 	////////////////////////////////////////////////
 
-	function handleSelectedFiles({
-		target: { files },
-	}: ChangeEvent<HTMLInputElement>) {
+	function handleSelectedFiles({ currentTarget: { files } }: InputChangeEvent) {
 		if (!files?.length) return;
 
 		const map: Map<Path, ConvertInfo> = new Map();
 
-		for (const file of files) map.set(file.webkitRelativePath, { toExtension });
+		for (const file of files)
+			map.set(file.webkitRelativePath, { toExtension: toExtension() });
 
 		setSelectedFiles(map);
 	}
 
 	////////////////////////////////////////////////
 
-	const openNativeUI_ChooseFiles = () => inputRef.current?.click();
+	const openNativeUI_ChooseFiles = () => inputRef?.click();
 
 	////////////////////////////////////////////////
 
 	// Start converting
-	useEffect(() => {
+	createEffect(() => {
 		// If there are selected files, convert them:
-		if (!(selectedFiles.size > 0)) return;
+		if (!(selectedFiles().size > 0)) return;
 
 		// To start convert, add to the convertInfoList:
-		useNewConvertions.setState({ newConvertions: selectedFiles });
+		useNewConvertions.setState({ newConvertions: selectedFiles() });
 
 		setSelectedFiles(emptyMap);
-	}, [toExtension, selectedFiles]);
+	});
 
 	////////////////////////////////////////////////
 
 	return (
 		<MainArea>
-			<div className="flex justify-center items-center ">
+			<div class="flex justify-center items-center ">
 				<Button
 					onPointerUp={openNativeUI_ChooseFiles}
-					className="no-transition"
+					class="no-transition"
 					variant="circle"
 				>
-					<ConvertIcon size={18} />
+					<SwapIcon class="w-4 h-4" />
 
 					<input
+						ref={inputRef as HTMLInputElement}
 						onChange={handleSelectedFiles}
 						accept="video/*,audio/*"
-						className="hidden"
-						ref={inputRef}
+						class="hidden"
 						type="file"
 						multiple
 					/>
 
-					<Translator path="buttons.convert" />
+					{t("buttons.convert")}
 				</Button>
 			</div>
 		</MainArea>
 	);
-}
+};
+
+export default Convert;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

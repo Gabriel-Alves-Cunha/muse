@@ -1,6 +1,13 @@
-import { Component, createSignal, JSX, onCleanup } from "solid-js";
+import {
+	type Component,
+	type JSX,
+	createSignal,
+	onCleanup,
+	onMount,
+} from "solid-js";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
 
 const Content: Component<DialogRootProps> = (props) => {
 	const [isOnFocus, setIsOnFocus] = createSignal(false);
@@ -19,26 +26,28 @@ const Content: Component<DialogRootProps> = (props) => {
 	/////////////////////////////////////////////
 	// Functions:
 
-	function setOnOpenChangeToFalse() {
-		props.onOpenChange(false);
-	}
+	const setOnOpenChangeToFalse = () => props.onOpenChange(false);
 
-	function closeDialogOnEsc(e: KeyboardEvent) {
-		if (
-			!isAModifierKeyPressed(e) &&
-			e.key === "Escape" &&
-			props.isOpen &&
-			isOnFocus()
-		)
-			closeDialog(e);
-	}
+	const closeDialogOnEsc = (e: KeyboardEvent) =>
+		!isAModifierKeyPressed(e) &&
+		e.key === "Escape" &&
+		props.isOpen &&
+		isOnFocus() &&
+		closeDialog(e);
 
 	/////////////////////////////////////////////
 	// Listeners
 
-	document.addEventListener("keyup", closeDialogOnEsc);
+	onMount(() => {
+		document.addEventListener("keyup", closeDialogOnEsc);
 
-	dialog.addEventListener("close", setOnOpenChangeToFalse);
+		dialog.addEventListener("close", setOnOpenChangeToFalse);
+
+		useOnClickOutside(dialog, (e) => {
+			closeDialog(e);
+			props.onClickOutside?.(e);
+		});
+	});
 
 	onCleanup(() => {
 		dialog.removeEventListener("close", setOnOpenChangeToFalse);
@@ -58,6 +67,7 @@ const Close: Component<CloseDialogProps> = (props) => (
 	<button
 		class={`close-dialog ${props.class ?? ""}`}
 		onPointerUp={closeDialog}
+		type="button"
 		{...props}
 	/>
 );
@@ -87,6 +97,7 @@ interface CloseDialogProps
 
 interface DialogRootProps extends JSX.DialogHtmlAttributes<HTMLDialogElement> {
 	onOpenChange(newIsOpen: boolean): void;
+	onClickOutside?(e: PointerEvent): void;
 	children: JSX.Element;
 	isOpen: boolean;
 	modal?: boolean;

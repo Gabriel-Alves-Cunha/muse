@@ -1,10 +1,11 @@
-import type { Component, JSX } from "solid-js";
+import { Component, JSX, Setter } from "solid-js";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
 import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
 import { assertUnreachable } from "@utils/utils";
 import { MainCtxMenu } from "./mainCtxMenu";
+import { Dialog } from "@components/Dialog";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -23,22 +24,18 @@ const { MEDIA_OPTIONS, MAIN, SEARCH_MEDIA_OPTIONS } = ctxContentEnum;
 /////////////////////////////////////////////
 // Main function:
 
-export const ContextMenu: Component<Props> = (props) => (
-	<>
-		<Trigger onContextMenuCapture={props.onContextMenu}>
-			{props.children}
-		</Trigger>
-
-		<Root onOpenChange={props.setIsOpen} modal>
-			<Content
-				className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
-				loop
-			>
-				{contentToShow(props.content ?? MAIN, Boolean(props.isAllDisabled))}
-			</Content>
-		</Root>
-	</>
-);
+export const ContextMenu: Component<Props> = (props) => {
+	return (
+		<Dialog.Content
+			class="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
+			onOpenChange={props.onOpenChange}
+			isOpen={props.isOpen}
+			modal
+		>
+			{contentToShow(props.content ?? MAIN, Boolean(props.isAllDisabled))}
+		</Dialog.Content>
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -69,10 +66,11 @@ function contentToShow(
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{
+type Props = {
+	onContextMenu?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
 	content?: ValuesOf<typeof ctxContentEnum>;
-	setIsOpen?: (newIsOpen: boolean) => void;
-	onContextMenu?: PointerEvent;
+	onOpenChange: Setter<boolean>;
 	isAllDisabled?: boolean;
 	children: JSX.Element;
-}>;
+	isOpen: boolean;
+};

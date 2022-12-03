@@ -96,6 +96,7 @@ const DownloadingBox: Component<DownloadingBoxProps> = (props) => {
 						)
 					}
 					title={t("tooltips.cancelDownload")}
+					type="button"
 				>
 					<CancelIcon class="w-3 h-3" />
 				</button>

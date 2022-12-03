@@ -1,5 +1,6 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
+import { VirtualContainer } from "@minht11/solid-virtual-container";
 import { useI18n } from "@solid-primitives/i18n";
 import {
 	type Component,
@@ -8,10 +9,11 @@ import {
 	createMemo,
 	onCleanup,
 	onMount,
+	Accessor,
 } from "solid-js";
 
 import { SearchOffIcon as NoMediaFound } from "@icons/SearchOffIcon";
-import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
+// import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
@@ -31,12 +33,10 @@ import {
 } from "@contexts/usePlaylists";
 import {
 	selectMediaByPointerEvent,
-	computeHistoryItemKey,
 	setIsCtxMenuOpen,
-	computeItemKey,
 	isCtxMenuOpen,
-	itemContent,
 	useFromList,
+	Row,
 } from "./helper";
 
 /////////////////////////////////////////
@@ -70,7 +70,7 @@ export const MediaListKind: Component<Props> = (props) => {
 
 const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 	const { fromList, homeList } = useFromList();
-	let listRef: HTMLDivElement | undefined;
+	let scrollTargetElement: HTMLDivElement | undefined;
 
 	// isHome is used to determine which list to use
 	// when the user is at the home page, the homeList is used
@@ -79,63 +79,119 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 	const listName = () => (props.isHome === true ? homeList : fromList);
 	const { [listName()]: list } = usePlaylists();
 
-	// readonly [Path, Media, DateAsNumber][]
-	const listAsArrayOfAMap = createMemo(() =>
-		time(() => {
-			const name = listName();
+	// 	const listAsArrayOfAMap: Accessor<
+	// 		readonly { media: Media; path: Path; date: number }[]
+	// 	> = createMemo(() =>
+	// 		time(() => {
+	// 			const name = listName();
+	//
+	// 			switch (name) {
+	// 				case playlistList.mainList:
+	// 					return Array.from(list as MainList, ([path, media]) => ({
+	// 						date: 0,
+	// 						media,
+	// 						path,
+	// 					}));
+	//
+	// 				case playlistList.sortedByDate:
+	// 				case playlistList.favorites: {
+	// 					const mainList = getMainList();
+	//
+	// 					return Array.from(list as ReadonlySet<Path>, (path) => {
+	// 						const media = mainList.get(path);
+	//
+	// 						if (!media)
+	// 							throw new Error(
+	// 								`Tried to access inexistent media with path = "${path}"`,
+	// 							);
+	//
+	// 						return { path, media, date: 0 };
+	// 					});
+	// 				}
+	//
+	// 				case playlistList.history: {
+	// 					const unsortedList: [Path, DateAsNumber][] = [];
+	//
+	// 					for (const [path, dates] of list as History)
+	// 						for (const date of dates) unsortedList.push([path, date]);
+	//
+	// 					const mainList = getMainList();
+	//
+	// 					return unsortedList
+	// 						.sort((a, b) => b[1] - a[1]) // sorted by date
+	// 						.map(([path, date]) => ({
+	// 							media: mainList.get(path)!,
+	// 							path,
+	// 							date,
+	// 						}));
+	// 				}
+	//
+	// 				default:
+	// 					return assertUnreachable(name);
+	// 			}
+	// 		}, "listAsArrayOfAMap"),
+	// 	);
+	const listAsArrayOfAMap: Accessor<[Path, Media, DateAsNumber][]> = createMemo(
+		() => time(() => {
+				const name = listName();
 
-			switch (name) {
-				case playlistList.mainList:
-					return Array.from(list as MainList, ([path, media]) => [
-						path,
-						media,
-						0,
-					]);
+				switch (name) {
+					case playlistList.mainList: {
+						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
+							list as MainList,
+							([path, media]) => [path, media, 0],
+						);
 
-				case playlistList.sortedByDate:
-				case playlistList.favorites: {
-					const mainList = getMainList();
+						return listAsArrayOfAMap;
+					}
 
-					const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
-						list as ReadonlySet<Path>,
-						(path) => {
-							const media = mainList.get(path);
+					case playlistList.sortedByDate:
+					case playlistList.favorites: {
+						const mainList = getMainList();
 
-							if (!media)
-								throw new Error(
-									`Tried to access inexistent media with path = "${path}"`,
-								);
+						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
+							list as ReadonlySet<Path>,
+							(path) => {
+								const media = mainList.get(path);
 
-							return [path, media, 0];
-						},
-					);
+								if (!media)
+									throw new Error(
+										`Tried to access inexistent media with path = "${path}"`,
+									);
 
-					return listAsArrayOfAMap;
+								return [path, media, 0];
+							},
+						);
+
+						return listAsArrayOfAMap;
+					}
+
+					case playlistList.history: {
+						const unsortedList: [Path, DateAsNumber][] = [];
+
+						for (const [path, dates] of list as History)
+							for (const date of dates) unsortedList.push([path, date]);
+
+						const mainList = getMainList();
+
+						const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
+							.sort((a, b) => b[1] - a[1]) // sorted by date
+							.map(([path, date]) => [path, mainList.get(path)!, date]);
+
+						return listAsArrayOfMap;
+					}
+
+					default:
+						return assertUnreachable(name);
 				}
-
-				case playlistList.history: {
-					const unsortedList: [Path, DateAsNumber][] = [];
-
-					for (const [path, dates] of list as History)
-						for (const date of dates) unsortedList.push([path, date]);
-
-					const mainList = getMainList();
-
-					const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
-						.sort((a, b) => b[1] - a[1]) // sorted by date
-						.map(([path, date]) => [path, mainList.get(path)!, date]);
-
-					return listAsArrayOfMap;
-				}
-
-				default:
-					return assertUnreachable(name);
-			}
-		}, "listAsArrayOfAMap"),
+			}, "listAsArrayOfAMap"),
 	);
 
 	onMount(() => {
-		useOnClickOutside(listRef as HTMLDivElement, handleDeselectAllMedias);
+		useOnClickOutside(
+			scrollTargetElement as HTMLDivElement,
+			handleDeselectAllMedias,
+		);
 	});
 
 	createEffect(() => useFromList.setState({ isHome: Boolean(props.isHome) }));
@@ -148,28 +204,21 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 
 	return (
 		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
-		<div class="max-w-2xl h-[87%]" ref={listRef as HTMLDivElement}>
-			<ContextMenu
+		<div class="max-w-2xl h-[87%]" ref={scrollTargetElement as HTMLDivElement}>
+			{/* <ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
 				content={ctxContentEnum.MEDIA_OPTIONS}
 				setIsOpen={setIsCtxMenuOpen}
+			> */}
+			<VirtualContainer
+				scrollTarget={scrollTargetElement}
+				items={listAsArrayOfAMap()}
+				itemSize={{ height: 64 }}
+				className="list"
 			>
-				<Virtuoso
-					computeItemKey={
-						listName() === playlistList.history
-							? computeHistoryItemKey
-							: computeItemKey
-					}
-					totalCount={listAsArrayOfAMap.length}
-					itemContent={itemContent}
-					data={listAsArrayOfAMap}
-					components={components}
-					fixedItemHeight={65}
-					class="list"
-					overscan={15}
-					noValidate
-				/>
-			</ContextMenu>
+				{Row}
+			</VirtualContainer>
+			{/* </ContextMenu> */}
 		</div>
 	);
 };
@@ -216,3 +265,5 @@ function handleDeselectAllMedias() {
 // Types:
 
 type Props = { isHome?: boolean | undefined };
+
+type TabIndex = number;

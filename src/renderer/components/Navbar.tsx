@@ -20,40 +20,8 @@ import { pages } from "@utils/app";
 /////////////////////////////////////////
 // Main function:
 
-export const Navbar: Component = () => (
-	<nav class="nav">
-		<ThemeToggler />
-
-		<ButtonsForPages />
-
-		{/* <div class="min-h-max flex flex-col justify-center items-center w-full">
-			<Converting />
-
-			<Downloading />
-		</div> */}
-	</nav>
-);
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Constants:
-
-const icons: Readonly<Record<Page, JSX.Element>> = {
-	Download: <DownloadIcon />,
-	Favorites: <HeartIcon />,
-	History: <HistoryIcon />,
-	Convert: <SwapIcon />,
-	Home: <HomeIcon />,
-} as const;
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Helper function:
-
-function ButtonsForPages() {
-	const currPage = usePage().page;
+export const Navbar: Component = () => {
+	const currPage = usePage((state) => state.page);
 	const buttons: JSX.Element[] = [];
 	const [t] = useI18n();
 
@@ -63,10 +31,31 @@ function ButtonsForPages() {
 				title={t("tooltips.goto") + t(`pages.${page}`)}
 				class={page === currPage ? "active" : ""}
 				onPointerUp={() => setPage({ page })}
+				type="button"
 			>
 				{icons[page]}
 			</button>,
 		);
 
-	return <div class="buttons-for-pages">{buttons}</div>;
-}
+	return (
+		<nav class="nav">
+			<ThemeToggler />
+
+			<div class="buttons-for-pages">{buttons}</div>
+
+			{/* <div class="min-h-max flex flex-col justify-center items-center w-full">
+			<Converting />
+
+			<Downloading />
+		</div> */}
+		</nav>
+	);
+};
+
+const icons: Readonly<Record<Page, JSX.Element>> = {
+	Download: <DownloadIcon />,
+	Favorites: <HeartIcon />,
+	History: <HistoryIcon />,
+	Convert: <SwapIcon />,
+	Home: <HomeIcon />,
+} as const;

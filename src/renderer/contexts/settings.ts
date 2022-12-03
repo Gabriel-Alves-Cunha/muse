@@ -1,9 +1,6 @@
-import type { Path } from "@common/@types/generalTypes";
+import { createEffect, createSignal } from "solid-js";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import create from "solid-zustand";
-
-import { emptySet } from "@common/empty";
+import { dbg } from "@common/debug";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -11,49 +8,42 @@ import { emptySet } from "@common/empty";
 // Pre work:
 
 const settingsKey = "muse:settings";
-const defaultValues: Settings = {
+const defaultValues: Settings = Object.freeze({
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
-	filesToShare: emptySet,
 	maxSizeOfHistory: 100,
-};
+});
 const savedSettings = localStorage.getItem(settingsKey);
-const settingsToApply =
-	savedSettings === null
-		? defaultValues
-		: (JSON.parse(savedSettings) as Settings);
+const settingsToApply = savedSettings
+	? (JSON.parse(savedSettings) as Settings)
+	: defaultValues;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main function:
 
-export const useSettings = create<Settings>()(
-	subscribeWithSelector((_set, _get, _api) => settingsToApply),
-);
-
-export const { getState: getSettings, setState: setSettings } = useSettings;
+export const [getSettings, setSettings] =
+	createSignal<Settings>(settingsToApply);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Helper function:
 
-useSettings.subscribe(
-	(state) => state,
-	function writeToLocalStorage(newSettings): void {
-		localStorage.setItem(settingsKey, JSON.stringify(newSettings));
-	},
-);
+createEffect(() => {
+	dbg("Saving new settings on LocalStorage.");
+
+	localStorage.setItem(settingsKey, JSON.stringify(getSettings()));
+});
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type Settings = Readonly<{
+export type Settings = {
 	assureMediaSizeIsGreaterThan60KB: boolean;
 	ignoreMediaWithLessThan60Seconds: boolean;
-	filesToShare: ReadonlySet<Path>;
 	maxSizeOfHistory: number;
-}>;
+};

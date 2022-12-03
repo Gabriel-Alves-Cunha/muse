@@ -5,7 +5,6 @@ import { createEffect, createSignal } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
 import create from "solid-zustand";
 
-import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { createNewDownload, Popup } from "./helper";
 import { reactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";
@@ -13,7 +12,8 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
 import { DownloadIcon } from "@icons/DownloadIcon";
 import { emptyString } from "@common/empty";
-import { errorToast } from "@components/toasts";
+import { errorToast } from "../toasts";
+import { Dialog } from "../Dialog";
 import { error } from "@utils/log";
 
 /////////////////////////////////////////////
@@ -72,30 +72,31 @@ export function Downloading() {
 	});
 
 	return (
-		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-			<Trigger
-				className={`${
-					downloadingListSize > 0 ? "has-items" : ""
-				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
+		<>
+			<button
+				class="relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group"
+				classList={{ "has-items": downloadingListSize > 0 }}
 				title={t("tooltips.showAllDownloadingMedias")}
+				type="button"
 			>
 				<span data-length={downloadingListSize} />
 
 				<DownloadIcon class="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
-			</Trigger>
+			</button>
 
-			<PopoverContent
-				size={
+			<Dialog.Content
+				class={`${
 					downloadingListSize === 0
 						? "nothing-found-for-convertions-or-downloads"
 						: "convertions-or-downloads"
-				}
-				side="right"
-				align="end"
+				}`}
+				onOpenChange={setIsPopoverOpen}
+				isOpen={isPopoverOpen()}
+				modal
 			>
 				<Popup />
-			</PopoverContent>
-		</PopoverRoot>
+			</Dialog.Content>
+		</>
 	);
 }
 
@@ -104,10 +105,10 @@ export function Downloading() {
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingDownloaded = Readonly<{
+export type MediaBeingDownloaded = {
 	status: ValuesOf<typeof progressStatus>;
 	percentage: number;
 	port: MessagePort;
 	imageURL: string;
 	title: string;
-}>;
+};

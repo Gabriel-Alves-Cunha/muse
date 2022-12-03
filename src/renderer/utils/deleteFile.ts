@@ -1,16 +1,18 @@
 import type { Path } from "@common/@types/generalTypes";
 
+import { useI18n } from "@solid-primitives/i18n";
+
 import { errorToast, successToast } from "@components/toasts";
 import { removeMedia } from "@contexts/usePlaylists";
 import { getBasename } from "@common/path";
-import { t } from "@components/I18n";
 
 const { deleteFile: electronDeleteFile } = electron.fs;
 
-export async function deleteFile(path: Path): Promise<void> {
+export const deleteFile = async (path: Path): Promise<void> => {
 	const wasDeleteSuccessfull = await electronDeleteFile(path);
+	const [t] = useI18n();
 
-	if (wasDeleteSuccessfull === true) {
+	if (wasDeleteSuccessfull) {
 		successToast(`${t("toasts.mediaDeletionSuccess")}"${getBasename(path)}"!`);
 
 		removeMedia(path);
@@ -20,4 +22,4 @@ export async function deleteFile(path: Path): Promise<void> {
 				"toasts.mediaDeletionError.afterPath",
 			)}`,
 		);
-}
+};

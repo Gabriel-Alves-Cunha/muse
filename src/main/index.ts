@@ -158,30 +158,6 @@ app
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		// This method will be called when Electron has finished
-		// initialization and is ready to create browser windows.
-		// Some APIs can only be used after this event occurs:
-		if (isDev) {
-			const devtoolsInstaller = await import("electron-devtools-installer");
-			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-			// @ts-ignore => This error occurs when not bundling.
-			const { default: installExtension } = devtoolsInstaller.default;
-			// const installExtension = devtoolsInstaller.default;
-
-			await installExtension(REACT_DEVELOPER_TOOLS, {
-				loadExtensionOptions: { allowFileAccess: true },
-			})
-				// @ts-ignore => This error occurs when not bundling.
-				.then((name) => dbg(`Added Extension: ${name}`))
-				// @ts-ignore => This error occurs when not bundling.
-				.catch((err) =>
-					error("An error occurred while installing extension: ", err),
-				);
-		}
-
-		/////////////////////////////////////////
-		/////////////////////////////////////////
-
 		// This variable is needed to hold a reference to the window,
 		// so it doesn't get garbge collected:
 		electronWindow = createElectronWindow();

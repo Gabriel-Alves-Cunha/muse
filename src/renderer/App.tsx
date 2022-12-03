@@ -4,13 +4,17 @@ import { Routes, Route } from "@solidjs/router";
 import { Toaster } from "solid-toast";
 import { lazy } from "solid-js";
 
-// import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
+import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
 // import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { BlurOverlay } from "@components/BlurOverlay";
 import { Dialog } from "@components/Dialog";
 import { Navbar } from "@components/Navbar";
 
-const Home = lazy(() => import("./pages/Home"));
+const Favorites = lazy(() => import("./routes/Favorites"));
+const Download = lazy(() => import("./routes/Download"));
+const Convert = lazy(() => import("./routes/Convert"));
+const History = lazy(() => import("./routes/History"));
+const Home = lazy(() => import("./routes/Home"));
 
 export const App: Component = () => {
 	const [isOpen, setIsOpen] = createSignal(true);
@@ -28,7 +32,7 @@ export const App: Component = () => {
 				}}
 			/>
 
-			<button class="w-5 h-3" onPointerUp={() => setIsOpen(true)}>
+			<button type="button" class="w-5 h-3" onPointerUp={() => setIsOpen(true)}>
 				abrir
 			</button>
 

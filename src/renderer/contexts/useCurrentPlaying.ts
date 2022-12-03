@@ -1,10 +1,8 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import create from "solid-zustand";
+import { createEffect, createSignal } from "solid-js";
 
-import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getRandomInt, time } from "@utils/utils";
 import { warn, error, info } from "@utils/log";
 import { getPlayOptions } from "./usePlayOptions";
@@ -18,40 +16,32 @@ import {
 	getMainList,
 	History,
 } from "./usePlaylists";
+import { areObjectKeysEqual } from "@utils/object";
+import { keys, setLocalStorage } from "@utils/localStorage";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Constants:
 
-export const defaultCurrentPlaying: CurrentPlaying = {
+export const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	listType: playlistList.mainList,
 	path: emptyString,
 	currentTime: 0,
-};
+});
 
-export const useCurrentPlaying = create<CurrentPlaying>()(
-	subscribeWithSelector(
-		setCurrentPlayingOnLocalStorage(
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			(_set, _get, _api) => defaultCurrentPlaying,
-			"currentPlaying",
-		),
-	),
-);
-
-export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
-	useCurrentPlaying;
+export const [getCurrentPlaying, setCurrentPlaying] =
+	createSignal<CurrentPlaying>(defaultCurrentPlaying);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Helper functions:
-
 export const playThisMedia = (
 	path: Path,
 	listType: ValuesOf<typeof playlistList> = playlistList.mainList,
-): void => setCurrentPlaying({ path, currentTime: 0, listType });
+): void =>
+	setCurrentPlaying({ path, currentTime: 0, listType }) as unknown as void;
 
 ////////////////////////////////////////////////
 
@@ -77,7 +67,8 @@ export function pause(audio?: HTMLAudioElement): void {
 	audio.pause();
 	const currentTime = audio.currentTime;
 
-	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
+	if (currentTime > 60 /* seconds */)
+		setCurrentPlaying((prev) => ({ ...prev, currentTime }));
 }
 
 ////////////////////////////////////////////////
@@ -180,7 +171,11 @@ export function playNextMedia(): void {
 				list,
 			});
 
-		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
+		setCurrentPlaying({
+			listType: correctListType,
+			path: nextMediaPath,
+			currentTime: 0,
+		});
 	}, "playNextMedia");
 }
 
@@ -198,16 +193,22 @@ navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-useCurrentPlaying.subscribe(
-	(state) => state.path,
-	function updateHistoryAndSetAudioSource(newPath, prevPath) {
-		if (newPath.length === 0) return;
+let prevCurrentPlaying: CurrentPlaying = defaultCurrentPlaying;
 
-		addToHistory(newPath);
+// Update history and set AudioSource:
+createEffect(() => {
+	const newCurrentPlaying = getCurrentPlaying();
 
-		setAudioSource(newPath, prevPath);
-	},
-);
+	if (!newCurrentPlaying.path) return;
+
+	addToHistory(newCurrentPlaying.path);
+
+	setAudioSource(newCurrentPlaying.path, prevCurrentPlaying.path);
+
+	// Set current playing on LocalStorage:
+	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
+	prevCurrentPlaying = newCurrentPlaying;
+});
 
 ////////////////////////////////////////////////
 // Handle what happens when the `currentPlaying.path` changes:
@@ -284,8 +285,8 @@ function changeMediaSessionMetadata(path: Path): void {
 ////////////////////////////////////////////////
 // Types:
 
-export type CurrentPlaying = Readonly<{
+export type CurrentPlaying = {
 	listType: ValuesOf<typeof playlistList>;
 	currentTime: number;
 	path: Path;
-}>;
+};

@@ -58,7 +58,10 @@ export const DecorationsDown: Component = () => (
 
 const WindowButton: Component<WindowButtonProps> = (props) => (
 	<button
-		class={`relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 transition-none text-icon-window-button hover:bg-icon-button-hovered focus:bg-icon-button-hovered ${props.class}`}
+		class={`relative flex justify-center items-center h-[var(--top-decorations-height)] w-12 transition-none text-icon-window-button hover:bg-icon-button-hovered focus:bg-icon-button-hovered ${
+			props.class ?? ""
+		}`}
+		type="button"
 		{...props}
 	/>
 );

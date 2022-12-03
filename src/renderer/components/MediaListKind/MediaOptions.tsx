@@ -1,7 +1,8 @@
+import type { InputChangeEvent } from "@common/@types/solid-js-helpers";
 import type { MetadataToChange } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { createSignal, onCleanup, onMount } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
 
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
@@ -17,11 +18,11 @@ import { deleteFile } from "@utils/deleteFile";
 import { log, error } from "@utils/log";
 import { SearchIcon } from "@icons/SearchIcon";
 import { CloseIcon } from "@icons/CloseIcon";
+import { TrashIcon } from "@icons/TrashIcon";
 import { FlexRow } from "../FlexRow";
 import { Button } from "../Button";
 import { Dialog } from "@components/Dialog";
 import { dbg } from "@common/debug";
-import { TrashIcon } from "@icons/TrashIcon";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -29,6 +30,8 @@ import { TrashIcon } from "@icons/TrashIcon";
 // Main function:
 
 export function MediaOptionsModal({ media, path }: Props) {
+	const [isDeleteMediaModalOpen, setIsDeleteMediaModalOpen] =
+		createSignal(false);
 	const [imageFilePath, setImageFilePath] = createSignal("");
 	const [isOpen, setIsOpen] = createSignal(false);
 	const [t] = useI18n();
@@ -40,7 +43,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 	const openNativeUI_ChooseFiles = () => imageInputRef?.click();
 
-	function handleSelectedFile({ target: { files } }: Event) {
+	function handleSelectedFile({ currentTarget: { files } }: InputChangeEvent) {
 		if (!(imageButtonRef && imageInputRef && files) || files.length === 0)
 			return;
 
@@ -57,15 +60,17 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const changeMediaMetadataOnEnter = (event: KeyboardEvent) =>
 		event.key === "Enter" &&
 		!isAModifierKeyPressed(event) &&
+		contentWrapperRef &&
+		closeButtonRef &&
 		changeMediaMetadata(
 			contentWrapperRef,
 			closeButtonRef,
-			imageFilePathRef,
+			imageFilePath(),
 			path,
 			media,
 		);
 
-	createEffect(() => {
+	onMount(() => {
 		// This is because if you open the popover by pressing
 		// "Enter", it will just open and close it!
 		setTimeout(
@@ -154,29 +159,35 @@ export function MediaOptionsModal({ media, path }: Props) {
 			))}
 
 			{/* line-height: 35px; // same as height */}
-			<button class="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition" onPointerUp={()=>setIsOpen(true)}>
+			<button
+				class="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition"
+				onPointerUp={() => setIsOpen(true)}
+			type="button"
+
+			>
 				{t("buttons.deleteMedia")}
 
 				<TrashIcon />
 			</button>
 
 			<FlexRow>
-				<Dialog.Content modal>
-					<DeleteMediaDialog
-						handleMediaDeletion={() =>
-							handleMediaDeletion(closeButtonRef, path)
-						}
-						isOpen={}
-					/>
-				</Dialog.Content>
+				<DeleteMediaDialog
+					handleMediaDeletion={() =>
+						closeButtonRef && handleMediaDeletion(closeButtonRef, path)
+					}
+					onOpenChange={setIsDeleteMediaModalOpen}
+					isOpen={isDeleteMediaModalOpen()}
+				/>
 
 				<Dialog.Close
 					class="unset-all flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold bg-[#ddf4e5] text-[#2c6e4f] hover:bg-[#c6dbce] focus:bg-[#c6dbce]"
 					onPointerUp={() =>
+						contentWrapperRef &&
+						closeButtonRef &&
 						changeMediaMetadata(
 							contentWrapperRef,
 							closeButtonRef,
-							imageFilePathRef,
+							imageFilePath(),
 							path,
 							media,
 						)
@@ -208,7 +219,7 @@ async function handleMediaDeletion(
 /////////////////////////////////////////////
 
 function changeMediaMetadata(
-	contentWrapperRef: HTMLDivElement,
+	contentWrapperRef: HTMLDialogElement,
 	closeButtonRef: HTMLButtonElement,
 	imageFilePath: Path,
 	mediaPath: Path,
@@ -238,7 +249,7 @@ function changeMediaMetadata(
 /////////////////////////////////////////////
 
 function changeMetadataIfAllowed(
-	contentWrapper: HTMLDivElement,
+	contentWrapper: HTMLDialogElement,
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,

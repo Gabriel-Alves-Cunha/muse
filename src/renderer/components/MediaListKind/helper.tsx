@@ -1,4 +1,5 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type { VirtualItemProps } from "@minht11/solid-virtual-container";
+import type { Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { Component, createSignal } from "solid-js";
@@ -51,24 +52,26 @@ export const setIsCtxMenuOpen = (bool: boolean) =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function selectMediaByPointerEvent(e: PointerEvent): void {
+export const selectMediaByPointerEvent = (
+	e: MouseEvent & { currentTarget: HTMLButtonElement; target: Element },
+): void => {
 	// TODO: see if this selector still works.
-	const mediaClickedMediaPath = (e.target as HTMLElement)
+	const mediaClickedMediaPath = (e.currentTarget as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
 
 	if (!mediaClickedMediaPath) return log("No 'data-path' found!");
 
 	addToAllSelectedMedias(mediaClickedMediaPath);
-}
+};
 
 /////////////////////////////////////////
 
 export const rightClick = 2;
 export const leftClick = 0;
 
-function selectOrPlayMedia(e: PointerEvent, mediaPath: Path): void {
-	if (e.button !== leftClick || e.ctrlKey === false) {
+const selectOrPlayMedia = (e: PointerEvent, mediaPath: Path): void => {
+	if (e.button !== leftClick || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome === true ? homeList : fromList;
 
@@ -76,50 +79,55 @@ function selectOrPlayMedia(e: PointerEvent, mediaPath: Path): void {
 	}
 
 	toggleSelectedMedia(mediaPath);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const Row: Component<RowProps> = (props) => {
+export const Row: Component<VirtualItemProps<RowProps>> = (props) => {
 	const [isMediaOptionsOpen, setIsMediaOptionsOpen] = createSignal(false);
 	const [t] = useI18n();
 
 	return (
 		<div
-			class={`${
-				getAllSelectedMedias().has(props.path) === true ? "selected " : ""
-			}${getCurrentPlaying().path === props.path ? "playing " : ""}row-wrapper`}
-			data-path={props.path}
+			classList={{
+				selected: getAllSelectedMedias().has(props.item.path),
+				playing: getCurrentPlaying().path === props.item.path,
+			}}
+			data-path={props.item.path}
+			tabIndex={props.tabIndex}
+			class="row-wrapper"
+			role="listitem"
 		>
 			<button
 				class="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
-				onPointerUp={(e) => selectOrPlayMedia(e, props.path)}
+				onPointerUp={(e) => selectOrPlayMedia(e, props.item.path)}
 				title={t("tooltips.playThisMedia")}
+				type="button"
 			>
 				<div class="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
 					<ImgWithFallback
 						Fallback={<MusicNoteIcon class="w-5 h-5" />}
-						mediaImg={props.media.image}
-						mediaPath={props.path}
+						mediaImg={props.item.media.image}
+						mediaPath={props.item.path}
 					/>
 				</div>
 
 				<div class="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
 					<p class="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
-						{props.media.title}
+						{props.item.media.title}
 					</p>
 
 					<p class="font-primary tracking-wide text-sm font-medium text-muted">
-						{props.media.duration}
+						{props.item.media.duration}
 						&emsp;|&emsp;
-						{props.media.artist}
+						{props.item.media.artist}
 					</p>
 				</div>
 			</button>
 
-			<button title={t("tooltips.openMediaOptions")}>
+			<button title={t("tooltips.openMediaOptions")} type="button">
 				<VerticalDotsIcon class="w-4 h-4" />
 			</button>
 
@@ -131,7 +139,7 @@ const Row: Component<RowProps> = (props) => {
 				>
 					<BlurOverlay />
 
-					<MediaOptionsModal media={props.media} path={props.path} />
+					<MediaOptionsModal media={props.item.media} path={props.item.path} />
 				</Dialog.Content>
 			</Portal>
 		</div>
@@ -142,27 +150,6 @@ const Row: Component<RowProps> = (props) => {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const computeItemKey = (
-	_index: number,
-	[path]: [Path, Media, DateAsNumber],
-): Path => path;
-
-/////////////////////////////////////////
-
-export const computeHistoryItemKey = (
-	_index: number,
-	[path, , date]: [Path, Media, DateAsNumber],
-): `${Path}•${DateAsNumber}` => `${path}•${date}`;
-
-/////////////////////////////////////////
-
-export const itemContent = (
-	_index: number,
-	[path, media]: [Path, Media, DateAsNumber],
-) => <Row media={media} path={path} />;
-
-/////////////////////////////////////////
-
 export const reloadWindow = (): void =>
 	notify(electronIpcMainProcessNotification.RELOAD_WINDOW);
 
@@ -171,7 +158,7 @@ export const reloadWindow = (): void =>
 /////////////////////////////////////////////
 // Types:
 
-type RowProps = { media: Media; path: Path };
+type RowProps = { media: Media; path: Path; tabIndex: number };
 
 /////////////////////////////////////////////
 

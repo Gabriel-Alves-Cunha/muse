@@ -23,6 +23,7 @@ export const Select: Component<Props> = (props) => (
 		<button
 			class={`relative flex justify-center items-center cursor-pointer bg-none border-none ${props.triggerClass}`}
 			title={props.tooltip}
+			type="button"
 		>
 			<p class="pl-6 text-ctx-menu-item font-secondary leading-6 text-xs">
 				{props.triggerTitle}
@@ -60,7 +61,7 @@ function contentToShow(content: ValuesOf<typeof contentOfSelectEnum>) {
 /////////////////////////////////////////
 // Types:
 
-type Props<T = unknown> = Readonly<{
+type Props<T = unknown> = {
 	content: ValuesOf<typeof contentOfSelectEnum>;
 	setValue(value: T): void;
 	children: JSX.Element;
@@ -68,4 +69,4 @@ type Props<T = unknown> = Readonly<{
 	triggerTitle?: string;
 	tooltip: string;
 	value: string;
-}>;
+};

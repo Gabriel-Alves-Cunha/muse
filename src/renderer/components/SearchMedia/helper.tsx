@@ -1,4 +1,4 @@
-import type { Component, JSX } from "solid-js";
+import { Component, JSX, Show } from "solid-js";
 import type { Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
@@ -8,7 +8,6 @@ import { useI18n } from "@solid-primitives/i18n";
 import create from "solid-zustand";
 
 import { ctxContentEnum, ContextMenu } from "../ContextMenu";
-import { PopoverContent, PopoverRoot } from "../Popover";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { MediaOptionsModal } from "../MediaListKind/MediaOptions";
@@ -158,6 +157,7 @@ const mantainFocusOnInput = (e: Event) => e.preventDefault();
 
 export const Results: Component = () => {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
+	const [isCtxMenuOpen, setIsCtxMenuOpen] = createSignal(false);
 	const resultsJSXs: JSX.Element[] = [];
 
 	/////////////////////////////////////////
@@ -179,28 +179,30 @@ export const Results: Component = () => {
 		<ContextMenu
 			content={ctxContentEnum.SEARCH_MEDIA_OPTIONS}
 			onContextMenu={selectMediaByPointerEvent}
+			onOpenChange={setIsCtxMenuOpen}
 			isAllDisabled={nothingFound}
+			isOpen={isCtxMenuOpen()}
 		>
-			<PopoverRoot open={shouldPopoverOpen}>
-				<PopoverContent
-					size={
-						nothingFound
-							? "nothing-found-for-search-media"
-							: "search-media-results"
-					}
-					onPointerDownOutside={setDefaultSearch}
-					onOpenAutoFocus={mantainFocusOnInput}
-					class="transition-none"
+			<Dialog.Content
+				// onOpenAutoFocus={mantainFocusOnInput}
+				onClickOutside={setDefaultSearch}
+				isOpen={shouldPopoverOpen}
+				onOpenChange={() => {}}
+				class={`transition-none ${
+					nothingFound
+						? "nothing-found-for-search-media"
+						: "search-media-results"
+				}`}
+			>
+				<Show
+					when={nothingFound}
+					fallback={<Show when={foundSomething}>{resultsJSXs}</Show>}
 				>
-					{nothingFound ? (
-						<div class="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
-							Nothing was found for &quot;{searchTerm}&quot;
-						</div>
-					) : foundSomething ? (
-						resultsJSXs
-					) : undefined}
-				</PopoverContent>
-			</PopoverRoot>
+					<div class="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
+						Nothing was found for &quot;{searchTerm}&quot;
+					</div>
+				</Show>
+			</Dialog.Content>
 		</ContextMenu>
 	);
 };
@@ -223,6 +225,7 @@ const MediaSearchRow: Component<MediaSearchRowProps> = (props) => {
 			<button
 				onPointerUp={() => playThisMedia(props.path)}
 				title={t("tooltips.playThisMedia")}
+				type="button"
 			>
 				<div>
 					<ImgWithFallback
@@ -245,7 +248,7 @@ const MediaSearchRow: Component<MediaSearchRowProps> = (props) => {
 				</div>
 			</button>
 
-			<button title={t("tooltips.openMediaOptions")}>
+			<button title={t("tooltips.openMediaOptions")} type="button">
 				<VerticalDotsIcon class="w-4 h-4" />
 			</button>
 

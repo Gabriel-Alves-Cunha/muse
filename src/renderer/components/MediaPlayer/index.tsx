@@ -44,7 +44,7 @@ const { setState: setProgress } = useProgress;
 ///////////////////////////////////////
 // Main function:
 
-export function MediaPlayer() {
+export const MediaPlayer: Component = () => {
 	const mainList = usePlaylists((state) => state.sortedByNameAndMainList);
 	const [isSeeking, setIsSeeking] = createSignal(false);
 	const path = useCurrentPlaying((state) => state.path);
@@ -109,7 +109,7 @@ export function MediaPlayer() {
 			/>
 		</aside>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

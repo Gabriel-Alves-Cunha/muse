@@ -68,7 +68,7 @@ export const Popup: Component = () => {
 /////////////////////////////////////////////
 // Helper functions for Popup:
 
-function cleanAllDoneConvertions(): void {
+const cleanAllDoneConvertions = (): void => {
 	for (const [url, download] of getConvertingList())
 		if (
 			download.status !==
@@ -76,7 +76,7 @@ function cleanAllDoneConvertions(): void {
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -122,10 +122,10 @@ const ConvertBox: Component<ConvertBoxProps> = (props) => {
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function createNewConvertion(
+export const createNewConvertion = (
 	convertInfo: ConvertInfo,
 	path: Path,
-): MessagePort {
+): MessagePort => {
 	const convertingList = getConvertingList();
 	const [t] = useI18n();
 
@@ -169,7 +169,7 @@ export function createNewConvertion(
 	frontEndPort.start();
 
 	return backEndPort;
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -181,9 +181,7 @@ export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function cancelConversionAndOrRemoveItFromList(
-	path: Readonly<string>,
-): void {
+export const cancelConversionAndOrRemoveItFromList = (path: string): void => {
 	const convertingList = getConvertingList();
 
 	const mediaBeingConverted = convertingList.get(path);
@@ -204,15 +202,15 @@ export function cancelConversionAndOrRemoveItFromList(
 
 	// Make React update:
 	setConvertingList(newConvertingList);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-function handleUpdateConvertingList(
+const handleUpdateConvertingList = (
 	{ data }: MessageEvent<PartialExceptStatus>,
 	path: Path,
-): void {
+): void => {
 	const convertingList = getConvertingList();
 	const [t] = useI18n();
 
@@ -272,7 +270,7 @@ function handleUpdateConvertingList(
 			assertUnreachable(data.status);
 			break;
 	}
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -2,13 +2,13 @@ import { type Component, createEffect, createSignal } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
 
 import { useNewConvertions, createNewConvertion, Popup } from "./helper";
-import { PopoverRoot, PopoverContent } from "../Popover";
 import { reactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { errorToast } from "../toasts";
 import { SwapIcon } from "@icons/SwapIcon";
 import { emptyMap } from "@common/empty";
+import { Dialog } from "../Dialog";
 import { error } from "@utils/log";
 
 /////////////////////////////////////////////
@@ -53,30 +53,30 @@ export const Converting: Component = () => {
 
 	return (
 		<>
-			<Trigger
-				class={`${
-					convertingListSize > 0 ? "has-items" : ""
-				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
+			<button
+				class="relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group"
+				classList={{ "has-items": convertingListSize > 0 }}
+				onPointerUp={() => setIsPopoverOpen((prev) => !prev)}
 				title={t("tooltips.showAllConvertingMedias")}
+				type="button"
 			>
 				<span data-length={convertingListSize} />
 
 				<SwapIcon class="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
-			</Trigger>
+			</button>
 
-			<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-				<PopoverContent
-					size={
-						convertingListSize === 0
-							? "nothing-found-for-convertions-or-downloads"
-							: "convertions-or-downloads"
-					}
-					side="right"
-					align="end"
-				>
-					<Popup />
-				</PopoverContent>
-			</PopoverRoot>
+			<Dialog.Content
+				class={`${
+					convertingListSize === 0
+						? "nothing-found-for-convertions-or-downloads"
+						: "convertions-or-downloads"
+				}`}
+				onOpenChange={setIsPopoverOpen}
+				isOpen={isPopoverOpen()}
+				modal
+			>
+				<Popup />
+			</Dialog.Content>
 		</>
 	);
 };

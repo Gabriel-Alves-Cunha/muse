@@ -27,6 +27,7 @@ export const DeleteMediaDialog: Component<{
 				onOpenChange={props.onOpenChange}
 				isOpen={props.isOpen}
 				class=""
+				modal
 			>
 				<BlurOverlay />
 

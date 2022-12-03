@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { type Component, onMount } from "solid-js";
 
 import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
@@ -6,21 +6,17 @@ import { playlistList } from "@common/enums";
 import { SearchMedia } from "@components/SearchMedia";
 import { setFromList } from "@components/MediaListKind/helper";
 import { MainArea } from "@components/MainArea";
-import { useTitle } from "@hooks/useTitle";
 import { Header } from "@components/Header";
-import { t } from "@components/I18n";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main function:
 
-export function Favorites() {
-	useTitle(t("titles.favorites"));
-
-	useEffect(() => {
+const Favorites: Component = () => {
+	onMount(() => {
 		setFromList({ fromList: playlistList.favorites });
-	}, []);
+	});
 
 	return (
 		<MainArea>
@@ -33,4 +29,6 @@ export function Favorites() {
 			<MediaListKind />
 		</MainArea>
 	);
-}
+};
+
+export default Favorites;

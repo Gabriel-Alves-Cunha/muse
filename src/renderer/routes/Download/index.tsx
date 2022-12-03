@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import type { InputChangeEvent } from "@common/@types/solid-js-helpers";
+
+import { type Component, createEffect, onCleanup } from "solid-js";
+import { useI18n } from "@solid-primitives/i18n";
 
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
-import { t, Translator } from "@components/I18n";
 import { BaseInput } from "@components/BaseInput";
-import { useTitle } from "@hooks/useTitle";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
 import { Button } from "@components/Button";
@@ -14,103 +15,86 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export function Download() {
-	useTitle(t("titles.download"));
+const Download: Component = () => {
+	const isLoading = useSearchInfo((state) => state.isLoading);
 
 	return (
-		<MainArea className="flex flex-col scroll scroll-2">
+		<MainArea class="flex flex-col scroll scroll-2">
 			<Header>
 				<SearcherWrapper />
 
-				<IsLoading />
+				<div class="w-6 h-6 ml-3">{isLoading && <Loading />}</div>
 			</Header>
 
 			<Result />
 		</MainArea>
 	);
-}
+};
 
 ////////////////////////////////////////////////
 // Helper functions:
 
-const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
-	setSearchInfo({ url: e.target.value });
+const setUrl = (e: InputChangeEvent) =>
+	setSearchInfo({ url: e.currentTarget.value });
 
 ////////////////////////////////////////////////
 
-const errorAndUrlSelectors = ({
-	error,
-	url,
-}: ReturnType<typeof useSearchInfo.getState>) => ({ error, url });
+const SearcherWrapper: Component = () => {
+	const [error, url] = useSearchInfo((state) => [state.error, state.url]);
+	const [t] = useI18n();
 
-////////////////////////////////////////////////
+	let searchTimeout: NodeJS.Timeout | undefined;
 
-function SearcherWrapper() {
-	const { error, url } = useSearchInfo(errorAndUrlSelectors);
+	createEffect(() => {
+		searchTimeout = setTimeout(async () => await search(url), 300);
+	});
 
-	useEffect(() => {
-		const searchTimeout = setTimeout(async () => await search(url), 300);
-
-		return () => clearTimeout(searchTimeout);
-	}, [url]);
+	onCleanup(() => clearTimeout(searchTimeout));
 
 	return (
 		<>
 			<BaseInput
 				label={t("labels.pasteVideoURL")}
 				autoCapitalize="off"
-				spellCheck="false"
+				spell-check="false"
 				onChange={setUrl}
-				autoCorrect="off"
 				value={url}
 			/>
 
-			<p className="absolute -bottom-3 left-[25%] font-primary tracking-wide text-sm text-red-600 font-normal">
+			<p class="absolute -bottom-3 left-[25%] font-primary tracking-wide text-sm text-red-600 font-normal">
 				{error}
 			</p>
 		</>
 	);
-}
+};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
-	state.isLoading;
-
-function IsLoading() {
-	const isLoading = useSearchInfo(isLoadingSelector);
-
-	return (
-		<div className="w-6 h-6 ml-3">{isLoading === true && <Loading />}</div>
-	);
-}
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
-	state.result;
-
-function Result() {
-	// Only need to change on `result`'s change:
-	const { imageURL, title } = useSearchInfo(resultSelector);
+const Result: Component = () => {
+	const [imageURL, title] = useSearchInfo((state) => [
+		state.result.imageURL,
+		state.result.title,
+	]);
+	const [t] = useI18n();
 
 	return title.length > 0 ? (
-		<div className="flex flex-col mb-5 mt-8">
+		<div class="flex flex-col mb-5 mt-8">
 			<img
-				className="object-cover h-44 w-80 shadow-reflect reflect-img transition-transform hover:transition-scale hover:scale-110 focus:scale-x-110"
+				class="object-cover h-44 w-80 shadow-reflect reflect-img transition-transform hover:transition-scale hover:scale-110 focus:scale-x-110"
 				alt={t("alts.videoThumbnail")}
 				src={imageURL}
 			/>
 
-			<p className="my-8 mx-4 font-primary text-center text-lg text-normal">
+			<p class="my-8 mx-4 font-primary text-center text-lg text-normal">
 				{title}
 			</p>
 
 			<Button variant="large" onPointerUp={downloadMedia}>
-				<Translator path="buttons.download" />
+				{t("buttons.download")}
 			</Button>
 		</div>
 	) : null;
-}
+};
+
+export default Download;
