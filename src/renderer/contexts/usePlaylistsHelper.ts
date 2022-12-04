@@ -91,8 +91,17 @@ export const sortByDate = (list: MainList): Set<Path> =>
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const sortByName = (list: MainList): MainList =>
+export const sortByName = (list: MainList): MainList => {
 	time(() => {
+		const listAsArrayOfPaths = [...list].sort(
+			([, { title: prevTitle }], [, { title: nextTitle }]) =>
+				compare(prevTitle, nextTitle),
+		);
+
+		return new Map(listAsArrayOfPaths);
+	}, "sortByName by fast function");
+
+	return time(() => {
 		const listAsArrayOfPaths = [...list].sort(
 			([, { title: prevTitle }], [, { title: nextTitle }]) =>
 				prevTitle.localeCompare(nextTitle, undefined, {
@@ -103,3 +112,25 @@ export const sortByName = (list: MainList): MainList =>
 
 		return new Map(listAsArrayOfPaths);
 	}, "sortByName");
+};
+
+/**
+ * Compare two strings. This comparison is not linguistically accurate, unlike
+ * String.prototype.localeCompare(), albeit stable.
+ *
+ * @returns -1, 0 or 1
+ */
+export function compare(a: string, b: string) {
+	const lenA = a.length;
+	const lenB = b.length;
+	const minLen = lenA < lenB ? lenA : lenB;
+	for (let i = 0; i < minLen; ++i) {
+		const ca = a.charCodeAt(i);
+		const cb = b.charCodeAt(i);
+
+		if (ca > cb) return 1;
+		else if (ca < cb) return -1;
+	}
+	if (lenA === lenB) return 0;
+	return lenA > lenB ? 1 : -1;
+}

@@ -3,6 +3,7 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { createEffect, createSignal } from "solid-js";
 
+import { keys, setLocalStorage } from "@utils/localStorage";
 import { getRandomInt, time } from "@utils/utils";
 import { warn, error, info } from "@utils/log";
 import { getPlayOptions } from "./usePlayOptions";
@@ -16,8 +17,8 @@ import {
 	getMainList,
 	History,
 } from "./usePlaylists";
-import { areObjectKeysEqual } from "@utils/object";
-import { keys, setLocalStorage } from "@utils/localStorage";
+import { dbgTests } from "@common/debug";
+import { nextTick } from "process";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -45,35 +46,28 @@ export const playThisMedia = (
 
 ////////////////////////////////////////////////
 
-export async function togglePlayPause(): Promise<void> {
-	const audio = document.getElementById("audio") as HTMLAudioElement;
-
-	audio.paused ? await play(audio) : pause(audio);
-}
+export const togglePlayPause = (): void => window.audio?.pause();
 
 ////////////////////////////////////////////////
 
-export async function play(audio?: HTMLAudioElement): Promise<void> {
-	audio
-		? await audio.play()
-		: await (document.getElementById("audio") as HTMLAudioElement).play();
-}
+export const play = (): void => window.audio?.play().then() as void;
 
 ////////////////////////////////////////////////
 
-export function pause(audio?: HTMLAudioElement): void {
-	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
+export const pause = (): void => {
+	const audio = window.audio;
+	if (!audio) return;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
 
 	if (currentTime > 60 /* seconds */)
 		setCurrentPlaying((prev) => ({ ...prev, currentTime }));
-}
+};
 
 ////////////////////////////////////////////////
 
-function sortHistoryByDate() {
+const sortHistoryByDate = (): [Path, Media, DateAsNumber][] => {
 	const unsortedList: [Path, DateAsNumber][] = [];
 
 	for (const [path, dates] of getPlaylist(playlistList.history) as History)
@@ -81,18 +75,16 @@ function sortHistoryByDate() {
 
 	const mainList = getMainList();
 
-	const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
+	return unsortedList
 		.sort((a, b) => b[1] - a[1]) // sorted by date
 		.map(([path, date]) => [path, mainList.get(path)!, date]);
+};
 
-	return listAsArrayOfMap;
-}
-
-export function playPreviousMedia(): void {
+export const playPreviousMedia = (): void =>
 	time(() => {
 		const { path, listType } = getCurrentPlaying();
 
-		if (path.length === 0)
+		if (!path)
 			return warn(
 				"A media needs to be currently selected to play a previous media!",
 			);
@@ -115,15 +107,14 @@ export function playPreviousMedia(): void {
 
 		playThisMedia(previousMediaPath, correctListType);
 	}, "playPreviousMedia");
-}
 
 ////////////////////////////////////////////////
 
-export function playNextMedia(): void {
+export const playNextMedia = (): void =>
 	time(() => {
 		const { path, listType } = getCurrentPlaying();
 
-		if (path.length === 0)
+		if (!path)
 			return info(
 				"A media needs to be currently selected to play a next media!",
 			);
@@ -151,25 +142,40 @@ export function playNextMedia(): void {
 		} else {
 			let found = false;
 
-			for (const newPath of list.keys()) {
-				if (found) {
-					nextMediaPath = newPath;
-					break;
-				}
+			time(() => {
+				for (const newPath of list.keys()) {
+					if (found) {
+						nextMediaPath = newPath;
+						break;
+					}
 
-				if (newPath === path) found = true;
-			}
+					if (newPath === path) found = true;
+				}
+			}, "string comparison ===");
+
+			time(() => {
+				for (const newPath of list.keys()) {
+					if (found) {
+						nextMediaPath = newPath;
+						break;
+					}
+
+					if (areStringsEqual(newPath, path)) found = true;
+				}
+			}, "string comparison by function");
 
 			// In case the currently playing is the last media, get the first:
-			if (nextMediaPath.length === 0) nextMediaPath = getFirstKey(list) as Path;
+			if (!nextMediaPath) nextMediaPath = getFirstKey(list) as Path;
 		}
 
-		if (nextMediaPath.length === 0)
+		if (!nextMediaPath)
 			return warn("There should be a nextMediaPath, but there isn't!", {
 				currentPlaying: getCurrentPlaying(),
 				nextMediaPath,
 				list,
 			});
+
+		dbgTests("prev path:", path, "\nnext path:", nextMediaPath);
 
 		setCurrentPlaying({
 			listType: correctListType,
@@ -177,38 +183,36 @@ export function playNextMedia(): void {
 			currentTime: 0,
 		});
 	}, "playNextMedia");
-}
+
+/**
+ * Compare two strings. This comparison is not linguistically accurate, unlike
+ * String.prototype.localeCompare(), albeit stable.
+ */
+const areStringsEqual = (a: string, b: string): boolean => {
+	const lenA = a.length;
+	const lenB = b.length;
+
+	if (lenA !== lenB) return false;
+
+	for (let index = 0; index < lenA; ++index)
+		if (a.charCodeAt(index) !== b.charCodeAt(index)) return false;
+
+	return true;
+};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Register functions to window mediaSession:
 
-navigator?.mediaSession?.setActionHandler?.("previoustrack", playPreviousMedia);
-navigator?.mediaSession?.setActionHandler?.("play", async () => await play());
-navigator?.mediaSession?.setActionHandler?.("nexttrack", playNextMedia);
-navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
+if (navigator?.mediaSession?.setActionHandler) {
+	const handleAction = navigator.mediaSession.setActionHandler;
 
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-let prevCurrentPlaying: CurrentPlaying = defaultCurrentPlaying;
-
-// Update history and set AudioSource:
-createEffect(() => {
-	const newCurrentPlaying = getCurrentPlaying();
-
-	if (!newCurrentPlaying.path) return;
-
-	addToHistory(newCurrentPlaying.path);
-
-	setAudioSource(newCurrentPlaying.path, prevCurrentPlaying.path);
-
-	// Set current playing on LocalStorage:
-	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
-	prevCurrentPlaying = newCurrentPlaying;
-});
+	handleAction("previoustrack", playPreviousMedia);
+	handleAction("nexttrack", playNextMedia);
+	handleAction("pause", pause);
+	handleAction("play", play);
+}
 
 ////////////////////////////////////////////////
 // Handle what happens when the `currentPlaying.path` changes:
@@ -217,14 +221,16 @@ createEffect(() => {
 // we don't load the media until the timeout ends.
 let prevTimerToSetMedia: NodeJS.Timeout | undefined;
 
-function setAudioSource(path: Path, prevPath: Path) {
+const setAudioSource = (path: Path, prevPath: Path): void => {
 	clearTimeout(prevTimerToSetMedia);
 
 	const mediaPathSuitableForElectron = `atom:///${path}`;
 
 	const timerToSetMedia = setTimeout(() => {
-		(document.getElementById("audio") as HTMLAudioElement).src =
-			mediaPathSuitableForElectron;
+		const audio = window.audio;
+		if (!audio) return;
+
+		audio.src = mediaPathSuitableForElectron;
 
 		changeMediaSessionMetadata(path);
 
@@ -235,7 +241,7 @@ function setAudioSource(path: Path, prevPath: Path) {
 	}, 150);
 
 	prevTimerToSetMedia = timerToSetMedia;
-}
+};
 
 ////////////////////////////////////////////////
 
@@ -245,27 +251,23 @@ const playingClass = "playing";
  * Decorate the rows of current playing medias
  * and undecorate previous playing ones.
  */
-function handleDecorateMediaRow(path: Path, previousPath: Path) {
-	const prevElements =
-		previousPath.length > 0
-			? document.querySelectorAll(`[data-path="${previousPath}"]`)
-			: null;
+const handleDecorateMediaRow = (path: Path, prevPath: Path): void => {
+	const prevElements = document.querySelectorAll(`[data-path="${prevPath}"]`);
 	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
-	if (!prevElements) info(`No previous media row found for "${previousPath}!"`);
+	if (!prevElements) info(`No previous media row found for "${prevPath}!"`);
 	if (!newElements) return info(`No media row found for "${path}"!`);
 
 	// Undecorate previous playing media row:
-	if (previousPath.length !== 0 && prevElements)
-		for (const element of prevElements) element.classList.remove(playingClass);
+	for (const element of prevElements) element.classList.remove(playingClass);
 
 	// Decorate new playing media row:
 	for (const element of newElements) element.classList.add(playingClass);
-}
+};
 
 ////////////////////////////////////////////////
 
-function changeMediaSessionMetadata(path: Path): void {
+const changeMediaSessionMetadata = (path: Path): void => {
 	if (!navigator?.mediaSession) return;
 
 	const media = getMainList().get(path);
@@ -278,7 +280,33 @@ function changeMediaSessionMetadata(path: Path): void {
 		title: media.title,
 		album: media.album,
 	});
-}
+};
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+let prevCurrentPlaying: CurrentPlaying = defaultCurrentPlaying;
+
+// Update history and set AudioSource:
+createEffect(() => {
+	const newCurrentPlaying = getCurrentPlaying();
+
+	nextTick(() => console.log("next tick on 'useCurrentPlaying.ts' at l:295"));
+	dbgTests(
+		"Added to history:",
+		newCurrentPlaying.path,
+		console.count("createEffect -> added to history"),
+	);
+	addToHistory(newCurrentPlaying.path);
+	nextTick(() => console.log("next tick on 'useCurrentPlaying.ts' at l:295"));
+
+	setAudioSource(newCurrentPlaying.path, prevCurrentPlaying.path);
+
+	// Set current playing on LocalStorage:
+	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
+	prevCurrentPlaying = newCurrentPlaying;
+});
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

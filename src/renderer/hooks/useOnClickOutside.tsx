@@ -4,7 +4,7 @@ import { leftClick } from "@components/MediaListKind/helper";
 
 export const useOnClickOutside = (
 	ref: HTMLElement | null,
-	onOutsideClick: (event: PointerEvent) => void
+	onOutsideClick: (event: PointerEvent) => void,
 ) => {
 	const handleClickOutside = (event: PointerEvent) =>
 		event.button !== leftClick &&
@@ -12,10 +12,10 @@ export const useOnClickOutside = (
 		onOutsideClick(event);
 
 	onMount(() =>
-		document.addEventListener("pointerup", handleClickOutside, false)
+		document.addEventListener("pointerup", handleClickOutside, false),
 	);
 
 	onCleanup(() =>
-		document.removeEventListener("pointerup", handleClickOutside, false)
+		document.removeEventListener("pointerup", handleClickOutside, false),
 	);
 };

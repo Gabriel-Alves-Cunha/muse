@@ -1,6 +1,7 @@
 import { createEffect, createSignal } from "solid-js";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
+import { info } from "@utils/log";
 import { dbg } from "@common/debug";
 
 ////////////////////////////////////////////////
@@ -14,7 +15,7 @@ export const [getPlayOptions, setPlayOptions] = createSignal<PlayOptions>({
 });
 
 createEffect(() => {
-	dbg("Saving playOptions on LocalStorage.");
+	// dbg("Saving playOptions on LocalStorage.");
 
 	setLocalStorage(keys.playOptions, getPlayOptions());
 });
@@ -25,7 +26,8 @@ createEffect(() => {
 // Helper functions:
 
 export const toggleLoopMedia = (): void => {
-	if (!window.audio) return;
+	if (!window.audio)
+		return info("There is no window.audio to toggleLoopMedia!");
 
 	const loop = !getPlayOptions().loop;
 

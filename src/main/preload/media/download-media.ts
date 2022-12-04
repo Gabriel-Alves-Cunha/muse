@@ -4,9 +4,9 @@ import type { MediaUrl } from "@contexts/downloadList";
 import type { Readable } from "node:stream";
 
 import { cursorTo, clearLine } from "node:readline";
-import { error, log } from"node:console";
+import { error, log } from "node:console";
 import { existsSync } from "node:fs";
-import { stdout } from"node:process";
+import { stdout } from "node:process";
 import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
@@ -22,7 +22,6 @@ import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

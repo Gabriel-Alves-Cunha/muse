@@ -2,12 +2,11 @@ import type { Middleware } from "koa";
 import type { Path } from "@common/@types/generalTypes";
 
 import { createReadStream } from "node:fs";
-import {log} from "node:console";
+import { log } from "node:console";
 import Router from "koa-router";
 
 import { getBasenameAndLastExtension } from "@common/path";
 import { prettyPrintStringArray } from "@utils/array";
-
 
 export const router = new Router();
 

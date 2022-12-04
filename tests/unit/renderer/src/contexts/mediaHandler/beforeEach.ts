@@ -18,7 +18,7 @@ import {
 function setMainListToTestList() {
 	expect(testList.size).toBe(numberOfMedias);
 
-	replaceEntireMainList(testList);
+	replaceEntireMainList(new Map(testList));
 
 	expect(getMainList().size).toBe(numberOfMedias);
 	expect(getMainList()).toEqual(testList);

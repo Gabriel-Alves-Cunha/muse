@@ -1,18 +1,20 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
+import { batch, createEffect, createSignal } from "solid-js";
+
 import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
-import {
-	getFromLocalStorage,
-	keys,
-	setLocalStorage,
-} from "@utils/localStorage";
 import { assertUnreachable, time } from "@utils/utils";
-import { playlistList } from "@common/enums";
 import { dbg, dbgPlaylists } from "@common/debug";
+import { playlistList } from "@common/enums";
 import { error, warn } from "@utils/log";
 import { getSettings } from "@contexts/settings";
 import { getFirstKey } from "@utils/map-set";
+import {
+	getFromLocalStorage,
+	setLocalStorage,
+	keys,
+} from "@utils/localStorage";
 import {
 	getAllSelectedMedias,
 	setAllSelectedMedias,
@@ -23,7 +25,6 @@ import {
 	sortByDate,
 	sortByName,
 } from "./usePlaylistsHelper";
-import { batch, createEffect, createSignal } from "solid-js";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -32,48 +33,13 @@ const { transformPathsToMedias } = electron.media;
 ////////////////////////////////////////////////
 // Type for the main function:
 
-export type UsePlaylistsStatesAndActions = Readonly<{
-	isLoadingMedias: boolean;
-
-	sortedByNameAndMainList: MainList;
-	sortedByDate: ReadonlySet<Path>;
-	favorites: ReadonlySet<Path>;
-	history: History;
-
-	addToHistory(path: Path): void;
-	clearHistory(): void;
-
-	toggleFavoriteMedia(path: Path): void;
-	removeFromFavorites(path: Path): void;
-	addToFavorites(path: Path): void;
-	clearFavorites(): void;
-
-	refreshMedia(path: Path, newPath: Path, newMedia?: Media): Promise<void>;
-	updateAndSortSortedAndMainLists(newMainList: MainList): void;
-	addToMainList(path: Path, newMedia: Media): void;
-	replaceEntireMainList(list: MainList): void;
-
-	removeMedia(path: Path): void;
-	cleanAllLists(): void;
-}>;
-
-type Playlists = {
-	isLoadingMedias: boolean;
-
-	sortedByNameAndMainList: MainList;
-	sortedByDate: Set<Path>;
-	favorites: Set<Path>;
-	history: History;
-};
+export const [isLoadingMedias, setIsLoadingMedias] = createSignal(false);
 
 export const [getPlaylists, setPlaylists] = createSignal<Playlists>({
-	isLoadingMedias: false,
-
-	sortedByDate:
-		(getFromLocalStorage(keys.sortedByDate) as Set<Path>) ?? new Set(),
 	favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
 	history: (getFromLocalStorage(keys.history) as History) ?? new Map(),
 	sortedByNameAndMainList: new Map(),
+	sortedByDate: new Set(),
 });
 
 createEffect(() => {
@@ -115,6 +81,8 @@ export const addToHistory = (path: Path): void => {
 		if (dates.length > maxSizeOfHistory) dates.length = maxSizeOfHistory;
 
 	setPlaylists((prev) => ({ ...prev, history }));
+
+	console.log("Added to history:", path, console.count("added to history"));
 };
 
 ////////////////////////////////////////////////
@@ -127,14 +95,6 @@ export const clearHistory = (): void =>
 
 		return { ...prev, history };
 	}) as unknown as void;
-
-////////////////////////////////////////////////
-
-export const addToFavorites = (path: Path) => {
-	const { favorites } = getPlaylists();
-
-	setPlaylists((prev) => ({ ...prev, favorites: favorites.add(path) }));
-};
 
 ////////////////////////////////////////////////
 
@@ -366,9 +326,9 @@ export const getHistory = () => getPlaylists().history;
 
 ///////////////////////////////////////////////////
 
-export function getPlaylist(
+export const getPlaylist = (
 	list: ValuesOf<typeof playlistList>,
-): ReadonlySet<Path> | MainList | History {
+): Set<Path> | MainList | History => {
 	switch (list) {
 		case playlistList.sortedByDate:
 			return getSortedByDate();
@@ -385,13 +345,13 @@ export function getPlaylist(
 		default:
 			assertUnreachable(list);
 	}
-}
+};
 
 ///////////////////////////////////////////////////
 
 export const searchLocalComputerForMedias = async (): Promise<void> => {
 	try {
-		setPlaylists((prev) => ({ ...prev, isLoadingMedias: true }));
+		setIsLoadingMedias(true);
 
 		const paths = getAllowedMedias(await searchDirectoryResult());
 
@@ -419,7 +379,7 @@ export const searchLocalComputerForMedias = async (): Promise<void> => {
 	} catch (err) {
 		error("Error on searchLocalComputerForMedias():", err);
 	} finally {
-		setPlaylists((prev) => ({ ...prev, isLoadingMedias: false }));
+		setIsLoadingMedias(false);
 	}
 };
 
@@ -440,8 +400,9 @@ export const unDiacritic = (str: string): string =>
 export const searchMedia = (highlight: string): [Path, Media][] =>
 	time(() => {
 		const medias: [Path, Media][] = [];
+		const mainList = getMainList();
 
-		for (const [path, media] of getMainList())
+		for (const [path, media] of mainList)
 			if (unDiacritic(media.title).includes(highlight))
 				medias.push([path, media]);
 
@@ -456,3 +417,10 @@ export const searchMedia = (highlight: string): [Path, Media][] =>
 export type History = Map<Path, DateAsNumber[]>;
 
 export type MainList = Map<Path, Media>;
+
+type Playlists = {
+	sortedByNameAndMainList: MainList;
+	sortedByDate: Set<Path>;
+	favorites: Set<Path>;
+	history: History;
+};

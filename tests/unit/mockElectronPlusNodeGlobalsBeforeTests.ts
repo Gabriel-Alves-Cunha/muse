@@ -1,9 +1,15 @@
-import { vi } from "vitest";
+import { vi, expect } from "vitest";
 
 import { getObjectLength, withoutProperty } from "@utils/object";
 import { stringifyJson } from "@common/utils";
 import { log } from "@utils/log";
 
+import { Window } from "happy-dom";
+
+const window = new Window();
+const document = window.document;
+
+expect(document.querySelectorAll).toBeDefined();
 
 // Mocking window.localStorage
 class LocalStorageMock {
@@ -63,6 +69,7 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 	vi.stubGlobal("localStorage", new LocalStorageMock());
 
 	vi.stubGlobal("document", {
+		...document,
 		getElementById: vi
 			.fn()
 			.mockImplementation(
@@ -72,15 +79,19 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 	});
 
 	vi.stubGlobal("window", {
+		...window,
 		postMessage: vi.fn().mockImplementation(function (...args: unknown[]) {
-			log(
-				"%cwindow.postMessage arguments =",
-				"color:blue",
-				stringifyJson(args),
-			);
+			// log(
+			// 	"%cwindow.postMessage arguments =",
+			// 	"color:blue",
+			// 	stringifyJson(args),
+			// );
 		}),
 		requestAnimationFrame: vi.fn().mockImplementation((cb: () => void) => cb()),
 		getElementById: vi.fn(),
 		createElement: vi.fn(),
+		audio: {
+			loop: false,
+		},
 	});
 }

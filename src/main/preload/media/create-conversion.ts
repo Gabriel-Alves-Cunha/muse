@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/generalTypes";
 
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
-import {log, error} from "node:console";
+import { log, error } from "node:console";
 import sanitize from "sanitize-filename";
 
 import { checkOrThrow, validator } from "@common/args-validator";
@@ -17,7 +17,6 @@ import { getBasename } from "@common/path";
 import { deleteFile } from "../file";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

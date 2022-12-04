@@ -162,8 +162,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 			<button
 				class="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition"
 				onPointerUp={() => setIsOpen(true)}
-			type="button"
-
+				type="button"
 			>
 				{t("buttons.deleteMedia")}
 

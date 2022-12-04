@@ -29,6 +29,9 @@ export default defineConfig(({ mode }) => {
 				"coverage/**",
 				"**/*.d.ts",
 			],
+			deps: {
+				inline: [/solid-js/],
+			},
 		},
 
 		define: isTest
@@ -44,6 +47,8 @@ export default defineConfig(({ mode }) => {
 		base: "./",
 
 		resolve: {
+			conditions: ["test", "browser"],
+
 			alias: [
 				{
 					find: "@components",

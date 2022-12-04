@@ -3,8 +3,6 @@ import type { Base64 } from "@common/@types/generalTypes";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-// import { dbgTests } from "@common/utils";
-
 export const test_assetsDir = resolve(
 	__dirname,
 	"..",
@@ -23,13 +21,6 @@ export const anotherMediaPath = resolve(
 );
 
 export const mediaPicture = resolve(test_assetsDir, "img for tests.png");
-
-// dbgTests("utils.ts", {
-// 	import: import.meta,
-// 	mediaPicture,
-// 	mediaPath,
-// 	__dirname,
-// });
 
 export async function getThumbnail() {
 	const base64 = await readFile(mediaPicture, { encoding: "base64" });

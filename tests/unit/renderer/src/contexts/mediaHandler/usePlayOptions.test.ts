@@ -5,7 +5,9 @@ import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectron
 mockElectronPlusNodeGlobalsBeforeTests();
 //
 
-const { getPlayOptions, setPlayOptions, toggleLoopMedia } = await import(
+import { createRoot } from "solid-js";
+
+const { getPlayOptions, toggleLoopMedia, toggleRandom } = await import(
 	"@contexts/usePlayOptions"
 );
 
@@ -13,44 +15,47 @@ const { getPlayOptions, setPlayOptions, toggleLoopMedia } = await import(
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-describe("Testing usePlayOptions", () => {
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
+describe("Testing usePlayOptions", () =>
+	createRoot((dispose) => {
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 
-	it("should get a new playOptions with .loopThisMedia set", () => {
-		setPlayOptions({ loop: true });
+		it("should get a new playOptions with loop set", () => {
+			toggleLoopMedia();
 
-		expect(
-			getPlayOptions(),
-			"playOptions should have { loop: true }!",
-		).toHaveProperty("loop", true);
+			expect(
+				getPlayOptions(),
+				"playOptions should have { loop: true }!",
+			).toHaveProperty("loop", true);
 
-		toggleLoopMedia();
+			toggleLoopMedia();
 
-		expect(
-			getPlayOptions(),
-			"playOptions should have { loop: false }!",
-		).toHaveProperty("loop", false);
-	});
+			expect(
+				getPlayOptions(),
+				"playOptions should have { loop: false }!",
+			).toHaveProperty("loop", false);
+		});
 
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
 
-	it("should get a new playOptions with .isRandom set", () => {
-		setPlayOptions({ isRandom: true });
+		it("should get a new playOptions with .isRandom set", () => {
+			toggleRandom();
 
-		expect(
-			getPlayOptions(),
-			"playOptions should have { random: true }!",
-		).toHaveProperty("random", true);
+			expect(
+				getPlayOptions(),
+				"playOptions should have { random: true }!",
+			).toHaveProperty("isRandom", true);
 
-		setPlayOptions({ isRandom: false });
+			toggleRandom();
 
-		expect(
-			getPlayOptions(),
-			"playOptions should have { random: true }!",
-		).toHaveProperty("random", false);
-	});
-});
+			expect(
+				getPlayOptions(),
+				"playOptions should have { random: false }!",
+			).toHaveProperty("isRandom", false);
+		});
+
+		dispose();
+	}));
