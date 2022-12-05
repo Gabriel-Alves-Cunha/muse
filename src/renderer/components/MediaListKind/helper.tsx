@@ -4,16 +4,12 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { Component, createSignal } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
-import { Portal } from "solid-js/web";
-import create from "solid-zustand";
 
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { VerticalDotsIcon } from "@icons/VerticalDotsIcon";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { MusicNoteIcon } from "@icons/MusicNoteIcon";
-import { BlurOverlay } from "@components/BlurOverlay";
-import { Dialog } from "../Dialog";
 import { log } from "@utils/log";
 import {
 	electronIpcMainProcessNotification,
@@ -32,22 +28,13 @@ const notify =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const useFromList = create<FromList>(() => ({
+export const [getFromList, setFromList] = createSignal<FromList>({
 	fromList: playlistList.favorites,
 	homeList: playlistList.mainList,
 	isHome: true,
-}));
-
-export const { getState: getFromList, setState: setFromList } = useFromList;
+});
 
 /////////////////////////////////////////
-
-const useIsCtxMenuOpen = create(() => ({ isCtxMenuOpen: false }));
-
-export const isCtxMenuOpen = () => useIsCtxMenuOpen.getState().isCtxMenuOpen;
-
-export const setIsCtxMenuOpen = (bool: boolean) =>
-	useIsCtxMenuOpen.setState({ isCtxMenuOpen: bool });
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -55,7 +42,6 @@ export const setIsCtxMenuOpen = (bool: boolean) =>
 export const selectMediaByPointerEvent = (
 	e: MouseEvent & { currentTarget: HTMLButtonElement; target: Element },
 ): void => {
-	// TODO: see if this selector still works.
 	const mediaClickedMediaPath = (e.currentTarget as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-path");
@@ -67,11 +53,11 @@ export const selectMediaByPointerEvent = (
 
 /////////////////////////////////////////
 
-export const rightClick = 2;
-export const leftClick = 0;
+export const RIGTH_CLICK = 2;
+export const LEFT_CLICK = 0;
 
 const selectOrPlayMedia = (e: PointerEvent, mediaPath: Path): void => {
-	if (e.button !== leftClick || !e.ctrlKey) {
+	if (e.button !== LEFT_CLICK || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome === true ? homeList : fromList;
 
@@ -90,7 +76,7 @@ export const Row: Component<VirtualItemProps<RowProps>> = (props) => {
 	const [t] = useI18n();
 
 	return (
-		<div
+		<li
 			classList={{
 				selected: getAllSelectedMedias().has(props.item.path),
 				playing: getCurrentPlaying().path === props.item.path,
@@ -98,7 +84,6 @@ export const Row: Component<VirtualItemProps<RowProps>> = (props) => {
 			data-path={props.item.path}
 			tabIndex={props.tabIndex}
 			class="row-wrapper"
-			role="listitem"
 		>
 			<button
 				class="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
@@ -127,22 +112,22 @@ export const Row: Component<VirtualItemProps<RowProps>> = (props) => {
 				</div>
 			</button>
 
-			<button title={t("tooltips.openMediaOptions")} type="button">
+			<button
+				onPointerUp={() => setIsMediaOptionsOpen(true)}
+				title={t("tooltips.openMediaOptions")}
+				type="button"
+			>
 				<VerticalDotsIcon class="w-4 h-4" />
 			</button>
 
-			<Portal>
-				<Dialog.Content
-					onOpenChange={setIsMediaOptionsOpen}
-					isOpen={isMediaOptionsOpen()}
-					modal
-				>
-					<BlurOverlay />
-
-					<MediaOptionsModal media={props.item.media} path={props.item.path} />
-				</Dialog.Content>
-			</Portal>
-		</div>
+			<MediaOptionsModal
+				setIsOpen={setIsMediaOptionsOpen}
+				isOpen={isMediaOptionsOpen()}
+				media={props.item.media}
+				path={props.item.path}
+				overlay="blur"
+			/>
+		</li>
 	);
 };
 

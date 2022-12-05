@@ -4,8 +4,8 @@ export function getFirstKey<Key>(
 	if (mapOrSet instanceof Map) {
 		if (mapOrSet.size < 1) return undefined;
 
-		const [key_] = mapOrSet as ReadonlyMap<Key, unknown>;
-		const [key] = key_!;
+		const [first] = mapOrSet as ReadonlyMap<Key, unknown>;
+		const [key] = first!;
 
 		return key;
 	} else {

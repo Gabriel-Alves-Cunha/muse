@@ -5,12 +5,10 @@ import { type JSX, createEffect, createSignal } from "solid-js";
 import { toCanvas } from "qrcode";
 import { useI18n } from "@solid-primitives/i18n";
 
-import { setSettings, useSettings } from "@contexts/settings";
+import { getFilesToShare, setFilesToShare } from "@contexts/filesToShare";
 import { error, assert } from "@utils/log";
-import { BlurOverlay } from "./BlurOverlay";
 import { getBasename } from "@common/path";
 import { CloseIcon } from "@icons/CloseIcon";
-import { emptySet } from "@common/empty";
 import { Loading } from "./Loading";
 import { Dialog } from "./Dialog";
 
@@ -30,47 +28,34 @@ const qrID = "qrcode-canvas";
 
 export function ShareDialog() {
 	const [server, setServer] = createSignal<ClientServerAPI | null>(null);
-	const filesToShare = useSettings((state) => state.filesToShare);
-	const [isDialogOpen, setIsDialogOpen] = createSignal(false);
+	const [isOpen, setIsOpen] = createSignal(false);
+	const filesToShare = getFilesToShare();
 	const [t] = useI18n();
 
 	const plural = () => (filesToShare.size > 1 ? "s" : "");
 
 	/////////////////////////////////////////
 
-	async function onCanvasElementMakeQRCode(canvas: HTMLCanvasElement | null) {
-		if (!(canvas && isDialogOpen() && server())) return;
+	const onCanvasElementGoMakeQRCode = (
+		canvas: HTMLCanvasElement | null,
+	): void => {
+		if (!(canvas && isOpen() && server())) return;
 
-		await makeQrcode(server()!.url).catch((err) => {
-			error("Error making QR Code.", err);
-			closePopover(server()!.close);
-		});
-	}
-
-	/////////////////////////////////////////
-
-	function handleDialogOpenStates(newValue: boolean): void {
-		if (!newValue) server()?.close();
-
-		setIsDialogOpen(newValue);
-	}
+		makeQrcode(server()!.url)
+			.then()
+			.catch((err) => {
+				error("Error making QR Code.", err);
+				setIsOpen(false);
+			});
+	};
 
 	/////////////////////////////////////////
 
-	// When the server closes, get rid of it's reference:
+	// Create a new server and open dialog when there is files to share.
 	createEffect(() => {
-		server()?.addListener("close", () => {
-			setTimeout(() => setServer(null), 1_000);
-			closePopover();
-		});
-	});
-
-	/////////////////////////////////////////
-
-	createEffect(function createNewServer() {
 		const shouldDialogOpen = filesToShare.size > 0;
 
-		setIsDialogOpen(shouldDialogOpen);
+		setIsOpen(shouldDialogOpen);
 
 		if (!shouldDialogOpen) return;
 
@@ -80,31 +65,44 @@ export function ShareDialog() {
 			setServer(clientServerApi);
 		} catch (err) {
 			error(err);
-			closePopover();
+			setIsOpen(false);
+		}
+	});
+
+	createEffect(() => {
+		// If is closing:
+		if (!isOpen()) {
+			server()?.close();
+			// When the server closes, get rid of it's reference:
+			server()?.addListener("close", () => setServer(null));
+
+			const filesToShare = getFilesToShare();
+
+			filesToShare.clear();
+
+			setFilesToShare(filesToShare);
 		}
 	});
 
 	/////////////////////////////////////////
 
 	return (
-		<Dialog.Content
+		<Dialog
 			class="absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition"
-			onOpenChange={handleDialogOpenStates}
-			isOpen={isDialogOpen()}
+			setIsOpen={setIsOpen}
+			isOpen={isOpen()}
+			overlay="blur"
 			modal
 		>
-			<BlurOverlay />
-
-			<Dialog.Close
+			<button
 				class="absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5"
+				onPointerUp={() => setIsOpen(false)}
 				title={t("tooltips.closeShareScreen")}
-				onPointerUp={() =>
-					closePopover(server()?.close)
-				}
+				type="button"
 				// zIndex: 155,
 			>
 				<CloseIcon class="fill-accent" />
-			</Dialog.Close>
+			</button>
 
 			<div class="relative w-80 p-2">
 				<p class="relative mt-6 font-primary tracking-wider text-xl text-normal font-medium overflow-ellipsis whitespace-nowrap overflow-hidden">
@@ -119,12 +117,12 @@ export function ShareDialog() {
 
 			<canvas
 				class="relative w-80 h-80 rounded-xl"
-				ref={onCanvasElementMakeQRCode}
+				ref={onCanvasElementGoMakeQRCode}
 				id={qrID}
 			>
 				<Loading />
 			</canvas>
-		</Dialog.Content>
+		</Dialog>
 	);
 }
 
@@ -133,15 +131,7 @@ export function ShareDialog() {
 /////////////////////////////////////////
 // Helper functions:
 
-function closePopover(closeServerFunction?: () => void): void {
-	closeServerFunction?.();
-
-	setSettings({ filesToShare: emptySet });
-}
-
-/////////////////////////////////////////
-
-const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
+const namesOfFilesToShare = (filesToShare: Set<Path>): JSX.Element[] =>
 	Array.from(filesToShare, (path) => (
 		<li class="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal">
 			{getBasename(path)}

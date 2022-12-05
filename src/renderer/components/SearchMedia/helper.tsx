@@ -1,11 +1,14 @@
-import { Component, JSX, Show } from "solid-js";
 import type { Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import { createSignal } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
-import create from "solid-zustand";
+import {
+	type Component,
+	type JSX,
+	createEffect,
+	createSignal,
+	Show,
+} from "solid-js";
 
 import { ctxContentEnum, ContextMenu } from "../ContextMenu";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
@@ -19,7 +22,6 @@ import { emptyString } from "@common/empty";
 import { emptyArray } from "@common/empty";
 import { RightSlot } from "../ContextMenu/RightSlot";
 import { BaseInput } from "../BaseInput";
-import { Overlay } from "../BlurOverlay";
 import { Portal } from "solid-js/web";
 import { Dialog } from "../Dialog";
 
@@ -49,46 +51,47 @@ const defaultSearcher: Searcher = Object.freeze({
 	results: emptyArray,
 });
 
-const useSearcher = create<Searcher>()(
-	subscribeWithSelector((_set, _get, _api) => defaultSearcher),
-);
-
-export const { setState: setSearcher, getState: getSearcher } = useSearcher;
+export const [getSearcher, setSearcher] = createSignal(defaultSearcher);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-useSearcher.subscribe(
-	(state) => state.highlight,
-	function searchForMedias(highlight): void {
-		if (highlight.length < 2) return;
+createEffect(() => {
+	// searchForMedias(highlight)
+	const { highlight } = getSearcher();
 
-		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
+	if (highlight.length < 2) return;
 
-		const results = searchMedia(highlight);
-		const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+	setSearcher((prev) => ({
+		...prev,
+		results: emptyArray,
+		searchStatus: SEARCHING,
+	}));
 
-		setSearcher({ searchStatus, results });
-	},
-);
+	const results = searchMedia(highlight);
+	const searchStatus = results.length > 0 ? FOUND_SOMETHING : NOTHING_FOUND;
+
+	setSearcher((prev) => ({ ...prev, searchStatus, results }));
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
 const setSearchTerm = (e: InputChange) =>
-	setSearcher({
+	setSearcher((prev) => ({
+		...prev,
 		highlight: unDiacritic(e.currentTarget.value),
 		searchTerm: e.currentTarget.value,
-	});
+	}));
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
 const setIsInputOnFocus = (bool: boolean) =>
-	setSearcher({ isInputOnFocus: bool });
+	setSearcher((prev) => ({ ...prev, isInputOnFocus: bool }));
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -101,10 +104,7 @@ const setDefaultSearch = () => setSearcher(defaultSearcher);
 /////////////////////////////////////////
 
 export const Input: Component = () => {
-	const { searchTerm, isInputOnFocus } = useSearcher((state) => ({
-		isInputOnFocus: state.isInputOnFocus,
-		searchTerm: state.searchTerm,
-	}));
+	const { searchTerm, isInputOnFocus } = getSearcher();
 	const [t] = useI18n();
 
 	let input: HTMLInputElement | undefined;
@@ -134,7 +134,9 @@ export const Input: Component = () => {
 	return (
 		<BaseInput
 			RightSlot={
-				isInputOnFocus ? null : <RightSlot id="search">Alt+s</RightSlot>
+				<Show when={isInputOnFocus}>
+					<RightSlot id="search">Alt+s</RightSlot>
+				</Show>
 			}
 			onFocus={() => setIsInputOnFocus(true)}
 			onBlur={() => setIsInputOnFocus(false)}
@@ -156,15 +158,15 @@ export const Input: Component = () => {
 const mantainFocusOnInput = (e: Event) => e.preventDefault();
 
 export const Results: Component = () => {
-	const { searchStatus, results, searchTerm, highlight } = useSearcher();
+	const { searchStatus, results, searchTerm, highlight } = getSearcher();
 	const [isCtxMenuOpen, setIsCtxMenuOpen] = createSignal(false);
 	const resultsJSXs: JSX.Element[] = [];
 
 	/////////////////////////////////////////
 
-	const foundSomething = searchStatus === FOUND_SOMETHING;
-	const nothingFound = searchStatus === NOTHING_FOUND;
-	const shouldPopoverOpen = foundSomething || nothingFound;
+	const foundSomething = () => searchStatus === FOUND_SOMETHING;
+	const nothingFound = () => searchStatus === NOTHING_FOUND;
+	const shouldPopoverOpen = () => foundSomething() || nothingFound();
 
 	/////////////////////////////////////////
 
@@ -180,29 +182,29 @@ export const Results: Component = () => {
 			content={ctxContentEnum.SEARCH_MEDIA_OPTIONS}
 			onContextMenu={selectMediaByPointerEvent}
 			onOpenChange={setIsCtxMenuOpen}
-			isAllDisabled={nothingFound}
+			isAllDisabled={nothingFound()}
 			isOpen={isCtxMenuOpen()}
 		>
-			<Dialog.Content
+			<Dialog
 				// onOpenAutoFocus={mantainFocusOnInput}
 				onClickOutside={setDefaultSearch}
-				isOpen={shouldPopoverOpen}
-				onOpenChange={() => {}}
+				isOpen={shouldPopoverOpen()}
+				setIsOpen={() => {}}
 				class={`transition-none ${
-					nothingFound
+					nothingFound()
 						? "nothing-found-for-search-media"
 						: "search-media-results"
 				}`}
 			>
 				<Show
-					when={nothingFound}
-					fallback={<Show when={foundSomething}>{resultsJSXs}</Show>}
+					fallback={<Show when={foundSomething()}>{resultsJSXs}</Show>}
+					when={nothingFound()}
 				>
 					<div class="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
 						Nothing was found for &quot;{searchTerm}&quot;
 					</div>
 				</Show>
-			</Dialog.Content>
+			</Dialog>
 		</ContextMenu>
 	);
 };
@@ -248,17 +250,21 @@ const MediaSearchRow: Component<MediaSearchRowProps> = (props) => {
 				</div>
 			</button>
 
-			<button title={t("tooltips.openMediaOptions")} type="button">
+			<button
+				title={t("tooltips.openMediaOptions")}
+				onPointerUp={() => setIsOpen(true)}
+				type="button"
+			>
 				<VerticalDotsIcon class="w-4 h-4" />
 			</button>
 
-			<Portal>
-				<Dialog.Content modal isOpen={isOpen()} onOpenChange={setIsOpen}>
-					<Overlay />
-
-					<MediaOptionsModal media={props.media} path={props.path} />
-				</Dialog.Content>
-			</Portal>
+			<MediaOptionsModal
+				setIsOpen={setIsOpen}
+				media={props.media}
+				path={props.path}
+				isOpen={isOpen()}
+				overlay="dim"
+			/>
 		</div>
 	);
 };
@@ -278,11 +284,11 @@ type Searcher = Readonly<{
 
 /////////////////////////////////////////
 
-type MediaSearchRowProps = Readonly<{
+type MediaSearchRowProps = {
 	highlight: string;
 	media: Media;
 	path: Path;
-}>;
+};
 
 /////////////////////////////////////////
 

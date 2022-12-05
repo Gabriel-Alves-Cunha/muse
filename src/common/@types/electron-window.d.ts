@@ -17,7 +17,6 @@ import {
 
 declare global {
 	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[] };
-	var audio: HTMLAudioElement | null;
 	var electron: VisibleElectron;
 	var isDev: boolean;
 }

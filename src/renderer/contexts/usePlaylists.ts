@@ -82,7 +82,8 @@ export const addToHistory = (path: Path): void => {
 
 	setPlaylists((prev) => ({ ...prev, history }));
 
-	console.log("Added to history:", path, console.count("added to history"));
+	console.log(`Added path to history: "${path}"`);
+	console.count("Added to history");
 };
 
 ////////////////////////////////////////////////

@@ -15,7 +15,7 @@ export const [getPlayOptions, setPlayOptions] = createSignal<PlayOptions>({
 });
 
 createEffect(() => {
-	// dbg("Saving playOptions on LocalStorage.");
+	dbg("Saving playOptions on LocalStorage.");
 
 	setLocalStorage(keys.playOptions, getPlayOptions());
 });
@@ -26,12 +26,12 @@ createEffect(() => {
 // Helper functions:
 
 export const toggleLoopMedia = (): void => {
-	if (!window.audio)
-		return info("There is no window.audio to toggleLoopMedia!");
+	const audio = document.getElementById("audio") as HTMLAudioElement | null;
+	if (!audio) return info("There is no window.audio to toggleLoopMedia!");
 
 	const loop = !getPlayOptions().loop;
 
-	window.audio.loop = loop;
+	audio.loop = loop;
 
 	setPlayOptions((prev) => ({ ...prev, loop }));
 };

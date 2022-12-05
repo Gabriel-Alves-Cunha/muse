@@ -8,10 +8,10 @@ import {
 	createSignal,
 	onMount,
 } from "solid-js";
-import create from "solid-zustand";
 
+import { getCurrentPlaying, playNextMedia } from "@contexts/useCurrentPlaying";
 import { FlipCard, mediaPlayerCardId } from "../FlipCard";
-import { refreshMedia, usePlaylists } from "@contexts/usePlaylists";
+import { refreshMedia, getPlaylists } from "@contexts/usePlaylists";
 import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { formatDuration } from "@common/utils";
@@ -21,23 +21,16 @@ import { log, error } from "@utils/log";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
 import { dbg } from "@common/debug";
-import {
-	useCurrentPlaying,
-	getCurrentPlaying,
-	playNextMedia,
-} from "@contexts/useCurrentPlaying";
 
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
 // Helper constants:
 
-export const useProgress = create<Progress>(() => ({
+export const [getProgress, setProgress] = createSignal({
 	currentTime: 0,
 	percentage: 0,
-}));
-
-const { setState: setProgress } = useProgress;
+});
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -45,21 +38,24 @@ const { setState: setProgress } = useProgress;
 // Main function:
 
 export const MediaPlayer: Component = () => {
-	const mainList = usePlaylists((state) => state.sortedByNameAndMainList);
+	const mainList = getPlaylists().sortedByNameAndMainList;
 	const [isSeeking, setIsSeeking] = createSignal(false);
-	const path = useCurrentPlaying((state) => state.path);
+	const { path } = getCurrentPlaying();
 	let audio: HTMLAudioElement | undefined;
 
 	const media = () => mainList.get(path);
 
-	function handleProgress(audio: HTMLAudioElement): void {
+	const handleProgress = (audio: HTMLAudioElement): void => {
 		const { duration, currentTime } = audio;
 
-		setProgress({ currentTime });
+		setProgress((prev) => ({ ...prev, currentTime }));
 
 		if (!isSeeking())
-			setProgress({ percentage: (currentTime / duration) * 100 });
-	}
+			setProgress((prev) => ({
+				...prev,
+				percentage: (currentTime / duration) * 100,
+			}));
+	};
 
 	createEffect(function flipMediaPlayerCardToNormalPlayer() {
 		log("flipMediaPlayerCardToNormalPlayer", audio?.src);

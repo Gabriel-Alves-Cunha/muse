@@ -1,5 +1,5 @@
+import { createSignal } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
-import create from "solid-zustand";
 
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
@@ -14,16 +14,15 @@ const { getBasicInfo } = electron.media;
 ////////////////////////////////////////////////
 // Constants:
 
-const defaultSearchInfo: SearcherInfo = {
+const defaultSearchInfo: SearcherInfo = Object.freeze({
 	result: { imageURL: emptyString, artist: emptyString, title: emptyString },
 	error: emptyString,
 	url: emptyString,
 	isLoading: false,
-};
+});
 
-export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
-
-export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
+export const [getSearchInfo, setSearchInfo] =
+	createSignal<SearcherInfo>(defaultSearchInfo);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -34,10 +33,10 @@ export const downloadMedia = (): void => {
 	const {
 		result: { artist, imageURL, title },
 		url,
-	} = searchInfo();
+	} = getSearchInfo();
 
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
-	if (title.length === 0 || url.length === 0) return;
+	if (!(title && url)) return;
 
 	// Start download:
 	setDownloadInfo({ imageURL, title, url, artist });
@@ -53,11 +52,12 @@ export const search = async (url: string): Promise<void> => {
 
 	dbg(`Searching for "${url}".`);
 
-	setSearchInfo({
+	setSearchInfo((prev) => ({
+		...prev,
 		result: defaultSearchInfo.result,
 		error: emptyString,
 		isLoading: true,
-	});
+	}));
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -69,17 +69,18 @@ export const search = async (url: string): Promise<void> => {
 			title,
 		};
 
-		setSearchInfo({ isLoading: false, result });
+		setSearchInfo((prev) => ({ ...prev, isLoading: false, result }));
 	} catch (err) {
 		const [t] = useI18n();
 
-		setSearchInfo({
+		setSearchInfo((prev) => ({
+			...prev,
 			result: defaultSearchInfo.result,
 			isLoading: false,
 			error: getErrorMessage(err).includes("No video id found")
 				? t("errors.noVideoIdFound")
 				: t("errors.gettingMediaInfo"),
-		});
+		}));
 
 		error(err);
 	}

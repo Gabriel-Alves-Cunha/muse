@@ -1,12 +1,7 @@
 import { assert, expect, it } from "vitest";
 
+import { assertUnreachable, getRandomInt, time } from "@utils/utils";
 import { sleep } from "@common/utils";
-import {
-	assertUnreachable,
-	getRandomInt,
-	capitalize,
-	time,
-} from "@utils/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -33,36 +28,6 @@ it("should time a function and return what it's result", async () => {
 	const ret2 = await doAndReturnSomethingAsync(10);
 
 	expect(ret2).toBe(110);
-});
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-
-it("should capitalize a string", () => {
-	const strings = Object.freeze([
-		"1 cup of water",
-		".gitignore",
-		"jupyter",
-		"9 lifes",
-		" hello",
-		"Venus",
-		"mars",
-		"",
-	]);
-
-	const result = strings.map((str) => capitalize(str));
-
-	expect(result).toStrictEqual([
-		"1 cup of water",
-		".gitignore",
-		"Jupyter",
-		"9 lifes",
-		" hello",
-		"Venus",
-		"Mars",
-		"",
-	]);
 });
 
 /////////////////////////////////////////////

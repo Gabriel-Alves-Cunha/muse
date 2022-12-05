@@ -7,13 +7,15 @@ import { dbg } from "@common/debug";
 ////////////////////////////////////////////////
 // Pre work:
 
-const settingsKey = "muse:settings";
+const settingsKey = "@muse:settings";
 const defaultValues: Settings = Object.freeze({
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
 	maxSizeOfHistory: 100,
 });
+
 const savedSettings = localStorage.getItem(settingsKey);
+
 const settingsToApply = savedSettings
 	? (JSON.parse(savedSettings) as Settings)
 	: defaultValues;
@@ -32,7 +34,7 @@ export const [getSettings, setSettings] =
 // Helper function:
 
 createEffect(() => {
-	dbg("Saving new settings on LocalStorage.");
+	dbg("Saving new settings on LocalStorage:", getSettings());
 
 	localStorage.setItem(settingsKey, JSON.stringify(getSettings()));
 });

@@ -37,9 +37,10 @@ export const Lyrics: Component<Props> = (props) => {
 /////////////////////////////////////////
 // Helper functions:
 
-export const flipMediaPlayerCard = (): void => {
-	document.getElementById(mediaPlayerCardId)?.classList.toggle("active");
-};
+export const flipMediaPlayerCard = (): void =>
+	document
+		.getElementById(mediaPlayerCardId)
+		?.classList.toggle("active") as void;
 
 /////////////////////////////////////////
 
@@ -52,7 +53,7 @@ export async function searchAndOpenLyrics(
 
 	const [t] = useI18n();
 
-	if (media.artist.length === 0) {
+	if (!media.artist) {
 		infoToast(t("toasts.assureMediaHasArtistMetadata"));
 		return;
 	}
@@ -83,7 +84,7 @@ export async function searchAndOpenLyrics(
 		error(err);
 	}
 
-	if (media.lyrics.length > 0 && openLyrics) flipMediaPlayerCard();
+	if (media.lyrics && openLyrics) flipMediaPlayerCard();
 }
 
 /////////////////////////////////////////

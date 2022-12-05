@@ -20,7 +20,7 @@ import { LeftIcon } from "@icons/LeftIcon";
 import { PlayIcon } from "@icons/PlayIcon";
 import {
 	toggleLoopMedia,
-	usePlayOptions,
+	getPlayOptions,
 	toggleRandom,
 } from "@contexts/usePlayOptions";
 import {
@@ -34,7 +34,7 @@ import {
 /////////////////////////////////////////
 
 export const ControlsAndSeeker: Component<RefToAudioAndSeeker> = (props) => {
-	const { isRandom, loop } = usePlayOptions();
+	const { isRandom, loop } = getPlayOptions();
 	const [t] = useI18n();
 
 	const isThereAMedia = () => !(props.audio && props.audio.src.length > 0);

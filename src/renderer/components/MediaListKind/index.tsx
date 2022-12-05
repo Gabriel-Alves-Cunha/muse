@@ -4,16 +4,16 @@ import { VirtualContainer } from "@minht11/solid-virtual-container";
 import { useI18n } from "@solid-primitives/i18n";
 import {
 	type Component,
+	type Accessor,
 	ErrorBoundary,
-	createEffect,
+	createSignal,
 	createMemo,
 	onCleanup,
 	onMount,
-	Accessor,
 } from "solid-js";
 
 import { SearchOffIcon as NoMediaFound } from "@icons/SearchOffIcon";
-// import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
+import { ctxContentEnum, ContextMenu } from "../ContextMenu";
 import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
@@ -28,14 +28,13 @@ import {
 import {
 	type MainList,
 	type History,
-	usePlaylists,
+	getPlaylists,
 	getMainList,
 } from "@contexts/usePlaylists";
 import {
 	selectMediaByPointerEvent,
-	setIsCtxMenuOpen,
-	isCtxMenuOpen,
-	useFromList,
+	getFromList,
+	setFromList,
 	Row,
 } from "./helper";
 
@@ -68,8 +67,10 @@ export const MediaListKind: Component<Props> = (props) => {
 /////////////////////////////////////////
 // Main function:
 
+const [isCtxMenuOpen, setIsCtxMenuOpen] = createSignal(false);
+
 const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
-	const { fromList, homeList } = useFromList();
+	const { fromList, homeList } = getFromList();
 	let scrollTargetElement: HTMLDivElement | undefined;
 
 	// isHome is used to determine which list to use
@@ -77,7 +78,9 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 	// then, cause it will have what the user has last set as the main list:
 	// either sortedByDate or sortedByName, in our current case.
 	const listName = () => (props.isHome === true ? homeList : fromList);
-	const { [listName()]: list } = usePlaylists();
+	const { [listName()]: list } = getPlaylists();
+
+	setFromList((prev) => ({ ...prev, isHome: Boolean(props.isHome) }));
 
 	// 	const listAsArrayOfAMap: Accessor<
 	// 		readonly { media: Media; path: Path; date: number }[]
@@ -150,7 +153,7 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 						const mainList = getMainList();
 
 						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
-							list as ReadonlySet<Path>,
+							list as Set<Path>,
 							(path) => {
 								const media = mainList.get(path);
 
@@ -192,11 +195,9 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 			scrollTargetElement as HTMLDivElement,
 			handleDeselectAllMedias,
 		);
+
+		document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
 	});
-
-	createEffect(() => useFromList.setState({ isHome: Boolean(props.isHome) }));
-
-	document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
 
 	onCleanup(() =>
 		document.removeEventListener("keydown", selectAllMediasOnCtrlPlusA),
@@ -205,20 +206,21 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 	return (
 		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
 		<div class="max-w-2xl h-[87%]" ref={scrollTargetElement as HTMLDivElement}>
-			{/* <ContextMenu
+			<ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
 				content={ctxContentEnum.MEDIA_OPTIONS}
-				setIsOpen={setIsCtxMenuOpen}
-			> */}
-			<VirtualContainer
-				scrollTarget={scrollTargetElement}
-				items={listAsArrayOfAMap()}
-				itemSize={{ height: 64 }}
-				className="list"
+				onOpenChange={setIsCtxMenuOpen}
+				isOpen={isCtxMenuOpen()}
 			>
-				{Row}
-			</VirtualContainer>
-			{/* </ContextMenu> */}
+				<VirtualContainer
+					scrollTarget={scrollTargetElement}
+					items={listAsArrayOfAMap()}
+					itemSize={{ height: 64 }}
+					className="list"
+				>
+					{Row}
+				</VirtualContainer>
+			</ContextMenu>
 		</div>
 	);
 };
@@ -246,18 +248,19 @@ const components = { EmptyPlaceholder, Header: Footer, Footer };
 
 /////////////////////////////////////////
 
-function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
+const selectAllMediasOnCtrlPlusA = (e: KeyboardEvent): void => {
 	if (e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])) {
 		e.preventDefault();
 		selectAllMedias();
 	}
-}
+};
 
 /////////////////////////////////////////
 
-function handleDeselectAllMedias() {
-	if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0) deselectAllMedias();
-}
+const handleDeselectAllMedias = (): void =>
+	(!isCtxMenuOpen() &&
+		getAllSelectedMedias().size > 0 &&
+		deselectAllMedias()) as unknown as void;
 
 /////////////////////////////////////////
 /////////////////////////////////////////

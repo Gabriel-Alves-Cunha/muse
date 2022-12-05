@@ -11,7 +11,6 @@ export default defineConfig(({ mode }) => {
 	const isTest = mode === "test";
 
 	const config: UserConfig = {
-		// @ts-ignore => I can't get this type to work :(
 		test: {
 			includeSource: ["src/**/*.{js,ts}"],
 			environment: "happy-dom",

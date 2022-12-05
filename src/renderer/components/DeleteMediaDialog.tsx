@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import type { Component, Setter } from "solid-js";
 
 import { useI18n } from "@solid-primitives/i18n";
 import { Portal } from "solid-js/web";
@@ -15,16 +15,16 @@ import warningSvg from "@assets/warning.svg";
 // Main function:
 
 export const DeleteMediaDialog: Component<{
-	onOpenChange(newIsOpen: boolean): void;
-	handleMediaDeletion: () => void;
+	handleMediaDeletion(): void;
+	setIsOpen: Setter<boolean>;
 	isOpen: boolean;
 }> = (props) => {
 	const [t] = useI18n();
 
 	return (
 		<Portal>
-			<Dialog.Content
-				onOpenChange={props.onOpenChange}
+			<Dialog
+				setIsOpen={props.setIsOpen}
 				isOpen={props.isOpen}
 				class=""
 				modal
@@ -38,18 +38,26 @@ export const DeleteMediaDialog: Component<{
 				<FlexRow>
 					<img class="" src={warningSvg} alt="Warning sign." />
 
-					<Dialog.Close
+					<button
 						class="bg-red-600 text-white hover:bg-opacity-70 focus:bg-opacity-70"
-						onPointerUp={props.handleMediaDeletion}
+						onPointerUp={() => {
+							props.handleMediaDeletion();
+							props.setIsOpen(false);
+						}}
+						type="button"
 					>
 						{t("buttons.confirm")}
-					</Dialog.Close>
+					</button>
 
-					<Dialog.Close class="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70">
+					<button
+						class="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70"
+						onPointerUp={() => props.setIsOpen(false)}
+						type="button"
+					>
 						{t("buttons.cancel")}
-					</Dialog.Close>
+					</button>
 				</FlexRow>
-			</Dialog.Content>
+			</Dialog>
 		</Portal>
 	);
 };

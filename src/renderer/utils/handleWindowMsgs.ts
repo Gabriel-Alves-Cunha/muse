@@ -32,8 +32,8 @@ function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 
 	if (!event.dataTransfer) return;
 
-	event.dataTransfer.dropEffect = "copy";
-	// ^ Style the drag-and-drop as a "copy file" operation.
+	event.dataTransfer.dropEffect = "link";
+	// ^ Style the drag-and-drop as a "link file" operation.
 }
 
 //////////////////////////////////////////
@@ -99,7 +99,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
 
-			const newMediaInArray: readonly [Path, Media][] =
+			const newMediaInArray =
 				await transformPathsToMedias(
 					[mediaPath],
 					assureMediaSizeIsGreaterThan60KB,

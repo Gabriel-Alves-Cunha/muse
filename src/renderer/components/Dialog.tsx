@@ -1,39 +1,31 @@
 import {
 	type Component,
+	type Setter,
 	type JSX,
-	createSignal,
 	onCleanup,
 	onMount,
+	Switch,
+	Match,
 } from "solid-js";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
+import { BlurOverlay, Overlay } from "./BlurOverlay";
 
-const Content: Component<DialogRootProps> = (props) => {
-	const [isOnFocus, setIsOnFocus] = createSignal(false);
-
-	const dialog = (
-		<dialog
-			class={`dialog ${props.class ?? ""}`}
-			onFocus={() => setIsOnFocus(true)}
-			onBlur={() => setIsOnFocus(false)}
-			aria-modal={Boolean(props.modal)}
-			open={props.isOpen}
-			{...props}
-		/>
-	) as HTMLDialogElement;
+export const Dialog: Component<DialogRootProps> = (props) => {
+	let dialogRef: HTMLDialogElement | undefined;
 
 	/////////////////////////////////////////////
 	// Functions:
 
-	const setOnOpenChangeToFalse = () => props.onOpenChange(false);
+	const setOnOpenChangeToFalse = () => props.setIsOpen(false);
 
-	const closeDialogOnEsc = (e: KeyboardEvent) =>
-		!isAModifierKeyPressed(e) &&
-		e.key === "Escape" &&
-		props.isOpen &&
-		isOnFocus() &&
-		closeDialog(e);
+	const closeDialogOnEsc = (e: KeyboardEvent) => {
+		if (e.key === "Escape" && !isAModifierKeyPressed(e) && props.isOpen) {
+			e.stopPropagation(); // There may be more than one dialog open.
+			closeDialog(dialogRef);
+		}
+	};
 
 	/////////////////////////////////////////////
 	// Listeners
@@ -41,21 +33,43 @@ const Content: Component<DialogRootProps> = (props) => {
 	onMount(() => {
 		document.addEventListener("keyup", closeDialogOnEsc);
 
-		dialog.addEventListener("close", setOnOpenChangeToFalse);
+		dialogRef!.addEventListener("close", setOnOpenChangeToFalse);
 
-		useOnClickOutside(dialog, (e) => {
-			closeDialog(e);
+		useOnClickOutside(dialogRef, (e) => {
+			closeDialog(dialogRef);
 			props.onClickOutside?.(e);
 		});
 	});
 
 	onCleanup(() => {
-		dialog.removeEventListener("close", setOnOpenChangeToFalse);
+		dialogRef!.removeEventListener("close", setOnOpenChangeToFalse);
 
 		document.removeEventListener("keyup", closeDialogOnEsc);
 	});
 
-	return dialog;
+	return (
+		<>
+			<Switch>
+				<Match when={props.overlay === "blur"}>
+					<BlurOverlay />
+				</Match>
+
+				<Match when={props.overlay === "dim"}>
+					<Overlay />
+				</Match>
+			</Switch>
+
+			<dialog
+				class={`dialog ${props.class ?? ""}`}
+				ref={dialogRef as HTMLDialogElement}
+				aria-modal={Boolean(props.modal)}
+				open={props.isOpen}
+				{...props}
+			>
+				{props.children}
+			</dialog>
+		</>
+	);
 };
 
 /////////////////////////////////////////////
@@ -63,41 +77,19 @@ const Content: Component<DialogRootProps> = (props) => {
 /////////////////////////////////////////////
 // Helper functions:
 
-const Close: Component<CloseDialogProps> = (props) => (
-	<button
-		class={`close-dialog ${props.class ?? ""}`}
-		onPointerUp={closeDialog}
-		type="button"
-		{...props}
-	/>
-);
-
-/////////////////////////////////////////////
-
 // Close the closest dialog element:
-const closeDialog = (e: PointerEvent | KeyboardEvent) =>
-	(e.target as HTMLElement).closest("dialog")!.close();
-
-/////////////////////////////////////////////
-
-export const Dialog = {
-	Content,
-	Close,
-};
+const closeDialog = (dialogRef: HTMLDialogElement | undefined): void =>
+	dialogRef?.close();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-interface CloseDialogProps
-	extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {}
-
-/////////////////////////////////////////////
-
 interface DialogRootProps extends JSX.DialogHtmlAttributes<HTMLDialogElement> {
-	onOpenChange(newIsOpen: boolean): void;
 	onClickOutside?(e: PointerEvent): void;
+	setIsOpen: Setter<boolean>;
+	overlay?: "blur" | "dim";
 	children: JSX.Element;
 	isOpen: boolean;
 	modal?: boolean;

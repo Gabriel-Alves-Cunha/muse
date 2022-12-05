@@ -4,10 +4,10 @@ import { useI18n } from "@solid-primitives/i18n";
 
 import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { DeleteMediaDialog } from "../DeleteMediaDialog";
+import { setFilesToShare } from "@contexts/filesToShare";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "../SearchMedia/helper";
 import { getMainList } from "@contexts/usePlaylists";
-import { setSettings } from "@contexts/settings";
 import { openLyrics } from "../MediaPlayer/Header";
 import { TrashIcon } from "@icons/TrashIcon";
 import { ShareIcon } from "@icons/ShareIcon";
@@ -37,7 +37,7 @@ export const SearchMediaOptionsCtxMenu: Component<Props> = (props) => {
 				</div>
 
 				<DeleteMediaDialog
-					onOpenChange={setIsDeletMediaDialogOpen}
+					setIsOpen={setIsDeletMediaDialogOpen}
 					handleMediaDeletion={deleteMedias}
 					isOpen={isDeletMediaDialogOpen()}
 				/>
@@ -81,13 +81,13 @@ export const SearchMediaOptionsCtxMenu: Component<Props> = (props) => {
 /////////////////////////////////////////////
 // Helper functions:
 
-export const shareMedias = () =>
-	setSettings({ filesToShare: getAllSelectedMedias() });
+export const shareMedias = () => setFilesToShare(getAllSelectedMedias());
 
 /////////////////////////////////////////////
 
 const selectAllMediasOnSearchResult = (): void => {
 	const paths = getSearcher().results.map(([path]) => path);
+
 	setAllSelectedMedias(new Set(paths));
 };
 

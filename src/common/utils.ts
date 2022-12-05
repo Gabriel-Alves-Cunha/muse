@@ -8,7 +8,7 @@ export const capitalizedAppName = "Muse";
 
 /////////////////////////////////////////
 
-export const separatedByCommaOrSemiColorOrSpace = /,|;| /gm;
+export const separatedByCommaOrSemiColonOrSpace = /,|;| /gm;
 // export const separatedByCommaOrSemiColon = /,|;/gm;
 
 /////////////////////////////////////////

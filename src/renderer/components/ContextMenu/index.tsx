@@ -1,4 +1,4 @@
-import { Component, JSX, Setter } from "solid-js";
+import type { Component, JSX, Setter } from "solid-js";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
@@ -26,14 +26,14 @@ const { MEDIA_OPTIONS, MAIN, SEARCH_MEDIA_OPTIONS } = ctxContentEnum;
 
 export const ContextMenu: Component<Props> = (props) => {
 	return (
-		<Dialog.Content
+		<Dialog
 			class="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
-			onOpenChange={props.onOpenChange}
+			setIsOpen={props.onOpenChange}
 			isOpen={props.isOpen}
 			modal
 		>
 			{contentToShow(props.content ?? MAIN, Boolean(props.isAllDisabled))}
-		</Dialog.Content>
+		</Dialog>
 	);
 };
 

@@ -1,5 +1,3 @@
-import { dbg } from "@common/debug";
-
 const modifierKeys = [
 	"SymbolLock",
 	"ScrollLock",
@@ -20,7 +18,7 @@ const modifierKeys = [
 export function isAModifierKeyPressed(
 	event: KeyboardEvent,
 	except: typeof modifierKeys[number][] = [],
-): Readonly<boolean> {
+): boolean {
 	for (const key of modifierKeys) {
 		if (except.includes(key)) continue;
 

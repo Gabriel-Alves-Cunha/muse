@@ -2,8 +2,8 @@ import type { RefToAudioAndSeeker } from "./Controls";
 
 import { type Component, createEffect, createSignal, onMount } from "solid-js";
 
+import { getProgress, setProgress } from ".";
 import { formatDuration, mapTo } from "@common/utils";
-import { useProgress } from ".";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -12,10 +12,7 @@ import { useProgress } from ".";
 export const SeekerWrapper: Component<RefToAudioAndSeeker> = (props) => {
 	const [formatedDuration, setFormatedDuration] = createSignal("00:00");
 	const [isDurationValid, setIsDurationValid] = createSignal(false);
-	const [currentTime, percentage] = useProgress((state) => [
-		state.currentTime,
-		state.percentage,
-	]);
+	const { currentTime, percentage } = getProgress();
 	let progressWrapper: HTMLDivElement | undefined;
 	let timeTooltip: HTMLSpanElement | undefined;
 
@@ -33,7 +30,7 @@ export const SeekerWrapper: Component<RefToAudioAndSeeker> = (props) => {
 		setIsDurationValid(props.audio?.duration > 0);
 	});
 
-	function setTimerTooltip({ offsetX }: PointerEvent): void {
+	const setTimerTooltip = ({ offsetX }: PointerEvent): void => {
 		if (!(timeTooltip && props.audio)) return;
 
 		const time =
@@ -44,23 +41,18 @@ export const SeekerWrapper: Component<RefToAudioAndSeeker> = (props) => {
 
 		timeTooltip.textContent = formatDuration(time);
 		timeTooltip.style.left = `${left}px`;
-	}
+	};
 
-	function seek({ offsetX }: PointerEvent): void {
-		if (
-			!(props.audio && timeTooltip) ||
-			isNaN(props.audio.duration) ||
-			!isFinite(props.audio.duration)
-		)
-			return;
+	const seek = ({ offsetX }: PointerEvent): void => {
+		if (!(props.audio && timeTooltip && isFinite(props.audio.duration))) return;
 
 		const desiredTime =
 			(offsetX / timeTooltip.getBoundingClientRect().width) *
 			props.audio.duration;
 		const percentage = mapTo(desiredTime, [0, props.audio.duration], [0, 100]);
 
-		useProgress.setState({ percentage });
-	}
+		setProgress((prev) => ({ ...prev, percentage }));
+	};
 
 	onMount(() => {
 		timeTooltip!.addEventListener("pointermove", setTimerTooltip);
@@ -102,9 +94,8 @@ export const SeekerWrapper: Component<RefToAudioAndSeeker> = (props) => {
 				ref={progressWrapper as HTMLDivElement}
 			>
 				<span // Timer tooltip
-					class={`group-hover:progress group-focus:progress ${
-						isDurationValid() ? "hidden" : ""
-					}`}
+					class="group-hover:progress group-focus:progress"
+					classList={{ hidden: isDurationValid() }}
 					ref={timeTooltip as HTMLSpanElement}
 				/>
 

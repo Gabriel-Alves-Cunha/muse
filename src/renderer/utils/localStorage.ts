@@ -33,21 +33,18 @@ export const setLocalStorage = (
 
 		dbgPlaylists({ key, json, value });
 
-		// @ts-ignore => It doesn't matter that `serializedValue`,
-		// is of type `String` or `string`, they both work:
 		localStorage.setItem(key, json);
 	}) as unknown as void;
 
 ////////////////////////////////////////////////
 
 export const getFromLocalStorage = (key: Keys): ReturnFromLocalStorage => {
-	const value = localStorage.getItem(key);
-	// @ts-ignore => ^ `?? "";` does not work :|
+	const value = localStorage.getItem(key) || "[]";
 	const item: unknown = JSON.parse(value);
 
-	dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
+	dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
 
-	if (!(item && value)) return undefined;
+	if (item === "[]") return undefined;
 
 	if (key === keys.favorites) {
 		const newFavorites = new Set(item as Path[]);

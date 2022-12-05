@@ -1,7 +1,7 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { createEffect, createSignal } from "solid-js";
+import { batch, createEffect, createSignal } from "solid-js";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
 import { getRandomInt, time } from "@utils/utils";
@@ -10,6 +10,7 @@ import { getPlayOptions } from "./usePlayOptions";
 import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
 import { getFirstKey } from "@utils/map-set";
+import { dbgTests } from "@common/debug";
 import {
 	type MainList,
 	addToHistory,
@@ -17,8 +18,6 @@ import {
 	getMainList,
 	History,
 } from "./usePlaylists";
-import { dbgTests } from "@common/debug";
-import { nextTick } from "process";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -46,16 +45,20 @@ export const playThisMedia = (
 
 ////////////////////////////////////////////////
 
-export const togglePlayPause = (): void => window.audio?.pause();
+export const togglePlayPause = (): void =>
+	(document.getElementById("audio") as HTMLAudioElement | null)?.pause();
 
 ////////////////////////////////////////////////
 
-export const play = (): void => window.audio?.play().then() as void;
+export const play = (): void =>
+	(document.getElementById("audio") as HTMLAudioElement | null)
+		?.play()
+		.then() as void;
 
 ////////////////////////////////////////////////
 
 export const pause = (): void => {
-	const audio = window.audio;
+	const audio = document.getElementById("audio") as HTMLAudioElement | null;
 	if (!audio) return;
 
 	audio.pause();
@@ -102,7 +105,7 @@ export const playPreviousMedia = (): void =>
 			);
 
 		// In the history list, the first is the newest.
-		// @ts-ignore => I garanteed above that a second media is present:
+		// @ts-ignore => I garanteed above that a second media is present.
 		const [_firstMedia, [previousMediaPath]] = history;
 
 		playThisMedia(previousMediaPath, correctListType);
@@ -142,27 +145,14 @@ export const playNextMedia = (): void =>
 		} else {
 			let found = false;
 
-			time(() => {
-				for (const newPath of list.keys()) {
-					if (found) {
-						nextMediaPath = newPath;
-						break;
-					}
-
-					if (newPath === path) found = true;
+			for (const newPath of list.keys()) {
+				if (found) {
+					nextMediaPath = newPath;
+					break;
 				}
-			}, "string comparison ===");
 
-			time(() => {
-				for (const newPath of list.keys()) {
-					if (found) {
-						nextMediaPath = newPath;
-						break;
-					}
-
-					if (areStringsEqual(newPath, path)) found = true;
-				}
-			}, "string comparison by function");
+				if (newPath === path) found = true;
+			}
 
 			// In case the currently playing is the last media, get the first:
 			if (!nextMediaPath) nextMediaPath = getFirstKey(list) as Path;
@@ -183,22 +173,6 @@ export const playNextMedia = (): void =>
 			currentTime: 0,
 		});
 	}, "playNextMedia");
-
-/**
- * Compare two strings. This comparison is not linguistically accurate, unlike
- * String.prototype.localeCompare(), albeit stable.
- */
-const areStringsEqual = (a: string, b: string): boolean => {
-	const lenA = a.length;
-	const lenB = b.length;
-
-	if (lenA !== lenB) return false;
-
-	for (let index = 0; index < lenA; ++index)
-		if (a.charCodeAt(index) !== b.charCodeAt(index)) return false;
-
-	return true;
-};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -227,7 +201,7 @@ const setAudioSource = (path: Path, prevPath: Path): void => {
 	const mediaPathSuitableForElectron = `atom:///${path}`;
 
 	const timerToSetMedia = setTimeout(() => {
-		const audio = window.audio;
+		const audio = document.getElementById("audio") as HTMLAudioElement | null;
 		if (!audio) return;
 
 		audio.src = mediaPathSuitableForElectron;
@@ -292,14 +266,14 @@ let prevCurrentPlaying: CurrentPlaying = defaultCurrentPlaying;
 createEffect(() => {
 	const newCurrentPlaying = getCurrentPlaying();
 
-	nextTick(() => console.log("next tick on 'useCurrentPlaying.ts' at l:295"));
 	dbgTests(
 		"Added to history:",
 		newCurrentPlaying.path,
-		console.count("createEffect -> added to history"),
+		console.count(
+			"'useCurrentPlaying.ts' createEffect -> batch -> added to history",
+		),
 	);
-	addToHistory(newCurrentPlaying.path);
-	nextTick(() => console.log("next tick on 'useCurrentPlaying.ts' at l:295"));
+	batch(() => addToHistory(newCurrentPlaying.path));
 
 	setAudioSource(newCurrentPlaying.path, prevCurrentPlaying.path);
 
