@@ -3,7 +3,7 @@ import { expect } from "vitest";
 import { numberOfMedias, testList } from "./fakeTestList";
 import {
 	defaultCurrentPlaying,
-	getCurrentPlaying,
+	currentPlaying,
 	setCurrentPlaying,
 } from "@contexts/useCurrentPlaying";
 import {
@@ -43,7 +43,7 @@ function cleanFavorites() {
 function setCurrentPlayingToDefault() {
 	setCurrentPlaying(defaultCurrentPlaying);
 
-	expect(getCurrentPlaying()).toStrictEqual(defaultCurrentPlaying);
+	expect(currentPlaying()).toStrictEqual(defaultCurrentPlaying);
 }
 
 export function cleanUpBeforeEachTest() {

@@ -1,8 +1,11 @@
-import { usePlaylists } from "@contexts/usePlaylists";
+import type { Component } from "solid-js";
+
 import { useI18n } from "@solid-primitives/i18n";
 
-export function NumberOfMedias() {
-	const numberOfMedias = usePlaylists((state) => state.sortedByDate.size);
+import { playlists } from "@contexts/usePlaylists";
+
+export const NumberOfMedias: Component = () => {
+	const numberOfMedias = playlists().sortedByDate.size;
 	const [t] = useI18n();
 
 	return (
@@ -10,4 +13,4 @@ export function NumberOfMedias() {
 			{numberOfMedias} {t("decorations.medias")}
 		</p>
 	);
-}
+};

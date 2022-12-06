@@ -6,16 +6,15 @@ import { ButtonOfGroup } from "./ButtonOfGroup";
 import { ReloadIcon } from "@icons/ReloadIcon";
 import {
 	searchLocalComputerForMedias,
-	usePlaylists,
+	isLoadingMedias,
 } from "@contexts/usePlaylists";
 
 export const Reload: Component = () => {
-	const isLoadingMedias = usePlaylists((state) => state.isLoadingMedias);
 	const [t] = useI18n();
 
 	return (
 		<ButtonOfGroup
-			classList={{ "animate-spin": isLoadingMedias }}
+			classList={{ "animate-spin": isLoadingMedias() }}
 			onPointerUp={searchLocalComputerForMedias}
 			title={t("tooltips.reloadAllMedias")}
 		>

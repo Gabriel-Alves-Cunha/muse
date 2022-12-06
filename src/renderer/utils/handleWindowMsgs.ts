@@ -5,8 +5,8 @@ import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { electronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
-import { getMediaFiles } from "@contexts/usePlaylistsHelper";
-import { getSettings } from "@contexts/settings";
+import { getMediaFiles } from "@contexts/playlistsHelper";
+import { settings } from "@contexts/settings";
 import { emptyString } from "@common/empty";
 import { log, error } from "@utils/log";
 import { deleteFile } from "./deleteFile";
@@ -15,9 +15,9 @@ import {
 	searchLocalComputerForMedias,
 	addToMainList,
 	refreshMedia,
-	getMainList,
 	removeMedia,
-} from "@contexts/usePlaylists";
+	playlists,
+} from "@contexts/playlists";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -95,16 +95,15 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			const {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			} = getSettings();
+			} = settings;
 
 			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
 
-			const newMediaInArray =
-				await transformPathsToMedias(
-					[mediaPath],
-					assureMediaSizeIsGreaterThan60KB,
-					ignoreMediaWithLessThan60Seconds,
-				);
+			const newMediaInArray = await transformPathsToMedias(
+				[mediaPath],
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			);
 
 			const newMedia = newMediaInArray[0]?.[1];
 
@@ -124,7 +123,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
-			if (!getMainList().has(mediaPath)) {
+			if (!playlists.sortedByDate.has(mediaPath)) {
 				error("Could not find media to delete.");
 				break;
 			}
@@ -160,7 +159,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
-			if (!getMainList().has(mediaPath)) {
+			if (!playlists.sortedByDate.has(mediaPath)) {
 				error(
 					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
 				);

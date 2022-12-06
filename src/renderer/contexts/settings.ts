@@ -1,4 +1,5 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import { dbg } from "@common/debug";
 
@@ -25,19 +26,21 @@ const settingsToApply = savedSettings
 ////////////////////////////////////////////////
 // Main function:
 
-export const [getSettings, setSettings] =
-	createSignal<Settings>(settingsToApply);
+export const [settings, setSettings] = createStore<Settings>(settingsToApply);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Helper function:
 
-createEffect(() => {
-	dbg("Saving new settings on LocalStorage:", getSettings());
+createEffect(
+	() => {
+		dbg("Saving new settings on LocalStorage:", settings);
 
-	localStorage.setItem(settingsKey, JSON.stringify(getSettings()));
-});
+		localStorage.setItem(settingsKey, JSON.stringify(settings));
+	},
+	{ defer: true },
+);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

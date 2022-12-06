@@ -1,8 +1,11 @@
-import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
-import type { PlayOptions } from "@contexts/usePlayOptions";
+import type { CurrentPlaying } from "@contexts/currentPlaying";
+import type { PlayOptions } from "@contexts/playOptions";
 import type { TypeOfMap } from "@common/@types/utils";
-import type { History } from "@contexts/usePlaylists";
+import type { History } from "@contexts/playlists";
 import type { Path } from "@common/@types/generalTypes";
+
+import { ReactiveMap } from "@solid-primitives/map";
+import { ReactiveSet } from "@solid-primitives/set";
 
 import { dbgPlaylists } from "@common/debug";
 
@@ -13,8 +16,8 @@ import { dbgPlaylists } from "@common/debug";
 
 export const keys = {
 	currentPlaying: "@muse:currentPlaying",
-	favorites: "@muse:playlist:favorites",
-	history: "@muse:playlist:history",
+	favorites: "@muse:playlists:favorites",
+	history: "@muse:playlists:history",
 	playOptions: "@muse:playOptions",
 } as const;
 
@@ -47,7 +50,7 @@ export const getFromLocalStorage = (key: Keys): ReturnFromLocalStorage => {
 	if (item === "[]") return undefined;
 
 	if (key === keys.favorites) {
-		const newFavorites = new Set(item as Path[]);
+		const newFavorites = new ReactiveSet(item as Path[]);
 
 		dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
 
@@ -55,7 +58,7 @@ export const getFromLocalStorage = (key: Keys): ReturnFromLocalStorage => {
 	}
 
 	if (key === keys.history) {
-		const newHistory: History = new Map(item as HistoryShape);
+		const newHistory: History = new ReactiveMap(item as HistoryShape);
 
 		dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
 
@@ -92,17 +95,17 @@ type Keys = typeof keys[keyof typeof keys];
 
 type AllowedToSetOnLocalStorage =
 	| (string | [string, number[]])[]
+	| ReactiveSet<Path>
 	| CurrentPlaying
 	| PlayOptions
-	| Set<Path>
 	| History;
 
 //////////////////////////////////////////
 
 type ReturnFromLocalStorage =
+	| ReactiveSet<Path>
 	| CurrentPlaying
 	| PlayOptions
-	| Set<Path>
 	| undefined
 	| History;
 

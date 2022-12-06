@@ -19,7 +19,7 @@ import {
 	testList,
 } from "./fakeTestList";
 
-const { playPreviousMedia, getCurrentPlaying, playThisMedia, playNextMedia } =
+const { playPreviousMedia, currentPlaying, playThisMedia, playNextMedia } =
 	await import("@contexts/useCurrentPlaying");
 const { getHistory } = await import("@contexts/usePlaylists");
 
@@ -55,7 +55,7 @@ describe("Testing useCurrentPlaying", () =>
 					path,
 				};
 
-				expect(expected).toEqual(getCurrentPlaying());
+				expect(expected).toEqual(currentPlaying());
 			}
 		});
 
@@ -67,7 +67,7 @@ describe("Testing useCurrentPlaying", () =>
 			expect(getHistory().size, "history.length is wrong!").toBe(0);
 
 			expect(
-				getCurrentPlaying().path,
+				currentPlaying().path,
 				"currentPlaying().path at the start should be set to an empty string!",
 			).toBe("");
 
@@ -84,13 +84,13 @@ describe("Testing useCurrentPlaying", () =>
 				// There needs to be at least 2 medias on history to be able to play a previous one.
 				if (index === 0) continue;
 
-				expect(getCurrentPlaying().path).toBe(prevMediaPath);
+				expect(currentPlaying().path).toBe(prevMediaPath);
 				expect(getHistory().size, "history.length is wrong!").toBe(index + 1);
 
 				playPreviousMedia();
 
 				expect(
-					getCurrentPlaying().path,
+					currentPlaying().path,
 					"currentPlaying().path should be set to the previous path!",
 				).toBe(prevMediaPath);
 
@@ -101,7 +101,7 @@ describe("Testing useCurrentPlaying", () =>
 				};
 
 				expect(expected, "The expected currentPlaying is wrong!").toEqual(
-					getCurrentPlaying(),
+					currentPlaying(),
 				);
 
 				++index;
@@ -120,7 +120,7 @@ describe("Testing useCurrentPlaying", () =>
 			);
 
 			expect(
-				getCurrentPlaying().path,
+				currentPlaying().path,
 				"currentPlaying().path at the start should be set to the firstMediaPathFromMainList!",
 			).toBe(firstMediaPathFromMainList);
 
@@ -128,7 +128,7 @@ describe("Testing useCurrentPlaying", () =>
 			for (const _ of arrayFromMainList) {
 				playNextMedia();
 
-				const currMediaPath = getCurrentPlaying().path;
+				const currMediaPath = currentPlaying().path;
 				const expectedMediaPath =
 					arrayFromMainList[index + 1]?.[0] ?? firstMediaPathFromTestArray;
 

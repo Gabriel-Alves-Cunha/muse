@@ -3,6 +3,7 @@ import type { MetadataToChange } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
 import { useI18n } from "@solid-primitives/i18n";
+import { Portal } from "solid-js/web";
 import {
 	type Component,
 	createSignal,
@@ -30,7 +31,6 @@ import { FlexRow } from "../FlexRow";
 import { Button } from "../Button";
 import { Dialog } from "../Dialog";
 import { dbg } from "@common/debug";
-import { Portal } from "solid-js/web";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

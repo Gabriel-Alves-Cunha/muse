@@ -9,9 +9,9 @@ import {
 	onMount,
 } from "solid-js";
 
-import { getCurrentPlaying, playNextMedia } from "@contexts/useCurrentPlaying";
+import { currentPlaying, playNextMedia } from "@contexts/useCurrentPlaying";
 import { FlipCard, mediaPlayerCardId } from "../FlipCard";
-import { refreshMedia, getPlaylists } from "@contexts/usePlaylists";
+import { refreshMedia, playlists } from "@contexts/usePlaylists";
 import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { formatDuration } from "@common/utils";
@@ -38,9 +38,9 @@ export const [getProgress, setProgress] = createSignal({
 // Main function:
 
 export const MediaPlayer: Component = () => {
-	const mainList = getPlaylists().sortedByNameAndMainList;
+	const mainList = playlists().sortedByNameAndMainList;
 	const [isSeeking, setIsSeeking] = createSignal(false);
-	const { path } = getCurrentPlaying();
+	const { path } = currentPlaying();
 	let audio: HTMLAudioElement | undefined;
 
 	const media = () => mainList.get(path);
@@ -57,7 +57,7 @@ export const MediaPlayer: Component = () => {
 			}));
 	};
 
-	createEffect(function flipMediaPlayerCardToNormalPlayer() {
+	createEffect(() => {
 		log("flipMediaPlayerCardToNormalPlayer", audio?.src);
 
 		document.getElementById(mediaPlayerCardId)?.classList.remove("active");
@@ -178,7 +178,7 @@ const handleLoadedData = (
 		refreshMedia(path, emptyString, { ...media, duration: formatedDuration });
 
 	// Maybe set audio.currentTime to last stopped time:
-	const lastTime = getCurrentPlaying().currentTime;
+	const lastTime = currentPlaying().currentTime;
 	if (lastTime > 30 /* seconds */) audio.currentTime = lastTime;
 };
 

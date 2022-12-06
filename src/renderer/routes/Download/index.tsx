@@ -3,7 +3,7 @@ import type { InputChangeEvent } from "@common/@types/solid-js-helpers";
 import { type Component, createEffect, onCleanup, Show } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
 
-import { downloadMedia, search, setSearchInfo, getSearchInfo } from "./helpers";
+import { downloadMedia, search, setSearchInfo, searchInfo } from "./helpers";
 import { BaseInput } from "@components/BaseInput";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
@@ -20,7 +20,7 @@ const Download: Component = () => (
 		<Header>
 			<SearcherWrapper />
 
-			<div class="w-6 h-6 ml-3">{getSearchInfo().isLoading && <Loading />}</div>
+			<div class="w-6 h-6 ml-3">{searchInfo.isLoading && <Loading />}</div>
 		</Header>
 
 		<Result />
@@ -31,21 +31,19 @@ const Download: Component = () => (
 // Helper functions:
 
 const setUrl = (e: InputChangeEvent) =>
-	setSearchInfo((prev) => ({ ...prev, url: e.currentTarget.value }));
+	setSearchInfo({ url: e.currentTarget.value });
 
 ////////////////////////////////////////////////
 
 const SearcherWrapper: Component = () => {
-	const { error, url } = getSearchInfo();
+	const { error, url } = searchInfo;
 	const [t] = useI18n();
 
-	let searchTimeout: NodeJS.Timeout | undefined;
-
 	createEffect(() => {
-		searchTimeout = setTimeout(async () => await search(url), 300);
-	});
+		const searchTimeout = setTimeout(async () => await search(url), 300);
 
-	onCleanup(() => clearTimeout(searchTimeout));
+		onCleanup(() => clearTimeout(searchTimeout));
+	});
 
 	return (
 		<>
@@ -68,7 +66,7 @@ const SearcherWrapper: Component = () => {
 ////////////////////////////////////////////////
 
 const Result: Component = () => {
-	const { imageURL, title } = getSearchInfo().result;
+	const { imageURL, title } = searchInfo.result;
 	const [t] = useI18n();
 
 	return (

@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import { useI18n } from "@solid-primitives/i18n";
 
 import { setDownloadInfo } from "@components/Downloading";
@@ -21,8 +21,8 @@ const defaultSearchInfo: SearcherInfo = Object.freeze({
 	isLoading: false,
 });
 
-export const [getSearchInfo, setSearchInfo] =
-	createSignal<SearcherInfo>(defaultSearchInfo);
+export const [searchInfo, setSearchInfo] =
+	createStore<SearcherInfo>(defaultSearchInfo);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -33,7 +33,7 @@ export const downloadMedia = (): void => {
 	const {
 		result: { artist, imageURL, title },
 		url,
-	} = getSearchInfo();
+	} = searchInfo;
 
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
 	if (!(title && url)) return;
@@ -52,12 +52,11 @@ export const search = async (url: string): Promise<void> => {
 
 	dbg(`Searching for "${url}".`);
 
-	setSearchInfo((prev) => ({
-		...prev,
+	setSearchInfo({
 		result: defaultSearchInfo.result,
 		error: emptyString,
 		isLoading: true,
-	}));
+	});
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -69,18 +68,17 @@ export const search = async (url: string): Promise<void> => {
 			title,
 		};
 
-		setSearchInfo((prev) => ({ ...prev, isLoading: false, result }));
+		setSearchInfo({ isLoading: false, result });
 	} catch (err) {
 		const [t] = useI18n();
 
-		setSearchInfo((prev) => ({
-			...prev,
+		setSearchInfo({
 			result: defaultSearchInfo.result,
 			isLoading: false,
 			error: getErrorMessage(err).includes("No video id found")
 				? t("errors.noVideoIdFound")
 				: t("errors.gettingMediaInfo"),
-		}));
+		});
 
 		error(err);
 	}

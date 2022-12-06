@@ -5,6 +5,7 @@ import type { ValuesOf } from "@common/@types/utils";
 import { Component, Index, Show } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
 
+import { getDownloadingList, setDownloadingList } from "@contexts/downloadList";
 import { errorToast, infoToast, successToast } from "@components/toasts";
 import { Progress, progressIcons } from "@components/Progress";
 import { CloseIcon as CancelIcon } from "@icons/CloseIcon";
@@ -14,11 +15,6 @@ import { progressStatus } from "@common/enums";
 import { error, assert } from "@utils/log";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
-import {
-	useDownloadingList,
-	setDownloadingList,
-	getDownloadingList,
-} from "@contexts/downloadList";
 
 import { handleSingleItemDeleteAnimation } from "./styles";
 
@@ -27,7 +23,7 @@ import { handleSingleItemDeleteAnimation } from "./styles";
 /////////////////////////////////////////////
 
 export const Popup: Component = () => {
-	const { downloadingList } = useDownloadingList();
+	const downloadingList = getDownloadingList();
 	const [t] = useI18n();
 
 	return (
@@ -176,7 +172,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 function handleUpdateDownloadingList(
 	{ data }: MessageEvent<PartialExceptStatus>,
-	url: Readonly<string>,
+	url: string,
 ): void {
 	const downloadingList = getDownloadingList();
 	const [t] = useI18n();
@@ -188,15 +184,13 @@ function handleUpdateDownloadingList(
 
 	// Assert that the download exists:
 	const thisDownload = downloadingList.get(url);
-	if (thisDownload === undefined)
+	if (!thisDownload)
 		return error(
 			"Received a message from Electron but the url is not in the list!",
 		);
 
 	// Update React's information about this DownloadingMedia:
-	setDownloadingList(
-		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
-	);
+	setDownloadingList(downloadingList.set(url, { ...thisDownload, ...data }));
 
 	// Handle status:
 	switch (data.status) {
@@ -261,7 +255,7 @@ export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 	const newDownloadingList = new Map(downloadingList);
 	newDownloadingList.delete(url);
 
-	// Make React update:
+	// Update:
 	setDownloadingList(newDownloadingList);
 }
 
@@ -270,11 +264,11 @@ export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 /////////////////////////////////////////////
 // Types:
 
-type DownloadingBoxProps = Readonly<{
+type DownloadingBoxProps = {
 	download: MediaBeingDownloaded;
 	downloadingIndex: number;
 	url: string;
-}>;
+};
 
 /////////////////////////////////////////////
 

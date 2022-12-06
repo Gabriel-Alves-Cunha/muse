@@ -1,8 +1,8 @@
-import type { Component, JSX } from "solid-js";
 import type { ValuesOf } from "@common/@types/utils";
 
+import { type Component, type JSX, Match, Switch } from "solid-js";
+
 import { SelectOrderOptions } from "./SelectOrderOptions";
-import { assertUnreachable } from "@utils/utils";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -19,7 +19,7 @@ export const contentOfSelectEnum = {
 // Main function:
 
 export const Select: Component<Props> = (props) => (
-	<select value={props.value} onChange={props.setValue}>
+	<>
 		<button
 			class={`relative flex justify-center items-center cursor-pointer bg-none border-none ${props.triggerClass}`}
 			title={props.tooltip}
@@ -32,29 +32,21 @@ export const Select: Component<Props> = (props) => (
 			{props.children}
 		</button>
 
-		<div class="select-content no-transition p-1">
-			{contentToShow(props.content)}
-		</div>
-	</select>
+		<select
+			class="select-content no-transition p-1"
+			onInput={props.setValue}
+			value={props.value}
+		>
+			<Switch>
+				<Match
+					when={props.content === contentOfSelectEnum.GROUPED_BUTTON_SORT_BY}
+				>
+					<SelectOrderOptions />
+				</Match>
+			</Switch>
+		</select>
+	</>
 );
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Helper function:
-
-function contentToShow(content: ValuesOf<typeof contentOfSelectEnum>) {
-	switch (content) {
-		// case FULL_EXAMPLE:
-		// 	return <FullExampleSelectButton />;
-
-		case contentOfSelectEnum.GROUPED_BUTTON_SORT_BY:
-			return <SelectOrderOptions />;
-
-		default:
-			return assertUnreachable(content);
-	}
-}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

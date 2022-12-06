@@ -9,8 +9,8 @@ import {
 } from "solid-js";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { BlurOverlay, Overlay } from "./BlurOverlay";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
 
 export const Dialog: Component<DialogRootProps> = (props) => {
 	let dialogRef: HTMLDialogElement | undefined;

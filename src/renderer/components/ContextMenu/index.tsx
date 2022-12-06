@@ -28,7 +28,7 @@ export const ContextMenu: Component<Props> = (props) => {
 	return (
 		<Dialog
 			class="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
-			setIsOpen={props.onOpenChange}
+			setIsOpen={props.setIsOpen}
 			isOpen={props.isOpen}
 			modal
 		>
@@ -69,7 +69,7 @@ function contentToShow(
 type Props = {
 	onContextMenu?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
 	content?: ValuesOf<typeof ctxContentEnum>;
-	onOpenChange: Setter<boolean>;
+	setIsOpen: Setter<boolean>;
 	isAllDisabled?: boolean;
 	children: JSX.Element;
 	isOpen: boolean;

@@ -94,9 +94,10 @@ const selectAllMediasOnSearchResult = (): void => {
 /////////////////////////////////////////////
 
 export const searchForLyrics = async (): Promise<void> => {
+	const allSelectedMedias = getAllSelectedMedias();
 	const allMedias = getMainList();
 
-	for (const path of getAllSelectedMedias()) {
+	for (const path of allSelectedMedias) {
 		const media = allMedias.get(path);
 
 		await searchAndOpenLyrics(media, path, !openLyrics);

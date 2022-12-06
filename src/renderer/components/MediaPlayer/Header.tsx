@@ -5,7 +5,7 @@ import { useI18n } from "@solid-primitives/i18n";
 
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
 import { JournalTextIcon as LyricsPresentIcon } from "@icons/JournalTextIcon";
-import { toggleFavoriteMedia, getPlaylists } from "@contexts/usePlaylists";
+import { toggleFavoriteMedia, playlists } from "@contexts/usePlaylists";
 import { JournalIcon as NoLyricsIcon } from "@icons/JournalIcon";
 import { CircleIconButton } from "../CircleIconButton";
 import { HeartIcon } from "@icons/HeartIcon";
@@ -57,7 +57,7 @@ const LoadOrToggleLyrics: Component<LoadOrToggleLyricsProps> = (props) => {
 /////////////////////////////////////////
 
 export const Header: Component<HeaderProps> = (props) => {
-	const { favorites } = getPlaylists();
+	const { favorites } = playlists();
 	const isFavorite = () => favorites.has(props.path);
 	const [t] = useI18n();
 

@@ -1,5 +1,8 @@
-import type { MainList } from "./usePlaylists";
+import type { MainList } from "./playlists";
 import type { Path } from "@common/@types/generalTypes";
+
+import { ReactiveMap } from "@solid-primitives/map";
+import { ReactiveSet } from "@solid-primitives/set";
 
 import { getLastExtension } from "@common/path";
 import { allowedMedias } from "@common/utils";
@@ -71,7 +74,7 @@ export const getAllowedMedias = (filenames: readonly Path[]): readonly Path[] =>
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const sortByDate = (list: MainList): Set<Path> =>
+export const sortByDate = (list: MainList): ReactiveSet<Path> =>
 	time(() => {
 		const listAsArrayOfPaths = [...list]
 			.sort(
@@ -84,7 +87,7 @@ export const sortByDate = (list: MainList): Set<Path> =>
 			)
 			.map(([path]) => path);
 
-		return new Set(listAsArrayOfPaths);
+		return new ReactiveSet(listAsArrayOfPaths);
 	}, "sortByDate");
 
 ////////////////////////////////////////////////
@@ -98,7 +101,7 @@ export const sortByName = (list: MainList): MainList =>
 				compare(prevTitle, nextTitle),
 		);
 
-		return new Map(listAsArrayOfPaths);
+		return new ReactiveMap(listAsArrayOfPaths);
 	}, "sortByName by fast compare() function");
 
 /**

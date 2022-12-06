@@ -1,18 +1,16 @@
 import type { InputChangeEvent } from "@common/@types/solid-js-helpers";
 import type { AllowedMedias } from "@common/utils";
+import type { ConvertInfo } from "@components/Converting/helper";
 import type { Path } from "@common/@types/generalTypes";
 
-import { type Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect, createSignal, batch } from "solid-js";
+import { ReactiveMap } from "@solid-primitives/map";
 import { useI18n } from "@solid-primitives/i18n";
 
+import { newConvertions } from "@components/Converting";
 import { MainArea } from "@components/MainArea";
-import { emptyMap } from "@common/empty";
 import { SwapIcon } from "@icons/SwapIcon";
 import { Button } from "@components/Button";
-import {
-	type ConvertInfo,
-	useNewConvertions,
-} from "@components/Converting/helper";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -20,8 +18,7 @@ import {
 // Main function:
 
 export const Convert: Component = () => {
-	const [selectedFiles, setSelectedFiles] =
-		createSignal<SelectedFiles>(emptyMap);
+	const selectedFiles = new ReactiveMap<Path, ConvertInfo>();
 	const [toExtension] = createSignal<AllowedMedias>("mp3");
 	const [t] = useI18n();
 
@@ -29,16 +26,18 @@ export const Convert: Component = () => {
 
 	////////////////////////////////////////////////
 
-	function handleSelectedFiles({ currentTarget: { files } }: InputChangeEvent) {
+	const handleSelectedFiles = ({
+		currentTarget: { files },
+	}: InputChangeEvent) => {
 		if (!files?.length) return;
 
-		const map: Map<Path, ConvertInfo> = new Map();
-
-		for (const file of files)
-			map.set(file.webkitRelativePath, { toExtension: toExtension() });
-
-		setSelectedFiles(map);
-	}
+		batch(() => {
+			for (const file of files)
+				selectedFiles.set(file.webkitRelativePath, {
+					toExtension: toExtension(),
+				});
+		});
+	};
 
 	////////////////////////////////////////////////
 
@@ -49,12 +48,15 @@ export const Convert: Component = () => {
 	// Start converting
 	createEffect(() => {
 		// If there are selected files, convert them:
-		if (!(selectedFiles().size > 0)) return;
+		if (!(selectedFiles.size > 0)) return;
 
 		// To start convert, add to the convertInfoList:
-		useNewConvertions.setState({ newConvertions: selectedFiles() });
+		batch(() => {
+			for (const [path, convertInfo] of selectedFiles)
+				newConvertions.set(path, convertInfo);
 
-		setSelectedFiles(emptyMap);
+			selectedFiles.clear();
+		});
 	});
 
 	////////////////////////////////////////////////
@@ -86,10 +88,3 @@ export const Convert: Component = () => {
 };
 
 export default Convert;
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-// Types:
-
-type SelectedFiles = ReadonlyMap<Path, ConvertInfo>;

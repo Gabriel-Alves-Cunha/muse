@@ -1,4 +1,5 @@
-import type { Component, JSX } from "solid-js";
+import { type Component, type JSX, createMemo } from "solid-js";
+import { useLocation } from "@solidjs/router";
 
 import { useI18n } from "@solid-primitives/i18n";
 
@@ -10,7 +11,6 @@ import { NumberOfMedias } from "./NumberOfMedias";
 import { MinimizeIcon } from "@icons/MinimizeIcon";
 import { MaximizeIcon } from "@icons/MaximizeIcon";
 import { MediasInfo } from "../Decorations/MediasInfo";
-import { usePage } from "@contexts/page";
 
 import imageUrl from "@assets/logo.svg";
 
@@ -19,7 +19,8 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 
 export const DecorationsTop: Component = () => {
-	const { page } = usePage();
+	const location = useLocation();
+	const currPage = createMemo(() => location.pathname);
 	const [t] = useI18n();
 
 	return (
@@ -30,7 +31,7 @@ export const DecorationsTop: Component = () => {
 			</div>
 
 			<div class="absolute flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light sm:hidden">
-				{capitalizedAppName} • {page}
+				{capitalizedAppName} • {currPage()}
 			</div>
 
 			<Buttons />

@@ -43,7 +43,7 @@ export type VisibleElectron = DeepReadonly<{
 			paths: readonly Path[],
 			assureMediaSizeIsGreaterThan60KB?: boolean,
 			ignoreMediaWithLessThan60Seconds?: boolean,
-		): Promise<readonly [Path, Media][]>;
+		): Promise<[Path, Media][]>;
 	};
 	share: { createServer(filepaths: readonly Path[]): ClientServerAPI };
 	lyric: {

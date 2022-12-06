@@ -1,7 +1,7 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { createSignal } from "solid-js";
+import { ReactiveMap } from "@solid-primitives/map";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -63,14 +63,13 @@ const testDownloadingMedias: [MediaUrl, MediaBeingDownloaded][] = Array.from(
 ////////////////////////////////////////////////
 // Main functions:
 
-export const [getDownloadingList, setDownloadingList] =
-	createSignal<DownloadingList>(new Map(testDownloadingMedias));
+export const downloadingList = new ReactiveMap<MediaUrl, MediaBeingDownloaded>(
+	testDownloadingMedias,
+);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
-
-export type DownloadingList = Map<MediaUrl, MediaBeingDownloaded>;
 
 export type MediaUrl = string;

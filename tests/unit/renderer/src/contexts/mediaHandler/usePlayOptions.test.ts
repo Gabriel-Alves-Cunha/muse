@@ -7,7 +7,7 @@ mockElectronPlusNodeGlobalsBeforeTests();
 
 import { createRoot } from "solid-js";
 
-const { getPlayOptions, toggleLoopMedia, toggleRandom } = await import(
+const { playOptions, toggleLoopMedia, toggleRandom } = await import(
 	"@contexts/usePlayOptions"
 );
 
@@ -25,14 +25,14 @@ describe("Testing usePlayOptions", () =>
 			toggleLoopMedia();
 
 			expect(
-				getPlayOptions(),
+				playOptions(),
 				"playOptions should have { loop: true }!",
 			).toHaveProperty("loop", true);
 
 			toggleLoopMedia();
 
 			expect(
-				getPlayOptions(),
+				playOptions(),
 				"playOptions should have { loop: false }!",
 			).toHaveProperty("loop", false);
 		});
@@ -45,14 +45,14 @@ describe("Testing usePlayOptions", () =>
 			toggleRandom();
 
 			expect(
-				getPlayOptions(),
+				playOptions(),
 				"playOptions should have { random: true }!",
 			).toHaveProperty("isRandom", true);
 
 			toggleRandom();
 
 			expect(
-				getPlayOptions(),
+				playOptions(),
 				"playOptions should have { random: false }!",
 			).toHaveProperty("isRandom", false);
 		});

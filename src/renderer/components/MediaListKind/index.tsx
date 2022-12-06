@@ -28,12 +28,12 @@ import {
 import {
 	type MainList,
 	type History,
-	getPlaylists,
+	playlists,
 	getMainList,
 } from "@contexts/usePlaylists";
 import {
 	selectMediaByPointerEvent,
-	getFromList,
+	fromList,
 	setFromList,
 	Row,
 } from "./helper";
@@ -70,7 +70,7 @@ export const MediaListKind: Component<Props> = (props) => {
 const [isCtxMenuOpen, setIsCtxMenuOpen] = createSignal(false);
 
 const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
-	const { fromList, homeList } = getFromList();
+	const { fromList, homeList } = fromList();
 	let scrollTargetElement: HTMLDivElement | undefined;
 
 	// isHome is used to determine which list to use
@@ -78,7 +78,7 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 	// then, cause it will have what the user has last set as the main list:
 	// either sortedByDate or sortedByName, in our current case.
 	const listName = () => (props.isHome === true ? homeList : fromList);
-	const { [listName()]: list } = getPlaylists();
+	const { [listName()]: list } = playlists();
 
 	setFromList((prev) => ({ ...prev, isHome: Boolean(props.isHome) }));
 
@@ -209,7 +209,7 @@ const MediaListKindWithoutErrorBoundary: Component<Props> = (props) => {
 			<ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
 				content={ctxContentEnum.MEDIA_OPTIONS}
-				onOpenChange={setIsCtxMenuOpen}
+				setIsOpen={setIsCtxMenuOpen}
 				isOpen={isCtxMenuOpen()}
 			>
 				<VirtualContainer

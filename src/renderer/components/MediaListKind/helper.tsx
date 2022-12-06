@@ -3,9 +3,10 @@ import type { Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { Component, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import { useI18n } from "@solid-primitives/i18n";
 
-import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
+import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { VerticalDotsIcon } from "@icons/VerticalDotsIcon";
 import { ImgWithFallback } from "@components/ImgWithFallback";
@@ -16,10 +17,9 @@ import {
 	playlistList,
 } from "@common/enums";
 import {
-	addToAllSelectedMedias,
-	getAllSelectedMedias,
 	toggleSelectedMedia,
-} from "@contexts/useAllSelectedMedias";
+	allSelectedMedias,
+} from "@contexts/allSelectedMedias";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -28,13 +28,11 @@ const notify =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const [getFromList, setFromList] = createSignal<FromList>({
-	fromList: playlistList.favorites,
+export const [fromList, setFromList] = createStore<FromList>({
 	homeList: playlistList.mainList,
+	from: playlistList.favorites,
 	isHome: true,
 });
-
-/////////////////////////////////////////
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -48,7 +46,7 @@ export const selectMediaByPointerEvent = (
 
 	if (!mediaClickedMediaPath) return log("No 'data-path' found!");
 
-	addToAllSelectedMedias(mediaClickedMediaPath);
+	allSelectedMedias.add(mediaClickedMediaPath);
 };
 
 /////////////////////////////////////////
@@ -58,8 +56,8 @@ export const LEFT_CLICK = 0;
 
 const selectOrPlayMedia = (e: PointerEvent, mediaPath: Path): void => {
 	if (e.button !== LEFT_CLICK || !e.ctrlKey) {
-		const { fromList, homeList, isHome } = getFromList();
-		const list = isHome === true ? homeList : fromList;
+		const { from, homeList, isHome } = fromList;
+		const list = isHome ? homeList : from;
 
 		return playThisMedia(mediaPath, list);
 	}
@@ -78,8 +76,8 @@ export const Row: Component<VirtualItemProps<RowProps>> = (props) => {
 	return (
 		<li
 			classList={{
-				selected: getAllSelectedMedias().has(props.item.path),
-				playing: getCurrentPlaying().path === props.item.path,
+				selected: allSelectedMedias.has(props.item.path),
+				playing: currentPlaying.path === props.item.path,
 			}}
 			data-path={props.item.path}
 			tabIndex={props.tabIndex}
@@ -150,7 +148,7 @@ type RowProps = { media: Media; path: Path; tabIndex: number };
 type PlaylistList = ValuesOf<typeof playlistList>;
 
 type FromList = {
-	fromList: Exclude<
+	from: Exclude<
 		PlaylistList,
 		typeof playlistList.mainList | typeof playlistList.sortedByDate
 	>;

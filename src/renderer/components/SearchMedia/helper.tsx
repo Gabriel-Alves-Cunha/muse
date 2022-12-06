@@ -4,10 +4,10 @@ import type { ValuesOf } from "@common/@types/utils";
 import { useI18n } from "@solid-primitives/i18n";
 import {
 	type Component,
-	type JSX,
 	createEffect,
 	createSignal,
 	Show,
+	For,
 } from "solid-js";
 
 import { ctxContentEnum, ContextMenu } from "../ContextMenu";
@@ -16,13 +16,13 @@ import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { MediaOptionsModal } from "../MediaListKind/MediaOptions";
 import { VerticalDotsIcon } from "@icons/VerticalDotsIcon";
 import { ImgWithFallback } from "../ImgWithFallback";
+import { noop_setIsOpen } from "../ErrorFallback";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { MusicNoteIcon } from "@icons/MusicNoteIcon";
 import { emptyString } from "@common/empty";
 import { emptyArray } from "@common/empty";
 import { RightSlot } from "../ContextMenu/RightSlot";
 import { BaseInput } from "../BaseInput";
-import { Portal } from "solid-js/web";
 import { Dialog } from "../Dialog";
 
 /////////////////////////////////////////
@@ -58,7 +58,7 @@ export const [getSearcher, setSearcher] = createSignal(defaultSearcher);
 /////////////////////////////////////////
 
 createEffect(() => {
-	// searchForMedias(highlight)
+	// Search for medias
 	const { highlight } = getSearcher();
 
 	if (highlight.length < 2) return;
@@ -86,8 +86,6 @@ const setSearchTerm = (e: InputChange) =>
 		searchTerm: e.currentTarget.value,
 	}));
 
-/////////////////////////////////////////
-/////////////////////////////////////////
 /////////////////////////////////////////
 
 const setIsInputOnFocus = (bool: boolean) =>
@@ -134,7 +132,7 @@ export const Input: Component = () => {
 	return (
 		<BaseInput
 			RightSlot={
-				<Show when={isInputOnFocus}>
+				<Show when={!isInputOnFocus}>
 					<RightSlot id="search">Alt+s</RightSlot>
 				</Show>
 			}
@@ -160,7 +158,6 @@ const mantainFocusOnInput = (e: Event) => e.preventDefault();
 export const Results: Component = () => {
 	const { searchStatus, results, searchTerm, highlight } = getSearcher();
 	const [isCtxMenuOpen, setIsCtxMenuOpen] = createSignal(false);
-	const resultsJSXs: JSX.Element[] = [];
 
 	/////////////////////////////////////////
 
@@ -170,18 +167,11 @@ export const Results: Component = () => {
 
 	/////////////////////////////////////////
 
-	for (const [path, media] of results)
-		resultsJSXs.push(
-			<MediaSearchRow highlight={highlight} media={media} path={path} />,
-		);
-
-	/////////////////////////////////////////
-
 	return (
 		<ContextMenu
 			content={ctxContentEnum.SEARCH_MEDIA_OPTIONS}
 			onContextMenu={selectMediaByPointerEvent}
-			onOpenChange={setIsCtxMenuOpen}
+			setIsOpen={setIsCtxMenuOpen}
 			isAllDisabled={nothingFound()}
 			isOpen={isCtxMenuOpen()}
 		>
@@ -189,7 +179,7 @@ export const Results: Component = () => {
 				// onOpenAutoFocus={mantainFocusOnInput}
 				onClickOutside={setDefaultSearch}
 				isOpen={shouldPopoverOpen()}
-				setIsOpen={() => {}}
+				setIsOpen={noop_setIsOpen}
 				class={`transition-none ${
 					nothingFound()
 						? "nothing-found-for-search-media"
@@ -197,7 +187,19 @@ export const Results: Component = () => {
 				}`}
 			>
 				<Show
-					fallback={<Show when={foundSomething()}>{resultsJSXs}</Show>}
+					fallback={
+						<Show when={foundSomething()}>
+							<For each={results}>
+								{([path, media]) => (
+									<MediaSearchRow
+										highlight={highlight}
+										media={media}
+										path={path}
+									/>
+								)}
+							</For>
+						</Show>
+					}
 					when={nothingFound()}
 				>
 					<div class="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">

@@ -1,4 +1,5 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
 import { info } from "@utils/log";
@@ -9,7 +10,7 @@ import { dbg } from "@common/debug";
 ////////////////////////////////////////////////
 // Main:
 
-export const [getPlayOptions, setPlayOptions] = createSignal<PlayOptions>({
+export const [playOptions, setPlayOptions] = createStore<PlayOptions>({
 	isRandom: false,
 	loop: false,
 });
@@ -17,7 +18,7 @@ export const [getPlayOptions, setPlayOptions] = createSignal<PlayOptions>({
 createEffect(() => {
 	dbg("Saving playOptions on LocalStorage.");
 
-	setLocalStorage(keys.playOptions, getPlayOptions());
+	setLocalStorage(keys.playOptions, playOptions);
 });
 
 ////////////////////////////////////////////////
@@ -29,17 +30,17 @@ export const toggleLoopMedia = (): void => {
 	const audio = document.getElementById("audio") as HTMLAudioElement | null;
 	if (!audio) return info("There is no window.audio to toggleLoopMedia!");
 
-	const loop = !getPlayOptions().loop;
+	const loop = !playOptions.loop;
 
 	audio.loop = loop;
 
-	setPlayOptions((prev) => ({ ...prev, loop }));
+	setPlayOptions({ loop });
 };
 
 ////////////////////////////////////////////////
 
 export const toggleRandom = () =>
-	setPlayOptions((prev) => ({ ...prev, isRandom: !getPlayOptions().isRandom }));
+	setPlayOptions({ isRandom: !playOptions.isRandom });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

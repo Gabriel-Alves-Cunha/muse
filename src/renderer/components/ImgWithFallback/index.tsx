@@ -94,8 +94,8 @@ export function ImgWithFallback({
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{
+type Props = {
 	mediaImg: string | undefined;
 	Fallback: JSX.Element;
 	mediaPath: Path;
-}>;
+};

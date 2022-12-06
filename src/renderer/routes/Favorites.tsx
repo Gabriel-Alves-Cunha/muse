@@ -15,7 +15,7 @@ import { Header } from "@components/Header";
 
 const Favorites: Component = () => {
 	onMount(() => {
-		setFromList({ fromList: playlistList.favorites });
+		setFromList({ from: playlistList.favorites });
 	});
 
 	return (

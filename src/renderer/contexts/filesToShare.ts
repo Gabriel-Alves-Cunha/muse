@@ -1,7 +1,5 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { createSignal } from "solid-js";
+import { ReactiveSet } from "@solid-primitives/set";
 
-export const [getFilesToShare, setFilesToShare] = createSignal<Set<Path>>(
-	new Set(),
-);
+export const filesToShare = new ReactiveSet<Path>();

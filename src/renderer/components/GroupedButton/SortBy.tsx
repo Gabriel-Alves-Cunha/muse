@@ -1,6 +1,6 @@
 import type { ValuesOf } from "@common/@types/utils";
 
-import { createEffect, createSignal } from "solid-js";
+import { Component, createEffect, createSignal, on } from "solid-js";
 import { useI18n } from "@solid-primitives/i18n";
 
 import { contentOfSelectEnum, Select } from "../Select";
@@ -14,29 +14,34 @@ import { SortIcon } from "@icons/SortIcon";
 /////////////////////////////////////////////
 // Types:
 
-export function SortBy() {
+export const SortBy: Component = () => {
 	const [selectedList, setSelectedList] = createSignal<SelectedList>("Name");
 	const [t] = useI18n();
 
-	createEffect(() => {
-		let homeList: ValuesOf<typeof playlistList> = playlistList.mainList;
-		const list = selectedList();
+	createEffect(
+		on(
+			selectedList,
+			(list) => {
+				let homeList: HomeList = playlistList.mainList;
 
-		switch (list) {
-			case "Name":
-				break;
+				switch (list) {
+					case "Name":
+						break;
 
-			case "Date": {
-				homeList = playlistList.sortedByDate;
-				break;
-			}
+					case "Date": {
+						homeList = playlistList.sortedByDate;
+						break;
+					}
 
-			default:
-				assertUnreachable(list);
-		}
+					default:
+						assertUnreachable(list);
+				}
 
-		setFromList({ homeList });
-	});
+				setFromList({ homeList });
+			},
+			{ defer: true },
+		),
+	);
 
 	return (
 		<Select
@@ -49,6 +54,11 @@ export function SortBy() {
 			<SortIcon class="w-5 h-5 fill-white" />
 		</Select>
 	);
-}
+};
 
 type SelectedList = "Name" | "Date";
+
+type HomeList = Extract<
+	ValuesOf<typeof playlistList>,
+	"sortedByNameAndMainList" | "sortedByDate"
+>;

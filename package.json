@@ -27,6 +27,8 @@
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
 		"@minht11/solid-virtual-container": "^0.2.1",
 		"@solid-primitives/i18n": "^1.1.2",
+		"@solid-primitives/map": "^0.3.0",
+		"@solid-primitives/set": "^0.3.0",
 		"@solidjs/router": "^0.5.1",
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/koa": "^2.13.5",

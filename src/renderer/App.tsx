@@ -4,10 +4,13 @@ import { Routes, Route } from "@solidjs/router";
 import { Toaster } from "solid-toast";
 import { lazy } from "solid-js";
 
-import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
-// import { handleWindowMsgs } from "@utils/handleWindowMsgs";
-import { BlurOverlay } from "@components/BlurOverlay";
-import { Dialog } from "@components/Dialog";
+import { DecorationsDown, DecorationsTop } from "@components/Decorations";
+import { searchLocalComputerForMedias } from "@contexts/playlists";
+import { MainGridContainer } from "@components/MainGridContainer";
+import { handleWindowMsgs } from "@utils/handleWindowMsgs";
+import { ShareDialog } from "@components/ShareDialog";
+import { ContextMenu } from "@components/ContextMenu";
+import { MediaPlayer } from "@components/MediaPlayer";
 import { Navbar } from "@components/Navbar";
 
 const Favorites = lazy(() => import("./routes/Favorites"));
@@ -17,7 +20,7 @@ const History = lazy(() => import("./routes/History"));
 const Home = lazy(() => import("./routes/Home"));
 
 export const App: Component = () => {
-	const [isOpen, setIsOpen] = createSignal(true);
+	const [isCtxMenuOpen, setIsCtxMenuOpen] = createSignal(true);
 
 	return (
 		<>
@@ -32,34 +35,27 @@ export const App: Component = () => {
 				}}
 			/>
 
-			<button type="button" class="w-5 h-3" onPointerUp={() => setIsOpen(true)}>
-				abrir
-			</button>
-
-			<Dialog.Content isOpen={isOpen()} onOpenChange={setIsOpen}>
-				<BlurOverlay />
-				Oi
-			</Dialog.Content>
-
-			<Navbar />
-
-			{/* <ShareDialog />
+			<ShareDialog />
 
 			<DecorationsTop />
 
-			<ContextMenu>
-			<MainGridContainer>
-				<Navbar />
+			<ContextMenu isOpen={isCtxMenuOpen()} setIsOpen={setIsCtxMenuOpen}>
+				<MainGridContainer>
+					<Navbar />
 
-				<Routes>
-					<Route path="/" component={Home} />
-				</Routes>
+					<Routes>
+						<Route path="/favorites" component={Favorites} />
+						<Route path="/download" component={Download} />
+						<Route path="/history" component={History} />
+						<Route path="/convert" component={Convert} />
+						<Route path="/home" component={Home} />
+					</Routes>
 
-				<MediaPlayer />
-			</MainGridContainer>
+					<MediaPlayer />
+				</MainGridContainer>
 			</ContextMenu>
 
-			<DecorationsDown /> */}
+			<DecorationsDown />
 		</>
 	);
 };
@@ -69,8 +65,8 @@ export const App: Component = () => {
 //////////////////////////////////////////
 // Do once on app start:
 
-// window.addEventListener("message", handleWindowMsgs);
-//
-// //////////////////////////////////////////
-//
-// await searchLocalComputerForMedias();
+window.addEventListener("message", handleWindowMsgs);
+
+//////////////////////////////////////////
+
+await searchLocalComputerForMedias();

@@ -2,7 +2,7 @@ import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import { createSignal } from "solid-js";
+import { ReactiveMap } from "@solid-primitives/map";
 
 import { error } from "@utils/log";
 
@@ -73,12 +73,6 @@ const testConvertingMedia: [Path, MediaBeingConverted][] = Array.from(
 ////////////////////////////////////////////////
 // Main functions:
 
-export const [getConvertingList, setConvertingList] =
-	createSignal<ConvertingList>(new Map(testConvertingMedia));
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-// Types:
-
-export type ConvertingList = Map<Path, MediaBeingConverted>;
+export const convertingList = new ReactiveMap<Path, MediaBeingConverted>(
+	testConvertingMedia,
+);

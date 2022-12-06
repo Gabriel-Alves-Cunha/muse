@@ -1,23 +1,24 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { batch, createEffect, createSignal } from "solid-js";
+import { batch, createEffect, on } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import { keys, setLocalStorage } from "@utils/localStorage";
 import { getRandomInt, time } from "@utils/utils";
 import { warn, error, info } from "@utils/log";
-import { getPlayOptions } from "./usePlayOptions";
+import { playOptions } from "./playOptions";
+import { dbg, dbgTests } from "@common/debug";
 import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
 import { getFirstKey } from "@utils/map-set";
-import { dbgTests } from "@common/debug";
 import {
 	type MainList,
 	addToHistory,
 	getPlaylist,
-	getMainList,
+	playlists,
 	History,
-} from "./usePlaylists";
+} from "./playlists";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -30,8 +31,9 @@ export const defaultCurrentPlaying: CurrentPlaying = Object.freeze({
 	currentTime: 0,
 });
 
-export const [getCurrentPlaying, setCurrentPlaying] =
-	createSignal<CurrentPlaying>(defaultCurrentPlaying);
+export const [currentPlaying, setCurrentPlaying] = createStore<CurrentPlaying>(
+	defaultCurrentPlaying,
+);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -62,10 +64,9 @@ export const pause = (): void => {
 	if (!audio) return;
 
 	audio.pause();
-	const currentTime = audio.currentTime;
+	const { currentTime } = audio;
 
-	if (currentTime > 60 /* seconds */)
-		setCurrentPlaying((prev) => ({ ...prev, currentTime }));
+	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
 };
 
 ////////////////////////////////////////////////
@@ -73,10 +74,10 @@ export const pause = (): void => {
 const sortHistoryByDate = (): [Path, Media, DateAsNumber][] => {
 	const unsortedList: [Path, DateAsNumber][] = [];
 
-	for (const [path, dates] of getPlaylist(playlistList.history) as History)
+	for (const [path, dates] of playlists.history)
 		for (const date of dates) unsortedList.push([path, date]);
 
-	const mainList = getMainList();
+	const mainList = playlists.sortedByNameAndMainList;
 
 	return unsortedList
 		.sort((a, b) => b[1] - a[1]) // sorted by date
@@ -85,7 +86,7 @@ const sortHistoryByDate = (): [Path, Media, DateAsNumber][] => {
 
 export const playPreviousMedia = (): void =>
 	time(() => {
-		const { path, listType } = getCurrentPlaying();
+		const { path, listType } = currentPlaying;
 
 		if (!path)
 			return warn(
@@ -115,7 +116,7 @@ export const playPreviousMedia = (): void =>
 
 export const playNextMedia = (): void =>
 	time(() => {
-		const { path, listType } = getCurrentPlaying();
+		const { path, listType } = currentPlaying;
 
 		if (!path)
 			return info(
@@ -131,7 +132,7 @@ export const playNextMedia = (): void =>
 
 		let nextMediaPath = emptyString;
 
-		if (getPlayOptions().isRandom) {
+		if (playOptions.isRandom) {
 			const randomIndex = getRandomInt(0, list.size);
 
 			let index = 0;
@@ -160,12 +161,10 @@ export const playNextMedia = (): void =>
 
 		if (!nextMediaPath)
 			return warn("There should be a nextMediaPath, but there isn't!", {
-				currentPlaying: getCurrentPlaying(),
+				currentPlaying,
 				nextMediaPath,
 				list,
 			});
-
-		dbgTests("prev path:", path, "\nnext path:", nextMediaPath);
 
 		setCurrentPlaying({
 			listType: correctListType,
@@ -180,12 +179,10 @@ export const playNextMedia = (): void =>
 // Register functions to window mediaSession:
 
 if (navigator?.mediaSession?.setActionHandler) {
-	const handleAction = navigator.mediaSession.setActionHandler;
-
-	handleAction("previoustrack", playPreviousMedia);
-	handleAction("nexttrack", playNextMedia);
-	handleAction("pause", pause);
-	handleAction("play", play);
+	navigator.mediaSession.setActionHandler("previoustrack", playPreviousMedia);
+	navigator.mediaSession.setActionHandler("nexttrack", playNextMedia);
+	navigator.mediaSession.setActionHandler("pause", pause);
+	navigator.mediaSession.setActionHandler("play", play);
 }
 
 ////////////////////////////////////////////////
@@ -244,7 +241,7 @@ const handleDecorateMediaRow = (path: Path, prevPath: Path): void => {
 const changeMediaSessionMetadata = (path: Path): void => {
 	if (!navigator?.mediaSession) return;
 
-	const media = getMainList().get(path);
+	const media = playlists.sortedByNameAndMainList.get(path);
 
 	if (!media) return;
 
@@ -263,24 +260,25 @@ const changeMediaSessionMetadata = (path: Path): void => {
 let prevCurrentPlaying: CurrentPlaying = defaultCurrentPlaying;
 
 // Update history and set AudioSource:
-createEffect(() => {
-	const newCurrentPlaying = getCurrentPlaying();
+createEffect(
+	() => {
+		dbg(
+			"Added to history:",
+			currentPlaying.path,
+			console.count(
+				"'useCurrentPlaying.ts' createEffect -> batch -> added to history",
+			),
+		);
+		addToHistory(currentPlaying.path);
 
-	dbgTests(
-		"Added to history:",
-		newCurrentPlaying.path,
-		console.count(
-			"'useCurrentPlaying.ts' createEffect -> batch -> added to history",
-		),
-	);
-	batch(() => addToHistory(newCurrentPlaying.path));
+		setAudioSource(currentPlaying.path, prevCurrentPlaying.path);
 
-	setAudioSource(newCurrentPlaying.path, prevCurrentPlaying.path);
-
-	// Set current playing on LocalStorage:
-	setLocalStorage(keys.currentPlaying, newCurrentPlaying);
-	prevCurrentPlaying = newCurrentPlaying;
-});
+		// Set current playing on LocalStorage:
+		setLocalStorage(keys.currentPlaying, currentPlaying);
+		prevCurrentPlaying = currentPlaying;
+	},
+	{ defer: true },
+);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

@@ -2,29 +2,29 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { batch, createEffect, createSignal } from "solid-js";
+import { ReactiveSet } from "@solid-primitives/set";
+import { ReactiveMap } from "@solid-primitives/map";
+import { createStore } from "solid-js/store";
 
-import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
+import { defaultCurrentPlaying, setCurrentPlaying } from "./currentPlaying";
 import { assertUnreachable, time } from "@utils/utils";
+import { allSelectedMedias } from "./allSelectedMedias";
 import { dbg, dbgPlaylists } from "@common/debug";
 import { playlistList } from "@common/enums";
 import { error, warn } from "@utils/log";
-import { getSettings } from "@contexts/settings";
 import { getFirstKey } from "@utils/map-set";
+import { settings } from "@contexts/settings";
 import {
 	getFromLocalStorage,
 	setLocalStorage,
 	keys,
 } from "@utils/localStorage";
 import {
-	getAllSelectedMedias,
-	setAllSelectedMedias,
-} from "./useAllSelectedMedias";
-import {
 	searchDirectoryResult,
 	getAllowedMedias,
 	sortByDate,
 	sortByName,
-} from "./usePlaylistsHelper";
+} from "./playlistsHelper";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -35,114 +35,104 @@ const { transformPathsToMedias } = electron.media;
 
 export const [isLoadingMedias, setIsLoadingMedias] = createSignal(false);
 
-export const [getPlaylists, setPlaylists] = createSignal<Playlists>({
-	favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? new Set(),
-	history: (getFromLocalStorage(keys.history) as History) ?? new Map(),
-	sortedByNameAndMainList: new Map(),
-	sortedByDate: new Set(),
+export const [playlists, setPlaylists] = createStore<Playlists>({
+	favorites:
+		(getFromLocalStorage(keys.favorites) as ReactiveSet<Path>) ??
+		new ReactiveSet(),
+	history: (getFromLocalStorage(keys.history) as History) ?? new ReactiveMap(),
+	sortedByNameAndMainList: new ReactiveMap(),
+	sortedByDate: new ReactiveSet(),
 });
 
-createEffect(() => {
-	dbg("Saving favorites in LocalStorage.");
+createEffect(
+	() => {
+		dbg("Saving favorites in LocalStorage.");
 
-	setLocalStorage(keys.favorites, getPlaylists().favorites);
-});
+		setLocalStorage(keys.favorites, playlists.favorites);
+	},
+	{ defer: true },
+);
 
-createEffect(() => {
-	dbg("Saving history in LocalStorage.");
+createEffect(
+	() => {
+		dbg("Saving history in LocalStorage.");
 
-	setLocalStorage(keys.history, getPlaylists().history);
-});
+		setLocalStorage(keys.history, playlists.history);
+	},
+	{ defer: true },
+);
 
 ////////////////////////////////////////////////
 
-export const addToHistory = (path: Path): void => {
-	const { maxSizeOfHistory } = getSettings();
-	const { history } = getPlaylists();
+export const addToHistory = (path: Path): void =>
+	batch(() => {
+		const { maxSizeOfHistory } = settings;
+		const { history } = playlists;
 
-	const dates: DateAsNumber[] = [];
+		const dates: DateAsNumber[] = [];
 
-	// Add to history if there isn't one yet:
-	const historyOfDates = history.get(path);
-	historyOfDates
-		? dates.unshift(...historyOfDates, Date.now())
-		: dates.unshift(Date.now());
+		// Add to history if there isn't one yet:
+		const historyOfDates = history.get(path);
+		historyOfDates
+			? dates.unshift(...historyOfDates, Date.now())
+			: dates.unshift(Date.now());
 
-	history.set(path, dates);
+		history.set(path, dates);
 
-	if (history.size > maxSizeOfHistory) {
-		// history has a max size of `maxSizeOfHistory`:
-		const firstPath = getFirstKey(history)!;
-		// remove the first element:
-		history.delete(firstPath);
-	}
+		if (history.size > maxSizeOfHistory) {
+			// history has a max size of `maxSizeOfHistory`:
+			const firstPath = getFirstKey(history)!;
+			// remove the first element:
+			history.delete(firstPath);
+		}
 
-	for (const [, dates] of history)
-		if (dates.length > maxSizeOfHistory) dates.length = maxSizeOfHistory;
+		for (const [, dates] of history)
+			if (dates.length > maxSizeOfHistory) dates.length = maxSizeOfHistory;
 
-	setPlaylists((prev) => ({ ...prev, history }));
-
-	console.log(`Added path to history: "${path}"`);
-	console.count("Added to history");
-};
-
-////////////////////////////////////////////////
-
-export const clearHistory = (): void =>
-	setPlaylists((prev) => {
-		const { history } = prev;
-
-		history.clear();
-
-		return { ...prev, history };
-	}) as unknown as void;
+		console.log(`Added path to history: "${path}"`);
+		console.count("Added to history");
+	});
 
 ////////////////////////////////////////////////
 
-export const clearFavorites = (): void =>
-	setPlaylists((prev) => {
-		const { favorites } = prev;
+export const clearHistory = (): void => playlists.history.clear();
 
-		favorites.clear();
+////////////////////////////////////////////////
 
-		return { ...prev, favorites };
-	}) as unknown as void;
+export const clearFavorites = (): void => playlists.favorites.clear();
 
 ////////////////////////////////////////////////
 
 export const toggleFavoriteMedia = (path: Path) => {
 	if (!path) return;
 
-	const { favorites } = getPlaylists();
+	const { favorites } = playlists;
 
 	// map.delete() returns true if an element in the Map
 	// object existed and has been removed, or false if
 	// the element does not exist.
 	if (!favorites.delete(path)) favorites.add(path);
-
-	setPlaylists((prev) => ({ ...prev, favorites }));
 };
 
 ////////////////////////////////////////////////
 
 const updateAndSortSortedAndMainLists = (newMainList: MainList): void =>
-	setPlaylists((prev) => ({
-		...prev,
-		sortedByDate: sortByDate(newMainList),
+	setPlaylists({
 		sortedByNameAndMainList: sortByName(newMainList),
-	})) as unknown as void;
+		sortedByDate: sortByDate(newMainList),
+	}) as unknown as void;
 
 ////////////////////////////////////////////////
 
 export const addToMainList = (path: Path, newMedia: Media): void => {
-	const { sortedByNameAndMainList: mainList } = getPlaylists();
+	const mainList = playlists.sortedByNameAndMainList;
 
 	if (mainList.has(path))
 		return warn(
 			`A media with path "${path}" already exists. Therefore, I'm not gonna add it. If you want to update it, call this function with type = PlaylistActions.REFRESH_ONE_MEDIA_BY_PATH`,
 		);
 
-	updateAndSortSortedAndMainLists(mainList.set(path, newMedia));
+	batch(() => updateAndSortSortedAndMainLists(mainList.set(path, newMedia)));
 };
 
 ////////////////////////////////////////////////
@@ -153,27 +143,17 @@ export const removeMedia = (path: Path): void => {
 		sortedByDate,
 		favorites,
 		history,
-	} = getPlaylists();
-
-	if (!mainList.delete(path))
-		return error(`A media with path "${path}" does not exist at sortedByName.`);
-
-	if (!sortedByDate.delete(path))
-		return error(`A media with path "${path}" does not exist at sortedByDate.`);
+	} = playlists;
 
 	batch(() => {
-		setPlaylists((prev) => ({
-			...prev,
-			sortedByNameAndMainList: mainList,
-			sortedByDate: sortedByDate,
-		}));
+		sortedByDate.delete(path);
+		mainList.delete(path);
 
 		// If the media is in the favorites, remove it from the favorites
-		if (favorites.delete(path))
-			setPlaylists((prev) => ({ ...prev, favorites }));
+		favorites.delete(path);
 
 		// If the media is in the history, remove it from the history
-		if (history.delete(path)) setPlaylists((prev) => ({ ...prev, history }));
+		history.delete(path);
 	});
 };
 
@@ -181,39 +161,35 @@ export const removeMedia = (path: Path): void => {
 
 export const replaceEntireMainList = (list: MainList): void =>
 	time(() => {
-		const { favorites, history } = getPlaylists();
-		const allSelectedMedias = getAllSelectedMedias();
-
-		// If the media in the favorites list is not on the new
-		// list, remove it from all other lists if present:
-		for (const path of favorites)
-			if (!list.has(path)) {
-				allSelectedMedias.delete(path);
-				favorites.delete(path);
-				history.delete(path);
-			}
-
-		// If the media in the history list is not on
-		// action.list, remove it from the favorites:
-		for (const [path] of history)
-			if (!list.has(path)) {
-				allSelectedMedias.delete(path);
-				favorites.delete(path);
-				history.delete(path);
-			}
-
-		// Update allSelectedMedias:
-		for (const path of allSelectedMedias)
-			if (!list.has(path)) {
-				allSelectedMedias.delete(path);
-				favorites.delete(path);
-				history.delete(path);
-			}
+		const { favorites, history } = playlists;
 
 		batch(() => {
-			setAllSelectedMedias(allSelectedMedias);
+			// If the media in the favorites list is not on the new
+			// list, remove it from all other lists if present:
+			for (const path of favorites)
+				if (!list.has(path)) {
+					allSelectedMedias.delete(path);
+					favorites.delete(path);
+					history.delete(path);
+				}
 
-			setPlaylists((prev) => ({ ...prev, history, favorites }));
+			// If the media in the history list is not on
+			// action.list, remove it from the favorites:
+			for (const [path] of history)
+				if (!list.has(path)) {
+					allSelectedMedias.delete(path);
+					favorites.delete(path);
+					history.delete(path);
+				}
+
+			// Update allSelectedMedias:
+			for (const path of allSelectedMedias)
+				if (!list.has(path)) {
+					allSelectedMedias.delete(path);
+					favorites.delete(path);
+					history.delete(path);
+				}
+
 			updateAndSortSortedAndMainLists(list);
 		});
 	}, "replaceEntireMainList");
@@ -225,7 +201,7 @@ export const refreshMedia = async (
 	newPath: Path,
 	newMedia?: Media,
 ): Promise<void> => {
-	const { sortedByNameAndMainList: mainList } = getPlaylists();
+	const mainList = playlists.sortedByNameAndMainList;
 	const oldMedia = mainList.get(path);
 
 	if (!oldMedia) {
@@ -237,14 +213,10 @@ export const refreshMedia = async (
 	}
 
 	// If a new media was given, just update it:
-	if (newMedia)
-		return setPlaylists((prev) => ({
-			...prev,
-			sortedByNameAndMainList: mainList.set(path, newMedia),
-		})) as unknown as void;
+	if (newMedia) return mainList.set(path, newMedia) as unknown as void;
 
 	const { assureMediaSizeIsGreaterThan60KB, ignoreMediaWithLessThan60Seconds } =
-		getSettings();
+		settings;
 
 	const refreshedMediaInArray: readonly [Path, Media][] =
 		await transformPathsToMedias(
@@ -263,55 +235,37 @@ export const refreshMedia = async (
 		return await searchLocalComputerForMedias();
 	}
 
-	if (newPath) {
-		mainList.delete(path);
-		mainList.set(newPath, refreshedMedia);
+	batch(() => {
+		if (newPath) {
+			mainList.delete(path);
+			mainList.set(newPath, refreshedMedia);
 
-		// Only sort if the their titles are different:
-		refreshedMedia.title !== oldMedia.title
-			? updateAndSortSortedAndMainLists(mainList)
-			: // Else, just update the media in the main list,
-			  // cause the title is the same, so no need to sort:
-			  setPlaylists((prev) => ({
-					...prev,
-					sortedByNameAndMainList: mainList,
-			  }));
-	} ////////////////////////////////////////////////
-	else if (refreshedMedia.title !== oldMedia.title)
-		updateAndSortSortedAndMainLists(mainList.set(path, refreshedMedia));
-	////////////////////////////////////////////////
-	else
-		setPlaylists((prev) => ({
-			...prev,
-			sortedByNameAndMainList: mainList.set(path, refreshedMedia),
-		}));
+			// Only sort if the their titles are different:
+			if (refreshedMedia.title !== oldMedia.title)
+				updateAndSortSortedAndMainLists(mainList);
+		} ////////////////////////////////////////////////
+		else if (refreshedMedia.title !== oldMedia.title)
+			updateAndSortSortedAndMainLists(mainList.set(path, refreshedMedia));
+		////////////////////////////////////////////////
+		else mainList.set(path, refreshedMedia);
+	});
 };
 
 ////////////////////////////////////////////////
 
 export const cleanAllLists = (): void => {
 	const { favorites, history, sortedByDate, sortedByNameAndMainList } =
-		getPlaylists();
-	const allSelectedMedias = getAllSelectedMedias();
-
-	sortedByNameAndMainList.clear();
-	allSelectedMedias.clear();
-	sortedByDate.clear();
-	favorites.clear();
-	history.clear();
+		playlists;
 
 	batch(() => {
-		setPlaylists({
-			sortedByNameAndMainList,
-			isLoadingMedias: false,
-			sortedByDate,
-			favorites,
-			history,
-		});
+		sortedByNameAndMainList.clear();
+		allSelectedMedias.clear();
+		allSelectedMedias.clear();
+		sortedByDate.clear();
+		favorites.clear();
+		history.clear();
 
 		setCurrentPlaying(defaultCurrentPlaying);
-
-		setAllSelectedMedias(allSelectedMedias);
 	});
 };
 
@@ -320,28 +274,21 @@ export const cleanAllLists = (): void => {
 ///////////////////////////////////////////////////
 // Helper funtions:
 
-export const getMainList = () => getPlaylists().sortedByNameAndMainList;
-export const getSortedByDate = () => getPlaylists().sortedByDate;
-export const getFavorites = () => getPlaylists().favorites;
-export const getHistory = () => getPlaylists().history;
-
-///////////////////////////////////////////////////
-
 export const getPlaylist = (
 	list: ValuesOf<typeof playlistList>,
 ): Set<Path> | MainList | History => {
 	switch (list) {
 		case playlistList.sortedByDate:
-			return getSortedByDate();
+			return playlists.sortedByDate;
 
 		case playlistList.favorites:
-			return getFavorites();
+			return playlists.favorites;
 
 		case playlistList.mainList:
-			return getMainList();
+			return playlists.sortedByNameAndMainList;
 
 		case playlistList.history:
-			return getHistory();
+			return playlists.history;
 
 		default:
 			assertUnreachable(list);
@@ -359,9 +306,9 @@ export const searchLocalComputerForMedias = async (): Promise<void> => {
 		const {
 			assureMediaSizeIsGreaterThan60KB,
 			ignoreMediaWithLessThan60Seconds,
-		} = getSettings();
+		} = settings;
 
-		const newMainList: MainList = new Map(
+		const newMainList: MainList = new ReactiveMap(
 			await transformPathsToMedias(
 				paths,
 				assureMediaSizeIsGreaterThan60KB,
@@ -401,9 +348,8 @@ export const unDiacritic = (str: string): string =>
 export const searchMedia = (highlight: string): [Path, Media][] =>
 	time(() => {
 		const medias: [Path, Media][] = [];
-		const mainList = getMainList();
 
-		for (const [path, media] of mainList)
+		for (const [path, media] of playlists.sortedByNameAndMainList)
 			if (unDiacritic(media.title).includes(highlight))
 				medias.push([path, media]);
 
@@ -415,13 +361,13 @@ export const searchMedia = (highlight: string): [Path, Media][] =>
 ///////////////////////////////////////////////////
 // Types:
 
-export type History = Map<Path, DateAsNumber[]>;
+export type History = ReactiveMap<Path, DateAsNumber[]>;
 
-export type MainList = Map<Path, Media>;
+export type MainList = ReactiveMap<Path, Media>;
 
 type Playlists = {
 	sortedByNameAndMainList: MainList;
-	sortedByDate: Set<Path>;
-	favorites: Set<Path>;
+	sortedByDate: ReactiveSet<Path>;
+	favorites: ReactiveSet<Path>;
 	history: History;
 };

@@ -3,7 +3,7 @@ import type { Path } from "@common/@types/generalTypes";
 import { useI18n } from "@solid-primitives/i18n";
 
 import { errorToast, successToast } from "@components/toasts";
-import { removeMedia } from "@contexts/usePlaylists";
+import { removeMedia } from "@contexts/playlists";
 import { getBasename } from "@common/path";
 
 const { deleteFile: electronDeleteFile } = electron.fs;

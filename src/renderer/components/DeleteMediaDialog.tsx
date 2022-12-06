@@ -23,12 +23,7 @@ export const DeleteMediaDialog: Component<{
 
 	return (
 		<Portal>
-			<Dialog
-				setIsOpen={props.setIsOpen}
-				isOpen={props.isOpen}
-				class=""
-				modal
-			>
+			<Dialog setIsOpen={props.setIsOpen} isOpen={props.isOpen} class="" modal>
 				<BlurOverlay />
 
 				<h1 class="text-lg first-letter:text-3xl first-letter:font-normal">

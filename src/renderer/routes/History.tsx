@@ -15,7 +15,7 @@ import { Header } from "@components/Header";
 
 const History: Component = () => {
 	onMount(() => {
-		setFromList({ fromList: playlistList.history });
+		setFromList({ from: playlistList.history });
 	});
 
 	return (

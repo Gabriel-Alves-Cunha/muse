@@ -33,7 +33,7 @@ import {
 const { getFavorites, searchMedia, getMainList, getHistory } = await import(
 	"@contexts/usePlaylists"
 );
-const { getCurrentPlaying, playNextMedia, playThisMedia } = await import(
+const { currentPlaying, playNextMedia, playThisMedia } = await import(
 	"@contexts/useCurrentPlaying"
 );
 const { formatDuration } = await import("@common/utils");
@@ -85,7 +85,7 @@ describe("Wrapping these tests because solid needs a wrapper that catches all re
 
 				playThisMedia(firstMediaPathFromMainList, playlistList.mainList);
 				expect(
-					getCurrentPlaying().path,
+					currentPlaying().path,
 					"currentPlaying().path should be equal to firstMediaPath!",
 				).toBe(firstMediaPathFromMainList);
 
@@ -102,14 +102,14 @@ describe("Wrapping these tests because solid needs a wrapper that catches all re
 				const [expectedMediaPath] = arrayFromMainList[nextIndex]!;
 
 				expect(
-					getCurrentPlaying().path,
+					currentPlaying().path,
 					`\ncurrentPlaying().path before playing the next media should be the currMediaPath = "${currMediaPath}"!\n`,
 				).toBe(currMediaPath);
 
 				playNextMedia();
 
 				expect(
-					getCurrentPlaying().path,
+					currentPlaying().path,
 					`currentPlaying().path after playing the next media should be the expectedMediaPath = "${expectedMediaPath}".\nprevMediaPath = "${currMediaPath}"!\n`,
 				).toBe(expectedMediaPath);
 
@@ -132,7 +132,7 @@ describe("Wrapping these tests because solid needs a wrapper that catches all re
 				expect(randomMediaPath).toBeTruthy();
 
 				playThisMedia(randomMediaPath, playlistList.mainList);
-				expect(getCurrentPlaying().path).toBe(randomMediaPath);
+				expect(currentPlaying().path).toBe(randomMediaPath);
 			}
 		});
 
@@ -273,7 +273,7 @@ describe("Wrapping these tests because solid needs a wrapper that catches all re
 			cleanAllLists();
 
 			expect(getAllSelectedMedias().size).toBe(0);
-			expect(getCurrentPlaying().path).toBe("");
+			expect(currentPlaying().path).toBe("");
 			expect(getFavorites().size).toBe(0);
 			expect(getMainList().size).toBe(0);
 			expect(getHistory().size).toBe(0);

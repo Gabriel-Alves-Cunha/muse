@@ -6,7 +6,7 @@ import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
 import { assertUnreachable } from "@utils/utils";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
-import { getFromList } from "../MediaListKind/helper";
+import { fromList } from "../MediaListKind/helper";
 import { TrashIcon } from "@icons/TrashIcon";
 
 export const Clean: Component = () => {
@@ -26,7 +26,7 @@ export const Clean: Component = () => {
 // Helper functions:
 
 const cleanProperList = () => {
-	const { fromList } = getFromList();
+	const { fromList } = fromList();
 
 	switch (fromList) {
 		case playlistList.favorites: {

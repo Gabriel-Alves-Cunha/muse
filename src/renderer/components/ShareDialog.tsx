@@ -1,12 +1,12 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server";
 
-import { type JSX, createEffect, createSignal } from "solid-js";
+import { type JSX, createEffect, createSignal, on } from "solid-js";
 import { toCanvas } from "qrcode";
 import { useI18n } from "@solid-primitives/i18n";
 
-import { getFilesToShare, setFilesToShare } from "@contexts/filesToShare";
 import { error, assert } from "@utils/log";
+import { filesToShare } from "@contexts/filesToShare";
 import { getBasename } from "@common/path";
 import { CloseIcon } from "@icons/CloseIcon";
 import { Loading } from "./Loading";
@@ -29,10 +29,10 @@ const qrID = "qrcode-canvas";
 export function ShareDialog() {
 	const [server, setServer] = createSignal<ClientServerAPI | null>(null);
 	const [isOpen, setIsOpen] = createSignal(false);
-	const filesToShare = getFilesToShare();
 	const [t] = useI18n();
 
 	const plural = () => (filesToShare.size > 1 ? "s" : "");
+	const shouldDialogOpen = () => filesToShare.size > 0;
 
 	/////////////////////////////////////////
 
@@ -52,37 +52,43 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	// Create a new server and open dialog when there is files to share.
-	createEffect(() => {
-		const shouldDialogOpen = filesToShare.size > 0;
+	createEffect(
+		on(
+			shouldDialogOpen,
+			(shouldDialogOpen) => {
+				setIsOpen(shouldDialogOpen);
 
-		setIsOpen(shouldDialogOpen);
+				if (!shouldDialogOpen) return;
 
-		if (!shouldDialogOpen) return;
+				try {
+					const clientServerApi = createServer([...filesToShare]);
 
-		try {
-			const clientServerApi = createServer([...filesToShare]);
+					setServer(clientServerApi);
+				} catch (err) {
+					error(err);
+					setIsOpen(false);
+				}
+			},
+			{ defer: true },
+		),
+	);
 
-			setServer(clientServerApi);
-		} catch (err) {
-			error(err);
-			setIsOpen(false);
-		}
-	});
+	createEffect(
+		on(
+			isOpen,
+			(isOpen) => {
+				// If is closing:
+				if (!isOpen) {
+					server()?.close();
+					// When the server closes, get rid of it's reference:
+					server()?.addListener("close", () => setServer(null));
 
-	createEffect(() => {
-		// If is closing:
-		if (!isOpen()) {
-			server()?.close();
-			// When the server closes, get rid of it's reference:
-			server()?.addListener("close", () => setServer(null));
-
-			const filesToShare = getFilesToShare();
-
-			filesToShare.clear();
-
-			setFilesToShare(filesToShare);
-		}
-	});
+					filesToShare.clear();
+				}
+			},
+			{ defer: true },
+		),
+	);
 
 	/////////////////////////////////////////
 
