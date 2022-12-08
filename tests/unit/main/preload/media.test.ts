@@ -10,7 +10,7 @@ mockElectronPlusNodeGlobalsBeforeTests();
 import { readFile, rename as renameFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
-import {existsSync} from "node:fs"
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { mediaPath, mediaPicture, test_assetsDir } from "./utils";
@@ -18,7 +18,6 @@ import { eraseImg, makeRandomString } from "@common/utils";
 import { error } from "@utils/log";
 
 const { writeTags } = await import("@main/preload/media/mutate-metadata");
-
 
 //////////////////////////////////////
 //////////////////////////////////////

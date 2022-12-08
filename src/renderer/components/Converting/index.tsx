@@ -7,11 +7,10 @@ import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { reactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { useTranslation } from "@i18n";
 import { errorToast } from "@components/toasts";
 import { emptyMap } from "@common/empty";
 import { error } from "@utils/log";
-import { t } from "@components/I18n";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -25,6 +24,7 @@ export function Converting() {
 	const convertingListSize = useConvertingList(convertingListSizeSelector);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		for (const [path, newConvertion] of newConvertions) {

@@ -9,13 +9,13 @@ import { Dialog } from "@radix-ui/react-dialog";
 
 import { setSettings, useSettings } from "@contexts/settings";
 import { isAModifierKeyPressed } from "@utils/keyboard";
+import { useTranslation } from "@i18n";
 import { error, assert } from "@utils/log";
 import { BlurOverlay } from "./BlurOverlay";
 import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
 import { Loading } from "@components/Loading";
 import { dbg } from "@common/debug";
-import { t } from "@components/I18n";
 
 const { createServer } = electron.share;
 
@@ -38,6 +38,7 @@ export function ShareDialog() {
 	const [server, setServer] = useState<ClientServerAPI | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const filesToShare = useSettings(filesToShareSelector);
+	const { t } = useTranslation();
 
 	const plural = filesToShare.size > 1 ? "s" : "";
 
@@ -122,9 +123,7 @@ export function ShareDialog() {
 				<Close
 					className="absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5"
 					title={t("tooltips.closeShareScreen")}
-					onPointerUp={() =>
-						closePopover(server?.close)
-					}
+					onPointerUp={() => closePopover(server?.close)}
 					// zIndex: 155,
 				>
 					<CloseIcon className="fill-accent" />

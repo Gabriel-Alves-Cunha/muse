@@ -20,7 +20,6 @@ import {
 	playNextMedia,
 } from "@contexts/useCurrentPlaying";
 
-
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -61,7 +60,7 @@ export function MediaPlayer() {
 
 		setProgress({ currentTime });
 
-		if (isSeekingRef.current === false)
+		if (!isSeekingRef.current)
 			setProgress({ percentage: (currentTime / duration) * 100 });
 	}
 

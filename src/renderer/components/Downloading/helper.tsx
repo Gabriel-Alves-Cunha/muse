@@ -9,7 +9,7 @@ import { Progress, progressIcons } from "@components/Progress";
 import { logThatPortIsClosing } from "@components/Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { progressStatus } from "@common/enums";
-import { t, Translator } from "@components/I18n";
+import { useTranslation } from "@i18n";
 import { error, assert } from "@utils/log";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
@@ -21,18 +21,18 @@ import {
 
 import { handleSingleItemDeleteAnimation } from "./styles";
 
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
 export function Popup() {
 	const { downloadingList } = useDownloadingList();
+	const { t } = useTranslation();
 
 	return downloadingList.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
-				<Translator path="buttons.cleanFinished" />
+				{t("buttons.cleanFinished")}
 			</Button>
 
 			{Array.from(downloadingList, ([url, downloadingMedia], index) => (
@@ -45,9 +45,7 @@ export function Popup() {
 			))}
 		</>
 	) : (
-		<p>
-			<Translator path="infos.noDownloadsInProgress" />
-		</p>
+		<p>{t("infos.noDownloadsInProgress")}</p>
 	);
 }
 
@@ -55,14 +53,13 @@ export function Popup() {
 // Helper functions for Popup:
 
 function cleanAllDoneDownloads(): void {
-	for (const [url, download] of getDownloadingList()) {
+	for (const [url, download] of getDownloadingList())
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);
-	}
 }
 
 /////////////////////////////////////////////
@@ -75,36 +72,40 @@ const DownloadingBox = ({
 	downloadingIndex,
 	download,
 	url,
-}: DownloadingBoxProps) => (
-	<div className="box">
-		<div className="left">
-			<p>{download.title}</p>
+}: DownloadingBoxProps) => {
+	const { t } = useTranslation();
 
-			<Progress
-				percent_0_to_100={download.percentage}
-				status={download.status}
-			/>
+	return (
+		<div className="box">
+			<div className="left">
+				<p>{download.title}</p>
+
+				<Progress
+					percent_0_to_100={download.percentage}
+					status={download.status}
+				/>
+			</div>
+
+			<div className="right">
+				<button
+					onPointerUp={(e) =>
+						handleSingleItemDeleteAnimation(
+							e,
+							downloadingIndex,
+							isDownloadList,
+							url,
+						)
+					}
+					title={t("tooltips.cancelDownload")}
+				>
+					<CancelIcon size={13} />
+				</button>
+
+				{progressIcons.get(download.status)}
+			</div>
 		</div>
-
-		<div className="right">
-			<button
-				onPointerUp={(e) =>
-					handleSingleItemDeleteAnimation(
-						e,
-						downloadingIndex,
-						isDownloadList,
-						url,
-					)
-				}
-				title={t("tooltips.cancelDownload")}
-			>
-				<CancelIcon size={13} />
-			</button>
-
-			{progressIcons.get(download.status)}
-		</div>
-	</div>
-);
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -125,10 +126,11 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// First, see if there is another one that has the same url
 	// and quit if true:
 	if (downloadingList.has(url)) {
+		const { t } = useTranslation();
+
 		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
 		infoToast(info);
-
 		error(info, downloadingList);
 		throw new Error(info);
 	}
@@ -174,7 +176,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 function handleUpdateDownloadingList(
 	{ data }: MessageEvent<PartialExceptStatus>,
-	url: Readonly<string>,
+	url: string,
 ): void {
 	const downloadingList = getDownloadingList();
 
@@ -185,7 +187,7 @@ function handleUpdateDownloadingList(
 
 	// Assert that the download exists:
 	const thisDownload = downloadingList.get(url);
-	if (thisDownload === undefined)
+	if (!thisDownload)
 		return error(
 			"Received a message from Electron but the url is not in the list!",
 		);
@@ -194,6 +196,8 @@ function handleUpdateDownloadingList(
 	setDownloadingList(
 		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
 	);
+
+	const { t } = useTranslation();
 
 	// Handle status:
 	switch (data.status) {
@@ -246,7 +250,7 @@ export function cancelDownloadAndOrRemoveItFromList(
 	// Assert that the download exists:
 	const download = downloadingList.get(url);
 
-	if (download === undefined)
+	if (!download)
 		return error(
 			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
 			downloadingList,
@@ -269,11 +273,11 @@ export function cancelDownloadAndOrRemoveItFromList(
 /////////////////////////////////////////////
 // Types:
 
-type DownloadingBoxProps = Readonly<{
+type DownloadingBoxProps = {
 	download: MediaBeingDownloaded;
 	downloadingIndex: number;
 	url: string;
-}>;
+};
 
 /////////////////////////////////////////////
 

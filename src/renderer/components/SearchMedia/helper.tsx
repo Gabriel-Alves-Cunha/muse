@@ -15,13 +15,13 @@ import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { MediaOptionsModal } from "@components/MediaListKind/MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
+import { useTranslation } from "@i18n";
 import { DialogTrigger } from "@components/DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { emptyString } from "@common/empty";
 import { emptyArray } from "@common/empty";
 import { RightSlot } from "@components/ContextMenu/RightSlot";
 import { BaseInput } from "@components/BaseInput";
-import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -107,6 +107,7 @@ const searchInputSelector = (
 export function Input() {
 	const { searchTerm, isInputOnFocus } = useSearcher(searchInputSelector);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { t } = useTranslation();
 
 	/////////////////////////////////////////
 
@@ -214,6 +215,8 @@ export function Results() {
 /////////////////////////////////////////
 
 function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
+	const { t } = useTranslation();
+
 	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (

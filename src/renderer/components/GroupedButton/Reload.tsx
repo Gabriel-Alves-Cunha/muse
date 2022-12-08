@@ -1,7 +1,7 @@
 import { MdAutorenew as ReloadIcon } from "react-icons/md";
 
+import { useTranslation } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { t } from "@components/I18n";
 import {
 	searchLocalComputerForMedias,
 	usePlaylists,
@@ -13,6 +13,7 @@ const isLoadingMediasSelector = (
 
 export function Reload() {
 	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
+	const { t } = useTranslation();
 
 	return (
 		<ButtonOfGroup

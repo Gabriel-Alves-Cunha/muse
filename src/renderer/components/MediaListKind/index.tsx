@@ -10,7 +10,7 @@ import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
-import { t, Translator } from "@components/I18n";
+import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
 import { playlistList } from "@common/enums";
 import {
@@ -39,21 +39,25 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const MediaListKind = ({ isHome }: Props) => (
-	<ErrorBoundary
-		FallbackComponent={() => (
-			<ErrorFallback
-				description={t("errors.mediaListKind.errorFallbackDescription")}
-			/>
-		)}
-		onReset={() => {
-			resetAllAppData();
-			reloadWindow();
-		}}
-	>
-		<MediaListKindWithoutErrorBoundary isHome={isHome} />
-	</ErrorBoundary>
-);
+export const MediaListKind = ({ isHome }: Props) => {
+	const { t } = useTranslation();
+
+	return (
+		<ErrorBoundary
+			FallbackComponent={() => (
+				<ErrorFallback
+					description={t("errors.mediaListKind.errorFallbackDescription")}
+				/>
+			)}
+			onReset={() => {
+				resetAllAppData();
+				reloadWindow();
+			}}
+		>
+			<MediaListKindWithoutErrorBoundary isHome={isHome} />
+		</ErrorBoundary>
+	);
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -171,24 +175,24 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
-const EmptyPlaceholder = () => (
-	<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
-		<NoMediaFound className="w-14 h-14 mr-5" />
+const EmptyPlaceholder = () => {
+	const { t } = useTranslation();
 
-		<Translator path="alts.noMediasFound" />
-	</div>
-);
+	return (
+		<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
+			<NoMediaFound className="w-14 h-14 mr-5" />
+
+			{t("alts.noMediasFound")}
+		</div>
+	);
+};
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };
 
 /////////////////////////////////////////
 
 function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
-	if (
-		e.ctrlKey === true &&
-		e.key === "a" &&
-		isAModifierKeyPressed(e, ["Control"]) === false
-	) {
+	if (e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])) {
 		e.preventDefault();
 		selectAllMedias();
 	}
@@ -197,8 +201,7 @@ function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
 /////////////////////////////////////////
 
 function handleDeselectAllMedias() {
-	if (isCtxMenuOpen() === false && getAllSelectedMedias().size > 0)
-		deselectAllMedias();
+	if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0) deselectAllMedias();
 }
 
 /////////////////////////////////////////

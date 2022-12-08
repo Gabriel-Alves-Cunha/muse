@@ -10,7 +10,7 @@ import { type ProgressProps, progressIcons } from "@components/Progress";
 import { assertUnreachable } from "@utils/utils";
 import { isDownloadList } from "@components/Downloading/helper";
 import { progressStatus } from "@common/enums";
-import { t, Translator } from "@components/I18n";
+import { useTranslation } from "@i18n";
 import { error, assert } from "@utils/log";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
@@ -24,7 +24,6 @@ import {
 } from "@contexts/convertList";
 
 import { handleSingleItemDeleteAnimation } from "../Downloading/styles";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -41,11 +40,12 @@ export const useNewConvertions = create<NewConvertions>(() => ({
 
 export function Popup() {
 	const { convertingList } = useConvertingList();
+	const { t } = useTranslation();
 
 	return convertingList.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
-				<Translator path="buttons.cleanFinished" />
+				{t("buttons.cleanFinished")}
 			</Button>
 
 			{Array.from(convertingList, ([path, convertingMedia], index) => (
@@ -58,9 +58,7 @@ export function Popup() {
 			))}
 		</>
 	) : (
-		<p>
-			<Translator path="infos.noConversionsInProgress" />
-		</p>
+		<p>{t("infos.noConversionsInProgress")}</p>
 	);
 }
 
@@ -68,14 +66,13 @@ export function Popup() {
 // Helper functions for Popup:
 
 function cleanAllDoneConvertions(): void {
-	for (const [url, download] of getConvertingList()) {
+	for (const [url, download] of getConvertingList())
 		if (
 			download.status !==
 				progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
 			download.status !== progressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
-	}
 }
 
 /////////////////////////////////////////////
@@ -86,35 +83,39 @@ const ConvertBox = ({
 	mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
 	convertionIndex,
 	path,
-}: ConvertBoxProps) => (
-	<div className="box">
-		<div className="left">
-			<p>{`${getBasename(path)}.${toExtension}`}</p>
+}: ConvertBoxProps) => {
+	const { t } = useTranslation();
 
-			{`${t("infos.converted")} ${formatDuration(
-				timeConverted,
-			)} / ${prettyBytes(sizeConverted)}`}
+	return (
+		<div className="box">
+			<div className="left">
+				<p>{`${getBasename(path)}.${toExtension}`}</p>
+
+				{`${t("infos.converted")} ${formatDuration(
+					timeConverted,
+				)} / ${prettyBytes(sizeConverted)}`}
+			</div>
+
+			<div className="right">
+				<button
+					onPointerUp={(e) =>
+						handleSingleItemDeleteAnimation(
+							e,
+							convertionIndex,
+							!isDownloadList,
+							path,
+						)
+					}
+					title={t("tooltips.cancelConversion")}
+				>
+					<CancelIcon size={13} />
+				</button>
+
+				{progressIcons.get(status)}
+			</div>
 		</div>
-
-		<div className="right">
-			<button
-				onPointerUp={(e) =>
-					handleSingleItemDeleteAnimation(
-						e,
-						convertionIndex,
-						!isDownloadList,
-						path,
-					)
-				}
-				title={t("tooltips.cancelConversion")}
-			>
-				<CancelIcon size={13} />
-			</button>
-
-			{progressIcons.get(status)}
-		</div>
-	</div>
-);
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -129,10 +130,11 @@ export function createNewConvertion(
 	dbg("Trying to create a new conversion...", { convertingList });
 
 	if (convertingList.has(path)) {
+		const { t } = useTranslation();
+
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		infoToast(info);
-
 		error(info, convertingList);
 		throw new Error(info);
 	}
@@ -185,7 +187,7 @@ export function cancelConversionAndOrRemoveItFromList(
 
 	const mediaBeingConverted = convertingList.get(path);
 
-	if (mediaBeingConverted === undefined)
+	if (!mediaBeingConverted)
 		return error(
 			`There should be a convertion with path "${path}"!\nconvertList =`,
 			convertingList,
@@ -228,6 +230,8 @@ function handleUpdateConvertingList(
 	setConvertingList(
 		new Map(convertingList).set(path, { ...thisConversion, ...data }),
 	);
+
+	const { t } = useTranslation();
 
 	// Handle status:
 	switch (data.status) {
@@ -275,25 +279,25 @@ function handleUpdateConvertingList(
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingConverted = Readonly<{
+export type MediaBeingConverted = {
 	status: ProgressProps["status"];
 	toExtension: AllowedMedias;
 	sizeConverted: number;
 	timeConverted: number;
 	port: MessagePort;
-}>;
+};
 
 /////////////////////////////////////////////
 
-type ConvertBoxProps = Readonly<{
+type ConvertBoxProps = {
 	mediaBeingConverted: MediaBeingConverted;
 	convertionIndex: number;
 	path: Path;
-}>;
+};
 
 /////////////////////////////////////////////
 
-export type ConvertInfo = Readonly<{ toExtension: AllowedMedias }>;
+export type ConvertInfo = { toExtension: AllowedMedias };
 
 /////////////////////////////////////////////
 

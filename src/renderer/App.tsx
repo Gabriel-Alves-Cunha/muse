@@ -41,28 +41,17 @@ export function App() {
 			<DecorationsTop />
 
 			<ContextMenu>
-				<Main />
+				<MainGridContainer>
+					<Navbar />
+
+					<PageToShow />
+
+					<MediaPlayer />
+				</MainGridContainer>
 			</ContextMenu>
 
 			<DecorationsDown />
 		</>
-	);
-}
-
-//////////////////////////////////////////
-//////////////////////////////////////////
-//////////////////////////////////////////
-// Helper functions:
-
-function Main() {
-	return (
-		<MainGridContainer>
-			<Navbar />
-
-			<PageToShow />
-
-			<MediaPlayer />
-		</MainGridContainer>
 	);
 }
 

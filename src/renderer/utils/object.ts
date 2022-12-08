@@ -20,13 +20,6 @@ export function getObjectDeepKeys(obj: Obj): string[] {
 
 //////////////////////////////////////////
 
-export function isObjectEmpty(obj: Obj): boolean {
-	for (const _ in obj) return false;
-	return true;
-}
-
-//////////////////////////////////////////
-
 export function getObjectLength(obj: Obj): number {
 	let length = 0;
 

@@ -8,9 +8,9 @@ import { toggleMaximize, minimizeWindow, closeWindow } from "./helper";
 import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
+import { useTranslation } from "@i18n";
 import { MediasInfo } from "@components/Decorations/MediasInfo";
 import { usePage } from "@contexts/page";
-import { t } from "@components/I18n";
 
 import imageUrl from "@assets/logo.svg";
 
@@ -18,18 +18,22 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const DecorationsTop = () => (
-	<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main">
-		{/* ^ window-draggable-region */}
-		<div className="flex justify-center items-center ml-2">
-			<img alt={t("alts.museLogo")} src={imageUrl} height={24} width={24} />
-		</div>
+export const DecorationsTop = () => {
+	const { t } = useTranslation();
 
-		<AppNamePlusFolder />
+	return (
+		<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main">
+			{/* ^ window-draggable-region */}
+			<div className="flex justify-center items-center ml-2">
+				<img alt={t("alts.museLogo")} src={imageUrl} height={24} width={24} />
+			</div>
 
-		<Buttons />
-	</header>
-);
+			<AppNamePlusFolder />
+
+			<Buttons />
+		</header>
+	);
+};
 
 /////////////////////////////////////////////
 
@@ -58,31 +62,35 @@ const WindowButton = ({ className = "", ...props }: WindowButtonProps) => (
 
 /////////////////////////////////////////////
 
-const Buttons = () => (
-	<div className="flex ml-auto h-full bg-transparent">
-		<WindowButton
-			title={t("tooltips.toggleMinimizeWindow")}
-			onPointerUp={minimizeWindow}
-		>
-			<Minimize size={16} />
-		</WindowButton>
+const Buttons = () => {
+	const { t } = useTranslation();
 
-		<WindowButton
-			title={t("tooltips.toggleMaximizeWindow")}
-			onPointerUp={toggleMaximize}
-		>
-			<Maximize size={16} />
-		</WindowButton>
+	return (
+		<div className="flex ml-auto h-full bg-transparent">
+			<WindowButton
+				title={t("tooltips.toggleMinimizeWindow")}
+				onPointerUp={minimizeWindow}
+			>
+				<Minimize size={16} />
+			</WindowButton>
 
-		<WindowButton
-			className="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white no-transition"
-			title={t("tooltips.closeWindow")}
-			onPointerUp={closeWindow}
-		>
-			<Close size={16} />
-		</WindowButton>
-	</div>
-);
+			<WindowButton
+				title={t("tooltips.toggleMaximizeWindow")}
+				onPointerUp={toggleMaximize}
+			>
+				<Maximize size={16} />
+			</WindowButton>
+
+			<WindowButton
+				className="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white no-transition"
+				title={t("tooltips.closeWindow")}
+				onPointerUp={closeWindow}
+			>
+				<Close size={16} />
+			</WindowButton>
+		</div>
+	);
+};
 
 /////////////////////////////////////////////
 

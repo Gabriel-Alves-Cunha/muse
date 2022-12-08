@@ -1,13 +1,12 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-
 import { reactToElectronMessage } from "@common/enums";
 import { mediaPlayerCardId } from "@components/FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { useTranslation } from "@i18n";
 import { infoToast } from "@components/toasts";
 import { Header } from "./Header";
 import { error } from "@utils/log";
-import { t } from "@components/I18n";
 
 const { searchForLyricsAndImage } = electron.lyric;
 
@@ -45,15 +44,17 @@ export async function searchAndOpenLyrics(
 	mediaPath: Path,
 	openLyrics: boolean,
 ): Promise<void> {
-	if (media === undefined) return;
+	if (!media) return;
 
-	if (media.artist.length === 0) {
+	const { t } = useTranslation();
+
+	if (!media.artist) {
 		infoToast(t("toasts.assureMediaHasArtistMetadata"));
 		return;
 	}
 
 	// If there is no image already, go get one:
-	const getImage = media.image.length === 0;
+	const getImage = !media.image;
 
 	try {
 		const { lyric, image, albumName } = await searchForLyricsAndImage(
@@ -78,8 +79,7 @@ export async function searchAndOpenLyrics(
 		error(err);
 	}
 
-	if (media.lyrics.length > 0 && openLyrics === true)
-		return flipMediaPlayerCard();
+	if (media.lyrics && openLyrics) return flipMediaPlayerCard();
 }
 
 /////////////////////////////////////////

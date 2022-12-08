@@ -21,7 +21,7 @@ import { reactToElectronMessage } from "@common/enums";
 import { areArraysEqualByValue } from "@utils/array";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { t, Translator } from "@components/I18n";
+import { useTranslation } from "@i18n";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { deleteFile } from "@utils/deleteFile";
@@ -29,7 +29,6 @@ import { log, error } from "@utils/log";
 import { FlexRow } from "@components/FlexRow";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -42,6 +41,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef(emptyString);
+	const { t } = useTranslation();
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 
@@ -49,16 +49,13 @@ export function MediaOptionsModal({ media, path }: Props) {
 		target: { files },
 	}: React.ChangeEvent<HTMLInputElement>) {
 		if (
-			imageButtonRef.current === null ||
-			imageInputRef.current === null ||
-			files === null ||
+			!(imageButtonRef.current && imageInputRef.current && files) ||
 			files.length === 0
 		)
 			return;
 
 		const [file] = files;
 
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		imageFilePathRef.current = file!.webkitRelativePath;
 
 		dbg("imageFilePath =", imageFilePathRef.current);
@@ -69,7 +66,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 
 	useEffect(() => {
 		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
-			if (event.key === "Enter" && isAModifierKeyPressed(event) === false)
+			if (event.key === "Enter" && !isAModifierKeyPressed(event))
 				changeMediaMetadata(
 					contentWrapperRef,
 					closeButtonRef,
@@ -96,11 +93,11 @@ export function MediaOptionsModal({ media, path }: Props) {
 			ref={contentWrapperRef}
 		>
 			<Title className="unset-all font-primary tracking-wide text-2xl text-normal font-medium">
-				<Translator path="dialogs.mediaOptions.title" />
+				{t("dialogs.mediaOptions.title")}
 			</Title>
 
 			<Description className="mt-3 mx-0 mb-5 font-secondary text-gray tracking-wide text-base">
-				<Translator path="dialogs.mediaOptions.description" />
+				{t("dialogs.mediaOptions.description")}
 			</Description>
 
 			<Close
@@ -121,7 +118,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 						className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
 						htmlFor={option}
 					>
-						<Translator path={`labels.${option as Options}`} />
+						{t(`labels.${option as Options}`)}
 					</label>
 
 					{option === "image" ? (
@@ -144,7 +141,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 								type="file"
 							/>
 
-							<Translator path="buttons.selectImg" />
+							{t("buttons.selectImg")}
 						</Button>
 					) : /////////////////////////////////////////////
 					/////////////////////////////////////////////
@@ -170,7 +167,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 				<Dialog modal>
 					{/* line-height: 35px; // same as height */}
 					<Trigger className="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition">
-						<Translator path="buttons.deleteMedia" />
+						{t("buttons.deleteMedia")}
 
 						<Remove />
 					</Trigger>
@@ -194,7 +191,7 @@ export function MediaOptionsModal({ media, path }: Props) {
 						)
 					}
 				>
-					<Translator path="buttons.saveChanges" />
+					{t("buttons.saveChanges")}
 				</Close>
 			</FlexRow>
 		</Content>
@@ -210,7 +207,7 @@ async function handleMediaDeletion(
 	closeButtonRef: Readonly<React.RefObject<HTMLButtonElement>>,
 	mediaPath: Readonly<Path>,
 ): Promise<void> {
-	if (closeButtonRef.current === null) return;
+	if (!closeButtonRef.current) return;
 
 	closeEverything(closeButtonRef.current);
 
@@ -220,14 +217,15 @@ async function handleMediaDeletion(
 /////////////////////////////////////////////
 
 function changeMediaMetadata(
-	contentWrapperRef: Readonly<React.RefObject<HTMLDivElement>>,
-	closeButtonRef: Readonly<React.RefObject<HTMLButtonElement>>,
-	imageFilePath: Readonly<Path>,
-	mediaPath: Readonly<Path>,
-	media: Readonly<Media>,
+	contentWrapperRef: React.RefObject<HTMLDivElement>,
+	closeButtonRef: React.RefObject<HTMLButtonElement>,
+	imageFilePath: Path,
+	mediaPath: Path,
+	media: Media,
 ): void {
-	if (contentWrapperRef.current === null || closeButtonRef.current === null)
-		return;
+	if (!(contentWrapperRef.current && closeButtonRef.current)) return;
+
+	const { t } = useTranslation();
 
 	try {
 		const hasAnythingChanged = changeMetadataIfAllowed(
@@ -238,8 +236,7 @@ function changeMediaMetadata(
 		);
 		closeEverything(closeButtonRef.current);
 
-		if (hasAnythingChanged === true)
-			successToast(t("toasts.mediaMetadataSaved"));
+		if (hasAnythingChanged) successToast(t("toasts.mediaMetadataSaved"));
 	} catch (err) {
 		error(err);
 
@@ -250,11 +247,11 @@ function changeMediaMetadata(
 /////////////////////////////////////////////
 
 function changeMetadataIfAllowed(
-	contentWrapper: Readonly<HTMLDivElement>,
-	imageFilePath: Readonly<Path>,
-	mediaPath: Readonly<Path>,
-	media: Readonly<Media>,
-): Readonly<boolean> {
+	contentWrapper: HTMLDivElement,
+	imageFilePath: Path,
+	mediaPath: Path,
+	media: Media,
+): boolean {
 	const thingsToChange: MetadataToChange = [];
 
 	if (imageFilePath.length > 0)
@@ -413,4 +410,4 @@ type Options = keyof ReturnType<typeof options>;
 
 /////////////////////////////////////////////
 
-type Props = Readonly<{ media: Media; path: Path }>;
+type Props = { media: Media; path: Path };

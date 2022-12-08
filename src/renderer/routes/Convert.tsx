@@ -4,7 +4,7 @@ import type { Path } from "@common/@types/generalTypes";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
 
-import { t, Translator } from "@components/I18n";
+import { useTranslation } from "@i18n";
 import { MainArea } from "@components/MainArea";
 import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
@@ -23,6 +23,8 @@ export function Convert() {
 	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { t } = useTranslation();
+
 	useTitle(t("titles.convert"));
 
 	////////////////////////////////////////////////
@@ -48,7 +50,7 @@ export function Convert() {
 	// Start converting
 	useEffect(() => {
 		// If there are selected files, convert them:
-		if (!(selectedFiles.size > 0)) return;
+		if (selectedFiles.size === 0) return;
 
 		// To start convert, add to the convertInfoList:
 		useNewConvertions.setState({ newConvertions: selectedFiles });
@@ -77,7 +79,7 @@ export function Convert() {
 						multiple
 					/>
 
-					<Translator path="buttons.convert" />
+					{t("buttons.convert")}
 				</Button>
 			</div>
 		</MainArea>

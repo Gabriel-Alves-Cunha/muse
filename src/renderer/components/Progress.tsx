@@ -82,7 +82,7 @@ export const progressIcons: ReadonlyMap<
 //////////////////////////////////////////
 // Types:
 
-export type ProgressProps = Readonly<{
+export type ProgressProps = {
 	status: ValuesOf<typeof progressStatus>;
 	percent_0_to_100: number;
-}>;
+};

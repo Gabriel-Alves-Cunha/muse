@@ -49,7 +49,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 		}
 
 		function seek({ offsetX }: PointerEvent): void {
-			if (!audio || isNaN(audio.duration) || !isFinite(audio.duration)) return;
+			if (!(audio && isFinite(audio.duration))) return;
 
 			const desiredTime =
 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;

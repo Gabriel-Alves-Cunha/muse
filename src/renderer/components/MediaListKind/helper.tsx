@@ -10,9 +10,9 @@ import create from "zustand";
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { MediaOptionsModal } from "./MediaOptions";
 import { ImgWithFallback } from "@components/ImgWithFallback";
+import { useTranslation } from "@i18n";
 import { DialogTrigger } from "@components/DialogTrigger";
 import { log } from "@utils/log";
-import { t } from "@components/I18n";
 import {
 	electronIpcMainProcessNotification,
 	playlistList,
@@ -25,7 +25,6 @@ import {
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
-
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -73,7 +72,7 @@ function selectOrPlayMedia(
 	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
 ): void {
-	if (e.button !== leftClick || e.ctrlKey === false) {
+	if (e.button !== leftClick || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome === true ? homeList : fromList;
 
@@ -88,53 +87,57 @@ function selectOrPlayMedia(
 /////////////////////////////////////////////
 
 const Row = memo(
-	({ media, path }: RowProps) => (
-		<div
-			className={`${
-				getAllSelectedMedias().has(path) === true ? "selected " : ""
-			}${getCurrentPlaying().path === path ? "playing " : ""}row-wrapper`}
-			data-path={path}
-		>
-			<button
-				className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
-				onPointerUp={(e) => selectOrPlayMedia(e, path)}
-				title={t("tooltips.playThisMedia")}
+	({ media, path }: RowProps) => {
+		const { t } = useTranslation();
+
+		return (
+			<div
+				className={`${getAllSelectedMedias().has(path) ? "selected " : ""}${
+					getCurrentPlaying().path === path ? "playing " : ""
+				}row-wrapper`}
+				data-path={path}
 			>
-				<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
-					<ImgWithFallback
-						Fallback={<MusicNote size="1.4rem" />}
-						mediaImg={media.image}
-						mediaPath={path}
-					/>
-				</div>
+				<button
+					className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
+					onPointerUp={(e) => selectOrPlayMedia(e, path)}
+					title={t("tooltips.playThisMedia")}
+				>
+					<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
+						<ImgWithFallback
+							Fallback={<MusicNote size="1.4rem" />}
+							mediaImg={media.image}
+							mediaPath={path}
+						/>
+					</div>
 
-				<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
-					<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
-						{media.title}
-					</p>
+					<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
+						<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
+							{media.title}
+						</p>
 
-					<p className="font-primary tracking-wide text-sm font-medium text-muted">
-						{media.duration}
-						&emsp;|&emsp;
-						{media.artist}
-					</p>
-				</div>
-			</button>
+						<p className="font-primary tracking-wide text-sm font-medium text-muted">
+							{media.duration}
+							&emsp;|&emsp;
+							{media.artist}
+						</p>
+					</div>
+				</button>
 
-			<Dialog modal>
-				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
-					<Dots size={17} />
-				</DialogTrigger>
+				<Dialog modal>
+					<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
+						<Dots size={17} />
+					</DialogTrigger>
 
-				<DialogPortal>
-					{/* backdropFilter: blur(2px); */}
-					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
+					<DialogPortal>
+						{/* backdropFilter: blur(2px); */}
+						<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
 
-					<MediaOptionsModal media={media} path={path} />
-				</DialogPortal>
-			</Dialog>
-		</div>
-	),
+						<MediaOptionsModal media={media} path={path} />
+					</DialogPortal>
+				</Dialog>
+			</div>
+		);
+	},
 	(prev, next) =>
 		prev.media.title === next.media.title &&
 		prev.media.artist === next.media.artist &&
@@ -175,13 +178,13 @@ export const reloadWindow = (): void =>
 /////////////////////////////////////////////
 // Types:
 
-type RowProps = Readonly<{ media: Media; path: Path }>;
+type RowProps = { media: Media; path: Path };
 
 /////////////////////////////////////////////
 
 type PlaylistList = ValuesOf<typeof playlistList>;
 
-type FromList = Readonly<{
+type FromList = {
 	fromList: Exclude<
 		PlaylistList,
 		typeof playlistList.mainList | typeof playlistList.sortedByDate
@@ -191,4 +194,4 @@ type FromList = Readonly<{
 		typeof playlistList.mainList | typeof playlistList.sortedByDate
 	>;
 	isHome: boolean;
-}>;
+};

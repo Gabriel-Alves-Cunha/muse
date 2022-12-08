@@ -9,7 +9,7 @@ const { random, floor } = Math;
 
 /** [min, max) */
 export function getRandomInt(min: number, max: number): number {
-	if (!(Number.isFinite(min) && Number.isFinite(max)))
+	if (!(isFinite(min) && isFinite(max)))
 		throw new Error(
 			`\`getRandomInt()\` can't handle infinite numbers. Received \`min = ${min}\` and \`max = ${max}\`.`,
 		);

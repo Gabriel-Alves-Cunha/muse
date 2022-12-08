@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 
 import { contentOfSelectEnum, Select } from "@components/Select";
 import { assertUnreachable } from "@utils/utils";
+import { useTranslation } from "@i18n";
 import { playlistList } from "@common/enums";
 import { setFromList } from "@components/MediaListKind/helper";
-import { t } from "@components/I18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -16,6 +16,7 @@ import { t } from "@components/I18n";
 
 export function SortBy() {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		// Default value:

@@ -36,6 +36,9 @@
 			"vitest/importMeta"
 		],
 		"paths": {
+			"@i18n": [
+				"src/renderer/i18n/index.ts"
+			],
 			"@components/*": [
 				"src/renderer/components/*"
 			],

@@ -12,11 +12,10 @@ import { reactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
+import { useTranslation } from "@i18n";
 import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
 import { error } from "@utils/log";
-import { t } from "@components/I18n";
-
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -46,9 +45,10 @@ export function Downloading() {
 	const downloadingListSize = useDownloadingList(sizeSelector);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const downloadInfo = useDownloadInfo();
+	const { t } = useTranslation();
 
 	useEffect(() => {
-		if (downloadInfo.url.length === 0) return;
+		if (!downloadInfo.url) return;
 
 		// For each new `downloadInfo`, start a new download:
 		try {
@@ -105,10 +105,10 @@ export function Downloading() {
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingDownloaded = Readonly<{
+export type MediaBeingDownloaded = {
 	status: ValuesOf<typeof progressStatus>;
 	percentage: number;
 	port: MessagePort;
 	imageURL: string;
 	title: string;
-}>;
+};

@@ -1,7 +1,6 @@
 import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
-
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { electronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
@@ -33,7 +32,7 @@ function listenToDragoverEvent(event: Readonly<DragEvent>): void {
 
 	if (!event.dataTransfer) return;
 
-	event.dataTransfer.dropEffect = "copy";
+	event.dataTransfer.dropEffect = "link";
 	// ^ Style the drag-and-drop as a "copy file" operation.
 }
 

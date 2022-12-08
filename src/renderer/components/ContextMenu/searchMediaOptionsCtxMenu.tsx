@@ -4,12 +4,12 @@ import { Dialog, Trigger } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
+import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "@components/SearchMedia/helper";
 import { getMainList } from "@contexts/usePlaylists";
 import { setSettings } from "@contexts/settings";
 import { openLyrics } from "@components/MediaPlayer/Header";
-import { Translator } from "@components/I18n";
 import { Item } from "./Item";
 import {
 	setAllSelectedMedias,
@@ -21,46 +21,50 @@ import {
 /////////////////////////////////////////////
 // Main function:
 
-export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => (
-	<>
-		<Dialog modal>
-			<Trigger
-				className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
-				disabled={isAllDisabled}
-			>
-				<>
-					<Translator path="ctxMenus.deleteMedia" />
+export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => {
+	const { t } = useTranslation();
 
-					<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-						<Trash />
-					</div>
-				</>
-			</Trigger>
+	return (
+		<>
+			<Dialog modal>
+				<Trigger
+					className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
+					disabled={isAllDisabled}
+				>
+					<>
+						{t("ctxMenus.deleteMedia")}
 
-			<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
-		</Dialog>
+						<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+							<Trash />
+						</div>
+					</>
+				</Trigger>
 
-		<Item onSelect={shareMedias} disabled={isAllDisabled}>
-			<Translator path="ctxMenus.shareMedia" />
+				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+			</Dialog>
 
-			<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-				<Share />
-			</div>
-		</Item>
+			<Item onSelect={shareMedias} disabled={isAllDisabled}>
+				{t("ctxMenus.shareMedia")}
 
-		<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
-			<Translator path="ctxMenus.selectAllMedias" />
+				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+					<Share />
+				</div>
+			</Item>
 
-			<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-				Ctrl+A
-			</div>
-		</Item>
+			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
+				{t("ctxMenus.selectAllMedias")}
 
-		<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
-			<Translator path="ctxMenus.searchForLyrics" />
-		</Item>
-	</>
-);
+				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+					Ctrl+A
+				</div>
+			</Item>
+
+			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
+				{t("ctxMenus.searchForLyrics")}
+			</Item>
+		</>
+	);
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -74,6 +78,7 @@ export const shareMedias = () =>
 
 function selectAllMediasOnSearchResult(): void {
 	const paths = getSearcher().results.map(([path]) => path);
+
 	setAllSelectedMedias(new Set(paths));
 }
 
@@ -94,4 +99,4 @@ export async function searchForLyrics(): Promise<void> {
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ isAllDisabled: boolean }>;
+type Props = { isAllDisabled: boolean };

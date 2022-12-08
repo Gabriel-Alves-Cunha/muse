@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { useSearchInfo, downloadMedia, search, setSearchInfo } from "./helpers";
-import { t, Translator } from "@components/I18n";
+import { useTranslation } from "@i18n";
 import { BaseInput } from "@components/BaseInput";
 import { useTitle } from "@hooks/useTitle";
 import { MainArea } from "@components/MainArea";
@@ -15,6 +15,8 @@ import { Header } from "@components/Header";
 // Main function:
 
 export function Download() {
+	const { t } = useTranslation();
+
 	useTitle(t("titles.download"));
 
 	return (
@@ -47,9 +49,10 @@ const errorAndUrlSelectors = ({
 
 function SearcherWrapper() {
 	const { error, url } = useSearchInfo(errorAndUrlSelectors);
+	const { t } = useTranslation();
 
 	useEffect(() => {
-		const searchTimeout = setTimeout(async () => await search(url), 300);
+		const searchTimeout = setTimeout(() => search(url).then(), 300);
 
 		return () => clearTimeout(searchTimeout);
 	}, [url]);
@@ -81,9 +84,7 @@ const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 function IsLoading() {
 	const isLoading = useSearchInfo(isLoadingSelector);
 
-	return (
-		<div className="w-6 h-6 ml-3">{isLoading === true && <Loading />}</div>
-	);
+	return <div className="w-6 h-6 ml-3">{isLoading && <Loading />}</div>;
 }
 
 ////////////////////////////////////////////////
@@ -95,8 +96,9 @@ const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 function Result() {
 	// Only need to change on `result`'s change:
 	const { imageURL, title } = useSearchInfo(resultSelector);
+	const { t } = useTranslation();
 
-	return title.length > 0 ? (
+	return title ? (
 		<div className="flex flex-col mb-5 mt-8">
 			<img
 				className="object-cover h-44 w-80 shadow-reflect reflect-img transition-transform hover:transition-scale hover:scale-110 focus:scale-x-110"
@@ -109,7 +111,7 @@ function Result() {
 			</p>
 
 			<Button variant="large" onPointerUp={downloadMedia}>
-				<Translator path="buttons.download" />
+				{t("buttons.download")}
 			</Button>
 		</div>
 	) : null;

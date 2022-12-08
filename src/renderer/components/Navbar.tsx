@@ -10,11 +10,11 @@ import {
 } from "react-icons/md";
 
 import { setPage, usePage } from "@contexts/page";
+import { useTranslation } from "@i18n";
 import { ThemeToggler } from "@components/ThemeToggler";
 import { Downloading } from "@components/Downloading";
 import { Converting } from "@components/Converting";
 import { pages } from "@utils/app";
-import { t } from "@components/I18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -55,6 +55,8 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 
 function ButtonsForPages() {
 	const currPage = usePage().page;
+	const { t } = useTranslation();
+
 	const buttons: JSX.Element[] = [];
 
 	for (const page of pages)

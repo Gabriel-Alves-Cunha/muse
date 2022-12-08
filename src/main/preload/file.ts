@@ -2,10 +2,9 @@ import type { Path } from "@common/@types/generalTypes";
 
 import { readdir, unlink } from "node:fs/promises";
 import { join } from "node:path";
-import {error} from "node:console";
+import { error } from "node:console";
 
 import { emptyArray } from "@common/empty";
-
 
 ///////////////////////////////////////////
 ///////////////////////////////////////////

@@ -55,25 +55,25 @@ export const playThisMedia = (
 
 ////////////////////////////////////////////////
 
-export async function togglePlayPause(): Promise<void> {
-	const audio = document.getElementById("audio") as HTMLAudioElement;
+export function togglePlayPause(): void {
+	const audio = document.getElementById("audio") as HTMLAudioElement | null;
+	if (!audio) return;
 
-	audio.paused ? await play(audio) : pause(audio);
+	audio.paused ? play(audio) : pause(audio);
 }
 
 ////////////////////////////////////////////////
 
-export async function play(audio?: HTMLAudioElement): Promise<void> {
-	audio !== undefined
-		? await audio.play()
-		: await (document.getElementById("audio") as HTMLAudioElement).play();
+export function play(audio?: HTMLAudioElement): void {
+	audio
+		? audio.play().then()
+		: (document.getElementById("audio") as HTMLAudioElement).play().then();
 }
 
 ////////////////////////////////////////////////
 
 export function pause(audio?: HTMLAudioElement): void {
-	if (audio === undefined)
-		audio = document.getElementById("audio") as HTMLAudioElement;
+	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
@@ -102,7 +102,7 @@ export function playPreviousMedia(): void {
 	time(() => {
 		const { path, listType } = getCurrentPlaying();
 
-		if (path.length === 0)
+		if (!path)
 			return warn(
 				"A media needs to be currently selected to play a previous media!",
 			);
@@ -133,7 +133,7 @@ export function playNextMedia(): void {
 	time(() => {
 		const { path, listType } = getCurrentPlaying();
 
-		if (path.length === 0)
+		if (!path)
 			return info(
 				"A media needs to be currently selected to play a next media!",
 			);
@@ -171,10 +171,10 @@ export function playNextMedia(): void {
 			}
 
 			// In case the currently playing is the last media, get the first:
-			if (nextMediaPath.length === 0) nextMediaPath = getFirstKey(list) as Path;
+			if (!nextMediaPath) nextMediaPath = getFirstKey(list) as Path;
 		}
 
-		if (nextMediaPath.length === 0)
+		if (!nextMediaPath)
 			return warn("There should be a nextMediaPath, but there isn't!", {
 				currentPlaying: getCurrentPlaying(),
 				nextMediaPath,
@@ -191,9 +191,9 @@ export function playNextMedia(): void {
 // Register functions to window mediaSession:
 
 navigator?.mediaSession?.setActionHandler?.("previoustrack", playPreviousMedia);
-navigator?.mediaSession?.setActionHandler?.("play", async () => await play());
 navigator?.mediaSession?.setActionHandler?.("nexttrack", playNextMedia);
 navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
+navigator?.mediaSession?.setActionHandler?.("play", () => play());
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -201,8 +201,9 @@ navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
 
 useCurrentPlaying.subscribe(
 	(state) => state.path,
-	function updateHistoryAndSetAudioSource(newPath, prevPath) {
-		if (newPath.length === 0) return;
+	// Update history and set audio source:
+	(newPath, prevPath) => {
+		if (!newPath) return;
 
 		addToHistory(newPath);
 
@@ -246,18 +247,16 @@ const playingClass = "playing";
  * and undecorate previous playing ones.
  */
 function handleDecorateMediaRow(path: Path, previousPath: Path) {
-	const prevElements =
-		previousPath.length > 0
-			? document.querySelectorAll(`[data-path="${previousPath}"]`)
-			: null;
+	const prevElements = previousPath
+		? document.querySelectorAll(`[data-path="${previousPath}"]`)
+		: null;
 	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
 
-	if (prevElements === null)
-		info(`No previous media row found for "${previousPath}!"`);
-	if (newElements === null) return info(`No media row found for "${path}"!`);
+	if (!prevElements) info(`No previous media row found for "${previousPath}!"`);
+	if (!newElements) return info(`No media row found for "${path}"!`);
 
 	// Undecorate previous playing media row:
-	if (previousPath.length !== 0 && prevElements !== null)
+	if (previousPath && prevElements)
 		for (const element of prevElements) element.classList.remove(playingClass);
 
 	// Decorate new playing media row:
@@ -267,11 +266,11 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 ////////////////////////////////////////////////
 
 function changeMediaSessionMetadata(path: Path): void {
-	if (navigator?.mediaSession === undefined) return;
+	if (!navigator?.mediaSession) return;
 
 	const media = getMainList().get(path);
 
-	if (media === undefined) return;
+	if (!media) return;
 
 	navigator.mediaSession.metadata = new MediaMetadata({
 		artwork: [{ src: media.image }],
@@ -286,8 +285,8 @@ function changeMediaSessionMetadata(path: Path): void {
 ////////////////////////////////////////////////
 // Types:
 
-export type CurrentPlaying = Readonly<{
+export type CurrentPlaying = {
 	listType: ValuesOf<typeof playlistList>;
 	currentTime: number;
 	path: Path;
-}>;
+};

@@ -17,7 +17,7 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 		function listener(event: PointerEvent) {
 			if (
 				event.button !== leftClick ||
-				ref.current === null ||
+				!ref.current ||
 				ref.current.contains(event.target as Node)
 			)
 				return;
@@ -27,9 +27,7 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 
 		document.addEventListener("pointerup", listener);
 
-		return () => {
-			document.removeEventListener("pointerup", listener);
-		};
+		return () => document.removeEventListener("pointerup", listener);
 	}, [ref, handler]);
 }
 

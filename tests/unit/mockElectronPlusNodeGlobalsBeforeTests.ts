@@ -4,7 +4,6 @@ import { getObjectLength, withoutProperty } from "@utils/object";
 import { stringifyJson } from "@common/utils";
 import { log } from "@utils/log";
 
-
 // Mocking window.localStorage
 class LocalStorageMock {
 	#store: Record<string, string>;

@@ -7,13 +7,13 @@ import create from "zustand";
 import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
 import { getFromLocalStorage, keys } from "@utils/localStorage";
-import { assertUnreachable, time } from "@utils/utils";
 import { emptyMap, emptySet } from "@common/empty";
 import { playlistList } from "@common/enums";
 import { dbgPlaylists } from "@common/debug";
 import { error, warn } from "@utils/log";
 import { getSettings } from "@contexts/settings";
 import { getFirstKey } from "@utils/map-set";
+import { time } from "@utils/utils";
 import {
 	getAllSelectedMedias,
 	setAllSelectedMedias,
@@ -39,6 +39,11 @@ export type UsePlaylistsStatesAndActions = Readonly<{
 	sortedByDate: ReadonlySet<Path>;
 	favorites: ReadonlySet<Path>;
 	history: History;
+
+	getSortedByDate(): ReadonlySet<Path>;
+	getFavorites(): ReadonlySet<Path>;
+	getMainList(): MainList;
+	getHistory(): History;
 
 	addToHistory(path: Path): void;
 	clearHistory(): void;
@@ -67,13 +72,19 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 		setPlaylistsOnLocalStorage((set, get) => ({
 			isLoadingMedias: false,
 
-			sortedByDate:
-				(getFromLocalStorage(keys.sortedByDate) as Set<Path>) ?? emptySet,
-			favorites: (getFromLocalStorage(keys.favorites) as Set<Path>) ?? emptySet,
+			favorites:
+				(getFromLocalStorage(keys.favorites) as ReadonlySet<Path>) ?? emptySet,
 			history: (getFromLocalStorage(keys.history) as History) ?? emptyMap,
 			sortedByNameAndMainList: emptyMap,
+			sortedByDate: emptySet,
 
 			///////////////////////////////////////////////////
+
+			getMainList: () => get().sortedByNameAndMainList,
+			getSortedByDate: () => get().sortedByDate,
+			getFavorites: () => get().favorites,
+			getHistory: () => get().history,
+
 			///////////////////////////////////////////////////
 
 			addToHistory(path) {
@@ -84,15 +95,14 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 
 				// Add to history if there isn't one yet:
 				const historyOfDates = history.get(path);
-				historyOfDates === undefined
-					? dates.unshift(Date.now())
-					: dates.unshift(...historyOfDates, Date.now());
+				historyOfDates
+					? dates.unshift(...historyOfDates, Date.now())
+					: dates.unshift(Date.now());
 
 				const newHistory = new Map(history).set(path, dates);
 
 				if (newHistory.size > maxSizeOfHistory) {
 					// history has a max size of `maxSizeOfHistory`:
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 					const firstPath = getFirstKey(newHistory)!;
 					// remove the first element:
 					newHistory.delete(firstPath);
@@ -131,7 +141,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			///////////////////////////////////////////////////
 
 			toggleFavoriteMedia(path) {
-				if (path.length === 0) return;
+				if (!path) return;
 
 				const newFavorites = new Set(get().favorites);
 
@@ -162,8 +172,8 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 
 			updateAndSortSortedAndMainLists(newMainList: MainList) {
 				set({
-					sortedByDate: sortByDate(newMainList),
 					sortedByNameAndMainList: sortByName(newMainList),
+					sortedByDate: sortByDate(newMainList),
 				});
 			},
 
@@ -309,7 +319,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 
 				const refreshedMedia = refreshedMediaInArray[0]?.[1];
 
-				if (refreshedMedia === undefined) {
+				if (!refreshedMedia) {
 					error(
 						`I wasn't able to transform this path (${path}) to a media to be refreshed!\nRefreshing all media instead.`,
 					);
@@ -317,7 +327,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 					return await searchLocalComputerForMedias();
 				}
 
-				if (newPath.length > 0) {
+				if (newPath) {
 					newMainList.delete(path);
 					newMainList.set(newPath, refreshedMedia);
 
@@ -363,16 +373,11 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 ///////////////////////////////////////////////////
 // Helper funtions:
 
-const { getState } = usePlaylists;
-export const getMainList = () => getState().sortedByNameAndMainList;
-export const getSortedByDate = () => getState().sortedByDate;
-export const getFavorites = () => getState().favorites;
-export const getHistory = () => getState().history;
 export const {
 	replaceEntireMainList,
 	toggleFavoriteMedia,
 	removeFromFavorites,
-	removeMedia,
+	getSortedByDate,
 	addToFavorites,
 	clearFavorites,
 	addToMainList,
@@ -380,29 +385,23 @@ export const {
 	addToHistory,
 	clearHistory,
 	refreshMedia,
-} = getState();
+	getFavorites,
+	removeMedia,
+	getMainList,
+	getHistory,
+} = usePlaylists.getState();
 
 ///////////////////////////////////////////////////
 
 export function getPlaylist(
 	list: ValuesOf<typeof playlistList>,
 ): ReadonlySet<Path> | MainList | History {
-	switch (list) {
-		case playlistList.sortedByDate:
-			return getSortedByDate();
+	if (list === playlistList.sortedByDate) return getSortedByDate();
+	if (list === playlistList.favorites) return getFavorites();
+	if (list === playlistList.mainList) return getMainList();
+	if (list === playlistList.history) return getHistory();
 
-		case playlistList.favorites:
-			return getFavorites();
-
-		case playlistList.mainList:
-			return getMainList();
-
-		case playlistList.history:
-			return getHistory();
-
-		default:
-			assertUnreachable(list);
-	}
+	throw new Error(`List ${list} is not handled!`);
 }
 
 ///////////////////////////////////////////////////

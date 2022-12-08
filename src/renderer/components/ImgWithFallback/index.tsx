@@ -44,7 +44,7 @@ export function ImgWithFallback({
 			img = null;
 		};
 
-		img.onerror = ev => {
+		img.onerror = (ev) => {
 			error("Failed image; going to erasing it...", {
 				mediaPath,
 				mediaImg,
@@ -93,8 +93,8 @@ export function ImgWithFallback({
 /////////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{
-	Fallback: JSX.Element;
+type Props = {
 	mediaImg: string | undefined;
+	Fallback: JSX.Element;
 	mediaPath: Path;
-}>;
+};

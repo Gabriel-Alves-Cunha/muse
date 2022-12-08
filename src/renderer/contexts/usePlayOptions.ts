@@ -37,4 +37,4 @@ export const toggleRandom = () =>
 ////////////////////////////////////////////////
 // Types:
 
-export type PlayOptions = Readonly<{ random: boolean; loop: boolean }>;
+export type PlayOptions = { random: boolean; loop: boolean };

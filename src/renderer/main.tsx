@@ -3,7 +3,6 @@ import { StrictMode } from "react";
 
 import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
 import { App } from "./App";
-import "./i18n"; // Import translations on app root.
 
 if (isDev) {
 	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();

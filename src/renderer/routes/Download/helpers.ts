@@ -2,10 +2,10 @@ import create from "zustand";
 
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
+import { useTranslation } from "@i18n";
 import { emptyString } from "@common/empty";
 import { error } from "@utils/log";
 import { dbg } from "@common/debug";
-import { t } from "@components/I18n";
 
 const { getBasicInfo } = electron.media;
 
@@ -14,12 +14,12 @@ const { getBasicInfo } = electron.media;
 ////////////////////////////////////////////////
 // Constants:
 
-const defaultSearchInfo: SearcherInfo = Object.freeze({
+const defaultSearchInfo: SearcherInfo = {
 	result: { imageURL: emptyString, artist: emptyString, title: emptyString },
 	error: emptyString,
 	url: emptyString,
 	isLoading: false,
-});
+};
 
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
 
@@ -37,7 +37,7 @@ export function downloadMedia(): void {
 	} = searchInfo();
 
 	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
-	if (title.length === 0 || url.length === 0) return;
+	if (!(title && url)) return;
 
 	// Start download:
 	setDownloadInfo({ imageURL, title, url, artist });
@@ -71,6 +71,8 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 		setSearchInfo({ isLoading: false, result });
 	} catch (err) {
+		const { t } = useTranslation();
+
 		setSearchInfo({
 			result: defaultSearchInfo.result,
 			isLoading: false,
@@ -88,17 +90,17 @@ export async function search(url: Readonly<string>): Promise<void> {
 ////////////////////////////////////////////////
 // Types:
 
-type UrlMediaMetadata = Readonly<{
+type UrlMediaMetadata = {
 	imageURL: string;
 	artist: string;
 	title: string;
-}>;
+};
 
 ////////////////////////////////////////////////
 
-type SearcherInfo = Readonly<{
+type SearcherInfo = {
 	result: UrlMediaMetadata;
 	isLoading: boolean;
 	error: string;
 	url: string;
-}>;
+};

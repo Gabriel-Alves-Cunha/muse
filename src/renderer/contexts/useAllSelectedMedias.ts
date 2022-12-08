@@ -28,7 +28,8 @@ export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 if (import.meta.vitest === undefined)
 	useAllSelectedMedias.subscribe(
 		(state) => state.medias,
-		function handleDecorateMediasRow(selectedMedias, prevSelectedMedias): void {
+		// Handle decorate medias row
+		(selectedMedias, prevSelectedMedias): void =>
 			time(() => {
 				// Has to be this order:
 				for (const path of prevSelectedMedias)
@@ -45,8 +46,7 @@ if (import.meta.vitest === undefined)
 						`[data-path="${path}"]`,
 					))
 						element.classList.add("selected");
-			}, "handleDecorateMediasRow");
-		},
+			}, "handleDecorateMediasRow"),
 	);
 
 ///////////////////////////////////////////////////

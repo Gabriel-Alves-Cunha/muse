@@ -4,11 +4,7 @@ import type { PlayOptions } from "@contexts/usePlayOptions";
 import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
-
-import { assertUnreachable } from "./utils";
 import { dbgPlaylists } from "@common/debug";
-import { error } from "@utils/log";
-
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -16,7 +12,6 @@ import { error } from "@utils/log";
 // Constants:
 
 export const keys = {
-	sortedByDate: "@muse:playlist:sortedByDate",
 	currentPlaying: "@muse:currentPlaying",
 	favorites: "@muse:playlist:favorites",
 	history: "@muse:playlist:history",
@@ -27,7 +22,7 @@ export const keys = {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
+export function setLocalStorage(key: Keys, value: Values): void {
 	setTimeout(() => {
 		if (value instanceof Map || value instanceof Set) value = [...value];
 
@@ -35,75 +30,53 @@ export function setLocalStorage(key: Readonly<Keys>, value: Values): void {
 
 		dbgPlaylists({ key, json, value });
 
-		// @ts-ignore => It doesn't matter that `serializedValue`,
-		// is of type `String` or `string`, they both work:
 		localStorage.setItem(key, json);
 	});
 }
 
 ////////////////////////////////////////////////
 
-export function getFromLocalStorage(key: Readonly<Keys>): Values | undefined {
-	try {
-		const value = localStorage.getItem(key);
-		// @ts-ignore => ^ `?? "";` does not work :|
-		const item: unknown = JSON.parse(value);
+export function getFromLocalStorage(key: Keys): Values | undefined {
+	const value = localStorage.getItem(key) ?? "[]";
+	const item: unknown = JSON.parse(value);
 
-		dbgPlaylists(`getFromLocalStorage(${key})`, { item, value });
+	dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
 
-		if (!(item && value)) return undefined;
+	if (item === "[]" && !value) return undefined;
 
-		switch (key) {
-			case keys.favorites: {
-				const newFavorites = new Set(item as Path[]);
+	if (key === keys.favorites) {
+		const newFavorites = new Set(item as Path[]);
 
-				dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
+		dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
 
-				return newFavorites;
-			}
-
-			case keys.history: {
-				const newHistory: History = new Map(item as HistoryShape);
-
-				dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
-
-				return newHistory;
-			}
-
-			case keys.sortedByDate: {
-				const newSortedByDate = new Set(item as Path[]);
-
-				dbgPlaylists("getFromLocalStorage: newSortedByDate =", newSortedByDate);
-
-				return newSortedByDate;
-			}
-
-			case keys.currentPlaying: {
-				const newCurrentPlaying = item as CurrentPlaying;
-
-				dbgPlaylists(
-					"getFromLocalStorage: newCurrentPlaying =",
-					newCurrentPlaying,
-				);
-
-				return newCurrentPlaying;
-			}
-
-			case keys.playOptions: {
-				const newPlayOptions = item as PlayOptions;
-
-				dbgPlaylists("getFromLocalStorage: newPlayOptions =", newPlayOptions);
-
-				return newPlayOptions;
-			}
-
-			default:
-				return assertUnreachable(key);
-		}
-	} catch (err) {
-		error(err);
-		return undefined;
+		return newFavorites;
 	}
+
+	if (key === keys.history) {
+		const newHistory: History = new Map(item as HistoryShape);
+
+		dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
+
+		return newHistory;
+	}
+
+	if (key === keys.currentPlaying) {
+		const newCurrentPlaying = item as CurrentPlaying;
+
+		dbgPlaylists("getFromLocalStorage: newCurrentPlaying =", newCurrentPlaying);
+
+		return newCurrentPlaying;
+	}
+
+	if (key === keys.playOptions) {
+		const newPlayOptions = item as PlayOptions;
+
+		dbgPlaylists("getFromLocalStorage: newPlayOptions =", newPlayOptions);
+
+		return newPlayOptions;
+	}
+
+	return undefined;
 }
 
 //////////////////////////////////////////

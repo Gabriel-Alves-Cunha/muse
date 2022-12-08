@@ -1,9 +1,5 @@
-import type { Path } from "@common/@types/generalTypes";
-
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
-
-import { emptySet } from "@common/empty";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -14,14 +10,12 @@ const settingsKey = "muse:settings";
 const defaultValues: Settings = {
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
-	filesToShare: emptySet,
 	maxSizeOfHistory: 100,
 };
 const savedSettings = localStorage.getItem(settingsKey);
-const settingsToApply =
-	savedSettings === null
-		? defaultValues
-		: (JSON.parse(savedSettings) as Settings);
+const settingsToApply = savedSettings
+	? (JSON.parse(savedSettings) as Settings)
+	: defaultValues;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -41,9 +35,9 @@ export const { getState: getSettings, setState: setSettings } = useSettings;
 
 useSettings.subscribe(
 	(state) => state,
-	function writeToLocalStorage(newSettings): void {
-		localStorage.setItem(settingsKey, JSON.stringify(newSettings));
-	},
+	(newSettings): void =>
+		// Write to LocalStorage:
+		localStorage.setItem(settingsKey, JSON.stringify(newSettings)),
 );
 
 ////////////////////////////////////////////////
@@ -54,6 +48,5 @@ useSettings.subscribe(
 export type Settings = Readonly<{
 	assureMediaSizeIsGreaterThan60KB: boolean;
 	ignoreMediaWithLessThan60Seconds: boolean;
-	filesToShare: ReadonlySet<Path>;
 	maxSizeOfHistory: number;
 }>;

@@ -56,6 +56,7 @@ export default defineConfig(({ mode }) => {
 				{ find: "@routes", replacement: resolve("src/renderer/routes") },
 				{ find: "@utils", replacement: resolve("src/renderer/utils") },
 				{ find: "@hooks", replacement: resolve("src/renderer/hooks") },
+				{ find: "@i18n", replacement: resolve("src/renderer/i18n") },
 				{ find: "@renderer", replacement: resolve("src/renderer") },
 				{ find: "@common", replacement: resolve("src/common") },
 				{ find: "@main", replacement: resolve("src/main") },

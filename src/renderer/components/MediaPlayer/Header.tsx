@@ -12,7 +12,7 @@ import {
 import { flipMediaPlayerCard, searchAndOpenLyrics } from "./Lyrics";
 import { toggleFavoriteMedia, usePlaylists } from "@contexts/usePlaylists";
 import { CircleIconButton } from "@components/CircleIconButton";
-import { t } from "@components/I18n";
+import { useTranslation } from "@i18n";
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -22,6 +22,7 @@ export const openLyrics = true;
 
 function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
+	const { t } = useTranslation();
 
 	async function loadAndOrToggleLyrics(): Promise<void> {
 		if (media?.lyrics) return flipMediaPlayerCard();
@@ -57,6 +58,8 @@ const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 
 export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 	const favorites = usePlaylists(favoritesSelector);
+	const { t } = useTranslation();
+
 	const isFavorite = favorites.has(path);
 
 	return (
@@ -83,14 +86,14 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 /////////////////////////////////////////
 // Types:
 
-type HeaderProps = Readonly<{
+type HeaderProps = {
 	media: Media | undefined;
 	displayTitle?: boolean;
 	path: Path;
-}>;
+};
 /////////////////////////////////////////
 
-type LoadOrToggleLyricsProps = Readonly<{
+type LoadOrToggleLyricsProps = {
 	media: Media | undefined;
 	path: Path;
-}>;
+};

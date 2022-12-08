@@ -13,8 +13,8 @@ import {
 } from "react-icons/io5";
 
 import { CircleIconButton } from "@components/CircleIconButton";
+import { useTranslation } from "@i18n";
 import { SeekerWrapper } from "./Seeker";
-import { t } from "@components/I18n";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
@@ -32,8 +32,9 @@ import {
 
 export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
+	const { t } = useTranslation();
 
-	const isThereAMedia = !(audio && audio.src.length > 0);
+	const isThereAMedia = !audio?.src;
 
 	return (
 		<div className="absolute flex flex-col bottom-10 w-full">
@@ -68,6 +69,7 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 
 function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	const [isPaused, setIsPaused] = useState(true);
+	const { t } = useTranslation();
 
 	const setIsPausedToFalse = () => setIsPaused(false);
 	const setIsPausedToTrue = () => setIsPaused(true);
@@ -100,41 +102,45 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const Controls = ({ isDisabled, audio }: ControlsProps) => (
-	<div className="relative flex justify-center items-center w-[120px]">
-		<CircleIconButton
-			title={t("tooltips.playPreviousTrack")}
-			onPointerUp={playPreviousMedia}
-			disabled={isDisabled}
-		>
-			<Previous />
-		</CircleIconButton>
+export const Controls = ({ isDisabled, audio }: ControlsProps) => {
+	const { t } = useTranslation();
 
-		<PlayPauseButton isDisabled={isDisabled} audio={audio} />
+	return (
+		<div className="relative flex justify-center items-center w-[120px]">
+			<CircleIconButton
+				title={t("tooltips.playPreviousTrack")}
+				onPointerUp={playPreviousMedia}
+				disabled={isDisabled}
+			>
+				<Previous />
+			</CircleIconButton>
 
-		<CircleIconButton
-			title={t("tooltips.playNextTrack")}
-			onPointerUp={playNextMedia}
-			disabled={isDisabled}
-		>
-			<Next />
-		</CircleIconButton>
-	</div>
-);
+			<PlayPauseButton isDisabled={isDisabled} audio={audio} />
+
+			<CircleIconButton
+				title={t("tooltips.playNextTrack")}
+				onPointerUp={playNextMedia}
+				disabled={isDisabled}
+			>
+				<Next />
+			</CircleIconButton>
+		</div>
+	);
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
 
-type ControlsProps = Readonly<{ isDisabled: boolean; audio: Audio }>;
+type ControlsProps = { isDisabled: boolean; audio: Audio };
 
 /////////////////////////////////////////
 
-export type RefToAudioAndSeeker = Readonly<{
+export type RefToAudioAndSeeker = {
 	isSeeking: React.MutableRefObject<boolean>;
 	audio: Audio;
-}>;
+};
 
 /////////////////////////////////////////
 

@@ -4,7 +4,7 @@ import {
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
-import { t } from "@components/I18n";
+import { useTranslation } from "@i18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -21,6 +21,7 @@ export const availableThemes = ["light", "dark"] as const;
 
 export function ThemeToggler() {
 	const [theme, setTheme] = useState(htmlDataset.theme as Theme);
+	const { t } = useTranslation();
 
 	const newTheme =
 		theme === availableThemes[0] ? availableThemes[1] : availableThemes[0];

@@ -2,9 +2,6 @@
 
 * FIX: choose a font with I and L different!!
 * ADD: select with mouse moving!!
-* CHANGE: from react to solidjs/preact
-* CHANGE: from i18 to ? solid-primitives
-* CHANGE: from radix-ui to hope-ui (solid js)
 * ADD: detect (avail port to share)
 * ADD: electron setProgressBar
 * FIX: gh-actions is always overwriting latest release!!
