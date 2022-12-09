@@ -392,11 +392,11 @@ const format = (
 /////////////////////////////////////////////
 // Types:
 
-export type WhatToChange = Readonly<{
+export type WhatToChange = {
 	whatToSend: ChangeOptionsToSend;
 	whatToChange: ChangeOptions;
 	current: string;
-}>;
+};
 
 /////////////////////////////////////////////
 

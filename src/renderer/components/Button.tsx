@@ -7,8 +7,8 @@ export const Button = forwardRef(function Button(
 	return (
 		<button
 			className={`button ${variant} ${className}`}
-			{...props}
 			ref={forwardedRef}
+			{...props}
 		/>
 	);
 });

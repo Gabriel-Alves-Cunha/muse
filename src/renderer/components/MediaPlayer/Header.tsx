@@ -36,7 +36,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 		<CircleIconButton
 			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
-			disabled={media === undefined}
+			disabled={!media}
 		>
 			{media?.lyrics ? (
 				<LyricsPresent size={16} />

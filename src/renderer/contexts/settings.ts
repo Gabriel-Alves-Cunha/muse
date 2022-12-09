@@ -45,7 +45,9 @@ useSettings.subscribe(
 ////////////////////////////////////////////////
 // Types:
 
-export type Settings = Readonly<{
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
+export type Settings = Json & Readonly<{
 	assureMediaSizeIsGreaterThan60KB: boolean;
 	ignoreMediaWithLessThan60Seconds: boolean;
 	maxSizeOfHistory: number;

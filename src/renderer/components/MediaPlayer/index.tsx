@@ -64,14 +64,12 @@ export function MediaPlayer() {
 			setProgress({ percentage: (currentTime / duration) * 100 });
 	}
 
-	useEffect(
-		function flipMediaPlayerCardToNormalPlayer() {
-			log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
+	useEffect(() => {
+		// Flip media player card to normal player:
+		log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
 
-			document.getElementById(mediaPlayerCardId)?.classList.remove("active");
-		},
-		[audioRef.current?.src],
-	);
+		document.getElementById(mediaPlayerCardId)?.classList.remove("active");
+	}, [audioRef.current?.src]);
 
 	useEffect(() => {
 		const audio = audioRef.current;
@@ -174,13 +172,13 @@ const Player = ({ media, audio, path, isSeeking }: PlayerProps) => (
 
 /////////////////////////////////////////
 
-const logInvalid = (e: Readonly<Event>): void => dbg("Audio is invalid.", e);
+const logInvalid = (e: Event): void => dbg("Audio is invalid.", e);
 const logAbort = (): void => dbg("Audio was aborted.");
 const logClose = (): void => dbg("Audio was closed.");
-const logSecurityPolicyViolation = (e: Readonly<Event>): void =>
+const logSecurityPolicyViolation = (e: Event): void =>
 	error("Audio has a security policy violation:", e);
-const logError = (e: Readonly<Event>): void => error("Audio error:", e);
-const logStalled = (e: Readonly<Event>): void =>
+const logError = (e: Event): void => error("Audio error:", e);
+const logStalled = (e: Event): void =>
 	dbg(
 		"Audio is stalled (Fires when the browser is trying to get media data, but it is not available):",
 		e,
@@ -209,7 +207,7 @@ function handleLoadedData(
 function handleEnded(audio: HTMLAudioElement): void {
 	dbg(
 		`Audio ended, playing ${
-			audio.loop === true ? "again because it's on loop." : "next media."
+			audio.loop ? "again because it's on loop." : "next media."
 		}`,
 	);
 
@@ -218,9 +216,9 @@ function handleEnded(audio: HTMLAudioElement): void {
 
 /////////////////////////////////////////
 
-async function handleAudioCanPlay(audio: HTMLAudioElement): Promise<void> {
+function handleAudioCanPlay(audio: HTMLAudioElement): void {
 	dbg("Audio can play.");
-	await audio.play();
+	audio.play().then();
 }
 
 /////////////////////////////////////////

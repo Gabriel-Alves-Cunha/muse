@@ -4,11 +4,13 @@ import create from "zustand";
 
 import { emptySet } from "@common/empty";
 
-export const useFilesToShare = create<{ paths: ReadonlySet<Path> }>(() => ({
-	paths: emptySet,
-}));
+export const useFilesToShare = create<{ filesToShare: ReadonlySet<Path> }>(
+	() => ({
+		filesToShare: emptySet,
+	}),
+);
 
-export const getFilesToShare = () => useFilesToShare.getState().paths;
+export const getFilesToShare = () => useFilesToShare.getState().filesToShare;
 
-export const setFilesToShare = (files: Set<Path>) =>
-	useFilesToShare.setState({ paths: files });
+export const setFilesToShare = (filesToShare: ReadonlySet<Path>) =>
+	useFilesToShare.setState({ filesToShare });

@@ -7,14 +7,15 @@ import { Content, Close } from "@radix-ui/react-dialog";
 import { toCanvas } from "qrcode";
 import { Dialog } from "@radix-ui/react-dialog";
 
-import { setSettings, useSettings } from "@contexts/settings";
 import { isAModifierKeyPressed } from "@utils/keyboard";
+import { setFilesToShare, useFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { error, assert } from "@utils/log";
+import { setSettings } from "@contexts/settings";
 import { BlurOverlay } from "./BlurOverlay";
 import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
-import { Loading } from "@components/Loading";
+import { Loading } from "./Loading";
 import { dbg } from "@common/debug";
 
 const { createServer } = electron.share;
@@ -31,13 +32,10 @@ const qrID = "qrcode-canvas";
 /////////////////////////////////////////
 // Main function:
 
-const filesToShareSelector = (state: ReturnType<typeof useSettings.getState>) =>
-	state.filesToShare;
-
 export function ShareDialog() {
-	const [server, setServer] = useState<ClientServerAPI | null>(null);
+	const [server, setServer] = useState<ClientServerAPI | undefined>();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const filesToShare = useSettings(filesToShareSelector);
+	const { filesToShare } = useFilesToShare();
 	const { t } = useTranslation();
 
 	const plural = filesToShare.size > 1 ? "s" : "";
@@ -46,7 +44,7 @@ export function ShareDialog() {
 
 	const onCanvasElementMakeQRCode = useCallback(
 		async (canvas: HTMLCanvasElement | null) => {
-			if (canvas === null || isDialogOpen === false || server === null) return;
+			if (!(canvas && isDialogOpen && server)) return;
 
 			await makeQrcode(server.url).catch((err) => {
 				error("Error making QR Code.", err);
@@ -59,7 +57,7 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	function handleDialogOpenStates(newValue: boolean): void {
-		if (newValue === false) server?.close();
+		if (!newValue) server?.close();
 
 		setIsDialogOpen(newValue);
 	}
@@ -69,7 +67,7 @@ export function ShareDialog() {
 	// When the server closes, get rid of it's reference:
 	useEffect(() => {
 		server?.addListener("close", () => {
-			setTimeout(() => setServer(null), 1_000);
+			setTimeout(() => setServer(undefined), 1_000);
 			closePopover();
 		});
 	}, [server]);
@@ -78,11 +76,7 @@ export function ShareDialog() {
 
 	useEffect(() => {
 		function closeShareDialogOnEsc(e: KeyboardEvent) {
-			if (
-				e.key === "Escape" &&
-				isDialogOpen === true &&
-				isAModifierKeyPressed(e) === false
-			)
+			if (e.key === "Escape" && isDialogOpen && !isAModifierKeyPressed(e))
 				closePopover(server?.close);
 		}
 
@@ -99,7 +93,7 @@ export function ShareDialog() {
 
 			setIsDialogOpen(shouldDialogOpen);
 
-			if (shouldDialogOpen === false) return;
+			if (!shouldDialogOpen) return;
 
 			try {
 				const clientServerApi = createServer([...filesToShare]);
@@ -160,7 +154,7 @@ export function ShareDialog() {
 function closePopover(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
-	setSettings({ filesToShare: emptySet });
+	setFilesToShare(emptySet);
 }
 
 /////////////////////////////////////////

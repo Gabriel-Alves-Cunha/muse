@@ -1,7 +1,6 @@
 import { FiTrash as CleanIcon } from "react-icons/fi";
 
 import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
-import { assertUnreachable } from "@utils/utils";
 import { useTranslation } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
@@ -26,18 +25,6 @@ export const Clean = () => {
 function cleanProperList() {
 	const { fromList } = getFromList();
 
-	switch (fromList) {
-		case playlistList.favorites: {
-			clearFavorites();
-			break;
-		}
-
-		case playlistList.history: {
-			clearHistory();
-			break;
-		}
-
-		default:
-			assertUnreachable(fromList);
-	}
+	if (fromList === playlistList.favorites) clearFavorites();
+	else if (fromList === playlistList.history) clearHistory();
 }

@@ -61,7 +61,8 @@ export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 
 useSearcher.subscribe(
 	(state) => state.highlight,
-	function searchForMedias(highlight): void {
+	// Search for medias:
+	(highlight): void => {
 		if (highlight.length < 2) return;
 
 		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
@@ -100,9 +101,10 @@ const setDefaultSearch = () => setSearcher(defaultSearcher);
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const searchInputSelector = (
-	state: ReturnType<typeof useSearcher.getState>,
-) => ({ searchTerm: state.searchTerm, isInputOnFocus: state.isInputOnFocus });
+const searchInputSelector = ({
+	isInputOnFocus,
+	searchTerm,
+}: ReturnType<typeof useSearcher.getState>) => ({ searchTerm, isInputOnFocus });
 
 export function Input() {
 	const { searchTerm, isInputOnFocus } = useSearcher(searchInputSelector);
@@ -115,8 +117,8 @@ export function Input() {
 		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent): void {
 			if (
 				e.key === "Escape" &&
-				getSearcher().isInputOnFocus === true &&
-				isAModifierKeyPressed(e) === false
+				getSearcher().isInputOnFocus &&
+				!isAModifierKeyPressed(e)
 			) {
 				setSearcher(defaultSearcher);
 				inputRef.current?.blur();
@@ -269,22 +271,22 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 /////////////////////////////////////////
 // Types:
 
-type Searcher = Readonly<{
+type Searcher = {
 	searchStatus: ValuesOf<typeof searchStatus>;
 	results: readonly [Path, Media][];
 	isInputOnFocus: boolean;
 	searchTerm: string;
 	highlight: string;
-}>;
+};
 
 /////////////////////////////////////////
 
-type MediaSearchRowProps = Readonly<{
+type MediaSearchRowProps = {
 	highlight: string;
 	media: Media;
 	path: Path;
-}>;
+};
 
 /////////////////////////////////////////
 
-type InputChange = Readonly<React.ChangeEvent<HTMLInputElement>>;
+type InputChange = React.ChangeEvent<HTMLInputElement>;

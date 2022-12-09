@@ -12,30 +12,29 @@ const { searchForLyricsAndImage } = electron.lyric;
 
 /////////////////////////////////////////
 
-export function Lyrics({ media, path }: Props) {
-	return (
-		<div className="relative w-full h-full">
-			<Header media={media} path={path} displayTitle />
+export const Lyrics = ({ media, path }: Props) => (
+	<div className="relative w-full h-full">
+		<Header media={media} path={path} displayTitle />
 
-			<div className="relative w-full h-full mt-8 scroll scroll-1 scroll-white overflow-x-hidden">
-				{/* whiteSpace: "pre-line", // break on new line!
+		<div className="relative w-full h-full mt-8 scroll scroll-1 scroll-white overflow-x-hidden">
+			{/* whiteSpace: "pre-line", // break on new line!
 						wordWrap: "break-word" */}
-				<p className="relative mb-24 whitespace-pre-line font-primary tracking-wide leading-6 text-left text-white font-medium">
-					{media?.lyrics}
-				</p>
-			</div>
+			<p className="relative mb-24 whitespace-pre-line font-primary tracking-wide leading-6 text-left text-white font-medium">
+				{media?.lyrics}
+			</p>
 		</div>
-	);
-}
+	</div>
+);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Helper functions:
 
-export function flipMediaPlayerCard(): void {
-	document.getElementById(mediaPlayerCardId)?.classList.toggle("active");
-}
+export const flipMediaPlayerCard = (): void =>
+	document
+		.getElementById(mediaPlayerCardId)
+		?.classList.toggle("active") as void;
 
 /////////////////////////////////////////
 
@@ -87,4 +86,4 @@ export async function searchAndOpenLyrics(
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ media: Media | undefined; path: Path }>;
+type Props = { media: Media | undefined; path: Path };

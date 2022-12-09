@@ -35,9 +35,9 @@ export const PopoverContent = forwardRef(function PopoverContent(
 	return (
 		<Content
 			className={`popover ${size}`}
+			ref={forwardedRef}
 			sideOffset={10}
 			{...props}
-			ref={forwardedRef}
 		/>
 	);
 });

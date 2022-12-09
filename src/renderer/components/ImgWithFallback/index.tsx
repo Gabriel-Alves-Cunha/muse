@@ -33,7 +33,7 @@ export function ImgWithFallback({
 
 	const cacheStatus = cache.get(mediaPath);
 
-	if (cacheStatus === undefined) {
+	if (!cacheStatus) {
 		cache.set(mediaPath, PENDING);
 
 		let img: HTMLImageElement | null = new Image();

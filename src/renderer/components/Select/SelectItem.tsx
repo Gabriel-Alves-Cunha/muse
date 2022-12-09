@@ -15,8 +15,8 @@ export const SelectItem = forwardRef(
 		return (
 			<Item
 				className={`select-item ${className}`}
-				{...props}
 				ref={forwardedRef}
+				{...props}
 			>
 				<ItemText>{title}</ItemText>
 

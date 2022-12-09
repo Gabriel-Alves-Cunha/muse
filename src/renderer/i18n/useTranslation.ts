@@ -3,7 +3,21 @@ import type { OneOf } from "@common/@types/utils";
 
 import create from "zustand";
 
-export const makeUseTranslation = <TranslationData extends TranslationData_>(
+/**
+ * @param translations
+ * ```ts
+ * const translations = {
+ * 	"en-US": { ... },
+ * 	"pt-BR": { ... },
+ * 	// ...
+ * };
+ * ```
+ * @param locale
+ * ```ts
+ * const locale = "en-US";
+ * ```
+ */
+export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 	translations: TranslationData,
 	locale: OneOf<TranslationData>,
 ) =>
@@ -18,55 +32,51 @@ export const makeUseTranslation = <TranslationData extends TranslationData_>(
 			key: DotNestedKeys<TranslationData[typeof locale]>,
 			args: TranslationArguments = {},
 		) => {
-			const parts = (key as string).split(".");
-			const lastPart = parts.at(-1) as string;
-			const root = parts
+			const startObject = get().translations[get().locale];
+			const keys = (key as string).split(".");
+			const lastPart = keys.at(-1) as string;
+			const targetObject = keys
 				.slice(0, -1)
 				.reduce(
-					(root, part) => root?.[part] as TranslationData,
-					get().translations,
+					(object, key) => object?.[key] as RecursiveObject,
+					startObject as RecursiveObject,
 				);
 
-			if (typeof root !== "object")
+			console.log({ targetObject, lastPart, keys });
+
+			if (typeof targetObject !== "object")
 				throw new Error(`Missing translation: "${key}"!`);
 
-			const translation = root[lastPart];
+			const translation = targetObject[lastPart];
 
 			if (typeof translation !== "string")
 				throw new Error(`Missing translation: "${key}"!`);
 
 			// Replace placeholders like `{{count}}` with values from `args`
 			const processed = Object.entries(args).reduce(
-				(v, [name, value]) =>
-					v.replace(
+				(prev, [name, value]) =>
+					prev.replace(
 						new RegExp(`{{\\s*${name}\\s*}}`, "g"),
 						get().formatArgument(value),
 					),
 				translation,
 			);
 
+			console.log({ processed });
+
 			return processed;
 		},
 	}));
 
-/**
- * Like:
- * ```ts
- * const translations = {
- * 	"en-US": { ... },
- * 	"pt-BR": { ... },
- * }
- * ```
- */
-interface TranslationData_ {
-	readonly [key: string]: string | TranslationData_;
-}
+type RecursiveObject = {
+	[key: string]: RecursiveObject | string;
+};
 
 type TranslationArguments = {
 	[name: string]: string | number;
 };
 
-type UseTranslation<TranslationData extends TranslationData_> = {
+type UseTranslation<TranslationData extends RecursiveObject> = {
 	formatArgument: (value: string | number) => string;
 	locale: OneOf<TranslationData>;
 	translations: TranslationData;

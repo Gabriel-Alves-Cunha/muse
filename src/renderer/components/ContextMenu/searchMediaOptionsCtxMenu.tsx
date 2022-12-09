@@ -4,11 +4,11 @@ import { Dialog, Trigger } from "@radix-ui/react-dialog";
 
 import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
+import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "@components/SearchMedia/helper";
 import { getMainList } from "@contexts/usePlaylists";
-import { setSettings } from "@contexts/settings";
 import { openLyrics } from "@components/MediaPlayer/Header";
 import { Item } from "./Item";
 import {
@@ -71,8 +71,7 @@ export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => {
 /////////////////////////////////////////////
 // Helper functions:
 
-export const shareMedias = () =>
-	setSettings({ filesToShare: getAllSelectedMedias() });
+export const shareMedias = () => setFilesToShare(getAllSelectedMedias());
 
 /////////////////////////////////////////////
 

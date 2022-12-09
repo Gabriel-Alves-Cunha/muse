@@ -19,8 +19,8 @@ export function GroupedButton(buttons: Buttons) {
 /////////////////////////////////////////////
 // Types:
 
-type Buttons = Readonly<{
+type Buttons = {
 	reload?: boolean;
 	sortBy?: boolean;
 	clean?: boolean;
-}>;
+};

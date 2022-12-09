@@ -74,7 +74,7 @@ function selectOrPlayMedia(
 ): void {
 	if (e.button !== leftClick || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
-		const list = isHome === true ? homeList : fromList;
+		const list = isHome ? homeList : fromList;
 
 		return playThisMedia(mediaPath, list);
 	}

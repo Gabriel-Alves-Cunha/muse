@@ -28,7 +28,7 @@ export const FlipCard = ({ cardFront, cardBack }: Props) => (
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{
+type Props = {
 	cardFront: React.ReactNode;
 	cardBack: React.ReactNode;
-}>;
+};

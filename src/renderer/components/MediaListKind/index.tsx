@@ -72,7 +72,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	// when the user is at the home page, the homeList is used
 	// then, cause it will have what the user has last set as the main list:
 	// either sortedByDate or sortedByName, in our current case.
-	const listName = isHome === true ? homeList : fromList;
+	const listName = isHome ? homeList : fromList;
 	const { [listName]: list } = usePlaylists();
 
 	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
@@ -95,7 +95,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 							(path) => {
 								const media = mainList.get(path);
 
-								if (media === undefined)
+								if (!media)
 									throw new Error(
 										`Tried to access inexistent media with path = "${path}"`,
 									);

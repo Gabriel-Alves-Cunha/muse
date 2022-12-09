@@ -4,7 +4,6 @@ import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { contentOfSelectEnum, Select } from "@components/Select";
-import { assertUnreachable } from "@utils/utils";
 import { useTranslation } from "@i18n";
 import { playlistList } from "@common/enums";
 import { setFromList } from "@components/MediaListKind/helper";
@@ -22,18 +21,7 @@ export function SortBy() {
 		// Default value:
 		let homeList: ValuesOf<typeof playlistList> = playlistList.mainList;
 
-		switch (selectedList) {
-			case "Name":
-				break;
-
-			case "Date": {
-				homeList = playlistList.sortedByDate;
-				break;
-			}
-
-			default:
-				assertUnreachable(selectedList);
-		}
+		if (selectedList === "Date") homeList = playlistList.sortedByDate;
 
 		setFromList({ homeList });
 	}, [selectedList]);

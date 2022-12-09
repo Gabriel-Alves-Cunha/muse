@@ -11,3 +11,10 @@ export type DotNestedKeys<T> = (
 ) extends infer D
 	? Extract<D, string>
 	: never;
+
+export type Recursion<T> = keyof {
+	[Property in
+		keyof T as T[Property] extends string | number | boolean | null
+			? Property
+			: `${string & Property}.${string & Recursion<T[Property]>}`]: true;
+};

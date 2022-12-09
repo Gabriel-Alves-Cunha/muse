@@ -123,7 +123,7 @@ const ConvertBox = ({
 
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
-	path: Readonly<Path>,
+	path: Path,
 ): MessagePort {
 	const convertingList = getConvertingList();
 
@@ -180,9 +180,7 @@ export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function cancelConversionAndOrRemoveItFromList(
-	path: Readonly<string>,
-): void {
+export function cancelConversionAndOrRemoveItFromList(path: string): void {
 	const convertingList = getConvertingList();
 
 	const mediaBeingConverted = convertingList.get(path);
@@ -221,7 +219,7 @@ function handleUpdateConvertingList(
 
 	// Assert that the download exists:
 	const thisConversion = convertingList.get(path);
-	if (thisConversion === undefined)
+	if (!thisConversion)
 		return error(
 			"Received a message from Electron but the path is not in the list!",
 		);
