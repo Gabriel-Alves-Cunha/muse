@@ -4,7 +4,7 @@
 import { type UserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
 import { resolve } from "node:path";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig(({ mode }) => {
 	const isDevelopment = mode === "development";
