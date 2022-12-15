@@ -11,7 +11,7 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export function Home() {
+export default function Home() {
 	const { t } = useTranslation();
 
 	useTitle(t("titles.home"));

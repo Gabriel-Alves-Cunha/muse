@@ -14,7 +14,7 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export function Download() {
+export default function Download() {
 	const { t } = useTranslation();
 
 	useTitle(t("titles.download"));
@@ -43,12 +43,12 @@ const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
 const errorAndUrlSelectors = ({
 	error,
 	url,
-}: ReturnType<typeof useSearchInfo.getState>) => ({ error, url });
+}: ReturnType<typeof useSearchInfo.getState>) => [error, url] as const;
 
 ////////////////////////////////////////////////
 
 function SearcherWrapper() {
-	const { error, url } = useSearchInfo(errorAndUrlSelectors);
+	const [error, url] = useSearchInfo(errorAndUrlSelectors);
 	const { t } = useTranslation();
 
 	useEffect(() => {

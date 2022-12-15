@@ -1,20 +1,21 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { ID, Media } from "@common/@types/generalTypes";
 
 import { reactToElectronMessage } from "@common/enums";
 import { mediaPlayerCardId } from "@components/FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
+import { error, warn } from "@utils/log";
 import { infoToast } from "@components/toasts";
+import { getMedia } from "@contexts/usePlaylists";
 import { Header } from "./Header";
-import { error } from "@utils/log";
 
 const { searchForLyricsAndImage } = electron.lyric;
 
 /////////////////////////////////////////
 
-export const Lyrics = ({ media, path }: Props) => (
+export const Lyrics = ({ media, id }: Props) => (
 	<div className="relative w-full h-full">
-		<Header media={media} path={path} displayTitle />
+		<Header media={media} id={id} displayTitle />
 
 		<div className="relative w-full h-full mt-8 scroll scroll-1 scroll-white overflow-x-hidden">
 			{/* whiteSpace: "pre-line", // break on new line!
@@ -38,12 +39,15 @@ export const flipMediaPlayerCard = (): void =>
 
 /////////////////////////////////////////
 
-export async function searchAndOpenLyrics(
-	media: Media | undefined,
-	mediaPath: Path,
+export const searchAndOpenLyrics = async (
+	mediaID: ID,
 	openLyrics: boolean,
-): Promise<void> {
-	if (!media) return;
+): Promise<void> => {
+	if (!mediaID) return warn(`No mediaID provided. Received "${mediaID}"!`);
+
+	const media = getMedia(mediaID);
+
+	if (!media) return warn(`No media with id = "${mediaID}" found!`);
 
 	const { t } = useTranslation();
 
@@ -69,7 +73,7 @@ export async function searchAndOpenLyrics(
 				{ whatToChange: "imageURL", newValue: image },
 				{ whatToChange: "lyrics", newValue: lyric },
 			],
-			mediaPath,
+			mediaPath: media.path,
 		});
 	} catch (err) {
 		if ((err as Error).message.includes("No lyrics found"))
@@ -79,11 +83,11 @@ export async function searchAndOpenLyrics(
 	}
 
 	if (media.lyrics && openLyrics) return flipMediaPlayerCard();
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
 
-type Props = { media: Media | undefined; path: Path };
+type Props = { media: Media | undefined; id: ID };

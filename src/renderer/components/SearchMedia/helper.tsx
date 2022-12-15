@@ -4,9 +4,9 @@ import type { ValuesOf } from "@common/@types/utils";
 import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { PopoverContent, PopoverRoot } from "@components/Popover";
+import { useEffect, useRef, useState } from "react";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { subscribeWithSelector } from "zustand/middleware";
-import { useEffect, useRef } from "react";
 import create from "zustand";
 
 import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
@@ -41,13 +41,12 @@ const { FOUND_SOMETHING, NOTHING_FOUND, DOING_NOTHING, SEARCHING } =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const defaultSearcher: Searcher = Object.freeze({
+const defaultSearcher: Searcher = {
 	searchStatus: DOING_NOTHING,
 	searchTerm: emptyString,
 	highlight: emptyString,
-	isInputOnFocus: false,
 	results: emptyArray,
-});
+};
 
 const useSearcher = create<Searcher>()(
 	subscribeWithSelector((_set, _get, _api) => defaultSearcher),
@@ -62,8 +61,9 @@ export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 useSearcher.subscribe(
 	(state) => state.highlight,
 	// Search for medias:
-	(highlight): void => {
-		if (highlight.length < 2) return;
+	(highlight) => {
+		if (highlight.length < 2)
+			return setSearcher({ results: emptyArray, searchStatus: DOING_NOTHING });
 
 		setSearcher({ results: emptyArray, searchStatus: SEARCHING });
 
@@ -88,13 +88,6 @@ const setSearchTerm = (e: InputChange) =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const setIsInputOnFocus = (bool: boolean) =>
-	setSearcher({ isInputOnFocus: bool });
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
 const setDefaultSearch = () => setSearcher(defaultSearcher);
 
 /////////////////////////////////////////
@@ -102,34 +95,30 @@ const setDefaultSearch = () => setSearcher(defaultSearcher);
 /////////////////////////////////////////
 
 const searchInputSelector = ({
-	isInputOnFocus,
 	searchTerm,
-}: ReturnType<typeof useSearcher.getState>) => ({ searchTerm, isInputOnFocus });
+}: ReturnType<typeof useSearcher.getState>) => searchTerm;
 
 export function Input() {
-	const { searchTerm, isInputOnFocus } = useSearcher(searchInputSelector);
+	const [isInputOnFocus, setIsInputOnFocus] = useState(false);
+	const searchTerm = useSearcher(searchInputSelector);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { t } = useTranslation();
 
 	/////////////////////////////////////////
 
 	useEffect(() => {
-		function closeSearchMediaPopoverOnEsc(e: KeyboardEvent): void {
-			if (
-				e.key === "Escape" &&
-				getSearcher().isInputOnFocus &&
-				!isAModifierKeyPressed(e)
-			) {
+		const closeSearchMediaPopoverOnEsc = (e: KeyboardEvent): void => {
+			if (e.key === "Escape" && isInputOnFocus && !isAModifierKeyPressed(e)) {
 				setSearcher(defaultSearcher);
 				inputRef.current?.blur();
 			}
-		}
+		};
 
 		document.addEventListener("keyup", closeSearchMediaPopoverOnEsc);
 
 		return () =>
 			document.removeEventListener("keyup", closeSearchMediaPopoverOnEsc);
-	}, []);
+	}, [isInputOnFocus]);
 
 	/////////////////////////////////////////
 
@@ -200,6 +189,7 @@ export function Results() {
 					className="transition-none"
 				>
 					{nothingFound ? (
+						// TODO: Wrap break workd
 						<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
 							Nothing was found for &quot;{searchTerm}&quot;
 						</div>
@@ -216,7 +206,7 @@ export function Results() {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
+const MediaSearchRow = ({ media, highlight, path }: MediaSearchRowProps) => {
 	const { t } = useTranslation();
 
 	const index = unDiacritic(media.title).indexOf(highlight);
@@ -234,7 +224,7 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 					<ImgWithFallback
 						Fallback={<MusicNote size={13} />}
 						mediaImg={media.image}
-						mediaPath={path}
+						mediaID={path}
 					/>
 				</div>
 
@@ -242,6 +232,7 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 				<div className="flex flex-col items-start justify-center flex-1 m-1 overflow-hidden">
 					<p className="pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium">
 						{media.title.slice(0, index)}
+
 						<span className="bg-highlight text-white">
 							{media.title.slice(index, index + highlight.length)}
 						</span>
@@ -264,7 +255,7 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 			</Dialog>
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -274,7 +265,6 @@ function MediaSearchRow({ media, highlight, path }: MediaSearchRowProps) {
 type Searcher = {
 	searchStatus: ValuesOf<typeof searchStatus>;
 	results: readonly [Path, Media][];
-	isInputOnFocus: boolean;
 	searchTerm: string;
 	highlight: string;
 };

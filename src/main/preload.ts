@@ -147,8 +147,8 @@ window.addEventListener(
 					break;
 				}
 
-				electronPort.onmessage = async ({ data }: { data: CreateDownload }) =>
-					await createOrCancelDownload({ ...data, electronPort });
+				electronPort.onmessage = ({ data }: { data: CreateDownload }) =>
+					createOrCancelDownload({ ...data, electronPort });
 
 				electronPort.addEventListener("close", logThatPortIsClosing);
 
@@ -191,7 +191,7 @@ window.addEventListener(
 					msg,
 				});
 
-				await writeTags(mediaPath, data);
+				writeTags(mediaPath, data);
 				break;
 			}
 

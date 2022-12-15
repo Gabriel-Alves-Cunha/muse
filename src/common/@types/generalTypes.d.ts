@@ -12,6 +12,7 @@ export type Media = DeepReadonly<{
 	album: string;
 	title: string;
 	size: number;
+	path: Path;
 }>;
 
 export type DownloadInfo = Readonly<{
@@ -22,7 +23,6 @@ export type DownloadInfo = Readonly<{
 	url: string;
 }>;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type ImageURL = typeof eraseImg | Base64 | (string & {});
 
 export type Base64 = `data:${string};base64,${string}`;
@@ -34,3 +34,5 @@ export type Page = typeof pages[number];
 export type DateAsNumber = number;
 
 export type Path = string;
+
+export type ID = string;

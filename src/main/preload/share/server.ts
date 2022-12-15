@@ -31,6 +31,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 	/////////////////////////////////////////////
 
 	app.context["filepaths"] = filepaths;
+	app.context["exampleSet"] = new Set(["test"]);
 
 	log({ ctx: app.context });
 
@@ -49,7 +50,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 
 	/////////////////////////////////////////////
 
-	const clientServerAPI: ClientServerAPI = Object.freeze({
+	const clientServerAPI: ClientServerAPI = {
 		addListener(event: string, listener: (...args: unknown[]) => void) {
 			server.addListener(event, listener);
 		},
@@ -57,7 +58,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 			server.close();
 		},
 		url,
-	});
+	};
 
 	return clientServerAPI;
 }

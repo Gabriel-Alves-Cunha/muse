@@ -40,7 +40,7 @@ export const electronIpcMainProcessNotification = {
 /////////////////////////////////////////////
 
 export const playlistList = {
-	mainList: "sortedByNameAndMainList",
+	mainList: "sortedByTitleAndMainList",
 	sortedByDate: "sortedByDate",
 	favorites: "favorites",
 	history: "history",

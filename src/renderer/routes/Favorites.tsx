@@ -15,7 +15,7 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export function Favorites() {
+export default function Favorites() {
 	const { t } = useTranslation();
 
 	useTitle(t("titles.favorites"));

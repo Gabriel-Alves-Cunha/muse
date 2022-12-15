@@ -7,11 +7,10 @@ import { Content, Close } from "@radix-ui/react-dialog";
 import { toCanvas } from "qrcode";
 import { Dialog } from "@radix-ui/react-dialog";
 
-import { isAModifierKeyPressed } from "@utils/keyboard";
 import { setFilesToShare, useFilesToShare } from "@contexts/filesToShare";
+import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useTranslation } from "@i18n";
 import { error, assert } from "@utils/log";
-import { setSettings } from "@contexts/settings";
 import { BlurOverlay } from "./BlurOverlay";
 import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
@@ -43,24 +42,25 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	const onCanvasElementMakeQRCode = useCallback(
-		async (canvas: HTMLCanvasElement | null) => {
-			if (!(canvas && isDialogOpen && server)) return;
-
-			await makeQrcode(server.url).catch((err) => {
-				error("Error making QR Code.", err);
-				closePopover(server.close);
-			});
+		(canvas: HTMLCanvasElement | null) => {
+			if (canvas && isDialogOpen && server)
+				makeQrcode(server.url)
+					.then()
+					.catch((err) => {
+						error("Error making QR Code.", err);
+						closePopover(server.close);
+					});
 		},
 		[isDialogOpen, server],
 	);
 
 	/////////////////////////////////////////
 
-	function handleDialogOpenStates(newValue: boolean): void {
+	const handleDialogOpenStates = (newValue: boolean): void => {
 		if (!newValue) server?.close();
 
 		setIsDialogOpen(newValue);
-	}
+	};
 
 	/////////////////////////////////////////
 
@@ -75,10 +75,10 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	useEffect(() => {
-		function closeShareDialogOnEsc(e: KeyboardEvent) {
+		const closeShareDialogOnEsc = (e: KeyboardEvent) => {
 			if (e.key === "Escape" && isDialogOpen && !isAModifierKeyPressed(e))
 				closePopover(server?.close);
-		}
+		};
 
 		document.addEventListener("keyup", closeShareDialogOnEsc);
 
@@ -87,8 +87,9 @@ export function ShareDialog() {
 
 	/////////////////////////////////////////
 
-	useEffect(
-		function createNewServer() {
+	useEffect(() =>
+		// Create new server:
+		{
 			const shouldDialogOpen = filesToShare.size > 0;
 
 			setIsDialogOpen(shouldDialogOpen);
@@ -103,9 +104,7 @@ export function ShareDialog() {
 				error(err);
 				closePopover();
 			}
-		},
-		[filesToShare],
-	);
+		}, [filesToShare]);
 
 	/////////////////////////////////////////
 
@@ -151,11 +150,11 @@ export function ShareDialog() {
 /////////////////////////////////////////
 // Helper functions:
 
-function closePopover(closeServerFunction?: () => void): void {
+const closePopover = (closeServerFunction?: () => void): void => {
 	closeServerFunction?.();
 
 	setFilesToShare(emptySet);
-}
+};
 
 /////////////////////////////////////////
 
@@ -171,7 +170,7 @@ const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
 
 /////////////////////////////////////////
 
-async function makeQrcode(url: QRCodeURL): Promise<void> {
+const makeQrcode = async (url: QRCodeURL): Promise<void> => {
 	dbg(`Making QR Code for "${url}"`);
 
 	const canvasElement = document.getElementById(qrID) as HTMLCanvasElement;
@@ -179,4 +178,4 @@ async function makeQrcode(url: QRCodeURL): Promise<void> {
 	assert(canvasElement, "There is no canvas element!");
 
 	await toCanvas(canvasElement, url, { errorCorrectionLevel: "H", width: 300 });
-}
+};

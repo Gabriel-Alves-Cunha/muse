@@ -30,7 +30,7 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 				: value,
 		t: (
 			key: DotNestedKeys<TranslationData[typeof locale]>,
-			args: TranslationArguments = {},
+			// args: TranslationArguments = {},
 		) => {
 			const startObject = get().translations[get().locale];
 			const keys = (key as string).split(".");
@@ -42,8 +42,6 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 					startObject as RecursiveObject,
 				);
 
-			console.log({ targetObject, lastPart, keys });
-
 			if (typeof targetObject !== "object")
 				throw new Error(`Missing translation: "${key}"!`);
 
@@ -52,19 +50,19 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 			if (typeof translation !== "string")
 				throw new Error(`Missing translation: "${key}"!`);
 
-			// Replace placeholders like `{{count}}` with values from `args`
-			const processed = Object.entries(args).reduce(
-				(prev, [name, value]) =>
-					prev.replace(
-						new RegExp(`{{\\s*${name}\\s*}}`, "g"),
-						get().formatArgument(value),
-					),
-				translation,
-			);
+			// 			// Replace placeholders like `{{count}}` with values from `args`
+			// 			const processed = Object.entries(args).reduce(
+			// 				(prev, [name, value]) =>
+			// 					prev.replace(
+			// 						new RegExp(`{{\\s*${name}\\s*}}`, "g"),
+			// 						get().formatArgument(value),
+			// 					),
+			// 				translation,
+			// 			);
+			//
+			// 			return processed;
 
-			console.log({ processed });
-
-			return processed;
+			return translation;
 		},
 	}));
 

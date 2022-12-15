@@ -5,7 +5,6 @@
 * ADD: detect (avail port to share)
 * ADD: electron setProgressBar
 * FIX: gh-actions is always overwriting latest release!!
-* DEV: refactor to get data from form on mediaListKind -> MediaOptions.
 
 ################## NOTES ##################
 

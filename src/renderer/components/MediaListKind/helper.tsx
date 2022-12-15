@@ -1,5 +1,10 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
+import type {
+	DateAsNumber,
+	Media,
+	Path,
+	ID,
+} from "@common/@types/generalTypes";
 
 import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
@@ -44,15 +49,15 @@ const useIsCtxMenuOpen = create(() => ({ isCtxMenuOpen: false }));
 
 export const isCtxMenuOpen = () => useIsCtxMenuOpen.getState().isCtxMenuOpen;
 
-export const setIsCtxMenuOpen = (bool: boolean) =>
-	useIsCtxMenuOpen.setState({ isCtxMenuOpen: bool });
+export const setIsCtxMenuOpen = (isCtxMenuOpen: boolean) =>
+	useIsCtxMenuOpen.setState({ isCtxMenuOpen });
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function selectMediaByPointerEvent(
+export const selectMediaByPointerEvent = (
 	e: React.PointerEvent<HTMLSpanElement>,
-): void {
+): void => {
 	// TODO: see if this selector still works.
 	const mediaClickedMediaPath = (e.nativeEvent.target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
@@ -61,17 +66,17 @@ export function selectMediaByPointerEvent(
 	if (!mediaClickedMediaPath) return log("No 'data-path' found!");
 
 	addToAllSelectedMedias(mediaClickedMediaPath);
-}
+};
 
 /////////////////////////////////////////
 
 export const rightClick = 2;
 export const leftClick = 0;
 
-function selectOrPlayMedia(
+const selectOrPlayMedia = (
 	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
-): void {
+): void => {
 	if (e.button !== leftClick || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome ? homeList : fromList;
@@ -80,33 +85,33 @@ function selectOrPlayMedia(
 	}
 
 	toggleSelectedMedia(mediaPath);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
 const Row = memo(
-	({ media, path }: RowProps) => {
+	function Row({ media, id }: RowProps) {
 		const { t } = useTranslation();
 
 		return (
 			<div
-				className={`${getAllSelectedMedias().has(path) ? "selected " : ""}${
-					getCurrentPlaying().path === path ? "playing " : ""
-				}row-wrapper`}
-				data-path={path}
+				className={`${getAllSelectedMedias().has(id) ? "selected " : ""}${
+					getCurrentPlaying().id === id ? "playing" : ""
+				} row-wrapper`}
+				data-id={id}
 			>
 				<button
 					className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
-					onPointerUp={(e) => selectOrPlayMedia(e, path)}
+					onPointerUp={(e) => selectOrPlayMedia(e, id)}
 					title={t("tooltips.playThisMedia")}
 				>
 					<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
 						<ImgWithFallback
 							Fallback={<MusicNote size="1.4rem" />}
 							mediaImg={media.image}
-							mediaPath={path}
+							mediaID={id}
 						/>
 					</div>
 
@@ -132,18 +137,14 @@ const Row = memo(
 						{/* backdropFilter: blur(2px); */}
 						<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
 
-						<MediaOptionsModal media={media} path={path} />
+						<MediaOptionsModal media={media} path={id} />
 					</DialogPortal>
 				</Dialog>
 			</div>
 		);
 	},
-	(prev, next) =>
-		prev.media.title === next.media.title &&
-		prev.media.artist === next.media.artist &&
-		prev.media.duration === next.media.duration,
+	(prev, next) => prev.id === next.id,
 );
-Row.displayName = "Row";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -151,22 +152,22 @@ Row.displayName = "Row";
 
 export const computeItemKey = (
 	_index: number,
-	[path]: [Path, Media, DateAsNumber],
-): Path => path;
+	[id]: [ID, Media, DateAsNumber],
+): ID => id;
 
 /////////////////////////////////////////
 
 export const computeHistoryItemKey = (
 	_index: number,
-	[path, , date]: [Path, Media, DateAsNumber],
-): `${Path}•${DateAsNumber}` => `${path}•${date}`;
+	[id, , date]: [ID, Media, DateAsNumber],
+): `${ID}•${DateAsNumber}` => `${id}•${date}`;
 
 /////////////////////////////////////////
 
 export const itemContent = (
 	_index: number,
-	[path, media]: [Path, Media, DateAsNumber],
-) => <Row media={media} path={path} />;
+	[id, media]: [ID, Media, DateAsNumber],
+) => <Row media={media} id={id} />;
 
 /////////////////////////////////////////
 
@@ -178,7 +179,7 @@ export const reloadWindow = (): void =>
 /////////////////////////////////////////////
 // Types:
 
-type RowProps = { media: Media; path: Path };
+type RowProps = { media: Media; id: ID };
 
 /////////////////////////////////////////////
 

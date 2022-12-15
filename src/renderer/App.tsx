@@ -1,4 +1,5 @@
 import { ToastContainer } from "react-toastify";
+import { lazy } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
@@ -7,13 +8,8 @@ import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { ShareDialog } from "@components/ShareDialog";
-import { Favorites } from "@routes/Favorites";
-import { Download } from "@routes/Download";
-import { History } from "@routes/History";
 import { usePage } from "@contexts/page";
-import { Convert } from "@routes/Convert";
 import { Navbar } from "@components/Navbar";
-import { Home } from "@routes/Home";
 
 import "react-toastify/dist/ReactToastify.min.css";
 
@@ -58,17 +54,19 @@ export function App() {
 //////////////////////////////////////////
 
 const pages = {
-	Favorites: <Favorites />,
-	Download: <Download />,
-	Convert: <Convert />,
-	History: <History />,
-	Home: <Home />,
+	Favorites: lazy(() => import("./routes/Favorites")),
+	Download: lazy(() => import("./routes/Download")),
+	Convert: lazy(() => import("./routes/Convert")),
+	History: lazy(() => import("./routes/History")),
+	Home: lazy(() => import("./routes/Home")),
 } as const;
 
 function PageToShow() {
 	const { page } = usePage();
 
-	return pages[page];
+	const Page = pages[page];
+
+	return <Page />;
 }
 
 //////////////////////////////////////////

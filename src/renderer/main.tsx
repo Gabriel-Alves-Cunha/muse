@@ -7,9 +7,6 @@ import { App } from "./App";
 if (isDev) {
 	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
 
-	// @ts-ignore => Setting Virtuoso log level
-	// globalThis.VIRTUOSO_LOG_LEVEL = LogLevel.DEBUG;
-
 	// document.designMode = "on";
 }
 

@@ -1,7 +1,8 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { ID, Media } from "@common/@types/generalTypes";
 
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 import { useEffect, useRef } from "react";
+import { randomUUID } from "crypto";
 import create from "zustand";
 
 import { FlipCard, mediaPlayerCardId } from "@components/FlipCard";
@@ -9,7 +10,6 @@ import { refreshMedia, usePlaylists } from "@contexts/usePlaylists";
 import { ControlsAndSeeker } from "./Controls";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { formatDuration } from "@common/utils";
-import { emptyString } from "@common/empty";
 import { log, error } from "@utils/log";
 import { Header } from "./Header";
 import { Lyrics } from "./Lyrics";
@@ -34,13 +34,13 @@ const { setState: setProgress } = useProgress;
 
 ///////////////////////////////////////
 
-const pathSelector = (state: ReturnType<typeof useCurrentPlaying.getState>) =>
-	state.path;
+const idSelector = (state: ReturnType<typeof useCurrentPlaying.getState>) =>
+	state.id;
 
 ///////////////////////////////////////
 
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByNameAndMainList;
+	state.sortedByTitleAndMainList;
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -50,19 +50,10 @@ const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 export function MediaPlayer() {
 	const mainList = usePlaylists(mainListSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
-	const path = useCurrentPlaying(pathSelector);
+	const id = useCurrentPlaying(idSelector);
 	const isSeekingRef = useRef(false);
 
-	const media = mainList.get(path);
-
-	function handleProgress(audio: HTMLAudioElement): void {
-		const { duration, currentTime } = audio;
-
-		setProgress({ currentTime });
-
-		if (!isSeekingRef.current)
-			setProgress({ percentage: (currentTime / duration) * 100 });
-	}
+	const media = mainList.get(id);
 
 	useEffect(() => {
 		// Flip media player card to normal player:
@@ -75,9 +66,10 @@ export function MediaPlayer() {
 		const audio = audioRef.current;
 		if (!(audio && media)) return;
 
-		const lambdaHandleLoadedData = () => handleLoadedData(audio, path, media);
+		const lambdaHandleProgress = () =>
+			handleProgress(audio, isSeekingRef.current);
+		const lambdaHandleLoadedData = () => handleLoadedData(audio, id, media);
 		const lambdaHandleAudioCanPlay = () => handleAudioCanPlay(audio);
-		const lambdaHandleProgress = () => handleProgress(audio);
 		const lambdaHandleEnded = () => handleEnded(audio);
 
 		// Adding event listeners:
@@ -112,20 +104,20 @@ export function MediaPlayer() {
 				logSecurityPolicyViolation,
 			);
 		};
-	}, [media, path]);
+	}, [media, id]);
 
 	return (
 		<aside className="aside">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
-				cardBack={<Lyrics media={media} path={path} />}
+				cardBack={<Lyrics media={media} id={id} />}
 				cardFront={
 					<Player
 						isSeeking={isSeekingRef}
 						audio={audioRef.current}
 						media={media}
-						path={path}
+						id={id}
 					/>
 				}
 			/>
@@ -138,15 +130,15 @@ export function MediaPlayer() {
 /////////////////////////////////////////
 // Helper functions:
 
-const Player = ({ media, audio, path, isSeeking }: PlayerProps) => (
+const Player = ({ media, audio, id, isSeeking }: PlayerProps) => (
 	<>
-		<Header media={media} path={path} />
+		<Header media={media} id={id} />
 
 		<div className="aspect-square rounded-2xl flex items-center justify-center w-full shadow-reflect mt-[25%]">
 			<ImgWithFallback
 				Fallback={<MusicNote size={30} />}
 				mediaImg={media?.image}
-				mediaPath={path}
+				mediaID={id}
 			/>
 		</div>
 
@@ -186,25 +178,28 @@ const logStalled = (e: Event): void =>
 
 /////////////////////////////////////////
 
-function handleLoadedData(
+const handleLoadedData = (
 	audio: HTMLAudioElement,
-	path: Path,
+	oldID: ID,
 	media: Media,
-): void {
+): void => {
 	const formatedDuration = formatDuration(audio.duration);
 
 	// Updating the duration of media:
-	if (formatedDuration !== media.duration)
-		refreshMedia(path, emptyString, { ...media, duration: formatedDuration });
+	if (formatedDuration !== media.duration) {
+		const newID = randomUUID();
+
+		refreshMedia(oldID, newID, { ...media, duration: formatedDuration });
+	}
 
 	// Maybe set audio.currentTime to last stopped time:
 	const lastTime = getCurrentPlaying().currentTime;
 	if (lastTime > 30 /* seconds */) audio.currentTime = lastTime;
-}
+};
 
 /////////////////////////////////////////
 
-function handleEnded(audio: HTMLAudioElement): void {
+const handleEnded = (audio: HTMLAudioElement): void => {
 	dbg(
 		`Audio ended, playing ${
 			audio.loop ? "again because it's on loop." : "next media."
@@ -212,14 +207,25 @@ function handleEnded(audio: HTMLAudioElement): void {
 	);
 
 	if (!audio.loop) playNextMedia();
-}
+};
 
 /////////////////////////////////////////
 
-function handleAudioCanPlay(audio: HTMLAudioElement): void {
+const handleAudioCanPlay = (audio: HTMLAudioElement): void => {
 	dbg("Audio can play.");
 	audio.play().then();
-}
+};
+
+/////////////////////////////////////////
+
+const handleProgress = (audio: HTMLAudioElement, isSeeking: boolean): void => {
+	const { duration, currentTime } = audio;
+
+	// If is seeking, set just the currentTime:
+	isSeeking
+		? setProgress({ currentTime })
+		: setProgress({ percentage: (currentTime / duration) * 100, currentTime });
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -230,9 +236,9 @@ type Progress = Readonly<{ currentTime: number; percentage: number }>;
 
 /////////////////////////////////////////
 
-type PlayerProps = Readonly<{
+type PlayerProps = {
 	isSeeking: React.MutableRefObject<boolean>;
 	audio: HTMLAudioElement | null;
 	media: Media | undefined;
-	path: Path;
-}>;
+	id: ID;
+};

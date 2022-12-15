@@ -1,12 +1,17 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
+import type {
+	DateAsNumber,
+	Media,
+	Path,
+	ID,
+} from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getRandomInt, time } from "@utils/utils";
-import { warn, error, info } from "@utils/log";
+import { warn, error, info, log } from "@utils/log";
 import { getPlayOptions } from "./usePlayOptions";
 import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
@@ -16,6 +21,7 @@ import {
 	addToHistory,
 	getPlaylist,
 	getMainList,
+	getMedia,
 	History,
 } from "./usePlaylists";
 
@@ -26,7 +32,7 @@ import {
 
 export const defaultCurrentPlaying: CurrentPlaying = {
 	listType: playlistList.mainList,
-	path: emptyString,
+	id: emptyString,
 	currentTime: 0,
 };
 
@@ -49,9 +55,9 @@ export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
 // Helper functions:
 
 export const playThisMedia = (
-	path: Path,
+	id: ID,
 	listType: ValuesOf<typeof playlistList> = playlistList.mainList,
-): void => setCurrentPlaying({ path, currentTime: 0, listType });
+): void => setCurrentPlaying({ id, currentTime: 0, listType });
 
 ////////////////////////////////////////////////
 
@@ -86,23 +92,23 @@ export function pause(audio?: HTMLAudioElement): void {
 function sortHistoryByDate() {
 	const unsortedList: [Path, DateAsNumber][] = [];
 
-	for (const [path, dates] of getPlaylist(playlistList.history) as History)
-		for (const date of dates) unsortedList.push([path, date]);
+	for (const [id, dates] of getPlaylist(playlistList.history) as History)
+		for (const date of dates) unsortedList.push([id, date]);
 
 	const mainList = getMainList();
 
-	const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
+	const listAsArrayOfMap: [ID, Media, DateAsNumber][] = unsortedList
 		.sort((a, b) => b[1] - a[1]) // sorted by date
-		.map(([path, date]) => [path, mainList.get(path)!, date]);
+		.map(([id, date]) => [id, mainList.get(id)!, date]);
 
 	return listAsArrayOfMap;
 }
 
 export function playPreviousMedia(): void {
 	time(() => {
-		const { path, listType } = getCurrentPlaying();
+		const { id, listType } = getCurrentPlaying();
 
-		if (!path)
+		if (!id)
 			return warn(
 				"A media needs to be currently selected to play a previous media!",
 			);
@@ -131,9 +137,9 @@ export function playPreviousMedia(): void {
 
 export function playNextMedia(): void {
 	time(() => {
-		const { path, listType } = getCurrentPlaying();
+		const { id, listType } = getCurrentPlaying();
 
-		if (!path)
+		if (!id)
 			return info(
 				"A media needs to be currently selected to play a next media!",
 			);
@@ -143,45 +149,51 @@ export function playNextMedia(): void {
 			listType === playlistList.history ? playlistList.mainList : listType;
 
 		// Get the correct list:
-		const list = getPlaylist(correctListType) as Set<string> | MainList;
+		const list = getPlaylist(correctListType) as ReadonlySet<ID> | MainList;
 
-		let nextMediaPath = emptyString;
+		let nextMediaID = emptyString;
+		const ids = list.keys();
 
-		if (getPlayOptions().random) {
+		if (getPlayOptions().isRandom) {
 			const randomIndex = getRandomInt(0, list.size);
-
 			let index = 0;
-			for (const newPath of list.keys()) {
+
+			for (const newID of ids) {
 				if (index === randomIndex) {
-					nextMediaPath = newPath;
+					nextMediaID = newID;
 					break;
 				}
+
 				++index;
 			}
 		} else {
 			let found = false;
 
-			for (const newPath of list.keys()) {
+			for (const newID of ids) {
 				if (found) {
-					nextMediaPath = newPath;
+					nextMediaID = newID;
 					break;
 				}
 
-				if (newPath === path) found = true;
+				if (newID === id) found = true;
 			}
 
 			// In case the currently playing is the last media, get the first:
-			if (!nextMediaPath) nextMediaPath = getFirstKey(list) as Path;
+			if (!nextMediaID) nextMediaID = getFirstKey(list) as ID;
 		}
 
-		if (!nextMediaPath)
+		if (!nextMediaID)
 			return warn("There should be a nextMediaPath, but there isn't!", {
 				currentPlaying: getCurrentPlaying(),
-				nextMediaPath,
+				nextMediaID,
 				list,
 			});
 
-		setCurrentPlaying({ path: nextMediaPath, currentTime: 0 });
+		setCurrentPlaying({
+			listType: correctListType,
+			id: nextMediaID,
+			currentTime: 0,
+		});
 	}, "playNextMedia");
 }
 
@@ -200,14 +212,14 @@ navigator?.mediaSession?.setActionHandler?.("play", () => play());
 ////////////////////////////////////////////////
 
 useCurrentPlaying.subscribe(
-	(state) => state.path,
+	(state) => state.id,
 	// Update history and set audio source:
-	(newPath, prevPath) => {
-		if (!newPath) return;
+	(newID, prevID) => {
+		if (!newID) return;
 
-		addToHistory(newPath);
+		addToHistory(newID);
 
-		setAudioSource(newPath, prevPath);
+		setAudioSource(newID, prevID);
 	},
 );
 
@@ -218,21 +230,21 @@ useCurrentPlaying.subscribe(
 // we don't load the media until the timeout ends.
 let prevTimerToSetMedia: NodeJS.Timeout | undefined;
 
-function setAudioSource(path: Path, prevPath: Path) {
+function setAudioSource(newID: ID, prevID: ID) {
 	clearTimeout(prevTimerToSetMedia);
 
-	const mediaPathSuitableForElectron = `atom:///${path}`;
+	const media = getMedia(newID);
+	if (!media) return;
+
+	const mediaPathSuitableForElectron = `atom:///${media.path}`;
 
 	const timerToSetMedia = setTimeout(() => {
 		(document.getElementById("audio") as HTMLAudioElement).src =
 			mediaPathSuitableForElectron;
 
-		changeMediaSessionMetadata(path);
+		changeMediaSessionMetadata(media);
 
-		time(
-			() => handleDecorateMediaRow(path, prevPath),
-			"handleDecorateMediaRow",
-		);
+		time(() => handleDecorateMediaRow(newID, prevID), "handleDecorateMediaRow");
 	}, 150);
 
 	prevTimerToSetMedia = timerToSetMedia;
@@ -246,17 +258,17 @@ const playingClass = "playing";
  * Decorate the rows of current playing medias
  * and undecorate previous playing ones.
  */
-function handleDecorateMediaRow(path: Path, previousPath: Path) {
-	const prevElements = previousPath
-		? document.querySelectorAll(`[data-path="${previousPath}"]`)
+function handleDecorateMediaRow(newID: ID, prevID: ID) {
+	const prevElements = prevID
+		? document.querySelectorAll(`[data-id="${prevID}"]`)
 		: null;
-	const newElements = document.querySelectorAll(`[data-path="${path}"]`);
+	const newElements = document.querySelectorAll(`[data-id="${newID}"]`);
 
-	if (!prevElements) info(`No previous media row found for "${previousPath}!"`);
-	if (!newElements) return info(`No media row found for "${path}"!`);
+	if (!prevElements) info(`No previous media row found for "${prevID}!"`);
+	if (!newElements) return info(`No media row found for "${newID}"!`);
 
 	// Undecorate previous playing media row:
-	if (previousPath && prevElements)
+	if (prevID && prevElements)
 		for (const element of prevElements) element.classList.remove(playingClass);
 
 	// Decorate new playing media row:
@@ -265,12 +277,8 @@ function handleDecorateMediaRow(path: Path, previousPath: Path) {
 
 ////////////////////////////////////////////////
 
-function changeMediaSessionMetadata(path: Path): void {
+function changeMediaSessionMetadata(media: Media): void {
 	if (!navigator?.mediaSession) return;
-
-	const media = getMainList().get(path);
-
-	if (!media) return;
 
 	navigator.mediaSession.metadata = new MediaMetadata({
 		artwork: [{ src: media.image }],
@@ -288,5 +296,5 @@ function changeMediaSessionMetadata(path: Path): void {
 export type CurrentPlaying = {
 	listType: ValuesOf<typeof playlistList>;
 	currentTime: number;
-	path: Path;
+	id: ID;
 };

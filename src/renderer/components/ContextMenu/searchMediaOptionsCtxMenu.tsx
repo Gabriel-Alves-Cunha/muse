@@ -8,7 +8,6 @@ import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "@components/SearchMedia/helper";
-import { getMainList } from "@contexts/usePlaylists";
 import { openLyrics } from "@components/MediaPlayer/Header";
 import { Item } from "./Item";
 import {
@@ -75,23 +74,18 @@ export const shareMedias = () => setFilesToShare(getAllSelectedMedias());
 
 /////////////////////////////////////////////
 
-function selectAllMediasOnSearchResult(): void {
+const selectAllMediasOnSearchResult = (): void => {
 	const paths = getSearcher().results.map(([path]) => path);
 
 	setAllSelectedMedias(new Set(paths));
-}
+};
 
 /////////////////////////////////////////////
 
-export async function searchForLyrics(): Promise<void> {
-	const allMedias = getMainList();
-
-	for (const path of getAllSelectedMedias()) {
-		const media = allMedias.get(path);
-
-		await searchAndOpenLyrics(media, path, !openLyrics);
-	}
-}
+export const searchForLyrics = (): void => {
+	for (const id of getAllSelectedMedias())
+		searchAndOpenLyrics(id, !openLyrics).then();
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

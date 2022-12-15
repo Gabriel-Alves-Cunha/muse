@@ -6,7 +6,7 @@ import { homedir } from "node:os";
 // This path has to be like this because of the bundling
 // process. This way it handles both cases: dev and prod.
 export const logoPath = isDev
-	? resolve("src", "renderer", "assets", "icons", "logo.png")
+	? resolve("src", "renderer", "assets", "logo.png")
 	: resolve("muse.png");
 
 /////////////////////////////////////////

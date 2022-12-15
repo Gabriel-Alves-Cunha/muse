@@ -1,5 +1,5 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
-import type { AllowedMedias } from "@common/utils";
+import { AllowedMedias, throwErr } from "@common/utils";
 import type { MediaUrl } from "@contexts/downloadList";
 import type { Readable } from "node:stream";
 
@@ -11,7 +11,6 @@ import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
@@ -22,25 +21,7 @@ import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Schemas For Arguments Verification
-
-const checkArgsToCreateDownload = validator.compile<CreateDownload>({
-	// All Required. Not empty.
-	electronPort: "object",
-	extension: "string",
-	imageURL: "string",
-	title: "string",
-	url: "string",
-	// $$strict: true, // No additional properties allowed.
-});
-
-/////////////////////////////////////////////
-
-const checkForURL = validator.compile({ url: { type: "url" } });
+import { time } from "@utils/utils";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -55,12 +36,26 @@ const currentDownloads: Map<MediaUrl, Readable> = new Map();
 // Entry function:
 
 export function createOrCancelDownload(args: CreateDownload): void {
-	checkOrThrow(checkForURL(args));
+	if (!args.url) throwErr(`A url is required. Received: "${args.url}".`);
 
 	if (!currentDownloads.has(args.url)) {
-		checkOrThrow(checkArgsToCreateDownload(args));
+		if (!args.electronPort)
+			throwErr(
+				`'electronPort' is required. Received: \`${args.electronPort}\`.`,
+			);
 
-		createDownload(args).then();
+		if (!args.extension)
+			throwErr(`'toExtension' is required. Received: "${args.extension}".`);
+
+		if (!args.imageURL)
+			throwErr(`An imageURL is required. Received: "${args.imageURL}".`);
+
+		if (!args.title)
+			throwErr(`A title is required. Received: "${args.title}".`);
+
+		if (!args.url) throwErr(`A url is required. Received: "${args.url}".`);
+
+		createDownload(args as Required<CreateDownload>).then();
 	} else if (args.destroy) currentDownloads.get(args.url)!.emit("destroy");
 }
 
@@ -77,7 +72,7 @@ export async function createDownload(
 		imageURL,
 		title,
 		url,
-	}: CreateDownload,
+	}: Required<CreateDownload>,
 ): Promise<void> {
 	dbg(`Attempting to create a stream for "${title}" to download.`);
 
@@ -97,10 +92,10 @@ export async function createDownload(
 			status: progressStatus.FAILED,
 			error: err,
 		};
-		electronPort!.postMessage(msg);
+		electronPort.postMessage(msg);
 
 		// Don't forget to throw away the MessagePort (clean up):
-		electronPort!.close();
+		electronPort.close();
 
 		return;
 	}
@@ -130,7 +125,7 @@ export async function createDownload(
 			if (!interval) {
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
-					() => electronPort!.postMessage({ percentage: percentageToSend }),
+					() => electronPort.postMessage({ percentage: percentageToSend }),
 					500,
 				);
 
@@ -143,7 +138,7 @@ export async function createDownload(
 				const msg: Partial<MediaBeingDownloaded> = {
 					status: progressStatus.ACTIVE,
 				};
-				electronPort!.postMessage(msg);
+				electronPort.postMessage(msg);
 			}
 
 			// Log progress to node console if in development:
@@ -182,12 +177,12 @@ export async function createDownload(
 			const msg: Partial<MediaBeingDownloaded> = {
 				status: progressStatus.CANCEL,
 			};
-			electronPort!.postMessage(msg);
+			electronPort.postMessage(msg);
 
 			// Clean up:
 			currentDownloads.delete(url);
 			clearInterval(interval);
-			electronPort!.close();
+			electronPort.close();
 
 			dbg(
 				"Download was destroyed. Deleting stream from currentDownloads:",
@@ -208,16 +203,20 @@ export async function createDownload(
 			const msg: Partial<MediaBeingDownloaded> = {
 				status: progressStatus.SUCCESS,
 			};
-			electronPort!.postMessage(msg);
+			electronPort.postMessage(msg);
 
 			// Download media image and put it on the media metadata:
-			await writeTags(saveSite, {
-				albumArtists: [artist],
-				imageURL: imageURL!,
-				downloadImg: true,
-				isNewMedia: true,
-				title: title!,
-			}).catch(error);
+			time(
+				() =>
+					writeTags(saveSite, {
+						albumArtists: [artist],
+						imageURL: imageURL,
+						downloadImg: true,
+						isNewMedia: true,
+						title: title,
+					}),
+				"writeTags",
+			);
 
 			// Tell client to add a new media...
 			sendMsgToClient({
@@ -228,7 +227,7 @@ export async function createDownload(
 			// Clean up:
 			currentDownloads.delete(url);
 			clearInterval(interval);
-			electronPort!.close();
+			electronPort.close();
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
@@ -274,7 +273,7 @@ export async function createDownload(
 /////////////////////////////////////////////
 // Types:
 
-export type CreateDownload = Readonly<{
+export type CreateDownload = {
 	electronPort?: MessagePort;
 	extension?: AllowedMedias;
 	imageURL?: string;
@@ -282,4 +281,4 @@ export type CreateDownload = Readonly<{
 	artist?: string;
 	title?: string;
 	url: string;
-}>;
+};

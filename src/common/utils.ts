@@ -107,4 +107,10 @@ type Color = readonly [color: string, backgroundColor: string];
 
 /////////////////////////////////////////
 
+export const throwErr = (msg: string): never => {
+	throw new Error(msg);
+};
+
+/////////////////////////////////////////
+
 export const eraseImg = "eraseImg";

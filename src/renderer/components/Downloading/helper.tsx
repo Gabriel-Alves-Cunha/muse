@@ -242,9 +242,7 @@ function handleUpdateDownloadingList(
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function cancelDownloadAndOrRemoveItFromList(
-	url: Readonly<string>,
-): void {
+export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 	const downloadingList = getDownloadingList();
 
 	// Assert that the download exists:

@@ -10,16 +10,6 @@ import {
 } from "@radix-ui/react-select";
 
 import { SelectOrderOptions } from "./SelectOrderOptions";
-import { assertUnreachable } from "@utils/utils";
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Enums:
-
-export const contentOfSelectEnum = {
-	GROUPED_BUTTON_SORT_BY: 2,
-} as const;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -60,20 +50,23 @@ export const Select = ({
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
+// Enums:
+
+export const contentOfSelectEnum = {
+	GROUPED_BUTTON_SORT_BY: 2,
+} as const;
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 // Helper function:
 
-function contentToShow(content: ValuesOf<typeof contentOfSelectEnum>) {
-	switch (content) {
-		// case FULL_EXAMPLE:
-		// 	return <FullExampleSelectButton />;
+const contentToShow = (content: ValuesOf<typeof contentOfSelectEnum>) => {
+	if (content === contentOfSelectEnum.GROUPED_BUTTON_SORT_BY)
+		return <SelectOrderOptions />;
 
-		case contentOfSelectEnum.GROUPED_BUTTON_SORT_BY:
-			return <SelectOrderOptions />;
-
-		default:
-			return assertUnreachable(content);
-	}
-}
+	return undefined;
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

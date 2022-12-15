@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import type { ImageURL, Base64, Path } from "@common/@types/generalTypes";
 import type { Mutable } from "@common/@types/utils";
 import type { Tags } from "@common/@types/electron-window";
 
-import { readFile, rename } from "node:fs/promises";
+import { existsSync, renameSync } from "node:fs";
 import { error, assert } from "node:console";
 import { dirname, join } from "node:path";
-import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { get } from "node:https";
 import {
 	File as MediaFile,
@@ -18,25 +16,12 @@ import {
 import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
-import { checkOrThrow, validator } from "@common/args-validator";
 import { electronToReactMessage } from "@common/enums";
+import { eraseImg, throwErr } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { isBase64Image } from "@main/utils";
 import { emptyString } from "@common/empty";
-import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Schemas For Arguments Verification
-
-const checkForMediaPath = validator.compile({
-	messages: { string: "Please check mediaPath!" },
-	type: "string",
-	$$root: true,
-	min: 10,
-});
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -48,7 +33,7 @@ async function handleImageMetadata(
 	downloadImg = false,
 	imageURL: ImageURL = emptyString,
 ): Promise<void> {
-	if (downloadImg === true) {
+	if (downloadImg) {
 		try {
 			dbg("Downloading picture...");
 
@@ -102,9 +87,7 @@ async function handleImageMetadata(
 
 /////////////////////////////////////////////
 
-export const downloadThumbnail = async (
-	url: Readonly<string>,
-): Promise<Picture[]> =>
+export const downloadThumbnail = async (url: string): Promise<Picture[]> =>
 	new Promise((resolve, reject) =>
 		get(url, async (res) => {
 			const byteVector = await ByteVector.fromStream(res);
@@ -189,14 +172,14 @@ function handleTitle(
 
 /////////////////////////////////////////////
 
-async function talkToClientSoItCanGetTheNewMedia(
+function talkToClientSoItCanGetTheNewMedia(
 	newPathOfFile: string,
 	mediaPath: string,
 	isNewMedia = false,
-): Promise<void> {
+): void {
 	if (newPathOfFile)
 		try {
-			await rename(mediaPath, newPathOfFile);
+			renameSync(mediaPath, newPathOfFile);
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
@@ -247,7 +230,7 @@ async function talkToClientSoItCanGetTheNewMedia(
 /////////////////////////////////////////////
 // Main function:
 
-export async function writeTags(
+export function writeTags(
 	mediaPath: Path,
 	{
 		albumArtists,
@@ -259,15 +242,16 @@ export async function writeTags(
 		album,
 		title,
 	}: WriteTagsData,
-): Promise<void> {
+): void {
 	// dbgTests("Writing tags to file:", { mediaPath, data });
-	checkOrThrow(checkForMediaPath(mediaPath));
+	if (!mediaPath)
+		throwErr(`A media path is required. Received: "${mediaPath}".`);
 
 	const file = MediaFile.createFromPath(mediaPath);
 
 	// Handle the tags:
 	if (imageURL || downloadImg) {
-		await handleImageMetadata(file, downloadImg, imageURL);
+		handleImageMetadata(file, downloadImg, imageURL).then();
 
 		assert(
 			file.tag.pictures.length === 1,
@@ -284,7 +268,7 @@ export async function writeTags(
 		else if (typeof albumArtists === "string")
 			file.tag.albumArtists = [albumArtists];
 
-	if (genres !== undefined) file.tag.genres = genres as Mutable<string[]>;
+	if (genres) file.tag.genres = genres as Mutable<string[]>;
 
 	if (album !== undefined) file.tag.album = album;
 
@@ -298,12 +282,10 @@ export async function writeTags(
 	file.dispose();
 	//
 
-	await talkToClientSoItCanGetTheNewMedia(newFilePath, mediaPath, isNewMedia);
+	talkToClientSoItCanGetTheNewMedia(newFilePath, mediaPath, isNewMedia);
 }
 
-type WriteTagsData = Readonly<
-	Tags & {
-		downloadImg?: boolean;
-		isNewMedia?: boolean;
-	}
->;
+type WriteTagsData = Tags & {
+	downloadImg?: boolean;
+	isNewMedia?: boolean;
+};

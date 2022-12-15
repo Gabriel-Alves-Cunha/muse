@@ -101,19 +101,19 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			const newMediaInArray: readonly [Path, Media][] =
 				await transformPathsToMedias(
-					[mediaPath],
+					mediaPath,
 					assureMediaSizeIsGreaterThan60KB,
 					ignoreMediaWithLessThan60Seconds,
 				);
 
-			const newMedia = newMediaInArray[0]?.[1];
+			const newMedia = newMediaInArray[0];
 
 			if (!newMedia) {
 				error(`Could not transform "${mediaPath}" to a media.`);
 				break;
 			}
 
-			addToMainList(mediaPath, newMedia);
+			addToMainList(newMedia[0], newMedia[1]);
 			break;
 		}
 

@@ -38,7 +38,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
 		const data = Object.freeze({ albumArtists: [makeRandomString()] });
 
-		await writeTags(anotherMediaPath, data);
+		writeTags(anotherMediaPath, data);
 
 		const file = MediaFile.createFromPath(anotherMediaPath);
 		expect(file.tag.albumArtists).toStrictEqual(data.albumArtists);
@@ -53,7 +53,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 			// Delete it so that git doesn't trigger a file change:
 			const data = Object.freeze({ albumArtists: [] });
 
-			await writeTags(anotherMediaPath, data);
+			writeTags(anotherMediaPath, data);
 
 			const file = MediaFile.createFromPath(anotherMediaPath);
 			expect(file.tag.albumArtists.length).toBe(0);

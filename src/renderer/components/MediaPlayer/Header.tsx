@@ -1,4 +1,4 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { ID, Media } from "@common/@types/generalTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
 import { BsJournal as NoLyrics } from "react-icons/bs";
@@ -20,25 +20,25 @@ import { useTranslation } from "@i18n";
 
 export const openLyrics = true;
 
-function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
+const LoadOrToggleLyrics = ({ lyrics, id }: LoadOrToggleLyricsProps) => {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
 	const { t } = useTranslation();
 
-	async function loadAndOrToggleLyrics(): Promise<void> {
-		if (media?.lyrics) return flipMediaPlayerCard();
+	const loadAndOrToggleLyrics = async (): Promise<void> => {
+		if (lyrics) return flipMediaPlayerCard();
 
 		setIsLoadingLyrics(true);
-		await searchAndOpenLyrics(media, path, openLyrics);
+		await searchAndOpenLyrics(id, openLyrics);
 		setIsLoadingLyrics(false);
-	}
+	};
 
 	return (
 		<CircleIconButton
 			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
-			disabled={!media}
+			disabled={!id}
 		>
-			{media?.lyrics ? (
+			{lyrics ? (
 				<LyricsPresent size={16} />
 			) : isLoadingLyrics ? (
 				<RingLoader className="absolute text-white w-8 h-8" />
@@ -47,7 +47,7 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 			)}
 		</CircleIconButton>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -56,24 +56,24 @@ function LoadOrToggleLyrics({ media, path }: LoadOrToggleLyricsProps) {
 const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.favorites;
 
-export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
+export const Header = ({ media, id, displayTitle = false }: HeaderProps) => {
 	const favorites = usePlaylists(favoritesSelector);
 	const { t } = useTranslation();
 
-	const isFavorite = favorites.has(path);
+	const isFavorite = favorites.has(id);
 
 	return (
 		<div className="flex justify-between items-center">
-			<LoadOrToggleLyrics media={media} path={path} />
+			<LoadOrToggleLyrics lyrics={media?.lyrics} id={id} />
 
 			<div className="w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium">
 				{displayTitle ? media?.title : media?.album}
 			</div>
 
 			<CircleIconButton
-				onPointerUp={() => toggleFavoriteMedia(path)}
+				onPointerUp={() => toggleFavoriteMedia(id)}
 				title={t("tooltips.toggleFavorite")}
-				disabled={!media}
+				disabled={!id}
 			>
 				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
 			</CircleIconButton>
@@ -89,11 +89,11 @@ export const Header = ({ media, path, displayTitle = false }: HeaderProps) => {
 type HeaderProps = {
 	media: Media | undefined;
 	displayTitle?: boolean;
-	path: Path;
+	id: ID;
 };
 /////////////////////////////////////////
 
 type LoadOrToggleLyricsProps = {
-	media: Media | undefined;
-	path: Path;
+	lyrics: string | undefined;
+	id: ID;
 };

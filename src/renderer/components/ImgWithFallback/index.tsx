@@ -1,9 +1,10 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { ID } from "@common/@types/generalTypes";
 
 import { reactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 import { ValuesOf } from "@common/@types/utils";
+import { getMedia } from "@contexts/usePlaylists";
 import { error } from "@utils/log";
 
 /////////////////////////////////////////////
@@ -17,7 +18,7 @@ const { FAILURE, PENDING, SUCCESS } = status;
 
 /////////////////////////////////////////////
 
-const cache: Map<Path, ValuesOf<typeof status>> = new Map();
+const cache: Map<ID, ValuesOf<typeof status>> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -25,28 +26,28 @@ const cache: Map<Path, ValuesOf<typeof status>> = new Map();
 // Main function:
 
 export function ImgWithFallback({
-	mediaPath,
+	mediaID,
 	Fallback,
 	mediaImg,
 }: Props): JSX.Element {
 	if (!mediaImg?.length) return Fallback;
 
-	const cacheStatus = cache.get(mediaPath);
+	const cacheStatus = cache.get(mediaID);
 
 	if (!cacheStatus) {
-		cache.set(mediaPath, PENDING);
+		cache.set(mediaID, PENDING);
 
 		let img: HTMLImageElement | null = new Image();
 
 		img.onload = () => {
-			cache.set(mediaPath, SUCCESS);
+			cache.set(mediaID, SUCCESS);
 
 			img = null;
 		};
 
 		img.onerror = (ev) => {
 			error("Failed image; going to erasing it...", {
-				mediaPath,
+				mediaID,
 				mediaImg,
 				ev,
 			});
@@ -54,17 +55,17 @@ export function ImgWithFallback({
 			sendMsgToBackend({
 				thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
 				type: reactToElectronMessage.WRITE_TAG,
-				mediaPath,
+				mediaPath: getMedia(mediaID)!.path,
 			});
 
-			cache.set(mediaPath, FAILURE);
+			cache.set(mediaID, FAILURE);
 
 			img = null;
 		};
 
 		img.src = mediaImg;
 
-		return cache.get(mediaPath) === SUCCESS ? (
+		return cache.get(mediaID) === SUCCESS ? (
 			<img
 				className="object-cover h-11 rounded-xl before:hidden"
 				decoding="async"
@@ -96,5 +97,5 @@ export function ImgWithFallback({
 type Props = {
 	mediaImg: string | undefined;
 	Fallback: JSX.Element;
-	mediaPath: Path;
+	mediaID: ID;
 };

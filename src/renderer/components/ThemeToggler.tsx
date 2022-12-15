@@ -19,17 +19,17 @@ export const availableThemes = ["light", "dark"] as const;
 /////////////////////////////////////////
 // Main function:
 
-export function ThemeToggler() {
+export const ThemeToggler = () => {
 	const [theme, setTheme] = useState(htmlDataset.theme as Theme);
 	const { t } = useTranslation();
 
 	const newTheme =
 		theme === availableThemes[0] ? availableThemes[1] : availableThemes[0];
 
-	function toggleTheme() {
+	const toggleTheme = () => {
 		htmlDataset.theme = newTheme;
 		setTheme(newTheme);
-	}
+	};
 
 	return (
 		<button
@@ -44,7 +44,7 @@ export function ThemeToggler() {
 			)}
 		</button>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

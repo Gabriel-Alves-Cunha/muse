@@ -15,7 +15,7 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export function History() {
+export default function History() {
 	const { t } = useTranslation();
 
 	useTitle(t("titles.history"));

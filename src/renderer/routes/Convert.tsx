@@ -19,7 +19,7 @@ import {
 ////////////////////////////////////////////////
 // Main function:
 
-export function Convert() {
+export default function Convert() {
 	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -29,9 +29,9 @@ export function Convert() {
 
 	////////////////////////////////////////////////
 
-	function handleSelectedFiles({
+	const handleSelectedFiles = ({
 		target: { files },
-	}: ChangeEvent<HTMLInputElement>) {
+	}: ChangeEvent<HTMLInputElement>) => {
 		if (!files?.length) return;
 
 		const map: Map<Path, ConvertInfo> = new Map();
@@ -39,7 +39,7 @@ export function Convert() {
 		for (const file of files) map.set(file.webkitRelativePath, { toExtension });
 
 		setSelectedFiles(map);
-	}
+	};
 
 	////////////////////////////////////////////////
 
@@ -59,29 +59,27 @@ export function Convert() {
 	}, [toExtension, selectedFiles]);
 
 	////////////////////////////////////////////////
-
+	//TODO: remove div
 	return (
-		<MainArea>
-			<div className="flex justify-center items-center ">
-				<Button
-					onPointerUp={openNativeUI_ChooseFiles}
-					className="no-transition"
-					variant="circle"
-				>
-					<ConvertIcon size={18} />
+		<MainArea className="flex justify-center items-center">
+			<Button
+				onPointerUp={openNativeUI_ChooseFiles}
+				className="no-transition"
+				variant="circle"
+			>
+				<ConvertIcon size={18} />
 
-					<input
-						onChange={handleSelectedFiles}
-						accept="video/*,audio/*"
-						className="hidden"
-						ref={inputRef}
-						type="file"
-						multiple
-					/>
+				<input
+					onChange={handleSelectedFiles}
+					accept="video/*,audio/*"
+					className="hidden"
+					ref={inputRef}
+					type="file"
+					multiple
+				/>
 
-					{t("buttons.convert")}
-				</Button>
-			</div>
+				{t("buttons.convert")}
+			</Button>
 		</MainArea>
 	);
 }

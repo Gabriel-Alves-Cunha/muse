@@ -9,7 +9,7 @@ import { useProgress } from ".";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
+export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 
@@ -48,7 +48,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 			timerTooltip.style.left = `${left}px`;
 		}
 
-		function seek({ offsetX }: PointerEvent): void {
+		const seek = ({ offsetX }: PointerEvent): void => {
 			if (!(audio && isFinite(audio.duration))) return;
 
 			const desiredTime =
@@ -56,7 +56,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
 
 			useProgress.setState({ percentage });
-		}
+		};
 
 		timeline.addEventListener("pointermove", setTimerTooltip);
 
@@ -113,7 +113,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 			</div>
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

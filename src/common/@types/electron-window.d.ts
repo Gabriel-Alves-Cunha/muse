@@ -1,4 +1,4 @@
-import type { DownloadInfo, Media, Path } from "./generalTypes";
+import type { DownloadInfo, ID, Media, Path } from "./generalTypes";
 import type { DeepReadonly, ValuesOf } from "./utils";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { ClientServerAPI } from "@main/preload/share";
@@ -40,10 +40,10 @@ export type VisibleElectron = DeepReadonly<{
 	media: {
 		getBasicInfo(url: string): Promise<videoInfo>;
 		transformPathsToMedias(
-			paths: readonly Path[],
+			path: Path | undefined,
 			assureMediaSizeIsGreaterThan60KB?: boolean,
 			ignoreMediaWithLessThan60Seconds?: boolean,
-		): Promise<readonly [Path, Media][]>;
+		): Promise<[ID, Media][]>;
 	};
 	share: { createServer(filepaths: readonly Path[]): ClientServerAPI };
 	lyric: {

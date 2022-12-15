@@ -8,7 +8,10 @@ import { setPlayOptionsOnLocalStorage } from "./localStorageHelpers";
 // Main:
 
 export const usePlayOptions = create<PlayOptions>()(
-	setPlayOptionsOnLocalStorage(() => ({ random: false, loop: false })),
+	setPlayOptionsOnLocalStorage(() => ({
+		loopThisMedia: false,
+		isRandom: false,
+	})),
 );
 
 export const { getState: getPlayOptions, setState: setPlayOptions } =
@@ -19,22 +22,22 @@ export const { getState: getPlayOptions, setState: setPlayOptions } =
 ////////////////////////////////////////////////
 // Helper functions:
 
-export function toggleLoopMedia(): void {
-	const loop = !getPlayOptions().loop;
+export const toggleLoopMedia = (): void => {
+	const loopThisMedia = !getPlayOptions().loopThisMedia;
 
-	(document.getElementById("audio") as HTMLAudioElement).loop = loop;
+	(document.getElementById("audio") as HTMLAudioElement).loop = loopThisMedia;
 
-	setPlayOptions({ loop });
-}
+	setPlayOptions({ loopThisMedia });
+};
 
 ////////////////////////////////////////////////
 
 export const toggleRandom = () =>
-	setPlayOptions({ random: !getPlayOptions().random });
+	setPlayOptions({ isRandom: !getPlayOptions().isRandom });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type PlayOptions = { random: boolean; loop: boolean };
+export type PlayOptions = { isRandom: boolean; loopThisMedia: boolean };

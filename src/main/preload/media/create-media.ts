@@ -1,10 +1,12 @@
-import type { Base64, Media, Path } from "@common/@types/generalTypes";
+import type { Base64, ID, Media, Path } from "@common/@types/generalTypes";
 
 import { error, groupEnd, groupCollapsed } from "node:console";
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
+import { randomUUID } from "node:crypto";
 import { statSync } from "node:fs";
 
 import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
+import { getAllowedMedias, searchDirectoryResult } from "../file";
 import { emptyString } from "@common/empty";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
@@ -18,12 +20,12 @@ const randomColor = randomBackgroundColorForConsole();
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-async function createMedia(
+const createMedia = async (
 	path: Path,
 	assureMediaSizeIsGreaterThan60KB: boolean,
 	ignoreMediaWithLessThan60Seconds: boolean,
-): Promise<readonly [Path, Media]> {
-	return new Promise((resolve, reject) => {
+): Promise<[Path, Media]> =>
+	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
 		time(() => {
@@ -83,50 +85,65 @@ async function createMedia(
 				genres,
 				title,
 				album,
+				path,
 			};
 
 			dbg(`%c${basename}`, randomColor(), { media, picture, mimeType, error });
 
-			resolve([path, media]);
+			resolve([randomUUID(), media]);
 		}, `createMedia('${basename}')`);
 	});
-}
 
-export async function transformPathsToMedias(
-	paths: readonly Path[],
+export const transformPathsToMedias = (
+	path: Path | undefined,
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
-): Promise<readonly [Path, Media][]> {
-	return time(async () => {
+): Promise<[Path, Media][]> =>
+	time(async () => {
 		groupCollapsed("Creating medias...");
 
-		const promises: Promise<void | readonly [Path, Media]>[] = [];
+		const medias: [ID, Media][] = [];
 
-		for (const path of paths)
-			promises.push(
-				createMedia(
-					path,
-					assureMediaSizeIsGreaterThan60KB,
-					ignoreMediaWithLessThan60Seconds,
-				).catch((e) =>
-					error(
-						`There was a possible error creating media of path: "${path}".\n\n`,
-						e,
-					),
+		if (path) {
+			const media = await createMedia(
+				path,
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			).catch((e) =>
+				error(
+					`There was a possible error creating media of path: "${path}".\n\n`,
+					e,
 				),
 			);
 
-		// Run promises in parallel:
-		const fulfilledPromises = await Promise.allSettled(promises);
+			if (media) medias.push(media);
+		} else {
+			const promises: Promise<void | readonly [Path, Media]>[] = [];
+			const paths = getAllowedMedias(await searchDirectoryResult());
 
-		const medias: [Path, Media][] = [];
+			for (const path of paths)
+				promises.push(
+					createMedia(
+						path,
+						assureMediaSizeIsGreaterThan60KB,
+						ignoreMediaWithLessThan60Seconds,
+					).catch((e) =>
+						error(
+							`There was a possible error creating media of path: "${path}".\n\n`,
+							e,
+						),
+					),
+				);
 
-		for (const fulfilled of fulfilledPromises)
-			fulfilled.status === "fulfilled" &&
-				medias.push(fulfilled.value as [Path, Media]);
+			// Run promises in parallel:
+			const fulfilledPromises = await Promise.allSettled(promises);
+
+			for (const fulfilled of fulfilledPromises)
+				fulfilled.status === "fulfilled" &&
+					medias.push(fulfilled.value as [ID, Media]);
+		}
 
 		groupEnd();
 
 		return medias;
 	}, "transformPathsToMedias");
-}

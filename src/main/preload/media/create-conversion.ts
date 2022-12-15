@@ -7,9 +7,8 @@ import { dirname, join } from "node:path";
 import { log, error } from "node:console";
 import sanitize from "sanitize-filename";
 
-import { checkOrThrow, validator } from "@common/args-validator";
+import { type AllowedMedias, throwErr } from "@common/utils";
 import { electronToReactMessage } from "@common/enums";
-import { type AllowedMedias } from "@common/utils";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { progressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
@@ -17,23 +16,6 @@ import { getBasename } from "@common/path";
 import { deleteFile } from "../file";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Schemas For Arguments Verification
-
-const checkArgsToConvertToAudio = validator.compile<CreateConversion>({
-	// All Required. Not empty.
-	electronPort: "object",
-	toExtension: "string",
-	path: "string",
-	// $$strict: true, // No additional properties allowed.
-});
-
-/////////////////////////////////////////////
-
-const checkForPath = validator.compile({ path: "string" });
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -47,12 +29,20 @@ const mediasConverting: Map<Path, Readable> = new Map();
 /////////////////////////////////////////////
 
 export function createOrCancelConvert(args: CreateConversion): void {
-	checkOrThrow(checkForPath(args));
+	if (!args.path) throwErr(`A path is required. Received: "${args.path}".`);
 
 	if (!mediasConverting.has(args.path)) {
-		checkOrThrow(checkArgsToConvertToAudio(args));
+		if (!args.electronPort)
+			throwErr(
+				`'electronPort' is required. Received: \`${args.electronPort}\`.`,
+			);
 
-		convertToAudio(args).then();
+		if (!args.toExtension)
+			throwErr(`'toExtension' is required. Received: "${args.toExtension}".`);
+
+		if (!args.path) throwErr(`A path is required. Received: "${args.path}".`);
+
+		convertToAudio(args as Required<CreateConversion>).then();
 	} else if (args.destroy) mediasConverting.get(args.path)!.emit("destroy");
 }
 
@@ -62,7 +52,7 @@ export function createOrCancelConvert(args: CreateConversion): void {
 export async function convertToAudio(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
-	{ electronPort, toExtension, path }: CreateConversion,
+	{ electronPort, toExtension, path }: Required<CreateConversion>,
 ): Promise<void> {
 	dbg(`Attempting to convert "${path}".`);
 
@@ -88,10 +78,10 @@ export async function convertToAudio(
 				status: progressStatus.FAILED,
 				error: err,
 			};
-			electronPort!.postMessage(msg);
+			electronPort.postMessage(msg);
 
 			// Don't forget to throw away the MessagePort (clean up):
-			electronPort!.close();
+			electronPort.close();
 
 			return;
 		}
@@ -176,7 +166,7 @@ export async function convertToAudio(
 			const msg: Partial<MediaBeingConverted> = {
 				status: progressStatus.SUCCESS,
 			};
-			electronPort!.postMessage(msg);
+			electronPort.postMessage(msg);
 
 			// Treat the successfully converted file as a new media...
 			sendMsgToClient({
@@ -198,7 +188,7 @@ export async function convertToAudio(
 			// Clean up:
 			mediasConverting.delete(path);
 			clearInterval(interval);
-			electronPort!.close();
+			electronPort.close();
 			readStream.close();
 		})
 		/////////////////////////////////////////////
@@ -216,7 +206,7 @@ export async function convertToAudio(
 			const msg: Partial<MediaBeingConverted> = {
 				status: progressStatus.CANCEL,
 			};
-			electronPort!.postMessage(msg);
+			electronPort.postMessage(msg);
 
 			// Clean up:
 			mediasConverting.delete(path);
@@ -227,7 +217,7 @@ export async function convertToAudio(
 				),
 			);
 			clearInterval(interval);
-			electronPort!.close();
+			electronPort.close();
 
 			dbg(
 				"Convertion was destroyed. Deleting from mediasConverting:",
@@ -251,13 +241,13 @@ export async function convertToAudio(
 ////////////////////////////////////////////
 // Types:
 
-export type CreateConversion = Readonly<{
+export type CreateConversion = {
 	toExtension?: AllowedMedias;
 	electronPort?: MessagePort;
 	destroy?: boolean;
 	path: Path;
-}>;
+};
 
 /////////////////////////////////////////////
 
-type Progress = Readonly<{ targetSize: number; timemark: number }>;
+type Progress = { targetSize: number; timemark: number };

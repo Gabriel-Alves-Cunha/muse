@@ -7,7 +7,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"exactOptionalPropertyTypes": true,
 		"noUncheckedIndexedAccess": true,
-		"experimentalDecorators": false,
+		"experimentalDecorators": true,
 		"strictFunctionTypes": true,
 		"strictBindCallApply": true,
 		"noUnusedParameters": true,

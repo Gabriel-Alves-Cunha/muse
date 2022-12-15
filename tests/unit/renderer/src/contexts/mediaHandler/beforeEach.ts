@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 
-import { numberOfMedias, testList } from "./fakeTestList";
+import { numberOfMedias, testMap } from "./fakeTestList";
 import {
 	defaultCurrentPlaying,
 	getCurrentPlaying,
@@ -16,12 +16,12 @@ import {
 } from "@contexts/usePlaylists";
 
 function setMainListToTestList() {
-	expect(testList.size).toBe(numberOfMedias);
+	expect(testMap.size).toBe(numberOfMedias);
 
-	replaceEntireMainList(testList);
+	replaceEntireMainList(testMap);
 
+	expect(getMainList()).toEqual(testMap);
 	expect(getMainList().size).toBe(numberOfMedias);
-	expect(getMainList()).toEqual(testList);
 }
 
 /////////////////////////////////////////////

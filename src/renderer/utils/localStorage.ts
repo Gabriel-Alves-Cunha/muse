@@ -1,6 +1,6 @@
 import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
-import type { Media, Path } from "@common/@types/generalTypes";
 import type { PlayOptions } from "@contexts/usePlayOptions";
+import type { ID, Media } from "@common/@types/generalTypes";
 import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
@@ -45,7 +45,7 @@ export function getFromLocalStorage(key: Keys): Values | undefined {
 	if (item === "[]" && !value) return undefined;
 
 	if (key === keys.favorites) {
-		const newFavorites = new Set(item as Path[]);
+		const newFavorites = new Set(item as ID[]);
 
 		dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
 
@@ -89,8 +89,8 @@ type Keys = typeof keys[keyof typeof keys];
 //////////////////////////////////////////
 
 type Values =
-	| readonly [Path, Media][]
-	| ReadonlySet<Path>
+	| readonly [ID, Media][]
+	| ReadonlySet<ID>
 	| CurrentPlaying
 	| PlayOptions
 	| History;

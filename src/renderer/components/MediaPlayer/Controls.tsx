@@ -30,8 +30,11 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
-	const { random: isRandom, loop: loopThisMedia } = usePlayOptions();
+export const ControlsAndSeeker = ({
+	audio,
+	isSeeking,
+}: RefToAudioAndSeeker) => {
+	const { isRandom, loopThisMedia } = usePlayOptions();
 	const { t } = useTranslation();
 
 	const isThereAMedia = !audio?.src;
@@ -61,13 +64,13 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 			</div>
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
+const PlayPauseButton = ({ isDisabled, audio }: ControlsProps) => {
 	const [isPaused, setIsPaused] = useState(true);
 	const { t } = useTranslation();
 
@@ -96,7 +99,7 @@ function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
 		</CircleIconButton>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

@@ -81,8 +81,8 @@ function contentToShow(
 
 type Props = {
 	onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
-	setIsOpen?: (newIsOpen: boolean) => void;
 	content?: ValuesOf<typeof ctxContentEnum>;
+	setIsOpen?(newIsOpen: boolean): void;
 	isAllDisabled?: boolean;
 	children: ReactNode;
 };

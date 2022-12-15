@@ -396,9 +396,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	.transition-shadow:focus-visible,
-	.transition-shadow:hover,
-	.transition-shadow:focus,
+	.transition-shadow:where(:focus, :focus-visible, :hover),
 	.active-shadow {
 		transition: box-shadow 100ms ease-out 32ms;
 		box-shadow: var(--shadow-row-wrapper);
@@ -458,9 +456,7 @@
 		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-decorations-down text-lg;
 	}
 
-	.button:focus-visible,
-	.button:hover,
-	.button:focus {
+	.button:where(:focus, :focus-visible, :hover) {
 		@apply bg-accent text-white;
 	}
 
@@ -573,9 +569,7 @@
 		color: white;
 	}
 
-	.delete-media:focus-visible,
-	.delete-media:hover,
-	.delete-media:focus {
+	.delete-media:where(:focus, :focus-visible, :hover) {
 		background: #821e20;
 	}
 

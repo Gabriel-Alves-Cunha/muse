@@ -1,4 +1,4 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { ID } from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
@@ -11,13 +11,13 @@ import { time } from "@utils/utils";
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path> }>()(
+export const useAllSelectedMedias = create<{ medias: ReadonlySet<ID> }>()(
 	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
 );
 
 export const getAllSelectedMedias = () =>
 	useAllSelectedMedias.getState().medias;
-export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
+export const setAllSelectedMedias = (medias: ReadonlySet<ID>) =>
 	useAllSelectedMedias.setState({ medias });
 
 ///////////////////////////////////////////////////
@@ -25,79 +25,74 @@ export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 ///////////////////////////////////////////////////
 // Handle media selection:
 
-if (import.meta.vitest === undefined)
-	useAllSelectedMedias.subscribe(
-		(state) => state.medias,
-		// Handle decorate medias row
-		(selectedMedias, prevSelectedMedias): void =>
-			time(() => {
-				// Has to be this order:
-				for (const path of prevSelectedMedias)
-					for (const element of document.querySelectorAll(
-						`[data-path="${path}"]`,
-					)) {
-						if (selectedMedias.has(path)) continue;
+useAllSelectedMedias.subscribe(
+	(state) => state.medias,
+	// Handle decorate medias row
+	(selectedMedias, prevSelectedMedias): void =>
+		time(() => {
+			// Has to be this order:
+			for (const id of prevSelectedMedias)
+				for (const element of document.querySelectorAll(`[data-id="${id}"]`)) {
+					if (selectedMedias.has(id)) continue;
 
-						element.classList.remove("selected");
-					}
+					element.classList.remove("selected");
+				}
 
-				for (const path of selectedMedias)
-					for (const element of document.querySelectorAll(
-						`[data-path="${path}"]`,
-					))
-						element.classList.add("selected");
-			}, "handleDecorateMediasRow"),
-	);
+			for (const id of selectedMedias)
+				for (const element of document.querySelectorAll(`[data-id="${id}"]`))
+					element.classList.add("selected");
+		}, "handleDecorateMediasRow"),
+);
 
 ///////////////////////////////////////////////////
 
-export function toggleSelectedMedia(path: Path): void {
+export const toggleSelectedMedia = (id: ID): void => {
 	time(
 		() =>
-			getAllSelectedMedias().has(path)
-				? removeFromAllSelectedMedias(path)
-				: addToAllSelectedMedias(path),
+			getAllSelectedMedias().has(id)
+				? removeFromAllSelectedMedias(id)
+				: addToAllSelectedMedias(id),
 		"toggleSelectedMedia",
 	);
-}
+};
 
 ///////////////////////////////////////////////////
 
-export function addToAllSelectedMedias(path: Path): void {
+export const addToAllSelectedMedias = (id: ID): void => {
 	const allSelectedMedias = getAllSelectedMedias();
 
-	if (allSelectedMedias.has(path)) return;
+	if (allSelectedMedias.has(id)) return;
 
-	setAllSelectedMedias(new Set(allSelectedMedias).add(path));
-}
+	setAllSelectedMedias(new Set(allSelectedMedias).add(id));
+};
 
 ///////////////////////////////////////////////////
 
-export function removeFromAllSelectedMedias(path: Path): void {
+export const removeFromAllSelectedMedias = (id: ID): void => {
 	const allSelectedMedias = getAllSelectedMedias();
 
-	if (!allSelectedMedias.has(path)) return;
+	if (!allSelectedMedias.has(id)) return;
 
 	const newSet = new Set(allSelectedMedias);
-	newSet.delete(path);
+	newSet.delete(id);
 
 	setAllSelectedMedias(newSet);
-}
+};
 
 ///////////////////////////////////////////////////
 
-export function deselectAllMedias(): void {
+export const deselectAllMedias = (): void => {
 	if (getAllSelectedMedias().size === 0) return;
 
 	setAllSelectedMedias(emptySet);
-}
+};
 
 ///////////////////////////////////////////////////
 
-export function selectAllMedias(): void {
+export const selectAllMedias = (): void => {
 	const sortedByDate = getSortedByDate();
 
 	if (getAllSelectedMedias().size === sortedByDate.size) return;
 
 	setAllSelectedMedias(sortedByDate);
-}
+};

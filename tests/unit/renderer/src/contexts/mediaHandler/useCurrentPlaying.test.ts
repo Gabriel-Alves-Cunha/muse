@@ -10,13 +10,16 @@ mockElectronPlusNodeGlobalsBeforeTests();
 import { cleanUpBeforeEachTest } from "./beforeEach";
 import { playlistList } from "@common/enums";
 import {
-	firstMediaPathFromTestArray,
-	firstMediaPathFromMainList,
+	firstMediaIDFromMainList,
 	arrayFromMainList,
-	testList,
+	numberOfMedias,
+	testMap,
 } from "./fakeTestList";
 
-const { getHistory } = await import("@contexts/usePlaylists");
+const { getPlayOptions } = await import("@contexts/usePlayOptions");
+const { getHistory, getMainList, getFavorites } = await import(
+	"@contexts/usePlaylists"
+);
 const { playPreviousMedia, getCurrentPlaying, playThisMedia, playNextMedia } =
 	await import("@contexts/useCurrentPlaying");
 
@@ -36,13 +39,13 @@ describe("Testing useCurrentPlaying", () => {
 	/////////////////////////////////////////////
 
 	it("should set the currentPlaying media", () => {
-		for (const [path] of testList) {
-			playThisMedia(path, playlistList.mainList);
+		for (const [id] of testMap) {
+			playThisMedia(id, playlistList.mainList);
 
 			const expected: CurrentPlaying = {
 				listType: playlistList.mainList,
 				currentTime: 0,
-				path,
+				id,
 			};
 
 			expect(expected).toEqual(getCurrentPlaying());
@@ -57,30 +60,30 @@ describe("Testing useCurrentPlaying", () => {
 		expect(getHistory().size, "history.length is wrong!").toBe(0);
 
 		expect(
-			getCurrentPlaying().path,
-			"currentPlaying().path at the start should be set to an empty string!",
+			getCurrentPlaying().id,
+			"currentPlaying().id at the start should be set to an empty string!",
 		).toBe("");
 
 		let index = 0;
-		for (const [prevMediaPath] of arrayFromMainList) {
-			playThisMedia(prevMediaPath, playlistList.mainList);
+		for (const [prevMediaID] of arrayFromMainList) {
+			playThisMedia(prevMediaID, playlistList.mainList);
 
 			// There needs to be at least 2 medias on history to be able to play a previous one.
 			if (index === 0) continue;
 
-			expect(getCurrentPlaying().path).toBe(prevMediaPath);
+			expect(getCurrentPlaying().id).toBe(prevMediaID);
 			expect(getHistory().size, "history.length is wrong!").toBe(index + 1);
 
 			playPreviousMedia();
 
 			expect(
-				getCurrentPlaying().path,
+				getCurrentPlaying().id,
 				"currentPlaying().path should be set to the previous path!",
-			).toBe(prevMediaPath);
+			).toBe(prevMediaID);
 
 			const expected: CurrentPlaying = {
 				listType: playlistList.mainList,
-				path: prevMediaPath,
+				id: prevMediaID,
 				currentTime: 0,
 			};
 
@@ -98,25 +101,92 @@ describe("Testing useCurrentPlaying", () => {
 
 	it("should play the next media from a given playlist and update history", () => {
 		// A media needs to be currently selected to play a next media.
-		playThisMedia(firstMediaPathFromMainList, playlistList.mainList);
+		playThisMedia(firstMediaIDFromMainList, playlistList.mainList);
 
 		expect(
-			getCurrentPlaying().path,
+			getCurrentPlaying().id,
 			"currentPlaying().path at the start should be set to the firstMediaPathFromMainList!",
-		).toBe(firstMediaPathFromMainList);
+		).toBe(firstMediaIDFromMainList);
 
 		let index = 0;
-		for (const _ of arrayFromMainList) {
+		for (const [currPlayingID] of arrayFromMainList) {
+			const expectedMediaID =
+				arrayFromMainList[index + 1]?.[0] ?? firstMediaIDFromMainList;
+
+			expect(getPlayOptions().isRandom).toBe(false);
+			expect(getCurrentPlaying().id).toBe(currPlayingID);
+
 			playNextMedia();
 
-			const currMediaPath = getCurrentPlaying().path;
-			const expectedMediaPath =
-				arrayFromMainList[index + 1]?.[0] ?? firstMediaPathFromTestArray;
-
-			expect(expectedMediaPath).toEqual(currMediaPath);
+			expect(expectedMediaID).toBe(getCurrentPlaying().id);
 
 			++index;
 		}
+	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+
+	it("playNextMedia() should play the next media", () => {
+		// Start with the first media:
+		{
+			expect(
+				getMainList().size,
+				"mainList.size at the start should be equal to numberOfMedias!",
+			).toBe(numberOfMedias);
+			expect(
+				getFavorites().size,
+				"favorites.size at the start should be 0!",
+			).toBe(0);
+			expect(
+				getHistory().size,
+				"history.length at the start should be 0!",
+			).toBe(0);
+
+			// Set currentPlaying to first media:
+			expect(
+				firstMediaIDFromMainList,
+				`There should be a firstMediaID = "${firstMediaIDFromMainList}"!`,
+			).toBeTruthy();
+
+			playThisMedia(firstMediaIDFromMainList, playlistList.mainList);
+
+			expect(
+				getCurrentPlaying().id,
+				"currentPlaying().id should be equal to firstMediaID!",
+			).toBe(firstMediaIDFromMainList);
+			expect(getHistory().size, "history().length should be 1 here!").toBe(1);
+		}
+
+		// The firstMediaID has index = 0.
+		let index = 0;
+		for (const [currMediaID, currMedia] of arrayFromMainList) {
+			// If is the last media, it is going
+			// to go back to the first one:
+			const nextIndex = index === numberOfMedias - 1 ? 0 : index + 1;
+
+			const [expectedMediaID, expectedMedia] = arrayFromMainList[nextIndex]!;
+
+			expect(
+				getCurrentPlaying().id,
+				`\ncurrentPlaying().id before playing the next media should be the currMediaID = "${currMediaID}"!\n`,
+			).toBe(currMediaID);
+
+			playNextMedia();
+
+			expect(
+				getCurrentPlaying().id,
+				`currentPlaying().id after playing the next media should be the expectedMediaID = "${expectedMediaID}"`,
+			).toBe(expectedMediaID);
+
+			++index;
+		}
+
+		expect(
+			getHistory().size,
+			`history().length should be ${numberOfMedias}!`,
+		).toBe(numberOfMedias);
 	});
 
 	/////////////////////////////////////////////

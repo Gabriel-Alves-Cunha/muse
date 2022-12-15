@@ -79,7 +79,7 @@ async function queryForPossibleLyric(
 
 	dbg({ queryForPossibleLyric: jsonRes });
 
-	if (jsonRes.success === false) throw new Error(jsonRes.error);
+	if (!jsonRes.success) throw new Error(jsonRes.error);
 
 	const [track] = jsonRes.result;
 

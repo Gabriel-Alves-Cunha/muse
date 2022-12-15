@@ -1,4 +1,9 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type {
+	DateAsNumber,
+	Media,
+	Path,
+	ID,
+} from "@common/@types/generalTypes";
 
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
@@ -6,13 +11,14 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
 import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
-import { assertUnreachable, time } from "@utils/utils";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
 import { playlistList } from "@common/enums";
+import { error } from "@utils/log";
+import { time } from "@utils/utils";
 import {
 	getAllSelectedMedias,
 	deselectAllMedias,
@@ -23,6 +29,7 @@ import {
 	type History,
 	usePlaylists,
 	getMainList,
+	removeMedia,
 } from "@contexts/usePlaylists";
 import {
 	selectMediaByPointerEvent,
@@ -39,7 +46,7 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const MediaListKind = ({ isHome }: Props) => {
+export function MediaListKind({ isHome }: Props) {
 	const { t } = useTranslation();
 
 	return (
@@ -57,14 +64,14 @@ export const MediaListKind = ({ isHome }: Props) => {
 			<MediaListKindWithoutErrorBoundary isHome={isHome} />
 		</ErrorBoundary>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
-function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
+const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
 	const { fromList, homeList } = useFromList();
 	const listRef = useRef<HTMLDivElement>(null);
 
@@ -75,56 +82,59 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	const listName = isHome ? homeList : fromList;
 	const { [listName]: list } = usePlaylists();
 
-	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
+	const listAsArrayOfAMap: readonly [ID, Media, DateAsNumber][] = useMemo(
 		() =>
 			time(() => {
-				switch (listName) {
-					case playlistList.mainList:
-						return Array.from(list as MainList, ([path, media]) => [
-							path,
-							media,
-							0,
-						]);
+				if (listName === playlistList.mainList)
+					return Array.from(list as MainList, ([id, media]) => [id, media, 0]);
 
-					case playlistList.sortedByDate:
-					case playlistList.favorites: {
-						const mainList = getMainList();
+				if (
+					listName === playlistList.sortedByDate ||
+					listName === playlistList.favorites
+				) {
+					const listAsArrayOfAMap: [ID, Media, DateAsNumber][] = [];
+					const mainList = getMainList();
 
-						const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = Array.from(
-							list as ReadonlySet<Path>,
-							(path) => {
-								const media = mainList.get(path);
+					for (const id of list as ReadonlySet<ID>) {
+						const media = mainList.get(id);
 
-								if (!media)
-									throw new Error(
-										`Tried to access inexistent media with path = "${path}"`,
-									);
+						if (!media) {
+							error(
+								`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
+							);
+							removeMedia(id);
+							continue;
+						}
 
-								return [path, media, 0];
-							},
-						);
-
-						return listAsArrayOfAMap;
+						listAsArrayOfAMap.push([id, media, 0]);
 					}
 
-					case playlistList.history: {
-						const unsortedList: [Path, DateAsNumber][] = [];
-
-						for (const [path, dates] of list as History)
-							for (const date of dates) unsortedList.push([path, date]);
-
-						const mainList = getMainList();
-
-						const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
-							.sort((a, b) => b[1] - a[1]) // sorted by date
-							.map(([path, date]) => [path, mainList.get(path)!, date]);
-
-						return listAsArrayOfMap;
-					}
-
-					default:
-						return assertUnreachable(listName);
+					return listAsArrayOfAMap;
 				}
+
+				// else if (listName === playlistList.history)
+				const unsortedList: [Path, Media, DateAsNumber][] = [];
+				const mainList = getMainList();
+
+				for (const [id, dates] of list as History) {
+					const media = mainList.get(id);
+
+					if (!media) {
+						error(
+							`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
+						);
+						removeMedia(id);
+						continue;
+					}
+
+					for (const date of dates) unsortedList.push([id, media, date]);
+				}
+
+				const sorted: [Path, Media, DateAsNumber][] = unsortedList.sort(
+					(a, b) => b[2] - a[2],
+				); // sorted by date
+
+				return sorted;
 			}, "listAsArrayOfAMap"),
 		[listName, list],
 	);
@@ -166,7 +176,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			</ContextMenu>
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -191,22 +201,22 @@ const components = { EmptyPlaceholder, Header: Footer, Footer };
 
 /////////////////////////////////////////
 
-function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
+const selectAllMediasOnCtrlPlusA = (e: KeyboardEvent) => {
 	if (e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])) {
 		e.preventDefault();
 		selectAllMedias();
 	}
-}
+};
 
 /////////////////////////////////////////
 
-function handleDeselectAllMedias() {
+const handleDeselectAllMedias = () => {
 	if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0) deselectAllMedias();
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
 
-type Props = Readonly<{ isHome?: boolean | undefined }>;
+type Props = { isHome?: boolean | undefined };

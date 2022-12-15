@@ -19,19 +19,19 @@ describe("Testing usePlayOptions", () => {
 	/////////////////////////////////////////////
 
 	it("should get a new playOptions with .loopThisMedia set", () => {
-		setPlayOptions({ loop: true });
+		setPlayOptions({ loopThisMedia: true });
 
 		expect(
 			getPlayOptions(),
-			"playOptions should have { loop: true }!",
-		).toHaveProperty("loop", true);
+			"playOptions should have { loopThisMedia: true }!",
+		).toHaveProperty("loopThisMedia", true);
 
 		toggleLoopMedia();
 
 		expect(
 			getPlayOptions(),
-			"playOptions should have { loop: false }!",
-		).toHaveProperty("loop", false);
+			"playOptions should have { loopThisMedia: false }!",
+		).toHaveProperty("loopThisMedia", false);
 	});
 
 	/////////////////////////////////////////////
@@ -39,18 +39,18 @@ describe("Testing usePlayOptions", () => {
 	/////////////////////////////////////////////
 
 	it("should get a new playOptions with .isRandom set", () => {
-		setPlayOptions({ random: true });
+		setPlayOptions({ isRandom: true });
 
 		expect(
 			getPlayOptions(),
-			"playOptions should have { random: true }!",
-		).toHaveProperty("random", true);
+			"playOptions should have { isRandom: true }!",
+		).toHaveProperty("isRandom", true);
 
-		setPlayOptions({ random: false });
+		setPlayOptions({ isRandom: false });
 
 		expect(
 			getPlayOptions(),
-			"playOptions should have { random: true }!",
-		).toHaveProperty("random", false);
+			"playOptions should have { isRandom: true }!",
+		).toHaveProperty("isRandom", false);
 	});
 });
