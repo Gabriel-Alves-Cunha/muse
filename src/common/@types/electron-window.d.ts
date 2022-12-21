@@ -6,9 +6,9 @@ import type { LyricsResponse } from "@main/preload/getLyrics.js";
 import type { videoInfo } from "ytdl-core";
 
 import {
-	electronIpcMainProcessNotification,
-	electronToReactMessage,
-	reactToElectronMessage,
+	ElectronIpcMainProcessNotification,
+	ElectronToReactMessage,
+	ReactToElectronMessage,
 } from "../enums";
 
 /////////////////////////////////////////////
@@ -27,7 +27,7 @@ export type VisibleElectron = DeepReadonly<{
 	os: { dirs: { documents: Path; downloads: Path; music: Path } };
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess(
-			type: ValuesOf<typeof electronIpcMainProcessNotification>,
+			type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
 		): void;
 	};
 	fs: {
@@ -65,11 +65,11 @@ export type MetadataToChange = Readonly<{
 /////////////////////////////////////////////
 
 export type MsgObjectReactToElectron = Readonly<
-	| { type: typeof reactToElectronMessage.CREATE_A_NEW_DOWNLOAD }
-	| { type: typeof reactToElectronMessage.ERROR; error: Error }
-	| { type: typeof reactToElectronMessage.CONVERT_MEDIA }
+	| { type: typeof ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD }
+	| { type: typeof ReactToElectronMessage.ERROR; error: Error }
+	| { type: typeof ReactToElectronMessage.CONVERT_MEDIA }
 	| {
-			type: typeof reactToElectronMessage.WRITE_TAG;
+			type: typeof ReactToElectronMessage.WRITE_TAG;
 			thingsToChange: MetadataToChange;
 			mediaPath: Path;
 	  }
@@ -78,17 +78,17 @@ export type MsgObjectReactToElectron = Readonly<
 /////////////////////////////////////////////
 
 export type MsgObjectElectronToReact = Readonly<
-	| { type: typeof electronToReactMessage.REFRESH_ONE_MEDIA; mediaPath: Path }
-	| { type: typeof electronToReactMessage.REMOVE_ONE_MEDIA; mediaPath: Path }
-	| { type: typeof electronToReactMessage.ADD_ONE_MEDIA; mediaPath: Path }
-	| { type: typeof electronToReactMessage.ERROR; error: Error }
-	| { type: typeof electronToReactMessage.REFRESH_ALL_MEDIA }
+	| { type: typeof ElectronToReactMessage.REFRESH_ONE_MEDIA; mediaPath: Path }
+	| { type: typeof ElectronToReactMessage.REMOVE_ONE_MEDIA; mediaPath: Path }
+	| { type: typeof ElectronToReactMessage.ADD_ONE_MEDIA; mediaPath: Path }
+	| { type: typeof ElectronToReactMessage.ERROR; error: Error }
+	| { type: typeof ElectronToReactMessage.REFRESH_ALL_MEDIA }
 	| {
-			type: typeof electronToReactMessage.DELETE_ONE_MEDIA_FROM_COMPUTER;
+			type: typeof ElectronToReactMessage.DELETE_ONE_MEDIA_FROM_COMPUTER;
 			mediaPath: Path;
 	  }
 	| {
-			type: typeof electronToReactMessage.CREATE_A_NEW_DOWNLOAD;
+			type: typeof ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD;
 			downloadInfo: DownloadInfo;
 	  }
 >;

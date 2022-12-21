@@ -17,10 +17,10 @@ const modifierKeys = [
 	"Fn",
 ] as const;
 
-export function isAModifierKeyPressed(
+export const isAModifierKeyPressed = (
 	event: KeyboardEvent,
 	except: typeof modifierKeys[number][] = [],
-): Readonly<boolean> {
+): Readonly<boolean> => {
 	for (const key of modifierKeys) {
 		if (except.includes(key)) continue;
 
@@ -32,4 +32,4 @@ export function isAModifierKeyPressed(
 	}
 
 	return false;
-}
+};

@@ -7,15 +7,16 @@ import { Trigger } from "@radix-ui/react-popover";
 import create from "zustand";
 
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { createNewDownload, Popup } from "./helper";
-import { reactToElectronMessage } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";
+import { createNewDownload } from "./helper";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { progressStatus } from "@common/enums";
+import { ProgressStatus } from "@common/enums";
 import { useTranslation } from "@i18n";
 import { emptyString } from "@common/empty";
 import { errorToast } from "@components/toasts";
-import { error } from "@utils/log";
+import { error } from "@common/log";
+import { Popup } from "./Popup";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -56,7 +57,7 @@ export function Downloading() {
 
 			// Sending port so we can communicate with Electron:
 			sendMsgToBackend(
-				{ type: reactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
+				{ type: ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
 				electronPort,
 			);
 		} catch (err) {
@@ -106,7 +107,7 @@ export function Downloading() {
 // Types:
 
 export type MediaBeingDownloaded = {
-	status: ValuesOf<typeof progressStatus>;
+	status: ValuesOf<typeof ProgressStatus>;
 	percentage: number;
 	port: MessagePort;
 	imageURL: string;

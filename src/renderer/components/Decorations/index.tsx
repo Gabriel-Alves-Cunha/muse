@@ -22,8 +22,8 @@ export const DecorationsTop = () => {
 	const { t } = useTranslation();
 
 	return (
-		<header className="absolute flex -mt-[var(--top-decorations-height)] h-[var(--top-decorations-height)] w-screen bg-main">
-			{/* ^ window-draggable-region */}
+		<header className="relative flex h-[var(--top-decorations-height)] w-screen bg-main app-drag-region">
+			{/*    ^ window-draggable-region */}
 			<div className="flex justify-center items-center ml-2">
 				<img alt={t("alts.museLogo")} src={imageUrl} height={24} width={24} />
 			</div>
@@ -94,15 +94,15 @@ const Buttons = () => {
 
 /////////////////////////////////////////////
 
-function AppNamePlusFolder() {
+const AppNamePlusFolder = () => {
 	const { page } = usePage();
 
 	return (
-		<div className="absolute flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light sm:hidden">
+		<div className="absolute hidden sm:flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light">
 			{capitalizedAppName} • {page}
 		</div>
 	);
-}
+};
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

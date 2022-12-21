@@ -1,10 +1,10 @@
 import type { ID, Media } from "@common/@types/generalTypes";
 
-import { reactToElectronMessage } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { mediaPlayerCardId } from "@components/FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
-import { error, warn } from "@utils/log";
+import { error, warn } from "@common/log";
 import { infoToast } from "@components/toasts";
 import { getMedia } from "@contexts/usePlaylists";
 import { Header } from "./Header";
@@ -43,7 +43,7 @@ export const searchAndOpenLyrics = async (
 	mediaID: ID,
 	openLyrics: boolean,
 ): Promise<void> => {
-	if (!mediaID) return warn(`No mediaID provided. Received "${mediaID}"!`);
+	if (!mediaID) return error(`No mediaID provided. Received "${mediaID}"!`);
 
 	const media = getMedia(mediaID);
 
@@ -67,7 +67,7 @@ export const searchAndOpenLyrics = async (
 		);
 
 		sendMsgToBackend({
-			type: reactToElectronMessage.WRITE_TAG,
+			type: ReactToElectronMessage.WRITE_TAG,
 			thingsToChange: [
 				{ whatToChange: "album", newValue: albumName },
 				{ whatToChange: "imageURL", newValue: image },

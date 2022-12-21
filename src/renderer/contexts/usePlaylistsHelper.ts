@@ -1,7 +1,7 @@
 import type { MainList } from "./usePlaylists";
 import type { ID } from "@common/@types/generalTypes";
 
-import { log } from "@utils/log";
+import { log } from "@common/log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

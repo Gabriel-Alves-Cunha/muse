@@ -6,7 +6,7 @@ import { AiOutlineCheck as SuccessIcon } from "react-icons/ai";
 import { TiCancel as CanceledIcon } from "react-icons/ti";
 import { MdError as FailedIcon } from "react-icons/md";
 
-import { progressStatus } from "@common/enums";
+import { ProgressStatus } from "@common/enums";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -16,7 +16,7 @@ import { progressStatus } from "@common/enums";
 export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
 	<progress
 		className="appearance-none border-none transition-width duration-300 ease-linear w-48 h-1"
-		value={status === progressStatus.SUCCESS ? 100 : percent_0_to_100}
+		value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}
 		max={100}
 	/>
 );
@@ -27,11 +27,11 @@ export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
 // Helper function:
 
 export const progressIcons: ReadonlyMap<
-	ValuesOf<typeof progressStatus>,
+	ValuesOf<typeof ProgressStatus>,
 	JSX.Element
 > = new Map([
 	[
-		progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		<LoadingIcon
 			className="fill-orange-400"
 			title="Waiting"
@@ -40,7 +40,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		progressStatus.ACTIVE,
+		ProgressStatus.ACTIVE,
 		<DownloadingIcon
 			className="fill-teal-600"
 			title="Downloading"
@@ -49,7 +49,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		progressStatus.CANCEL,
+		ProgressStatus.CANCEL,
 		<CanceledIcon
 			className="fill-yellow-600"
 			title="Canceled"
@@ -58,7 +58,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		progressStatus.SUCCESS,
+		ProgressStatus.SUCCESS,
 		<SuccessIcon
 			className="fill-green-500"
 			title="Success"
@@ -67,7 +67,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		progressStatus.FAILED,
+		ProgressStatus.FAILED,
 		<FailedIcon
 			className="fill-red-500"
 			title="Failed"
@@ -83,6 +83,6 @@ export const progressIcons: ReadonlyMap<
 // Types:
 
 export type ProgressProps = {
-	status: ValuesOf<typeof progressStatus>;
+	status: ValuesOf<typeof ProgressStatus>;
 	percent_0_to_100: number;
 };

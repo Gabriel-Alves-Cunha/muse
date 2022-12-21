@@ -7,9 +7,8 @@ import type {
 
 import { contextBridge, ipcRenderer, Notification } from "electron";
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
-import { error } from "node:console";
 
-import { electronToReactMessage, reactToElectronMessage } from "@common/enums";
+import { ElectronToReactMessage, ReactToElectronMessage } from "@common/enums";
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { searchForLyricsAndImage } from "./preload/getLyrics";
 import { transformPathsToMedias } from "./preload/media/create-media";
@@ -19,6 +18,7 @@ import { dirs, logoPath } from "./utils";
 import { createServer } from "./preload/share/server";
 import { emptyString } from "@common/empty";
 import { writeTags } from "./preload/media/mutate-metadata";
+import { error } from "@common/log";
 import { dbg } from "@common/debug";
 import {
 	type MsgWithSource,
@@ -55,6 +55,9 @@ const visibleElectronAPI: VisibleElectron = {
 };
 
 contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
+
+console.log("preload Notification =", Notification);
+console.log("preload new Notification() =", new Notification());
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -96,7 +99,7 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
 					// // Send msg to ipcMain, wich in turn will relay to ipcRenderer:
 					sendMsgToClient({
-						type: electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+						type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 						downloadInfo,
 					});
 
@@ -112,9 +115,9 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
 // Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
-	electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+	ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 	(_event, downloadValues) => sendMsgToClient({
-			type: electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+			type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 			downloadInfo: downloadValues,
 		}),
 );
@@ -130,96 +133,93 @@ const logThatPortIsClosing = (): void => dbg("Closing ports (electronPort).");
 /////////////////////////////////////////////
 // Handle messages from the renderer process:
 
-window.addEventListener(
-	"message",
-	async (event: CrossWindowEvent): Promise<void> => {
-		if (event.data.source !== reactSource) return;
+window.addEventListener("message", (event: CrossWindowEvent): void => {
+	if (event.data.source !== reactSource) return;
 
-		dbg("Received message from React:", event.data);
+	dbg("Received message from React:", event.data);
 
-		const [electronPort] = event.ports;
-		const { msg } = event.data;
+	const [electronPort] = event.ports;
+	const { msg } = event.data;
 
-		switch (msg.type) {
-			case reactToElectronMessage.CREATE_A_NEW_DOWNLOAD: {
-				if (!electronPort) {
-					error("There should be an electronPort to download a media!");
-					break;
-				}
-
-				electronPort.onmessage = ({ data }: { data: CreateDownload }) =>
-					createOrCancelDownload({ ...data, electronPort });
-
-				electronPort.addEventListener("close", logThatPortIsClosing);
-
-				// MessagePortMain queues messages until the .start() method has been called.
-				electronPort.start();
+	switch (msg.type) {
+		case ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD: {
+			if (!electronPort) {
+				error("There should be an electronPort to download a media!");
 				break;
 			}
 
-			/////////////////////////////////////////////
-			/////////////////////////////////////////////
+			electronPort.onmessage = ({ data }: { data: CreateDownload }) =>
+				createOrCancelDownload({ ...data, electronPort });
 
-			case reactToElectronMessage.CONVERT_MEDIA: {
-				if (!electronPort) {
-					error("There should be an electronPort to convert a media!");
-					break;
-				}
+			electronPort.addEventListener("close", logThatPortIsClosing);
 
-				electronPort.onmessage = ({ data }: { data: CreateConversion }) =>
-					createOrCancelConvert({ ...data, electronPort });
-
-				electronPort.addEventListener("close", logThatPortIsClosing);
-
-				// MessagePortMain queues messages until the .start() method has been called.
-				electronPort.start();
-				break;
-			}
-
-			/////////////////////////////////////////////
-			/////////////////////////////////////////////
-
-			case reactToElectronMessage.WRITE_TAG: {
-				const { mediaPath, thingsToChange } = msg;
-
-				const data: Mutable<Parameters<typeof writeTags>[1]> = {};
-
-				for (const { whatToChange, newValue } of thingsToChange)
-					Reflect.set(data, whatToChange, newValue);
-
-				dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", {
-					msg,
-				});
-
-				writeTags(mediaPath, data);
-				break;
-			}
-
-			/////////////////////////////////////////////
-			/////////////////////////////////////////////
-
-			case reactToElectronMessage.ERROR: {
-				error("TODO: maybe do something with this error...?\n", msg.error);
-
-				break;
-			}
-
-			/////////////////////////////////////////////
-			/////////////////////////////////////////////
-
-			default: {
-				error(
-					`There is no method to handle this event.data: (${typeof event.data}) '`,
-					event.data,
-					"'\nEvent =",
-					event,
-				);
-
-				assertUnreachable(msg);
-			}
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
 		}
-	},
-);
+
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.CONVERT_MEDIA: {
+			if (!electronPort) {
+				error("There should be an electronPort to convert a media!");
+				break;
+			}
+
+			electronPort.onmessage = ({ data }: { data: CreateConversion }) =>
+				createOrCancelConvert({ ...data, electronPort });
+
+			electronPort.addEventListener("close", logThatPortIsClosing);
+
+			// MessagePortMain queues messages until the .start() method has been called.
+			electronPort.start();
+			break;
+		}
+
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.WRITE_TAG: {
+			const { mediaPath, thingsToChange } = msg;
+
+			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
+
+			for (const { whatToChange, newValue } of thingsToChange)
+				Reflect.set(data, whatToChange, newValue);
+
+			dbg("On 'preload.ts' at electron-window.onmessage [WRITE_TAG]:", {
+				msg,
+			});
+
+			writeTags(mediaPath, data);
+			break;
+		}
+
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		case ReactToElectronMessage.ERROR: {
+			error("TODO: maybe do something with this error...?\n", msg.error);
+
+			break;
+		}
+
+		/////////////////////////////////////////////
+		/////////////////////////////////////////////
+
+		default: {
+			error(
+				`There is no method to handle this event.data: (${typeof event.data}) '`,
+				event.data,
+				"'\nEvent =",
+				event,
+			);
+
+			assertUnreachable(msg);
+		}
+	}
+});
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

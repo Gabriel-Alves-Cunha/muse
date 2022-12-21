@@ -1,7 +1,7 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MdClose as CloseIcon } from "react-icons/md";
 import { Content, Close } from "@radix-ui/react-dialog";
 import { toCanvas } from "qrcode";
@@ -10,9 +10,9 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { setFilesToShare, useFilesToShare } from "@contexts/filesToShare";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useTranslation } from "@i18n";
-import { error, assert } from "@utils/log";
+import { error, assert } from "@common/log";
+import { getMainList } from "@contexts/usePlaylists";
 import { BlurOverlay } from "./BlurOverlay";
-import { getBasename } from "@common/path";
 import { emptySet } from "@common/empty";
 import { Loading } from "./Loading";
 import { dbg } from "@common/debug";
@@ -31,9 +31,10 @@ const qrID = "qrcode-canvas";
 /////////////////////////////////////////
 // Main function:
 
-export function ShareDialog() {
+export default function ShareDialog() {
 	const [server, setServer] = useState<ClientServerAPI | undefined>();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const contentRef = useRef<HTMLDivElement>(null);
 	const { filesToShare } = useFilesToShare();
 	const { t } = useTranslation();
 
@@ -75,14 +76,17 @@ export function ShareDialog() {
 	/////////////////////////////////////////
 
 	useEffect(() => {
-		const closeShareDialogOnEsc = (e: KeyboardEvent) => {
-			if (e.key === "Escape" && isDialogOpen && !isAModifierKeyPressed(e))
+		const content = contentRef.current;
+		if (!content) return;
+
+		content.onkeyup = (e) => {
+			console.log("isDialogOpen =", isDialogOpen);
+
+			if (e.key === "Escape" && !isAModifierKeyPressed(e))
 				closePopover(server?.close);
 		};
 
-		document.addEventListener("keyup", closeShareDialogOnEsc);
-
-		return () => document.removeEventListener("keyup", closeShareDialogOnEsc);
+		// return () => document.removeEventListener("keyup", closeShareDialogOnEsc);
 	}, [isDialogOpen, server]);
 
 	/////////////////////////////////////////
@@ -112,7 +116,10 @@ export function ShareDialog() {
 		<Dialog modal open={isDialogOpen} onOpenChange={handleDialogOpenStates}>
 			<BlurOverlay />
 
-			<Content className="absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition">
+			<Content
+				ref={contentRef}
+				className="absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition"
+			>
 				<Close
 					className="absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5"
 					title={t("tooltips.closeShareScreen")}
@@ -158,15 +165,20 @@ const closePopover = (closeServerFunction?: () => void): void => {
 
 /////////////////////////////////////////
 
-const namesOfFilesToShare = (filesToShare: ReadonlySet<Path>): JSX.Element[] =>
-	Array.from(filesToShare, (path) => (
+const namesOfFilesToShare = (
+	filesToShare: ReadonlySet<Path>,
+): JSX.Element[] => {
+	const mainList = getMainList();
+
+	return Array.from(filesToShare, (id) => (
 		<li
 			className="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
-			key={path}
+			key={id}
 		>
-			{getBasename(path)}
+			{mainList.get(id)?.title}
 		</li>
 	));
+};
 
 /////////////////////////////////////////
 

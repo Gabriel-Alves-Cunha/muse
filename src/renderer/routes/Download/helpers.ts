@@ -4,7 +4,7 @@ import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { useTranslation } from "@i18n";
 import { emptyString } from "@common/empty";
-import { error } from "@utils/log";
+import { error } from "@common/log";
 import { dbg } from "@common/debug";
 
 const { getBasicInfo } = electron.media;
@@ -30,7 +30,7 @@ export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 ////////////////////////////////////////////////
 // Helper functions:
 
-export function downloadMedia(): void {
+export const downloadMedia = (): void => {
 	const {
 		result: { artist, imageURL, title },
 		url,
@@ -44,14 +44,17 @@ export function downloadMedia(): void {
 
 	// Reset values:
 	setSearchInfo(defaultSearchInfo);
-}
+};
 
 ////////////////////////////////////////////////
 
-export async function search(url: Readonly<string>): Promise<void> {
-	if (url.length < 16) return;
+export const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
+	setSearchInfo({ url: e.target.value });
 
-	dbg(`Searching for "${url}".`);
+////////////////////////////////////////////////
+
+export const search = async (url: Readonly<string>): Promise<void> => {
+	if (url.length < 16) return;
 
 	setSearchInfo({
 		result: defaultSearchInfo.result,
@@ -83,7 +86,7 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 		error(err);
 	}
-}
+};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

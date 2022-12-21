@@ -1,6 +1,5 @@
 import type { Page } from "@common/@types/generalTypes";
 
-import { startTransition } from "react";
 import {
 	MdOutlineVideoLibrary as Home,
 	// MdOutlineSettings as Settings,
@@ -64,7 +63,7 @@ function ButtonsForPages() {
 				<button
 					title={t("tooltips.goto") + t(`pages.${page}`)}
 					className={page === currPage ? "active" : ""}
-					onPointerUp={() => gotoPage(page)}
+					onPointerUp={() => setPage({ page })}
 					key={page}
 				>
 					{icons[page]}
@@ -73,8 +72,3 @@ function ButtonsForPages() {
 		</div>
 	);
 }
-
-const gotoPage = (page: Page) =>
-	startTransition(() => {
-		setPage({ page });
-	});

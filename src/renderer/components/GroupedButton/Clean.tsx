@@ -4,7 +4,7 @@ import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
 import { useTranslation } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
-import { getFromList } from "@components/MediaListKind/helper";
+import { getFromList } from "@components/MediaListKind/states";
 
 export const Clean = () => {
 	const { t } = useTranslation();
@@ -22,9 +22,9 @@ export const Clean = () => {
 /////////////////////////////////////////////
 // Helper functions:
 
-function cleanProperList() {
+const cleanProperList = () => {
 	const { fromList } = getFromList();
 
 	if (fromList === playlistList.favorites) clearFavorites();
 	else if (fromList === playlistList.history) clearHistory();
-}
+};

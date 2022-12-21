@@ -1,3 +1,5 @@
+import type { Json } from "./@types/utils";
+
 const { trunc, floor, random } = Math;
 
 /////////////////////////////////////////
@@ -32,9 +34,10 @@ export type AllowedMedias = typeof allowedMedias[number];
 
 /////////////////////////////////////////
 
-export function formatDuration(time?: number): Readonly<string> {
-	if (time === undefined || isNaN(time) || !isFinite(time)) return "00:00";
-	time = trunc(time);
+export function formatDuration(time: number | undefined): Readonly<string> {
+	// isFinite(undefined) === false
+	if (!isFinite(time!)) return "00:00";
+	time = trunc(time!);
 
 	const hour = `0${floor(time / 3_600) % 24}`.slice(-2);
 	const minutes = `0${floor(time / 60) % 60}`.slice(-2);
@@ -50,17 +53,14 @@ export function formatDuration(time?: number): Readonly<string> {
 
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-export function makeRandomString(length = 15): Readonly<string> {
-	const randomString = Array.from({ length }, () =>
+export const makeRandomString = (length = 15): string =>
+	Array.from({ length }, () =>
 		chars.charAt(floor(random() * chars.length)),
 	).join("");
 
-	return randomString;
-}
-
 /////////////////////////////////////////
 
-export function sleep(ms: number, logFn?: () => void): Promise<void> {
+export function sleep(ms = 0, logFn?: () => void): Promise<void> {
 	logFn?.();
 
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -68,7 +68,7 @@ export function sleep(ms: number, logFn?: () => void): Promise<void> {
 
 /////////////////////////////////////////
 
-export const stringifyJson = <T>(obj: T) => JSON.stringify(obj, null, 2);
+export const stringifyJson = (obj: Json) => JSON.stringify(obj, null, 2);
 
 /////////////////////////////////////////
 
@@ -77,7 +77,7 @@ export const mapTo = (
 	value: Readonly<number>,
 	from: readonly [start: number, end: number],
 	to: readonly [start: number, end: number],
-): Readonly<number> =>
+): number =>
 	((value - from[0]) * (to[1] - to[0])) / (from[1] - from[0]) + to[0];
 
 /////////////////////////////////////////
@@ -85,7 +85,6 @@ export const mapTo = (
 export function randomBackgroundColorForConsole(): () => string {
 	let index = 0;
 
-	// dprint-ignore
 	const colors: Color[] = [
 		["#fff", "#3490db"],
 		["#fff", "#1abc9c"],
@@ -93,7 +92,7 @@ export function randomBackgroundColorForConsole(): () => string {
 	];
 
 	return () => {
-		if (index >= colors.length) index = 0;
+		if (index === colors.length) index = 0;
 
 		const color = `color: ${colors[index]?.[0]}; background-color: ${colors[index]?.[1]}; border-radius: 2px; padding: 2px 4px; font-weight: bold;`;
 
@@ -104,12 +103,6 @@ export function randomBackgroundColorForConsole(): () => string {
 }
 
 type Color = readonly [color: string, backgroundColor: string];
-
-/////////////////////////////////////////
-
-export const throwErr = (msg: string): never => {
-	throw new Error(msg);
-};
 
 /////////////////////////////////////////
 

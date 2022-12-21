@@ -1,26 +1,28 @@
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
 import { Dialog, Trigger } from "@radix-ui/react-dialog";
+import { Suspense, lazy } from "react";
 
-import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
-import { searchAndOpenLyrics } from "@components/MediaPlayer/Lyrics";
+import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
-import { getSearcher } from "@components/SearchMedia/helper";
-import { openLyrics } from "@components/MediaPlayer/Header";
+import { getSearcher } from "../SearchMedia/state";
+import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
 import { Item } from "./Item";
 import {
 	setAllSelectedMedias,
 	getAllSelectedMedias,
 } from "@contexts/useAllSelectedMedias";
 
+const DeleteMediaDialogContent = lazy(() => import("../DeleteMediaDialog"));
+
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => {
+export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 	const { t } = useTranslation();
 
 	return (
@@ -39,7 +41,9 @@ export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => {
 					</>
 				</Trigger>
 
-				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+				<Suspense>
+					<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+				</Suspense>
 			</Dialog>
 
 			<Item onSelect={shareMedias} disabled={isAllDisabled}>
@@ -63,7 +67,7 @@ export const SearchMediaOptionsCtxMenu = ({ isAllDisabled }: Props) => {
 			</Item>
 		</>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -1,10 +1,10 @@
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
+import { Suspense, lazy } from "react";
 import { Trigger } from "@radix-ui/react-context-menu";
 import { Dialog } from "@radix-ui/react-dialog";
 
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
-import { DeleteMediaDialogContent } from "@components/DeleteMediaDialog";
 import { useTranslation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
 import { Item } from "./Item";
@@ -13,7 +13,9 @@ import {
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 
-export function MediaOptionsCtxMenu() {
+const DeleteMediaDialogContent = lazy(() => import("../DeleteMediaDialog"));
+
+export default function MediaOptionsCtxMenu() {
 	// If there is none selected, disable:
 	const isDisabled = getAllSelectedMedias().size === 0;
 	const { t } = useTranslation();
@@ -34,7 +36,9 @@ export function MediaOptionsCtxMenu() {
 					</>
 				</Trigger>
 
-				<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+				<Suspense>
+					<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+				</Suspense>
 			</Dialog>
 
 			<Item onSelect={shareMedias} disabled={isDisabled}>
@@ -65,10 +69,10 @@ export function MediaOptionsCtxMenu() {
 /////////////////////////////////////////////
 // Helper functions:
 
-export function deleteMedias(): void {
+export const deleteMedias = (): void => {
 	const promises = Array.from(getAllSelectedMedias(), (path) =>
 		deleteFile(path),
 	);
 
 	Promise.all(promises).then();
-}
+};

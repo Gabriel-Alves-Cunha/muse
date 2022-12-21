@@ -5,7 +5,7 @@ const sizeSelector = (
 	state: ReturnType<typeof useAllSelectedMedias.getState>,
 ) => state.medias.size;
 
-export function NumberOfMediasSelected() {
+export const NumberOfMediasSelected = () => {
 	const numberOfMediasSelected = useAllSelectedMedias(sizeSelector);
 	const { t } = useTranslation();
 
@@ -14,4 +14,4 @@ export function NumberOfMediasSelected() {
 			{numberOfMediasSelected} {t("decorations.selected")}
 		</p>
 	);
-}
+};

@@ -1,4 +1,4 @@
-export const progressStatus = {
+export const ProgressStatus = {
 	WAITING_FOR_CONFIRMATION_FROM_ELECTRON: 2,
 	SUCCESS: 3,
 	ACTIVE: 4,
@@ -8,7 +8,7 @@ export const progressStatus = {
 
 /////////////////////////////////////////////
 
-export const reactToElectronMessage = {
+export const ReactToElectronMessage = {
 	CREATE_A_NEW_DOWNLOAD: 2,
 	CONVERT_MEDIA: 3,
 	WRITE_TAG: 4,
@@ -17,7 +17,7 @@ export const reactToElectronMessage = {
 
 /////////////////////////////////////////////
 
-export const electronToReactMessage = {
+export const ElectronToReactMessage = {
 	DELETE_ONE_MEDIA_FROM_COMPUTER: "2",
 	CREATE_A_NEW_DOWNLOAD: "3",
 	REFRESH_ALL_MEDIA: "4",
@@ -29,7 +29,7 @@ export const electronToReactMessage = {
 
 /////////////////////////////////////////////
 
-export const electronIpcMainProcessNotification = {
+export const ElectronIpcMainProcessNotification = {
 	TOGGLE_DEVELOPER_TOOLS: 2,
 	TOGGLE_MAXIMIZE: 3,
 	RELOAD_WINDOW: 4,

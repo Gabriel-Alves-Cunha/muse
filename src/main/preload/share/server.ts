@@ -1,10 +1,10 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { AddressInfo } from "node:net";
 
-import { error, log } from "node:console";
 import Koa from "koa";
 
 import { myIp, unableToShareMediasError } from "./myIpAddress";
+import { throwErr, error, log } from "@common/log";
 import { router } from "./routes";
 import { dbg } from "@common/debug";
 
@@ -25,7 +25,7 @@ export const app = new Koa()
 // Main function:
 
 export function createServer(filepaths: readonly Path[]): ClientServerAPI {
-	if (!myIp) throw new Error(unableToShareMediasError);
+	if (!myIp) throwErr(unableToShareMediasError);
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
@@ -50,7 +50,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 
 	/////////////////////////////////////////////
 
-	const clientServerAPI: ClientServerAPI = {
+	return {
 		addListener(event: string, listener: (...args: unknown[]) => void) {
 			server.addListener(event, listener);
 		},
@@ -58,9 +58,7 @@ export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 			server.close();
 		},
 		url,
-	};
-
-	return clientServerAPI;
+	} satisfies ClientServerAPI;
 }
 
 /////////////////////////////////////////////

@@ -2,15 +2,16 @@ import { MdCompareArrows as ConvertIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { Trigger } from "@radix-ui/react-popover";
 
-import { useNewConvertions, createNewConvertion, Popup } from "./helper";
+import { useNewConvertions, createNewConvertion } from "./helper";
 import { PopoverRoot, PopoverContent } from "@components/Popover";
-import { reactToElectronMessage } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
 import { errorToast } from "@components/toasts";
 import { emptyMap } from "@common/empty";
-import { error } from "@utils/log";
+import { error } from "@common/log";
+import { Popup } from "./Popup";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -20,7 +21,7 @@ const convertingListSizeSelector = (
 	state: ReturnType<typeof useConvertingList.getState>,
 ) => state.convertingList.size;
 
-export function Converting() {
+export const Converting = () => {
 	const convertingListSize = useConvertingList(convertingListSizeSelector);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
@@ -33,7 +34,7 @@ export function Converting() {
 
 				// Sending port so we can communicate with electron:
 				sendMsgToBackend(
-					{ type: reactToElectronMessage.CONVERT_MEDIA },
+					{ type: ReactToElectronMessage.CONVERT_MEDIA },
 					electronPort,
 				);
 			} catch (err) {
@@ -80,4 +81,4 @@ export function Converting() {
 			</PopoverContent>
 		</PopoverRoot>
 	);
-}
+};

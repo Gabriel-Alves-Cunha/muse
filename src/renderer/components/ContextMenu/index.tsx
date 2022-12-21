@@ -1,19 +1,20 @@
-import type { ReactNode } from "react";
 import type { ValuesOf } from "@common/@types/utils";
 
+import { type ReactNode, Suspense, lazy } from "react";
 import { Content, Root, Trigger } from "@radix-ui/react-context-menu";
 
-import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
-import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
-import { FullExampleCtxMenu } from "./fullExampleCtxMenu";
-import { assertUnreachable } from "@utils/utils";
-import { MainCtxMenu } from "./mainCtxMenu";
+const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
+const FullExampleCtxMenu = lazy(() => import("./FullExampleCtxMenu"));
+const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
+const SearchMediaOptionsCtxMenu = lazy(
+	() => import("./searchMediaOptionsCtxMenu"),
+);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const ctxContentEnum = {
+export const CtxContentEnum = {
 	SEARCH_MEDIA_OPTIONS: 2,
 	MEDIA_OPTIONS: 3,
 	FULL_EXAMPLE: 4,
@@ -21,7 +22,7 @@ export const ctxContentEnum = {
 } as const;
 
 const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN, SEARCH_MEDIA_OPTIONS } =
-	ctxContentEnum;
+	CtxContentEnum;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -42,37 +43,20 @@ export const ContextMenu = ({
 			className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
 			loop
 		>
-			{contentToShow(content, isAllDisabled)}
+			<Suspense>
+				{content === SEARCH_MEDIA_OPTIONS ? (
+					<SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />
+				) : content === MEDIA_OPTIONS ? (
+					<MediaOptionsCtxMenu />
+				) : content === FULL_EXAMPLE ? (
+					<FullExampleCtxMenu />
+				) : content === MAIN ? (
+					<MainCtxMenu />
+				) : null}
+			</Suspense>
 		</Content>
 	</Root>
 );
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Helper functions:
-
-function contentToShow(
-	content: NonNullable<Props["content"]>,
-	isAllDisabled: boolean,
-) {
-	switch (content) {
-		case SEARCH_MEDIA_OPTIONS:
-			return <SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />;
-
-		case MEDIA_OPTIONS:
-			return <MediaOptionsCtxMenu />;
-
-		case FULL_EXAMPLE:
-			return <FullExampleCtxMenu />;
-
-		case MAIN:
-			return <MainCtxMenu />;
-
-		default:
-			return assertUnreachable(content);
-	}
-}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -81,7 +65,7 @@ function contentToShow(
 
 type Props = {
 	onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
-	content?: ValuesOf<typeof ctxContentEnum>;
+	content?: ValuesOf<typeof CtxContentEnum>;
 	setIsOpen?(newIsOpen: boolean): void;
 	isAllDisabled?: boolean;
 	children: ReactNode;

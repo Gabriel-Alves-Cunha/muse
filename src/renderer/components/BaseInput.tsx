@@ -6,7 +6,7 @@ export const BaseInput = forwardRef(function BaseInput(
 	forwardedRef: React.Ref<HTMLInputElement>,
 ) {
 	return (
-		<div className="relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none transition-all ease-out duration-200 search-media">
+		<div className="search-media">
 			<SearchIcon className="w-5 h-5 text-alternative cursor-default mx-3 duration-100" />
 
 			<label className="absolute flex items-center h-9 left-[2.7rem] bottom-0 right-0 top-0 p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider font-normal text-base cursor-default pointer-events-none">

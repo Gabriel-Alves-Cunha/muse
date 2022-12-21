@@ -1,5 +1,5 @@
 import { ToastContainer } from "react-toastify";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
@@ -7,11 +7,13 @@ import { MainGridContainer } from "@components/MainGridContainer";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
-import { ShareDialog } from "@components/ShareDialog";
 import { usePage } from "@contexts/page";
 import { Navbar } from "@components/Navbar";
+import { log } from "@common/log";
 
 import "react-toastify/dist/ReactToastify.min.css";
+
+const ShareDialog = lazy(() => import("./components/ShareDialog"));
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -32,7 +34,9 @@ export function App() {
 				draggable
 			/>
 
-			<ShareDialog />
+			<Suspense>
+				<ShareDialog />
+			</Suspense>
 
 			<DecorationsTop />
 
@@ -40,7 +44,9 @@ export function App() {
 				<MainGridContainer>
 					<Navbar />
 
-					<PageToShow />
+					<Suspense>
+						<PageToShow />
+					</Suspense>
 
 					<MediaPlayer />
 				</MainGridContainer>
@@ -61,13 +67,13 @@ const pages = {
 	Home: lazy(() => import("./routes/Home")),
 } as const;
 
-function PageToShow() {
+const PageToShow = () => {
 	const { page } = usePage();
 
 	const Page = pages[page];
 
 	return <Page />;
-}
+};
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -75,6 +81,14 @@ function PageToShow() {
 // Do once on app start:
 
 window.addEventListener("message", handleWindowMsgs);
+
+document.addEventListener("copy", (e) => {
+	log("Copy event on document =", e);
+});
+
+window.addEventListener("copy", (e) => {
+	log("Copy event on window =", e);
+});
 
 //////////////////////////////////////////
 

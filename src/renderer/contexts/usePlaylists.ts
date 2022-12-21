@@ -1,10 +1,5 @@
+import type { DateAsNumber, Media, ID } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
-import type {
-	DateAsNumber,
-	Media,
-	Path,
-	ID,
-} from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
@@ -14,11 +9,12 @@ import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
 import { getFromLocalStorage, keys } from "@utils/localStorage";
 import { sortByDate, sortByTitle } from "./usePlaylistsHelper";
 import { emptyMap, emptySet } from "@common/empty";
+import { dbg, dbgPlaylists } from "@common/debug";
 import { playlistList } from "@common/enums";
-import { dbgPlaylists } from "@common/debug";
-import { error, warn } from "@utils/log";
+import { error, warn } from "@common/log";
 import { getSettings } from "@contexts/settings";
 import { getFirstKey } from "@utils/map-set";
+import { throwErr } from "@common/log";
 import { time } from "@utils/utils";
 import {
 	getAllSelectedMedias,
@@ -213,6 +209,8 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			removeMedia(id) {
 				const { sortedByTitleAndMainList, updatedSorted, favorites, history } =
 					get();
+
+				dbg("Removing media with id =", id);
 
 				const newMainList = new Map(sortedByTitleAndMainList);
 
@@ -417,7 +415,7 @@ export function getPlaylist(
 	if (list === playlistList.mainList) return getMainList();
 	if (list === playlistList.history) return getHistory();
 
-	throw new Error(`List ${list} is not handled!`);
+	throw throwErr(`List ${list} is not handled!`);
 }
 
 ///////////////////////////////////////////////////

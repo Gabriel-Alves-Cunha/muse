@@ -1,12 +1,12 @@
 import type { Path } from "@common/@types/generalTypes";
 
 import { readdir, unlink } from "node:fs/promises";
-import { error } from "node:console";
 import { join } from "node:path";
 
 import { getLastExtension } from "@common/path";
 import { allowedMedias } from "@common/utils";
 import { emptyArray } from "@common/empty";
+import { error } from "@common/log";
 import { dirs } from "@main/utils";
 
 ///////////////////////////////////////////
@@ -14,9 +14,9 @@ import { dirs } from "@main/utils";
 ///////////////////////////////////////////
 
 /** Infallible async function. */
-export const getFullPathOfFilesForFilesInThisDirectory = async (
+export async function getFullPathOfFilesForFilesInThisDirectory(
 	dir: Path,
-): Promise<readonly Path[]> => {
+): Promise<readonly Path[]> {
 	const files = await readDir(dir);
 
 	const fullPaths: Path[] = [];
@@ -24,7 +24,7 @@ export const getFullPathOfFilesForFilesInThisDirectory = async (
 	for (const file of files) fullPaths.push(join(dir, file));
 
 	return fullPaths;
-};
+}
 
 ///////////////////////////////////////////
 
@@ -46,7 +46,7 @@ export const deleteFile = (path: Path): Promise<boolean> =>
 			return false;
 		});
 
-export const searchDirectoryResult = async (): Promise<readonly Path[]> => {
+export async function searchDirectoryResult(): Promise<readonly Path[]> {
 	const resoledPromises = await Promise.allSettled([
 		getFullPathOfFilesForFilesInThisDirectory(dirs.documents),
 		getFullPathOfFilesForFilesInThisDirectory(dirs.downloads),
@@ -59,7 +59,7 @@ export const searchDirectoryResult = async (): Promise<readonly Path[]> => {
 		if (resolved.status === "fulfilled") paths.push(...resolved.value);
 
 	return paths;
-};
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

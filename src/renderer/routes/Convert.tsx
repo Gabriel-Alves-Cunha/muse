@@ -59,7 +59,7 @@ export default function Convert() {
 	}, [toExtension, selectedFiles]);
 
 	////////////////////////////////////////////////
-	//TODO: remove div
+
 	return (
 		<MainArea className="flex justify-center items-center">
 			<Button

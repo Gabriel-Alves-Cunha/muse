@@ -5,7 +5,10 @@ import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
 import { App } from "./App";
 
 if (isDev) {
-	globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
+	setTimeout(
+		() => (globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_()),
+		10_000,
+	);
 
 	// document.designMode = "on";
 }

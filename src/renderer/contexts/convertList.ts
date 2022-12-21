@@ -4,14 +4,14 @@ import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
-import { error } from "@utils/log";
+import { error } from "@common/log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
 // For in-hand testing porpuses:
-import { progressStatus } from "@common/enums";
+import { ProgressStatus } from "@common/enums";
 import { getRandomInt } from "@utils/utils";
 
 const { port1: testPort } = new MessageChannel();
@@ -20,38 +20,38 @@ const testConvertingMedia: [Path, MediaBeingConverted][] = Array.from(
 		length: 10,
 	},
 	(_, index) => {
-		let status: ValuesOf<typeof progressStatus> = progressStatus.ACTIVE;
+		let status: ValuesOf<typeof ProgressStatus> = ProgressStatus.ACTIVE;
 
 		const random1_5 = getRandomInt(0, 5);
 		switch (random1_5) {
 			case 0: {
-				status = progressStatus.ACTIVE;
+				status = ProgressStatus.ACTIVE;
 				break;
 			}
 
 			case 1: {
-				status = progressStatus.CANCEL;
+				status = ProgressStatus.CANCEL;
 				break;
 			}
 
 			case 2: {
-				status = progressStatus.FAILED;
+				status = ProgressStatus.FAILED;
 				break;
 			}
 
 			case 3: {
-				status = progressStatus.SUCCESS;
+				status = ProgressStatus.SUCCESS;
 				break;
 			}
 
 			case 4: {
-				status = progressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON;
+				status = ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON;
 				break;
 			}
 
 			default:
 				error("Error: random1_5 is not in range [0, 5]", random1_5);
-				status = progressStatus.SUCCESS;
+				status = ProgressStatus.SUCCESS;
 				break;
 		}
 

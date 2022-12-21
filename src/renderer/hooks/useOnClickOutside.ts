@@ -1,6 +1,6 @@
 import { type RefObject, useEffect } from "react";
 
-import { leftClick } from "@components/MediaListKind/helper";
+import { leftClick } from "@components/MediaListKind/Row";
 
 /**
  * It's worth noting that because passed in `handler` is a new
@@ -9,10 +9,10 @@ import { leftClick } from "@components/MediaListKind/helper";
  * but to optimize you can wrap `handler` in `useCallback` before
  * passing it into this hook.
  */
-export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
+export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(
 	ref: RefObject<T>,
 	handler: Handler,
-) {
+) => {
 	useEffect(() => {
 		const listener = (event: PointerEvent) => {
 			if (
@@ -29,6 +29,6 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 
 		return () => document.removeEventListener("pointerup", listener);
 	}, [ref, handler]);
-}
+};
 
 type Handler = (event: PointerEvent) => void;

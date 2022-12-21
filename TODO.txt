@@ -5,6 +5,9 @@
 * ADD: detect (avail port to share)
 * ADD: electron setProgressBar
 * FIX: gh-actions is always overwriting latest release!!
+* REFACTOR: use web-share!!!
+* ADD: playback rate
+* ADD: cut and visualise audio
 
 ################## NOTES ##################
 

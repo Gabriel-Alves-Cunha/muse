@@ -14,12 +14,12 @@
 		"release:linux:test": "cross-env DEBUG=electron-builder electron-builder --publish=never --dir --linux -c.asar=false",
 		"release:linux": "cross-env DEBUG=electron-builder electron-builder --publish=never --linux",
 		"preview": "yarn build && electron --trace-warnings --inspect build/main/index.cjs",
-		"test": "cross-env DEBUG=muse:tests vitest -c vite.config.ts --dir tests/",
 		"build": "cross-env DEBUG=muse NODE_ENV=production hmr-electron build",
 		"dev": "cross-env DEBUG=muse NODE_ENV=development hmr-electron dev",
-		"coverage": "vitest -c vite.config.ts --dir tests/ run --coverage",
 		"ts:check": "tsc --noEmit --pretty --extendedDiagnostics",
 		"postinstall": "electron-builder install-app-deps",
+		"test": "cross-env DEBUG=muse:tests vitest",
+		"coverage": "vitest run --coverage",
 		"fmt": "rome format . --write",
 		"lint": "rome check ."
 	},
@@ -32,11 +32,11 @@
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/koa": "^2.13.5",
 		"@types/koa-router": "^7.4.4",
-		"@types/node": "^18.11.15",
+		"@types/node": "^18.11.17",
 		"@types/qrcode": "^1.5.0",
 		"@types/react": "^18.0.26",
 		"@types/react-dom": "^18.0.9",
-		"@vitejs/plugin-react-swc": "^3.0.0",
+		"@vitejs/plugin-react-swc": "^3.0.1",
 		"autoprefixer": "^10.4.13",
 		"cross-env": "^7.0.3",
 		"electron": "^22.0.0",
@@ -55,15 +55,14 @@
 		"react-dom": "^18.2.0",
 		"react-error-boundary": "^3.1.4",
 		"react-icons": "^4.7.1",
-		"react-spinners": "^0.13.7",
 		"react-toastify": "^9.1.1",
 		"react-virtuoso": "^3.1.5",
 		"rome": "^11.0.0",
 		"sanitize-filename": "^1.6.3",
 		"tailwindcss": "^3.2.4",
 		"typescript": "^4.9.4",
-		"vite": "^4.0.1",
-		"vitest": "^0.25.8",
+		"vite": "^4.0.2",
+		"vitest": "^0.26.1",
 		"ytdl-core": "^4.11.2",
 		"zustand": "4.1.5"
 	},
@@ -73,5 +72,6 @@
 	"os": [
 		"windows",
 		"linux"
-	]
+	],
+	"dependencies": {}
 }

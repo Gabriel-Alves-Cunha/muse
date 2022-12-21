@@ -1,6 +1,7 @@
-import { log } from "@utils/log";
+import { log } from "@common/log";
 
 const debug = process.env.DEBUG?.split(",");
+
 const logPlaylists = debug?.includes("muse:playlists");
 const logGeneralDebug = debug?.includes("muse");
 const logTests = debug?.includes("muse:tests");

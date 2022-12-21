@@ -11,7 +11,7 @@ const isLoadingMediasSelector = (
 	state: ReturnType<typeof usePlaylists.getState>,
 ) => state.isLoadingMedias;
 
-export function Reload() {
+export const Reload = () => {
 	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
 	const { t } = useTranslation();
 
@@ -24,4 +24,4 @@ export function Reload() {
 			<ReloadIcon size={17} className="fill-white" />
 		</ButtonOfGroup>
 	);
-}
+};

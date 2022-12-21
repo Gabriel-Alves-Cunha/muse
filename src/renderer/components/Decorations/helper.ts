@@ -1,4 +1,4 @@
-import { electronIpcMainProcessNotification } from "@common/enums";
+import { ElectronIpcMainProcessNotification } from "@common/enums";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -8,18 +8,14 @@ const notify =
 /////////////////////////////////////////////
 
 export const toggleMaximize = () =>
-	notify(electronIpcMainProcessNotification.TOGGLE_MAXIMIZE);
+	notify(ElectronIpcMainProcessNotification.TOGGLE_MAXIMIZE);
 
 /////////////////////////////////////////////
 
 export const minimizeWindow = () =>
-	notify(electronIpcMainProcessNotification.MINIMIZE);
+	notify(ElectronIpcMainProcessNotification.MINIMIZE);
 
 /////////////////////////////////////////////
 
 export const closeWindow = () =>
-	notify(electronIpcMainProcessNotification.QUIT_APP);
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
+	notify(ElectronIpcMainProcessNotification.QUIT_APP);

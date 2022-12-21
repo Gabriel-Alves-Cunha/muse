@@ -1,27 +1,27 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
-import { AllowedMedias, throwErr } from "@common/utils";
+import type { AllowedMedias } from "@common/utils";
 import type { MediaUrl } from "@contexts/downloadList";
 import type { Readable } from "node:stream";
 
 import { cursorTo, clearLine } from "node:readline";
-import { error, log } from "node:console";
 import { existsSync } from "node:fs";
 import { stdout } from "node:process";
 import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { electronToReactMessage } from "@common/enums";
+import { ElectronToReactMessage } from "@common/enums";
+import { error, log, throwErr } from "@common/log";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { progressStatus } from "@common/enums";
+import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { emptyString } from "@common/empty";
 import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
-import { dbg } from "@common/debug";
 import { time } from "@utils/utils";
+import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -89,7 +89,7 @@ export async function createDownload(
 
 		// Send a msg to the client that the download failed:
 		const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
-			status: progressStatus.FAILED,
+			status: ProgressStatus.FAILED,
 			error: err,
 		};
 		electronPort.postMessage(msg);
@@ -136,7 +136,7 @@ export async function createDownload(
 
 				// Send a message to client that we're successfully starting a download:
 				const msg: Partial<MediaBeingDownloaded> = {
-					status: progressStatus.ACTIVE,
+					status: ProgressStatus.ACTIVE,
 				};
 				electronPort.postMessage(msg);
 			}
@@ -164,18 +164,18 @@ export async function createDownload(
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 		// Handle download cancelation:
-		.on("destroy", async () => {
+		.on("destroy", () => {
 			log(
 				`%cDestroy was called on readStream! title: ${title}`,
 				"color: blue; font-weight: bold; background: yellow; font-size: 0.8rem;",
 			);
 
 			// Delete the file since it was canceled:
-			await deleteFile(saveSite);
+			deleteFile(saveSite).then();
 
 			// Tell the client the download was successfully canceled:
 			const msg: Partial<MediaBeingDownloaded> = {
-				status: progressStatus.CANCEL,
+				status: ProgressStatus.CANCEL,
 			};
 			electronPort.postMessage(msg);
 
@@ -193,7 +193,7 @@ export async function createDownload(
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("end", async () => {
+		.on("end", () => {
 			log(
 				`%cFile "${titleWithExtension}" saved successfully!`,
 				"color: green; font-weight: bold;",
@@ -201,7 +201,7 @@ export async function createDownload(
 
 			// Tell the client the download was successfull:
 			const msg: Partial<MediaBeingDownloaded> = {
-				status: progressStatus.SUCCESS,
+				status: ProgressStatus.SUCCESS,
 			};
 			electronPort.postMessage(msg);
 
@@ -220,7 +220,7 @@ export async function createDownload(
 
 			// Tell client to add a new media...
 			sendMsgToClient({
-				type: electronToReactMessage.ADD_ONE_MEDIA,
+				type: ElectronToReactMessage.ADD_ONE_MEDIA,
 				mediaPath: saveSite,
 			});
 
@@ -231,15 +231,15 @@ export async function createDownload(
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("error", async (err) => {
+		.on("error", (err) => {
 			error(`Error downloading file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
-			await deleteFile(saveSite);
+			deleteFile(saveSite).then();
 
 			// Tell the client the download threw an error:
 			const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
-				status: progressStatus.FAILED,
+				status: ProgressStatus.FAILED,
 				error: new Error(err.message),
 			};
 			electronPort!.postMessage(msg);

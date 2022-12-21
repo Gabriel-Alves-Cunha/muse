@@ -1,8 +1,10 @@
+import type { Json } from "@common/@types/utils";
+
 import { vi } from "vitest";
 
 import { getObjectLength, withoutProperty } from "@utils/object";
 import { stringifyJson } from "@common/utils";
-import { log } from "@utils/log";
+import { dbgTests } from "@common/debug";
 
 // Mocking window.localStorage
 class LocalStorageMock {
@@ -71,8 +73,8 @@ export function mockElectronPlusNodeGlobalsBeforeTests() {
 	});
 
 	vi.stubGlobal("window", {
-		postMessage: vi.fn().mockImplementation(function (...args: unknown[]) {
-			log(
+		postMessage: vi.fn().mockImplementation(function (...args: Json[]) {
+			dbgTests(
 				"%cwindow.postMessage arguments =",
 				"color:blue",
 				stringifyJson(args),

@@ -3,6 +3,8 @@ import type { OneOf } from "@common/@types/utils";
 
 import create from "zustand";
 
+import { throwErr } from "@common/log";
+
 /**
  * @param translations
  * ```ts
@@ -43,12 +45,12 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 				);
 
 			if (typeof targetObject !== "object")
-				throw new Error(`Missing translation: "${key}"!`);
+				throwErr(`Missing translation: "${key}"!`);
 
 			const translation = targetObject[lastPart];
 
 			if (typeof translation !== "string")
-				throw new Error(`Missing translation: "${key}"!`);
+				throwErr(`Missing translation: "${key}"!`);
 
 			// 			// Replace placeholders like `{{count}}` with values from `args`
 			// 			const processed = Object.entries(args).reduce(
@@ -62,7 +64,7 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 			//
 			// 			return processed;
 
-			return translation;
+			return translation as string;
 		},
 	}));
 

@@ -17,7 +17,7 @@ import {
 import { RightSlot } from "./RightSlot";
 import { Item } from "./Item";
 
-export function FullExampleCtxMenu() {
+export default function FullExampleCtxMenu() {
 	const [bookmarksChecked, setBookmarksChecked] = useState<
 		boolean | "indeterminate"
 	>(true);

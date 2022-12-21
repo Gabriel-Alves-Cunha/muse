@@ -5,9 +5,9 @@ import { clearLine, cursorTo } from "node:readline";
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { autoUpdater } from "electron-updater";
-import { error } from "node:console";
 import {
 	BrowserWindow,
+	Notification,
 	nativeImage,
 	MenuItem,
 	protocol,
@@ -20,11 +20,15 @@ import {
 import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
 import { logoPath } from "./utils";
+import { error } from "@common/log";
 import { dbg } from "@common/debug";
 import {
-	electronIpcMainProcessNotification,
-	electronToReactMessage,
+	ElectronIpcMainProcessNotification,
+	ElectronToReactMessage,
 } from "@common/enums";
+
+console.log("Notification =", Notification);
+console.log("new Notification() =", new Notification());
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -72,7 +76,7 @@ function createElectronWindow(): BrowserWindow {
 		width: 800,
 
 		webPreferences: {
-			preload: resolve(app.getAppPath(), "preload.cjs"),
+			preload: resolve(app.getAppPath(), "build", "main", "preload.cjs"),
 			allowRunningInsecureContent: false,
 			contextIsolation: true, // <-- Needed to use contextBridge
 			nodeIntegration: true,
@@ -128,7 +132,7 @@ function createElectronWindow(): BrowserWindow {
 	const url = isDev
 		? "http://localhost:3000"
 		: pathToFileURL(
-				resolve(app.getAppPath(), "..", "renderer", "index.html"),
+				resolve(app.getAppPath(), "build", "renderer", "index.html"),
 		  ).toString();
 
 	window.loadURL(url).then();
@@ -190,7 +194,9 @@ app
 		/////////////////////////////////////////
 
 		// Tray setup:
-		tray = new Tray(nativeImage.createFromPath(logoPath));
+		tray = new Tray(
+			nativeImage.createFromPath(resolve(app.getAppPath(), "muse.png")),
+		);
 		tray.setToolTip("Music player and downloader");
 		tray.setTitle("Muse");
 
@@ -215,12 +221,12 @@ app
 ipcMain
 	.on(
 		// Relay message from electronWindow to ipcRenderer:
-		electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+		ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 		(_, downloadValues: DownloadInfo) => {
 			dbg("ipcMain received data from electronWindow:", downloadValues);
 
 			ipcMain.emit(
-				electronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+				ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 				downloadValues,
 			);
 		},
@@ -230,17 +236,17 @@ ipcMain
 		"notify",
 		(
 			event,
-			type: ValuesOf<typeof electronIpcMainProcessNotification>,
+			type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
 		): void => {
 			const focusedWindow = BrowserWindow.getFocusedWindow();
 
 			switch (type) {
-				case electronIpcMainProcessNotification.QUIT_APP: {
+				case ElectronIpcMainProcessNotification.QUIT_APP: {
 					app.quit();
 					break;
 				}
 
-				case electronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
+				case ElectronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
 					if (!focusedWindow) break;
 
 					focusedWindow.isMaximized()
@@ -249,17 +255,17 @@ ipcMain
 					break;
 				}
 
-				case electronIpcMainProcessNotification.MINIMIZE: {
+				case ElectronIpcMainProcessNotification.MINIMIZE: {
 					focusedWindow?.minimize();
 					break;
 				}
 
-				case electronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
+				case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
 					focusedWindow?.webContents.toggleDevTools();
 					break;
 				}
 
-				case electronIpcMainProcessNotification.RELOAD_WINDOW: {
+				case ElectronIpcMainProcessNotification.RELOAD_WINDOW: {
 					focusedWindow?.reload();
 					break;
 				}

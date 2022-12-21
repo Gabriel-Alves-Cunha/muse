@@ -1,3 +1,5 @@
+import type { Json } from "@common/@types/utils";
+
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
@@ -44,14 +46,6 @@ useSettings.subscribe(
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
-
-export type Json =
-	| string
-	| number
-	| boolean
-	| null
-	| Json[]
-	| { [key: string]: Json };
 
 export type Settings = Json &
 	Readonly<{

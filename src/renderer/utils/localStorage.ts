@@ -22,7 +22,7 @@ export const keys = {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function setLocalStorage(key: Keys, value: Values): void {
+export const setLocalStorage = (key: Keys, value: Values): void =>
 	setTimeout(() => {
 		if (value instanceof Map || value instanceof Set) value = [...value];
 
@@ -31,18 +31,19 @@ export function setLocalStorage(key: Keys, value: Values): void {
 		dbgPlaylists({ key, json, value });
 
 		localStorage.setItem(key, json);
-	});
-}
+	}) as unknown as void;
 
 ////////////////////////////////////////////////
 
-export function getFromLocalStorage(key: Keys): Values | undefined {
-	const value = localStorage.getItem(key) ?? "[]";
+const emptyArrayString = "[]";
+
+export const getFromLocalStorage = (key: Keys): Values | undefined => {
+	const value = localStorage.getItem(key) ?? emptyArrayString;
 	const item: unknown = JSON.parse(value);
 
 	dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
 
-	if (item === "[]" && !value) return undefined;
+	if (item === emptyArrayString && !value) return undefined;
 
 	if (key === keys.favorites) {
 		const newFavorites = new Set(item as ID[]);
@@ -77,7 +78,7 @@ export function getFromLocalStorage(key: Keys): Values | undefined {
 	}
 
 	return undefined;
-}
+};
 
 //////////////////////////////////////////
 //////////////////////////////////////////

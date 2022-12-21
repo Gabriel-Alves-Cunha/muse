@@ -1,12 +1,12 @@
 import type { Base64, ID, Media, Path } from "@common/@types/generalTypes";
 
-import { error, groupEnd, groupCollapsed } from "node:console";
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { randomUUID } from "node:crypto";
 import { statSync } from "node:fs";
 
 import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
 import { getAllowedMedias, searchDirectoryResult } from "../file";
+import { error, groupEnd, groupCollapsed } from "@common/log";
 import { emptyString } from "@common/empty";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
@@ -24,7 +24,7 @@ const createMedia = async (
 	path: Path,
 	assureMediaSizeIsGreaterThan60KB: boolean,
 	ignoreMediaWithLessThan60Seconds: boolean,
-): Promise<[Path, Media]> =>
+): Promise<[ID, Media]> =>
 	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
@@ -98,7 +98,7 @@ export const transformPathsToMedias = (
 	path: Path | undefined,
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
-): Promise<[Path, Media][]> =>
+): Promise<[ID, Media][]> =>
 	time(async () => {
 		groupCollapsed("Creating medias...");
 

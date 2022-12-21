@@ -199,7 +199,6 @@
 		position: fixed;
 		line-height: 1.5;
 
-		/* contain-intrinsic-size: auto; */
 		contain-intrinsic-size: 1px 5000px;
 		content-visibility: auto;
 		overflow: hidden;
@@ -263,6 +262,11 @@
 		height: var(--main-grid-height);
 	}
 
+	.grid-area-nav {
+		grid-area: nav;
+		height: var(--main-grid-height);
+	}
+
 	.grid-template-for-content-wrapper {
 		@apply grid w-screen bg-main;
 
@@ -270,16 +274,105 @@
 				200px,
 				25vw
 			);
-		margin-top: var(--top-decorations-height);
 		height: var(--main-grid-height);
 	}
 
-	@media (min-width: 640px) {
+	@media (max-width: 640px) {
 		.grid-template-for-content-wrapper {
-			grid-template:
-				[row1-start] "nav main-area" 1fr / 35px 1fr [row1-end]
-				[row2-start] "media-player" 70px / 1fr [row2-start];
+			/* grid-template:
+				"nav main-area" 1fr / 35px 1fr
+				"media-player" 70px / 1fr; */
+
+			grid-template-columns: 0.17fr 1.8fr;
+			grid-template-rows: 1.6fr 0.7fr;
+			grid-template-areas:
+				"nav main-area"
+				"media-player media-player";
 		}
+
+		.grid-area-media-player {
+			grid-area: media-player;
+			height: 100%;
+		}
+
+		.grid-area-main {
+			@apply relative flex flex-col p-3 h-auto;
+
+			grid-area: main-area;
+		}
+
+		.grid-area-nav {
+			grid-area: nav;
+			height: auto;
+		}
+
+		.search-media {
+			width: 15rem !important;
+		}
+
+		.grouped-button {
+			@apply px-2 h-10 !important;
+		}
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Navbar */
+
+	.nav {
+		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition grid-area-nav;
+	}
+
+	.nav > button:where(:focus, :focus-visible, :hover) {
+		@apply text-active;
+	}
+
+	.buttons-for-pages {
+		@apply flex flex-col justify-center items-center w-full;
+	}
+
+	.buttons-for-pages button {
+		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
+	}
+
+	.buttons-for-pages button:where(:focus, :focus-visible, :hover) {
+		@apply text-icon-active;
+	}
+
+	.buttons-for-pages button.active {
+		@apply text-icon-active;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Search Media */
+
+	.search-media {
+		@apply relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none transition-all ease-out duration-200;
+	}
+
+	.search-media * {
+		transition-timing-function: ease;
+		transition-duration: 200ms;
+		transition-property: all;
+	}
+
+	.search-media:where(:focus, :focus-visible, :hover, :focus-within) {
+		@apply border-active cursor-text;
+	}
+
+	.search-media:where(:focus, :focus-visible, :hover, :focus-within) svg {
+		@apply text-active;
+	}
+
+	.search-media:where(:focus, :focus-visible, :hover, :focus-within) label {
+		transform: translate(-44px, -31px);
+
+		@apply text-active;
 	}
 
 	/* ********************************** */
@@ -581,11 +674,60 @@
 		@apply w-80 h-5;
 	}
 
+	.main-area-header {
+		@apply relative flex justify-start items-center h-14 gap-4 mb-[5%];
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Ring loader */
+
+	.ring-loader {
+		position: relative;
+		display: block;
+		height: 100px;
+		width: 100px;
+	}
+
+	.right-ring-loader {
+		position: absolute;
+		display: block;
+		top: 0px;
+		left: 0px;
+		width: 100px;
+		height: 100px;
+		border: 10px solid rgb(0, 0, 255);
+		opacity: 0.4;
+		border-radius: 100%;
+		perspective: 800px;
+		animation: 2s linear 0s infinite normal none running anim-right-ring-loader;
+	}
+
+	.left-ring-loader {
+		position: absolute;
+		display: block;
+		top: 0px;
+		left: 0px;
+		width: 100px;
+		height: 100px;
+		border: 10px solid rgb(0, 0, 255);
+		opacity: 0.4;
+		border-radius: 100%;
+		perspective: 800px;
+		animation: 2s linear 0s infinite normal none running anim-left-ring-loader;
+	}
+
 	/* ********************************** */
 	/* ********************************** */
 	/* ********************************** */
 
 	/* Context Menu */
+
+	.ctx-menu-item {
+		@apply unset-all relative flex items-center h-6 cursor-pointer py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide text-base leading-none select-none disabled:text-disabled disabled:pointer-events-none hover:text-ctx-menu-item-focus hover:bg-ctx-menu-item-focus focus:text-ctx-menu-item-focus focus:bg-ctx-menu-item-focus;
+	}
 
 	.ctx-trigger:where(:focus, :focus-visible, :hover) {
 		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
@@ -601,32 +743,6 @@
 
 	.ctx-trigger:disabled svg {
 		@apply text-disabled;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* Search Media */
-
-	.search-media * {
-		transition-timing-function: ease;
-		transition-duration: 200ms;
-		transition-property: all;
-	}
-
-	.search-media:where(:focus, :focus-visible, :hover, :focus-within) {
-		@apply border-active cursor-text;
-	}
-
-	.search-media:where(:focus, :focus-visible, :hover, :focus-within) svg {
-		@apply text-active;
-	}
-
-	.search-media:where(:focus, :focus-visible, :hover, :focus-within) label {
-		transform: translate(-44px, -31px);
-
-		@apply text-active;
 	}
 
 	/* ********************************** */
@@ -709,39 +825,6 @@
 
 	.decorations-down-right {
 		@apply flex justify-center items-center gap-4 first:pl-4;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* Navbar */
-
-	.nav {
-		grid-area: nav;
-		height: var(--main-grid-height);
-
-		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition;
-	}
-
-	.nav > button:where(:focus, :focus-visible, :hover) {
-		@apply text-active;
-	}
-
-	.buttons-for-pages {
-		@apply flex flex-col justify-center items-center w-full;
-	}
-
-	.buttons-for-pages button {
-		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
-	}
-
-	.buttons-for-pages button:where(:focus, :focus-visible, :hover) {
-		@apply text-icon-active;
-	}
-
-	.buttons-for-pages button.active {
-		@apply text-icon-active;
 	}
 
 	/* ********************************** */
@@ -903,5 +986,25 @@
 	100% {
 		/* -71 is the (height + 1 * gap): */
 		transform: translateY(-71px);
+	}
+}
+
+@keyframes anim-right-ring-loader {
+	0% {
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+	}
+
+	100% {
+		transform: rotateX(180deg) rotateY(360deg) rotateZ(360deg);
+	}
+}
+
+@keyframes anim-left-ring-loader {
+	0% {
+		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+	}
+
+	100% {
+		transform: rotateX(360deg) rotateY(180deg) rotateZ(360deg);
 	}
 }

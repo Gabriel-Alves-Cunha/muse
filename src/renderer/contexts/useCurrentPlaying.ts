@@ -11,7 +11,7 @@ import create from "zustand";
 
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getRandomInt, time } from "@utils/utils";
-import { warn, error, info, log } from "@utils/log";
+import { warn, error, info } from "@common/log";
 import { getPlayOptions } from "./usePlayOptions";
 import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
@@ -61,35 +61,35 @@ export const playThisMedia = (
 
 ////////////////////////////////////////////////
 
-export function togglePlayPause(): void {
+export const togglePlayPause = (): void => {
 	const audio = document.getElementById("audio") as HTMLAudioElement | null;
 	if (!audio) return;
 
 	audio.paused ? play(audio) : pause(audio);
-}
+};
 
 ////////////////////////////////////////////////
 
-export function play(audio?: HTMLAudioElement): void {
+export const play = (audio?: HTMLAudioElement): void => {
 	audio
 		? audio.play().then()
 		: (document.getElementById("audio") as HTMLAudioElement).play().then();
-}
+};
 
 ////////////////////////////////////////////////
 
-export function pause(audio?: HTMLAudioElement): void {
+export const pause = (audio?: HTMLAudioElement): void => {
 	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
 
 	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
-}
+};
 
 ////////////////////////////////////////////////
 
-function sortHistoryByDate() {
+const sortHistoryByDate = () => {
 	const unsortedList: [Path, DateAsNumber][] = [];
 
 	for (const [id, dates] of getPlaylist(playlistList.history) as History)
@@ -102,9 +102,9 @@ function sortHistoryByDate() {
 		.map(([id, date]) => [id, mainList.get(id)!, date]);
 
 	return listAsArrayOfMap;
-}
+};
 
-export function playPreviousMedia(): void {
+export const playPreviousMedia = (): void => {
 	time(() => {
 		const { id, listType } = getCurrentPlaying();
 
@@ -131,11 +131,11 @@ export function playPreviousMedia(): void {
 
 		playThisMedia(previousMediaPath, correctListType);
 	}, "playPreviousMedia");
-}
+};
 
 ////////////////////////////////////////////////
 
-export function playNextMedia(): void {
+export const playNextMedia = (): void => {
 	time(() => {
 		const { id, listType } = getCurrentPlaying();
 
@@ -195,7 +195,7 @@ export function playNextMedia(): void {
 			currentTime: 0,
 		});
 	}, "playNextMedia");
-}
+};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -230,7 +230,7 @@ useCurrentPlaying.subscribe(
 // we don't load the media until the timeout ends.
 let prevTimerToSetMedia: NodeJS.Timeout | undefined;
 
-function setAudioSource(newID: ID, prevID: ID) {
+const setAudioSource = (newID: ID, prevID: ID) => {
 	clearTimeout(prevTimerToSetMedia);
 
 	const media = getMedia(newID);
@@ -248,7 +248,7 @@ function setAudioSource(newID: ID, prevID: ID) {
 	}, 150);
 
 	prevTimerToSetMedia = timerToSetMedia;
-}
+};
 
 ////////////////////////////////////////////////
 
@@ -258,7 +258,7 @@ const playingClass = "playing";
  * Decorate the rows of current playing medias
  * and undecorate previous playing ones.
  */
-function handleDecorateMediaRow(newID: ID, prevID: ID) {
+const handleDecorateMediaRow = (newID: ID, prevID: ID) => {
 	const prevElements = prevID
 		? document.querySelectorAll(`[data-id="${prevID}"]`)
 		: null;
@@ -273,11 +273,11 @@ function handleDecorateMediaRow(newID: ID, prevID: ID) {
 
 	// Decorate new playing media row:
 	for (const element of newElements) element.classList.add(playingClass);
-}
+};
 
 ////////////////////////////////////////////////
 
-function changeMediaSessionMetadata(media: Media): void {
+const changeMediaSessionMetadata = (media: Media): void => {
 	if (!navigator?.mediaSession) return;
 
 	navigator.mediaSession.metadata = new MediaMetadata({
@@ -286,7 +286,7 @@ function changeMediaSessionMetadata(media: Media): void {
 		title: media.title,
 		album: media.album,
 	});
-}
+};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

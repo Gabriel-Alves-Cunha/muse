@@ -12,7 +12,9 @@ import warningSvg from "@assets/warning.svg";
 /////////////////////////////////////////////
 // Main function:
 
-export const DeleteMediaDialogContent = ({ handleMediaDeletion }: Props) => {
+export default function DeleteMediaDialogContent({
+	handleMediaDeletion,
+}: Props) {
 	const { t } = useTranslation();
 
 	return (
@@ -41,11 +43,11 @@ export const DeleteMediaDialogContent = ({ handleMediaDeletion }: Props) => {
 			</Content>
 		</Portal>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-type Props = { handleMediaDeletion: () => void };
+type Props = { handleMediaDeletion(): void };

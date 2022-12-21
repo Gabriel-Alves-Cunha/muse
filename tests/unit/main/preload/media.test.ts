@@ -15,7 +15,7 @@ import { join } from "node:path";
 
 import { mediaPath, mediaPicture, test_assetsDir } from "./utils";
 import { eraseImg, makeRandomString } from "@common/utils";
-import { error } from "@utils/log";
+import { error } from "@common/log";
 
 const { writeTags } = await import("@main/preload/media/mutate-metadata");
 

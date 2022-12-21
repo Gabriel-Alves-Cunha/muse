@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 import { contentOfSelectEnum, Select } from "@components/Select";
 import { useTranslation } from "@i18n";
 import { playlistList } from "@common/enums";
-import { setFromList } from "@components/MediaListKind/helper";
+import { setFromList } from "@components/MediaListKind/states";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-export function SortBy() {
+export const SortBy = () => {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
 	const { t } = useTranslation();
 
@@ -37,6 +37,6 @@ export function SortBy() {
 			<SortIcon size={19} className="fill-white" />
 		</Select>
 	);
-}
+};
 
 type SelectedList = "Name" | "Date";

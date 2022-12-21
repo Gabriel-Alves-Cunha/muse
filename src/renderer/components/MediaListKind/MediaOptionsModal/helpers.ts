@@ -1,205 +1,23 @@
 import type { MetadataToChange } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
-import { MdOutlineDelete as Remove } from "react-icons/md";
-import { MdClose as CloseIcon } from "react-icons/md";
-import { useEffect, useRef } from "react";
-import {
-	Description,
-	Content,
-	Trigger,
-	Dialog,
-	Title,
-	Close,
-} from "@radix-ui/react-dialog";
-
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
-import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
-import { errorToast, successToast } from "../toasts";
-import { reactToElectronMessage } from "@common/enums";
+import { errorToast, successToast } from "../../toasts";
+import { ReactToElectronMessage } from "@common/enums";
 import { areArraysEqualByValue } from "@utils/array";
-import { isAModifierKeyPressed } from "@utils/keyboard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
 import { prettyBytes } from "@common/prettyBytes";
-import { emptyString } from "@common/empty";
 import { deleteFile } from "@utils/deleteFile";
-import { log, error } from "@utils/log";
-import { FlexRow } from "../FlexRow";
-import { Button } from "../Button";
+import { log, error } from "@common/log";
 import { dbg } from "@common/debug";
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Main function:
-
-export function MediaOptionsModal({ media, path }: Props) {
-	const closeButtonRef = useRef<HTMLButtonElement>(null);
-	const imageButtonRef = useRef<HTMLButtonElement>(null);
-	const imageInputRef = useRef<HTMLInputElement>(null);
-	const imageFilePathRef = useRef(emptyString);
-	const { t } = useTranslation();
-
-	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
-
-	const handleSelectedFile = ({
-		target: { files },
-	}: React.ChangeEvent<HTMLInputElement>) => {
-		if (
-			!(imageButtonRef.current && imageInputRef.current && files) ||
-			files.length === 0
-		)
-			return;
-
-		const [file] = files;
-
-		imageFilePathRef.current = file!.webkitRelativePath;
-
-		dbg("imageFilePath =", imageFilePathRef.current);
-
-		// Change button color to indicate that selection was successfull:
-		imageButtonRef.current.classList.add("file-present");
-	};
-
-	useEffect(() => {
-		const changeMediaMetadataOnEnter = (event: KeyboardEvent) => {
-			if (event.key === "Enter" && !isAModifierKeyPressed(event))
-				changeMediaMetadata(
-					closeButtonRef,
-					imageFilePathRef.current,
-					path,
-					media,
-				);
-		};
-
-		// This is because if you open the popover by pressing
-		// "Enter", it will just open and close it!
-		setTimeout(
-			() => document.addEventListener("keyup", changeMediaMetadataOnEnter),
-			500,
-		);
-
-		return () =>
-			document.removeEventListener("keyup", changeMediaMetadataOnEnter);
-	}, [media, path]);
-
-	return (
-		<Content className="unset-all fixed grid center max-w-md min-w-[300px] p-8 bg-dialog z-20 rounded">
-			<Title className="unset-all font-primary tracking-wide text-2xl text-normal font-medium">
-				{t("dialogs.mediaOptions.title")}
-			</Title>
-
-			<Description className="mt-3 mx-0 mb-5 font-secondary text-gray tracking-wide text-base">
-				{t("dialogs.mediaOptions.description")}
-			</Description>
-
-			<Close
-				// outline: "initial"; h-9; rounded
-				className="unset-all flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold absolute right-2 top-2 rounded-full hover:bg-icon-button-hovered focus:bg-icon-button-hovered"
-				title={t("tooltips.closeDialog")}
-				ref={closeButtonRef}
-			>
-				<CloseIcon className="fill-accent-light" />
-			</Close>
-
-			<form id="form">
-				{Object.entries(optionsForUserToSee(media)).map(([option, value]) => (
-					<fieldset
-						className="unset-all flex items-center h-9 gap-5 mb-4"
-						key={option}
-					>
-						<label
-							className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
-							htmlFor={option}
-						>
-							{t(`labels.${option as OptionsForUserToSee}`)}
-						</label>
-
-						{option === "image" ? (
-							/////////////////////////////////////////////
-							/////////////////////////////////////////////
-							// Handle file input for image:
-							<Button
-								onPointerUp={openNativeUI_ChooseFiles}
-								className="no-transition"
-								ref={imageButtonRef}
-								variant="input"
-								id={option}
-							>
-								<SearchImage size={18} />
-
-								<input
-									onChange={handleSelectedFile}
-									ref={imageInputRef}
-									accept="image/*"
-									type="file"
-								/>
-
-								{t("buttons.selectImg")}
-							</Button>
-						) : /////////////////////////////////////////////
-						/////////////////////////////////////////////
-						// Handle text input with line feeds:
-						option === "lyrics" ? (
-							<textarea
-								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								defaultValue={value}
-								id={option}
-							/>
-						) : (
-							<input
-								className="unset-all box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								readOnly={!isChangeable(option)}
-								defaultValue={format(value)}
-								id={option}
-							/>
-						)}
-					</fieldset>
-				))}
-			</form>
-
-			<FlexRow>
-				<Dialog modal>
-					{/* line-height: 35px; // same as height */}
-					<Trigger className="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition">
-						{t("buttons.deleteMedia")}
-
-						<Remove />
-					</Trigger>
-
-					<DeleteMediaDialogContent
-						handleMediaDeletion={() =>
-							handleMediaDeletion(closeButtonRef, path)
-						}
-					/>
-				</Dialog>
-
-				<Close
-					className="unset-all flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold bg-[#ddf4e5] text-[#2c6e4f] hover:bg-[#c6dbce] focus:bg-[#c6dbce]"
-					onPointerUp={() =>
-						changeMediaMetadata(
-							closeButtonRef,
-							imageFilePathRef.current,
-							path,
-							media,
-						)
-					}
-				>
-					{t("buttons.saveChanges")}
-				</Close>
-			</FlexRow>
-		</Content>
-	);
-}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions:
 
-const handleMediaDeletion = (
+export const handleMediaDeletion = (
 	closeButtonRef: React.RefObject<HTMLButtonElement>,
 	mediaPath: Path,
 ): void => {
@@ -212,7 +30,7 @@ const handleMediaDeletion = (
 
 /////////////////////////////////////////////
 
-const changeMediaMetadata = (
+export const changeMediaMetadata = (
 	closeButtonRef: React.RefObject<HTMLButtonElement>,
 	imageFilePath: Path,
 	mediaPath: Path,
@@ -240,7 +58,7 @@ const changeMediaMetadata = (
 
 /////////////////////////////////////////////
 
-const changeMetadataIfAllowed = (
+export const changeMetadataIfAllowed = (
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
@@ -305,7 +123,7 @@ const changeMetadataIfAllowed = (
 	// Send message to Electron to execute the function writeTag() in the main process:
 	if (isThereAnythingToChange)
 		sendMsgToBackend({
-			type: reactToElectronMessage.WRITE_TAG,
+			type: ReactToElectronMessage.WRITE_TAG,
 			thingsToChange,
 			mediaPath,
 		});
@@ -408,7 +226,7 @@ const changeMetadataIfAllowed = (
 
 /////////////////////////////////////////////
 
-const optionsForUserToSee = ({
+export const optionsForUserToSee = ({
 	duration,
 	artist,
 	genres,
@@ -435,7 +253,7 @@ const translatedOptionsToSend = {
 
 /////////////////////////////////////////////
 
-const isChangeable = (option: string): option is ChangeOptions =>
+export const isChangeable = (option: string): option is ChangeOptions =>
 	option in translatedOptionsToSend;
 
 /////////////////////////////////////////////
@@ -444,7 +262,7 @@ const closeEverything = (element: HTMLButtonElement): void => element.click();
 
 /////////////////////////////////////////////
 
-const format = (
+export const format = (
 	value: string | readonly string[] | number | undefined,
 ): undefined | string | number => {
 	if (value instanceof Array) return value.join(", ");
@@ -473,12 +291,6 @@ type ChangeOptions = keyof typeof translatedOptionsToSend;
 
 /////////////////////////////////////////////
 
-type OptionsForUserToSee = keyof ReturnType<typeof optionsForUserToSee>;
-
-/////////////////////////////////////////////
-
 type HasAnythingChanged = boolean;
 
 /////////////////////////////////////////////
-
-type Props = { media: Media; path: Path };

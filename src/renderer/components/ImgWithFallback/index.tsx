@@ -1,11 +1,11 @@
 import type { ID } from "@common/@types/generalTypes";
 
-import { reactToElectronMessage } from "@common/enums";
+import { ReactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 import { ValuesOf } from "@common/@types/utils";
 import { getMedia } from "@contexts/usePlaylists";
-import { error } from "@utils/log";
+import { error } from "@common/log";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -54,7 +54,7 @@ export function ImgWithFallback({
 
 			sendMsgToBackend({
 				thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
-				type: reactToElectronMessage.WRITE_TAG,
+				type: ReactToElectronMessage.WRITE_TAG,
 				mediaPath: getMedia(mediaID)!.path,
 			});
 

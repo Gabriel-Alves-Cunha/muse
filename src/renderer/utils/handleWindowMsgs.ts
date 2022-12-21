@@ -1,15 +1,14 @@
 import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
-import type { Media, Path } from "@common/@types/generalTypes";
 
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
-import { electronToReactMessage } from "@common/enums";
+import { ElectronToReactMessage } from "@common/enums";
 import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
 import { emptyString } from "@common/empty";
-import { log, error } from "@utils/log";
 import { deleteFile } from "./deleteFile";
+import { error } from "@common/log";
 import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
@@ -26,19 +25,19 @@ const { transformPathsToMedias } = electron.media;
 //////////////////////////////////////////
 // Listen for files drop:
 
-function listenToDragoverEvent(event: Readonly<DragEvent>): void {
+const listenToDragoverEvent = (event: DragEvent): void => {
 	event.stopPropagation();
 	event.preventDefault();
 
 	if (!event.dataTransfer) return;
 
 	event.dataTransfer.dropEffect = "link";
-	// ^ Style the drag-and-drop as a "copy file" operation.
-}
+	// ^ Style the drag-and-drop as a "link file" operation.
+};
 
 //////////////////////////////////////////
 
-function listenToDropEvent(event: Readonly<DragEvent>): void {
+const listenToDropEvent = (event: DragEvent): void => {
 	event.stopPropagation();
 	event.preventDefault();
 
@@ -47,9 +46,10 @@ function listenToDropEvent(event: Readonly<DragEvent>): void {
 	const fileList = event.dataTransfer.files;
 	const files = getMediaFiles(fileList);
 
-	log({ fileList, files });
-	error("@TODO: handle these files droped!", files);
-}
+	if (files.length === 0) return;
+
+	error("@TODO: handle these files droped!", { fileList, files });
+};
 
 //////////////////////////////////////////
 
@@ -69,11 +69,11 @@ const {
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
 	ERROR,
-} = electronToReactMessage;
+} = ElectronToReactMessage;
 
 //////////////////////////////////////////
 
-export async function handleWindowMsgs(event: Event): Promise<void> {
+export const handleWindowMsgs = async (event: Event): Promise<void> => {
 	if (event.data.source !== electronSource) return;
 
 	dbg("Received message from Electron.\ndata =", event.data);
@@ -99,14 +99,11 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
 
-			const newMediaInArray: readonly [Path, Media][] =
-				await transformPathsToMedias(
-					mediaPath,
-					assureMediaSizeIsGreaterThan60KB,
-					ignoreMediaWithLessThan60Seconds,
-				);
-
-			const newMedia = newMediaInArray[0];
+			const [newMedia] = await transformPathsToMedias(
+				mediaPath,
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			);
 
 			if (!newMedia) {
 				error(`Could not transform "${mediaPath}" to a media.`);
@@ -149,7 +146,6 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
 
 			await refreshMedia(mediaPath, emptyString);
-
 			break;
 		}
 
@@ -175,7 +171,6 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		case ERROR: {
 			error("@TODO: ERROR", { error: msg.error });
-
 			break;
 		}
 
@@ -192,7 +187,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			assertUnreachable(msg);
 		}
 	}
-}
+};
 
 //////////////////////////////////////////
 //////////////////////////////////////////

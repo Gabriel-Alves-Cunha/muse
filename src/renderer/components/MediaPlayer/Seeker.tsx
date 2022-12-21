@@ -1,9 +1,9 @@
-import type { RefToAudioAndSeeker } from "./Controls";
+import type { RefToAudioAndSeeker } from "./ControlsAndSeeker";
 
 import { useEffect, useMemo, useRef } from "react";
 
 import { formatDuration, mapTo } from "@common/utils";
-import { useProgress } from ".";
+import { useProgress } from "./helpers";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -36,7 +36,7 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 		const timerTooltip = timeTooltipRef.current;
 		const timeline = progressWrapperRef.current;
 
-		function setTimerTooltip({ offsetX }: PointerEvent): void {
+		const setTimerTooltip = ({ offsetX }: PointerEvent): void => {
 			if (!audio) return;
 
 			const time =
@@ -46,7 +46,7 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 
 			timerTooltip.textContent = formatDuration(time);
 			timerTooltip.style.left = `${left}px`;
-		}
+		};
 
 		const seek = ({ offsetX }: PointerEvent): void => {
 			if (!(audio && isFinite(audio.duration))) return;
@@ -120,13 +120,15 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 /////////////////////////////////////////
 // Helper functions:
 
-const percentageSelector = (state: ReturnType<typeof useProgress.getState>) =>
-	state.percentage;
+const percentageSelector = ({
+	percentage,
+}: ReturnType<typeof useProgress.getState>) => percentage;
 
 /////////////////////////////////////////
 
 const Progress = () => {
 	const percentage = useProgress(percentageSelector);
+
 	document.documentElement.style.setProperty(
 		"--progress-width",
 		// !NaN => true (in case is not present), everything else is false:
@@ -140,8 +142,9 @@ const Progress = () => {
 
 /////////////////////////////////////////
 
-const currentTimeSelector = (state: ReturnType<typeof useProgress.getState>) =>
-	state.currentTime;
+const currentTimeSelector = ({
+	currentTime,
+}: ReturnType<typeof useProgress.getState>) => currentTime;
 
 /////////////////////////////////////////
 

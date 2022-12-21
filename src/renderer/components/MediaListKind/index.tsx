@@ -10,20 +10,16 @@ import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
-import { ctxContentEnum, ContextMenu } from "@components/ContextMenu";
-import { isAModifierKeyPressed } from "@utils/keyboard";
+import { setIsCtxMenuOpen, useFromList } from "./states";
+import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
 import { playlistList } from "@common/enums";
-import { error } from "@utils/log";
+import { itemContent } from "./Row";
+import { error } from "@common/log";
 import { time } from "@utils/utils";
-import {
-	getAllSelectedMedias,
-	deselectAllMedias,
-	selectAllMedias,
-} from "@contexts/useAllSelectedMedias";
 import {
 	type MainList,
 	type History,
@@ -32,21 +28,19 @@ import {
 	removeMedia,
 } from "@contexts/usePlaylists";
 import {
+	selectAllMediasOnCtrlPlusA,
 	selectMediaByPointerEvent,
+	handleDeselectAllMedias,
 	computeHistoryItemKey,
-	setIsCtxMenuOpen,
 	computeItemKey,
-	isCtxMenuOpen,
 	reloadWindow,
-	itemContent,
-	useFromList,
 } from "./helper";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function MediaListKind({ isHome }: Props) {
+export const MediaListKind = ({ isHome }: Props) => {
 	const { t } = useTranslation();
 
 	return (
@@ -64,7 +58,7 @@ export function MediaListKind({ isHome }: Props) {
 			<MediaListKindWithoutErrorBoundary isHome={isHome} />
 		</ErrorBoundary>
 	);
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -102,7 +96,7 @@ const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
 							error(
 								`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
 							);
-							removeMedia(id);
+							setTimeout(() => removeMedia(id));
 							continue;
 						}
 
@@ -123,7 +117,7 @@ const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
 						error(
 							`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
 						);
-						removeMedia(id);
+						setTimeout(() => removeMedia(id));
 						continue;
 					}
 
@@ -155,7 +149,7 @@ const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
 		<div className="max-w-2xl h-[87%]" ref={listRef}>
 			<ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
-				content={ctxContentEnum.MEDIA_OPTIONS}
+				content={CtxContentEnum.MEDIA_OPTIONS}
 				setIsOpen={setIsCtxMenuOpen}
 			>
 				<Virtuoso
@@ -198,21 +192,6 @@ const EmptyPlaceholder = () => {
 };
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };
-
-/////////////////////////////////////////
-
-const selectAllMediasOnCtrlPlusA = (e: KeyboardEvent) => {
-	if (e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])) {
-		e.preventDefault();
-		selectAllMedias();
-	}
-};
-
-/////////////////////////////////////////
-
-const handleDeselectAllMedias = () => {
-	if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0) deselectAllMedias();
-};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

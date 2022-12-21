@@ -3,7 +3,6 @@ import type { Mutable } from "@common/@types/utils";
 import type { Tags } from "@common/@types/electron-window";
 
 import { existsSync, renameSync } from "node:fs";
-import { error, assert } from "node:console";
 import { dirname, join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { get } from "node:https";
@@ -16,11 +15,12 @@ import {
 import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
-import { electronToReactMessage } from "@common/enums";
-import { eraseImg, throwErr } from "@common/utils";
+import { error, assert, throwErr } from "@common/log";
+import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { isBase64Image } from "@main/utils";
 import { emptyString } from "@common/empty";
+import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
@@ -43,7 +43,7 @@ async function handleImageMetadata(
 
 			// Send error to client:
 			sendMsgToClient({
-				type: electronToReactMessage.ERROR,
+				type: ElectronToReactMessage.ERROR,
 				error: err as Error,
 			});
 		}
@@ -143,7 +143,6 @@ export function createAndSaveImageOnMedia(
 }
 
 /////////////////////////////////////////////
-
 /////////////////////////////////////////////
 
 /** Returns a new file name if it exists, otherwise, just an empty string. */
@@ -183,25 +182,25 @@ function talkToClientSoItCanGetTheNewMedia(
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
-				type: electronToReactMessage.ADD_ONE_MEDIA,
+				type: ElectronToReactMessage.ADD_ONE_MEDIA,
 				mediaPath: newPathOfFile,
 			});
 
 			// and remove old one
 			sendMsgToClient({
-				type: electronToReactMessage.REMOVE_ONE_MEDIA,
+				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
 				mediaPath,
 			});
 		} catch (error) {
 			// Send error to react process: (error renaming file => file has old path)
 			sendMsgToClient({
-				type: electronToReactMessage.ERROR,
+				type: ElectronToReactMessage.ERROR,
 				error: error as Error,
 			});
 
 			// Since there was an error, let's at least refresh media:
 			sendMsgToClient({
-				type: electronToReactMessage.REFRESH_ONE_MEDIA,
+				type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
 				mediaPath,
 			});
 		} finally {
@@ -215,12 +214,12 @@ function talkToClientSoItCanGetTheNewMedia(
 	/////////////////////////////////////////////
 	else if (isNewMedia)
 		// Add the new media:
-		sendMsgToClient({ type: electronToReactMessage.ADD_ONE_MEDIA, mediaPath });
+		sendMsgToClient({ type: ElectronToReactMessage.ADD_ONE_MEDIA, mediaPath });
 	/////////////////////////////////////////////
 	// If everything else fails, at least refresh media:
 	else
 		sendMsgToClient({
-			type: electronToReactMessage.REFRESH_ONE_MEDIA,
+			type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
 			mediaPath,
 		});
 }

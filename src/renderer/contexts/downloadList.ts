@@ -8,7 +8,7 @@ import create from "zustand";
 ////////////////////////////////////////////////
 
 // For testing:
-import { progressStatus } from "@common/enums";
+import { ProgressStatus } from "@common/enums";
 import { getRandomInt } from "@utils/utils";
 
 const { port1: testPort } = new MessageChannel();
@@ -17,28 +17,28 @@ const testDownloadingMedias: [MediaUrl, MediaBeingDownloaded][] = Array.from(
 		length: 10,
 	},
 	(_, index) => {
-		let status: ValuesOf<typeof progressStatus> = progressStatus.ACTIVE;
+		let status: ValuesOf<typeof ProgressStatus> = ProgressStatus.ACTIVE;
 
 		{
 			const random1_5 = getRandomInt(0, 5);
 			switch (random1_5) {
 				case 0: {
-					status = progressStatus.ACTIVE;
+					status = ProgressStatus.ACTIVE;
 					break;
 				}
 
 				case 1: {
-					status = progressStatus.CANCEL;
+					status = ProgressStatus.CANCEL;
 					break;
 				}
 
 				case 2: {
-					status = progressStatus.FAILED;
+					status = ProgressStatus.FAILED;
 					break;
 				}
 
 				case 3: {
-					status = progressStatus.SUCCESS;
+					status = ProgressStatus.SUCCESS;
 					break;
 				}
 

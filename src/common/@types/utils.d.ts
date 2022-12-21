@@ -38,3 +38,13 @@ export type ValuesOf<Obj> = Obj[keyof Obj];
 ////////////////////////////////////////////
 
 export type OneOf<T> = keyof T;
+
+////////////////////////////////////////////
+
+export type Json =
+	| string
+	| number
+	| boolean
+	| null
+	| Json[]
+	| { [key: string]: Json };

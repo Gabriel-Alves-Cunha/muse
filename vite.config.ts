@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
 			includeSource: ["src/**/*.{js,ts}"],
 			environment: "happy-dom",
 			logHeapUsage: true,
+			dir: "tests",
 			// coverage: {
 			// 	// reporter: ["html", "text"],
 			// 	reporter: ["text"],
