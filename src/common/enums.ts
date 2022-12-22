@@ -18,13 +18,19 @@ export const ReactToElectronMessage = {
 /////////////////////////////////////////////
 
 export const ElectronToReactMessage = {
-	DELETE_ONE_MEDIA_FROM_COMPUTER: "2",
-	CREATE_A_NEW_DOWNLOAD: "3",
-	REFRESH_ALL_MEDIA: "4",
-	REFRESH_ONE_MEDIA: "5",
-	REMOVE_ONE_MEDIA: "6",
-	ADD_ONE_MEDIA: "7",
-	ERROR: "8",
+	DELETE_ONE_MEDIA_FROM_COMPUTER: "DELETE_ONE_MEDIA_FROM_COMPUTER",
+	CREATE_A_NEW_DOWNLOAD: "CREATE_A_NEW_DOWNLOAD",
+	REFRESH_ALL_MEDIA: "REFRESH_ALL_MEDIA",
+	REFRESH_ONE_MEDIA: "REFRESH_ONE_MEDIA",
+	REMOVE_ONE_MEDIA: "REMOVE_ONE_MEDIA",
+	ADD_ONE_MEDIA: "ADD_ONE_MEDIA",
+	ERROR: "ERROR",
+} as const;
+
+/////////////////////////////////////////////
+
+export const ElectronPreloadToMainElectronMessage = {
+	CLIPBOARD_TEXT_CHANGED: "CLIPBOARD_TEXT_CHANGED",
 } as const;
 
 /////////////////////////////////////////////

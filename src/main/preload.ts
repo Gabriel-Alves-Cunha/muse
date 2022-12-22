@@ -1,25 +1,27 @@
-import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { Mutable } from "@common/@types/utils";
 import type {
 	MsgObjectReactToElectron,
 	VisibleElectron,
 } from "@common/@types/electron-window";
 
-import { contextBridge, ipcRenderer, Notification } from "electron";
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
+import { contextBridge, ipcRenderer } from "electron";
 
-import { ElectronToReactMessage, ReactToElectronMessage } from "@common/enums";
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { searchForLyricsAndImage } from "./preload/getLyrics";
 import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
 import { ClipboardExtended } from "./preload/clipboardExtended.js";
-import { dirs, logoPath } from "./utils";
 import { createServer } from "./preload/share/server";
-import { emptyString } from "@common/empty";
 import { writeTags } from "./preload/media/mutate-metadata";
 import { error } from "@common/log";
+import { dirs } from "./utils";
 import { dbg } from "@common/debug";
+import {
+	ElectronPreloadToMainElectronMessage,
+	ElectronToReactMessage,
+	ReactToElectronMessage,
+} from "@common/enums";
 import {
 	type MsgWithSource,
 	sendMsgToClient,
@@ -56,9 +58,6 @@ const visibleElectronAPI: VisibleElectron = {
 
 contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
-console.log("preload Notification =", Notification);
-console.log("preload new Notification() =", new Notification());
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // This is to make Electron show a notification
@@ -75,37 +74,20 @@ console.log("preload new Notification() =", new Notification());
 			if (!isUrlValid(url)) return;
 
 			const {
-				media: { artist = emptyString },
+				media: { artist = "" },
 				thumbnails,
 				title,
 			} = (await getBasicInfo(url)).videoDetails;
 
-			new Notification({
-				title: "Click to download this media as 'mp3'",
-				timeoutType: "never",
-				urgency: "normal",
-				icon: logoPath,
-				silent: true,
-				body: title,
-			})
-				.on("click", () => {
-					const downloadInfo: DownloadInfo = {
-						imageURL: thumbnails.at(-1)?.url ?? emptyString,
-						extension: "mp3",
-						artist,
-						title,
-						url,
-					};
-
-					// // Send msg to ipcMain, wich in turn will relay to ipcRenderer:
-					sendMsgToClient({
-						type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-						downloadInfo,
-					});
-
-					dbg("Clicked notification and sent data:", downloadInfo);
-				})
-				.show();
+			ipcRenderer.invoke(
+				ElectronPreloadToMainElectronMessage.CLIPBOARD_TEXT_CHANGED,
+				{
+					thumbnail: thumbnails.at(-1)?.url ?? "",
+					artist,
+					title,
+					url,
+				} satisfies ClipboardTextChangeNotificationProps,
+			);
 		})
 		.startWatching();
 })();
@@ -229,3 +211,12 @@ window.addEventListener("message", (event: CrossWindowEvent): void => {
 type CrossWindowEvent = Readonly<
 	MessageEvent<MsgWithSource<MsgObjectReactToElectron>>
 >;
+
+/////////////////////////////////////////////
+
+export interface ClipboardTextChangeNotificationProps {
+	thumbnail: string;
+	artist: string;
+	title: string;
+	url: string;
+}

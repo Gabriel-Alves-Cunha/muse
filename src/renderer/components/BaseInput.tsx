@@ -15,7 +15,7 @@ export const BaseInput = forwardRef(function BaseInput(
 
 			<input
 				// flex: 1 === occupy all remaining width
-				className="flex items-center flex-1 h-9 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-transparent border-none"
+				className="flex items-center flex-1 h-9 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-transparent border-none select-all"
 				ref={forwardedRef}
 				{...props}
 			/>

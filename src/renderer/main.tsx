@@ -4,6 +4,10 @@ import { StrictMode } from "react";
 import { _runtimeGlobalsChecker_ } from "@common/seeLeakedVariables";
 import { App } from "./App";
 
+// Importing this so vite keeps it when bundled and
+// Electron AppImage can pick it up
+import "@assets/logo.png"
+
 if (isDev) {
 	setTimeout(
 		() => (globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_()),

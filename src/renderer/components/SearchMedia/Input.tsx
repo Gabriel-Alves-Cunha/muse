@@ -12,7 +12,7 @@ const searchTermSelector = ({
 
 let isInputOnFocus = false;
 
-export const Input = () => {
+export function Input() {
 	const searchTerm = useSearcher(searchTermSelector);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { t } = useTranslation();
@@ -22,15 +22,17 @@ export const Input = () => {
 		const input = inputRef.current;
 		if (!input) return;
 
-		input.onfocus = () => (isInputOnFocus = true);
-		input.onblur = () => (isInputOnFocus = false);
-		input.onkeyup = (e) => {
+		input.addEventListener("focus", () => (isInputOnFocus = true));
+		input.addEventListener("blur", () => (isInputOnFocus = false));
+		input.addEventListener("keyup", (e) => {
 			// Close SearchMediaPopover on "Escape"
 			if (e.key === "Escape" && !isAModifierKeyPressed(e)) {
 				inputRef.current?.blur();
 				setDefaultSearch();
+			} else if (e.ctrlKey && e.key === "a") {
+				input.select();
 			}
-		};
+		});
 	}, []);
 
 	/////////////////////////////////////////
@@ -50,4 +52,4 @@ export const Input = () => {
 			accessKey="s"
 		/>
 	);
-};
+}

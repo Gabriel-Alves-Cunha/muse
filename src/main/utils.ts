@@ -1,21 +1,15 @@
 import type { Base64 } from "@common/@types/generalTypes";
 
-import { resolve } from "node:path";
 import { homedir } from "node:os";
-
-// This path has to be like this because of the bundling
-// process. This way it handles both cases: dev and prod.
-export const logoPath = isDev
-	? resolve("src", "renderer", "assets", "logo.png")
-	: resolve("muse.png");
+import { join } from "node:path";
 
 /////////////////////////////////////////
 
 const homeDir = homedir();
 export const dirs = {
-	documents: resolve(homeDir, "Documents"),
-	downloads: resolve(homeDir, "Downloads"),
-	music: resolve(homeDir, "Music"),
+	documents: join(homeDir, "Documents"),
+	downloads: join(homeDir, "Downloads"),
+	music: join(homeDir, "Music"),
 };
 
 /////////////////////////////////////////

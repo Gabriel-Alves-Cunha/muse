@@ -1,7 +1,7 @@
+import type { ClipboardTextChangeNotificationProps } from "./preload";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { clearLine, cursorTo } from "node:readline";
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { autoUpdater } from "electron-updater";
@@ -19,16 +19,14 @@ import {
 
 import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
-import { logoPath } from "./utils";
-import { error } from "@common/log";
+import { sendMsgToClient } from "@common/crossCommunication";
+import { error, log } from "@common/log";
 import { dbg } from "@common/debug";
 import {
+	ElectronPreloadToMainElectronMessage,
 	ElectronIpcMainProcessNotification,
 	ElectronToReactMessage,
 } from "@common/enums";
-
-console.log("Notification =", Notification);
-console.log("new Notification() =", new Notification());
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -38,18 +36,11 @@ console.log("new Notification() =", new Notification());
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater
-	.on("update-not-available", (info) => dbg("Update not available:", info))
-	.on("update-downloaded", (info) => dbg("Update downloaded:", info))
-	.on("update-available", (info) => dbg("Update available:", info))
-	.on("checking-for-update", () => dbg("Checking for update..."))
-	.on("error", (err) => dbg("Error in auto-updater. ", err))
-	.on("download-progress", (progressObj) => {
-		cursorTo(process.stdout, 0);
-		clearLine(process.stdout, 0);
-		process.stdout.write(
-			`Download speed: ${progressObj.bytesPerSecond} bytes/s. Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`,
-		);
-	});
+	.on("update-not-available", (info) => log("Update not available:", info))
+	.on("update-downloaded", (info) => log("Update downloaded:", info))
+	.on("update-available", (info) => log("Update available:", info))
+	.on("checking-for-update", () => log("Checking for update..."))
+	.on("error", (err) => log("Error in auto-updater. ", err));
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -58,6 +49,14 @@ autoUpdater
 
 let electronWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
+
+const logoPath = resolve(
+	app.getAppPath(),
+	"build",
+	"renderer",
+	"assets",
+	"logo.png",
+);
 
 /////////////////////////////////////////
 
@@ -76,7 +75,9 @@ function createElectronWindow(): BrowserWindow {
 		width: 800,
 
 		webPreferences: {
-			preload: resolve(app.getAppPath(), "build", "main", "preload.cjs"),
+			preload: isDev
+				? resolve(app.getAppPath(), "preload.cjs")
+				: resolve(app.getAppPath(), "build", "main", "preload.cjs"),
 			allowRunningInsecureContent: false,
 			contextIsolation: true, // <-- Needed to use contextBridge
 			nodeIntegration: true,
@@ -225,6 +226,8 @@ ipcMain
 		(_, downloadValues: DownloadInfo) => {
 			dbg("ipcMain received data from electronWindow:", downloadValues);
 
+			log("Relaying message from to ipcRenderer");
+
 			ipcMain.emit(
 				ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
 				downloadValues,
@@ -281,3 +284,37 @@ ipcMain
 			}
 		},
 	);
+
+ipcMain.handle(
+	ElectronPreloadToMainElectronMessage.CLIPBOARD_TEXT_CHANGED,
+	(
+		_event,
+		{ artist, thumbnail, title, url }: ClipboardTextChangeNotificationProps,
+	) =>
+		new Notification({
+			title: "Click to download this media as 'mp3'",
+			timeoutType: "never",
+			urgency: "normal",
+			icon: logoPath,
+			silent: true,
+			body: title,
+		})
+			.on("click", () => {
+				const downloadInfo: DownloadInfo = {
+					imageURL: thumbnail,
+					extension: "mp3",
+					artist,
+					title,
+					url,
+				};
+
+				// // Send msg to ipcMain, wich in turn will relay to ipcRenderer:
+				sendMsgToClient({
+					type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
+					downloadInfo,
+				});
+
+				dbg("Clicked notification and sent data:", downloadInfo);
+			})
+			.show(),
+);
