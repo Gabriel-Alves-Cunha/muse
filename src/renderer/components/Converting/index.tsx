@@ -21,7 +21,7 @@ const convertingListSizeSelector = (
 	state: ReturnType<typeof useConvertingList.getState>,
 ) => state.convertingList.size;
 
-export const Converting = () => {
+export function Converting() {
 	const convertingListSize = useConvertingList(convertingListSizeSelector);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
@@ -81,4 +81,4 @@ export const Converting = () => {
 			</PopoverContent>
 		</PopoverRoot>
 	);
-};
+}

@@ -5,7 +5,7 @@ import { prettyBytes } from "@common/prettyBytes";
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByTitleAndMainList;
 
-export const MediasInfo = () => {
+export function MediasInfo() {
 	const mainList = usePlaylists(mainListSelector);
 	const { t } = useTranslation();
 
@@ -18,4 +18,4 @@ export const MediasInfo = () => {
 			{t("decorations.size")}: {prettyBytes(allFilesSize)}
 		</p>
 	);
-};
+}

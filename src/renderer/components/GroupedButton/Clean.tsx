@@ -6,7 +6,7 @@ import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
 import { getFromList } from "@components/MediaListKind/states";
 
-export const Clean = () => {
+export function Clean() {
 	const { t } = useTranslation();
 
 	return (
@@ -17,14 +17,14 @@ export const Clean = () => {
 			<CleanIcon size={17} className="stroke-white" />
 		</ButtonOfGroup>
 	);
-};
+}
 
 /////////////////////////////////////////////
 // Helper functions:
 
-const cleanProperList = () => {
+function cleanProperList() {
 	const { fromList } = getFromList();
 
 	if (fromList === playlistList.favorites) clearFavorites();
 	else if (fromList === playlistList.history) clearHistory();
-};
+}

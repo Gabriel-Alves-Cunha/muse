@@ -1,6 +1,6 @@
-export const getFirstKey = <Key>(
+export function getFirstKey<Key>(
 	mapOrSet: ReadonlyMap<Key, unknown> | ReadonlySet<Key>,
-): Key | undefined => {
+): Key | undefined {
 	if (mapOrSet instanceof Map) {
 		if (mapOrSet.size < 1) return undefined;
 
@@ -13,7 +13,7 @@ export const getFirstKey = <Key>(
 
 		return key;
 	}
-};
+}
 
 ////////////////////////////////////////////////
 

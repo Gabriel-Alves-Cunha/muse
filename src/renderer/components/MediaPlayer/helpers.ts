@@ -57,11 +57,11 @@ export const logStalled = (e: Event): void =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const handleLoadedData = (
+export function handleLoadedData(
 	audio: HTMLAudioElement,
 	oldID: ID,
 	media: Media,
-): void => {
+): void {
 	const formatedDuration = formatDuration(audio.duration);
 
 	// Updating the duration of media:
@@ -74,12 +74,12 @@ export const handleLoadedData = (
 	// Maybe set audio.currentTime to last stopped time:
 	const lastTime = getCurrentPlaying().currentTime;
 	if (lastTime > 30 /* seconds */) audio.currentTime = lastTime;
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const handleEnded = (e: Event, audio: HTMLAudioElement): void => {
+export function handleEnded(e: Event, audio: HTMLAudioElement): void {
 	console.log("Audio event:", e);
 
 	dbg(
@@ -89,30 +89,30 @@ export const handleEnded = (e: Event, audio: HTMLAudioElement): void => {
 	);
 
 	if (!audio.loop) playNextMedia();
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const handleAudioCanPlay = (audio: HTMLAudioElement): void => {
+export function handleAudioCanPlay(audio: HTMLAudioElement): void {
 	dbg("Audio can play.");
 	audio.play().then();
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const handleProgress = (
+export function handleProgress(
 	audio: HTMLAudioElement,
 	isSeeking: boolean,
-): void => {
+): void {
 	const { duration, currentTime } = audio;
 
 	// If is seeking, set just the currentTime:
 	isSeeking
 		? setProgress({ currentTime })
 		: setProgress({ percentage: (currentTime / duration) * 100, currentTime });
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

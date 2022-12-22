@@ -9,14 +9,14 @@ const { random, floor } = Math;
 //////////////////////////////////////////
 
 /** [min, max) */
-export const getRandomInt = (min: number, max: number): number => {
+export function getRandomInt(min: number, max: number): number {
 	if (!(isFinite(min) && isFinite(max)))
 		throwErr(
 			`\`getRandomInt()\` can't handle infinite numbers. Received \`min = ${min}\` and \`max = ${max}\`.`,
 		);
 
 	return floor(min + random() * (max - min));
-};
+}
 
 //////////////////////////////////////////
 
@@ -25,17 +25,17 @@ export const capitalize = (str: string): string =>
 
 //////////////////////////////////////////
 
-export const assertUnreachable = (received: never): never => {
+export function assertUnreachable(received: never): never {
 	const error = stringifyJson(received) ?? received;
 
 	throw throwErr(
 		"I shouldn't get here (on 'assertUnreachable')!\nreceived = " + error,
 	);
-};
+}
 
 //////////////////////////////////////////
 
-export const time = <T>(fn: () => T, label: string): T => {
+export function time<T>(fn: () => T, label: string): T {
 	const start = performance.now();
 
 	const fnReturn = fn();
@@ -50,4 +50,4 @@ export const time = <T>(fn: () => T, label: string): T => {
 	);
 
 	return fnReturn;
-};
+}

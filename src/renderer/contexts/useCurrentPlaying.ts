@@ -61,35 +61,35 @@ export const playThisMedia = (
 
 ////////////////////////////////////////////////
 
-export const togglePlayPause = (): void => {
+export function togglePlayPause(): void {
 	const audio = document.getElementById("audio") as HTMLAudioElement | null;
 	if (!audio) return;
 
 	audio.paused ? play(audio) : pause(audio);
-};
+}
 
 ////////////////////////////////////////////////
 
-export const play = (audio?: HTMLAudioElement): void => {
+export function play(audio?: HTMLAudioElement): void {
 	audio
 		? audio.play().then()
 		: (document.getElementById("audio") as HTMLAudioElement).play().then();
-};
+}
 
 ////////////////////////////////////////////////
 
-export const pause = (audio?: HTMLAudioElement): void => {
+export function pause(audio?: HTMLAudioElement): void {
 	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
 
 	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
-};
+}
 
 ////////////////////////////////////////////////
 
-const sortHistoryByDate = () => {
+function sortHistoryByDate() {
 	const unsortedList: [Path, DateAsNumber][] = [];
 
 	for (const [id, dates] of getPlaylist(playlistList.history) as History)
@@ -102,9 +102,11 @@ const sortHistoryByDate = () => {
 		.map(([id, date]) => [id, mainList.get(id)!, date]);
 
 	return listAsArrayOfMap;
-};
+}
 
-export const playPreviousMedia = (): void => {
+////////////////////////////////////////////////
+
+export function playPreviousMedia(): void {
 	time(() => {
 		const { id, listType } = getCurrentPlaying();
 
@@ -131,11 +133,11 @@ export const playPreviousMedia = (): void => {
 
 		playThisMedia(previousMediaPath, correctListType);
 	}, "playPreviousMedia");
-};
+}
 
 ////////////////////////////////////////////////
 
-export const playNextMedia = (): void => {
+export const playNextMedia = (): void =>
 	time(() => {
 		const { id, listType } = getCurrentPlaying();
 
@@ -195,7 +197,6 @@ export const playNextMedia = (): void => {
 			currentTime: 0,
 		});
 	}, "playNextMedia");
-};
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -230,7 +231,7 @@ useCurrentPlaying.subscribe(
 // we don't load the media until the timeout ends.
 let prevTimerToSetMedia: NodeJS.Timeout | undefined;
 
-const setAudioSource = (newID: ID, prevID: ID) => {
+function setAudioSource(newID: ID, prevID: ID) {
 	clearTimeout(prevTimerToSetMedia);
 
 	const media = getMedia(newID);
@@ -248,7 +249,7 @@ const setAudioSource = (newID: ID, prevID: ID) => {
 	}, 150);
 
 	prevTimerToSetMedia = timerToSetMedia;
-};
+}
 
 ////////////////////////////////////////////////
 
@@ -258,7 +259,7 @@ const playingClass = "playing";
  * Decorate the rows of current playing medias
  * and undecorate previous playing ones.
  */
-const handleDecorateMediaRow = (newID: ID, prevID: ID) => {
+function handleDecorateMediaRow(newID: ID, prevID: ID) {
 	const prevElements = prevID
 		? document.querySelectorAll(`[data-id="${prevID}"]`)
 		: null;
@@ -273,11 +274,11 @@ const handleDecorateMediaRow = (newID: ID, prevID: ID) => {
 
 	// Decorate new playing media row:
 	for (const element of newElements) element.classList.add(playingClass);
-};
+}
 
 ////////////////////////////////////////////////
 
-const changeMediaSessionMetadata = (media: Media): void => {
+function changeMediaSessionMetadata(media: Media): void {
 	if (!navigator?.mediaSession) return;
 
 	navigator.mediaSession.metadata = new MediaMetadata({
@@ -286,7 +287,7 @@ const changeMediaSessionMetadata = (media: Media): void => {
 		title: media.title,
 		album: media.album,
 	});
-};
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

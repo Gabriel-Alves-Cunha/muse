@@ -9,7 +9,7 @@ import { useProgress } from "./helpers";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
+export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
 
@@ -36,7 +36,7 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 		const timerTooltip = timeTooltipRef.current;
 		const timeline = progressWrapperRef.current;
 
-		const setTimerTooltip = ({ offsetX }: PointerEvent): void => {
+		function setTimerTooltip({ offsetX }: PointerEvent): void {
 			if (!audio) return;
 
 			const time =
@@ -46,9 +46,9 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 
 			timerTooltip.textContent = formatDuration(time);
 			timerTooltip.style.left = `${left}px`;
-		};
+		}
 
-		const seek = ({ offsetX }: PointerEvent): void => {
+		function seek({ offsetX }: PointerEvent): void {
 			if (!(audio && isFinite(audio.duration))) return;
 
 			const desiredTime =
@@ -56,7 +56,7 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
 
 			useProgress.setState({ percentage });
-		};
+		}
 
 		timeline.addEventListener("pointermove", setTimerTooltip);
 
@@ -113,7 +113,7 @@ export const SeekerWrapper = ({ audio, isSeeking }: RefToAudioAndSeeker) => {
 			</div>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -126,7 +126,7 @@ const percentageSelector = ({
 
 /////////////////////////////////////////
 
-const Progress = () => {
+function Progress() {
 	const percentage = useProgress(percentageSelector);
 
 	document.documentElement.style.setProperty(
@@ -138,7 +138,7 @@ const Progress = () => {
 	return (
 		<div className={"relative bg-accent h-full w-[var(--progress-width)]"} />
 	);
-};
+}
 
 /////////////////////////////////////////
 
@@ -148,8 +148,8 @@ const currentTimeSelector = ({
 
 /////////////////////////////////////////
 
-const CurrentTime = () => {
+function CurrentTime() {
 	const currentTime = useProgress(currentTimeSelector);
 
 	return <p>{formatDuration(currentTime)}</p>;
-};
+}

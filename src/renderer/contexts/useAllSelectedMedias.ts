@@ -58,17 +58,17 @@ export const toggleSelectedMedia = (id: ID): void => {
 
 ///////////////////////////////////////////////////
 
-export const addToAllSelectedMedias = (id: ID): void => {
+export function addToAllSelectedMedias(id: ID): void {
 	const allSelectedMedias = getAllSelectedMedias();
 
 	if (allSelectedMedias.has(id)) return;
 
 	setAllSelectedMedias(new Set(allSelectedMedias).add(id));
-};
+}
 
 ///////////////////////////////////////////////////
 
-export const removeFromAllSelectedMedias = (id: ID): void => {
+export function removeFromAllSelectedMedias(id: ID): void {
 	const allSelectedMedias = getAllSelectedMedias();
 
 	if (!allSelectedMedias.has(id)) return;
@@ -77,22 +77,22 @@ export const removeFromAllSelectedMedias = (id: ID): void => {
 	newSet.delete(id);
 
 	setAllSelectedMedias(newSet);
-};
+}
 
 ///////////////////////////////////////////////////
 
-export const deselectAllMedias = (): void => {
+export function deselectAllMedias(): void {
 	if (getAllSelectedMedias().size === 0) return;
 
 	setAllSelectedMedias(emptySet);
-};
+}
 
 ///////////////////////////////////////////////////
 
-export const selectAllMedias = (): void => {
+export function selectAllMedias(): void {
 	const sortedByDate = getSortedByDate();
 
 	if (getAllSelectedMedias().size === sortedByDate.size) return;
 
 	setAllSelectedMedias(sortedByDate);
-};
+}

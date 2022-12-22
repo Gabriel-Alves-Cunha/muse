@@ -40,7 +40,7 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const MediaListKind = ({ isHome }: Props) => {
+export function MediaListKind({ isHome }: Props) {
 	const { t } = useTranslation();
 
 	return (
@@ -58,14 +58,14 @@ export const MediaListKind = ({ isHome }: Props) => {
 			<MediaListKindWithoutErrorBoundary isHome={isHome} />
 		</ErrorBoundary>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
-const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
+function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	const { fromList, homeList } = useFromList();
 	const listRef = useRef<HTMLDivElement>(null);
 
@@ -170,7 +170,7 @@ const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
 			</ContextMenu>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -179,7 +179,7 @@ const MediaListKindWithoutErrorBoundary = ({ isHome = false }: Props) => {
 
 const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
-const EmptyPlaceholder = () => {
+function EmptyPlaceholder() {
 	const { t } = useTranslation();
 
 	return (
@@ -189,7 +189,7 @@ const EmptyPlaceholder = () => {
 			{t("alts.noMediasFound")}
 		</div>
 	);
-};
+}
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };
 

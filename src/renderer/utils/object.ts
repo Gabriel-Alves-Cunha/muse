@@ -1,4 +1,4 @@
-export const areObjectKeysEqual = (obj_1: Obj, obj_2: Obj): boolean => {
+export function areObjectKeysEqual(obj_1: Obj, obj_2: Obj): boolean {
 	const obj_2_lenght = getObjectLength(obj_2);
 	const obj_1_lenght = getObjectLength(obj_1);
 
@@ -7,7 +7,7 @@ export const areObjectKeysEqual = (obj_1: Obj, obj_2: Obj): boolean => {
 	for (const key in obj_1) if (obj_1[key] !== obj_2[key]) return false;
 
 	return true;
-};
+}
 
 //////////////////////////////////////////
 
@@ -19,21 +19,21 @@ export const getObjectDeepKeys = (obj: Obj): string[] =>
 
 //////////////////////////////////////////
 
-export const getObjectLength = (obj: Obj): number => {
+export function getObjectLength(obj: Obj): number {
 	let length = 0;
 
 	for (const _ in obj) ++length;
 
 	return length;
-};
+}
 
 //////////////////////////////////////////
 
-export const withoutProperty = <T>(obj: Obj<T>, property: string) => {
+export function withoutProperty<T>(obj: Obj<T>, property: string) {
 	const { [property]: _unused, ...rest } = obj;
 
 	return rest;
-};
+}
 
 //////////////////////////////////////////
 //////////////////////////////////////////

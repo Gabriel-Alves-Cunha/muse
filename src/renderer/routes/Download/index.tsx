@@ -36,8 +36,8 @@ export default function Download() {
 const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 	state.isLoading;
 
-const IsLoading = () => {
+function IsLoading() {
 	const isLoading = useSearchInfo(isLoadingSelector);
 
 	return <div className="w-6 h-6 ml-3">{isLoading && <Loading />}</div>;
-};
+}

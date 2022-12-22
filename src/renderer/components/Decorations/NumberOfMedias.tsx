@@ -4,7 +4,7 @@ import { usePlaylists } from "@contexts/usePlaylists";
 const sizeSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByDate.size;
 
-export const NumberOfMedias = () => {
+export function NumberOfMedias() {
 	const numberOfMedias = usePlaylists(sizeSelector);
 	const { t } = useTranslation();
 
@@ -13,4 +13,4 @@ export const NumberOfMedias = () => {
 			{numberOfMedias} {t("decorations.medias")}
 		</p>
 	);
-};
+}

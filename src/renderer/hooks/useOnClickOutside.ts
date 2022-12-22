@@ -9,12 +9,12 @@ import { leftClick } from "@components/MediaListKind/Row";
  * but to optimize you can wrap `handler` in `useCallback` before
  * passing it into this hook.
  */
-export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(
+export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
 	ref: RefObject<T>,
 	handler: Handler,
-) => {
+) {
 	useEffect(() => {
-		const listener = (event: PointerEvent) => {
+		function listener(event: PointerEvent) {
 			if (
 				event.button !== leftClick ||
 				!ref.current ||
@@ -23,12 +23,12 @@ export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(
 				return;
 
 			handler(event);
-		};
+		}
 
 		document.addEventListener("pointerup", listener);
 
 		return () => document.removeEventListener("pointerup", listener);
 	}, [ref, handler]);
-};
+}
 
 type Handler = (event: PointerEvent) => void;

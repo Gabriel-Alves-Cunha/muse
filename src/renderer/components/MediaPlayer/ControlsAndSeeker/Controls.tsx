@@ -13,7 +13,7 @@ import { useTranslation } from "@i18n";
 /////////////////////////////////////////
 // Main function:
 
-export const Controls = ({ isDisabled, audio }: ControlsProps) => {
+export function Controls({ isDisabled, audio }: ControlsProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -37,7 +37,7 @@ export const Controls = ({ isDisabled, audio }: ControlsProps) => {
 			</CircleIconButton>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

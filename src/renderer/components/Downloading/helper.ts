@@ -20,7 +20,7 @@ import { dbg } from "@common/debug";
  * Electron to enable 2 way communication between it
  * and React.
  */
-export const createNewDownload = (downloadInfo: DownloadInfo): MessagePort => {
+export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	const downloadingList = getDownloadingList();
 
 	dbg("Trying to create a new download...", { downloadingList });
@@ -72,7 +72,7 @@ export const createNewDownload = (downloadInfo: DownloadInfo): MessagePort => {
 	frontEndPort.start();
 
 	return backEndPort;
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

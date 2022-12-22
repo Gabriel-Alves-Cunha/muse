@@ -18,7 +18,7 @@ const favoritesSelector = ({
 	favorites,
 }: ReturnType<typeof usePlaylists.getState>) => favorites;
 
-export const Header = ({ media, id, displayTitle = false }: HeaderProps) => {
+export function Header({ media, id, displayTitle = false }: HeaderProps) {
 	const favorites = usePlaylists(favoritesSelector);
 	const { t } = useTranslation();
 
@@ -41,7 +41,7 @@ export const Header = ({ media, id, displayTitle = false }: HeaderProps) => {
 			</CircleIconButton>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

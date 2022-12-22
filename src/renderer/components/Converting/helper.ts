@@ -27,10 +27,10 @@ export const useNewConvertions = create<NewConvertions>(() => ({
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const createNewConvertion = (
+export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Path,
-): MessagePort => {
+): MessagePort {
 	const convertingList = getConvertingList();
 
 	dbg("Trying to create a new conversion...", { convertingList });
@@ -74,7 +74,7 @@ export const createNewConvertion = (
 	frontEndPort.start();
 
 	return backEndPort;
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -86,7 +86,7 @@ export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const cancelConversionAndOrRemoveItFromList = (path: string): void => {
+export function cancelConversionAndOrRemoveItFromList(path: string): void {
 	const convertingList = getConvertingList();
 
 	const mediaBeingConverted = convertingList.get(path);
@@ -107,15 +107,15 @@ export const cancelConversionAndOrRemoveItFromList = (path: string): void => {
 
 	// Make React update:
 	setConvertingList(newConvertingList);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const handleUpdateConvertingList = (
+function handleUpdateConvertingList(
 	{ data }: MessageEvent<PartialExceptStatus>,
 	path: Path,
-): void => {
+): void {
 	const convertingList = getConvertingList();
 
 	dbg(`Received a message from Electron on port for "${path}":`, {
@@ -176,7 +176,7 @@ const handleUpdateConvertingList = (
 			assertUnreachable(data.status);
 			break;
 	}
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

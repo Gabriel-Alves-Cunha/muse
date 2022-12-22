@@ -61,12 +61,12 @@ export const contentOfSelectEnum = {
 /////////////////////////////////////////
 // Helper function:
 
-const contentToShow = (content: ValuesOf<typeof contentOfSelectEnum>) => {
+function contentToShow(content: ValuesOf<typeof contentOfSelectEnum>) {
 	if (content === contentOfSelectEnum.GROUPED_BUTTON_SORT_BY)
 		return <SelectOrderOptions />;
 
 	return undefined;
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

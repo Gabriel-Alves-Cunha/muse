@@ -37,7 +37,7 @@ export const setLocalStorage = (key: Keys, value: Values): void =>
 
 const emptyArrayString = "[]";
 
-export const getFromLocalStorage = (key: Keys): Values | undefined => {
+export function getFromLocalStorage(key: Keys): Values | undefined {
 	const value = localStorage.getItem(key) ?? emptyArrayString;
 	const item: unknown = JSON.parse(value);
 
@@ -78,7 +78,7 @@ export const getFromLocalStorage = (key: Keys): Values | undefined => {
 	}
 
 	return undefined;
-};
+}
 
 //////////////////////////////////////////
 //////////////////////////////////////////

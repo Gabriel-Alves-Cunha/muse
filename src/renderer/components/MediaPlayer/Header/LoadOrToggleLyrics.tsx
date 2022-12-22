@@ -15,7 +15,7 @@ import { RingLoader } from "@components/RingLoader";
 
 export const openLyrics = true;
 
-export const LoadOrToggleLyrics = ({ lyrics, id }: LoadOrToggleLyricsProps) => {
+export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
 	const { t } = useTranslation();
 
@@ -42,7 +42,7 @@ export const LoadOrToggleLyrics = ({ lyrics, id }: LoadOrToggleLyricsProps) => {
 			)}
 		</CircleIconButton>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

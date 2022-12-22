@@ -5,12 +5,12 @@ const fallAway = "animation-fall-away";
 const moveUp = "animation-move-up";
 const boxClass = ".box";
 
-export const handleSingleItemDeleteAnimation = (
+export function handleSingleItemDeleteAnimation(
 	e: React.PointerEvent<HTMLButtonElement>,
 	downloadingOrConvertionIndex: number,
 	isDownloadList: boolean,
 	url: string,
-): void => {
+): void {
 	const items = document.querySelectorAll(
 		boxClass,
 	) as NodeListOf<HTMLDivElement>;
@@ -51,4 +51,4 @@ export const handleSingleItemDeleteAnimation = (
 			? cancelDownloadAndOrRemoveItFromList(url)
 			: cancelConversionAndOrRemoveItFromList(url);
 	});
-};
+}

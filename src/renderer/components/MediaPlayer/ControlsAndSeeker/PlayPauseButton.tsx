@@ -12,7 +12,7 @@ import { useTranslation } from "@i18n";
 /////////////////////////////////////////
 // Main function:
 
-export const PlayPauseButton = ({ isDisabled, audio }: ControlsProps) => {
+export function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	const [isPaused, setIsPaused] = useState(true);
 	const { t } = useTranslation();
 
@@ -36,4 +36,4 @@ export const PlayPauseButton = ({ isDisabled, audio }: ControlsProps) => {
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}
 		</CircleIconButton>
 	);
-};
+}

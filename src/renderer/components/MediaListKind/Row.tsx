@@ -28,10 +28,10 @@ import {
 export const rightClick = 2;
 export const leftClick = 0;
 
-const selectOrPlayMedia = (
+function selectOrPlayMedia(
 	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
-): void => {
+): void {
 	if (e.button !== leftClick || !e.ctrlKey) {
 		const { fromList, homeList, isHome } = getFromList();
 		const list = isHome ? homeList : fromList;
@@ -40,7 +40,7 @@ const selectOrPlayMedia = (
 	}
 
 	toggleSelectedMedia(mediaPath);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

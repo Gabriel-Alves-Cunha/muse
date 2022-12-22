@@ -19,9 +19,9 @@ const notify =
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const selectMediaByPointerEvent = (
+export function selectMediaByPointerEvent(
 	e: React.PointerEvent<HTMLSpanElement>,
-): void => {
+): void {
 	// TODO: see if this selector still works.
 	const mediaClickedMediaId = (e.nativeEvent.target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
@@ -30,7 +30,7 @@ export const selectMediaByPointerEvent = (
 	if (!mediaClickedMediaId) return dbg("No 'data-id' found!");
 
 	addToAllSelectedMedias(mediaClickedMediaId);
-};
+}
 
 /////////////////////////////////////////////
 
@@ -53,15 +53,15 @@ export const reloadWindow = (): void =>
 
 /////////////////////////////////////////
 
-export const selectAllMediasOnCtrlPlusA = (e: KeyboardEvent) => {
+export function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
 	if (e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])) {
 		e.preventDefault();
 		selectAllMedias();
 	}
-};
+}
 
 /////////////////////////////////////////
 
-export const handleDeselectAllMedias = () => {
+export function handleDeselectAllMedias() {
 	if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0) deselectAllMedias();
-};
+}

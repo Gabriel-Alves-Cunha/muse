@@ -17,25 +17,25 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 // Helper functions:
 
-export const handleMediaDeletion = (
+export function handleMediaDeletion(
 	closeButtonRef: React.RefObject<HTMLButtonElement>,
 	mediaPath: Path,
-): void => {
+): void {
 	if (!closeButtonRef.current) return;
 
 	closeEverything(closeButtonRef.current);
 
 	deleteFile(mediaPath).then();
-};
+}
 
 /////////////////////////////////////////////
 
-export const changeMediaMetadata = (
+export function changeMediaMetadata(
 	closeButtonRef: React.RefObject<HTMLButtonElement>,
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
-): void => {
+): void {
 	if (!closeButtonRef.current) return;
 
 	const { t } = useTranslation();
@@ -54,15 +54,15 @@ export const changeMediaMetadata = (
 
 		errorToast(t("toasts.mediaMetadataNotSaved"));
 	}
-};
+}
 
 /////////////////////////////////////////////
 
-export const changeMetadataIfAllowed = (
+export function changeMetadataIfAllowed(
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
-): HasAnythingChanged => {
+): HasAnythingChanged {
 	const form = document.getElementById("form") as HTMLFormElement;
 
 	if (!form) {
@@ -129,7 +129,7 @@ export const changeMetadataIfAllowed = (
 		});
 
 	return isThereAnythingToChange;
-};
+}
 
 // function changeMetadataIfAllowed(
 // 	contentWrapper: HTMLDivElement,
@@ -262,15 +262,15 @@ const closeEverything = (element: HTMLButtonElement): void => element.click();
 
 /////////////////////////////////////////////
 
-export const format = (
+export function format(
 	value: string | readonly string[] | number | undefined,
-): undefined | string | number => {
+): undefined | string | number {
 	if (value instanceof Array) return value.join(", ");
 
 	if (typeof value === "number") return prettyBytes(value);
 
 	return value;
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

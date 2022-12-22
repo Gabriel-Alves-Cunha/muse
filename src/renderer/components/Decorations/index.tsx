@@ -18,7 +18,7 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const DecorationsTop = () => {
+export function DecorationsTop() {
 	const { t } = useTranslation();
 
 	return (
@@ -33,7 +33,7 @@ export const DecorationsTop = () => {
 			<Buttons />
 		</header>
 	);
-};
+}
 
 /////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ const WindowButton = ({ className = "", ...props }: WindowButtonProps) => (
 
 /////////////////////////////////////////////
 
-const Buttons = () => {
+function Buttons() {
 	const { t } = useTranslation();
 
 	return (
@@ -90,11 +90,11 @@ const Buttons = () => {
 			</WindowButton>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////////
 
-const AppNamePlusFolder = () => {
+function AppNamePlusFolder() {
 	const { page } = usePage();
 
 	return (
@@ -102,7 +102,7 @@ const AppNamePlusFolder = () => {
 			{capitalizedAppName} • {page}
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

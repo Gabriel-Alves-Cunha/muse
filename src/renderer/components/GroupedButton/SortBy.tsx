@@ -13,7 +13,7 @@ import { setFromList } from "@components/MediaListKind/states";
 /////////////////////////////////////////////
 // Types:
 
-export const SortBy = () => {
+export function SortBy() {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
 	const { t } = useTranslation();
 
@@ -37,6 +37,6 @@ export const SortBy = () => {
 			<SortIcon size={19} className="fill-white" />
 		</Select>
 	);
-};
+}
 
 type SelectedList = "Name" | "Date";

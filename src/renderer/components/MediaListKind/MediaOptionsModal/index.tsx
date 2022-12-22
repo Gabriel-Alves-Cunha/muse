@@ -34,7 +34,7 @@ const DeleteMediaDialogContent = lazy(() => import("../../DeleteMediaDialog"));
 /////////////////////////////////////////////
 // Main function:
 
-export const MediaOptionsModal = ({ media, path }: Props) => {
+export function MediaOptionsModal({ media, path }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
@@ -43,9 +43,9 @@ export const MediaOptionsModal = ({ media, path }: Props) => {
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 
-	const handleSelectedFile = ({
+	function handleSelectedFile({
 		target: { files },
-	}: React.ChangeEvent<HTMLInputElement>) => {
+	}: React.ChangeEvent<HTMLInputElement>) {
 		if (
 			!(imageButtonRef.current && imageInputRef.current && files) ||
 			files.length === 0
@@ -60,10 +60,10 @@ export const MediaOptionsModal = ({ media, path }: Props) => {
 
 		// Change button color to indicate that selection was successfull:
 		imageButtonRef.current.classList.add("file-present");
-	};
+	}
 
 	useEffect(() => {
-		const changeMediaMetadataOnEnter = (event: KeyboardEvent) => {
+		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
 			if (event.key === "Enter" && !isAModifierKeyPressed(event))
 				changeMediaMetadata(
 					closeButtonRef,
@@ -71,7 +71,7 @@ export const MediaOptionsModal = ({ media, path }: Props) => {
 					path,
 					media,
 				);
-		};
+		}
 
 		// This is because if you open the popover by pressing
 		// "Enter", it will just open and close it!
@@ -193,7 +193,7 @@ export const MediaOptionsModal = ({ media, path }: Props) => {
 			</FlexRow>
 		</Content>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

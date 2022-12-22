@@ -22,7 +22,7 @@ import { handleSingleItemDeleteAnimation } from "@components/Downloading/styles"
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const Popup = () => {
+export function Popup() {
 	const { convertingList } = useConvertingList();
 	const { t } = useTranslation();
 
@@ -44,15 +44,15 @@ export const Popup = () => {
 	) : (
 		<p>{t("infos.noConversionsInProgress")}</p>
 	);
-};
+}
 
 /////////////////////////////////////////////
 
-const ConvertBox = ({
+function ConvertBox({
 	mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
 	convertionIndex,
 	path,
-}: ConvertBoxProps) => {
+}: ConvertBoxProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -84,14 +84,14 @@ const ConvertBox = ({
 			</div>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions for Popup:
 
-const cleanAllDoneConvertions = (): void => {
+function cleanAllDoneConvertions(): void {
 	for (const [url, download] of getConvertingList())
 		if (
 			download.status !==
@@ -99,7 +99,7 @@ const cleanAllDoneConvertions = (): void => {
 			download.status !== ProgressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -15,7 +15,7 @@ import { handleSingleItemDeleteAnimation } from "./styles";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const Popup = () => {
+export function Popup() {
 	const { downloadingList } = useDownloadingList();
 	const { t } = useTranslation();
 
@@ -37,17 +37,17 @@ export const Popup = () => {
 	) : (
 		<p>{t("infos.noDownloadsInProgress")}</p>
 	);
-};
+}
 
 /////////////////////////////////////////////
 
 export const isDownloadList = true;
 
-const DownloadingBox = ({
+function DownloadingBox({
 	downloadingIndex,
 	download,
 	url,
-}: DownloadingBoxProps) => {
+}: DownloadingBoxProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -80,14 +80,14 @@ const DownloadingBox = ({
 			</div>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions for Popup:
 
-const cleanAllDoneDownloads = (): void => {
+function cleanAllDoneDownloads(): void {
 	for (const [url, download] of getDownloadingList())
 		if (
 			download.status !==
@@ -95,7 +95,7 @@ const cleanAllDoneDownloads = (): void => {
 			download.status !== ProgressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

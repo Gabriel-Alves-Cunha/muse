@@ -20,10 +20,7 @@ import {
 /////////////////////////////////////////
 // Main function:
 
-export const ControlsAndSeeker = ({
-	audio,
-	isSeeking,
-}: RefToAudioAndSeeker) => {
+export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 	const { isRandom, loopThisMedia } = usePlayOptions();
 	const { t } = useTranslation();
 
@@ -54,7 +51,7 @@ export const ControlsAndSeeker = ({
 			</div>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

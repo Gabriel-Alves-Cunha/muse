@@ -39,10 +39,10 @@ export const flipMediaPlayerCard = (): void =>
 
 /////////////////////////////////////////
 
-export const searchAndOpenLyrics = async (
+export async function searchAndOpenLyrics(
 	mediaID: ID,
 	openLyrics: boolean,
-): Promise<void> => {
+): Promise<void> {
 	if (!mediaID) return error(`No mediaID provided. Received "${mediaID}"!`);
 
 	const media = getMedia(mediaID);
@@ -83,7 +83,7 @@ export const searchAndOpenLyrics = async (
 	}
 
 	if (media.lyrics && openLyrics) return flipMediaPlayerCard();
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

@@ -16,11 +16,7 @@ import { unDiacritic } from "@contexts/usePlaylists";
 /////////////////////////////////////////
 // Main function:
 
-export const MediaSearchRow = ({
-	highlight,
-	media,
-	id,
-}: MediaSearchRowProps) => {
+export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 	const { t } = useTranslation();
 
 	const index = unDiacritic(media.title).indexOf(highlight);
@@ -69,7 +65,7 @@ export const MediaSearchRow = ({
 			</Dialog>
 		</div>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

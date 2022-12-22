@@ -19,7 +19,7 @@ export const availableThemes = ["light", "dark"] as const;
 /////////////////////////////////////////
 // Main function:
 
-export const ThemeToggler = () => {
+export function ThemeToggler() {
 	const [theme, setTheme] = useState(htmlDataset.theme as Theme);
 	const { t } = useTranslation();
 
@@ -44,7 +44,7 @@ export const ThemeToggler = () => {
 			)}
 		</button>
 	);
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

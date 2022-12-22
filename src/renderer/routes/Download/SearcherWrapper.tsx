@@ -13,7 +13,7 @@ const errorAndUrlSelectors = ({
 	url,
 }: ReturnType<typeof useSearchInfo.getState>) => [error, url] as const;
 
-export const SearcherWrapper = () => {
+export function SearcherWrapper() {
 	const [error, url] = useSearchInfo(errorAndUrlSelectors);
 	const { t } = useTranslation();
 
@@ -39,4 +39,4 @@ export const SearcherWrapper = () => {
 			</p>
 		</>
 	);
-};
+}

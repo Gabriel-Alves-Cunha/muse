@@ -25,7 +25,7 @@ const { transformPathsToMedias } = electron.media;
 //////////////////////////////////////////
 // Listen for files drop:
 
-const listenToDragoverEvent = (event: DragEvent): void => {
+function listenToDragoverEvent(event: DragEvent): void {
 	event.stopPropagation();
 	event.preventDefault();
 
@@ -33,11 +33,11 @@ const listenToDragoverEvent = (event: DragEvent): void => {
 
 	event.dataTransfer.dropEffect = "link";
 	// ^ Style the drag-and-drop as a "link file" operation.
-};
+}
 
 //////////////////////////////////////////
 
-const listenToDropEvent = (event: DragEvent): void => {
+function listenToDropEvent(event: DragEvent): void {
 	event.stopPropagation();
 	event.preventDefault();
 
@@ -49,7 +49,7 @@ const listenToDropEvent = (event: DragEvent): void => {
 	if (files.length === 0) return;
 
 	error("@TODO: handle these files droped!", { fileList, files });
-};
+}
 
 //////////////////////////////////////////
 
@@ -73,7 +73,7 @@ const {
 
 //////////////////////////////////////////
 
-export const handleWindowMsgs = async (event: Event): Promise<void> => {
+export async function handleWindowMsgs(event: Event): Promise<void> {
 	if (event.data.source !== electronSource) return;
 
 	dbg("Received message from Electron.\ndata =", event.data);
@@ -187,7 +187,7 @@ export const handleWindowMsgs = async (event: Event): Promise<void> => {
 			assertUnreachable(msg);
 		}
 	}
-};
+}
 
 //////////////////////////////////////////
 //////////////////////////////////////////

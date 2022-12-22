@@ -157,17 +157,15 @@ export default function ShareDialog() {
 /////////////////////////////////////////
 // Helper functions:
 
-const closePopover = (closeServerFunction?: () => void): void => {
+function closePopover(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
 	setFilesToShare(emptySet);
-};
+}
 
 /////////////////////////////////////////
 
-const namesOfFilesToShare = (
-	filesToShare: ReadonlySet<Path>,
-): JSX.Element[] => {
+function namesOfFilesToShare(filesToShare: ReadonlySet<Path>): JSX.Element[] {
 	const mainList = getMainList();
 
 	return Array.from(filesToShare, (id) => (
@@ -178,11 +176,11 @@ const namesOfFilesToShare = (
 			{mainList.get(id)?.title}
 		</li>
 	));
-};
+}
 
 /////////////////////////////////////////
 
-const makeQrcode = async (url: QRCodeURL): Promise<void> => {
+async function makeQrcode(url: QRCodeURL): Promise<void> {
 	dbg(`Making QR Code for "${url}"`);
 
 	const canvasElement = document.getElementById(qrID) as HTMLCanvasElement;
@@ -190,4 +188,4 @@ const makeQrcode = async (url: QRCodeURL): Promise<void> => {
 	assert(canvasElement, "There is no canvas element!");
 
 	await toCanvas(canvasElement, url, { errorCorrectionLevel: "H", width: 300 });
-};
+}

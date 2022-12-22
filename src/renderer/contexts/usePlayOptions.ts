@@ -22,13 +22,13 @@ export const { getState: getPlayOptions, setState: setPlayOptions } =
 ////////////////////////////////////////////////
 // Helper functions:
 
-export const toggleLoopMedia = (): void => {
+export function toggleLoopMedia(): void {
 	const loopThisMedia = !getPlayOptions().loopThisMedia;
 
 	(document.getElementById("audio") as HTMLAudioElement).loop = loopThisMedia;
 
 	setPlayOptions({ loopThisMedia });
-};
+}
 
 ////////////////////////////////////////////////
 

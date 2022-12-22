@@ -9,7 +9,7 @@ import { Button } from "@components/Button";
 const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
 	state.result;
 
-export const Result = () => {
+export function Result() {
 	const { imageURL, title } = useSearchInfo(resultSelector);
 	const { t } = useTranslation();
 
@@ -30,4 +30,4 @@ export const Result = () => {
 			</Button>
 		</div>
 	) : null;
-};
+}

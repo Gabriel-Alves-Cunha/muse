@@ -6,7 +6,7 @@ import { App } from "./App";
 
 // Importing this so vite keeps it when bundled and
 // Electron AppImage can pick it up
-import "@assets/logo.png"
+import "@assets/logo.png";
 
 if (isDev) {
 	setTimeout(

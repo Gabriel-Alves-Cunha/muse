@@ -10,7 +10,7 @@ import { BlurOverlay } from "./BlurOverlay";
 /////////////////////////////////////////////
 // Main function:
 
-export const ErrorFallback = ({ description }: ErrorBoundaryProps) => {
+export function ErrorFallback({ description }: ErrorBoundaryProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -43,7 +43,7 @@ export const ErrorFallback = ({ description }: ErrorBoundaryProps) => {
 			</Content>
 		</Dialog>
 	);
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

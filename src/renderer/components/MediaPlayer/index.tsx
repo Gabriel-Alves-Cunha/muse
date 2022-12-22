@@ -26,7 +26,7 @@ import {
 ///////////////////////////////////////
 // Main function:
 
-export const MediaPlayer = () => {
+export function MediaPlayer() {
 	const mainList = usePlaylists(mainListSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const id = useCurrentPlaying(idSelector);
@@ -75,4 +75,4 @@ export const MediaPlayer = () => {
 			/>
 		</aside>
 	);
-};
+}

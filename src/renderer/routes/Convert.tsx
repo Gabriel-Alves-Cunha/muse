@@ -29,9 +29,9 @@ export default function Convert() {
 
 	////////////////////////////////////////////////
 
-	const handleSelectedFiles = ({
+	function handleSelectedFiles({
 		target: { files },
-	}: ChangeEvent<HTMLInputElement>) => {
+	}: ChangeEvent<HTMLInputElement>) {
 		if (!files?.length) return;
 
 		const map: Map<Path, ConvertInfo> = new Map();
@@ -39,7 +39,7 @@ export default function Convert() {
 		for (const file of files) map.set(file.webkitRelativePath, { toExtension });
 
 		setSelectedFiles(map);
-	};
+	}
 
 	////////////////////////////////////////////////
 

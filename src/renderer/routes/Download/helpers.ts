@@ -30,7 +30,7 @@ export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 ////////////////////////////////////////////////
 // Helper functions:
 
-export const downloadMedia = (): void => {
+export function downloadMedia(): void {
 	const {
 		result: { artist, imageURL, title },
 		url,
@@ -44,7 +44,7 @@ export const downloadMedia = (): void => {
 
 	// Reset values:
 	setSearchInfo(defaultSearchInfo);
-};
+}
 
 ////////////////////////////////////////////////
 
@@ -53,7 +53,7 @@ export const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
 
 ////////////////////////////////////////////////
 
-export const search = async (url: Readonly<string>): Promise<void> => {
+export async function search(url: Readonly<string>): Promise<void> {
 	if (url.length < 16) return;
 
 	setSearchInfo({
@@ -86,7 +86,7 @@ export const search = async (url: Readonly<string>): Promise<void> => {
 
 		error(err);
 	}
-};
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

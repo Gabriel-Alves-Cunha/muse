@@ -69,10 +69,10 @@ export default function MediaOptionsCtxMenu() {
 /////////////////////////////////////////////
 // Helper functions:
 
-export const deleteMedias = (): void => {
+export function deleteMedias(): void {
 	const promises = Array.from(getAllSelectedMedias(), (path) =>
 		deleteFile(path),
 	);
 
 	Promise.all(promises).then();
-};
+}

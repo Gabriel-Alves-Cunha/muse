@@ -10,7 +10,7 @@ import { MediaSearchRow } from "./MediaSearchRow";
 
 const mantainFocusOnInput = (e: Event) => e.preventDefault();
 
-export const Results = () => {
+export function Results() {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
 	const resultsJSXs: JSX.Element[] = [];
 
@@ -63,4 +63,4 @@ export const Results = () => {
 			</PopoverRoot>
 		</ContextMenu>
 	);
-};
+}

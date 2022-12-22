@@ -2,7 +2,7 @@ import { useTranslation } from "@i18n";
 import { SelectItem } from "./SelectItem";
 
 // The values have to follow `type SelectedList`!!
-export const SelectOrderOptions = () => {
+export function SelectOrderOptions() {
 	const { t } = useTranslation();
 
 	return (
@@ -12,4 +12,4 @@ export const SelectOrderOptions = () => {
 			<SelectItem value="Date" title={t("sortTypes.date")} />
 		</>
 	);
-};
+}

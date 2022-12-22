@@ -78,18 +78,18 @@ export const shareMedias = () => setFilesToShare(getAllSelectedMedias());
 
 /////////////////////////////////////////////
 
-const selectAllMediasOnSearchResult = (): void => {
+function selectAllMediasOnSearchResult(): void {
 	const paths = getSearcher().results.map(([path]) => path);
 
 	setAllSelectedMedias(new Set(paths));
-};
+}
 
 /////////////////////////////////////////////
 
-export const searchForLyrics = (): void => {
+export function searchForLyrics(): void {
 	for (const id of getAllSelectedMedias())
 		searchAndOpenLyrics(id, !openLyrics).then();
-};
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

@@ -67,13 +67,13 @@ const pages = {
 	Home: lazy(() => import("./routes/Home")),
 } as const;
 
-const PageToShow = () => {
+function PageToShow() {
 	const { page } = usePage();
 
 	const Page = pages[page];
 
 	return <Page />;
-};
+}
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -81,14 +81,6 @@ const PageToShow = () => {
 // Do once on app start:
 
 window.addEventListener("message", handleWindowMsgs);
-
-document.addEventListener("copy", (e) => {
-	log("Copy event on document =", e);
-});
-
-window.addEventListener("copy", (e) => {
-	log("Copy event on window =", e);
-});
 
 //////////////////////////////////////////
 
