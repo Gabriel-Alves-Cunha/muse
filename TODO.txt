@@ -1,13 +1,17 @@
 ################## TODO ##################
 
-* FIX: choose a font with I and L different!!
-* ADD: select with mouse moving!!
+* REFACTOR: use web-share!
+
 * ADD: detect (avail port to share)
+* ADD: select with mouse moving
 * ADD: electron setProgressBar
-* FIX: gh-actions is always overwriting latest release!!
-* REFACTOR: use web-share!!!
-* ADD: playback rate
 * ADD: cut and visualise audio
+* ADD: playback rate
+* ADD: own select menu
+
+* FIX: gh-actions is always overwriting latest release
+* FIX: choose a font with I and L different
+* FIX: select menu style
 
 ################## NOTES ##################
 

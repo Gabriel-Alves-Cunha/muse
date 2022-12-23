@@ -5,6 +5,7 @@ import { useTranslation } from "@i18n";
 import { BlurOverlay } from "./BlurOverlay";
 import { FlexRow } from "@components/FlexRow";
 
+// @ts-ignore => This is ok:
 import warningSvg from "@assets/warning.svg";
 
 /////////////////////////////////////////////

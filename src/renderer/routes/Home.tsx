@@ -1,3 +1,4 @@
+import { ModalContent, ModalTrigger } from "@components/Modal";
 import { useTranslation } from "@i18n";
 import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
@@ -23,6 +24,14 @@ export default function Home() {
 
 				<GroupedButton reload sortBy />
 			</Header>
+
+			<>
+				<ModalTrigger htmlTargetName="home-modal">Open tree modal</ModalTrigger>
+
+				<ModalContent htmlFor="home-modal" blur closeOnClickOutside>
+					Hello from the outside
+				</ModalContent>
+			</>
 
 			<MediaListKind isHome />
 		</MainArea>

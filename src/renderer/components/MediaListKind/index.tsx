@@ -1,9 +1,4 @@
-import type {
-	DateAsNumber,
-	Media,
-	Path,
-	ID,
-} from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, ID } from "@common/@types/generalTypes";
 
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
@@ -40,25 +35,23 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function MediaListKind({ isHome }: Props) {
-	const { t } = useTranslation();
-
-	return (
-		<ErrorBoundary
-			FallbackComponent={() => (
-				<ErrorFallback
-					description={t("errors.mediaListKind.errorFallbackDescription")}
-				/>
-			)}
-			onReset={() => {
-				resetAllAppData();
-				reloadWindow();
-			}}
-		>
-			<MediaListKindWithoutErrorBoundary isHome={isHome} />
-		</ErrorBoundary>
-	);
-}
+export const MediaListKind = ({ isHome }: Props) => (
+	<ErrorBoundary
+		FallbackComponent={() => (
+			<ErrorFallback
+				description={useTranslation().t(
+					"errors.mediaListKind.errorFallbackDescription",
+				)}
+			/>
+		)}
+		onReset={() => {
+			resetAllAppData();
+			reloadWindow();
+		}}
+	>
+		<MediaListKindWithoutErrorBoundary isHome={isHome} />
+	</ErrorBoundary>
+);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -107,7 +100,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 				}
 
 				// else if (listName === playlistList.history)
-				const unsortedList: [Path, Media, DateAsNumber][] = [];
+				const unsortedList: [ID, Media, DateAsNumber][] = [];
 				const mainList = getMainList();
 
 				for (const [id, dates] of list as History) {
@@ -124,7 +117,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					for (const date of dates) unsortedList.push([id, media, date]);
 				}
 
-				const sorted: [Path, Media, DateAsNumber][] = unsortedList.sort(
+				const sorted: [ID, Media, DateAsNumber][] = unsortedList.sort(
 					(a, b) => b[2] - a[2],
 				); // sorted by date
 
@@ -179,17 +172,13 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
-function EmptyPlaceholder() {
-	const { t } = useTranslation();
+const EmptyPlaceholder = () => (
+	<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
+		<NoMediaFound className="w-14 h-14 mr-5" />
 
-	return (
-		<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
-			<NoMediaFound className="w-14 h-14 mr-5" />
-
-			{t("alts.noMediasFound")}
-		</div>
-	);
-}
+		{useTranslation().t("alts.noMediasFound")}
+	</div>
+);
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };
 

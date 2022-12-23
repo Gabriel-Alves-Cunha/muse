@@ -22,11 +22,11 @@ const method = "GET";
 /////////////////////////////////////////
 // Main function:
 
-export const searchForLyricsAndImage = async (
+export async function searchForLyricsAndImage(
 	mediaTitle: string,
 	mediaArtist: string,
 	getImage: boolean,
-): Promise<LyricsResponse> => {
+): Promise<LyricsResponse> {
 	if (!(mediaTitle && mediaArtist))
 		throwErr(
 			`Required argument can't be empty: mediaArtist = "${mediaArtist}"; mediaTitle = "${mediaTitle}"`,
@@ -45,17 +45,17 @@ export const searchForLyricsAndImage = async (
 	dbg({ lyric, image, albumName });
 
 	return { lyric, image, albumName } satisfies LyricsResponse;
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Helper functions:
 
-const queryForPossibleLyric = async (
+async function queryForPossibleLyric(
 	mediaTitle: string,
 	mediaArtist: string,
-): Promise<PossibleLyrics> => {
+): Promise<PossibleLyrics> {
 	// From 'https://happi.dev/docs/music' docs:
 	const params = new URLSearchParams({
 		// Text to search:
@@ -84,11 +84,11 @@ const queryForPossibleLyric = async (
 		imageURL: track.cover,
 		title: track.track,
 	} satisfies PossibleLyrics;
-};
+}
 
 /////////////////////////////////////////
 
-const queryForLyric = async (lyricURL: string): Promise<string> => {
+async function queryForLyric(lyricURL: string): Promise<string> {
 	dbg(`Querying for lyricURL: "${lyricURL}".`);
 
 	const jsonRes = (await (await fetch(lyricURL, { method, headers })).json()) as
@@ -104,11 +104,11 @@ const queryForLyric = async (lyricURL: string): Promise<string> => {
 	}
 
 	return jsonRes.result.lyrics;
-};
+}
 
 /////////////////////////////////////////
 
-const queryForImage = async (imageURL: string): Promise<Base64> => {
+async function queryForImage(imageURL: string): Promise<Base64> {
 	dbg(`Querying for lyricURL = "${imageURL}".`);
 
 	const blob = await (
@@ -120,11 +120,11 @@ const queryForImage = async (imageURL: string): Promise<Base64> => {
 	dbg({ blob, base64 });
 
 	return base64;
-};
+}
 
 /////////////////////////////////////////
 
-const blobToBase64 = (blob: Blob): Promise<Base64> => {
+function blobToBase64(blob: Blob): Promise<Base64> {
 	const reader = new FileReader();
 	reader.readAsDataURL(blob);
 
@@ -132,7 +132,7 @@ const blobToBase64 = (blob: Blob): Promise<Base64> => {
 		reader.onerror = () => reject("Error reading on blobToBase64!");
 		reader.onloadend = () => resolve(reader.result as Base64);
 	});
-};
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

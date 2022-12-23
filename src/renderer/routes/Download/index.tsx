@@ -18,7 +18,7 @@ export default function Download() {
 	useTitle(t("titles.download"));
 
 	return (
-		<MainArea className="flex flex-col scroll scroll-2">
+		<MainArea>
 			<Header>
 				<SearcherWrapper />
 

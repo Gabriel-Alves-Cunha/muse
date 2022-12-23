@@ -9,6 +9,7 @@ import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "../SearchMedia/state";
 import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
+import { RightSlot } from "./RightSlot";
 import { Item } from "./Item";
 import {
 	setAllSelectedMedias,
@@ -28,17 +29,12 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 	return (
 		<>
 			<Dialog modal>
-				<Trigger
-					className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
-					disabled={isAllDisabled}
-				>
-					<>
-						{t("ctxMenus.deleteMedia")}
+				<Trigger className="ctx-menu-item" disabled={isAllDisabled}>
+					{t("ctxMenus.deleteMedia")}
 
-						<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-							<Trash />
-						</div>
-					</>
+					<RightSlot>
+						<Trash />
+					</RightSlot>
 				</Trigger>
 
 				<Suspense>
@@ -49,17 +45,15 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 			<Item onSelect={shareMedias} disabled={isAllDisabled}>
 				{t("ctxMenus.shareMedia")}
 
-				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+				<RightSlot>
 					<Share />
-				</div>
+				</RightSlot>
 			</Item>
 
 			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
 				{t("ctxMenus.selectAllMedias")}
 
-				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-					Ctrl+A
-				</div>
+				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
 			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>

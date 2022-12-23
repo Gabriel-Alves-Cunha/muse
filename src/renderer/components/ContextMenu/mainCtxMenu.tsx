@@ -1,9 +1,9 @@
-import { Item, Separator } from "@radix-ui/react-context-menu";
-
 import { ElectronIpcMainProcessNotification } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 import { useTranslation } from "@i18n";
+import { Separator } from "../Separator";
 import { RightSlot } from "./RightSlot";
+import { Item } from "./Item";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;

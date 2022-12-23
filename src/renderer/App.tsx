@@ -9,7 +9,6 @@ import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { usePage } from "@contexts/page";
 import { Navbar } from "@components/Navbar";
-import { log } from "@common/log";
 
 import "react-toastify/dist/ReactToastify.min.css";
 

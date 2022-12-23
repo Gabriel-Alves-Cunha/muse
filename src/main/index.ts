@@ -226,7 +226,7 @@ ipcMain
 		(_, downloadValues: DownloadInfo) => {
 			dbg("ipcMain received data from electronWindow:", downloadValues);
 
-			log("Relaying message from to ipcRenderer");
+			log("Relaying message from on main/index.ts to ipcRenderer");
 
 			ipcMain.emit(
 				ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,

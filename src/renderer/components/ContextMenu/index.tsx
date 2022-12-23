@@ -4,7 +4,6 @@ import { type ReactNode, Suspense, lazy } from "react";
 import { Content, Root, Trigger } from "@radix-ui/react-context-menu";
 
 const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
-const FullExampleCtxMenu = lazy(() => import("./FullExampleCtxMenu"));
 const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
 const SearchMediaOptionsCtxMenu = lazy(
 	() => import("./searchMediaOptionsCtxMenu"),
@@ -17,12 +16,10 @@ const SearchMediaOptionsCtxMenu = lazy(
 export const CtxContentEnum = {
 	SEARCH_MEDIA_OPTIONS: 2,
 	MEDIA_OPTIONS: 3,
-	FULL_EXAMPLE: 4,
-	MAIN: 5,
+	MAIN: 4,
 } as const;
 
-const { MEDIA_OPTIONS, FULL_EXAMPLE, MAIN, SEARCH_MEDIA_OPTIONS } =
-	CtxContentEnum;
+const { MEDIA_OPTIONS, MAIN, SEARCH_MEDIA_OPTIONS } = CtxContentEnum;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -37,7 +34,7 @@ export const ContextMenu = ({
 	children,
 }: Props) => (
 	<Root onOpenChange={setIsOpen} modal>
-		<Trigger onContextMenuCapture={onContextMenu}>{children}</Trigger>
+		<Trigger onContextMenu={onContextMenu}>{children}</Trigger>
 
 		<Content
 			className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
@@ -48,11 +45,9 @@ export const ContextMenu = ({
 					<SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />
 				) : content === MEDIA_OPTIONS ? (
 					<MediaOptionsCtxMenu />
-				) : content === FULL_EXAMPLE ? (
-					<FullExampleCtxMenu />
-				) : content === MAIN ? (
+				) : (
 					<MainCtxMenu />
-				) : null}
+				)}
 			</Suspense>
 		</Content>
 	</Root>

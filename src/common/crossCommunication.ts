@@ -10,24 +10,24 @@ import { dbg } from "./debug";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function sendMsgToBackend(
+export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
 	electronPort?: MessagePort,
-): void {
+): void => {
 	dbg("Sending message to backend:", { msg, electronPort });
 
 	electronPort
 		? window.postMessage({ msg, source: reactSource }, "*", [electronPort])
 		: window.postMessage({ msg, source: reactSource }, "*");
-}
+};
 
 /////////////////////////////////////////
 
-export function sendMsgToClient(msg: MsgObjectElectronToReact): void {
+export const sendMsgToClient = (msg: MsgObjectElectronToReact): void => {
 	dbg("Sending message to client:", msg);
 
 	window.postMessage({ msg, source: electronSource }, "*");
-}
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////

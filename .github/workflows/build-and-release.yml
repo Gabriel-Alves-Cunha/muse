@@ -13,13 +13,26 @@
 
 # And push:
 # > git push
+##################################################
+# To make this action run, do this on the terminal:
+
+# Make sure to bump the version on package.json;
+
+# Make sure your working tree is in a clean state:
+# `git status`
+
+# If ok, create a git tag:
+# `git tag v<new_release_version>`
+
+# And push:
+# `git push`
 
 name: Build and release
 
 on:
   push:
-    branches:
-      - build
+    tags:
+      - "v*"
 
 jobs:
   build_on_linux:
@@ -35,12 +48,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.16.0
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: Build React app
+      - name: Build/Bundle Electron-React app
         run: yarn build
 
       - name: Build Electron app for Linux only
@@ -55,9 +68,8 @@ jobs:
       - name: Release action
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          # This token is provided by Actions, you do not need to create your own token
+          # This token is provided by Actions, you do not need to create your own token:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: latest
           prerelease: false
           files: |
             latest-linux.yml

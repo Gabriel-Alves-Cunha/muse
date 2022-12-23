@@ -7,6 +7,7 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
 import { useTranslation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
+import { RightSlot } from "./RightSlot";
 import { Item } from "./Item";
 import {
 	getAllSelectedMedias,
@@ -22,39 +23,34 @@ export default function MediaOptionsCtxMenu() {
 
 	return (
 		<>
-			<Dialog modal>
-				<Trigger
-					aria-disabled={isDisabled}
-					className="group unset-all relative flex items-center w-[calc(100%-35px)] h-6 cursor-pointer border-none py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide leading-none select-none ctx-trigger"
-				>
-					<>
+			<div>
+				<Dialog modal>
+					<Trigger className="ctx-menu-item" disabled={isDisabled}>
 						{t("ctxMenus.deleteMedia")}
 
-						<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+						<RightSlot>
 							<Trash />
-						</div>
-					</>
-				</Trigger>
+						</RightSlot>
+					</Trigger>
 
-				<Suspense>
-					<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
-				</Suspense>
-			</Dialog>
+					<Suspense>
+						<DeleteMediaDialogContent handleMediaDeletion={deleteMedias} />
+					</Suspense>
+				</Dialog>
+			</div>
 
 			<Item onSelect={shareMedias} disabled={isDisabled}>
 				{t("ctxMenus.shareMedia")}
 
-				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
+				<RightSlot>
 					<Share />
-				</div>
+				</RightSlot>
 			</Item>
 
 			<Item onSelect={selectAllMedias}>
 				{t("ctxMenus.selectAllMedias")}
 
-				<div className="ml-auto pl-5 text-ctx-menu font-secondary tracking-wide text-base leading-none group-focus:text-ctx-menu-item-focus group-disabled:text-disabled">
-					Ctrl+A
-				</div>
+				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
 			<Item onSelect={searchForLyrics} disabled={isDisabled}>

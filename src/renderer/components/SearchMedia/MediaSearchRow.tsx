@@ -4,10 +4,10 @@ import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 
-import { MediaOptionsModal } from "@components/MediaListKind/MediaOptionsModal";
-import { ImgWithFallback } from "@components/ImgWithFallback";
+import { MediaOptionsModal } from "../MediaListKind/MediaOptionsModal";
+import { ImgWithFallback } from "../ImgWithFallback";
 import { useTranslation } from "@i18n";
-import { DialogTrigger } from "@components/DialogTrigger";
+import { DialogTrigger } from "../DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { unDiacritic } from "@contexts/usePlaylists";
 

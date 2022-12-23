@@ -12,6 +12,7 @@ import { useTranslation } from "@i18n";
 import { MediasInfo } from "@components/Decorations/MediasInfo";
 import { usePage } from "@contexts/page";
 
+// @ts-ignore => This is ok:
 import imageUrl from "@assets/logo.svg";
 
 /////////////////////////////////////////////

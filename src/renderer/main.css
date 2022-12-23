@@ -186,7 +186,6 @@
 	*::before {
 		text-rendering: optimizeLegibility;
 		box-sizing: border-box;
-		/* box-sizing: inherit; */
 
 		overscroll-behavior: none;
 	}
@@ -279,10 +278,6 @@
 
 	@media (max-width: 640px) {
 		.grid-template-for-content-wrapper {
-			/* grid-template:
-				"nav main-area" 1fr / 35px 1fr
-				"media-player" 70px / 1fr; */
-
 			grid-template-columns: 0.17fr 1.8fr;
 			grid-template-rows: 1.6fr 0.7fr;
 			grid-template-areas:
@@ -352,27 +347,85 @@
 	/* Search Media */
 
 	.search-media {
-		@apply relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none transition-all ease-out duration-200;
+		@apply relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none;
 	}
 
 	.search-media * {
-		transition-timing-function: ease;
-		transition-duration: 200ms;
-		transition-property: all;
+		@apply transition-all ease-out duration-200;
 	}
 
-	.search-media:where(:focus, :focus-visible, :hover, :focus-within) {
+	.search-media:where(:focus-visible, :focus-within, :focus, :hover) {
 		@apply border-active cursor-text;
 	}
 
-	.search-media:where(:focus, :focus-visible, :hover, :focus-within) svg {
-		@apply text-active;
-	}
-
-	.search-media:where(:focus, :focus-visible, :hover, :focus-within) label {
+	.search-media:is:not(:blank) label {
 		transform: translate(-44px, -31px);
 
 		@apply text-active;
+	}
+
+	.search-media:where(:focus-visible, :focus-within, :focus, :hover) {
+		@apply border-active cursor-text;
+	}
+
+	.search-media:where(:focus-visible, :focus-within, :hover, :focus) svg {
+		@apply text-active;
+	}
+
+	.search-media:where(:focus-visible, :focus-within, :focus, :hover) label {
+		transform: translate(-44px, -31px);
+
+		@apply text-active;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Modal */
+
+	.modal-content-wrapper {
+		@apply invisible fixed inset-0 z-40 items-center justify-center overscroll-none bg-[rgba(0,0,0,0.6)] transition-all duration-75 flex px-4;
+	}
+
+	.modal-outside {
+		@apply inset-0 absolute;
+	}
+
+	.modal-state {
+		@apply hidden;
+	}
+
+	.modal-state:checked + .modal-content-wrapper {
+		@apply visible;
+	}
+
+	body:has(.modal-state:checked) {
+		@apply overflow-hidden;
+	}
+
+	.modal-state:checked + .modal-content-wrapper .modal-content {
+		@apply scale-100;
+	}
+
+	.modal-content {
+		@apply relative h-max max-h-[90%] max-w-lg scale-90 overflow-auto rounded-xl bg-popover p-6 transition ease-in-out duration-75;
+	}
+
+	.modal-close {
+		@apply right-[1em] top-[1em] h-[1.1em] w-[1.1em] absolute cursor-pointer;
+	}
+
+	.modal-close:where(::after, ::before) {
+		@apply left-1/2 top-0 -mt-1.5 w-0.5 rotate-45 transform bg-gray-700 content-[""] absolute h-6;
+	}
+
+	.modal-close:hover:where(::after, ::before) {
+		@apply bg-gray-600;
+	}
+
+	.modal-close::before {
+		transform: rotate(-45deg);
 	}
 
 	/* ********************************** */
@@ -481,8 +534,7 @@
 	}
 
 	.transition-bc-bg {
-		transition-property: border-color, background;
-		transition: 200ms ease;
+		@apply transition-[border-color,background] duration-200;
 	}
 
 	.transition-border-color {
@@ -532,7 +584,7 @@
 	}
 
 	.rotate-y-180 {
-		transform: rotateY("180deg");
+		transform: rotateY(180deg);
 	}
 
 	.flip-active > div {
@@ -633,20 +685,8 @@
 	}
 
 	.reflect-img {
-		-webkit-box-reflect: below 0px
-			linear-gradient(
-				to bottom,
-				from(transparent),
-				color-stop(40%, transparent),
-				to(rgba(255, 255, 255, 0.1))
-			);
-
-		/* "-webkit-box-reflect": `below 0px
-			-webkit-gradient(linear, right top, right	bottom,
-				from(transparent),
-				color-stop(40%, transparent),
-				to(rgba(255, 255, 255, 0.1))
-			)`, */
+		-webkit-box-reflect: below 10px
+			linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.4));
 	}
 
 	.list-decimal-zero {
@@ -691,32 +731,30 @@
 		width: 100px;
 	}
 
-	.right-ring-loader {
+	.side-ring-loader {
 		position: absolute;
 		display: block;
 		top: 0px;
 		left: 0px;
 		width: 100px;
 		height: 100px;
-		border: 10px solid rgb(0, 0, 255);
+		border: 10px solid white;
 		opacity: 0.4;
 		border-radius: 100%;
 		perspective: 800px;
-		animation: 2s linear 0s infinite normal none running anim-right-ring-loader;
+		animation: 2s linear 0s infinite normal none running;
+	}
+
+	.right-ring-loader {
+		@apply side-ring-loader;
+
+		animation-name: anim-right-ring-loader;
 	}
 
 	.left-ring-loader {
-		position: absolute;
-		display: block;
-		top: 0px;
-		left: 0px;
-		width: 100px;
-		height: 100px;
-		border: 10px solid rgb(0, 0, 255);
-		opacity: 0.4;
-		border-radius: 100%;
-		perspective: 800px;
-		animation: 2s linear 0s infinite normal none running anim-left-ring-loader;
+		@apply side-ring-loader;
+
+		animation-name: anim-left-ring-loader;
 	}
 
 	/* ********************************** */
@@ -726,23 +764,27 @@
 	/* Context Menu */
 
 	.ctx-menu-item {
-		@apply unset-all relative flex items-center h-6 cursor-pointer py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide text-base leading-none select-none disabled:text-disabled disabled:pointer-events-none hover:text-ctx-menu-item-focus hover:bg-ctx-menu-item-focus focus:text-ctx-menu-item-focus focus:bg-ctx-menu-item-focus;
+		@apply unset-all relative flex items-center h-6 cursor-pointer py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide text-base leading-none select-none;
 	}
 
-	.ctx-trigger:where(:focus, :focus-visible, :hover) {
-		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
-	}
-
-	.ctx-trigger:where(:focus, :focus-visible, :hover) svg {
-		@apply text-ctx-menu-item-focus;
-	}
-
-	.ctx-trigger:disabled {
+	.ctx-menu-item[data-disabled] {
 		@apply text-disabled pointer-events-none;
 	}
 
-	.ctx-trigger:disabled svg {
+	.ctx-menu-item[data-disabled] * {
 		@apply text-disabled;
+	}
+
+	.ctx-menu-item[data-highlighted] {
+		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
+	}
+
+	.ctx-menu-item[data-highlighted] * {
+		@apply text-ctx-menu-item-focus;
+	}
+
+	.ctx-menu-item-slot {
+		@apply flex justify-end ml-auto pl-12 pr-2 text-ctx-menu font-secondary tracking-wide text-base leading-none;
 	}
 
 	/* ********************************** */
