@@ -6,7 +6,6 @@ import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
 
 import { useTranslation } from "@i18n";
 import { MainArea } from "@components/MainArea";
-import { useTitle } from "@hooks/useTitle";
 import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
 import {
@@ -25,7 +24,6 @@ export default function Convert() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { t } = useTranslation();
 
-	useTitle(t("titles.convert"));
 
 	////////////////////////////////////////////////
 

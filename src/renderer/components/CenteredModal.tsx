@@ -1,4 +1,4 @@
-export const ModalTrigger = ({
+export const CenteredModalTrigger = ({
 	labelClassName = "",
 	inputClassName = "",
 	htmlTargetName,
@@ -22,11 +22,10 @@ export const ModalTrigger = ({
 
 /////////////////////////////////////////////
 
-export const ModalContent = ({
+export const CenteredModalContent = ({
 	closeOnClickOutside,
 	className = "",
 	htmlFor,
-	blur,
 	...rest
 }: ContentProps) => (
 	<div className={`modal-content-wrapper ${className}`}>
@@ -35,18 +34,29 @@ export const ModalContent = ({
 			htmlFor={closeOnClickOutside ? htmlFor : undefined}
 		/>
 
-		<div className={`modal-content ${className}`} {...rest} />
+		<div
+			className={`modal-content ${className}`} // Doing this to trap focus inside modal!
+			onTransitionEnd={(e) => {
+				e.currentTarget.querySelector("label")?.focus();
+			}}
+			{...rest}
+		/>
 	</div>
 );
 
 /////////////////////////////////////////////
 
-export const CloseModal = ({
+export const CloseCenteredModal = ({
 	className = "",
 	htmlFor,
 	...rest
 }: CloseProps) => (
-	<label className={`modal-close ${className}`} htmlFor={htmlFor} {...rest} />
+	<label
+		className={`modal-close ${className}`}
+		htmlFor={htmlFor}
+		tabIndex={0}
+		{...rest}
+	/>
 );
 
 /////////////////////////////////////////////
@@ -78,7 +88,6 @@ interface ContentProps
 	> {
 	closeOnClickOutside?: boolean;
 	htmlFor: string;
-	blur?: boolean;
 }
 
 /////////////////////////////////////////////

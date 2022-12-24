@@ -1,47 +1,58 @@
-import { Close, Content, Dialog, Title } from "@radix-ui/react-dialog";
-
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
-import { reloadWindow } from "@components/MediaListKind/helper";
-import { BlurOverlay } from "./BlurOverlay";
+import { reloadWindow } from "./MediaListKind/helper";
+import {
+	CloseOpenedCenteredModal,
+	OpenedCenteredModal,
+} from "./OpenedCenteredModal";
+
+// @ts-ignore => That's alright:
+import warningSvg from "@assets/warning.svg";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
+const errorFallbackModalHtmlId = "error-fallback-modal";
+
 export function ErrorFallback({ description }: ErrorBoundaryProps) {
 	const { t } = useTranslation();
 
 	return (
-		<Dialog modal open>
-			<BlurOverlay />
+		<OpenedCenteredModal
+			className="relative flex flex-col items-center"
+			htmlTargetName={errorFallbackModalHtmlId}
+		>
+			<h1 className="flex items-center title">
+				{t("errors.mediaListKind.errorTitle")}
 
-			<Content className="relative flex flex-col justify-center items-center">
-				<Title className="">{t("errors.mediaListKind.errorTitle")}</Title>
+				<img src={warningSvg} className="w-7 h-7 ml-3" alt="Warning sign" />
+			</h1>
 
-				<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
-					{description}
-				</p>
+			<p className="my-5 text-muted font-secondary text-center tracking-wide">
+				{description}
+			</p>
 
-				<Close
-					className="bg-[#94a59b] my-2 mx-0 text-black hover:bg-opacity-70 focus:bg-opacity-70"
-					onPointerUp={() => {
-						resetAllAppData();
-						reloadWindow();
-					}}
-				>
-					{t("buttons.resetAllAppData")}
-				</Close>
+			<CloseOpenedCenteredModal
+				onPointerUp={() => {
+					resetAllAppData();
+					reloadWindow();
+				}}
+				htmlFor={errorFallbackModalHtmlId}
+				className="modal-close-reset"
+			>
+				{t("buttons.resetAllAppData")}
+			</CloseOpenedCenteredModal>
 
-				<Close
-					className="bg-[#94a59b] text-black hover:bg-opacity-70 focus:bg-opacity-70"
-					onPointerUp={reloadWindow}
-				>
-					{t("buttons.reloadWindow")}
-				</Close>
-			</Content>
-		</Dialog>
+			<CloseOpenedCenteredModal
+				htmlFor={errorFallbackModalHtmlId}
+				className="modal-close-reset"
+				onPointerUp={reloadWindow}
+			>
+				{t("buttons.reloadWindow")}
+			</CloseOpenedCenteredModal>
+		</OpenedCenteredModal>
 	);
 }
 

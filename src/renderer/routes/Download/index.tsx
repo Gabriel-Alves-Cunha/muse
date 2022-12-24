@@ -1,7 +1,5 @@
 import { SearcherWrapper } from "./SearcherWrapper";
-import { useTranslation } from "@i18n";
 import { useSearchInfo } from "./helpers";
-import { useTitle } from "@hooks/useTitle";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
 import { Header } from "@components/Header";
@@ -13,10 +11,6 @@ import { Result } from "./Result";
 // Main function:
 
 export default function Download() {
-	const { t } = useTranslation();
-
-	useTitle(t("titles.download"));
-
 	return (
 		<MainArea>
 			<Header>

@@ -1,17 +1,18 @@
 ################## TODO ##################
 
+* REFACTOR: choose a font with I and L different
 * REFACTOR: use web-share!
+* REFACTOR: change modals!
 
+* ADD: offer the option to turn on debug when ErrorFallback is reached
 * ADD: detect (avail port to share)
 * ADD: select with mouse moving
 * ADD: electron setProgressBar
 * ADD: cut and visualise audio
-* ADD: playback rate
 * ADD: own select menu
+* ADD: playback rate
 
 * FIX: gh-actions is always overwriting latest release
-* FIX: choose a font with I and L different
-* FIX: select menu style
 
 ################## NOTES ##################
 

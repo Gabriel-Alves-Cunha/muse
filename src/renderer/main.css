@@ -385,7 +385,7 @@
 	/* Modal */
 
 	.modal-content-wrapper {
-		@apply invisible fixed inset-0 z-40 items-center justify-center overscroll-none bg-[rgba(0,0,0,0.6)] transition-all duration-75 flex px-4;
+		@apply invisible fixed inset-0 z-40 items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] transition-all duration-75 flex px-4;
 	}
 
 	.modal-outside {
@@ -408,24 +408,41 @@
 		@apply scale-100;
 	}
 
-	.modal-content {
-		@apply relative h-max max-h-[90%] max-w-lg scale-90 overflow-auto rounded-xl bg-popover p-6 transition ease-in-out duration-75;
+	.modal-state:checked
+		+ .modal-content-wrapper
+		.modal-content:not(:focus-within) {
+		transition: background-color 0.001s;
+		background: #fff;
 	}
 
-	.modal-close {
+	.modal-content {
+		@apply relative h-max max-h-[90%] max-w-lg scale-90 rounded-xl bg-popover p-6 transition ease-in-out duration-75 overflow-hidden;
+	}
+
+	/* 1) modal-close-x (right top x close circled button) */
+
+	.modal-close-x {
 		@apply right-[1em] top-[1em] h-[1.1em] w-[1.1em] absolute cursor-pointer;
 	}
 
-	.modal-close:where(::after, ::before) {
-		@apply left-1/2 top-0 -mt-1.5 w-0.5 rotate-45 transform bg-gray-700 content-[""] absolute h-6;
+	.modal-close-x:where(:after, :before) {
+		@apply absolute h-6 content-[""] left-1/2 top-0 -mt-1.5 w-0.5 bg-gray-700;
+
+		transform: rotate(45deg);
 	}
 
-	.modal-close:hover:where(::after, ::before) {
+	.modal-close-x:hover:where(:after, :before) {
 		@apply bg-gray-600;
 	}
 
-	.modal-close::before {
+	.modal-close-x:before {
 		transform: rotate(-45deg);
+	}
+
+	/* 2) modal-close (a button) */
+
+	.modal-close-reset {
+		@apply transition-none cursor-pointer flex justify-center items-center bg-cyan-500 text-slate-800 text-base rounded-md w-full h-8 mt-3 hover:bg-cyan-400 focus:bg-cyan-400;
 	}
 
 	/* ********************************** */
@@ -716,6 +733,10 @@
 
 	.main-area-header {
 		@apply relative flex justify-start items-center h-14 gap-4 mb-[5%];
+	}
+
+	.title {
+		@apply text-2xl text-normal font-medium;
 	}
 
 	/* ********************************** */
