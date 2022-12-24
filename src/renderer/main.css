@@ -396,6 +396,12 @@
 		@apply hidden;
 	}
 
+	/* Style for MediaOptionsCtxMenu modal: */
+	label .modal-state:disabled {
+		@apply text-disabled pointer-events-none;
+	}
+	/* end */
+
 	.modal-state:checked + .modal-content-wrapper {
 		@apply visible;
 	}
@@ -443,6 +449,19 @@
 
 	.modal-close-reset {
 		@apply transition-none cursor-pointer flex justify-center items-center bg-cyan-500 text-slate-800 text-base rounded-md w-full h-8 mt-3 hover:bg-cyan-400 focus:bg-cyan-400;
+	}
+
+	/* 3) modal-trigger (a circled button with only an icon) */
+	.icon-circle-modal-trigger {
+		@apply relative flex justify-center items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
+	}
+
+	.modal-trigger:where(:focus, :focus-visible, :hover) {
+		@apply bg-icon-button-hovered;
+	}
+
+	.modal-trigger:where(:focus, :focus-visible, :hover) svg {
+		@apply text-normal bg-icon-button-hovered;
 	}
 
 	/* ********************************** */
@@ -938,24 +957,6 @@
 
 	.circle-icon-button.large {
 		@apply h-12 w-12;
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* DialogTrigger */
-
-	.dialog-trigger {
-		@apply unset-all relative flex justify-center items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full border-none no-transition;
-	}
-
-	.dialog-trigger:where(:focus, :focus-visible, :hover) {
-		@apply bg-icon-button-hovered;
-	}
-
-	.dialog-trigger:where(:focus, :focus-visible, :hover) svg {
-		@apply text-normal bg-icon-button-hovered;
 	}
 
 	/* ********************************** */

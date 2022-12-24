@@ -14,8 +14,6 @@ import { Header } from "@components/Header";
 // Main function:
 
 export default function History() {
-
-
 	useEffect(() => setFromList({ fromList: playlistList.history }), []);
 
 	return (

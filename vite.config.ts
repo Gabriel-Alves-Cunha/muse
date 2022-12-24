@@ -1,16 +1,13 @@
-/// <reference types="vitest" />
-/// <reference types="vite/client" />
-
-import { type UserConfig, defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
+import { defineConfig } from "vite";
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig(({ mode }) => {
-	const isDevelopment = mode === "development";
+	const isDev = mode === "development";
 	const isTest = mode === "test";
 
-	const config: UserConfig = {
+	return {
 		// @ts-ignore => I can't get this type to work :(
 		test: {
 			includeSource: ["src/**/*.{js,ts}"],
@@ -33,11 +30,10 @@ export default defineConfig(({ mode }) => {
 		},
 
 		define: isTest
-			? { isDev: isDevelopment }
+			? { isDev: isDev }
 			: {
 					"process.env": process.env ?? "{}",
-					"import.meta.vitest": "undefined",
-					isDev: isDevelopment,
+					isDev,
 			  },
 		server: { port: 3_000 },
 		root: "./src/renderer",
@@ -64,7 +60,5 @@ export default defineConfig(({ mode }) => {
 				{ find: "@tests", replacement: resolve("tests") },
 			],
 		},
-	};
-
-	return config;
+	} satisfies ReturnType<typeof defineConfig>;
 });

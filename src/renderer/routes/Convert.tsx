@@ -24,7 +24,6 @@ export default function Convert() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { t } = useTranslation();
 
-
 	////////////////////////////////////////////////
 
 	function handleSelectedFiles({

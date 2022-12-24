@@ -18,7 +18,7 @@ import { dbg } from "@common/debug";
 // Helper functions:
 
 export function handleMediaDeletion(
-	closeButtonRef: React.RefObject<HTMLButtonElement>,
+	closeButtonRef: React.RefObject<HTMLLabelElement>,
 	mediaPath: Path,
 ): void {
 	if (!closeButtonRef.current) return;
@@ -31,7 +31,7 @@ export function handleMediaDeletion(
 /////////////////////////////////////////////
 
 export function changeMediaMetadata(
-	closeButtonRef: React.RefObject<HTMLButtonElement>,
+	closeButtonRef: React.RefObject<HTMLLabelElement>,
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
@@ -258,7 +258,7 @@ export const isChangeable = (option: string): option is ChangeOptions =>
 
 /////////////////////////////////////////////
 
-const closeEverything = (element: HTMLButtonElement): void => element.click();
+const closeEverything = (element: HTMLLabelElement): void => element.click();
 
 /////////////////////////////////////////////
 

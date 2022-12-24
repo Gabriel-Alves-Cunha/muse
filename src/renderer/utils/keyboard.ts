@@ -1,3 +1,5 @@
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
+
 import { dbg } from "@common/debug";
 
 const modifierKeys = [
@@ -18,7 +20,7 @@ const modifierKeys = [
 ] as const;
 
 export function isAModifierKeyPressed(
-	event: KeyboardEvent,
+	event: KeyboardEvent | ReactKeyboardEvent,
 	except: typeof modifierKeys[number][] = [],
 ): Readonly<boolean> {
 	for (const key of modifierKeys) {

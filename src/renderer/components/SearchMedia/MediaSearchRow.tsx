@@ -1,20 +1,29 @@
 import type { ID, Media } from "@common/@types/generalTypes";
 
-import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdMusicNote as MusicNote } from "react-icons/md";
+import { Suspense, lazy } from "react";
 
-import { MediaOptionsModal } from "../MediaListKind/MediaOptionsModal";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { useTranslation } from "@i18n";
-import { DialogTrigger } from "../DialogTrigger";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { unDiacritic } from "@contexts/usePlaylists";
+import {
+	CenteredModalContent,
+	CenteredModalTrigger,
+} from "@components/CenteredModal";
+
+const MediaOptionsModal = lazy(
+	() => import("../MediaListKind/MediaOptionsModal"),
+);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
+
+const mediaOptionsModalID_mediaSearchRow =
+	"media-options-modal-media-search-row";
 
 export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 	const { t } = useTranslation();
@@ -23,7 +32,7 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 
 	return (
 		<div
-			className="unset-all box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow "
+			className="box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow "
 			data-id={id}
 		>
 			<button
@@ -52,17 +61,24 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 				</div>
 			</button>
 
-			<Dialog modal>
-				<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
+			<>
+				<CenteredModalTrigger
+					htmlTargetName={mediaOptionsModalID_mediaSearchRow}
+					labelClassName="icon-circle-modal-trigger"
+					labelProps={{ title: t("tooltips.openMediaOptions") }}
+				>
 					<Dots size={17} />
-				</DialogTrigger>
+				</CenteredModalTrigger>
 
-				<DialogPortal>
-					<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
-
-					<MediaOptionsModal media={media} path={id} />
-				</DialogPortal>
-			</Dialog>
+				<CenteredModalContent
+					className="grid center max-w-md min-w-[300px] p-8 bg-dialog"
+					htmlFor={mediaOptionsModalID_mediaSearchRow}
+				>
+					<Suspense>
+						<MediaOptionsModal media={media} path={id} />
+					</Suspense>
+				</CenteredModalContent>
+			</>
 		</div>
 	);
 }

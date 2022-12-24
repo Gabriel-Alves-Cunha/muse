@@ -1,3 +1,5 @@
+import { forwardRef } from "react";
+
 export const CenteredModalTrigger = ({
 	labelClassName = "",
 	inputClassName = "",
@@ -46,17 +48,19 @@ export const CenteredModalContent = ({
 
 /////////////////////////////////////////////
 
-export const CloseCenteredModal = ({
-	className = "",
-	htmlFor,
-	...rest
-}: CloseProps) => (
-	<label
-		className={`modal-close ${className}`}
-		htmlFor={htmlFor}
-		tabIndex={0}
-		{...rest}
-	/>
+export const CloseCenteredModal = forwardRef(
+	(
+		{ className = "", htmlFor, ...rest }: CloseProps,
+		forwardedRef: React.ForwardedRef<HTMLLabelElement>,
+	) => (
+		<label
+			className={`modal-close ${className}`}
+			ref={forwardedRef}
+			htmlFor={htmlFor}
+			tabIndex={0}
+			{...rest}
+		/>
+	),
 );
 
 /////////////////////////////////////////////

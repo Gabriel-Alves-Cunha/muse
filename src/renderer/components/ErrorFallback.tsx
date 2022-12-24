@@ -1,13 +1,11 @@
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
 import { reloadWindow } from "./MediaListKind/helper";
+import { WarningSign } from "./WarningSign";
 import {
 	CloseOpenedCenteredModal,
 	OpenedCenteredModal,
 } from "./OpenedCenteredModal";
-
-// @ts-ignore => That's alright:
-import warningSvg from "@assets/warning.svg";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -27,7 +25,7 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 			<h1 className="flex items-center title">
 				{t("errors.mediaListKind.errorTitle")}
 
-				<img src={warningSvg} className="w-7 h-7 ml-3" alt="Warning sign" />
+				<WarningSign />
 			</h1>
 
 			<p className="my-5 text-muted font-secondary text-center tracking-wide">

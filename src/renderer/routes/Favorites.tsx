@@ -14,8 +14,6 @@ import { Header } from "@components/Header";
 // Main function:
 
 export default function Favorites() {
-
-
 	useEffect(() => setFromList({ fromList: playlistList.favorites }), []);
 
 	return (

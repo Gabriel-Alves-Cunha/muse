@@ -5,25 +5,30 @@ import type {
 	ID,
 } from "@common/@types/generalTypes";
 
-import { Dialog, DialogPortal, Overlay } from "@radix-ui/react-dialog";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { memo } from "react";
+import { memo, Suspense, lazy } from "react";
 
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
-import { MediaOptionsModal } from "./MediaOptionsModal";
 import { ImgWithFallback } from "@components/ImgWithFallback";
 import { useTranslation } from "@i18n";
-import { DialogTrigger } from "@components/DialogTrigger";
 import { getFromList } from "./states";
 import {
 	getAllSelectedMedias,
 	toggleSelectedMedia,
 } from "@contexts/useAllSelectedMedias";
+import {
+	CenteredModalContent,
+	CenteredModalTrigger,
+} from "@components/CenteredModal";
+
+const MediaOptionsModal = lazy(() => import("./MediaOptionsModal"));
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
+
+export const mediaOptionsModalId = "media-options-modal";
 
 export const rightClick = 2;
 export const leftClick = 0;
@@ -84,18 +89,24 @@ const Row = memo(
 					</div>
 				</button>
 
-				<Dialog modal>
-					<DialogTrigger tooltip={t("tooltips.openMediaOptions")}>
+				<>
+					<CenteredModalTrigger
+						htmlTargetName={mediaOptionsModalId}
+						labelClassName="modal-trigger"
+						labelProps={{ title: t("tooltips.openMediaOptions") }}
+					>
 						<Dots size={17} />
-					</DialogTrigger>
+					</CenteredModalTrigger>
 
-					<DialogPortal>
-						{/* backdropFilter: blur(2px); */}
-						<Overlay className="fixed grid place-items-center bottom-0 right-0 left-0 top-0 blur-sm bg-opacity-10 overflow-y-auto z-20 animation-overlay-show" />
-
-						<MediaOptionsModal media={media} path={id} />
-					</DialogPortal>
-				</Dialog>
+					<CenteredModalContent
+						className="grid center max-w-md min-w-[300px] p-8 bg-dialog"
+						htmlFor={mediaOptionsModalId}
+					>
+						<Suspense>
+							<MediaOptionsModal media={media} path={id} />
+						</Suspense>
+					</CenteredModalContent>
+				</>
 			</div>
 		);
 	},

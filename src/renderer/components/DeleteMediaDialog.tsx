@@ -1,12 +1,7 @@
-import { Close, Content, Title } from "@radix-ui/react-dialog";
-import { Root as Portal } from "@radix-ui/react-portal";
-
+import { CloseCenteredModal } from "./CenteredModal";
 import { useTranslation } from "@i18n";
-import { BlurOverlay } from "./BlurOverlay";
+import { WarningSign } from "./WarningSign";
 import { FlexRow } from "@components/FlexRow";
-
-// @ts-ignore => This is ok:
-import warningSvg from "@assets/warning.svg";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -15,34 +10,35 @@ import warningSvg from "@assets/warning.svg";
 
 export default function DeleteMediaDialogContent({
 	handleMediaDeletion,
+	idOfModalToBeClosed,
 }: Props) {
 	const { t } = useTranslation();
 
 	return (
-		<Portal>
-			<BlurOverlay />
+		<>
+			<h1 className="title">
+				{t("dialogs.deleteMedia.subtitle")}
 
-			<Content className="">
-				<Title className="text-lg first-letter:text-3xl first-letter:font-normal">
-					{t("dialogs.deleteMedia.subtitle")}
-				</Title>
+				<WarningSign />
+			</h1>
 
-				<FlexRow>
-					<img className="" src={warningSvg} alt="Warning sign." />
+			<FlexRow>
+				<CloseCenteredModal
+					className="bg-red-600 text-white hover:bg-opacity-70 focus:bg-opacity-70"
+					onPointerUp={handleMediaDeletion}
+					htmlFor={idOfModalToBeClosed}
+				>
+					{t("buttons.confirm")}
+				</CloseCenteredModal>
 
-					<Close
-						className="bg-red-600 text-white hover:bg-opacity-70 focus:bg-opacity-70"
-						onPointerUp={handleMediaDeletion}
-					>
-						{t("buttons.confirm")}
-					</Close>
-
-					<Close className="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70">
-						{t("buttons.cancel")}
-					</Close>
-				</FlexRow>
-			</Content>
-		</Portal>
+				<CloseCenteredModal
+					className="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70"
+					htmlFor={idOfModalToBeClosed}
+				>
+					{t("buttons.cancel")}
+				</CloseCenteredModal>
+			</FlexRow>
+		</>
 	);
 }
 
@@ -51,4 +47,4 @@ export default function DeleteMediaDialogContent({
 /////////////////////////////////////////////
 // Types:
 
-type Props = { handleMediaDeletion(): void };
+type Props = { handleMediaDeletion(): void; idOfModalToBeClosed: string };
