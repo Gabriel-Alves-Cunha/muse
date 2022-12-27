@@ -124,7 +124,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			removeFromHistory(id) {
 				const newHistory = new Map(get().history);
 
-				// map.delete() returns true if an element in the Map
+				// Map.delete() returns true if an element in the Map
 				// object existed and has been removed, or false if
 				// the element does not exist.
 				if (newHistory.delete(id)) set({ history: newHistory });
@@ -159,7 +159,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			toggleFavoriteMedia(id) {
 				const newFavorites = new Set(get().favorites);
 
-				// map.delete() returns true if an element in the Map
+				// Map.delete() returns true if an element in the Map
 				// object existed and has been removed, or false if
 				// the element does not exist.
 				if (!newFavorites.delete(id)) newFavorites.add(id);
@@ -173,7 +173,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			removeFromFavorites(id) {
 				const newFavorites = new Set(get().favorites);
 
-				// set.delete() returns true if an element in the Map
+				// Set.delete() returns true if an element in the Map
 				// object existed and has been removed, or false if
 				// the element does not exist.
 				if (newFavorites.delete(id)) set({ favorites: newFavorites });

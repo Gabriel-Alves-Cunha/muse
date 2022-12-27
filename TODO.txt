@@ -9,6 +9,7 @@
 * ADD: electron setProgressBar
 * ADD: cut and visualise audio
 * ADD: make own select menu
+* ADD: make own popover
 * ADD: playback rate
 
 * FIX: gh-actions is always overwriting latest release

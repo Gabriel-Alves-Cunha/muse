@@ -41,8 +41,8 @@ export function SearchMedia() {
 				onChange={setSearchTerm}
 				value={searchTerm}
 				spellCheck="false"
-				id="search-songs"
 				autoCorrect="off"
+				id="search-songs"
 				accessKey="s"
 			/>
 
@@ -63,13 +63,12 @@ export function SearchMedia() {
 						className="transition-none"
 					>
 						{nothingFound ? (
-							// TODO: Wrap break word
-							<div className="absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium">
+							<div className="nothing-found">
 								Nothing was found for &quot;{searchTerm}&quot;
 							</div>
 						) : foundSomething ? (
 							resultsJSXs
-						) : undefined}
+						) : null}
 					</PopoverContent>
 				</PopoverRoot>
 			</ContextMenu>

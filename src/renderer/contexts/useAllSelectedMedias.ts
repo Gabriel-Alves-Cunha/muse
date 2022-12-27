@@ -25,6 +25,8 @@ export const setAllSelectedMedias = (medias: ReadonlySet<ID>) =>
 ///////////////////////////////////////////////////
 // Handle media selection:
 
+export const data_id = (id: ID) => `[data-id="${id}"]`;
+
 useAllSelectedMedias.subscribe(
 	(state) => state.medias,
 	// Handle decorate medias row
@@ -32,14 +34,14 @@ useAllSelectedMedias.subscribe(
 		time(() => {
 			// Has to be this order:
 			for (const id of prevSelectedMedias)
-				for (const element of document.querySelectorAll(`[data-id="${id}"]`)) {
+				for (const element of document.querySelectorAll(data_id(id))) {
 					if (selectedMedias.has(id)) continue;
 
 					element.classList.remove("selected");
 				}
 
 			for (const id of selectedMedias)
-				for (const element of document.querySelectorAll(`[data-id="${id}"]`))
+				for (const element of document.querySelectorAll(data_id(id)))
 					element.classList.add("selected");
 		}, "handleDecorateMediasRow"),
 );

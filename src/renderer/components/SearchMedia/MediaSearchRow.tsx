@@ -31,10 +31,7 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (
-		<div
-			className="box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow "
-			data-id={id}
-		>
+		<div className="media-search-row" data-id={id}>
 			<button
 				onPointerUp={() => playThisMedia(id)}
 				title={t("tooltips.playThisMedia")}
@@ -48,13 +45,11 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 				</div>
 
 				{/* size: "calc(100% - 5px)" */}
-				<div className="flex flex-col items-start justify-center flex-1 m-1 overflow-hidden">
-					<p className="pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium">
+				<div className="highlight">
+					<p>
 						{media.title.slice(0, index)}
 
-						<span className="bg-highlight text-white">
-							{media.title.slice(index, index + highlight.length)}
-						</span>
+						<span>{media.title.slice(index, index + highlight.length)}</span>
 
 						{media.title.slice(index + highlight.length)}
 					</p>
@@ -63,9 +58,9 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 
 			<>
 				<CenteredModalTrigger
+					labelProps={{ title: t("tooltips.openMediaOptions") }}
 					htmlTargetName={mediaOptionsModalID_mediaSearchRow}
 					labelClassName="icon-circle-modal-trigger"
-					labelProps={{ title: t("tooltips.openMediaOptions") }}
 				>
 					<Dots size={17} />
 				</CenteredModalTrigger>

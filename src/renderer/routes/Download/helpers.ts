@@ -58,17 +58,17 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 	setSearchInfo({
 		result: defaultSearchInfo.result,
-		error: emptyString,
 		isLoading: true,
+		error: "",
 	});
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
 
 		const result: UrlMediaMetadata = {
-			imageURL: thumbnails.at(-1)?.url ?? emptyString,
+			imageURL: thumbnails.at(-1)?.url ?? "",
 			// ^ Highest quality is last in this array.
-			artist: media.artist ?? emptyString,
+			artist: media.artist ?? "",
 			title,
 		};
 

@@ -301,7 +301,7 @@
 			height: auto;
 		}
 
-		.search-media {
+		.base-input {
 			width: 15rem !important;
 		}
 
@@ -320,7 +320,7 @@
 		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition grid-area-nav;
 	}
 
-	.nav > button:where(:focus, :focus-visible, :hover) {
+	.nav > button:where(:focus, :hover) {
 		@apply text-active;
 	}
 
@@ -332,7 +332,7 @@
 		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
 	}
 
-	.buttons-for-pages button:where(:focus, :focus-visible, :hover) {
+	.buttons-for-pages button:where(:focus, :hover) {
 		@apply text-icon-active;
 	}
 
@@ -344,38 +344,67 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* Search Media */
+	/* Base Input */
 
-	.search-media {
+	.base-input {
 		@apply relative flex justify-start items-center w-80 h-10 border-2 border-solid border-input cursor-default rounded-xl bg-none;
 	}
 
-	.search-media * {
+	.base-input * {
 		@apply transition-all ease-out duration-200;
 	}
 
-	.search-media:where(:focus-visible, :focus-within, :focus, :hover) {
+	.base-input:where(:focus, :hover) {
 		@apply border-active cursor-text;
 	}
 
-	.search-media:is:not(:blank) label {
-		transform: translate(-44px, -31px);
-
-		@apply text-active;
-	}
-
-	.search-media:where(:focus-visible, :focus-within, :focus, :hover) {
+	.base-input:where(:focus, :hover) {
 		@apply border-active cursor-text;
 	}
 
-	.search-media:where(:focus-visible, :focus-within, :hover, :focus) svg {
-		@apply text-active;
+	.base-input:where(:hover, :focus) svg {
+		@apply text-active !important;
 	}
 
-	.search-media:where(:focus-visible, :focus-within, :focus, :hover) label {
+	.base-input:where(:focus, :hover) label {
 		transform: translate(-44px, -31px);
 
-		@apply text-active;
+		@apply text-active !important;
+	}
+
+	.base-input svg {
+		@apply w-5 h-5 text-alternative cursor-default mx-3 duration-100;
+	}
+
+	.base-input label {
+		@apply absolute flex items-center h-9 left-[2.7rem] bottom-0 right-0 top-0 p-0 text-placeholder whitespace-nowrap font-secondary tracking-wider font-normal text-base cursor-default pointer-events-none;
+	}
+
+	/* flex: 1 === occupy all remaining width */
+	.base-input input {
+		@apply flex items-center flex-1 h-9 whitespace-nowrap text-input font-primary cursor-text tracking-wider text-base font-medium outline-none bg-transparent border-none select-all;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Media Search Row */
+
+	.media-search-row {
+		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow;
+	}
+
+	.highlight {
+		@apply flex flex-col items-start justify-center flex-1 m-1 overflow-hidden;
+	}
+
+	.highlight p {
+		@apply pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium;
+	}
+
+	.highlight span {
+		@apply bg-highlight text-white;
 	}
 
 	/* ********************************** */
@@ -456,11 +485,11 @@
 		@apply relative flex justify-center items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
 	}
 
-	.modal-trigger:where(:focus, :focus-visible, :hover) {
+	.modal-trigger:where(:focus, :hover) {
 		@apply bg-icon-button-hovered;
 	}
 
-	.modal-trigger:where(:focus, :focus-visible, :hover) svg {
+	.modal-trigger:where(:focus, :hover) svg {
 		@apply text-normal bg-icon-button-hovered;
 	}
 
@@ -577,7 +606,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	.transition-shadow:where(:focus, :focus-visible, :hover),
+	.transition-shadow:where(:focus, :hover),
 	.active-shadow {
 		transition: box-shadow 100ms ease-out 32ms;
 		box-shadow: var(--shadow-row-wrapper);
@@ -637,7 +666,7 @@
 		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-decorations-down text-lg;
 	}
 
-	.button:where(:focus, :focus-visible, :hover) {
+	.button:where(:focus, :hover) {
 		@apply bg-accent text-white;
 	}
 
@@ -653,7 +682,7 @@
 		@apply hidden w-[calc(100%-115px)] h-9 border-2 border-solid border-input rounded-xl transition-bc-bg;
 	}
 
-	.button.input:where(:focus, :focus-visible, :hover) {
+	.button.input:where(:focus, :hover) {
 		@apply border-active bg-active text-white;
 	}
 
@@ -668,7 +697,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	.file-present:where(:focus, :focus-visible, :hover) {
+	.file-present:where(:focus, :hover) {
 		@apply bg-active text-white;
 	}
 
@@ -682,7 +711,7 @@
 		@apply relative flex justify-center items-center bg-button-hover border-none px-5 h-9 transition-colors ease-linear cursor-pointer active:scale-95 first:rounded-l-xl last:rounded-r-xl;
 	}
 
-	.grouped-button:where(:focus, :focus-visible, :hover) {
+	.grouped-button:where(:focus, :hover) {
 		@apply opacity-80;
 	}
 
@@ -704,6 +733,12 @@
 	/* ********************************** */
 	/* ********************************** */
 
+	/* Media List Kind */
+
+	.row-wrapper {
+		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-lg p-2 transition-shadow;
+	}
+
 	.selected-row {
 		@apply outline-none outline-selected-border -outline-offset-2 bg-selected;
 	}
@@ -716,6 +751,14 @@
 		@apply scroll-2;
 	}
 
+	.list-decimal-zero {
+		list-style: decimal-leading-zero inside;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
 	.single-button {
 		@apply h-10 w-10 rounded-full p-0;
 	}
@@ -723,10 +766,6 @@
 	.reflect-img {
 		-webkit-box-reflect: below 10px
 			linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.4));
-	}
-
-	.list-decimal-zero {
-		list-style: decimal-leading-zero inside;
 	}
 
 	.active-icon {
@@ -738,12 +777,8 @@
 		color: white;
 	}
 
-	.delete-media:where(:focus, :focus-visible, :hover) {
+	.delete-media:where(:focus, :hover) {
 		background: #821e20;
-	}
-
-	.row-wrapper {
-		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-lg p-2 transition-shadow;
 	}
 
 	.delete-media-overlay {
@@ -837,54 +872,24 @@
 		@apply relative flex w-full h-[60px] border-2 border-solid border-input rounded-md p-2 tracking-wider font-primary text-placeholder;
 	}
 
-	.left {
+	.box > .left {
 		@apply flex flex-col w-full overflow-hidden gap-1 leading-none justify-between;
 	}
 
-	.left p {
+	.box > .left p {
 		@apply text-muted whitespace-nowrap font-primary overflow-hidden;
 	}
 
-	.right {
+	.box > .right {
 		@apply flex flex-col justify-between w-5 h-full items-center gap-1;
 	}
 
-	.right button {
+	.box > .right button {
 		@apply flex items-center justify-center w-5 h-5 cursor-pointer rounded-full no-transition [&_svg]:fill-[var(--text-alternative)];
 	}
 
-	.right button:where(:focus, :focus-visible, :hover) {
+	.box > .right button:where(:focus, :hover) {
 		@apply bg-icon-button-hovered [&_svg]:fill-[var(--text-oposite)];
-	}
-
-	/* ********************************** */
-	/* ********************************** */
-	/* ********************************** */
-
-	/* Select */
-
-	.select-content {
-		@apply bg-select rounded-md overflow-hidden;
-
-		box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-			0px 10px 20px -15px rgba(22, 23, 24, 0.2);
-	}
-
-	.select-item {
-		@apply flex relative items-center h-6 py-0 pr-9 pl-6 select-none cursor-pointer text-sm leading-none;
-
-		color: #7d52c9;
-	}
-
-	.select-item[data-disabled] {
-		pointer-events: none;
-		color: #d5d4d7;
-	}
-
-	.select-item[data-highlighted] {
-		color: var(--bg-select);
-		background: #6e56cf;
-		outline: none;
 	}
 
 	/* ********************************** */
@@ -919,8 +924,174 @@
 		@apply flex justify-center items-center w-11 h-11 bg-none border-none text-icon-deactivated;
 	}
 
-	.toggle-theme-button:where(:focus, :focus-visible, :hover) {
+	.toggle-theme-button:where(:focus, :hover) {
 		@apply hover:text-icon-active focus:text-icon-active;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* New Select */
+
+	.select-state {
+		@apply hidden;
+	}
+
+	.select-state:checked + .select-content-wrapper {
+		@apply visible;
+	}
+
+	.select-state:checked + .select-content-wrapper:not(:focus-within) {
+		transition: background-color 0.001s;
+		background: transparent;
+	}
+
+	.select-content-wrapper {
+		@apply fixed invisible z-50;
+	}
+
+	.outside-select {
+		@apply inset-0 fixed;
+	}
+
+	.select-content {
+		@apply relative p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md;
+	}
+
+	.select-item {
+		@apply relative flex whitespace-nowrap items-center w-full h-6 pr-9 pl-6 select-none cursor-pointer leading-none rounded-sm font-secondary text-base tracking-wide text-ctx-menu-item;
+	}
+
+	.select-item:disabled {
+		@apply pointer-events-none text-gray-400;
+	}
+
+	.select-item:disabled * {
+		@apply pointer-events-none text-gray-400;
+	}
+
+	.select-item:where(:hover, :focus) {
+		color: var(--bg-select);
+		background: #6e56cf;
+	}
+
+	/* Only right */
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Dropdow */
+
+	.dropdown-menu-bottom-right {
+		@apply invisible left-0 mt-2 w-56 origin-top-left -translate-y-2;
+	}
+
+	.dropdown-menu-bottom-left {
+		@apply invisible right-0 mt-2 w-56 origin-top-right -translate-y-2;
+	}
+
+	.dropdown-menu-top-right {
+		@apply invisible left-1/2 bottom-full ml-[-50%] mb-2 mt-0 w-56 origin-bottom-left -translate-y-2;
+	}
+
+	.dropdown-menu-top-left {
+		@apply invisible left-1/2 bottom-full right-0 ml-auto mb-2 mt-0 w-56 origin-bottom-right -translate-y-2;
+	}
+
+	.dropdown-menu-left {
+		@apply invisible bottom-auto top-1/2 right-[100%] mr-2  mt-0 w-56 origin-right -translate-y-1/2;
+	}
+
+	.dropdown-menu-right {
+		@apply invisible bottom-auto top-1/2 left-[100%] ml-2 mt-0 w-56 origin-left -translate-y-1/2;
+	}
+
+	.dropdown-menu-left-bottom {
+		@apply invisible right-[100%] mr-2 mt-0 w-56  origin-top-right -translate-y-10;
+	}
+
+	.dropdown-menu-right-bottom {
+		@apply invisible left-[100%] ml-2 mt-0 w-56 origin-top-left -translate-y-10;
+	}
+
+	.dropdown-menu-left-top {
+		@apply invisible right-[100%] bottom-0 mr-2 mt-2 w-56 origin-bottom-right;
+	}
+
+	.dropdown-menu-right-top {
+		@apply invisible left-[100%] bottom-0 ml-2 mt-2 w-56 origin-bottom-left -translate-y-2;
+	}
+
+	/* Only Bottom Side  */
+	.dropdown-hover:hover .dropdown-menu,
+	.dropdown-hover:hover .dropdown-menu-bottom-right,
+	.dropdown-hover:hover .dropdown-menu-bottom-left,
+	.dropdown-open.dropdown-menu,
+	.dropdown-open.dropdown-menu-bottom-right,
+	.dropdown-open.dropdown-menu-bottom-left,
+	.dropdown:focus .dropdown-menu,
+	.dropdown:focus-within .dropdown-menu,
+	.dropdown:focus .dropdown-menu-bottom-right,
+	.dropdown:focus .dropdown-menu-bottom-left,
+	.dropdown:focus-within .dropdown-menu-bottom-right,
+	.dropdown:focus-within .dropdown-menu-bottom-left {
+		@apply visible  translate-x-0 translate-y-0 scale-100 opacity-100;
+	}
+
+	/* Only Top Side  */
+	.dropdown-hover:hover .dropdown-menu-top-right,
+	.dropdown-hover:hover .dropdown-menu-top-left,
+	.dropdown-open.dropdown-menu-top-right,
+	.dropdown-open.dropdown-menu-top-left,
+	.dropdown:focus .dropdown-menu-top-right,
+	.dropdown:focus .dropdown-menu-top-left,
+	.dropdown:focus-within .dropdown-menu-top-right,
+	.dropdown:focus-within .dropdown-menu-top-left {
+		@apply visible translate-x-0 -translate-y-0 scale-100 opacity-100;
+	}
+
+	/* Only Right   */
+
+	.dropdown-hover:hover .dropdown-menu-right,
+	.dropdown-open.dropdown-menu-right,
+	.dropdown:focus .dropdown-menu-right,
+	.dropdown:focus-within .dropdown-menu-right {
+		@apply visible right-auto bottom-auto top-1/2 translate-x-0 -translate-y-1/2  scale-100 opacity-100;
+	}
+
+	/* Only Left   */
+
+	.dropdown-hover:hover .dropdown-menu-left,
+	.dropdown-open.dropdown-menu-left,
+	.dropdown:focus .dropdown-menu-left,
+	.dropdown:focus-within .dropdown-menu-left {
+		@apply visible left-auto bottom-auto top-1/2 translate-x-0 -translate-y-1/2  scale-100 opacity-100;
+	}
+
+	/* Only Left and right Bottom Side   */
+	.dropdown-hover:hover .dropdown-menu-right-bottom,
+	.dropdown-hover:hover .dropdown-menu-left-bottom,
+	.dropdown-open.dropdown-menu-right-bottom,
+	.dropdown-open.dropdown-menu-left-bottom,
+	.dropdown:focus .dropdown-menu-right-bottom,
+	.dropdown:focus-within .dropdown-menu-right-bottom,
+	.dropdown:focus .dropdown-menu-left-bottom,
+	.dropdown:focus-within .dropdown-menu-left-bottom {
+		@apply visible translate-x-0 -translate-y-10 scale-100 opacity-100;
+	}
+
+	/* Only Left and right Top Side  */
+	.dropdown-hover:hover .dropdown-menu-right-top,
+	.dropdown-hover:hover .dropdown-menu-left-top,
+	.dropdown-open.dropdown-menu-right-top,
+	.dropdown-open.dropdown-menu-left-top,
+	.dropdown:focus .dropdown-menu-right-top,
+	.dropdown:focus-within .dropdown-menu-right-top,
+	.dropdown:focus .dropdown-menu-left-top,
+	.dropdown:focus-within .dropdown-menu-left-top {
+		@apply visible translate-x-0 translate-y-0 scale-100 opacity-100;
 	}
 
 	/* ********************************** */
@@ -933,7 +1104,7 @@
 		@apply relative flex justify-center items-center cursor-pointer bg-none rounded-full border-none;
 	}
 
-	.circle-icon-button:where(:focus, :focus-visible, :hover) {
+	.circle-icon-button:where(:focus, :hover) {
 		@apply bg-icon-button-hovered;
 	}
 
@@ -969,7 +1140,7 @@
 		@apply flex flex-col p-1 gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1;
 	}
 
-	.popover:where(:focus, :focus-visible, :hover) {
+	.popover:where(:focus, :hover) {
 		@apply shadow-popover outline-none;
 	}
 
@@ -985,6 +1156,10 @@
 
 	.nothing-found-for-search-media {
 		@apply max-h-24 min-h-[3rem] w-80;
+	}
+
+	.nothing-found {
+		@apply absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium break-all;
 	}
 
 	.convertions-or-downloads {

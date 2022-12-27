@@ -16,6 +16,7 @@ import { getPlayOptions } from "./usePlayOptions";
 import { playlistList } from "@common/enums";
 import { emptyString } from "@common/empty";
 import { getFirstKey } from "@utils/map-set";
+import { data_id } from "./useAllSelectedMedias";
 import {
 	type MainList,
 	addToHistory,
@@ -39,7 +40,6 @@ export const defaultCurrentPlaying: CurrentPlaying = {
 export const useCurrentPlaying = create<CurrentPlaying>()(
 	subscribeWithSelector(
 		setCurrentPlayingOnLocalStorage(
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			(_set, _get, _api) => defaultCurrentPlaying,
 			"currentPlaying",
 		),
@@ -61,25 +61,22 @@ export const playThisMedia = (
 
 ////////////////////////////////////////////////
 
-export function togglePlayPause(): void {
-	const audio = document.getElementById("audio") as HTMLAudioElement | null;
+export const getAudio = () =>
+	document.getElementById("audio") as HTMLAudioElement | null;
+
+////////////////////////////////////////////////
+
+export const togglePlayPause = () => (getAudio()?.paused ? play() : pause());
+
+////////////////////////////////////////////////
+
+export const play = () => getAudio()?.play().then();
+
+////////////////////////////////////////////////
+
+export function pause(): void {
+	const audio = getAudio();
 	if (!audio) return;
-
-	audio.paused ? play(audio) : pause(audio);
-}
-
-////////////////////////////////////////////////
-
-export function play(audio?: HTMLAudioElement): void {
-	audio
-		? audio.play().then()
-		: (document.getElementById("audio") as HTMLAudioElement).play().then();
-}
-
-////////////////////////////////////////////////
-
-export function pause(audio?: HTMLAudioElement): void {
-	if (!audio) audio = document.getElementById("audio") as HTMLAudioElement;
 
 	audio.pause();
 	const currentTime = audio.currentTime;
@@ -137,7 +134,7 @@ export function playPreviousMedia(): void {
 
 ////////////////////////////////////////////////
 
-export const playNextMedia = (): void =>
+export function playNextMedia(): void {
 	time(() => {
 		const { id, listType } = getCurrentPlaying();
 
@@ -159,15 +156,25 @@ export const playNextMedia = (): void =>
 		if (getPlayOptions().isRandom) {
 			const randomIndex = getRandomInt(0, list.size);
 			let index = 0;
+			let curr;
 
-			for (const newID of ids) {
+			while (!(curr = ids.next()).done) {
 				if (index === randomIndex) {
-					nextMediaID = newID;
+					nextMediaID = curr.value;
 					break;
 				}
 
 				++index;
 			}
+
+			// 			for (const newID of ids) {
+			// 				if (index === randomIndex) {
+			// 					nextMediaID = newID;
+			// 					break;
+			// 				}
+			//
+			// 				++index;
+			// 			}
 		} else {
 			let found = false;
 
@@ -197,6 +204,7 @@ export const playNextMedia = (): void =>
 			currentTime: 0,
 		});
 	}, "playNextMedia");
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -240,8 +248,10 @@ function setAudioSource(newID: ID, prevID: ID) {
 	const mediaPathSuitableForElectron = `atom:///${media.path}`;
 
 	const timerToSetMedia = setTimeout(() => {
-		(document.getElementById("audio") as HTMLAudioElement).src =
-			mediaPathSuitableForElectron;
+		const audio = getAudio();
+		if (!audio) return;
+
+		audio.src = mediaPathSuitableForElectron;
 
 		changeMediaSessionMetadata(media);
 
@@ -261,9 +271,9 @@ const playingClass = "playing";
  */
 function handleDecorateMediaRow(newID: ID, prevID: ID) {
 	const prevElements = prevID
-		? document.querySelectorAll(`[data-id="${prevID}"]`)
+		? document.querySelectorAll(data_id(prevID))
 		: null;
-	const newElements = document.querySelectorAll(`[data-id="${newID}"]`);
+	const newElements = document.querySelectorAll(data_id(newID));
 
 	if (!prevElements) info(`No previous media row found for "${prevID}!"`);
 	if (!newElements) return info(`No media row found for "${newID}"!`);
