@@ -320,7 +320,7 @@
 		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition grid-area-nav;
 	}
 
-	.nav > button:where(:focus, :hover) {
+	.nav > button:where(:focus, :focus-within, :hover) {
 		@apply text-active;
 	}
 
@@ -332,7 +332,7 @@
 		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
 	}
 
-	.buttons-for-pages button:where(:focus, :hover) {
+	.buttons-for-pages button:where(:focus, :focus-within, :hover) {
 		@apply text-icon-active;
 	}
 
@@ -354,19 +354,19 @@
 		@apply transition-all ease-out duration-200;
 	}
 
-	.base-input:where(:focus, :hover) {
+	.base-input:where(:focus, :focus-within, :hover) {
 		@apply border-active cursor-text;
 	}
 
-	.base-input:where(:focus, :hover) {
+	.base-input:where(:focus, :focus-within, :hover) {
 		@apply border-active cursor-text;
 	}
 
-	.base-input:where(:hover, :focus) svg {
+	.base-input:where(:hover, :focus, :focus-within) svg {
 		@apply text-active !important;
 	}
 
-	.base-input:where(:focus, :hover) label {
+	.base-input:where(:focus, :focus-within, :hover) label {
 		transform: translate(-44px, -31px);
 
 		@apply text-active !important;
@@ -445,7 +445,7 @@
 
 	.modal-state:checked
 		+ .modal-content-wrapper
-		.modal-content:not(:focus-within) {
+		.modal-content:not(:focus, :focus-within-within) {
 		transition: background-color 0.001s;
 		background: #fff;
 	}
@@ -485,12 +485,38 @@
 		@apply relative flex justify-center items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
 	}
 
-	.modal-trigger:where(:focus, :hover) {
+	.modal-trigger:where(:focus, :focus-within, :hover) {
 		@apply bg-icon-button-hovered;
 	}
 
-	.modal-trigger:where(:focus, :hover) svg {
+	.modal-trigger:where(:focus, :focus-within, :hover) svg {
 		@apply text-normal bg-icon-button-hovered;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* Share Dialog */
+
+	.share-dialog-wrapper {
+		@apply absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition;
+	}
+
+	.share-dialog-trigger {
+		@apply absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5 [&_svg]:fill-accent;
+	}
+
+	.share-dialog-text-wrapper {
+		@apply relative w-80 p-2;
+	}
+
+	.share-dialog-text-wrapper p {
+		@apply relative mt-6 font-primary tracking-wider text-xl text-normal font-medium overflow-ellipsis whitespace-nowrap overflow-hidden;
+	}
+
+	.share-dialog-text-wrapper ol {
+		@apply list-item relative h-32 mt-4 overflow-x-hidden scroll scroll-1;
 	}
 
 	/* ********************************** */
@@ -606,7 +632,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	.transition-shadow:where(:focus, :hover),
+	.transition-shadow:where(:focus, :focus-within, :hover),
 	.active-shadow {
 		transition: box-shadow 100ms ease-out 32ms;
 		box-shadow: var(--shadow-row-wrapper);
@@ -666,7 +692,7 @@
 		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-decorations-down text-lg;
 	}
 
-	.button:where(:focus, :hover) {
+	.button:where(:focus, :focus-within, :hover) {
 		@apply bg-accent text-white;
 	}
 
@@ -682,7 +708,7 @@
 		@apply hidden w-[calc(100%-115px)] h-9 border-2 border-solid border-input rounded-xl transition-bc-bg;
 	}
 
-	.button.input:where(:focus, :hover) {
+	.button.input:where(:focus, :focus-within, :hover) {
 		@apply border-active bg-active text-white;
 	}
 
@@ -697,7 +723,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	.file-present:where(:focus, :hover) {
+	.file-present:where(:focus, :focus-within, :hover) {
 		@apply bg-active text-white;
 	}
 
@@ -711,7 +737,7 @@
 		@apply relative flex justify-center items-center bg-button-hover border-none px-5 h-9 transition-colors ease-linear cursor-pointer active:scale-95 first:rounded-l-xl last:rounded-r-xl;
 	}
 
-	.grouped-button:where(:focus, :hover) {
+	.grouped-button:where(:focus, :focus-within, :hover) {
 		@apply opacity-80;
 	}
 
@@ -720,6 +746,19 @@
 	/* ********************************** */
 
 	/* Converting and Downloading */
+
+	.converting-downloading-list-popover-trigger {
+		@apply relative flex justify-center items-center w-11 h-11 cursor-pointer text-base;
+	}
+
+	.converting-downloading-list-popover-trigger:where(
+			:focus-within,
+			:focus,
+			:hover
+		)
+		svg {
+		@apply text-icon-active;
+	}
 
 	.has-items span {
 		@apply absolute w-[1.1rem] h-[1.1rem] -right-2 top-0 bg-green-700 rounded-full;
@@ -777,7 +816,7 @@
 		color: white;
 	}
 
-	.delete-media:where(:focus, :hover) {
+	.delete-media:where(:focus, :focus-within, :hover) {
 		background: #821e20;
 	}
 
@@ -888,7 +927,7 @@
 		@apply flex items-center justify-center w-5 h-5 cursor-pointer rounded-full no-transition [&_svg]:fill-[var(--text-alternative)];
 	}
 
-	.box > .right button:where(:focus, :hover) {
+	.box > .right button:where(:focus, :focus-within, :hover) {
 		@apply bg-icon-button-hovered [&_svg]:fill-[var(--text-oposite)];
 	}
 
@@ -924,7 +963,7 @@
 		@apply flex justify-center items-center w-11 h-11 bg-none border-none text-icon-deactivated;
 	}
 
-	.toggle-theme-button:where(:focus, :hover) {
+	.toggle-theme-button:where(:focus, :focus-within, :hover) {
 		@apply hover:text-icon-active focus:text-icon-active;
 	}
 
@@ -942,7 +981,8 @@
 		@apply visible;
 	}
 
-	.select-state:checked + .select-content-wrapper:not(:focus-within) {
+	.select-state:checked
+		+ .select-content-wrapper:not(:focus, :focus-within-within) {
 		transition: background-color 0.001s;
 		background: transparent;
 	}
@@ -971,7 +1011,7 @@
 		@apply pointer-events-none text-gray-400;
 	}
 
-	.select-item:where(:hover, :focus) {
+	.select-item:where(:hover, :focus, :focus-within) {
 		color: var(--bg-select);
 		background: #6e56cf;
 	}
@@ -1031,12 +1071,18 @@
 	.dropdown-open.dropdown-menu,
 	.dropdown-open.dropdown-menu-bottom-right,
 	.dropdown-open.dropdown-menu-bottom-left,
-	.dropdown:focus .dropdown-menu,
-	.dropdown:focus-within .dropdown-menu,
-	.dropdown:focus .dropdown-menu-bottom-right,
-	.dropdown:focus .dropdown-menu-bottom-left,
-	.dropdown:focus-within .dropdown-menu-bottom-right,
-	.dropdown:focus-within .dropdown-menu-bottom-left {
+	.dropdown:focus,
+	:focus-within .dropdown-menu,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu,
+	.dropdown:focus,
+	:focus-within .dropdown-menu-bottom-right,
+	.dropdown:focus,
+	:focus-within .dropdown-menu-bottom-left,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-bottom-right,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-bottom-left {
 		@apply visible  translate-x-0 translate-y-0 scale-100 opacity-100;
 	}
 
@@ -1045,10 +1091,14 @@
 	.dropdown-hover:hover .dropdown-menu-top-left,
 	.dropdown-open.dropdown-menu-top-right,
 	.dropdown-open.dropdown-menu-top-left,
-	.dropdown:focus .dropdown-menu-top-right,
-	.dropdown:focus .dropdown-menu-top-left,
-	.dropdown:focus-within .dropdown-menu-top-right,
-	.dropdown:focus-within .dropdown-menu-top-left {
+	.dropdown:focus,
+	:focus-within .dropdown-menu-top-right,
+	.dropdown:focus,
+	:focus-within .dropdown-menu-top-left,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-top-right,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-top-left {
 		@apply visible translate-x-0 -translate-y-0 scale-100 opacity-100;
 	}
 
@@ -1056,8 +1106,10 @@
 
 	.dropdown-hover:hover .dropdown-menu-right,
 	.dropdown-open.dropdown-menu-right,
-	.dropdown:focus .dropdown-menu-right,
-	.dropdown:focus-within .dropdown-menu-right {
+	.dropdown:focus,
+	:focus-within .dropdown-menu-right,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-right {
 		@apply visible right-auto bottom-auto top-1/2 translate-x-0 -translate-y-1/2  scale-100 opacity-100;
 	}
 
@@ -1065,8 +1117,10 @@
 
 	.dropdown-hover:hover .dropdown-menu-left,
 	.dropdown-open.dropdown-menu-left,
-	.dropdown:focus .dropdown-menu-left,
-	.dropdown:focus-within .dropdown-menu-left {
+	.dropdown:focus,
+	:focus-within .dropdown-menu-left,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-left {
 		@apply visible left-auto bottom-auto top-1/2 translate-x-0 -translate-y-1/2  scale-100 opacity-100;
 	}
 
@@ -1075,10 +1129,14 @@
 	.dropdown-hover:hover .dropdown-menu-left-bottom,
 	.dropdown-open.dropdown-menu-right-bottom,
 	.dropdown-open.dropdown-menu-left-bottom,
-	.dropdown:focus .dropdown-menu-right-bottom,
-	.dropdown:focus-within .dropdown-menu-right-bottom,
-	.dropdown:focus .dropdown-menu-left-bottom,
-	.dropdown:focus-within .dropdown-menu-left-bottom {
+	.dropdown:focus,
+	:focus-within .dropdown-menu-right-bottom,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-right-bottom,
+	.dropdown:focus,
+	:focus-within .dropdown-menu-left-bottom,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-left-bottom {
 		@apply visible translate-x-0 -translate-y-10 scale-100 opacity-100;
 	}
 
@@ -1087,10 +1145,14 @@
 	.dropdown-hover:hover .dropdown-menu-left-top,
 	.dropdown-open.dropdown-menu-right-top,
 	.dropdown-open.dropdown-menu-left-top,
-	.dropdown:focus .dropdown-menu-right-top,
-	.dropdown:focus-within .dropdown-menu-right-top,
-	.dropdown:focus .dropdown-menu-left-top,
-	.dropdown:focus-within .dropdown-menu-left-top {
+	.dropdown:focus,
+	:focus-within .dropdown-menu-right-top,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-right-top,
+	.dropdown:focus,
+	:focus-within .dropdown-menu-left-top,
+	.dropdown:focus,
+	:focus-within-within .dropdown-menu-left-top {
 		@apply visible translate-x-0 translate-y-0 scale-100 opacity-100;
 	}
 
@@ -1104,7 +1166,7 @@
 		@apply relative flex justify-center items-center cursor-pointer bg-none rounded-full border-none;
 	}
 
-	.circle-icon-button:where(:focus, :hover) {
+	.circle-icon-button:where(:focus, :focus-within, :hover) {
 		@apply bg-icon-button-hovered;
 	}
 
@@ -1136,11 +1198,23 @@
 
 	/* Popover */
 
+	.popover-content {
+		@apply relative p-1 no-transition left-10 scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover;
+	}
+
+	.popover-content.right {
+		@apply translate-x-[7.2rem] -translate-y-14;
+	}
+
+	.popover-content.end {
+		@apply -translate-y-14;
+	}
+
 	.popover {
 		@apply flex flex-col p-1 gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1;
 	}
 
-	.popover:where(:focus, :hover) {
+	.popover:where(:focus, :focus-within, :hover) {
 		@apply shadow-popover outline-none;
 	}
 

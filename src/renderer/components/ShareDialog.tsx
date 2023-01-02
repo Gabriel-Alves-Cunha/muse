@@ -12,7 +12,6 @@ import { error, assert } from "@common/log";
 import { getMainList } from "@contexts/usePlaylists";
 import { emptySet } from "@common/empty";
 import { Loading } from "./Loading";
-import { dbg } from "@common/debug";
 import {
 	CloseOpenedCenteredModal,
 	OpenedCenteredModal,
@@ -49,7 +48,7 @@ export default function ShareDialog() {
 				.then()
 				.catch((err) => {
 					error("Error making QR Code.", err);
-					closePopover(server.close);
+					closeModal(server.close);
 				});
 	}
 
@@ -59,7 +58,7 @@ export default function ShareDialog() {
 	useEffect(() => {
 		server?.addListener("close", () => {
 			setServer(null);
-			closePopover();
+			closeModal();
 		});
 	}, [server]);
 
@@ -75,7 +74,7 @@ export default function ShareDialog() {
 			setServer(clientServerApi);
 		} catch (err) {
 			error(err);
-			closePopover();
+			closeModal();
 		}
 	}, [filesToShare]);
 
@@ -83,32 +82,29 @@ export default function ShareDialog() {
 
 	return shouldModalOpen ? (
 		<OpenedCenteredModal
-			className="absolute flex flex-col justify-between items-center w-80 h-80 text-center m-auto bottom-0 right-0 left-0 top-0 shadow-popover bg-popover z-20 rounded-xl no-transition"
+			className="share-dialog-wrapper"
 			htmlTargetName={shareModalId}
 			onKeyUp={(e) => {
 				if (e.key === "Escape" && !isAModifierKeyPressed(e))
-					closePopover(server?.close);
+					closeModal(server?.close);
 			}}
 		>
 			<CloseOpenedCenteredModal
-				className="absolute justify-center items-center w-7 h-7 right-1 top-1 cursor-pointer z-10 bg-none border-none rounded-full font-secondary tracking-wider text-base leading-none hover:opacity-5 focus:opacity-5"
-				onPointerUp={() => closePopover(server?.close)}
+				onPointerUp={() => closeModal(server?.close)}
 				title={t("tooltips.closeShareScreen")}
+				className="share-dialog-trigger"
 				htmlFor={shareModalId}
-				// zIndex: 155,
 			>
-				<CloseIcon className="fill-accent" />
+				<CloseIcon />
 			</CloseOpenedCenteredModal>
 
-			<div className="relative w-80 p-2">
-				<p className="relative mt-6 font-primary tracking-wider text-xl text-normal font-medium overflow-ellipsis whitespace-nowrap overflow-hidden">
+			<div className="share-dialog-text-wrapper">
+				<p>
 					{t("dialogs.sharingMedia")}
 					{plural}:
 				</p>
 
-				<ol className="list-item relative h-32 mt-4 overflow-x-hidden scroll scroll-1">
-					{namesOfFilesToShare(filesToShare)}
-				</ol>
+				<ol>{namesOfFilesToShare(filesToShare)}</ol>
 			</div>
 
 			<canvas
@@ -127,7 +123,7 @@ export default function ShareDialog() {
 /////////////////////////////////////////
 // Helper functions:
 
-function closePopover(closeServerFunction?: () => void): void {
+function closeModal(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
 	setFilesToShare(emptySet);
@@ -151,8 +147,6 @@ function namesOfFilesToShare(filesToShare: ReadonlySet<Path>): JSX.Element[] {
 /////////////////////////////////////////
 
 async function makeQrcode(url: QRCodeURL): Promise<void> {
-	dbg(`Making QR Code for "${url}"`);
-
 	const canvasElement = document.getElementById(qrID) as HTMLCanvasElement;
 
 	assert(canvasElement, "There is no canvas element!");

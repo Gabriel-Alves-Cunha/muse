@@ -1,14 +1,13 @@
 import { MdCompareArrows as ConvertIcon } from "react-icons/md";
-import { useEffect, useState } from "react";
-import { Trigger } from "@radix-ui/react-popover";
+import { useEffect } from "react";
 
 import { useNewConvertions, createNewConvertion } from "./helper";
-import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessage } from "@common/enums";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { PopoverButtons } from "../Navbar/PopoverButtons";
 import { useTranslation } from "@i18n";
-import { errorToast } from "@components/toasts";
+import { errorToast } from "../toasts";
 import { emptyMap } from "@common/empty";
 import { error } from "@common/log";
 import { Popup } from "./Popup";
@@ -17,18 +16,19 @@ import { Popup } from "./Popup";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+const convertingListPopoverId = "converting-list-popover-id";
+
 const convertingListSizeSelector = (
 	state: ReturnType<typeof useConvertingList.getState>,
 ) => state.convertingList.size;
 
 export function Converting() {
 	const convertingListSize = useConvertingList(convertingListSizeSelector);
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const { newConvertions } = useNewConvertions();
 	const { t } = useTranslation();
 
 	useEffect(() => {
-		for (const [path, newConvertion] of newConvertions) {
+		for (const [path, newConvertion] of newConvertions)
 			try {
 				const electronPort = createNewConvertion(newConvertion, path);
 
@@ -46,7 +46,6 @@ export function Converting() {
 
 				error(err);
 			}
-		}
 
 		// In here, we've already handled all the files,
 		// so we can clear the list;
@@ -56,29 +55,13 @@ export function Converting() {
 	}, [newConvertions]);
 
 	return (
-		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-			<Trigger
-				className={`${
-					convertingListSize > 0 ? "has-items" : ""
-				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
-				title={t("tooltips.showAllConvertingMedias")}
-			>
-				<span data-length={convertingListSize} />
-
-				<ConvertIcon className="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
-			</Trigger>
-
-			<PopoverContent
-				size={
-					convertingListSize === 0
-						? "nothing-found-for-convertions-or-downloads"
-						: "convertions-or-downloads"
-				}
-				side="right"
-				align="end"
-			>
-				<Popup />
-			</PopoverContent>
-		</PopoverRoot>
+		<PopoverButtons
+			tooltip={t("tooltips.showAllConvertingMedias")}
+			popoverId={convertingListPopoverId}
+			size={convertingListSize}
+			Icon={ConvertIcon}
+		>
+			<Popup />
+		</PopoverButtons>
 	);
 }

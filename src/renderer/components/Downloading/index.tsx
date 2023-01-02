@@ -2,19 +2,18 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
-import { useEffect, useState } from "react";
-import { Trigger } from "@radix-ui/react-popover";
+import { useEffect } from "react";
 import create from "zustand";
 
-import { PopoverRoot, PopoverContent } from "@components/Popover";
 import { ReactToElectronMessage } from "@common/enums";
 import { useDownloadingList } from "@contexts/downloadList";
 import { createNewDownload } from "./helper";
 import { sendMsgToBackend } from "@common/crossCommunication";
+import { PopoverButtons } from "../Navbar/PopoverButtons";
 import { ProgressStatus } from "@common/enums";
 import { useTranslation } from "@i18n";
 import { emptyString } from "@common/empty";
-import { errorToast } from "@components/toasts";
+import { errorToast } from "../toasts";
 import { error } from "@common/log";
 import { Popup } from "./Popup";
 
@@ -39,12 +38,13 @@ export const { setState: setDownloadInfo } = useDownloadInfo;
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
+const downloadingListPopoverId = "downloading-list-popover-id";
+
 const sizeSelector = (state: ReturnType<typeof useDownloadingList.getState>) =>
 	state.downloadingList.size;
 
 export function Downloading() {
 	const downloadingListSize = useDownloadingList(sizeSelector);
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const downloadInfo = useDownloadInfo();
 	const { t } = useTranslation();
 
@@ -74,30 +74,14 @@ export function Downloading() {
 	}, [downloadInfo.title, downloadInfo]);
 
 	return (
-		<PopoverRoot modal open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-			<Trigger
-				className={`${
-					downloadingListSize > 0 ? "has-items" : ""
-				} relative flex justify-center items-center w-11 h-11 bg-none border-none text-base group`}
-				title={t("tooltips.showAllDownloadingMedias")}
-			>
-				<span data-length={downloadingListSize} />
-
-				<DownloadingIcon className="w-5 h-5 text-icon-deactivated group-hover:text-icon-active group-focus:text-icon-active" />
-			</Trigger>
-
-			<PopoverContent
-				size={
-					downloadingListSize === 0
-						? "nothing-found-for-convertions-or-downloads"
-						: "convertions-or-downloads"
-				}
-				side="right"
-				align="end"
-			>
-				<Popup />
-			</PopoverContent>
-		</PopoverRoot>
+		<PopoverButtons
+			tooltip={t("tooltips.showAllDownloadingMedias")}
+			popoverId={downloadingListPopoverId}
+			size={downloadingListSize}
+			Icon={DownloadingIcon}
+		>
+			<Popup />
+		</PopoverButtons>
 	);
 }
 

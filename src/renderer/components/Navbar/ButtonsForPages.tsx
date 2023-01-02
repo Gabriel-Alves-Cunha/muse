@@ -11,34 +11,11 @@ import {
 
 import { setPage, usePage } from "@contexts/page";
 import { useTranslation } from "@i18n";
-import { ThemeToggler } from "@components/ThemeToggler";
-import { Downloading } from "@components/Downloading";
-import { Converting } from "@components/Converting";
 import { pages } from "@utils/app";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-// Main function:
-
-export const Navbar = () => (
-	<nav className="nav">
-		<ThemeToggler />
-
-		<ButtonsForPages />
-
-		<div className="min-h-max flex flex-col justify-center items-center w-full">
-			<Converting />
-
-			<Downloading />
-		</div>
-	</nav>
-);
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Constants:
 
 const icons: Readonly<Record<Page, JSX.Element>> = {
 	Favorites: <Favorites />,
@@ -49,11 +26,8 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 } as const;
 
 /////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Helper function:
 
-function ButtonsForPages() {
+export function ButtonsForPages() {
 	const currPage = usePage().page;
 	const { t } = useTranslation();
 
