@@ -8,7 +8,7 @@ import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
-import { getMainList } from "@contexts/usePlaylists";
+import { getMainList, removeMedia } from "@contexts/usePlaylists";
 import { getSearcher } from "../SearchMedia/state";
 import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
 import { RightSlot } from "./RightSlot";
@@ -22,6 +22,7 @@ import {
 	CenteredModalTrigger,
 } from "@components/CenteredModal";
 import DeleteMediaDialogContent from "@components/DeleteMediaDialog";
+import { error } from "@common/log";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -31,7 +32,7 @@ import DeleteMediaDialogContent from "@components/DeleteMediaDialog";
 const deleteMediaModalID_searchMediaCtxMenu =
 	"delete-media-modal-search-media-ctx-menu";
 
-export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
+export default function SearchMediaOptionsCtxMenu() {
 	const { t } = useTranslation();
 
 	return (
@@ -39,7 +40,6 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 			<>
 				<CenteredModalTrigger
 					htmlTargetName={deleteMediaModalID_searchMediaCtxMenu}
-					inputProps={{ disabled: isAllDisabled }}
 					labelClassName="ctx-menu-item"
 				>
 					{t("ctxMenus.deleteMedia")}
@@ -59,7 +59,7 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 				</CenteredModalContent>
 			</>
 
-			<Item onSelect={shareMedias} disabled={isAllDisabled}>
+			<Item onSelect={shareMedias}>
 				{t("ctxMenus.shareMedia")}
 
 				<RightSlot>
@@ -67,15 +67,13 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 				</RightSlot>
 			</Item>
 
-			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
+			<Item onSelect={selectAllMediasOnSearchResult}>
 				{t("ctxMenus.selectAllMedias")}
 
 				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
-			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
-				{t("ctxMenus.searchForLyrics")}
-			</Item>
+			<Item onSelect={searchForLyrics}>{t("ctxMenus.searchForLyrics")}</Item>
 		</>
 	);
 }
@@ -89,8 +87,17 @@ export function shareMedias() {
 	const filePathsToShare: Set<Path> = new Set();
 	const allMedias = getMainList();
 
-	for (const id of getAllSelectedMedias())
-		filePathsToShare.add(allMedias.get(id)!.path);
+	for (const id of getAllSelectedMedias()) {
+		const path = allMedias.get(id)?.path;
+
+		if (!path) {
+			error(`There is no media with id: "${id}"!`);
+			removeMedia(id);
+			continue;
+		}
+
+		filePathsToShare.add(path);
+	}
 
 	setFilesToShare(filePathsToShare);
 }
@@ -109,10 +116,3 @@ export function searchForLyrics(): void {
 	for (const id of getAllSelectedMedias())
 		searchAndOpenLyrics(id, !openLyrics).then();
 }
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Types:
-
-type Props = { isAllDisabled: boolean };

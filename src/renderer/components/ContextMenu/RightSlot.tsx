@@ -1,5 +1,5 @@
-export const RightSlot = ({ ...props }: Props) => (
-	<div className="ctx-menu-item-slot" {...props} />
+export const RightSlot = ({ className = "", ...props }: Props) => (
+	<div className={`ctx-menu-item-slot ${className}`} {...props} />
 );
 
 type Props = React.DetailedHTMLProps<

@@ -40,7 +40,7 @@ export const CenteredModalContent = ({
 			className={`modal-content ${className}`}
 			onTransitionEnd={(e) => {
 				// Doing this to trap focus inside modal!
-				e.currentTarget.querySelector("label")?.focus();
+				(e.target as HTMLElement).querySelector("label")?.focus();
 			}}
 			{...rest}
 		/>

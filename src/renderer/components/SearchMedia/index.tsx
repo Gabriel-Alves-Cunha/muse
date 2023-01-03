@@ -1,5 +1,8 @@
+import { useRef } from "react";
+
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { PopoverContent } from "@components/Popover";
 import { MediaSearchRow } from "./MediaSearchRow";
 import { useTranslation } from "@i18n";
@@ -12,10 +15,9 @@ import {
 	useSearcher,
 } from "./state";
 
-const mantainFocusOnInput = (e: Event) => e.preventDefault();
-
 export function SearchMedia() {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
+	const searchWrapper = useRef<HTMLDivElement>(null);
 	const { t } = useTranslation();
 
 	const resultsJSXs: JSX.Element[] = [];
@@ -33,11 +35,16 @@ export function SearchMedia() {
 			<MediaSearchRow highlight={highlight} media={media} key={id} id={id} />,
 		);
 
+	/////////////////////////////////////////
+
+	useOnClickOutside(searchWrapper, setDefaultSearch);
+
 	return (
-		<>
+		<div ref={searchWrapper}>
 			<BaseInput
-				RightSlot={<RightSlot id="search">Alt+s</RightSlot>}
+				RightSlot={<RightSlot id="searcher-right-slot">Alt+s</RightSlot>}
 				label={t("labels.searchForSongs")}
+				onEscape={setDefaultSearch}
 				onChange={setSearchTerm}
 				value={searchTerm}
 				spellCheck="false"
@@ -46,12 +53,11 @@ export function SearchMedia() {
 				accessKey="s"
 			/>
 
-			<ContextMenu
-				content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
-				onContextMenu={selectMediaByPointerEvent}
-				isAllDisabled={nothingFound}
-			>
-				{shouldPopoverOpen ? (
+			{shouldPopoverOpen ? (
+				<ContextMenu
+					content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
+					onContextMenu={selectMediaByPointerEvent}
+				>
 					<PopoverContent
 						size={
 							nothingFound
@@ -59,20 +65,23 @@ export function SearchMedia() {
 								: "search-media-results"
 						}
 						onPointerDownOutside={setDefaultSearch}
-						// onOpenAutoFocus={mantainFocusOnInput}
-						className="transition-none"
+						className="transition-none visible"
 						htmlFor=""
 					>
 						{nothingFound ? (
 							<div className="nothing-found">
 								Nothing was found for &quot;{searchTerm}&quot;
 							</div>
-						) : foundSomething ? (
+						) : (
+							// foundSomething:
 							resultsJSXs
-						) : null}
+						)}
 					</PopoverContent>
-				) : null}
-			</ContextMenu>
-		</>
+				</ContextMenu>
+			) : null}
+		</div>
 	);
 }
+
+const parents = (node: HTMLElement): HTMLElement[] =>
+	(node.parentElement ? parents(node.parentElement) : []).concat([node]);

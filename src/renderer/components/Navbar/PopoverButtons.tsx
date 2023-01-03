@@ -23,7 +23,7 @@ export const PopoverButtons = ({
 		</PopoverTrigger>
 
 		<PopoverContent
-			className="translate-x-1/2 -translate-y-1/2"
+			className="left-8 translate-x-1/2 -translate-y-1/2"
 			htmlFor={popoverId}
 			size={
 				size === 0

@@ -366,10 +366,15 @@
 		@apply text-active !important;
 	}
 
-	.base-input:where(:focus, :focus-within, :hover) label {
+	.base-input:where(:has(+ span div), :focus-within, :focus, :hover) label {
 		transform: translate(-44px, -31px);
 
 		@apply text-active !important;
+	}
+
+	#search-songs:where(:has(+ span div), :focus-within, :focus, :hover)
+		+ #searcher-right-slot {
+		@apply hidden;
 	}
 
 	.base-input svg {
@@ -441,13 +446,6 @@
 
 	.modal-state:checked + .modal-content-wrapper .modal-content {
 		@apply scale-100;
-	}
-
-	.modal-state:checked
-		+ .modal-content-wrapper
-		.modal-content:not(:focus, :focus-within-within) {
-		transition: background-color 0.001s;
-		background: #fff;
 	}
 
 	.modal-content {
@@ -904,7 +902,7 @@
 	}
 
 	.ctx-menu-item-slot {
-		@apply flex justify-end ml-auto pl-12 pr-2 text-ctx-menu font-secondary tracking-wide text-base leading-none;
+		@apply absolute right-0 mr-3 flex justify-end text-ctx-menu font-secondary tracking-wide text-base leading-none;
 	}
 
 	/* ********************************** */
@@ -987,18 +985,12 @@
 		@apply visible;
 	}
 
-	.select-state:checked
-		+ .select-content-wrapper:not(:focus, :focus-within-within) {
-		transition: background-color 0.001s;
-		background: transparent;
-	}
-
 	.select-content-wrapper {
-		@apply fixed invisible z-50;
+		@apply fixed invisible z-30;
 	}
 
 	.outside-select {
-		@apply inset-0 fixed;
+		@apply inset-0 fixed z-20;
 	}
 
 	.select-content {
@@ -1205,7 +1197,7 @@
 	/* Popover */
 
 	.popover-content {
-		@apply relative p-1 no-transition left-10 scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover;
+		@apply relative p-1 no-transition scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover;
 	}
 
 	.popover-content.right {
@@ -1235,11 +1227,11 @@
 	}
 
 	.nothing-found-for-search-media {
-		@apply max-h-24 min-h-[3rem] w-80;
+		@apply max-h-24 min-h-[3rem] w-80 z-50 mt-2;
 	}
 
 	.nothing-found {
-		@apply absolute flex justify-center items-center left-[calc(64px+3.5vw)] w-80 top-24 rounded-xl p-3 shadow-popover bg-popover z-10 text-alternative font-secondary tracking-wider text-base text-center font-medium break-all;
+		@apply flex justify-center items-center m-auto w-full text-alternative font-secondary tracking-wider text-base text-center font-medium break-all;
 	}
 
 	.convertions-or-downloads {
@@ -1247,7 +1239,7 @@
 	}
 
 	.search-media-results {
-		@apply absolute h-64 w-80 top-24 left-[calc(64px+3.5vw)];
+		@apply absolute h-64 w-80 top-24;
 	}
 
 	/* ********************************** */

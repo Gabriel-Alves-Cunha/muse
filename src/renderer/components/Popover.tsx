@@ -29,13 +29,7 @@ export const PopoverContent = ({
 	size,
 	...rest
 }: PopoverContentProps) => (
-	<div
-		className="select-content-wrapper"
-		onTransitionEnd={(e) => {
-			// Doing this to trap focus inside modal!
-			(e.currentTarget.firstElementChild as HTMLElement)?.focus?.();
-		}}
-	>
+	<div className="select-content-wrapper">
 		<label
 			onPointerDown={onPointerDownOutside}
 			className="outside-select"
@@ -55,18 +49,20 @@ export const PopoverContent = ({
 /////////////////////////////////////////
 // Types:
 
-interface PopoverTriggerProps
-	extends React.DetailedHTMLProps<
-		React.HTMLAttributes<HTMLLabelElement>,
-		HTMLLabelElement
-	> {
-	labelProps?: React.DetailedHTMLProps<
-		React.LabelHTMLAttributes<HTMLLabelElement>,
-		HTMLLabelElement
+interface PopoverTriggerProps {
+	labelProps?: Omit<
+		React.DetailedHTMLProps<
+			React.LabelHTMLAttributes<HTMLLabelElement>,
+			HTMLLabelElement
+		>,
+		"className"
 	>;
-	inputProps?: React.DetailedHTMLProps<
-		React.InputHTMLAttributes<HTMLInputElement>,
-		HTMLInputElement
+	inputProps?: Omit<
+		React.DetailedHTMLProps<
+			React.InputHTMLAttributes<HTMLInputElement>,
+			HTMLInputElement
+		>,
+		"className"
 	>;
 	children: React.ReactNode;
 	labelClassName?: string;
@@ -81,9 +77,7 @@ interface PopoverContentProps
 		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
-	onPointerDownOutside?:
-		| React.PointerEventHandler<HTMLLabelElement>
-		| undefined;
+	onPointerDownOutside?: React.PointerEventHandler<HTMLLabelElement>;
 	size:
 		| "nothing-found-for-convertions-or-downloads"
 		| "nothing-found-for-search-media"

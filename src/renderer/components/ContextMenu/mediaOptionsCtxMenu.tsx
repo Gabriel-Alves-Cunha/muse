@@ -30,8 +30,8 @@ export default function MediaOptionsCtxMenu() {
 		<>
 			<>
 				<CenteredModalTrigger
-					inputProps={{ disabled: isDisabled }}
 					htmlTargetName={deleteMediaModalID_mediaOptionsCtxMenu}
+					inputProps={{ disabled: isDisabled }}
 					labelClassName="ctx-menu-item"
 				>
 					{t("ctxMenus.deleteMedia")}

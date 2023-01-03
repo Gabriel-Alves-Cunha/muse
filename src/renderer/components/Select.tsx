@@ -24,24 +24,13 @@ export const SelectTrigger = ({
 
 export const SelectContent = ({
 	className = "",
-	side = "",
 	htmlFor,
 	...rest
 }: SelectContentProps) => (
-	<div
-		className="select-content-wrapper"
-		onTransitionEnd={(e) => {
-			// Doing this to trap focus inside modal!
-			e.currentTarget.querySelector("button")?.focus();
-		}}
-	>
+	<div className="select-content-wrapper">
 		<label className="outside-select" htmlFor={htmlFor} />
 
-		<div
-			className={`select-content ${className} ${side}`}
-			role="dialog"
-			{...rest}
-		/>
+		<div className={`select-content ${className}`} role="dialog" {...rest} />
 	</div>
 );
 
@@ -56,18 +45,20 @@ export const SelectItem = ({ className = "", ...props }: SelectItemProps) => (
 /////////////////////////////////////////
 // Types:
 
-interface SelectTriggerProps
-	extends React.DetailedHTMLProps<
-		React.HTMLAttributes<HTMLLabelElement>,
-		HTMLLabelElement
-	> {
-	labelProps?: React.DetailedHTMLProps<
-		React.LabelHTMLAttributes<HTMLLabelElement>,
-		HTMLLabelElement
+interface SelectTriggerProps {
+	labelProps?: Omit<
+		React.DetailedHTMLProps<
+			React.LabelHTMLAttributes<HTMLLabelElement>,
+			HTMLLabelElement
+		>,
+		"className"
 	>;
-	inputProps?: React.DetailedHTMLProps<
-		React.InputHTMLAttributes<HTMLInputElement>,
-		HTMLInputElement
+	inputProps?: Omit<
+		React.DetailedHTMLProps<
+			React.InputHTMLAttributes<HTMLInputElement>,
+			HTMLInputElement
+		>,
+		"className"
 	>;
 	children: React.ReactNode;
 	labelClassName?: string;
@@ -82,7 +73,7 @@ interface SelectContentProps
 		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
-	side?: "right" | "left" | "bottom" | "top" | "";
+	// side?: "right" | "left" | "bottom" | "top" | "";
 	htmlFor: string;
 }
 
