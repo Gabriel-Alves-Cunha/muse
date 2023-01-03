@@ -1,8 +1,6 @@
 import { EventEmitter } from "node:events";
 import { clipboard } from "electron";
 
-import { emptyString } from "@common/empty";
-
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -16,7 +14,7 @@ const clipboardEmitter = new EventEmitter();
 
 Object.assign(clipboard, {
 	watcherId: undefined as NodeJS.Timer | undefined,
-	previousText: emptyString,
+	previousText: "",
 
 	/////////////////////////////////////////
 
@@ -71,7 +69,7 @@ Object.assign(clipboard, {
 
 /////////////////////////////////////////
 
-const isTextDiff = (str1 = emptyString, str2 = emptyString) => str1 !== str2;
+const isTextDiff = (str1 = "", str2 = "") => str1 !== str2;
 
 /////////////////////////////////////////
 

@@ -2,7 +2,6 @@ import type { Base64 } from "@common/@types/generalTypes";
 
 import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { error, throwErr } from "@common/log";
-import { emptyString } from "@common/empty";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////
@@ -11,8 +10,8 @@ import { dbg } from "@common/debug";
 // Constants:
 
 const headers = {
-	"x-happi-key": lyricApiKey ?? emptyString,
 	"content-type": "application/json",
+	"x-happi-key": lyricApiKey ?? "",
 };
 
 const method = "GET";
@@ -39,7 +38,7 @@ export async function searchForLyricsAndImage(
 		mediaArtist,
 	);
 
-	const image = getImage ? await queryForImage(imageURL) : emptyString;
+	const image = getImage ? await queryForImage(imageURL) : "";
 	const lyric = await queryForLyric(lyricURL);
 
 	dbg({ lyric, image, albumName });
@@ -100,7 +99,7 @@ async function queryForLyric(lyricURL: string): Promise<string> {
 	if (!jsonRes.success) {
 		error(jsonRes.error);
 
-		return emptyString;
+		return "";
 	}
 
 	return jsonRes.result.lyrics;

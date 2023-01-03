@@ -19,7 +19,6 @@ import { error, assert, throwErr } from "@common/log";
 import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { isBase64Image } from "@main/utils";
-import { emptyString } from "@common/empty";
 import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
 
@@ -31,7 +30,7 @@ import { dbg } from "@common/debug";
 async function handleImageMetadata(
 	file: MediaFile,
 	downloadImg = false,
-	imageURL: ImageURL = emptyString,
+	imageURL: ImageURL = "",
 ): Promise<void> {
 	if (downloadImg) {
 		try {
@@ -91,7 +90,9 @@ export const downloadThumbnail = async (url: string): Promise<Picture[]> =>
 	new Promise((resolve, reject) =>
 		get(url, async (res) => {
 			const byteVector = await ByteVector.fromStream(res);
-			const mimeType = res.headers["content-type"] ?? emptyString;
+			const mimeType = res.headers["content-type"];
+
+			if (!mimeType) throwErr("No mimeType!");
 
 			const picture = Picture.fromFullData(
 				byteVector,
@@ -155,7 +156,7 @@ function handleTitle(
 	// If they are the same, there is no need to treat this as a new
 	// file, or if the sanitization left an empty string, return "":
 	if (getBasename(oldMediaPath) === sanitizedTitle || !sanitizedTitle)
-		return emptyString;
+		return "";
 
 	const newPath = join(
 		dirname(oldMediaPath),
@@ -259,7 +260,7 @@ export function writeTags(
 		);
 	}
 
-	const newFilePath = title ? handleTitle(file, mediaPath, title) : emptyString;
+	const newFilePath = title ? handleTitle(file, mediaPath, title) : "";
 
 	if (albumArtists !== undefined)
 		if (albumArtists instanceof Array)

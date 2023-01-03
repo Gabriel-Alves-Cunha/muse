@@ -16,7 +16,6 @@ import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatus } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
-import { emptyString } from "@common/empty";
 import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
@@ -66,8 +65,8 @@ export async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
 	{
-		artist = emptyString,
 		electronPort,
+		artist = "",
 		extension,
 		imageURL,
 		title,
@@ -103,9 +102,9 @@ export async function createDownload(
 	/////////////////////////////////////////////
 
 	let interval: NodeJS.Timer | undefined;
-	let prettyTotal = emptyString;
 	const startTime = Date.now();
 	let percentageToSend = 0;
+	let prettyTotal = "";
 
 	/////////////////////////////////////////////
 

@@ -7,7 +7,6 @@ import { statSync } from "node:fs";
 import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
 import { getAllowedMedias, searchDirectoryResult } from "../file";
 import { error, groupEnd, groupCollapsed } from "@common/log";
-import { emptyString } from "@common/empty";
 import { getBasename } from "@common/path";
 import { time } from "@utils/utils";
 import { dbg } from "@common/debug";
@@ -33,10 +32,10 @@ const createMedia = async (
 				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 				tag: {
-					lyrics = emptyString,
-					album = emptyString,
 					title = basename,
 					albumArtists,
+					lyrics = "",
+					album = "",
 					pictures,
 					genres,
 				},
@@ -76,9 +75,9 @@ const createMedia = async (
 				image:
 					picture && mimeType
 						? (`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64)
-						: emptyString,
+						: "",
 				duration: formatDuration(durationInSeconds),
-				artist: albumArtists[0] ?? emptyString,
+				artist: albumArtists[0] ?? "",
 				birthTime: statSync(path).birthtimeMs,
 				size: length,
 				lyrics,

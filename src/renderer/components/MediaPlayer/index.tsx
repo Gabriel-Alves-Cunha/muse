@@ -36,7 +36,9 @@ export function MediaPlayer() {
 		// Flip media player card to frontCard:
 		log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
 
-		document.getElementById(mediaPlayerFlipCardId)?.classList.remove("flip-card-active");
+		document
+			.getElementById(mediaPlayerFlipCardId)
+			?.classList.remove("flip-card-active");
 	}, [audioRef.current?.src]);
 
 	useEffect(() => {

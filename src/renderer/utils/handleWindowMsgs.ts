@@ -6,7 +6,6 @@ import { assertUnreachable } from "./utils";
 import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
-import { emptyString } from "@common/empty";
 import { deleteFile } from "./deleteFile";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
@@ -145,7 +144,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
 
-			await refreshMedia(mediaPath, emptyString);
+			await refreshMedia(mediaPath);
 			break;
 		}
 

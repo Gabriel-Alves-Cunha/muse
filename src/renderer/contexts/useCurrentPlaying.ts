@@ -14,7 +14,6 @@ import { getRandomInt, time } from "@utils/utils";
 import { warn, error, info } from "@common/log";
 import { getPlayOptions } from "./usePlayOptions";
 import { playlistList } from "@common/enums";
-import { emptyString } from "@common/empty";
 import { getFirstKey } from "@utils/map-set";
 import { data_id } from "./useAllSelectedMedias";
 import {
@@ -34,7 +33,7 @@ import {
 export const defaultCurrentPlaying: CurrentPlaying = {
 	listType: playlistList.mainList,
 	lastStoppedTime: 0,
-	id: emptyString,
+	id: "",
 };
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
@@ -152,8 +151,8 @@ export function playNextMedia(): void {
 		// Get the correct list:
 		const list = getPlaylist(correctListType) as ReadonlySet<ID> | MainList;
 
-		let nextMediaID = emptyString;
 		const ids = list.keys();
+		let nextMediaID = "";
 
 		if (getPlayOptions().isRandom) {
 			const randomIndex = getRandomInt(0, list.size);

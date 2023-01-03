@@ -3,8 +3,8 @@ import { useRef } from "react";
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
 import { useOnClickOutside } from "@hooks/useOnClickOutside";
-import { PopoverContent } from "@components/Popover";
 import { MediaSearchRow } from "./MediaSearchRow";
+import { PopoverContent } from "../Popover";
 import { useTranslation } from "@i18n";
 import { RightSlot } from "../ContextMenu/RightSlot";
 import { BaseInput } from "../BaseInput";
@@ -57,6 +57,7 @@ export function SearchMedia() {
 				<ContextMenu
 					content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
 					onContextMenu={selectMediaByPointerEvent}
+					isAllDisabled={foundSomething}
 				>
 					<PopoverContent
 						size={
@@ -82,6 +83,3 @@ export function SearchMedia() {
 		</div>
 	);
 }
-
-const parents = (node: HTMLElement): HTMLElement[] =>
-	(node.parentElement ? parents(node.parentElement) : []).concat([node]);

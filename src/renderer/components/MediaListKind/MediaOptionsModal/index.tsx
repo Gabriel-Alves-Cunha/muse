@@ -8,7 +8,6 @@ import { MdClose as CloseIcon } from "react-icons/md";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { mediaOptionsModalId } from "../Row";
 import { useTranslation } from "@i18n";
-import { emptyString } from "@common/empty";
 import { FlexRow } from "@components/FlexRow";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
@@ -38,7 +37,7 @@ export default function MediaOptionsModal({ media, path }: Props) {
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
 	const closeButtonRef = useRef<HTMLLabelElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
-	const imageFilePathRef = useRef(emptyString);
+	const imageFilePathRef = useRef("");
 	const { t } = useTranslation();
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
@@ -104,10 +103,7 @@ export default function MediaOptionsModal({ media, path }: Props) {
 
 			<form id="form">
 				{Object.entries(optionsForUserToSee(media)).map(([option, value]) => (
-					<fieldset
-						className="flex items-center h-9 gap-5 mb-4"
-						key={option}
-					>
+					<fieldset className="flex items-center h-9 gap-5 mb-4" key={option}>
 						<label
 							className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
 							htmlFor={option}

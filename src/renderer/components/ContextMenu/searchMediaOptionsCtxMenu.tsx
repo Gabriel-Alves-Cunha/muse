@@ -32,7 +32,7 @@ import { error } from "@common/log";
 const deleteMediaModalID_searchMediaCtxMenu =
 	"delete-media-modal-search-media-ctx-menu";
 
-export default function SearchMediaOptionsCtxMenu() {
+export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 	const { t } = useTranslation();
 
 	return (
@@ -40,6 +40,7 @@ export default function SearchMediaOptionsCtxMenu() {
 			<>
 				<CenteredModalTrigger
 					htmlTargetName={deleteMediaModalID_searchMediaCtxMenu}
+					inputProps={{ disabled: isAllDisabled }}
 					labelClassName="ctx-menu-item"
 				>
 					{t("ctxMenus.deleteMedia")}
@@ -59,7 +60,7 @@ export default function SearchMediaOptionsCtxMenu() {
 				</CenteredModalContent>
 			</>
 
-			<Item onSelect={shareMedias}>
+			<Item onSelect={shareMedias} disabled={isAllDisabled}>
 				{t("ctxMenus.shareMedia")}
 
 				<RightSlot>
@@ -67,13 +68,15 @@ export default function SearchMediaOptionsCtxMenu() {
 				</RightSlot>
 			</Item>
 
-			<Item onSelect={selectAllMediasOnSearchResult}>
+			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
 				{t("ctxMenus.selectAllMedias")}
 
 				<RightSlot>Ctrl+A</RightSlot>
 			</Item>
 
-			<Item onSelect={searchForLyrics}>{t("ctxMenus.searchForLyrics")}</Item>
+			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
+				{t("ctxMenus.searchForLyrics")}
+			</Item>
 		</>
 	);
 }
@@ -116,3 +119,10 @@ export function searchForLyrics(): void {
 	for (const id of getAllSelectedMedias())
 		searchAndOpenLyrics(id, !openLyrics).then();
 }
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
+
+type Props = { isAllDisabled: boolean };

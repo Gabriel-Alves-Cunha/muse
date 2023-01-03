@@ -29,8 +29,8 @@ export function SortBy() {
 		<>
 			<SelectTrigger
 				labelClassName="grouped-button rounded-r-xl" // Same as ButtonOfGroup.
+				labelProps={{ title: t("tooltips.sortBy") }}
 				htmlTargetName={selectOrderOptionsId}
-				title={t("tooltips.sortBy")}
 			>
 				<SortIcon size={19} className="fill-white" />
 			</SelectTrigger>

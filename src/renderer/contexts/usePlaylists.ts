@@ -56,7 +56,7 @@ export type UsePlaylistsStatesAndActions = Readonly<{
 		favorites?: ReadonlySet<ID>;
 		history?: History;
 	};
-	refreshMedia(oldID: ID, newID: ID, newMedia?: Media): Promise<void>;
+	refreshMedia(oldID: ID, newID?: ID, newMedia?: Media): Promise<void>;
 	addToMainList(id: ID, newMedia: Media): void;
 	replaceEntireMainList(list: MainList): void;
 
@@ -289,6 +289,8 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 
 			async refreshMedia(oldID, newID, newMedia) {
 				function updateLists(newMedia: Media) {
+					newID ||= crypto.randomUUID();
+
 					const newAllSelectedMedias = new Set(getAllSelectedMedias());
 					newMainList.delete(oldID);
 

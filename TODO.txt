@@ -8,7 +8,6 @@
 * ADD: select with mouse moving
 * ADD: electron setProgressBar
 * ADD: cut and visualise audio
-* ADD: make own select menu
 * ADD: make own popover
 * ADD: playback rate
 
@@ -25,6 +24,6 @@
 		will rerender not only with `isLoadingMedias`,
 		you have to use a select function.
 
-3. If ever needed, see last.fm for lyrics, or lrc
+3. If ever needed, see `last.fm` for lyrics, or lrc
 
 4. If ever needed, make a data structure that has an indexed map.

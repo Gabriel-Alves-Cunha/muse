@@ -12,8 +12,6 @@ import { arrayFromMainList, numberOfMedias } from "./fakeTestList";
 import { cleanUpBeforeEachTest } from "./beforeEach";
 import { getAllSelectedMedias } from "@contexts/useAllSelectedMedias";
 import { playlistList } from "@common/enums";
-import { prettyBytes } from "@common/prettyBytes";
-import { emptyString } from "@common/empty";
 import {
 	replaceEntireMainList,
 	removeFromFavorites,
@@ -162,12 +160,12 @@ describe("Testing usePlaylists", () => {
 				path: `home/Music/test/${title}.mp3`,
 				duration: formatDuration(100),
 				birthTime: Date.now(),
-				artist: emptyString,
-				lyrics: emptyString,
-				album: emptyString,
-				image: emptyString,
 				size: 3_000,
 				genres: [],
+				artist: "",
+				lyrics: "",
+				album: "",
+				image: "",
 				title,
 			};
 

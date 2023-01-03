@@ -12,7 +12,6 @@ import { sendMsgToBackend } from "@common/crossCommunication";
 import { PopoverButtons } from "../Navbar/PopoverButtons";
 import { ProgressStatus } from "@common/enums";
 import { useTranslation } from "@i18n";
-import { emptyString } from "@common/empty";
 import { errorToast } from "../toasts";
 import { error } from "@common/log";
 import { Popup } from "./Popup";
@@ -23,11 +22,11 @@ import { Popup } from "./Popup";
 // Constants:
 
 const defaultDownloadInfo: DownloadInfo = {
-	imageURL: emptyString,
-	artist: emptyString,
-	title: emptyString,
-	url: emptyString,
 	extension: "mp3",
+	imageURL: "",
+	artist: "",
+	title: "",
+	url: "",
 } as const;
 
 export const useDownloadInfo = create(() => defaultDownloadInfo);

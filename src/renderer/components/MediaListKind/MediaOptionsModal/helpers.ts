@@ -161,7 +161,7 @@ export function changeMetadataIfAllowed(
 // 					if (
 // 						key !== id ||
 // 						oldValue === newValue ||
-// 						(!oldValue && newValue === emptyString)
+// 						(!oldValue && newValue === "")
 // 					)
 // 						continue;
 //

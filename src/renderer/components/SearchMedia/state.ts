@@ -5,7 +5,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
 
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
-import { emptyArray, emptyString } from "@common/empty";
+import { emptyArray } from "@common/empty";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -22,9 +22,9 @@ export const SearchStatus = {
 
 const defaultSearcher: Searcher = {
 	searchStatus: SearchStatus.DOING_NOTHING,
-	searchTerm: emptyString,
-	highlight: emptyString,
 	results: emptyArray,
+	searchTerm: "",
+	highlight: "",
 };
 
 export const useSearcher = create<Searcher>()(

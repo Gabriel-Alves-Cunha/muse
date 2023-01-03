@@ -3,7 +3,6 @@ import create from "zustand";
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { useTranslation } from "@i18n";
-import { emptyString } from "@common/empty";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
 
@@ -15,10 +14,10 @@ const { getBasicInfo } = electron.media;
 // Constants:
 
 const defaultSearchInfo: SearcherInfo = {
-	result: { imageURL: emptyString, artist: emptyString, title: emptyString },
-	error: emptyString,
-	url: emptyString,
+	result: { imageURL: "", artist: "", title: "" },
 	isLoading: false,
+	error: "",
+	url: "",
 };
 
 export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);

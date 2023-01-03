@@ -3,8 +3,6 @@ import type { ID, Media } from "@common/@types/generalTypes";
 import { randomUUID } from "node:crypto";
 
 import { formatDuration } from "@common/utils";
-import { prettyBytes } from "@common/prettyBytes";
-import { emptyString } from "@common/empty";
 
 const { sortByTitle } = await import("@contexts/usePlaylistsHelper");
 
@@ -19,13 +17,13 @@ export const testMap: ReadonlyMap<ID, Media> = sortByTitle(
 			const media: Media = {
 				duration: formatDuration(index + 10),
 				birthTime: Date.now(),
-				artist: emptyString,
-				lyrics: emptyString,
-				album: emptyString,
-				image: emptyString,
 				path: `${index}`,
 				size: 3_000,
 				genres: [],
+				artist: "",
+				lyrics: "",
+				album: "",
+				image: "",
 				title,
 			};
 

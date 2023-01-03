@@ -83,8 +83,8 @@ describe("Testing useCurrentPlaying", () => {
 
 			const expected: CurrentPlaying = {
 				listType: playlistList.mainList,
-				id: prevMediaID,
 				lastStoppedTime: 0,
+				id: prevMediaID,
 			};
 
 			expect(expected, "The expected currentPlaying is wrong!").toEqual(
@@ -161,12 +161,12 @@ describe("Testing useCurrentPlaying", () => {
 
 		// The firstMediaID has index = 0.
 		let index = 0;
-		for (const [currMediaID, currMedia] of arrayFromMainList) {
+		for (const [currMediaID] of arrayFromMainList) {
 			// If is the last media, it is going
 			// to go back to the first one:
 			const nextIndex = index === numberOfMedias - 1 ? 0 : index + 1;
 
-			const [expectedMediaID, expectedMedia] = arrayFromMainList[nextIndex]!;
+			const [expectedMediaID] = arrayFromMainList[nextIndex]!;
 
 			expect(
 				getCurrentPlaying().id,

@@ -14,8 +14,8 @@ export const PopoverButtons = ({
 			labelClassName={`${
 				size > 0 ? "has-items" : ""
 			} converting-downloading-list-popover-trigger`}
+			labelProps={{ title: tooltip }}
 			htmlTargetName={popoverId}
-			title={tooltip}
 		>
 			<span data-length={size} />
 
