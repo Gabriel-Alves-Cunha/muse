@@ -1,8 +1,4 @@
-import type { ID, Media } from "@common/@types/generalTypes";
-
-import create from "zustand";
-
-import { refreshMedia, usePlaylists } from "@contexts/usePlaylists";
+import { getMedia, refreshMedia, usePlaylists } from "@contexts/usePlaylists";
 import { formatDuration } from "@common/utils";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
@@ -15,23 +11,11 @@ import {
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
-// Helper constants:
 
-export const useProgress = create<Progress>(() => ({
-	currentTime: 0,
-	percentage: 0,
-}));
+export const idSelector = (
+	state: ReturnType<typeof useCurrentPlaying.getState>,
+) => state.id;
 
-const { setState: setProgress } = useProgress;
-
-///////////////////////////////////////
-///////////////////////////////////////
-
-export const idSelector = ({
-	id,
-}: ReturnType<typeof useCurrentPlaying.getState>) => id;
-
-///////////////////////////////////////
 ///////////////////////////////////////
 
 export const mainListSelector = (
@@ -57,31 +41,29 @@ export const logStalled = (e: Event): void =>
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function handleLoadedData(
-	audio: HTMLAudioElement,
-	oldID: ID,
-	media: Media,
-): void {
+export function handleLoadedData({ target: audio }: AudioEvent): void {
+	const { lastStoppedTime, id: oldId } = getCurrentPlaying();
 	const formatedDuration = formatDuration(audio.duration);
+	const media = getMedia(oldId)!;
 
 	// Updating the duration of media:
 	if (formatedDuration !== media.duration) {
 		const newID = crypto.randomUUID();
 
-		refreshMedia(oldID, newID, { ...media, duration: formatedDuration }).then();
+		refreshMedia(oldId, newID, {
+			...media,
+			duration: formatedDuration,
+		}).then();
 	}
 
 	// Maybe set audio.currentTime to last stopped time:
-	const lastTime = getCurrentPlaying().currentTime;
-	if (lastTime > 30 /* seconds */) audio.currentTime = lastTime;
+	if (lastStoppedTime > 30 /* seconds */) audio.currentTime = lastStoppedTime;
 }
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function handleEnded(e: Event, audio: HTMLAudioElement): void {
-	console.log("Audio event:", e);
-
+export function handleEnded({ target: audio }: AudioEvent): void {
 	dbg(
 		`Audio ended, playing ${
 			audio.loop ? "again because it's on loop." : "next media."
@@ -94,24 +76,9 @@ export function handleEnded(e: Event, audio: HTMLAudioElement): void {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function handleAudioCanPlay(audio: HTMLAudioElement): void {
+export function handleAudioCanPlay({ target: audio }: AudioEvent): void {
 	dbg("Audio can play.");
 	audio.play().then();
-}
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-export function handleProgress(
-	audio: HTMLAudioElement,
-	isSeeking: boolean,
-): void {
-	const { duration, currentTime } = audio;
-
-	// If is seeking, set just the currentTime:
-	isSeeking
-		? setProgress({ currentTime })
-		: setProgress({ percentage: (currentTime / duration) * 100, currentTime });
 }
 
 /////////////////////////////////////////
@@ -119,4 +86,6 @@ export function handleProgress(
 /////////////////////////////////////////
 // Types:
 
-type Progress = Readonly<{ currentTime: number; percentage: number }>;
+interface AudioEvent extends Event {
+	target: HTMLAudioElement;
+}

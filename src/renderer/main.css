@@ -662,24 +662,30 @@
 
 	/* FlipCard */
 
-	.perspective-10 {
-		perspective: 1000px;
-	}
-
-	.transform-preserve-3d {
-		transform-style: preserve-3d;
-	}
-
-	.backface-visibility-hidden {
-		backface-visibility: hidden;
-	}
-
 	.rotate-y-180 {
 		transform: rotateY(180deg);
 	}
 
-	.flip-active > div {
+	.flip-card-active > div {
 		@apply rotate-y-180;
+	}
+
+	.flip-card {
+		@apply w-full h-full bg-transparent;
+	}
+
+	.flip-card > div {
+		@apply relative w-full h-full transition-transform duration-700;
+
+		transform-style: preserve-3d;
+		perspective: 1000px;
+		/* transform: rotateY(180deg); */
+	}
+
+	.flip-card > div > div {
+		@apply absolute w-full h-full bg-transparent z-10;
+
+		backface-visibility: hidden;
 	}
 
 	/* ********************************** */
@@ -1251,10 +1257,10 @@
 	/* Media Player */
 
 	.aside {
-		@apply grid-area-media-player relative inline-block justify-items-center items-center w-full justify-self-center self-start p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom [&_svg]:text-icon-media-player;
+		@apply grid-area-media-player relative inline-block justify-items-center items-center w-full justify-self-center self-start p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom;
 	}
 
-	.aside svg * {
+	.aside svg {
 		@apply text-icon-media-player;
 	}
 

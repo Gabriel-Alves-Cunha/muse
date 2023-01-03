@@ -1,17 +1,19 @@
-import type { RefToAudioAndSeeker } from "./ControlsAndSeeker";
+import type { RefToAudio } from "./ControlsAndSeeker";
 
 import { useEffect, useMemo, useRef } from "react";
 
 import { formatDuration, mapTo } from "@common/utils";
-import { useProgress } from "./helpers";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
+export function SeekerWrapper({ audio }: RefToAudio) {
+	const currentTimeRef = useRef<HTMLParagraphElement>(null);
+	const progressElementRef = useRef<HTMLInputElement>(null);
 	const progressWrapperRef = useRef<HTMLDivElement>(null);
 	const timeTooltipRef = useRef<HTMLSpanElement>(null);
+	const isPointerOnSlider = useRef(false);
 
 	const { formatedDuration, isDurationValid } = useMemo(
 		() => ({
@@ -23,12 +25,32 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 	);
 
 	useEffect(() => {
+		if (!(audio?.src && progressElementRef.current)) return;
+
+		const progressElement = progressElementRef.current;
+
+		audio.ontimeupdate = () => {
+			if (!isPointerOnSlider)
+				progressElement.value = `${(audio.currentTime / audio.duration) * 100}`;
+
+			// const currentTimeElement = currentTimeRef.current;
+			// if (!currentTimeElement) return;
+			// currentTimeElement.textContent = formatDuration(audio.currentTime);
+		};
+
+		audio.onchange = () => {
+			const percentage = Number(progressElement.value) / 100;
+			audio.currentTime = (audio.duration || 0) * percentage;
+		};
+	}, [audio]);
+
+	useEffect(() => {
 		if (
 			!(
 				progressWrapperRef.current &&
 				timeTooltipRef.current &&
 				isDurationValid &&
-				audio
+				audio?.src
 			)
 		)
 			return;
@@ -37,26 +59,25 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 		const timeline = progressWrapperRef.current;
 
 		function setTimerTooltip({ offsetX }: PointerEvent): void {
-			if (!audio) return;
+			if (!audio?.duration) return;
 
 			const time =
 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-			const left = offsetX - (35 >> 1); // 35 is the width of the tooltip.
-			// Also, (35 >> 1) is the half of the width (binary divide by 2).
+			const left = offsetX - 17.5; // 35 is the width of the tooltip, 17.5 is half.
 
 			timerTooltip.textContent = formatDuration(time);
 			timerTooltip.style.left = `${left}px`;
 		}
 
-		function seek({ offsetX }: PointerEvent): void {
-			if (!(audio && isFinite(audio.duration))) return;
-
-			const desiredTime =
-				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
-
-			useProgress.setState({ percentage });
-		}
+		// 		function seek({ offsetX }: PointerEvent): void {
+		// 			if (!(audio && isFinite(audio.duration))) return;
+		//
+		// 			const desiredTime =
+		// 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
+		// 			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
+		//
+		// 			useProgress.setState({ percentage });
+		// 		}
 
 		timeline.addEventListener("pointermove", setTimerTooltip);
 
@@ -64,16 +85,16 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 			// Make sure that event is captured even if pointer moves away from timeline rect bounds:
 			timeline.setPointerCapture(e.pointerId);
 
-			isSeeking.current = true;
-			seek(e);
+			isPointerOnSlider.current = true;
+			// seek(e);
 
-			timeline.addEventListener("pointermove", seek);
+			// timeline.addEventListener("pointermove", seek);
 			timeline.addEventListener(
 				"pointerup",
 				(e) => {
-					timeline.removeEventListener("pointermove", seek);
+					// timeline.removeEventListener("pointermove", seek);
 
-					isSeeking.current = false;
+					isPointerOnSlider.current = false;
 
 					const desiredTime =
 						(e.offsetX / timeline.getBoundingClientRect().width) *
@@ -84,7 +105,7 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 				{ once: true },
 			);
 		});
-	}, [audio, isDurationValid, isSeeking]);
+	}, [audio, isDurationValid]);
 
 	return (
 		<div className="flex flex-col w-full gap-2">
@@ -103,53 +124,23 @@ export function SeekerWrapper({ audio, isSeeking }: RefToAudioAndSeeker) {
 					ref={timeTooltipRef}
 				/>
 
-				<Progress />
+				<input
+					className="relative bg-accent h-full progress"
+					ref={progressElementRef}
+					defaultValue="0"
+					id="progress"
+					type="range"
+					max="100"
+					step="1"
+					min="0"
+				/>
 			</div>
 
 			<div className="flex justify-between items-center text-icon-media-player font-primary text-center text-lg">
-				<CurrentTime />
+				<p ref={currentTimeRef}>00:00</p>
 
 				<p>{formatedDuration}</p>
 			</div>
 		</div>
 	);
-}
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Helper functions:
-
-const percentageSelector = ({
-	percentage,
-}: ReturnType<typeof useProgress.getState>) => percentage;
-
-/////////////////////////////////////////
-
-function Progress() {
-	const percentage = useProgress(percentageSelector);
-
-	document.documentElement.style.setProperty(
-		"--progress-width",
-		// !NaN => true (in case is not present), everything else is false:
-		`${percentage ? percentage : 0}%`,
-	);
-
-	return (
-		<div className={"relative bg-accent h-full w-[var(--progress-width)]"} />
-	);
-}
-
-/////////////////////////////////////////
-
-const currentTimeSelector = ({
-	currentTime,
-}: ReturnType<typeof useProgress.getState>) => currentTime;
-
-/////////////////////////////////////////
-
-function CurrentTime() {
-	const currentTime = useProgress(currentTimeSelector);
-
-	return <p>{formatDuration(currentTime)}</p>;
 }

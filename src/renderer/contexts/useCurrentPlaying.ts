@@ -33,8 +33,8 @@ import {
 
 export const defaultCurrentPlaying: CurrentPlaying = {
 	listType: playlistList.mainList,
+	lastStoppedTime: 0,
 	id: emptyString,
-	currentTime: 0,
 };
 
 export const useCurrentPlaying = create<CurrentPlaying>()(
@@ -57,7 +57,7 @@ export const { getState: getCurrentPlaying, setState: setCurrentPlaying } =
 export const playThisMedia = (
 	id: ID,
 	listType: ValuesOf<typeof playlistList> = playlistList.mainList,
-): void => setCurrentPlaying({ id, currentTime: 0, listType });
+): void => setCurrentPlaying({ id, lastStoppedTime: 0, listType });
 
 ////////////////////////////////////////////////
 
@@ -79,9 +79,10 @@ export function pause(): void {
 	if (!audio) return;
 
 	audio.pause();
-	const currentTime = audio.currentTime;
+	const lastStoppedTime = audio.currentTime;
 
-	if (currentTime > 60 /* seconds */) setCurrentPlaying({ currentTime });
+	if (lastStoppedTime > 60 /* seconds */)
+		setCurrentPlaying({ lastStoppedTime });
 }
 
 ////////////////////////////////////////////////
@@ -135,6 +136,7 @@ export function playPreviousMedia(): void {
 ////////////////////////////////////////////////
 
 export function playNextMedia(): void {
+	// If this ever becomes too slow, maybe make an array of ids === mainList.keys().
 	time(() => {
 		const { id, listType } = getCurrentPlaying();
 
@@ -201,7 +203,7 @@ export function playNextMedia(): void {
 		setCurrentPlaying({
 			listType: correctListType,
 			id: nextMediaID,
-			currentTime: 0,
+			lastStoppedTime: 0,
 		});
 	}, "playNextMedia");
 }
@@ -306,6 +308,6 @@ function changeMediaSessionMetadata(media: Media): void {
 
 export type CurrentPlaying = {
 	listType: ValuesOf<typeof playlistList>;
-	currentTime: number;
+	lastStoppedTime: number;
 	id: ID;
 };

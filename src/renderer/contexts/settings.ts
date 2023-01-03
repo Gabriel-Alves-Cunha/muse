@@ -1,4 +1,5 @@
-import type { Json } from "@common/@types/utils";
+import type { UserAvailableLanguages } from "@i18n";
+import type { availableThemes } from "@components/ThemeToggler";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import create from "zustand";
@@ -13,6 +14,8 @@ const defaultValues: Settings = {
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
 	maxSizeOfHistory: 100,
+	language: "en-US",
+	theme: "light",
 };
 const savedSettings = localStorage.getItem(settingsKey);
 const settingsToApply = savedSettings
@@ -37,9 +40,12 @@ export const { getState: getSettings, setState: setSettings } = useSettings;
 
 useSettings.subscribe(
 	(state) => state,
-	(newSettings): void =>
+	(newSettings) =>
 		// Write to LocalStorage:
-		localStorage.setItem(settingsKey, JSON.stringify(newSettings)),
+		setTimeout(
+			() => localStorage.setItem(settingsKey, JSON.stringify(newSettings)),
+			1_000,
+		),
 );
 
 ////////////////////////////////////////////////
@@ -47,9 +53,10 @@ useSettings.subscribe(
 ////////////////////////////////////////////////
 // Types:
 
-export type Settings = Json &
-	Readonly<{
-		assureMediaSizeIsGreaterThan60KB: boolean;
-		ignoreMediaWithLessThan60Seconds: boolean;
-		maxSizeOfHistory: number;
-	}>;
+export type Settings = Readonly<{
+	assureMediaSizeIsGreaterThan60KB: boolean;
+	ignoreMediaWithLessThan60Seconds: boolean;
+	theme: typeof availableThemes[number];
+	language: UserAvailableLanguages;
+	maxSizeOfHistory: number;
+}>;

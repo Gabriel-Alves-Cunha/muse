@@ -1,6 +1,6 @@
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
-import { PopoverContent, PopoverRoot } from "../Popover";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
+import { PopoverContent } from "@components/Popover";
 import { MediaSearchRow } from "./MediaSearchRow";
 import { useTranslation } from "@i18n";
 import { RightSlot } from "../ContextMenu/RightSlot";
@@ -51,7 +51,7 @@ export function SearchMedia() {
 				onContextMenu={selectMediaByPointerEvent}
 				isAllDisabled={nothingFound}
 			>
-				<PopoverRoot open={shouldPopoverOpen}>
+				{shouldPopoverOpen ? (
 					<PopoverContent
 						size={
 							nothingFound
@@ -59,8 +59,9 @@ export function SearchMedia() {
 								: "search-media-results"
 						}
 						onPointerDownOutside={setDefaultSearch}
-						onOpenAutoFocus={mantainFocusOnInput}
+						// onOpenAutoFocus={mantainFocusOnInput}
 						className="transition-none"
+						htmlFor=""
 					>
 						{nothingFound ? (
 							<div className="nothing-found">
@@ -70,7 +71,7 @@ export function SearchMedia() {
 							resultsJSXs
 						) : null}
 					</PopoverContent>
-				</PopoverRoot>
+				) : null}
 			</ContextMenu>
 		</>
 	);

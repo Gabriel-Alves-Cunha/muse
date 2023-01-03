@@ -13,8 +13,8 @@ import { dbgPlaylists } from "@common/debug";
 
 export const keys = {
 	currentPlaying: "@muse:currentPlaying",
-	favorites: "@muse:playlist:favorites",
-	history: "@muse:playlist:history",
+	favorites: "@muse:playlists:favorites",
+	history: "@muse:playlists:history",
 	playOptions: "@muse:playOptions",
 } as const;
 

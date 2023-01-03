@@ -394,28 +394,6 @@
     aria-hidden "^1.1.1"
     react-remove-scroll "2.5.5"
 
-"@radix-ui/react-popover@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@radix-ui/react-popover/-/react-popover-1.0.2.tgz#f761c8aafb61519522b8e80501c589e619073a2c"
-  integrity sha512-4tqZEl9w95R5mlZ/sFdgBnfhCBOEPepLIurBA5kt/qaAhldJ1tNQd0ngr0ET0AHbPotT4mwxMPr7a+MA/wbK0g==
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/primitive" "1.0.0"
-    "@radix-ui/react-compose-refs" "1.0.0"
-    "@radix-ui/react-context" "1.0.0"
-    "@radix-ui/react-dismissable-layer" "1.0.2"
-    "@radix-ui/react-focus-guards" "1.0.0"
-    "@radix-ui/react-focus-scope" "1.0.1"
-    "@radix-ui/react-id" "1.0.0"
-    "@radix-ui/react-popper" "1.0.1"
-    "@radix-ui/react-portal" "1.0.1"
-    "@radix-ui/react-presence" "1.0.0"
-    "@radix-ui/react-primitive" "1.0.1"
-    "@radix-ui/react-slot" "1.0.1"
-    "@radix-ui/react-use-controllable-state" "1.0.0"
-    aria-hidden "^1.1.1"
-    react-remove-scroll "2.5.5"
-
 "@radix-ui/react-popper@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-popper/-/react-popper-1.0.1.tgz#9fa8a6a493404afa225866a5cd75af23d141baa0"
@@ -928,18 +906,6 @@
   integrity sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==
   dependencies:
     "@types/node" "*"
-
-"@virtuoso.dev/react-urx@^0.2.12":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@virtuoso.dev/react-urx/-/react-urx-0.2.13.tgz#e2cfc42d259d2a002695e7517d34cb97b64ee9c4"
-  integrity sha512-MY0ugBDjFb5Xt8v2HY7MKcRGqw/3gTpMlLXId2EwQvYJoC8sP7nnXjAxcBtTB50KTZhO0SbzsFimaZ7pSdApwA==
-  dependencies:
-    "@virtuoso.dev/urx" "^0.2.13"
-
-"@virtuoso.dev/urx@^0.2.12", "@virtuoso.dev/urx@^0.2.13":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@virtuoso.dev/urx/-/urx-0.2.13.tgz#a65e7e8d923cb03397ac876bfdd45c7f71c8edf1"
-  integrity sha512-iirJNv92A1ZWxoOHHDYW/1KPoi83939o83iUBQHIim0i3tMeSKEh+bxhJdTHQ86Mr4uXx9xGUTq69cp52ZP8Xw==
 
 "@vitejs/plugin-react-swc@^3.0.1":
   version "3.0.1"
@@ -2199,10 +2165,10 @@ he@^1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-hmr-electron@^0.0.9:
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/hmr-electron/-/hmr-electron-0.0.9.tgz#3a33e9445d99c84f125177828b7831bcdb46daa2"
-  integrity sha512-dipEnrnUc+GnfTJctJ9P29/iaGMWsh6HHKLGn2Y/rDieKT00uA22opJQogwWNCKBmd9WBi39ugeWPbreQ2Lwgw==
+hmr-electron@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/hmr-electron/-/hmr-electron-0.0.10.tgz#578a41af6ff9b7f1088c5a2838a30dfe57958179"
+  integrity sha512-Q46tWHOeHjNA4CcT6Q0IlMCZUqj4RG4KMs0XryBl2UWNjF+datKPAqCNvB/m5rKRL5fXH84p3vTCgOxpWVMXAg==
 
 hosted-git-info@^4.1.0:
   version "4.1.0"
@@ -3180,13 +3146,10 @@ react-toastify@^9.1.1:
   dependencies:
     clsx "^1.1.1"
 
-react-virtuoso@^3.1.5:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-3.1.5.tgz#cee62d8f69240e6ce34d13d2101a5c0509345c49"
-  integrity sha512-Dwf7SGr73UAahfcQNIND+c+MtCb0PeHu+QTZ5ptR7oXxQkupfHXEKGwEDF5lDkLqdGxm+yH4uh/IFCqMKxudJw==
-  dependencies:
-    "@virtuoso.dev/react-urx" "^0.2.12"
-    "@virtuoso.dev/urx" "^0.2.12"
+react-virtuoso@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-4.0.1.tgz#e8edc2501615052bf2ee4bfeccc093a96b45c1ff"
+  integrity sha512-6zdv46NPrJK3ZtjJD/BVggbLv4SASuWjHkS+Wuf3SjLenE7I9qH27D/atKfF8rLl+C3nOw0rC5V5oMKHVfZe2w==
 
 react@^18.2.0:
   version "18.2.0"
@@ -3786,10 +3749,10 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vite-node@0.26.2:
-  version "0.26.2"
-  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-0.26.2.tgz#2624236b9d68ea62c753572ee465fe4fa0657572"
-  integrity sha512-4M/zlatItZAyvrQG+82zQBhgDjRZRhVJYFW4T9wcAKh7eMmSiPOVSeI5zsV9UzHXgCcIDKX0o0r3s4OxExTHqg==
+vite-node@0.26.3:
+  version "0.26.3"
+  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-0.26.3.tgz#164fbaf449d5bd382b44b736653ba800397b5ebd"
+  integrity sha512-Te2bq0Bfvq6XiO718I+1EinMjpNYKws6SNHKOmVbILAQimKoZKDd+IZLlkaYcBXPpK3HFe2U80k8Zw+m3w/a2w==
   dependencies:
     debug "^4.3.4"
     mlly "^1.0.0"
@@ -3810,10 +3773,10 @@ vite-node@0.26.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.26.2:
-  version "0.26.2"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.26.2.tgz#c1647e41d5619d1d059ff65d9c00672261ccac30"
-  integrity sha512-Jvqxh6SDy9SsuslkDjts0iDewDIdq4rveEt69YgDuAb1tVDGV0lDepVaeAFraoySWqneJmOt4TngFFNhlw7GfA==
+vitest@^0.26.3:
+  version "0.26.3"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.26.3.tgz#0e3abb7674e8af7b74519b40c04efe6e43c0b0a7"
+  integrity sha512-FmHxU9aUCxTi23keF3vxb/Qp0lYXaaJ+jRLGOUmMS3qVTOJvgGE+f1VArupA6pEhaG2Ans4X+zV9dqM5WISMbg==
   dependencies:
     "@types/chai" "^4.3.4"
     "@types/chai-subset" "^1.3.3"
@@ -3829,7 +3792,7 @@ vitest@^0.26.2:
     tinypool "^0.3.0"
     tinyspy "^1.0.2"
     vite "^3.0.0 || ^4.0.0"
-    vite-node "0.26.2"
+    vite-node "0.26.3"
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
@@ -4003,9 +3966,9 @@ ytdl-core@^4.11.2:
     miniget "^4.2.2"
     sax "^1.1.3"
 
-zustand@4.1.5:
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.1.5.tgz#7402b511f5b23ccb0f9ba6d20ae01ec817e16eb6"
-  integrity sha512-PsdRT8Bvq22Yyh1tvpgdHNE7OAeFKqJXUxtJvj1Ixw2B9O2YZ1M34ImQ+xyZah4wZrR4lENMoDUutKPpyXCQ/Q==
+zustand@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.2.0.tgz#f6ef9e63794eda9b296979578538a6df6be3e1b0"
+  integrity sha512-eNwaDoD2FYVnMgtNxiMUhTJO780wonZUzJrPQTLYI0erSIMZF8cniWFW22kGQUECd8rdHRJ/ZJL2XO54c9Ttuw==
   dependencies:
     use-sync-external-store "1.2.0"

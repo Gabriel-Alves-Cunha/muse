@@ -14,9 +14,8 @@ import { useTranslation } from "@i18n";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-const favoritesSelector = ({
-	favorites,
-}: ReturnType<typeof usePlaylists.getState>) => favorites;
+const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
+	state.favorites;
 
 export function Header({ media, id, displayTitle = false }: HeaderProps) {
 	const favorites = usePlaylists(favoritesSelector);

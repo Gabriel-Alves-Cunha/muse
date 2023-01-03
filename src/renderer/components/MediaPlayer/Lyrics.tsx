@@ -1,7 +1,7 @@
 import type { ID, Media } from "@common/@types/generalTypes";
 
 import { ReactToElectronMessage } from "@common/enums";
-import { mediaPlayerCardId } from "@components/FlipCard";
+import { mediaPlayerFlipCardId } from "@components/FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
 import { error, warn } from "@common/log";
@@ -34,7 +34,7 @@ export const Lyrics = ({ media, id }: Props) => (
 
 export const flipMediaPlayerCard = (): void =>
 	document
-		.getElementById(mediaPlayerCardId)
+		.getElementById(mediaPlayerFlipCardId)
 		?.classList.toggle("active") as void;
 
 /////////////////////////////////////////

@@ -1,6 +1,6 @@
 import type { IconType } from "react-icons/lib";
 
-import { PopoverContent, PopoverTrigger } from "@components/Popover_";
+import { PopoverContent, PopoverTrigger } from "@components/Popover";
 
 export const PopoverButtons = ({
 	popoverId,
@@ -11,7 +11,7 @@ export const PopoverButtons = ({
 }: Props) => (
 	<>
 		<PopoverTrigger
-			className={`${
+			labelClassName={`${
 				size > 0 ? "has-items" : ""
 			} converting-downloading-list-popover-trigger`}
 			htmlTargetName={popoverId}
@@ -23,6 +23,7 @@ export const PopoverButtons = ({
 		</PopoverTrigger>
 
 		<PopoverContent
+			className="translate-x-1/2 -translate-y-1/2"
 			htmlFor={popoverId}
 			size={
 				size === 0

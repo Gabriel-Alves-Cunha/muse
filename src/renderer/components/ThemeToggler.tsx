@@ -5,6 +5,7 @@ import {
 } from "react-icons/md";
 
 import { useTranslation } from "@i18n";
+import { setSettings } from "@contexts/settings";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -28,6 +29,7 @@ export function ThemeToggler() {
 
 	const toggleTheme = () => {
 		htmlDataset.theme = newTheme;
+		setSettings((prev) => ({ ...prev, theme: newTheme }));
 		setTheme(newTheme);
 	};
 

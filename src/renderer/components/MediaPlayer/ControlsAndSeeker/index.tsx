@@ -20,7 +20,7 @@ import {
 /////////////////////////////////////////
 // Main function:
 
-export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
+export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { isRandom, loopThisMedia } = usePlayOptions();
 	const { t } = useTranslation();
 
@@ -28,7 +28,7 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 
 	return (
 		<div className="absolute flex flex-col bottom-10 w-full">
-			<SeekerWrapper audio={audio} isSeeking={isSeeking} />
+			<SeekerWrapper audio={audio} />
 
 			<div className="flex justify-between items-center mt-[10%]">
 				<CircleIconButton
@@ -58,7 +58,6 @@ export function ControlsAndSeeker({ audio, isSeeking }: RefToAudioAndSeeker) {
 /////////////////////////////////////////
 // Types:
 
-export type RefToAudioAndSeeker = {
-	isSeeking: React.MutableRefObject<boolean>;
+export type RefToAudio = {
 	audio: Audio;
 };

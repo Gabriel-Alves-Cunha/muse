@@ -44,7 +44,7 @@ describe("Testing useCurrentPlaying", () => {
 
 			const expected: CurrentPlaying = {
 				listType: playlistList.mainList,
-				currentTime: 0,
+				lastStoppedTime: 0,
 				id,
 			};
 
@@ -84,7 +84,7 @@ describe("Testing useCurrentPlaying", () => {
 			const expected: CurrentPlaying = {
 				listType: playlistList.mainList,
 				id: prevMediaID,
-				currentTime: 0,
+				lastStoppedTime: 0,
 			};
 
 			expect(expected, "The expected currentPlaying is wrong!").toEqual(

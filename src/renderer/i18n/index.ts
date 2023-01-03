@@ -9,3 +9,7 @@ export const useTranslation = makeUseTranslation(
 	},
 	"en-US",
 );
+
+export type UserAvailableLanguages = keyof ReturnType<
+	Pick<typeof useTranslation, "getState">["getState"]
+>["translations"];

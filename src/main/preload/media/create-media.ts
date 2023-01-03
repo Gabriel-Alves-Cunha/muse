@@ -95,7 +95,7 @@ const createMedia = async (
 	});
 
 export const transformPathsToMedias = (
-	path: Path | undefined,
+	path: Path,
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
 ): Promise<[ID, Media][]> =>
