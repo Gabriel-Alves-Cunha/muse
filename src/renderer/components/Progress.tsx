@@ -15,7 +15,7 @@ import { ProgressStatus } from "@common/enums";
 
 export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
 	<progress
-		className="appearance-none border-none transition-width duration-300 ease-linear w-48 h-1"
+		className="appearance-none border-none transition-[width] duration-300 ease-linear w-48 h-1"
 		value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}
 		max={100}
 	/>

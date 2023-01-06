@@ -5,14 +5,13 @@ module.exports = {
 		extend: {
 			transition: {
 				"box-shadow": "box-shadow .2s ease-in-out 32ms",
-				bgc: "background-color .1s ease-in-out 32ms",
 				scale: "scale .2s ease-in-out 32ms",
 			},
 			colors: {
 				/* Colors */
-				"ctx-menu-separator": "var(--ctx-menu-separator)",
+				separator: "var(--separator)",
 				"selected-border": "var(--selected-border)",
-				"input-disabled": "var(--input-disabled)",
+				"input-disabled": "var(--input-disabled-border)",
 				"playing-border": "var(--playing-border)",
 				active: "var(--active)",
 
@@ -36,9 +35,9 @@ module.exports = {
 				"icon-active": "var(--icon-active)",
 			},
 			textColor: {
-				"ctx-menu-item-focus": "var(--text-ctx-menu-item-focus)",
-				"ctx-menu-item": "var(--text-ctx-menu-item)",
-				"ctx-menu": "var(--text-ctx-menu)",
+				"menu-item-focus": "var(--text-menu-item-focus)",
+				"menu-item": "var(--text-menu-item)",
+				"menu": "var(--text-menu)",
 
 				"decorations-down": "var(--text-decorations-down)",
 				placeholder: "var(--text-placeholder)",
@@ -50,11 +49,11 @@ module.exports = {
 				input: "var(--text-input)",
 			},
 			borderColor: {
-				input: "var(--border-input)",
+				input: "var(--input-border)",
 			},
 			backgroundColor: {
-				"ctx-menu-item-focus": "var(--bg-ctx-menu-item-focus)",
-				"ctx-menu": "var(--bg-ctx-menu)",
+				"menu-item-focus": "var(--bg-menu-item-focus)",
+				menu: "var(--bg-menu)",
 
 				"media-player-icon-button-hovered":
 					"var(--bg-media-player-icon-button-hovered)",
