@@ -1,7 +1,7 @@
 import type { ValuesOf } from "@common/@types/utils";
 
 import { type ReactNode, Suspense, lazy } from "react";
-import { Content, Root, Trigger } from "@radix-ui/react-context-menu";
+import { CtxMenu } from "./index_";
 
 const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
 const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
@@ -30,16 +30,15 @@ export const ContextMenu = ({
 	isAllDisabled = false,
 	content = MAIN,
 	onContextMenu,
-	setIsOpen,
+	contentClass,
+	onOpenChange,
 	children,
 }: Props) => (
-	<Root onOpenChange={setIsOpen} modal>
-		<Trigger onContextMenu={onContextMenu}>{children}</Trigger>
-
-		<Content
-			className="min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
-			loop
-		>
+	<CtxMenu
+		contentClassName={contentClass} // "min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
+		onContextMenu={onContextMenu}
+		onOpenChange={onOpenChange}
+		ctxMenuContent={
 			<Suspense>
 				{content === SEARCH_MEDIA_OPTIONS ? (
 					<SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />
@@ -49,8 +48,10 @@ export const ContextMenu = ({
 					<MainCtxMenu />
 				)}
 			</Suspense>
-		</Content>
-	</Root>
+		}
+	>
+		{children}
+	</CtxMenu>
 );
 
 /////////////////////////////////////////////
@@ -59,9 +60,10 @@ export const ContextMenu = ({
 // Types:
 
 type Props = {
-	onContextMenu?: React.PointerEventHandler<HTMLSpanElement>;
+	onContextMenu?: React.MouseEventHandler<HTMLDivElement> | undefined;
 	content?: ValuesOf<typeof CtxContentEnum>;
-	setIsOpen?(newIsOpen: boolean): void;
+	onOpenChange?(newValue: boolean): void;
 	isAllDisabled?: boolean;
+	contentClass?: string;
 	children: ReactNode;
 };

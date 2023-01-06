@@ -143,7 +143,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 			<ContextMenu
 				onContextMenu={selectMediaByPointerEvent}
 				content={CtxContentEnum.MEDIA_OPTIONS}
-				setIsOpen={setIsCtxMenuOpen}
+				onOpenChange={setIsCtxMenuOpen}
 			>
 				<Virtuoso
 					computeItemKey={

@@ -879,30 +879,33 @@
 	/* ********************************** */
 	/* ********************************** */
 
+	.right-slot {
+		@apply mr-3 text-ctx-menu font-secondary tracking-wide text-base leading-none;
+	}
+
+	.menu-item {
+		@apply relative inline-flex whitespace-nowrap items-center justify-between w-full h-6 pl-6 select-none cursor-pointer leading-none rounded-sm font-secondary text-base tracking-wide text-ctx-menu-item gap-10;
+	}
+
+	.menu-item:disabled,
+	.menu-item:disabled * {
+		@apply pointer-events-none text-gray-400;
+	}
+
+	.menu-item:is(:hover, :focus, :focus-within),
+	.menu-item:is(:hover, :focus, :focus-within) * {
+		color: var(--bg-select);
+		background: #6e56cf;
+	}
+
 	/* Context Menu */
 
-	.ctx-menu-item {
-		@apply unset-all relative flex items-center h-6 cursor-pointer py-0 px-1 pl-6 rounded-sm text-ctx-menu-item font-secondary tracking-wide text-base leading-none select-none;
+	.ctx-menu-content {
+		@apply fixed invisible select-content no-transition z-50;
 	}
 
-	.ctx-menu-item[data-disabled] {
-		@apply text-disabled pointer-events-none;
-	}
-
-	.ctx-menu-item[data-disabled] * {
-		@apply text-disabled;
-	}
-
-	.ctx-menu-item[data-highlighted] {
-		@apply text-ctx-menu-item-focus bg-ctx-menu-item-focus;
-	}
-
-	.ctx-menu-item[data-highlighted] * {
-		@apply text-ctx-menu-item-focus;
-	}
-
-	.ctx-menu-item-slot {
-		@apply absolute right-0 mr-3 flex justify-end text-ctx-menu font-secondary tracking-wide text-base leading-none;
+	.ctx-menu-content[data-is-open="true"] {
+		@apply visible;
 	}
 
 	/* ********************************** */
@@ -995,23 +998,6 @@
 
 	.select-content {
 		@apply relative p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md;
-	}
-
-	.select-item {
-		@apply relative flex whitespace-nowrap items-center w-full h-6 pr-9 pl-6 select-none cursor-pointer leading-none rounded-sm font-secondary text-base tracking-wide text-ctx-menu-item;
-	}
-
-	.select-item:disabled {
-		@apply pointer-events-none text-gray-400;
-	}
-
-	.select-item:disabled * {
-		@apply pointer-events-none text-gray-400;
-	}
-
-	.select-item:where(:hover, :focus, :focus-within) {
-		color: var(--bg-select);
-		background: #6e56cf;
 	}
 
 	/* Only right */

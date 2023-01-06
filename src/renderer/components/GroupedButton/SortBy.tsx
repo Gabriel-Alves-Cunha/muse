@@ -3,10 +3,11 @@ import type { ValuesOf } from "@common/@types/utils";
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
-import { SelectContent, SelectItem, SelectTrigger } from "../Select";
+import { SelectContent, SelectTrigger } from "../Select";
 import { useTranslation } from "@i18n";
 import { playlistList } from "@common/enums";
 import { setFromList } from "../MediaListKind/states";
+import { MenuItem } from "../MenuItem";
 
 const selectOrderOptionsId = "select-order-options-id";
 const closeSelect = () =>
@@ -36,23 +37,23 @@ export function SortBy() {
 			</SelectTrigger>
 
 			<SelectContent htmlFor={selectOrderOptionsId}>
-				<SelectItem
+				<MenuItem
 					onPointerUp={() => {
 						setSelectedList("Name");
 						closeSelect();
 					}}
 				>
 					{t("sortTypes.name")}
-				</SelectItem>
+				</MenuItem>
 
-				<SelectItem
+				<MenuItem
 					onPointerUp={() => {
 						setSelectedList("Date");
 						closeSelect();
 					}}
 				>
 					{t("sortTypes.date")}
-				</SelectItem>
+				</MenuItem>
 			</SelectContent>
 		</>
 	);

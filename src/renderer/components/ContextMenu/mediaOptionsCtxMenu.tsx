@@ -5,8 +5,8 @@ import { Suspense, lazy } from "react";
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
 import { useTranslation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
-import { RightSlot } from "./RightSlot";
-import { Item } from "./Item";
+import { RightSlot } from "../RightSlot";
+import { MenuItem } from "../MenuItem";
 import {
 	getAllSelectedMedias,
 	selectAllMedias,
@@ -51,23 +51,23 @@ export default function MediaOptionsCtxMenu() {
 				</CenteredModalContent>
 			</>
 
-			<Item onSelect={shareMedias} disabled={isDisabled}>
+			<MenuItem onPointerUp={shareMedias} disabled={isDisabled}>
 				{t("ctxMenus.shareMedia")}
 
 				<RightSlot>
 					<Share />
 				</RightSlot>
-			</Item>
+			</MenuItem>
 
-			<Item onSelect={selectAllMedias}>
+			<MenuItem onPointerUp={selectAllMedias}>
 				{t("ctxMenus.selectAllMedias")}
 
 				<RightSlot>Ctrl+A</RightSlot>
-			</Item>
+			</MenuItem>
 
-			<Item onSelect={searchForLyrics} disabled={isDisabled}>
+			<MenuItem onPointerUp={searchForLyrics} disabled={isDisabled}>
 				{t("ctxMenus.searchForLyrics")}
-			</Item>
+			</MenuItem>
 		</>
 	);
 }

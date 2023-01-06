@@ -4,15 +4,16 @@ import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
 import { Suspense } from "react";
 
+import { getMainList, removeMedia } from "@contexts/usePlaylists";
 import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
-import { getMainList, removeMedia } from "@contexts/usePlaylists";
 import { getSearcher } from "../SearchMedia/state";
 import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
-import { RightSlot } from "./RightSlot";
-import { Item } from "./Item";
+import { RightSlot } from "../RightSlot";
+import { MenuItem } from "../MenuItem";
+import { error } from "@common/log";
 import {
 	setAllSelectedMedias,
 	getAllSelectedMedias,
@@ -22,7 +23,6 @@ import {
 	CenteredModalTrigger,
 } from "@components/CenteredModal";
 import DeleteMediaDialogContent from "@components/DeleteMediaDialog";
-import { error } from "@common/log";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -60,23 +60,26 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 				</CenteredModalContent>
 			</>
 
-			<Item onSelect={shareMedias} disabled={isAllDisabled}>
+			<MenuItem onPointerUp={shareMedias} disabled={isAllDisabled}>
 				{t("ctxMenus.shareMedia")}
 
 				<RightSlot>
 					<Share />
 				</RightSlot>
-			</Item>
+			</MenuItem>
 
-			<Item onSelect={selectAllMediasOnSearchResult} disabled={isAllDisabled}>
+			<MenuItem
+				onPointerUp={selectAllMediasOnSearchResult}
+				disabled={isAllDisabled}
+			>
 				{t("ctxMenus.selectAllMedias")}
 
 				<RightSlot>Ctrl+A</RightSlot>
-			</Item>
+			</MenuItem>
 
-			<Item onSelect={searchForLyrics} disabled={isAllDisabled}>
+			<MenuItem onPointerUp={searchForLyrics} disabled={isAllDisabled}>
 				{t("ctxMenus.searchForLyrics")}
-			</Item>
+			</MenuItem>
 		</>
 	);
 }
@@ -95,7 +98,7 @@ export function shareMedias() {
 
 		if (!path) {
 			error(`There is no media with id: "${id}"!`);
-			removeMedia(id);
+			setTimeout(() => removeMedia(id));
 			continue;
 		}
 

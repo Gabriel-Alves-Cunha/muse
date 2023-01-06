@@ -6,7 +6,7 @@ import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaSearchRow } from "./MediaSearchRow";
 import { PopoverContent } from "../Popover";
 import { useTranslation } from "@i18n";
-import { RightSlot } from "../ContextMenu/RightSlot";
+import { RightSlot } from "../RightSlot";
 import { BaseInput } from "../BaseInput";
 import {
 	setDefaultSearch,

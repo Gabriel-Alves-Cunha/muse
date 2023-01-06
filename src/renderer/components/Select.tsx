@@ -35,12 +35,6 @@ export const SelectContent = ({
 );
 
 /////////////////////////////////////////
-
-export const SelectItem = ({ className = "", ...props }: SelectItemProps) => (
-	<button className={`select-item ${className}`} role="menuitem" {...props} />
-);
-
-/////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
@@ -76,11 +70,3 @@ interface SelectContentProps
 	// side?: "right" | "left" | "bottom" | "top" | "";
 	htmlFor: string;
 }
-
-/////////////////////////////////////////
-
-interface SelectItemProps
-	extends React.DetailedHTMLProps<
-		React.ButtonHTMLAttributes<HTMLButtonElement>,
-		HTMLButtonElement
-	> {}

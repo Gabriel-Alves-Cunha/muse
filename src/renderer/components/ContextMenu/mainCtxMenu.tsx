@@ -2,8 +2,8 @@ import { ElectronIpcMainProcessNotification } from "@common/enums";
 import { selectAllMedias } from "@contexts/useAllSelectedMedias";
 import { useTranslation } from "@i18n";
 import { Separator } from "../Separator";
-import { RightSlot } from "./RightSlot";
-import { Item } from "./Item";
+import { RightSlot } from "../RightSlot";
+import { MenuItem } from "../MenuItem";
 
 const notify =
 	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
@@ -23,19 +23,19 @@ export default function MainCtxMenu() {
 
 	return (
 		<>
-			<Item onSelect={selectAllMedias}>
+			<MenuItem onPointerUp={selectAllMedias}>
 				{t("ctxMenus.selectAllMedias")}
 
 				<RightSlot>Ctrl+A</RightSlot>
-			</Item>
+			</MenuItem>
 
 			<Separator />
 
-			<Item onSelect={toggleDeveloperTools}>
+			<MenuItem onPointerUp={toggleDeveloperTools}>
 				{t("ctxMenus.toggleDevTools")}
 
 				<RightSlot>f12</RightSlot>
-			</Item>
+			</MenuItem>
 		</>
 	);
 }
