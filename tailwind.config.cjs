@@ -37,7 +37,7 @@ module.exports = {
 			textColor: {
 				"menu-item-focus": "var(--text-menu-item-focus)",
 				"menu-item": "var(--text-menu-item)",
-				"menu": "var(--text-menu)",
+				menu: "var(--text-menu)",
 
 				"decorations-down": "var(--text-decorations-down)",
 				placeholder: "var(--text-placeholder)",

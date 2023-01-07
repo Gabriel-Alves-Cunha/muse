@@ -25,10 +25,13 @@ const cache: Map<ID, ValuesOf<typeof status>> = new Map();
 /////////////////////////////////////////////
 // Main function:
 
+const defaultClassName = "object-cover h-11 rounded-xl before:hidden";
+
 export function ImgWithFallback({
-	mediaID,
+	className = defaultClassName,
 	Fallback,
 	mediaImg,
+	mediaID,
 }: Props): JSX.Element {
 	if (!mediaImg?.length) return Fallback;
 
@@ -45,11 +48,11 @@ export function ImgWithFallback({
 			img = null;
 		};
 
-		img.onerror = (ev) => {
+		img.onerror = (e) => {
 			error("Failed image; going to erasing it...", {
-				mediaID,
+				media: getMedia(mediaID),
 				mediaImg,
-				ev,
+				e,
 			});
 
 			sendMsgToBackend({
@@ -66,26 +69,14 @@ export function ImgWithFallback({
 		img.src = mediaImg;
 
 		return cache.get(mediaID) === SUCCESS ? (
-			<img
-				className="object-cover h-11 rounded-xl before:hidden"
-				decoding="async"
-				loading="lazy"
-				src={mediaImg}
-				alt=""
-			/>
+			<img className={className} loading="lazy" src={mediaImg} alt="" />
 		) : (
 			Fallback
 		);
 	}
 
 	if (cacheStatus === SUCCESS)
-		return (
-			<img
-				className="object-cover h-11 rounded-xl before:hidden"
-				src={mediaImg}
-				alt=""
-			/>
-		);
+		return <img className={className} loading="lazy" src={mediaImg} alt="" />;
 
 	// else cacheStatus === FAILURE || cacheStatus === PENDING
 	return Fallback;
@@ -97,5 +88,6 @@ export function ImgWithFallback({
 type Props = {
 	mediaImg: string | undefined;
 	Fallback: JSX.Element;
+	className?: string;
 	mediaID: ID;
 };

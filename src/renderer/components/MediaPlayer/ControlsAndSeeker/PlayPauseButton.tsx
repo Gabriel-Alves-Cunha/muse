@@ -22,8 +22,8 @@ export function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	useEffect(() => {
 		if (!audio) return;
 
-		audio.onpause = setIsPausedToTrue;
-		audio.onplay = setIsPausedToFalse;
+		audio.addEventListener("pause", setIsPausedToTrue);
+		audio.addEventListener("play", setIsPausedToFalse);
 	}, [audio]);
 
 	return (

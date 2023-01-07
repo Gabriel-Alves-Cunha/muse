@@ -10,17 +10,14 @@ import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { memo, Suspense, lazy } from "react";
 
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
-import { ImgWithFallback } from "@components/ImgWithFallback";
+import { ImgWithFallback } from "../ImgWithFallback";
 import { useTranslation } from "@i18n";
 import { getFromList } from "./states";
 import {
 	getAllSelectedMedias,
 	toggleSelectedMedia,
 } from "@contexts/useAllSelectedMedias";
-import {
-	CenteredModalContent,
-	CenteredModalTrigger,
-} from "@components/CenteredModal";
+import { CenteredModalContent, CenteredModalTrigger } from "../CenteredModal";
 
 const MediaOptionsModal = lazy(() => import("./MediaOptionsModal"));
 
@@ -58,17 +55,17 @@ const Row = memo(
 
 		return (
 			<div
-				className={`${getAllSelectedMedias().has(id) ? "selected " : ""}${
-					getCurrentPlaying().id === id ? "playing" : ""
-				} row-wrapper`}
+				data-is-selected-row={getAllSelectedMedias().has(id)}
+				data-is-playing-row={getCurrentPlaying().id === id}
+				className="row-wrapper"
 				data-id={id}
 			>
 				<button
-					className="relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none"
 					onPointerUp={(e) => selectOrPlayMedia(e, id)}
 					title={t("tooltips.playThisMedia")}
 				>
-					<div className="flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated">
+					{/* Try to take out this div */}
+					<div>
 						<ImgWithFallback
 							Fallback={<MusicNote size="1.4rem" />}
 							mediaImg={media.image}
@@ -76,12 +73,10 @@ const Row = memo(
 						/>
 					</div>
 
-					<div className="flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5">
-						<p className="text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden">
-							{media.title}
-						</p>
+					<div>
+						<p>{media.title}</p>
 
-						<p className="font-primary tracking-wide text-sm font-medium text-muted">
+						<p>
 							{media.duration}
 							&emsp;|&emsp;
 							{media.artist}
@@ -91,9 +86,9 @@ const Row = memo(
 
 				<>
 					<CenteredModalTrigger
+						labelProps={{ title: t("tooltips.openMediaOptions") }}
 						htmlTargetName={mediaOptionsModalId}
 						labelClassName="modal-trigger"
-						labelProps={{ title: t("tooltips.openMediaOptions") }}
 					>
 						<Dots size={17} />
 					</CenteredModalTrigger>

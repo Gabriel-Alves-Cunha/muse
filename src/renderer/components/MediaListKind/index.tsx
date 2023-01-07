@@ -5,16 +5,19 @@ import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
-import { setIsCtxMenuOpen, useFromList } from "./states";
-import { CtxContentEnum, ContextMenu } from "@components/ContextMenu";
-import { useOnClickOutside } from "@hooks/useOnClickOutside";
+import { isCtxMenuOpen, setIsCtxMenuOpen, useFromList } from "./states";
+import { CtxContentEnum, ContextMenu } from "../ContextMenu";
+import { itemContent, leftClick } from "./Row";
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
 import { playlistList } from "@common/enums";
-import { itemContent } from "./Row";
 import { error } from "@common/log";
 import { time } from "@utils/utils";
+import {
+	getAllSelectedMedias,
+	deselectAllMedias,
+} from "@contexts/useAllSelectedMedias";
 import {
 	type MainList,
 	type History,
@@ -126,15 +129,28 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 		[listName, list],
 	);
 
-	useOnClickOutside(listRef, handleDeselectAllMedias);
-
 	useEffect(() => useFromList.setState({ isHome }), [isHome]);
 
 	useEffect(() => {
-		document.addEventListener("keydown", selectAllMediasOnCtrlPlusA);
+		function handleDeselectAllMedias(event: PointerEvent) {
+			const isClickOutsideValid =
+				event.button !== leftClick ||
+				!listRef.current ||
+				listRef.current.contains(event.target as Node);
 
-		return () =>
-			document.removeEventListener("keydown", selectAllMediasOnCtrlPlusA);
+			if (!isClickOutsideValid) return;
+
+			if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0)
+				deselectAllMedias();
+		}
+
+		document.addEventListener("pointerup", handleDeselectAllMedias);
+		document.addEventListener("keyup", selectAllMediasOnCtrlPlusA);
+
+		return () => {
+			document.removeEventListener("pointerup", handleDeselectAllMedias);
+			document.removeEventListener("keyup", selectAllMediasOnCtrlPlusA);
+		};
 	}, []);
 
 	return (

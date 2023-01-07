@@ -16,7 +16,7 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 
 /**
- * This function returns a MessagePort that will be send to
+ * This function returns a MessagePort that will be sent to
  * Electron to enable 2 way communication between it
  * and React.
  */
@@ -34,8 +34,8 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 
 		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
-		infoToast(info);
 		error(info, downloadingList);
+		infoToast(info);
 		throwErr(info);
 	}
 

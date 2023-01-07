@@ -2,14 +2,15 @@
 
 * REFACTOR: choose a font with I and L different
 * REFACTOR: use web-share!
+* REFACTOR: dont make a type for i18n, infer it.
 
 * ADD: offer the option to turn on debug when ErrorFallback is reached
 * ADD: detect (avail port to share)
 * ADD: select with mouse moving
 * ADD: electron setProgressBar
 * ADD: cut and visualise audio
-* ADD: make own popover
 * ADD: playback rate
+* ADD: make own toast
 
 * FIX: gh-actions is always overwriting latest release
 

@@ -324,7 +324,8 @@
 		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
 	}
 
-	.buttons-for-pages button:is(:focus, :focus-within, :hover, .active) {
+	.buttons-for-pages
+		button:is(:focus, :focus-within, :hover, [data-active="true"]) {
 		@apply text-icon-active;
 	}
 
@@ -356,8 +357,8 @@
 		@apply text-active;
 	}
 
-	:where(#search-songs, .base-input):is(:has(+ span div), :focus-within, :focus, :hover)
-		+ #searcher-right-slot {
+	.base-input:is(:has(+ span div), :focus-within, :focus, :hover)
+		#searcher-right-slot {
 		@apply hidden;
 	}
 
@@ -406,8 +407,8 @@
 		@apply invisible fixed inset-0 z-40 items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] transition-all duration-75 flex px-4;
 	}
 
-	.modal-outside {
-		@apply inset-0 absolute;
+	.outside-dialog {
+		@apply inset-0 fixed;
 	}
 
 	.modal-state {
@@ -607,16 +608,52 @@
 
 	/* Progress */
 
-	.progress {
+	.seeker-container {
+		@apply flex flex-col w-full gap-2;
+	}
+
+	.seeker-wrapper {
+		@apply relative block w-full cursor-default;
+	}
+
+	.seeker-wrapper:hover > span {
 		@apply absolute flex justify-center items-center bottom-3 h-5 w-9 transition-none bg-main rounded-sm font-primary text-center text-sm text-normal font-medium;
 	}
 
-	progress[value]::-webkit-progress-value {
-		@apply bg-accent;
+	.seeker-wrapper[data-is-duration-valid="true"] {
+		@apply cursor-pointer;
 	}
 
-	progress[value]::-webkit-progress-bar {
-		background: #a8a8a880;
+	input[type="range"] {
+		@apply appearance-none w-full h-1 bg-main;
+	}
+
+	/* TODO: Have to see this */
+	input[type="range"]::-webkit-slider-runnable-track {
+		@apply appearance-none;
+
+		--max: 100;
+		--min: 0;
+		--value: 79;
+		--range: calc(var(--max) - var(--min));
+		--ratio: calc((var(--value) - var(--min)) / var(--range));
+		--sx: calc(0.5 * 2em + var(--ratio) * (100% - 2em));
+
+		background: linear-gradient(blue, blue) 0 / var(--sx) 100% no-repeat, white;
+	}
+
+	input[type="range"]::-webkit-slider-thumb {
+		all: unset;
+
+		@apply w-[2px] h-4 bg-white mt-[6px];
+	}
+
+	span[data-hidden="true"] {
+		@apply hidden;
+	}
+
+	.seeker-info {
+		@apply flex justify-between items-center text-icon-media-player font-primary text-center text-lg;
 	}
 
 	/* ********************************** */
@@ -742,11 +779,31 @@
 		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-lg p-2 transition-shadow;
 	}
 
-	.selected-row {
+	.row-wrapper > button {
+		@apply relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none;
+	}
+
+	.row-wrapper > button > div:last {
+		@apply flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5;
+	}
+
+	.row-wrapper > button > div:last p:first {
+		@apply text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden;
+	}
+
+	.row-wrapper > button > div:last p:last {
+		@apply font-primary tracking-wide text-sm font-medium text-muted;
+	}
+
+	.row-wrapper > button div:first {
+		@apply flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated;
+	}
+
+	div[data-is-selected-row="true"] {
 		@apply outline-none outline-selected-border -outline-offset-2 bg-selected;
 	}
 
-	.playing-row {
+	div[data-is-playing-row="true"] {
 		@apply outline-none outline-playing-border -outline-offset-2 bg-playing;
 	}
 
@@ -901,12 +958,36 @@
 		@apply flex h-full text-decorations-down font-secondary tracking-wide text-sm text-center font-medium;
 	}
 
-	.decorations-down-left {
-		@apply flex justify-center items-center gap-4 last:pr-4;
+	.decorations-down > div {
+		@apply flex justify-center items-center gap-4;
 	}
 
-	.decorations-down-right {
-		@apply flex justify-center items-center gap-4 first:pl-4;
+	/* DecorationsUp */
+
+	.decorations-up {
+		@apply relative flex w-screen bg-main app-drag-region;
+
+		height: var(--top-decorations-height);
+	}
+
+	.decorations-up > img {
+		@apply flex justify-center items-center ml-2;
+	}
+
+	/* ********************************** */
+	/* ********************************** */
+	/* ********************************** */
+
+	/* WindowButton */
+
+	.window-button {
+		@apply relative flex justify-center items-center w-12 transition-none text-icon-window-button no-transition hover:bg-icon-button-hovered focus:bg-icon-button-hovered;
+
+		height: var(--top-decorations-height);
+	}
+
+	.app-name-plus-folder {
+		@apply absolute hidden sm:flex justify-center items-center h-full w-[20%] -translate-x-1/2 left-1/2 bg-transparent border-none whitespace-nowrap font-primary tracking-wide text-sm text-normal font-light;
 	}
 
 	/* ********************************** */
@@ -939,10 +1020,6 @@
 
 	.select-content-wrapper {
 		@apply fixed invisible z-30;
-	}
-
-	.outside-select {
-		@apply inset-0 fixed z-20;
 	}
 
 	.select-content {

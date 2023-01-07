@@ -1,7 +1,8 @@
 import type { ValuesOf } from "@common/@types/utils";
 
-import { type ReactNode, Suspense, lazy } from "react";
-import { CtxMenu } from "./index_";
+import { Suspense, lazy } from "react";
+
+import { CtxMenu, CtxMenuProps } from "./CtxMenu";
 
 const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
 const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
@@ -29,15 +30,11 @@ const { MEDIA_OPTIONS, MAIN, SEARCH_MEDIA_OPTIONS } = CtxContentEnum;
 export const ContextMenu = ({
 	isAllDisabled = false,
 	content = MAIN,
-	onContextMenu,
-	contentClass,
-	onOpenChange,
 	children,
+	...props
 }: Props) => (
 	<CtxMenu
-		contentClassName={contentClass} // "min-w-[226px] bg-ctx-menu z-50 rounded-md p-1 shadow-md no-transition"
-		onContextMenu={onContextMenu}
-		onOpenChange={onOpenChange}
+		{...props}
 		ctxMenuContent={
 			<Suspense>
 				{content === SEARCH_MEDIA_OPTIONS ? (
@@ -59,11 +56,8 @@ export const ContextMenu = ({
 /////////////////////////////////////////////
 // Types:
 
-type Props = {
-	onContextMenu?: React.MouseEventHandler<HTMLDivElement> | undefined;
+type Props = Omit<CtxMenuProps, "ctxMenuContent"> & {
 	content?: ValuesOf<typeof CtxContentEnum>;
-	onOpenChange?(newValue: boolean): void;
+	children: React.ReactNode;
 	isAllDisabled?: boolean;
-	contentClass?: string;
-	children: ReactNode;
 };

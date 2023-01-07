@@ -14,8 +14,8 @@ import { dbg } from "@common/debug";
 import {
 	changeMediaMetadata,
 	handleMediaDeletion,
-	optionsForUserToSee,
 	isChangeable,
+	visibleData,
 	format,
 } from "./helpers";
 import {
@@ -75,7 +75,10 @@ export default function MediaOptionsModal({ media, path }: Props) {
 		// This is because if you open the popover by pressing
 		// "Enter", it will just open and close it!
 		setTimeout(
-			() => document.addEventListener("keyup", changeMediaMetadataOnEnter),
+			() =>
+				document.addEventListener("keyup", changeMediaMetadataOnEnter, {
+					once: true,
+				}),
 			500,
 		);
 
@@ -102,7 +105,7 @@ export default function MediaOptionsModal({ media, path }: Props) {
 			</CloseCenteredModal>
 
 			<form id="form">
-				{Object.entries(optionsForUserToSee(media)).map(([option, value]) => (
+				{Object.entries(visibleData(media)).map(([option, value]) => (
 					<fieldset className="flex items-center h-9 gap-5 mb-4" key={option}>
 						<label
 							className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
@@ -205,4 +208,4 @@ type Props = { media: Media; path: Path };
 
 /////////////////////////////////////////////
 
-type OptionsForUserToSee = keyof ReturnType<typeof optionsForUserToSee>;
+type OptionsForUserToSee = keyof ReturnType<typeof visibleData>;

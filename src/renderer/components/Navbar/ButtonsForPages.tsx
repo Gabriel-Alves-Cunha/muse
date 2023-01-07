@@ -36,8 +36,8 @@ export function ButtonsForPages() {
 			{pages.map((page) => (
 				<button
 					title={t("tooltips.goto") + t(`pages.${page}`)}
-					className={page === currPage ? "active" : ""}
 					onPointerUp={() => setPage({ page })}
+					data-active={page === currPage}
 					key={page}
 				>
 					{icons[page]}

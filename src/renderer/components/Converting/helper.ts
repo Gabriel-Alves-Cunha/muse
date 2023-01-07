@@ -1,12 +1,12 @@
 import type { AllowedMedias } from "@common/utils";
-import type { ProgressProps } from "@components/Progress";
+import type { ProgressProps } from "../Progress";
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
 import create from "zustand";
 
 import { getConvertingList, setConvertingList } from "@contexts/convertList";
-import { errorToast, infoToast, successToast } from "@components/toasts";
+import { errorToast, infoToast, successToast } from "../toasts";
 import { error, assert, throwErr } from "@common/log";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
@@ -40,8 +40,8 @@ export function createNewConvertion(
 
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
-		infoToast(info);
 		error(info, convertingList);
+		infoToast(info);
 		throwErr(info);
 	}
 
@@ -85,6 +85,7 @@ export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+/////////////////////////////////////////////
 
 export function cancelConversionAndOrRemoveItFromList(path: string): void {
 	const convertingList = getConvertingList();
@@ -109,6 +110,7 @@ export function cancelConversionAndOrRemoveItFromList(path: string): void {
 	setConvertingList(newConvertingList);
 }
 
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 

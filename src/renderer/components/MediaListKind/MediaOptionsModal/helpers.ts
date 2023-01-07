@@ -226,7 +226,7 @@ export function changeMetadataIfAllowed(
 
 /////////////////////////////////////////////
 
-export const optionsForUserToSee = ({
+export const visibleData = ({
 	duration,
 	artist,
 	genres,

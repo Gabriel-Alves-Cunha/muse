@@ -25,45 +25,32 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 	);
 
 	useEffect(() => {
-		if (!(audio?.src && progressElementRef.current)) return;
-
 		const progressElement = progressElementRef.current;
+		const timerTooltip = timeTooltipRef.current;
+		const timeline = progressWrapperRef.current;
+
+		if (!(timeline && timerTooltip && audio?.src && progressElement)) return;
 
 		audio.ontimeupdate = () => {
 			if (!isPointerOnSlider)
 				progressElement.value = `${(audio.currentTime / audio.duration) * 100}`;
 
-			// const currentTimeElement = currentTimeRef.current;
-			// if (!currentTimeElement) return;
-			// currentTimeElement.textContent = formatDuration(audio.currentTime);
+			const currentTimeElement = currentTimeRef.current;
+			if (!currentTimeElement) return;
+			currentTimeElement.textContent = formatDuration(audio.currentTime);
 		};
 
 		audio.onchange = () => {
 			const percentage = Number(progressElement.value) / 100;
 			audio.currentTime = (audio.duration || 0) * percentage;
 		};
-	}, [audio]);
-
-	useEffect(() => {
-		if (
-			!(
-				progressWrapperRef.current &&
-				timeTooltipRef.current &&
-				isDurationValid &&
-				audio?.src
-			)
-		)
-			return;
-
-		const timerTooltip = timeTooltipRef.current;
-		const timeline = progressWrapperRef.current;
 
 		function setTimerTooltip({ offsetX }: PointerEvent): void {
-			if (!audio?.duration) return;
+			if (!(audio?.duration && timeline && timerTooltip)) return;
 
 			const time =
 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-			const left = offsetX - 17.5; // 35 is the width of the tooltip, 17.5 is half.
+			const left = offsetX - 17.5; // 17.5 is half the width of the tooltip.
 
 			timerTooltip.textContent = formatDuration(time);
 			timerTooltip.style.left = `${left}px`;
@@ -105,30 +92,25 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 				{ once: true },
 			);
 		});
-	}, [audio, isDurationValid]);
+	}, [audio]);
 
 	return (
-		<div className="flex flex-col w-full gap-2">
+		<div className="seeker-container">
 			<div
-				className={`group relative block w-full h-1 bg-main ${
-					isDurationValid ? "cursor-pointer" : "cursor-default"
-				}`}
+				data-is-duration-valid={isDurationValid}
 				// onPointerUp={e => seek(e, audio)}
 				// onPointerMove={setTimerTooltip}
+				className="seeker-wrapper"
 				ref={progressWrapperRef}
 			>
 				<span // Timer tooltip
-					className={`group-hover:progress group-focus:progress ${
-						isDurationValid ? "hidden" : ""
-					}`}
+					data-hidden={isDurationValid}
 					ref={timeTooltipRef}
 				/>
 
 				<input
-					className="relative bg-accent h-full progress"
 					ref={progressElementRef}
 					defaultValue="0"
-					id="progress"
 					type="range"
 					max="100"
 					step="1"
@@ -136,7 +118,7 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 				/>
 			</div>
 
-			<div className="flex justify-between items-center text-icon-media-player font-primary text-center text-lg">
+			<div className="seeker-info">
 				<p ref={currentTimeRef}>00:00</p>
 
 				<p>{formatedDuration}</p>

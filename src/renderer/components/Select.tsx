@@ -28,7 +28,7 @@ export const SelectContent = ({
 	...rest
 }: SelectContentProps) => (
 	<div className="select-content-wrapper">
-		<label className="outside-select" htmlFor={htmlFor} />
+		<label className="outside-dialog" htmlFor={htmlFor} />
 
 		<div className={`select-content ${className}`} role="dialog" {...rest} />
 	</div>

@@ -16,13 +16,12 @@ export const BaseInput = ({
 
 		<input
 			onKeyUp={(e) => {
-				if (e.key === "Escape" && !isAModifierKeyPressed(e)) {
+				if (e.key === "Escape" && !isAModifierKeyPressed(e))
 					// Close SearchMediaPopover on "Escape":
 					onEscape?.();
-				} else if (e.ctrlKey && e.key === "a") {
+				else if (e.ctrlKey && e.key === "a")
 					// Select all text on "Ctrl + a":
 					(e.target as HTMLInputElement).select();
-				}
 			}}
 			type="text"
 			{...props}

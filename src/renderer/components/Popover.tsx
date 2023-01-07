@@ -32,7 +32,7 @@ export const PopoverContent = ({
 	<div className="select-content-wrapper">
 		<label
 			onPointerDown={onPointerDownOutside}
-			className="outside-select"
+			className="outside-dialog"
 			htmlFor={htmlFor}
 		/>
 
@@ -49,7 +49,7 @@ export const PopoverContent = ({
 /////////////////////////////////////////
 // Types:
 
-interface PopoverTriggerProps {
+type PopoverTriggerProps = {
 	labelProps?: Omit<
 		React.DetailedHTMLProps<
 			React.LabelHTMLAttributes<HTMLLabelElement>,
@@ -68,7 +68,7 @@ interface PopoverTriggerProps {
 	labelClassName?: string;
 	inputClassName?: string;
 	htmlTargetName: string;
-}
+};
 
 /////////////////////////////////////////
 

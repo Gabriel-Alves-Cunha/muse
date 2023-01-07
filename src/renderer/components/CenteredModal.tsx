@@ -32,8 +32,8 @@ export const CenteredModalContent = ({
 }: ContentProps) => (
 	<div className={`modal-content-wrapper ${className}`}>
 		<label
-			className="modal-outside"
 			htmlFor={closeOnClickOutside ? htmlFor : undefined}
+			className="outside-dialog"
 		/>
 
 		<div

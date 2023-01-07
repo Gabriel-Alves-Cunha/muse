@@ -41,7 +41,7 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 				<CenteredModalTrigger
 					htmlTargetName={deleteMediaModalID_searchMediaCtxMenu}
 					inputProps={{ disabled: isAllDisabled }}
-					labelClassName="ctx-menu-item"
+					labelClassName="menu-item"
 				>
 					{t("ctxMenus.deleteMedia")}
 
