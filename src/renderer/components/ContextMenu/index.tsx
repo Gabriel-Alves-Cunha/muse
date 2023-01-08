@@ -1,4 +1,5 @@
 import type { ValuesOf } from "@common/@types/utils";
+import { deselectAllMedias } from "@contexts/useAllSelectedMedias";
 
 import { Suspense, lazy } from "react";
 
@@ -30,10 +31,13 @@ const { MEDIA_OPTIONS, MAIN, SEARCH_MEDIA_OPTIONS } = CtxContentEnum;
 export const ContextMenu = ({
 	isAllDisabled = false,
 	content = MAIN,
+	wrapperProps,
 	children,
 	...props
 }: Props) => (
 	<CtxMenu
+		wrapperProps={wrapperProps}
+		onOpenChange={onOpenClose}
 		{...props}
 		ctxMenuContent={
 			<Suspense>
@@ -50,6 +54,10 @@ export const ContextMenu = ({
 		{children}
 	</CtxMenu>
 );
+
+function onOpenClose(newValue: boolean): void {
+	if (!newValue) deselectAllMedias();
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

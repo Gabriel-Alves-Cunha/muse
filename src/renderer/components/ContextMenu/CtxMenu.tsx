@@ -8,6 +8,9 @@ import { useEffect, useReducer, useRef } from "react";
 const contentClass = "ctx-menu-content";
 
 export function CtxMenu({
+	wrapperProps: { className: wrapperClassName, ...wrapperProps } = {
+		className: "",
+	},
 	ctxMenuContent,
 	onOpenChange,
 	children,
@@ -16,7 +19,11 @@ export function CtxMenu({
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<div ref={wrapperRef}>
+		<div
+			className={`ctx-menu-wrapper ${wrapperClassName}`}
+			{...wrapperProps}
+			ref={wrapperRef}
+		>
 			<CtxMenuContent
 				ctxMenuContent={ctxMenuContent}
 				onOpenChange={onOpenChange}
@@ -60,6 +67,7 @@ function CtxMenuContent({
 			| null) = (event) => {
 			// Assume isOpen === false
 
+			event.stopPropagation();
 			event.preventDefault();
 
 			const contentEl = contentRef.current;
@@ -146,6 +154,12 @@ export interface CtxMenuProps
 		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
+	wrapperProps?:
+		| React.DetailedHTMLProps<
+				React.HTMLAttributes<HTMLDivElement>,
+				HTMLDivElement
+		  >
+		| undefined;
 	onOpenChange?(newValue: boolean): void;
 	ctxMenuContent: React.ReactNode;
 	children: React.ReactNode;

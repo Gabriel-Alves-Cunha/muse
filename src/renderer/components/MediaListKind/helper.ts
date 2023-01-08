@@ -22,7 +22,6 @@ const notify =
 export function selectMediaByPointerEvent(
 	e: React.PointerEvent<HTMLDivElement>,
 ): void {
-	// TODO: see if this selector still works. maybe nativeEvent.target
 	const mediaClickedMediaId = (e.target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
 		?.getAttribute("data-id");

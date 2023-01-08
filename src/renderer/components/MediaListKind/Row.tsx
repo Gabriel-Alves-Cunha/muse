@@ -64,8 +64,7 @@ const Row = memo(
 					onPointerUp={(e) => selectOrPlayMedia(e, id)}
 					title={t("tooltips.playThisMedia")}
 				>
-					{/* Try to take out this div */}
-					<div>
+					<div className="row-img">
 						<ImgWithFallback
 							Fallback={<MusicNote size="1.4rem" />}
 							mediaImg={media.image}
@@ -73,13 +72,13 @@ const Row = memo(
 						/>
 					</div>
 
-					<div>
+					<div className="row-info">
 						<p>{media.title}</p>
 
 						<p>
 							{media.duration}
-							&emsp;|&emsp;
-							{media.artist}
+
+							{media.artist && `&emsp;|&emsp;${media.artist}`}
 						</p>
 					</div>
 				</button>
@@ -87,15 +86,16 @@ const Row = memo(
 				<>
 					<CenteredModalTrigger
 						labelProps={{ title: t("tooltips.openMediaOptions") }}
+						labelClassName="icon-circle-modal-trigger"
 						htmlTargetName={mediaOptionsModalId}
-						labelClassName="modal-trigger"
 					>
 						<Dots size={17} />
 					</CenteredModalTrigger>
 
 					<CenteredModalContent
-						className="grid center max-w-md min-w-[300px] p-8 bg-dialog"
+						className="media-options-modal"
 						htmlFor={mediaOptionsModalId}
+						closeOnClickOutside
 					>
 						<Suspense>
 							<MediaOptionsModal media={media} path={id} />

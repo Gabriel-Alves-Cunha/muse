@@ -8,6 +8,7 @@ import { deleteFile } from "@utils/deleteFile";
 import { RightSlot } from "../RightSlot";
 import { MenuItem } from "../MenuItem";
 import {
+	useAllSelectedMedias,
 	getAllSelectedMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
@@ -21,17 +22,23 @@ const DeleteMediaDialogContent = lazy(() => import("../DeleteMediaDialog"));
 const deleteMediaModalID_mediaOptionsCtxMenu =
 	"delete-media-modal-media-options-ctx-menu";
 
+const sizeSelector = (
+	state: ReturnType<typeof useAllSelectedMedias.getState>,
+) => state.medias.size;
+
 export default function MediaOptionsCtxMenu() {
 	// If there is none selected, disable:
-	const isDisabled = getAllSelectedMedias().size === 0;
+	const size = useAllSelectedMedias(sizeSelector);
 	const { t } = useTranslation();
+
+	const isDisabled = size === 0;
 
 	return (
 		<>
 			<>
 				<CenteredModalTrigger
 					htmlTargetName={deleteMediaModalID_mediaOptionsCtxMenu}
-					inputProps={{ disabled: isDisabled }}
+					labelProps={{ "aria-disabled": isDisabled }}
 					labelClassName="menu-item"
 				>
 					{t("ctxMenus.deleteMedia")}
@@ -67,6 +74,8 @@ export default function MediaOptionsCtxMenu() {
 
 			<MenuItem onPointerUp={searchForLyrics} disabled={isDisabled}>
 				{t("ctxMenus.searchForLyrics")}
+
+				<RightSlot>&emsp;&emsp;</RightSlot>
 			</MenuItem>
 		</>
 	);

@@ -2,5 +2,5 @@
 import warningSvg from "@assets/warning.svg";
 
 export const WarningSign = () => (
-	<img src={warningSvg} className="w-7 h-7 ml-3" alt="Warning sign" />
+	<img src={warningSvg} className="w-9 h-9 ml-3" alt="Warning sign" />
 );

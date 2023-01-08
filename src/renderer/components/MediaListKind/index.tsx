@@ -155,29 +155,28 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 	return (
 		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
-		<div className="max-w-2xl h-[87%]" ref={listRef}>
-			<ContextMenu
-				onContextMenu={selectMediaByPointerEvent}
-				content={CtxContentEnum.MEDIA_OPTIONS}
-				onOpenChange={setIsCtxMenuOpen}
-			>
-				<Virtuoso
-					computeItemKey={
-						listName === playlistList.history
-							? computeHistoryItemKey
-							: computeItemKey
-					}
-					totalCount={listAsArrayOfAMap.length}
-					itemContent={itemContent}
-					data={listAsArrayOfAMap}
-					components={components}
-					fixedItemHeight={65}
-					className="list"
-					overscan={15}
-					noValidate
-				/>
-			</ContextMenu>
-		</div>
+		<ContextMenu
+			wrapperProps={{ className: "max-w-2xl h-[87%]", ref: listRef }}
+			onContextMenu={selectMediaByPointerEvent}
+			content={CtxContentEnum.MEDIA_OPTIONS}
+			onOpenChange={setIsCtxMenuOpen}
+		>
+			<Virtuoso
+				computeItemKey={
+					listName === playlistList.history
+						? computeHistoryItemKey
+						: computeItemKey
+				}
+				totalCount={listAsArrayOfAMap.length}
+				itemContent={itemContent}
+				data={listAsArrayOfAMap}
+				components={components}
+				fixedItemHeight={65}
+				className="list"
+				overscan={15}
+				noValidate
+			/>
+		</ContextMenu>
 	);
 }
 

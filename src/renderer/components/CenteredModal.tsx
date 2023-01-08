@@ -25,25 +25,24 @@ export const CenteredModalTrigger = ({
 /////////////////////////////////////////////
 
 export const CenteredModalContent = ({
+	wrapperProps: { className: wrapperClassName, ...wrapperProps } = {
+		className: "",
+	},
 	closeOnClickOutside,
 	className = "",
 	htmlFor,
 	...rest
 }: ContentProps) => (
-	<div className={`modal-content-wrapper ${className}`}>
+	<div
+		className={`modal-content-wrapper ${wrapperClassName}`}
+		{...wrapperProps}
+	>
 		<label
 			htmlFor={closeOnClickOutside ? htmlFor : undefined}
 			className="outside-dialog"
 		/>
 
-		<div
-			className={`modal-content ${className}`}
-			onTransitionEnd={(e) => {
-				// Doing this to trap focus inside modal!
-				(e.target as HTMLElement).querySelector("label")?.focus();
-			}}
-			{...rest}
-		/>
+		<div className={`modal-content ${className}`} role="dialog" {...rest} />
 	</div>
 );
 
@@ -55,7 +54,7 @@ export const CloseCenteredModal = forwardRef(
 		forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 	) => (
 		<label
-			className={`modal-close ${className}`}
+			className={className}
 			ref={forwardedRef}
 			htmlFor={htmlFor}
 			tabIndex={0}
@@ -91,6 +90,12 @@ interface ContentProps
 		React.LabelHTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
+	wrapperProps?:
+		| React.DetailedHTMLProps<
+				React.LabelHTMLAttributes<HTMLDivElement>,
+				HTMLDivElement
+		  >
+		| undefined;
 	closeOnClickOutside?: boolean;
 	htmlFor: string;
 }

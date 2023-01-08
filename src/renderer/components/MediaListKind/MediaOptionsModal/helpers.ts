@@ -236,7 +236,17 @@ export const visibleData = ({
 	title,
 	size,
 }: Media) =>
-	({ size, duration, title, album, artist, genres, lyrics, image }) as const;
+	// The order here is the order that will appear!!
+	Object.entries({
+		duration,
+		size,
+		artist,
+		genres,
+		title,
+		album,
+		lyrics,
+		image,
+	} satisfies VisibleData);
 
 /////////////////////////////////////////////
 
@@ -281,6 +291,19 @@ export type WhatToChange = {
 	whatToSend: ChangeOptionsToSend;
 	whatToChange: ChangeOptions;
 	current: string;
+};
+
+/////////////////////////////////////////////
+
+export type VisibleData = {
+	genres: readonly string[];
+	duration: string;
+	artist: string;
+	lyrics: string;
+	title: string;
+	album: string;
+	image: string;
+	size: number;
 };
 
 /////////////////////////////////////////////

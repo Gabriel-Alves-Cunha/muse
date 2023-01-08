@@ -167,15 +167,6 @@ export function playNextMedia(): void {
 
 				++index;
 			}
-
-			// 			for (const newID of ids) {
-			// 				if (index === randomIndex) {
-			// 					nextMediaID = newID;
-			// 					break;
-			// 				}
-			//
-			// 				++index;
-			// 			}
 		} else {
 			let found = false;
 
@@ -201,8 +192,8 @@ export function playNextMedia(): void {
 
 		setCurrentPlaying({
 			listType: correctListType,
-			id: nextMediaID,
 			lastStoppedTime: 0,
+			id: nextMediaID,
 		});
 	}, "playNextMedia");
 }
@@ -264,7 +255,7 @@ function setAudioSource(newID: ID, prevID: ID) {
 
 ////////////////////////////////////////////////
 
-const playingClass = "playing";
+const playingRowDatalistString = "isPlayingRow";
 
 /**
  * Decorate the rows of current playing medias
@@ -279,12 +270,14 @@ function handleDecorateMediaRow(newID: ID, prevID: ID) {
 	if (!prevElements) info(`No previous media row found for "${prevID}!"`);
 	if (!newElements) return info(`No media row found for "${newID}"!`);
 
-	// Undecorate previous playing media row:
 	if (prevID && prevElements)
-		for (const element of prevElements) element.classList.remove(playingClass);
+		// Undecorate previous playing media row:
+		for (const element of prevElements as NodeListOf<HTMLElement>)
+			element.dataset[playingRowDatalistString] = "false";
 
 	// Decorate new playing media row:
-	for (const element of newElements) element.classList.add(playingClass);
+	for (const element of newElements as NodeListOf<HTMLElement>)
+		element.dataset[playingRowDatalistString] = "true";
 }
 
 ////////////////////////////////////////////////

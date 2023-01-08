@@ -60,10 +60,10 @@
 		--bg-button-hover: #330892;
 		--bg-selected: #aac1ff70;
 		--bg-highlight: #9381ff;
-		--bg-popover: #f9f6f5;
 		--bg-button: #f9f6f5;
 		--bg-navbar: #f9f6f5;
 		--bg-media: #f9f6f5;
+		--bg-popover: #fff;
 		--bg-main: #f9f6f5;
 		--bg-playing: #fff;
 		--bg-dialog: #fff;
@@ -190,6 +190,9 @@
 		position: fixed;
 		line-height: 1.5;
 
+		font-family: Assistant, sans-serif;
+		font-weight: 500;
+
 		contain-intrinsic-size: 1px 5000px;
 		content-visibility: auto;
 		overflow: hidden;
@@ -206,7 +209,7 @@
 	/* assistant-300 - latin */
 	@font-face {
 		src: url("./assets/assistant-v16-latin-300.woff2") format("woff2");
-		font-family: "Assistant";
+		font-family: Assistant;
 		font-style: normal;
 		font-weight: 300;
 	}
@@ -214,7 +217,7 @@
 	/* assistant-regular-400 - latin */
 	@font-face {
 		src: url("./assets/assistant-v16-latin-regular.woff2") format("woff2");
-		font-family: "Assistant";
+		font-family: Assistant;
 		font-style: normal;
 		font-weight: 400;
 	}
@@ -222,7 +225,7 @@
 	/* assistant-500 - latin */
 	@font-face {
 		src: url("./assets/assistant-v16-latin-500.woff2") format("woff2");
-		font-family: "Assistant";
+		font-family: Assistant;
 		font-style: normal;
 		font-weight: 500;
 	}
@@ -404,7 +407,7 @@
 	/* Modal */
 
 	.modal-content-wrapper {
-		@apply invisible fixed inset-0 z-40 items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] transition-all duration-75 flex px-4;
+		@apply invisible fixed inset-0 z-40 flex items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] no-transition;
 	}
 
 	.outside-dialog {
@@ -415,57 +418,29 @@
 		@apply hidden;
 	}
 
-	/* Style for MediaOptionsCtxMenu modal: */
 	label .modal-state:disabled {
 		@apply text-disabled pointer-events-none;
 	}
-	/* end */
 
 	.modal-state:checked + .modal-content-wrapper {
 		@apply visible;
 	}
 
-	.modal-state:checked + .modal-content-wrapper .modal-content {
-		@apply scale-100;
-	}
-
 	.modal-content {
-		@apply relative h-max max-h-[90%] max-w-lg scale-90 rounded-xl bg-popover p-6 transition ease-in-out duration-75 overflow-hidden;
-	}
-
-	/* 1) modal-close-x (right top x close circled button) */
-
-	.modal-close-x {
-		@apply right-[1em] top-[1em] h-[1.1em] w-[1.1em] absolute cursor-pointer;
-	}
-
-	.modal-close-x:is(:after, :before) {
-		@apply absolute h-6 left-1/2 top-0 -mt-1.5 w-0.5 bg-gray-700;
-
-		transform: rotate(45deg);
-	}
-
-	.modal-close-x:hover:is(:after, :before) {
-		@apply bg-gray-600;
-	}
-
-	.modal-close-x:before {
-		transform: rotate(-45deg);
+		@apply relative h-max max-h-[90%] max-w-md rounded-xl bg-popover scroll scroll-1;
 	}
 
 	/* 2) modal-close (a button) */
-
 	.modal-close-reset {
 		@apply transition-none cursor-pointer flex justify-center items-center bg-cyan-500 text-slate-800 text-base rounded-md w-full h-8 mt-3 hover:bg-cyan-400 focus:bg-cyan-400;
 	}
 
 	/* 3) modal-trigger (a circled button with only an icon) */
 	.icon-circle-modal-trigger {
-		@apply relative flex justify-center items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
+		@apply relative flex justify-center mx-auto items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
 	}
 
-	.modal-trigger:is(:focus, :focus-within, :hover),
-	.modal-trigger:is(:focus, :focus-within, :hover) svg {
+	.icon-circle-modal-trigger:is(:focus, :focus-within, :hover) {
 		@apply text-normal bg-icon-button-hovered;
 	}
 
@@ -592,10 +567,6 @@
 		transition: none !important;
 	}
 
-	.transition-bc-bg {
-		@apply transition-[border-color,background] duration-200;
-	}
-
 	.transition-shadow:is(:focus, :focus-within, :hover),
 	.active-shadow {
 		transition: box-shadow 100ms ease-out 32ms;
@@ -710,10 +681,14 @@
 	}
 
 	.button.input {
-		@apply hidden w-[calc(100%-115px)] h-9 border-2 border-solid border-input rounded-xl transition-bc-bg;
+		@apply w-[calc(100%-115px)] h-9 p-0 border-2 border-solid border-input rounded-xl m-0;
 	}
 
-	.button.input:is(:focus, :focus-within, :hover) {
+	.button.input input {
+		@apply hidden;
+	}
+
+	.button.input:is(:focus, :hover) {
 		@apply border-active bg-active text-white;
 	}
 
@@ -776,35 +751,35 @@
 	/* Media List Kind */
 
 	.row-wrapper {
-		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-lg p-2 transition-shadow;
+		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 rounded-lg p-2 transition-shadow;
 	}
 
 	.row-wrapper > button {
-		@apply relative flex justify-center items-center h-full w-[90%] cursor-pointer bg-none border-none;
+		@apply relative flex items-center h-full w-[90%] cursor-pointer bg-none border-none;
 	}
 
-	.row-wrapper > button > div:last {
-		@apply flex flex-col justify-center items-start w-[95%] h-[95%] overflow-hidden gap-2 pl-5;
+	.row-info {
+		@apply flex flex-col justify-center items-start w-full h-full overflow-hidden pl-5;
 	}
 
-	.row-wrapper > button > div:last p:first {
-		@apply text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden;
+	.row-info p {
+		@apply block align-middle text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden;
 	}
 
-	.row-wrapper > button > div:last p:last {
+	.row-info p:last-child {
 		@apply font-primary tracking-wide text-sm font-medium text-muted;
 	}
 
-	.row-wrapper > button div:first {
-		@apply flex justify-center items-center h-11 w-11 min-w-[44px] border-none rounded-xl [&_svg]:text-icon-deactivated;
-	}
-
-	div[data-is-selected-row="true"] {
-		@apply outline-none outline-selected-border -outline-offset-2 bg-selected;
+	.row-img {
+		@apply flex justify-center items-center h-full aspect-square border-none rounded-xl [&_svg]:text-icon-deactivated;
 	}
 
 	div[data-is-playing-row="true"] {
 		@apply outline-none outline-playing-border -outline-offset-2 bg-playing;
+	}
+
+	div[data-is-selected-row="true"] {
+		@apply outline-none outline-selected-border -outline-offset-2 bg-selected;
 	}
 
 	.list {
@@ -815,9 +790,56 @@
 		list-style: decimal-leading-zero inside;
 	}
 
+	.media-options-modal {
+		@apply flex flex-col min-w-[300px] p-8 mx-auto;
+	}
+
+	.close-media-options-modal {
+		@apply absolute right-2 top-2 flex justify-center items-center h-6 cursor-pointer px-4 rounded-full [&_svg]:fill-accent-light;
+	}
+
+	.close-media-options-modal:is(:focus, :focus-within, :hover) {
+		@apply bg-icon-button-hovered [&_svg]:fill-black;
+	}
+
+	.subtitle {
+		@apply mt-3 mx-0 mb-5 font-secondary text-gray-500 tracking-wide text-base;
+	}
+
+	#form fieldset {
+		@apply flex items-center h-9 gap-5 mb-4;
+	}
+
+	#form label {
+		@apply flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base;
+	}
+
+	#form > fieldset > input,
+	#form textarea {
+		@apply box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input px-3 rounded-xl outline-none whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium hover:border-active focus:border-active read-only:text-accent-light read-only:cursor-default read-only:border-none scroll scroll-1;
+	}
+
+	.remove-media {
+		@apply flex justify-between items-center h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20];
+	}
+
+	.save-media-options-modal {
+		@apply flex justify-center items-center h-9 cursor-pointer py-0 px-4 rounded font-secondary tracking-wider font-semibold bg-[#ddf4e5] text-[#2c6e4f] hover:bg-[#c6dbce] focus:bg-[#c6dbce];
+	}
+
+	.confirm-remove-media {
+		@apply p-8;
+	}
+
+	.confirm-remove-media h1 {
+		@apply flex items-center text-xl tracking-wide mb-8;
+	}
+
 	/* ********************************** */
 	/* ********************************** */
 	/* ********************************** */
+
+	/* General */
 
 	.single-button {
 		@apply h-10 w-10 rounded-full p-0;
@@ -894,8 +916,10 @@
 		@apply relative inline-flex whitespace-nowrap items-center justify-between w-full h-6 pl-6 select-none cursor-pointer leading-none rounded-sm font-secondary text-base tracking-wide text-menu-item gap-10;
 	}
 
+	.menu-item[aria-disabled="true"] > *,
+	.menu-item[aria-disabled="true"],
 	.menu-item:disabled,
-	.menu-item:disabled * {
+	.menu-item:disabled > * {
 		@apply pointer-events-none text-gray-400;
 	}
 
@@ -906,8 +930,12 @@
 
 	/* Context Menu */
 
+	.ctx-menu-wrapper {
+		@apply w-full h-full no-transition;
+	}
+
 	.ctx-menu-content {
-		@apply fixed invisible select-content no-transition z-50;
+		@apply fixed invisible select-content w-min z-50;
 	}
 
 	.ctx-menu-content[data-is-open="true"] {
@@ -1019,11 +1047,11 @@
 	}
 
 	.select-content-wrapper {
-		@apply fixed invisible z-30;
+		@apply fixed invisible z-30 no-transition;
 	}
 
 	.select-content {
-		@apply relative p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md;
+		@apply relative p-1 h-fit w-fit rounded-md bg-select no-transition overflow-hidden shadow-md;
 	}
 
 	/* ********************************** */

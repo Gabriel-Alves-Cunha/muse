@@ -12,6 +12,7 @@ import { FlexRow } from "@components/FlexRow";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 import {
+	type VisibleData,
 	changeMediaMetadata,
 	handleMediaDeletion,
 	isChangeable,
@@ -79,7 +80,7 @@ export default function MediaOptionsModal({ media, path }: Props) {
 				document.addEventListener("keyup", changeMediaMetadataOnEnter, {
 					once: true,
 				}),
-			500,
+			200,
 		);
 
 		return () =>
@@ -88,34 +89,27 @@ export default function MediaOptionsModal({ media, path }: Props) {
 
 	return (
 		<>
-			<h1 className="title">{t("dialogs.mediaOptions.title")}</h1>
+			<h1 className="title text-center">{t("dialogs.mediaOptions.title")}</h1>
 
-			<h2 className="mt-3 mx-0 mb-5 font-secondary text-gray tracking-wide text-base">
-				{t("dialogs.mediaOptions.description")}
-			</h2>
+			<h2 className="subtitle">{t("dialogs.mediaOptions.description")}</h2>
 
 			<CloseCenteredModal
-				// outline: "initial"; h-9; rounded
-				className="flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold absolute right-2 top-2 rounded-full hover:bg-icon-button-hovered focus:bg-icon-button-hovered"
+				className="close-media-options-modal"
 				title={t("tooltips.closeDialog")}
 				htmlFor={mediaOptionsModalId}
 				ref={closeButtonRef}
 			>
-				<CloseIcon className="fill-accent-light" />
+				<CloseIcon />
 			</CloseCenteredModal>
 
 			<form id="form">
-				{Object.entries(visibleData(media)).map(([option, value]) => (
-					<fieldset className="flex items-center h-9 gap-5 mb-4" key={option}>
-						<label
-							className="flex w-24 text-accent-light font-secondary tracking-wide text-right font-medium text-base"
-							htmlFor={option}
-						>
+				{visibleData(media).map(([option, value]) => (
+					<fieldset key={option}>
+						<label htmlFor={option}>
 							{t(`labels.${option as OptionsForUserToSee}`)}
 						</label>
 
 						{option === "image" ? (
-							/////////////////////////////////////////////
 							/////////////////////////////////////////////
 							// Handle file input for image:
 							<Button
@@ -137,17 +131,13 @@ export default function MediaOptionsModal({ media, path }: Props) {
 								{t("buttons.selectImg")}
 							</Button>
 						) : /////////////////////////////////////////////
-						/////////////////////////////////////////////
 						// Handle text input with line feeds:
 						option === "lyrics" ? (
-							<textarea
-								className="box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input rounded-xl p-3 whitespace-nowrap text-input font-secondary font-medium leading-none transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
-								defaultValue={value}
-								id={option}
-							/>
+							<textarea defaultValue={value} id={option} />
 						) : (
+							/////////////////////////////////////////////
+							// Else:
 							<input
-								className="box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input py-0 px-3 rounded-xl whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium transition-border hover:border-active focus:border-active read-only:text-accent-light read-only:border-none"
 								readOnly={!isChangeable(option)}
 								defaultValue={format(value)}
 								id={option}
@@ -161,14 +151,18 @@ export default function MediaOptionsModal({ media, path }: Props) {
 				<>
 					<CenteredModalTrigger
 						htmlTargetName={deleteMediaModalID_mediaOptionsModal}
-						labelClassName="flex justify-between items-center max-h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 border-none rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20] no-transition"
+						labelClassName="remove-media"
 					>
 						{t("buttons.deleteMedia")}
 
 						<Remove />
 					</CenteredModalTrigger>
 
-					<CenteredModalContent htmlFor={deleteMediaModalID_mediaOptionsModal}>
+					<CenteredModalContent
+						htmlFor={deleteMediaModalID_mediaOptionsModal}
+						className="confirm-remove-media"
+						closeOnClickOutside
+					>
 						<Suspense>
 							<DeleteMediaDialogContent
 								idOfModalToBeClosed={deleteMediaModalID_mediaOptionsModal}
@@ -181,7 +175,7 @@ export default function MediaOptionsModal({ media, path }: Props) {
 				</>
 
 				<CloseCenteredModal
-					className="flex justify-center items-center h-6 cursor-pointer py-0 px-4 border-none whitespace-nowrap font-secondary tracking-wider font-semibold bg-[#ddf4e5] text-[#2c6e4f] hover:bg-[#c6dbce] focus:bg-[#c6dbce]"
+					className="save-media-options-modal"
 					htmlFor={mediaOptionsModalId}
 					onPointerUp={() =>
 						changeMediaMetadata(
@@ -208,4 +202,4 @@ type Props = { media: Media; path: Path };
 
 /////////////////////////////////////////////
 
-type OptionsForUserToSee = keyof ReturnType<typeof visibleData>;
+type OptionsForUserToSee = keyof VisibleData;

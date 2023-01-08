@@ -16,7 +16,7 @@ export default function DeleteMediaDialogContent({
 
 	return (
 		<>
-			<h1 className="title">
+			<h1>
 				{t("dialogs.deleteMedia.subtitle")}
 
 				<WarningSign />
@@ -24,16 +24,18 @@ export default function DeleteMediaDialogContent({
 
 			<FlexRow>
 				<CloseCenteredModal
-					className="bg-red-600 text-white hover:bg-opacity-70 focus:bg-opacity-70"
 					onPointerUp={handleMediaDeletion}
 					htmlFor={idOfModalToBeClosed}
+					className="remove-media"
 				>
 					{t("buttons.confirm")}
 				</CloseCenteredModal>
 
 				<CloseCenteredModal
-					className="bg-transparent text-green-400 hover:bg-opacity-70 focus:bg-opacity-70"
+					className="save-media-options-modal bg-transparent"
 					htmlFor={idOfModalToBeClosed}
+					// @ts-ignore => it's okay, React polyfills the behavior
+					autoFocus
 				>
 					{t("buttons.cancel")}
 				</CloseCenteredModal>
