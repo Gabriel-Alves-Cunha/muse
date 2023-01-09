@@ -17,11 +17,14 @@ export function Reload() {
 
 	return (
 		<ButtonOfGroup
-			className={isLoadingMedias ? "animate-spin" : ""}
 			onPointerUp={searchLocalComputerForMedias}
 			title={t("tooltips.reloadAllMedias")}
 		>
-			<ReloadIcon size={17} className="fill-white" />
+			<ReloadIcon
+				data-animate-spin={isLoadingMedias}
+				className="fill-white"
+				size={17}
+			/>
 		</ButtonOfGroup>
 	);
 }

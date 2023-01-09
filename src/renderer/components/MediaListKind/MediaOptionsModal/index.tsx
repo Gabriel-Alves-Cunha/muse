@@ -1,42 +1,35 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
+import { Suspense, useEffect, useRef, useState } from "react";
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
-import { Suspense, useEffect, useRef, lazy } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as CloseIcon } from "react-icons/md";
 
+import { DeleteMediaDialogContent } from "../../DeleteMediaDialog";
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { mediaOptionsModalId } from "../Row";
+import { once, removeOn } from "@utils/window";
 import { useTranslation } from "@i18n";
-import { FlexRow } from "@components/FlexRow";
+import { CenteredModal } from "@components/CenteredModal";
+import { deleteFile } from "@utils/deleteFile";
 import { Button } from "@components/Button";
 import { dbg } from "@common/debug";
 import {
 	type VisibleData,
 	changeMediaMetadata,
-	handleMediaDeletion,
 	isChangeable,
 	visibleData,
 	format,
 } from "./helpers";
-import {
-	CenteredModalContent,
-	CenteredModalTrigger,
-	CloseCenteredModal,
-} from "@components/CenteredModal";
-
-const DeleteMediaDialogContent = lazy(() => import("../../DeleteMediaDialog"));
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-const deleteMediaModalID_mediaOptionsModal = "delete-modal-media-options-modal";
-
-export default function MediaOptionsModal({ media, path }: Props) {
+export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
+	const [isDeleteMediaModalOpen, setIsDeleteMediaModalOpen] = useState(false);
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
-	const closeButtonRef = useRef<HTMLLabelElement>(null);
+	const closeButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef("");
 	const { t } = useTranslation();
@@ -65,26 +58,12 @@ export default function MediaOptionsModal({ media, path }: Props) {
 	useEffect(() => {
 		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
 			if (event.key === "Enter" && !isAModifierKeyPressed(event))
-				changeMediaMetadata(
-					closeButtonRef,
-					imageFilePathRef.current,
-					path,
-					media,
-				);
+				changeMediaMetadata(imageFilePathRef.current, path, media);
 		}
 
-		// This is because if you open the popover by pressing
-		// "Enter", it will just open and close it!
-		setTimeout(
-			() =>
-				document.addEventListener("keyup", changeMediaMetadataOnEnter, {
-					once: true,
-				}),
-			200,
-		);
+		once("keyup", changeMediaMetadataOnEnter);
 
-		return () =>
-			document.removeEventListener("keyup", changeMediaMetadataOnEnter);
+		return () => removeOn("keyup", changeMediaMetadataOnEnter);
 	}, [media, path]);
 
 	return (
@@ -93,14 +72,14 @@ export default function MediaOptionsModal({ media, path }: Props) {
 
 			<h2 className="subtitle">{t("dialogs.mediaOptions.description")}</h2>
 
-			<CloseCenteredModal
+			<button
+				onPointerUp={() => setIsOpen(false)}
 				className="close-media-options-modal"
 				title={t("tooltips.closeDialog")}
-				htmlFor={mediaOptionsModalId}
 				ref={closeButtonRef}
 			>
 				<CloseIcon />
-			</CloseCenteredModal>
+			</button>
 
 			<form id="form">
 				{visibleData(media).map(([option, value]) => (
@@ -147,48 +126,45 @@ export default function MediaOptionsModal({ media, path }: Props) {
 				))}
 			</form>
 
-			<FlexRow>
+			<div data-flex-row>
 				<>
-					<CenteredModalTrigger
-						htmlTargetName={deleteMediaModalID_mediaOptionsModal}
-						labelClassName="remove-media"
+					<button
+						onPointerUp={() => setIsDeleteMediaModalOpen(true)}
+						className="remove-media"
 					>
 						{t("buttons.deleteMedia")}
 
 						<Remove />
-					</CenteredModalTrigger>
+					</button>
 
-					<CenteredModalContent
-						htmlFor={deleteMediaModalID_mediaOptionsModal}
+					<CenteredModal
 						className="confirm-remove-media"
-						closeOnClickOutside
+						isOpen={isDeleteMediaModalOpen}
 					>
 						<Suspense>
 							<DeleteMediaDialogContent
-								idOfModalToBeClosed={deleteMediaModalID_mediaOptionsModal}
-								handleMediaDeletion={() =>
-									handleMediaDeletion(closeButtonRef, path)
-								}
+								deleteMediaPlusCloseDialog={() => {
+									setIsDeleteMediaModalOpen(false);
+									setIsOpen(false);
+
+									deleteFile(path).then();
+								}}
 							/>
 						</Suspense>
-					</CenteredModalContent>
+					</CenteredModal>
 				</>
 
-				<CloseCenteredModal
+				<button
 					className="save-media-options-modal"
-					htmlFor={mediaOptionsModalId}
-					onPointerUp={() =>
-						changeMediaMetadata(
-							closeButtonRef,
-							imageFilePathRef.current,
-							path,
-							media,
-						)
-					}
+					onPointerUp={() => {
+						setIsOpen(false);
+
+						changeMediaMetadata(imageFilePathRef.current, path, media);
+					}}
 				>
 					{t("buttons.saveChanges")}
-				</CloseCenteredModal>
-			</FlexRow>
+				</button>
+			</div>
 		</>
 	);
 }
@@ -198,7 +174,11 @@ export default function MediaOptionsModal({ media, path }: Props) {
 /////////////////////////////////////////////
 // Types:
 
-type Props = { media: Media; path: Path };
+type Props = {
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	media: Media;
+	path: Path;
+};
 
 /////////////////////////////////////////////
 

@@ -1,8 +1,5 @@
-export const ButtonOfGroup = ({
-	className = "",
-	...props
-}: ButtonOfGroupProps) => (
-	<button className={`grouped-button ${className}`} {...props} />
+export const ButtonOfGroup = (props: ButtonOfGroupProps) => (
+	<button data-grouped-button {...props} />
 );
 
 type ButtonOfGroupProps = React.ButtonHTMLAttributes<HTMLButtonElement>;

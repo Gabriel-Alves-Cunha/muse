@@ -3,7 +3,6 @@ import { lazy, Suspense } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
-import { MainGridContainer } from "@components/MainGridContainer";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
@@ -40,7 +39,7 @@ export function App() {
 			<DecorationsTop />
 
 			<ContextMenu>
-				<MainGridContainer>
+				<div data-main-grid-container>
 					<Navbar />
 
 					<Suspense>
@@ -48,7 +47,7 @@ export function App() {
 					</Suspense>
 
 					<MediaPlayer />
-				</MainGridContainer>
+				</div>
 			</ContextMenu>
 
 			<DecorationsDown />

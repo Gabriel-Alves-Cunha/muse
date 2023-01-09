@@ -5,27 +5,25 @@ import type {
 	ID,
 } from "@common/@types/generalTypes";
 
+import { memo, Suspense, lazy, useState } from "react";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { memo, Suspense, lazy } from "react";
 
 import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { useTranslation } from "@i18n";
+import { CenteredModal } from "../CenteredModal";
 import { getFromList } from "./states";
 import {
 	getAllSelectedMedias,
 	toggleSelectedMedia,
 } from "@contexts/useAllSelectedMedias";
-import { CenteredModalContent, CenteredModalTrigger } from "../CenteredModal";
 
 const MediaOptionsModal = lazy(() => import("./MediaOptionsModal"));
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-
-export const mediaOptionsModalId = "media-options-modal";
 
 export const rightClick = 2;
 export const leftClick = 0;
@@ -51,6 +49,7 @@ function selectOrPlayMedia(
 
 const Row = memo(
 	function Row({ media, id }: RowProps) {
+		const [isOpen, setIsOpen] = useState(false);
 		const { t } = useTranslation();
 
 		return (
@@ -84,23 +83,27 @@ const Row = memo(
 				</button>
 
 				<>
-					<CenteredModalTrigger
-						labelProps={{ title: t("tooltips.openMediaOptions") }}
-						labelClassName="icon-circle-modal-trigger"
-						htmlTargetName={mediaOptionsModalId}
+					<button
+						title={t("tooltips.openMediaOptions")}
+						className="icon-circle-modal-trigger"
+						onPointerUp={() => setIsOpen(true)}
 					>
 						<Dots size={17} />
-					</CenteredModalTrigger>
+					</button>
 
-					<CenteredModalContent
+					<CenteredModal
 						className="media-options-modal"
-						htmlFor={mediaOptionsModalId}
-						closeOnClickOutside
+						setIsOpen={setIsOpen}
+						isOpen={isOpen}
 					>
 						<Suspense>
-							<MediaOptionsModal media={media} path={id} />
+							<MediaOptionsModal
+								setIsOpen={setIsOpen}
+								media={media}
+								path={id}
+							/>
 						</Suspense>
-					</CenteredModalContent>
+					</CenteredModal>
 				</>
 			</div>
 		);

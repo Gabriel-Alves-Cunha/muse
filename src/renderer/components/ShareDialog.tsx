@@ -1,39 +1,29 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server";
 
+import { useEffect, useReducer } from "react";
 import { MdClose as CloseIcon } from "react-icons/md";
-import { useEffect, useState } from "react";
 import { toCanvas } from "qrcode";
 
 import { setFilesToShare, useFilesToShare } from "@contexts/filesToShare";
-import { isAModifierKeyPressed } from "@utils/keyboard";
 import { useTranslation } from "@i18n";
+import { CenteredModal } from "./CenteredModal";
 import { error, assert } from "@common/log";
 import { getMainList } from "@contexts/usePlaylists";
 import { emptySet } from "@common/empty";
 import { Loading } from "./Loading";
-import {
-	CloseOpenedCenteredModal,
-	OpenedCenteredModal,
-} from "./OpenedCenteredModal";
 
 const { createServer } = electron.share;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-// Constants:
-
-const shareModalId = "share-modal";
-const qrID = "qrcode-canvas";
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
 // Main function:
 
+const qrID = "qrcode-canvas";
+
 export default function ShareDialog() {
-	const [server, setServer] = useState<ClientServerAPI | null>(null);
+	const [server, setServer] = useReducer(reducer, null);
 	const { filesToShare } = useFilesToShare();
 	const { t } = useTranslation();
 
@@ -42,25 +32,35 @@ export default function ShareDialog() {
 
 	/////////////////////////////////////////
 
-	function onCanvasElementMakeQRCode(canvas: HTMLCanvasElement | null) {
-		if (canvas && shouldModalOpen && server)
-			makeQrcode(server.url)
-				.then()
-				.catch((err) => {
-					error("Error making QR Code.", err);
-					closeModal(server.close);
-				});
+	function reducer(
+		_prevValue: ClientServerAPI | null,
+		newValue: ClientServerAPI | null,
+	): ClientServerAPI | null {
+		if (!newValue) {
+			// Setting server to null.
+
+			closeShareDialog();
+
+			return null;
+		}
+
+		// When the server closes, get rid of it's reference:
+		newValue.addListener("close", () => setServer(null));
+
+		return newValue;
 	}
 
 	/////////////////////////////////////////
 
-	// When the server closes, get rid of it's reference:
-	useEffect(() => {
-		server?.addListener("close", () => {
-			setServer(null);
-			closeModal();
-		});
-	}, [server]);
+	function onCanvasElementMakeQRCode(canvas: HTMLCanvasElement | null) {
+		if (shouldModalOpen && server && canvas)
+			makeQrcode(server.url)
+				.then()
+				.catch((err) => {
+					error("Error making QR Code.", err);
+					closeShareDialog(server.close);
+				});
+	}
 
 	/////////////////////////////////////////
 
@@ -74,29 +74,25 @@ export default function ShareDialog() {
 			setServer(clientServerApi);
 		} catch (err) {
 			error(err);
-			closeModal();
+			closeShareDialog();
 		}
 	}, [filesToShare]);
 
 	/////////////////////////////////////////
 
 	return shouldModalOpen ? (
-		<OpenedCenteredModal
+		<CenteredModal
+			onEscape={() => closeShareDialog(server?.close)}
 			className="share-dialog-wrapper"
-			htmlTargetName={shareModalId}
-			onKeyUp={(e) => {
-				if (e.key === "Escape" && !isAModifierKeyPressed(e))
-					closeModal(server?.close);
-			}}
+			isOpen
 		>
-			<CloseOpenedCenteredModal
-				onPointerUp={() => closeModal(server?.close)}
+			<button
+				onPointerUp={() => closeShareDialog(server?.close)}
 				title={t("tooltips.closeShareScreen")}
 				className="share-dialog-trigger"
-				htmlFor={shareModalId}
 			>
 				<CloseIcon />
-			</CloseOpenedCenteredModal>
+			</button>
 
 			<div className="share-dialog-text-wrapper">
 				<p>
@@ -114,7 +110,7 @@ export default function ShareDialog() {
 			>
 				<Loading />
 			</canvas>
-		</OpenedCenteredModal>
+		</CenteredModal>
 	) : null;
 }
 
@@ -123,7 +119,7 @@ export default function ShareDialog() {
 /////////////////////////////////////////
 // Helper functions:
 
-function closeModal(closeServerFunction?: () => void): void {
+function closeShareDialog(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
 	setFilesToShare(emptySet);
@@ -135,10 +131,7 @@ function namesOfFilesToShare(filesToShare: ReadonlySet<Path>): JSX.Element[] {
 	const mainList = getMainList();
 
 	return Array.from(filesToShare, (id) => (
-		<li
-			className="list-item relative mx-3 list-decimal-zero text-start font-primary tracking-wider text-lg text-normal font-medium overflow-ellipsis whitespace-nowrap marker:text-accent marker:font-normal"
-			key={id}
-		>
+		<li data-files-to-share key={id}>
 			{mainList.get(id)?.title}
 		</li>
 	));

@@ -1,9 +1,9 @@
 import type { ValuesOf } from "@common/@types/utils";
-import { deselectAllMedias } from "@contexts/useAllSelectedMedias";
 
 import { Suspense, lazy } from "react";
 
 import { CtxMenu, CtxMenuProps } from "./CtxMenu";
+import { deselectAllMedias } from "@contexts/useAllSelectedMedias";
 
 const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
 const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
@@ -32,12 +32,11 @@ export const ContextMenu = ({
 	isAllDisabled = false,
 	content = MAIN,
 	wrapperProps,
-	children,
 	...props
 }: Props) => (
 	<CtxMenu
 		wrapperProps={wrapperProps}
-		onOpenChange={onOpenClose}
+		onOpenChange={onOpenChange}
 		{...props}
 		ctxMenuContent={
 			<Suspense>
@@ -50,12 +49,11 @@ export const ContextMenu = ({
 				)}
 			</Suspense>
 		}
-	>
-		{children}
-	</CtxMenu>
+	/>
 );
 
-function onOpenClose(newValue: boolean): void {
+function onOpenChange(newValue: boolean): void {
+	// On close, deselectAllMedias():
 	if (!newValue) deselectAllMedias();
 }
 
@@ -66,6 +64,5 @@ function onOpenClose(newValue: boolean): void {
 
 type Props = Omit<CtxMenuProps, "ctxMenuContent"> & {
 	content?: ValuesOf<typeof CtxContentEnum>;
-	children: React.ReactNode;
 	isAllDisabled?: boolean;
 };

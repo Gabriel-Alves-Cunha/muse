@@ -1,16 +1,13 @@
-import { CloseCenteredModal } from "./CenteredModal";
 import { useTranslation } from "@i18n";
 import { WarningSign } from "./WarningSign";
-import { FlexRow } from "@components/FlexRow";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-export default function DeleteMediaDialogContent({
-	handleMediaDeletion,
-	idOfModalToBeClosed,
+export function DeleteMediaDialogContent({
+	deleteMediaPlusCloseDialog,
 }: Props) {
 	const { t } = useTranslation();
 
@@ -22,24 +19,15 @@ export default function DeleteMediaDialogContent({
 				<WarningSign />
 			</h1>
 
-			<FlexRow>
-				<CloseCenteredModal
-					onPointerUp={handleMediaDeletion}
-					htmlFor={idOfModalToBeClosed}
-					className="remove-media"
-				>
+			<div data-flex-row>
+				<button onPointerUp={deleteMediaPlusCloseDialog} data-remove-media>
 					{t("buttons.confirm")}
-				</CloseCenteredModal>
+				</button>
 
-				<CloseCenteredModal
-					className="save-media-options-modal bg-transparent"
-					htmlFor={idOfModalToBeClosed}
-					// @ts-ignore => it's okay, React polyfills the behavior
-					autoFocus
-				>
+				<button className="save-media-options-modal bg-transparent">
 					{t("buttons.cancel")}
-				</CloseCenteredModal>
-			</FlexRow>
+				</button>
+			</div>
 		</>
 	);
 }
@@ -49,4 +37,6 @@ export default function DeleteMediaDialogContent({
 /////////////////////////////////////////////
 // Types:
 
-type Props = { handleMediaDeletion(): void; idOfModalToBeClosed: string };
+type Props = {
+	deleteMediaPlusCloseDialog(): void;
+};

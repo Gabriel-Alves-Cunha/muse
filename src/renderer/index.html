@@ -9,7 +9,7 @@
 
 		<script nonce="get-theme-at-start">
 			// Setting or getting theme before styles are applied.
-			const storagedOrDefaultTheme = localStorage.getItem("theme") ?? "light";
+			const storagedOrDefaultTheme = localStorage.getItem("theme") || "light";
 
 			document.documentElement.dataset.theme = storagedOrDefaultTheme;
 		</script>

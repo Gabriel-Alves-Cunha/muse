@@ -3,14 +3,14 @@ import type { Path } from "@common/@types/generalTypes";
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 
 import { getConvertingList, useConvertingList } from "@contexts/convertList";
-import { isDownloadList } from "@components/Downloading/Popup";
+import { isDownloadList } from "../Downloading/Popup";
 import { ProgressStatus } from "@common/enums";
 import { formatDuration } from "@common/utils";
 import { useTranslation } from "@i18n";
 import { progressIcons } from "@components/Progress";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
-import { Button } from "@components/Button";
+import { Button } from "../Button";
 import {
 	cancelConversionAndOrRemoveItFromList,
 	MediaBeingConverted,

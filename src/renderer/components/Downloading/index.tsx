@@ -6,10 +6,10 @@ import { useEffect } from "react";
 import create from "zustand";
 
 import { ReactToElectronMessage } from "@common/enums";
+import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { useDownloadingList } from "@contexts/downloadList";
 import { createNewDownload } from "./helper";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { PopoverButtons } from "../Navbar/PopoverButtons";
 import { ProgressStatus } from "@common/enums";
 import { useTranslation } from "@i18n";
 import { errorToast } from "../toasts";
@@ -36,8 +36,6 @@ export const { setState: setDownloadInfo } = useDownloadInfo;
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-
-const downloadingListPopoverId = "downloading-list-popover-id";
 
 const sizeSelector = (state: ReturnType<typeof useDownloadingList.getState>) =>
 	state.downloadingList.size;
@@ -73,14 +71,13 @@ export function Downloading() {
 	}, [downloadInfo.title, downloadInfo]);
 
 	return (
-		<PopoverButtons
+		<NavbarPopoverButtons
 			tooltip={t("tooltips.showAllDownloadingMedias")}
-			popoverId={downloadingListPopoverId}
 			size={downloadingListSize}
 			Icon={DownloadingIcon}
 		>
 			<Popup />
-		</PopoverButtons>
+		</NavbarPopoverButtons>
 	);
 }
 

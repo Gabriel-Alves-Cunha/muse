@@ -24,12 +24,10 @@ export function Header({ media, id, displayTitle = false }: HeaderProps) {
 	const isFavorite = favorites.has(id);
 
 	return (
-		<div className="flex justify-between items-center">
+		<div className="media-player-header">
 			<LoadOrToggleLyrics lyrics={media?.lyrics} id={id} />
 
-			<div className="w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium">
-				{displayTitle ? media?.title : media?.album}
-			</div>
+			<div>{displayTitle ? media?.title : media?.album}</div>
 
 			<CircleIconButton
 				onPointerUp={() => toggleFavoriteMedia(id)}

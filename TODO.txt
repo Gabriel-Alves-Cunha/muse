@@ -2,7 +2,6 @@
 
 * REFACTOR: choose a font with I and L different
 * REFACTOR: use web-share!
-* REFACTOR: dont make a type for i18n, infer it.
 
 * ADD: offer the option to turn on debug when ErrorFallback is reached
 * ADD: detect (avail port to share)

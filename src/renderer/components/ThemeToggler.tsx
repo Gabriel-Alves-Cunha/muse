@@ -36,8 +36,8 @@ export function ThemeToggler() {
 	return (
 		<button
 			title={t("tooltips.toggleTheme")}
-			className="toggle-theme-button"
 			onPointerUp={toggleTheme}
+			data-toggle-theme-button
 		>
 			{theme === availableThemes[0] ? (
 				<Dark size="20px" />

@@ -1,7 +1,7 @@
 import type { AllowedMedias } from "@common/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
 
 import { useTranslation } from "@i18n";
@@ -28,7 +28,7 @@ export default function Convert() {
 
 	function handleSelectedFiles({
 		target: { files },
-	}: ChangeEvent<HTMLInputElement>) {
+	}: React.ChangeEvent<HTMLInputElement>) {
 		if (!files?.length) return;
 
 		const map: Map<Path, ConvertInfo> = new Map();
@@ -50,10 +50,10 @@ export default function Convert() {
 		if (selectedFiles.size === 0) return;
 
 		// To start convert, add to the convertInfoList:
-		useNewConvertions.setState({ newConvertions: selectedFiles });
+		useNewConvertions.setState({ newConvertions: selectedFiles, toExtension });
 
 		setSelectedFiles(emptyMap);
-	}, [toExtension, selectedFiles]);
+	}, [selectedFiles, toExtension]);
 
 	////////////////////////////////////////////////
 

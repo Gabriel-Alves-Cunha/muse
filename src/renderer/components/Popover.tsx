@@ -1,87 +1,81 @@
-export const PopoverTrigger = ({
-	labelClassName = "",
-	inputClassName = "",
-	htmlTargetName,
-	labelProps,
-	inputProps,
-	children,
-}: PopoverTriggerProps) => (
-	<>
-		<label className={labelClassName} htmlFor={htmlTargetName} {...labelProps}>
-			{children}
-		</label>
+import { useEffect, useRef } from "react";
 
-		<input
-			className={`select-state ${inputClassName}`}
-			id={htmlTargetName}
-			type="checkbox"
-			{...inputProps}
-		/>
-	</>
-);
+import { isAModifierKeyPressed } from "@utils/keyboard";
+import { once, removeOn } from "@utils/window";
+import { leftClick } from "./MediaListKind/Row";
 
-/////////////////////////////////////////
-
-export const PopoverContent = ({
+export function Popover({
 	onPointerDownOutside,
-	className = "",
-	htmlFor,
+	setIsOpen,
+	isOpen,
 	size,
-	...rest
-}: PopoverContentProps) => (
-	<div className="select-content-wrapper">
-		<label
-			onPointerDown={onPointerDownOutside}
-			className="outside-dialog"
-			htmlFor={htmlFor}
-		/>
+	...contentProps
+}: PopoverProps) {
+	const contentRef = useRef<HTMLDivElement>(null);
 
+	useEffect(() => {
+		function closeOnClickOutside(event: PointerEvent): void {
+			// Assume that isOpen === true.
+
+			// Check if click happened outside:
+			if (
+				event.button !== leftClick ||
+				!contentRef.current ||
+				contentRef.current.contains(event.target as Node)
+			)
+				return;
+
+			onPointerDownOutside?.(event);
+
+			setIsOpen?.(false);
+		}
+
+		function closeOnEscape(event: KeyboardEvent): void {
+			// Assume that isOpen === true.
+
+			if (event.key === "Escape" && !isAModifierKeyPressed(event))
+				setIsOpen?.(false);
+		}
+
+		isOpen &&
+			setTimeout(() => {
+				// If I don't put a setTimeout, it just opens and closes!
+				once("pointerup", closeOnClickOutside);
+				once("keypress", closeOnEscape);
+			}, 200);
+
+		return () => {
+			removeOn("pointerup", closeOnClickOutside);
+			removeOn("keypress", closeOnEscape);
+		};
+	}, [isOpen, setIsOpen]);
+
+	return isOpen ? (
 		<div
-			className={`popover-content ${className} ${size}`}
-			role="dialog"
-			{...rest}
+			data-popover-size={size}
+			data-popover-content
+			ref={contentRef}
+			{...contentProps}
 		/>
-	</div>
-);
+	) : null;
+}
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 // Types:
 
-type PopoverTriggerProps = {
-	labelProps?: Omit<
-		React.DetailedHTMLProps<
-			React.LabelHTMLAttributes<HTMLLabelElement>,
-			HTMLLabelElement
-		>,
-		"className"
-	>;
-	inputProps?: Omit<
-		React.DetailedHTMLProps<
-			React.InputHTMLAttributes<HTMLInputElement>,
-			HTMLInputElement
-		>,
-		"className"
-	>;
-	children: React.ReactNode;
-	labelClassName?: string;
-	inputClassName?: string;
-	htmlTargetName: string;
-};
-
-/////////////////////////////////////////
-
-interface PopoverContentProps
+interface PopoverProps
 	extends React.DetailedHTMLProps<
 		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
-	onPointerDownOutside?: React.PointerEventHandler<HTMLLabelElement>;
 	size:
 		| "nothing-found-for-convertions-or-downloads"
 		| "nothing-found-for-search-media"
 		| "convertions-or-downloads"
 		| "search-media-results";
-	htmlFor: string;
+	setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+	onPointerDownOutside?(event: PointerEvent): void;
+	isOpen: boolean;
 }

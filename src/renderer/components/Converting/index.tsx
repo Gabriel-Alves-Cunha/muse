@@ -3,9 +3,9 @@ import { useEffect } from "react";
 
 import { useNewConvertions, createNewConvertion } from "./helper";
 import { ReactToElectronMessage } from "@common/enums";
+import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { useConvertingList } from "@contexts/convertList";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { PopoverButtons } from "../Navbar/PopoverButtons";
 import { useTranslation } from "@i18n";
 import { errorToast } from "../toasts";
 import { emptyMap } from "@common/empty";
@@ -15,8 +15,6 @@ import { Popup } from "./Popup";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-
-const convertingListPopoverId = "converting-list-popover-id";
 
 const convertingListSizeSelector = (
 	state: ReturnType<typeof useConvertingList.getState>,
@@ -55,13 +53,12 @@ export function Converting() {
 	}, [newConvertions]);
 
 	return (
-		<PopoverButtons
+		<NavbarPopoverButtons
 			tooltip={t("tooltips.showAllConvertingMedias")}
-			popoverId={convertingListPopoverId}
 			size={convertingListSize}
 			Icon={ConvertIcon}
 		>
 			<Popup />
-		</PopoverButtons>
+		</NavbarPopoverButtons>
 	);
 }

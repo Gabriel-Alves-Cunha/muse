@@ -1,13 +1,14 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
-import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { MediaSearchRow } from "./MediaSearchRow";
-import { PopoverContent } from "../Popover";
+import { once, removeOn } from "@utils/window";
 import { useTranslation } from "@i18n";
+import { leftClick } from "../MediaListKind/Row";
 import { RightSlot } from "../RightSlot";
 import { BaseInput } from "../BaseInput";
+import { Popover } from "../Popover";
 import {
 	setDefaultSearch,
 	setSearchTerm,
@@ -17,7 +18,7 @@ import {
 
 export function SearchMedia() {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
-	const searchWrapper = useRef<HTMLDivElement>(null);
+	const searchWrapperRef = useRef<HTMLDivElement>(null);
 	const { t } = useTranslation();
 
 	const resultsJSXs: JSX.Element[] = [];
@@ -37,10 +38,26 @@ export function SearchMedia() {
 
 	/////////////////////////////////////////
 
-	useOnClickOutside(searchWrapper, setDefaultSearch);
+	useEffect(() => {
+		function onClickOutside(event: PointerEvent): void {
+			// Check if click happened outside:
+			if (
+				event.button !== leftClick ||
+				!searchWrapperRef.current ||
+				searchWrapperRef.current.contains(event.target as Node)
+			)
+				return;
+
+			setDefaultSearch();
+		}
+
+		once("pointerup", onClickOutside);
+
+		return () => removeOn("pointerup", onClickOutside);
+	}, []);
 
 	return (
-		<div ref={searchWrapper}>
+		<div ref={searchWrapperRef}>
 			<BaseInput
 				RightSlot={<RightSlot id="searcher-right-slot">Alt+s</RightSlot>}
 				label={t("labels.searchForSongs")}
@@ -59,15 +76,14 @@ export function SearchMedia() {
 					onContextMenu={selectMediaByPointerEvent}
 					isAllDisabled={foundSomething}
 				>
-					<PopoverContent
+					<Popover
 						size={
 							nothingFound
 								? "nothing-found-for-search-media"
 								: "search-media-results"
 						}
 						onPointerDownOutside={setDefaultSearch}
-						className="transition-none visible"
-						htmlFor=""
+						isOpen
 					>
 						{nothingFound ? (
 							<div className="nothing-found">
@@ -77,7 +93,7 @@ export function SearchMedia() {
 							// foundSomething:
 							resultsJSXs
 						)}
-					</PopoverContent>
+					</Popover>
 				</ContextMenu>
 			) : null}
 		</div>

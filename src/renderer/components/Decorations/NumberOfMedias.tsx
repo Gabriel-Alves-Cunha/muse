@@ -8,9 +8,12 @@ export function NumberOfMedias() {
 	const numberOfMedias = usePlaylists(sizeSelector);
 	const { t } = useTranslation();
 
+	const plural = numberOfMedias > 1;
+
 	return (
 		<p>
 			{numberOfMedias} {t("decorations.medias")}
+			{plural ? "s" : ""}
 		</p>
 	);
 }

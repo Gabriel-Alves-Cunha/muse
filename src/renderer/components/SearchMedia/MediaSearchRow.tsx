@@ -2,16 +2,13 @@ import type { ID, Media } from "@common/@types/generalTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdMusicNote as MusicNote } from "react-icons/md";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 
 import { ImgWithFallback } from "../ImgWithFallback";
 import { useTranslation } from "@i18n";
 import { playThisMedia } from "@contexts/useCurrentPlaying";
+import { CenteredModal } from "../CenteredModal";
 import { unDiacritic } from "@contexts/usePlaylists";
-import {
-	CenteredModalContent,
-	CenteredModalTrigger,
-} from "@components/CenteredModal";
 
 const MediaOptionsModal = lazy(
 	() => import("../MediaListKind/MediaOptionsModal"),
@@ -22,10 +19,8 @@ const MediaOptionsModal = lazy(
 /////////////////////////////////////////
 // Main function:
 
-const mediaOptionsModalID_mediaSearchRow =
-	"media-options-modal-media-search-row";
-
 export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
+	const [isOpen, setIsOpen] = useState(false);
 	const { t } = useTranslation();
 
 	const index = unDiacritic(media.title).indexOf(highlight);
@@ -44,7 +39,6 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 					/>
 				</div>
 
-				{/* size: "calc(100% - 5px)" */}
 				<div className="highlight">
 					<p>
 						{media.title.slice(0, index)}
@@ -57,22 +51,22 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 			</button>
 
 			<>
-				<CenteredModalTrigger
-					labelProps={{ title: t("tooltips.openMediaOptions") }}
-					htmlTargetName={mediaOptionsModalID_mediaSearchRow}
-					labelClassName="icon-circle-modal-trigger"
+				<button
+					title={t("tooltips.openMediaOptions")}
+					className="icon-circle-modal-trigger"
+					onPointerUp={() => setIsOpen(true)}
 				>
 					<Dots size={17} />
-				</CenteredModalTrigger>
+				</button>
 
-				<CenteredModalContent
+				<CenteredModal
 					className="grid center max-w-md min-w-[300px] p-8 bg-dialog"
-					htmlFor={mediaOptionsModalID_mediaSearchRow}
+					isOpen={isOpen}
 				>
 					<Suspense>
-						<MediaOptionsModal media={media} path={id} />
+						<MediaOptionsModal setIsOpen={setIsOpen} media={media} path={id} />
 					</Suspense>
-				</CenteredModalContent>
+				</CenteredModal>
 			</>
 		</div>
 	);

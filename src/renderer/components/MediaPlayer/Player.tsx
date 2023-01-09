@@ -10,7 +10,7 @@ export const Player = ({ media, audio, id }: PlayerProps) => (
 	<>
 		<Header media={media} id={id} />
 
-		<div className="aspect-square rounded-2xl flex items-center justify-center w-full shadow-reflect mt-[25%]">
+		<div className="media-player-img">
 			<ImgWithFallback
 				Fallback={<MusicNote size={30} />}
 				mediaImg={media?.image}
@@ -18,20 +18,10 @@ export const Player = ({ media, audio, id }: PlayerProps) => (
 			/>
 		</div>
 
-		<div className="flex flex-col justify-center items-center h-[10vh] w-full mt-[3vh]">
-			<span
-				className="flex justify-center items-center w-full text-icon-media-player flex-wrap font-secondary tracking-wide text-center overflow-y-hidden text-xl font-medium"
-				id="title"
-			>
-				{media?.title}
-			</span>
+		<div className="media-info">
+			<span className="text-xl font-medium">{media?.title}</span>
 
-			<span
-				className="flex justify-center items-center w-full text-icon-media-player flex-wrap font-secondary tracking-wide text-center overflow-y-hidden text-sm font-normal"
-				id="subtitle"
-			>
-				{media?.artist}
-			</span>
+			<span className="text-sm font-normal">{media?.artist}</span>
 		</div>
 
 		<ControlsAndSeeker audio={audio} />

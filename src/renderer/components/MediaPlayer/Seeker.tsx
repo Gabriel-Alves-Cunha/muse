@@ -25,27 +25,35 @@ export function SeekerWrapper({ audio }: RefToAudio) {
 	);
 
 	useEffect(() => {
-		const progressElement = progressElementRef.current;
-		const timerTooltip = timeTooltipRef.current;
+		// 		const progressElement = progressElementRef.current;
+		// 		const timerTooltip = timeTooltipRef.current;
 		const timeline = progressWrapperRef.current;
-
-		if (!(timeline && timerTooltip && audio?.src && progressElement)) return;
+		//
+		// 		if (!(timeline && timerTooltip && audio?.src && progressElement)) return;
+		if (!(audio?.duration && timeline)) return;
 
 		audio.ontimeupdate = () => {
+			const progressElement = progressElementRef.current;
+			const currentTimeElement = currentTimeRef.current;
+			if (!(currentTimeElement && progressElement)) return;
+
 			if (!isPointerOnSlider)
 				progressElement.value = `${(audio.currentTime / audio.duration) * 100}`;
 
-			const currentTimeElement = currentTimeRef.current;
-			if (!currentTimeElement) return;
 			currentTimeElement.textContent = formatDuration(audio.currentTime);
 		};
 
 		audio.onchange = () => {
+			const progressElement = progressElementRef.current;
+			if (!progressElement) return;
+
 			const percentage = Number(progressElement.value) / 100;
+
 			audio.currentTime = (audio.duration || 0) * percentage;
 		};
 
 		function setTimerTooltip({ offsetX }: PointerEvent): void {
+			const timerTooltip = timeTooltipRef.current;
 			if (!(audio?.duration && timeline && timerTooltip)) return;
 
 			const time =

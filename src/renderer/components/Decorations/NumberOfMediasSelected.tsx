@@ -9,9 +9,12 @@ export function NumberOfMediasSelected() {
 	const numberOfMediasSelected = useAllSelectedMedias(sizeSelector);
 	const { t } = useTranslation();
 
+	const plural = numberOfMediasSelected > 1;
+
 	return numberOfMediasSelected === 0 ? null : (
 		<p>
 			{numberOfMediasSelected} {t("decorations.selected")}
+			{plural ? "s" : ""}
 		</p>
 	);
 }

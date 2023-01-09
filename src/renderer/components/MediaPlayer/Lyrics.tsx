@@ -1,11 +1,11 @@
 import type { ID, Media } from "@common/@types/generalTypes";
 
 import { ReactToElectronMessage } from "@common/enums";
-import { mediaPlayerFlipCardId } from "@components/FlipCard";
+import { mediaPlayerFlipCardId } from "../FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
 import { error, warn } from "@common/log";
-import { infoToast } from "@components/toasts";
+import { infoToast } from "../toasts";
 import { getMedia } from "@contexts/usePlaylists";
 import { Header } from "./Header";
 
@@ -14,15 +14,11 @@ const { searchForLyricsAndImage } = electron.lyric;
 /////////////////////////////////////////
 
 export const Lyrics = ({ media, id }: Props) => (
-	<div className="relative w-full h-full">
+	<div className="lyrics-wrapper">
 		<Header media={media} id={id} displayTitle />
 
-		<div className="relative w-full h-full mt-8 scroll scroll-1 scroll-white overflow-x-hidden">
-			{/* whiteSpace: "pre-line", // break on new line!
-						wordWrap: "break-word" */}
-			<p className="relative mb-24 whitespace-pre-line font-primary tracking-wide leading-6 text-left text-white font-medium">
-				{media?.lyrics}
-			</p>
+		<div className="lyrics">
+			<p>{media?.lyrics}</p>
 		</div>
 	</div>
 );
@@ -39,6 +35,8 @@ export const flipMediaPlayerCard = (): void =>
 
 /////////////////////////////////////////
 
+const { t } = useTranslation();
+
 export async function searchAndOpenLyrics(
 	mediaID: ID,
 	openLyrics: boolean,
@@ -48,8 +46,6 @@ export async function searchAndOpenLyrics(
 	const media = getMedia(mediaID);
 
 	if (!media) return warn(`No media with id = "${mediaID}" found!`);
-
-	const { t } = useTranslation();
 
 	if (!media.artist) {
 		infoToast(t("toasts.assureMediaHasArtistMetadata"));

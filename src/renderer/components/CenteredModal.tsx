@@ -1,111 +1,83 @@
-import { forwardRef } from "react";
+import { useEffect, useRef } from "react";
 
-export const CenteredModalTrigger = ({
-	labelClassName = "",
-	inputClassName = "",
-	htmlTargetName,
-	labelProps,
-	inputProps,
-	children,
-}: TriggerProps) => (
-	<>
-		<label className={labelClassName} htmlFor={htmlTargetName} {...labelProps}>
-			{children}
-		</label>
+import { isAModifierKeyPressed } from "@utils/keyboard";
+import { once, removeOn } from "@utils/window";
+import { leftClick } from "./MediaListKind/Row";
 
-		<input
-			className={`modal-state ${inputClassName}`}
-			id={htmlTargetName}
-			type="checkbox"
-			{...inputProps}
-		/>
-	</>
-);
+export function CenteredModal({
+	onPointerDownOutside,
+	wrapperProps,
+	setIsOpen,
+	onEscape,
+	isOpen,
+	...contentProps
+}: CenteredModalProps) {
+	const contentRef = useRef<HTMLDivElement>(null);
 
-/////////////////////////////////////////////
+	useEffect(() => {
+		function closeOnClickOutside(event: PointerEvent): void {
+			// Assume that isOpen === true.
 
-export const CenteredModalContent = ({
-	wrapperProps: { className: wrapperClassName, ...wrapperProps } = {
-		className: "",
-	},
-	closeOnClickOutside,
-	className = "",
-	htmlFor,
-	...rest
-}: ContentProps) => (
-	<div
-		className={`modal-content-wrapper ${wrapperClassName}`}
-		{...wrapperProps}
-	>
-		<label
-			htmlFor={closeOnClickOutside ? htmlFor : undefined}
-			className="outside-dialog"
-		/>
+			// Check if click happened outside:
+			if (
+				event.button !== leftClick ||
+				!contentRef.current ||
+				contentRef.current.contains(event.target as Node)
+			)
+				return;
 
-		<div className={`modal-content ${className}`} role="dialog" {...rest} />
-	</div>
-);
+			onPointerDownOutside?.(event);
 
-/////////////////////////////////////////////
+			setIsOpen?.(false);
+		}
 
-export const CloseCenteredModal = forwardRef(
-	(
-		{ className = "", htmlFor, ...rest }: CloseProps,
-		forwardedRef: React.ForwardedRef<HTMLLabelElement>,
-	) => (
-		<label
-			className={className}
-			ref={forwardedRef}
-			htmlFor={htmlFor}
-			tabIndex={0}
-			{...rest}
-		/>
-	),
-);
+		function closeOnEscape(event: KeyboardEvent): void {
+			// Assume that isOpen === true.
+
+			if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
+				setIsOpen?.(false);
+				onEscape?.();
+			}
+		}
+
+		isOpen &&
+			setTimeout(() => {
+				// If I don't put a setTimeout, it just opens and closes!
+				once("pointerup", closeOnClickOutside);
+				once("keyup", closeOnEscape);
+			}, 200);
+
+		return () => {
+			removeOn("pointerup", closeOnClickOutside);
+			removeOn("keyup", closeOnEscape);
+		};
+	}, [isOpen, setIsOpen]);
+
+	return isOpen ? (
+		<div ref={contentRef} data-modal-content-wrapper {...wrapperProps}>
+			<div data-modal-content {...contentProps} />
+		</div>
+	) : null;
+}
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-interface TriggerProps {
-	labelProps?: React.DetailedHTMLProps<
-		React.LabelHTMLAttributes<HTMLLabelElement>,
-		HTMLLabelElement
-	>;
-	inputProps?: React.DetailedHTMLProps<
-		React.InputHTMLAttributes<HTMLInputElement>,
-		HTMLInputElement
-	>;
-	children: React.ReactNode;
-	labelClassName?: string;
-	inputClassName?: string;
-	htmlTargetName: string;
-}
-
-/////////////////////////////////////////////
-
-interface ContentProps
+interface CenteredModalProps
 	extends React.DetailedHTMLProps<
-		React.LabelHTMLAttributes<HTMLDivElement>,
+		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
+	onPointerDownOutside?(event: PointerEvent): void;
 	wrapperProps?:
 		| React.DetailedHTMLProps<
-				React.LabelHTMLAttributes<HTMLDivElement>,
+				React.HTMLAttributes<HTMLDivElement>,
 				HTMLDivElement
 		  >
 		| undefined;
-	closeOnClickOutside?: boolean;
-	htmlFor: string;
-}
-
-/////////////////////////////////////////////
-
-interface CloseProps
-	extends React.DetailedHTMLProps<
-		React.LabelHTMLAttributes<HTMLLabelElement>,
-		HTMLLabelElement
-	> {
-	htmlFor: string;
+	setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+	onEscape?(): void;
+	isOpen: boolean;
 }

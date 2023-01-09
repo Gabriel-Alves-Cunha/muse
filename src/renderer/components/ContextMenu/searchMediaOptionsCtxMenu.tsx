@@ -2,12 +2,14 @@ import type { Path } from "@common/@types/generalTypes";
 
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
-import { Suspense } from "react";
+import { useState } from "react";
 
 import { getMainList, removeMedia } from "@contexts/usePlaylists";
+import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
 import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
+import { CenteredModal } from "../CenteredModal";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
 import { getSearcher } from "../SearchMedia/state";
 import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
@@ -18,46 +20,34 @@ import {
 	setAllSelectedMedias,
 	getAllSelectedMedias,
 } from "@contexts/useAllSelectedMedias";
-import {
-	CenteredModalContent,
-	CenteredModalTrigger,
-} from "@components/CenteredModal";
-import DeleteMediaDialogContent from "@components/DeleteMediaDialog";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-const deleteMediaModalID_searchMediaCtxMenu =
-	"delete-media-modal-search-media-ctx-menu";
-
 export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
+	const [isOpen, setIsOpen] = useState(false);
 	const { t } = useTranslation();
 
 	return (
 		<>
 			<>
-				<CenteredModalTrigger
-					htmlTargetName={deleteMediaModalID_searchMediaCtxMenu}
-					labelProps={{ "aria-disabled": isAllDisabled }}
-					labelClassName="menu-item"
+				<button
+					onPointerUp={() => setIsOpen(true)}
+					disabled={isAllDisabled}
+					data-menu-item
 				>
 					{t("ctxMenus.deleteMedia")}
 
 					<RightSlot>
 						<Trash />
 					</RightSlot>
-				</CenteredModalTrigger>
+				</button>
 
-				<CenteredModalContent htmlFor={deleteMediaModalID_searchMediaCtxMenu}>
-					<Suspense>
-						<DeleteMediaDialogContent
-							idOfModalToBeClosed={deleteMediaModalID_searchMediaCtxMenu}
-							handleMediaDeletion={deleteMedias}
-						/>
-					</Suspense>
-				</CenteredModalContent>
+				<CenteredModal isOpen={isOpen} setIsOpen={setIsOpen}>
+					<DeleteMediaDialogContent deleteMediaPlusCloseDialog={deleteMedias} />
+				</CenteredModal>
 			</>
 
 			<MenuItem onPointerUp={shareMedias} disabled={isAllDisabled}>
@@ -98,7 +88,10 @@ export function shareMedias() {
 
 		if (!path) {
 			error(`There is no media with id: "${id}"!`);
-			setTimeout(() => removeMedia(id));
+			// setTimeout here so it doesn't run all the
+			// possible removeMedia(id) fns now, delaying
+			// the user.
+			setTimeout(() => removeMedia(id), 1_000);
 			continue;
 		}
 

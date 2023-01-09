@@ -34,7 +34,7 @@ export function SearcherWrapper() {
 				value={url}
 			/>
 
-			<p className="absolute -bottom-3 left-[25%] font-primary tracking-wide text-sm text-red-600 font-normal">
+			<p className="searcher">
 				{error}
 			</p>
 		</>

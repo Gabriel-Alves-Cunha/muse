@@ -1,5 +1,5 @@
-export const Header = ({ className = "", ...props }: Props) => (
-	<header className={`main-area-header ${className}`} {...props} />
+export const Header = (props: Props) => (
+	<header data-main-area-header {...props} />
 );
 
-type Props = React.BaseHTMLAttributes<HTMLHeadElement>;
+type Props = React.BaseHTMLAttributes<HTMLHeadingElement>;

@@ -12,6 +12,7 @@ import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
 import { playlistList } from "@common/enums";
+import { on, removeOn } from "@utils/window";
 import { error } from "@common/log";
 import { time } from "@utils/utils";
 import {
@@ -28,7 +29,6 @@ import {
 import {
 	selectAllMediasOnCtrlPlusA,
 	selectMediaByPointerEvent,
-	handleDeselectAllMedias,
 	computeHistoryItemKey,
 	computeItemKey,
 	reloadWindow,
@@ -89,10 +89,12 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 						const media = mainList.get(id);
 
 						if (!media) {
-							error(
-								`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
-							);
-							setTimeout(() => removeMedia(id));
+							setTimeout(() => {
+								error(
+									`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
+								);
+								removeMedia(id);
+							}, 1_000);
 							continue;
 						}
 
@@ -110,10 +112,12 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					const media = mainList.get(id);
 
 					if (!media) {
-						error(
-							`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
-						);
-						setTimeout(() => removeMedia(id));
+						setTimeout(() => {
+							error(
+								`Tried to access inexistent media with id = "${id}". Erasing from mainList...`,
+							);
+							removeMedia(id);
+						}, 1_000);
 						continue;
 					}
 
@@ -144,12 +148,12 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 				deselectAllMedias();
 		}
 
-		document.addEventListener("pointerup", handleDeselectAllMedias);
-		document.addEventListener("keyup", selectAllMediasOnCtrlPlusA);
+		on("pointerup", handleDeselectAllMedias);
+		on("keyup", selectAllMediasOnCtrlPlusA);
 
 		return () => {
-			document.removeEventListener("pointerup", handleDeselectAllMedias);
-			document.removeEventListener("keyup", selectAllMediasOnCtrlPlusA);
+			removeOn("pointerup", handleDeselectAllMedias);
+			removeOn("keyup", selectAllMediasOnCtrlPlusA);
 		};
 	}, []);
 
@@ -171,7 +175,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 				itemContent={itemContent}
 				data={listAsArrayOfAMap}
 				components={components}
-				fixedItemHeight={65}
+				fixedItemHeight={64}
 				className="list"
 				overscan={15}
 				noValidate
@@ -188,7 +192,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 const Footer = () => <div className="relative w-2 h-2 bg-none" />;
 
 const EmptyPlaceholder = () => (
-	<div className="absolute flex justify-center items-center center text-alternative font-secondary tracking-wider text-lg font-medium">
+	<div className="empty-placeholder">
 		<NoMediaFound className="w-14 h-14 mr-5" />
 
 		{useTranslation().t("alts.noMediasFound")}

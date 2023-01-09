@@ -8,7 +8,6 @@ import { areArraysEqualByValue } from "@utils/array";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { useTranslation } from "@i18n";
 import { prettyBytes } from "@common/prettyBytes";
-import { deleteFile } from "@utils/deleteFile";
 import { log, error } from "@common/log";
 import { dbg } from "@common/debug";
 
@@ -17,28 +16,13 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 // Helper functions:
 
-export function handleMediaDeletion(
-	closeButtonRef: React.RefObject<HTMLLabelElement>,
-	mediaPath: Path,
-): void {
-	if (!closeButtonRef.current) return;
-
-	closeEverything(closeButtonRef.current);
-
-	deleteFile(mediaPath).then();
-}
-
-/////////////////////////////////////////////
+const { t } = useTranslation();
 
 export function changeMediaMetadata(
-	closeButtonRef: React.RefObject<HTMLLabelElement>,
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
 ): void {
-	if (!closeButtonRef.current) return;
-
-	const { t } = useTranslation();
 
 	try {
 		const hasAnythingChanged = changeMetadataIfAllowed(
@@ -46,7 +30,6 @@ export function changeMediaMetadata(
 			mediaPath,
 			media,
 		);
-		closeEverything(closeButtonRef.current);
 
 		if (hasAnythingChanged) successToast(t("toasts.mediaMetadataSaved"));
 	} catch (err) {
@@ -58,7 +41,7 @@ export function changeMediaMetadata(
 
 /////////////////////////////////////////////
 
-export function changeMetadataIfAllowed(
+function changeMetadataIfAllowed(
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
@@ -236,7 +219,7 @@ export const visibleData = ({
 	title,
 	size,
 }: Media) =>
-	// The order here is the order that will appear!!
+	// The order here is the order that will appear!
 	Object.entries({
 		duration,
 		size,
@@ -265,10 +248,6 @@ const translatedOptionsToSend = {
 
 export const isChangeable = (option: string): option is ChangeOptions =>
 	option in translatedOptionsToSend;
-
-/////////////////////////////////////////////
-
-const closeEverything = (element: HTMLLabelElement): void => element.click();
 
 /////////////////////////////////////////////
 

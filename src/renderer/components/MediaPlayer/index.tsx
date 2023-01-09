@@ -34,7 +34,7 @@ export function MediaPlayer() {
 
 	useEffect(() => {
 		// Flip media player card to frontCard:
-		log("flipMediaPlayerCardToNormalPlayer", audioRef.current?.src);
+		log("flip MediaPlayerCard to normal player", audioRef.current?.src);
 
 		document
 			.getElementById(mediaPlayerFlipCardId)

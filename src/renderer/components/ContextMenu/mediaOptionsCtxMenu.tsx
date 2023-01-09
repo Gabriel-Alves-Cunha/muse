@@ -1,9 +1,11 @@
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
-import { Suspense, lazy } from "react";
+import { useState } from "react";
 
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
+import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
 import { useTranslation } from "@i18n";
+import { CenteredModal } from "../CenteredModal";
 import { deleteFile } from "@utils/deleteFile";
 import { RightSlot } from "../RightSlot";
 import { MenuItem } from "../MenuItem";
@@ -12,15 +14,6 @@ import {
 	getAllSelectedMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
-import {
-	CenteredModalContent,
-	CenteredModalTrigger,
-} from "@components/CenteredModal";
-
-const DeleteMediaDialogContent = lazy(() => import("../DeleteMediaDialog"));
-
-const deleteMediaModalID_mediaOptionsCtxMenu =
-	"delete-media-modal-media-options-ctx-menu";
 
 const sizeSelector = (
 	state: ReturnType<typeof useAllSelectedMedias.getState>,
@@ -29,6 +22,7 @@ const sizeSelector = (
 export default function MediaOptionsCtxMenu() {
 	// If there is none selected, disable:
 	const size = useAllSelectedMedias(sizeSelector);
+	const [isOpen, setIsOpen] = useState(false);
 	const { t } = useTranslation();
 
 	const isDisabled = size === 0;
@@ -36,26 +30,21 @@ export default function MediaOptionsCtxMenu() {
 	return (
 		<>
 			<>
-				<CenteredModalTrigger
-					htmlTargetName={deleteMediaModalID_mediaOptionsCtxMenu}
-					labelProps={{ "aria-disabled": isDisabled }}
-					labelClassName="menu-item"
+				<button
+					onPointerUp={() => setIsOpen(true)}
+					disabled={isDisabled}
+					data-menu-item
 				>
 					{t("ctxMenus.deleteMedia")}
 
 					<RightSlot>
 						<Trash />
 					</RightSlot>
-				</CenteredModalTrigger>
+				</button>
 
-				<CenteredModalContent htmlFor={deleteMediaModalID_mediaOptionsCtxMenu}>
-					<Suspense>
-						<DeleteMediaDialogContent
-							idOfModalToBeClosed={deleteMediaModalID_mediaOptionsCtxMenu}
-							handleMediaDeletion={deleteMedias}
-						/>
-					</Suspense>
-				</CenteredModalContent>
+				<CenteredModal isOpen={isOpen} setIsOpen={setIsOpen}>
+					<DeleteMediaDialogContent deleteMediaPlusCloseDialog={deleteMedias} />
+				</CenteredModal>
 			</>
 
 			<MenuItem onPointerUp={shareMedias} disabled={isDisabled}>

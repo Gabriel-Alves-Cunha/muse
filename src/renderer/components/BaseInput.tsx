@@ -9,27 +9,33 @@ export const BaseInput = ({
 	label,
 	...props
 }: Props) => (
-	<div className="base-input">
+	<div data-base-input>
 		{LeftIcon}
 
 		<label>{label}</label>
 
-		<input
-			onKeyUp={(e) => {
-				if (e.key === "Escape" && !isAModifierKeyPressed(e))
-					// Close SearchMediaPopover on "Escape":
-					onEscape?.();
-				else if (e.ctrlKey && e.key === "a")
-					// Select all text on "Ctrl + a":
-					(e.target as HTMLInputElement).select();
-			}}
-			type="text"
-			{...props}
-		/>
+		<input onKeyUp={(e) => handleKeyUp(e, onEscape)} type="text" {...props} />
 
 		{RightSlot}
 	</div>
 );
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+// Helper function:
+
+function handleKeyUp(
+	event: React.KeyboardEvent<HTMLInputElement>,
+	onEscape?: () => void,
+): void {
+	if (event.key === "Escape" && !isAModifierKeyPressed(event))
+		// Close SearchMediaPopover on "Escape":
+		onEscape?.();
+	else if (event.ctrlKey && event.key === "a")
+		// Select all text on "Ctrl + a":
+		(event.target as HTMLInputElement).select();
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

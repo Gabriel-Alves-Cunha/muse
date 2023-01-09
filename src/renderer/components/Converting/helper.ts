@@ -21,11 +21,14 @@ import { dbg } from "@common/debug";
 
 export const useNewConvertions = create<NewConvertions>(() => ({
 	newConvertions: emptyMap,
+	toExtension: "mp3",
 }));
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+
+const { t } = useTranslation();
 
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
@@ -36,8 +39,6 @@ export function createNewConvertion(
 	dbg("Trying to create a new conversion...", { convertingList });
 
 	if (convertingList.has(path)) {
-		const { t } = useTranslation();
-
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		error(info, convertingList);
@@ -79,7 +80,7 @@ export function createNewConvertion(
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// Helper functions for `createNewConvertion()`
+// Helper functions for `createNewConvertion()`:
 
 export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 
@@ -137,8 +138,6 @@ function handleUpdateConvertingList(
 		new Map(convertingList).set(path, { ...thisConversion, ...data }),
 	);
 
-	const { t } = useTranslation();
-
 	// Handle status:
 	switch (data.status) {
 		case ProgressStatus.FAILED: {
@@ -176,7 +175,6 @@ function handleUpdateConvertingList(
 
 		default:
 			assertUnreachable(data.status);
-			break;
 	}
 }
 
@@ -199,12 +197,13 @@ export type ConvertInfo = { toExtension: AllowedMedias };
 
 /////////////////////////////////////////////
 
-interface PartialExceptStatus extends Partial<MediaBeingConverted> {
+type PartialExceptStatus = Partial<MediaBeingConverted> & {
 	status: ValuesOf<typeof ProgressStatus>;
-}
+};
 
 /////////////////////////////////////////////
 
 type NewConvertions = Readonly<{
 	newConvertions: ReadonlyMap<Path, ConvertInfo>;
+	toExtension: AllowedMedias;
 }>;

@@ -1,17 +1,6 @@
-import { forwardRef } from "react";
-
-export const Button = forwardRef(function Button(
-	{ className = "", variant, ...props }: Props,
-	forwardedRef: React.Ref<HTMLButtonElement>,
-) {
-	return (
-		<button
-			className={`button ${variant} ${className}`}
-			ref={forwardedRef}
-			{...props}
-		/>
-	);
-});
+export const Button = ({ variant, ...props }: Props) => (
+	<button data-variant={variant} data-button {...props} />
+);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

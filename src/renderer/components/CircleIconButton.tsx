@@ -1,9 +1,5 @@
-export const CircleIconButton = ({
-	variant = "small",
-	className = "",
-	...props
-}: Props) => (
-	<button className={`circle-icon-button ${variant} ${className}`} {...props} />
+export const CircleIconButton = ({ variant = "small", ...props }: Props) => (
+	<button data-circle-icon-button data-variant={variant} {...props} />
 );
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {

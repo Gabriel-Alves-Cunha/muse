@@ -1,72 +1,70 @@
-export const SelectTrigger = ({
-	labelClassName = "",
-	inputClassName = "",
-	htmlTargetName,
-	labelProps,
-	inputProps,
-	children,
-}: SelectTriggerProps) => (
-	<>
-		<label className={labelClassName} htmlFor={htmlTargetName} {...labelProps}>
-			{children}
-		</label>
+import { useEffect, useRef } from "react";
 
-		<input
-			className={`select-state ${inputClassName}`}
-			id={htmlTargetName}
-			type="checkbox"
-			{...inputProps}
-		/>
-	</>
-);
+import { isAModifierKeyPressed } from "@utils/keyboard";
+import { once, removeOn } from "@utils/window";
+import { leftClick } from "./MediaListKind/Row";
 
-/////////////////////////////////////////
+export function Select({
+	onPointerDownOutside,
+	setIsOpen,
+	isOpen,
+	...contentProps
+}: SelectProps) {
+	const contentRef = useRef<HTMLDivElement>(null);
 
-export const SelectContent = ({
-	className = "",
-	htmlFor,
-	...rest
-}: SelectContentProps) => (
-	<div className="select-content-wrapper">
-		<label className="outside-dialog" htmlFor={htmlFor} />
+	useEffect(() => {
+		function closeOnClickOutside(event: PointerEvent): void {
+			// Assume that isOpen === true.
 
-		<div className={`select-content ${className}`} role="dialog" {...rest} />
-	</div>
-);
+			// Check if click happened outside:
+			if (
+				event.button !== leftClick ||
+				!contentRef.current ||
+				contentRef.current.contains(event.target as Node)
+			)
+				return;
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Types:
+			onPointerDownOutside?.(event);
 
-interface SelectTriggerProps {
-	labelProps?: Omit<
-		React.DetailedHTMLProps<
-			React.LabelHTMLAttributes<HTMLLabelElement>,
-			HTMLLabelElement
-		>,
-		"className"
-	>;
-	inputProps?: Omit<
-		React.DetailedHTMLProps<
-			React.InputHTMLAttributes<HTMLInputElement>,
-			HTMLInputElement
-		>,
-		"className"
-	>;
-	children: React.ReactNode;
-	labelClassName?: string;
-	inputClassName?: string;
-	htmlTargetName: string;
+			setIsOpen?.(false);
+		}
+
+		function closeOnEscape(event: KeyboardEvent): void {
+			// Assume that isOpen === true.
+
+			if (event.key === "Escape" && !isAModifierKeyPressed(event))
+				setIsOpen?.(false);
+		}
+
+		isOpen &&
+			setTimeout(() => {
+				// If I don't put a setTimeout, it just opens and closes!
+				once("pointerup", closeOnClickOutside);
+				once("keypress", closeOnEscape);
+			}, 200);
+
+		return () => {
+			removeOn("pointerup", closeOnClickOutside);
+			removeOn("keypress", closeOnEscape);
+		};
+	}, [isOpen, setIsOpen]);
+
+	return isOpen ? (
+		<div ref={contentRef} data-select-content {...contentProps} />
+	) : null;
 }
 
-/////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
-interface SelectContentProps
+interface SelectProps
 	extends React.DetailedHTMLProps<
 		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
-	// side?: "right" | "left" | "bottom" | "top" | "";
-	htmlFor: string;
+	setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+	onPointerDownOutside?(event: PointerEvent): void;
+	isOpen: boolean;
 }

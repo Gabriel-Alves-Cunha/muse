@@ -3,12 +3,9 @@ import type { DateAsNumber, Media, ID } from "@common/@types/generalTypes";
 import { ElectronIpcMainProcessNotification } from "@common/enums";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { isCtxMenuOpen } from "./states";
 import { dbg } from "@common/debug";
 import {
 	addToAllSelectedMedias,
-	getAllSelectedMedias,
-	deselectAllMedias,
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 
@@ -57,10 +54,4 @@ export function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
 		e.preventDefault();
 		selectAllMedias();
 	}
-}
-
-/////////////////////////////////////////
-
-export function handleDeselectAllMedias() {
-	if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0) deselectAllMedias();
 }

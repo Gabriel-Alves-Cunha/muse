@@ -1,7 +1,7 @@
-export const RingLoader = ({ className = "", ...rest }: Props) => (
-	<span className={`ring-loader ${className}`} {...rest}>
-		<span className="right-ring-loader" />
-		<span className="left-ring-loader" />
+export const RingLoader = (props: Props) => (
+	<span data-ring-loader {...props}>
+		<span />
+		<span />
 	</span>
 );
 

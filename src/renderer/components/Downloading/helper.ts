@@ -3,9 +3,9 @@ import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { setDownloadingList, getDownloadingList } from "@contexts/downloadList";
-import { errorToast, infoToast, successToast } from "@components/toasts";
+import { errorToast, infoToast, successToast } from "../toasts";
 import { error, assert, throwErr } from "@common/log";
-import { logThatPortIsClosing } from "@components/Converting/helper";
+import { logThatPortIsClosing } from "../Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { ProgressStatus } from "@common/enums";
 import { useTranslation } from "@i18n";
@@ -14,6 +14,8 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+
+const { t } = useTranslation();
 
 /**
  * This function returns a MessagePort that will be sent to
@@ -30,8 +32,6 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// First, see if there is another one that has the same url
 	// and quit if true:
 	if (downloadingList.has(url)) {
-		const { t } = useTranslation();
-
 		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
 		error(info, downloadingList);
@@ -100,8 +100,6 @@ function handleUpdateDownloadingList(
 	setDownloadingList(
 		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
 	);
-
-	const { t } = useTranslation();
 
 	// Handle status:
 	switch (data.status) {

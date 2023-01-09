@@ -1,29 +1,26 @@
 import { useEffect, useReducer, useRef } from "react";
 
+import { once, removeOn } from "@utils/window";
+
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main functions:
 
-const contentClass = "ctx-menu-content";
-
+// Separated the wrapper and the ctxMenuContent
+// so that when ctxMenuContent rerenders, the
+// wrapper, with all of it's children, doesn't.
 export function CtxMenu({
-	wrapperProps: { className: wrapperClassName, ...wrapperProps } = {
-		className: "",
-	},
 	ctxMenuContent,
 	onOpenChange,
+	wrapperProps,
 	children,
 	...props
 }: CtxMenuProps) {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<div
-			className={`ctx-menu-wrapper ${wrapperClassName}`}
-			{...wrapperProps}
-			ref={wrapperRef}
-		>
+		<div data-ctx-menu-wrapper {...wrapperProps} ref={wrapperRef}>
 			<CtxMenuContent
 				ctxMenuContent={ctxMenuContent}
 				onOpenChange={onOpenChange}
@@ -39,7 +36,6 @@ export function CtxMenu({
 /////////////////////////////////////////
 
 function CtxMenuContent({
-	className = "",
 	ctxMenuContent,
 	onContextMenu,
 	onOpenChange,
@@ -65,7 +61,7 @@ function CtxMenuContent({
 					ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
 			  ) => void)
 			| null) = (event) => {
-			// Assume isOpen === false
+			// Assume isOpen === false.
 
 			event.stopPropagation();
 			event.preventDefault();
@@ -94,25 +90,20 @@ function CtxMenuContent({
 			isOpen &&
 				setTimeout(
 					// If I don't put a setTimeout, it just opens and closes!
-					() =>
-						document.addEventListener("pointerup", closeOnClickAnywhere, {
-							once: true,
-						}),
+					() => once("pointerup", closeOnClickAnywhere),
 					200,
 				);
 
-			return () =>
-				document.removeEventListener("pointerup", closeOnClickAnywhere);
+			return () => removeOn("pointerup", closeOnClickAnywhere);
 		},
 		[isOpen],
 	);
 
 	return (
 		<div
-			className={`${contentClass} ${className}`}
+			data-ctx-menu-content
 			data-is-open={isOpen}
 			ref={contentRef}
-			role="dialog"
 			{...props}
 		>
 			{ctxMenuContent}

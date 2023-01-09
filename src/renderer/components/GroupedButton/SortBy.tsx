@@ -3,18 +3,16 @@ import type { ValuesOf } from "@common/@types/utils";
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
-import { SelectContent, SelectTrigger } from "../Select";
 import { useTranslation } from "@i18n";
+import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
 import { setFromList } from "../MediaListKind/states";
 import { MenuItem } from "../MenuItem";
-
-const selectOrderOptionsId = "select-order-options-id";
-const closeSelect = () =>
-	document.getElementById(selectOrderOptionsId)?.click();
+import { Select } from "../Select";
 
 export function SortBy() {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
+	const [isOpen, setIsOpen] = useState(false);
 	const { t } = useTranslation();
 
 	useEffect(() => {
@@ -28,19 +26,19 @@ export function SortBy() {
 
 	return (
 		<>
-			<SelectTrigger
-				labelClassName="grouped-button rounded-r-xl" // Same as ButtonOfGroup.
-				labelProps={{ title: t("tooltips.sortBy") }}
-				htmlTargetName={selectOrderOptionsId}
+			<ButtonOfGroup
+				onPointerUp={() => setIsOpen(true)}
+				title={t("tooltips.sortBy")}
+				className="rounded-r-xl" // Same as ButtonOfGroup.
 			>
-				<SortIcon size={19} className="fill-white" />
-			</SelectTrigger>
+				<SortIcon size="19" className="fill-white" />
+			</ButtonOfGroup>
 
-			<SelectContent htmlFor={selectOrderOptionsId}>
+			<Select isOpen={isOpen}>
 				<MenuItem
 					onPointerUp={() => {
 						setSelectedList("Name");
-						closeSelect();
+						setIsOpen(false);
 					}}
 				>
 					{t("sortTypes.name")}
@@ -49,12 +47,12 @@ export function SortBy() {
 				<MenuItem
 					onPointerUp={() => {
 						setSelectedList("Date");
-						closeSelect();
+						setIsOpen(false);
 					}}
 				>
 					{t("sortTypes.date")}
 				</MenuItem>
-			</SelectContent>
+			</Select>
 		</>
 	);
 }

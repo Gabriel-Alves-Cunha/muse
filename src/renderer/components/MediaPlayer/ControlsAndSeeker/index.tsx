@@ -24,13 +24,13 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 	const { isRandom, loopThisMedia } = usePlayOptions();
 	const { t } = useTranslation();
 
-	const isThereAMedia = !audio?.src;
+	const isThereAMedia = !!audio?.src;
 
 	return (
-		<div className="absolute flex flex-col bottom-10 w-full">
+		<div className="media-player-seeker">
 			<SeekerWrapper audio={audio} />
 
-			<div className="flex justify-between items-center mt-[10%]">
+			<div>
 				<CircleIconButton
 					title={t("tooltips.toggleLoopThisMedia")}
 					onPointerUp={toggleLoopMedia}

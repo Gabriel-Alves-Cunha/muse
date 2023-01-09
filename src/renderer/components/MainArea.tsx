@@ -1,5 +1,5 @@
-export const MainArea = ({ className = "", ...props }: Props) => (
-	<main className={`grid-area-main ${className}`} {...props} />
+export const MainArea = (props: Props) => (
+	<main data-grid-area-main {...props} />
 );
 
 type Props = React.BaseHTMLAttributes<HTMLButtonElement>;

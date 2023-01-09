@@ -17,7 +17,7 @@ export function Controls({ isDisabled, audio }: ControlsProps) {
 	const { t } = useTranslation();
 
 	return (
-		<div className="relative flex justify-center items-center w-[120px]">
+		<div className="media-player-controls">
 			<CircleIconButton
 				title={t("tooltips.playPreviousTrack")}
 				onPointerUp={playPreviousMedia}

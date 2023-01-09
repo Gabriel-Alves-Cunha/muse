@@ -1,27 +1,19 @@
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
+import { CenteredModal } from "./CenteredModal";
 import { reloadWindow } from "./MediaListKind/helper";
 import { WarningSign } from "./WarningSign";
-import {
-	CloseOpenedCenteredModal,
-	OpenedCenteredModal,
-} from "./OpenedCenteredModal";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-const errorFallbackModalHtmlId = "error-fallback-modal";
-
 export function ErrorFallback({ description }: ErrorBoundaryProps) {
 	const { t } = useTranslation();
 
 	return (
-		<OpenedCenteredModal
-			className="relative flex flex-col items-center"
-			htmlTargetName={errorFallbackModalHtmlId}
-		>
+		<CenteredModal className="relative flex flex-col items-center" isOpen>
 			<h1 className="flex items-center title">
 				{t("errors.mediaListKind.errorTitle")}
 
@@ -32,25 +24,20 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 				{description}
 			</p>
 
-			<CloseOpenedCenteredModal
+			<button
+				data-modal-close-reset
 				onPointerUp={() => {
 					resetAllAppData();
 					reloadWindow();
 				}}
-				htmlFor={errorFallbackModalHtmlId}
-				className="modal-close-reset"
 			>
 				{t("buttons.resetAllAppData")}
-			</CloseOpenedCenteredModal>
+			</button>
 
-			<CloseOpenedCenteredModal
-				htmlFor={errorFallbackModalHtmlId}
-				className="modal-close-reset"
-				onPointerUp={reloadWindow}
-			>
+			<button data-modal-close-reset onPointerUp={reloadWindow}>
 				{t("buttons.reloadWindow")}
-			</CloseOpenedCenteredModal>
-		</OpenedCenteredModal>
+			</button>
+		</CenteredModal>
 	);
 }
 

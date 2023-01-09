@@ -19,13 +19,13 @@ export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
 	const { t } = useTranslation();
 
-	const loadAndOrToggleLyrics = async (): Promise<void> => {
+	async function loadAndOrToggleLyrics(): Promise<void> {
 		if (lyrics) return flipMediaPlayerCard();
 
 		setIsLoadingLyrics(true);
 		await searchAndOpenLyrics(id, openLyrics);
 		setIsLoadingLyrics(false);
-	};
+	}
 
 	return (
 		<CircleIconButton

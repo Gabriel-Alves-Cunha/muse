@@ -52,8 +52,8 @@ export const DecorationsDown = () => (
 
 /////////////////////////////////////////////
 
-const WindowButton = ({ className = "", ...props }: WindowButtonProps) => (
-	<button className={`window-button ${className}`} {...props} />
+const WindowButton = (props: WindowButtonProps) => (
+	<button data-window-button {...props} />
 );
 
 /////////////////////////////////////////////

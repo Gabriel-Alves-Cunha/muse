@@ -25,10 +25,8 @@ const cache: Map<ID, ValuesOf<typeof status>> = new Map();
 /////////////////////////////////////////////
 // Main function:
 
-const defaultClassName = "object-cover h-11 rounded-xl before:hidden";
-
 export function ImgWithFallback({
-	className = defaultClassName,
+	className = "object-cover h-11 rounded-xl before:hidden",
 	Fallback,
 	mediaImg,
 	mediaID,
@@ -49,17 +47,19 @@ export function ImgWithFallback({
 		};
 
 		img.onerror = (e) => {
-			error("Failed image; going to erasing it...", {
-				media: getMedia(mediaID),
-				mediaImg,
-				e,
-			});
+			setTimeout(() => {
+				error("Failed image; going to erasing it...", {
+					media: getMedia(mediaID),
+					mediaImg,
+					e,
+				});
 
-			sendMsgToBackend({
-				thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
-				type: ReactToElectronMessage.WRITE_TAG,
-				mediaPath: getMedia(mediaID)!.path,
-			});
+				sendMsgToBackend({
+					thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
+					type: ReactToElectronMessage.WRITE_TAG,
+					mediaPath: getMedia(mediaID)!.path,
+				});
+			}, 1_000);
 
 			cache.set(mediaID, FAILURE);
 
@@ -78,10 +78,12 @@ export function ImgWithFallback({
 	if (cacheStatus === SUCCESS)
 		return <img className={className} loading="lazy" src={mediaImg} alt="" />;
 
-	// else cacheStatus === FAILURE || cacheStatus === PENDING
+	// Else cacheStatus === FAILURE || cacheStatus === PENDING
 	return Fallback;
 }
 
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 

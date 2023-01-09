@@ -4,10 +4,10 @@ import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 
 import { getDownloadingList, useDownloadingList } from "@contexts/downloadList";
 import { cancelDownloadAndOrRemoveItFromList } from "./helper";
-import { Progress, progressIcons } from "@components/Progress";
+import { Progress, progressIcons } from "../Progress";
 import { ProgressStatus } from "@common/enums";
 import { useTranslation } from "@i18n";
-import { Button } from "@components/Button";
+import { Button } from "../Button";
 
 import { handleSingleItemDeleteAnimation } from "./styles";
 
