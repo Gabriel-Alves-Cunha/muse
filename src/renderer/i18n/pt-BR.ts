@@ -53,7 +53,7 @@ export const pt_BR_Translations: Translations = {
 	},
 
 	labels: {
-		pasteVideoURL: "Cole uma url do YouTube aqui",
+		pasteVideoURL: "Cole uma URL do YouTube aqui",
 		searchForSongs: "Pesquisar por músicas",
 		duration: "Duração",
 		genres: "Gênero",
@@ -70,15 +70,15 @@ export const pt_BR_Translations: Translations = {
 			"Error ao salvar novos metadados. Veja o console pressionando Ctrl+Shift+i.",
 		assureMediaHasArtistMetadata:
 			'Deve haver "Artista" nos metadados da media!',
-		mediaMetadataSaved: "Novos metadados salvos.",
-		convertAlreadyExists: "Já há uma conversão de ",
 		downloadAlreadyExists: "Já há uma transferência de ",
-		conversionCanceled: "Conversão cancelada para ",
-		conversionSuccess: "Conversão bem sucedida para ",
-		downloadCanceled: "Transferência cancelada para ",
-		conversionFailed: "Conversão falhou para ",
 		downloadSuccess: "Transferência bem sucedida para ",
 		noLyricsFound: "Não foram encontradas letras para ",
+		downloadCanceled: "Transferência cancelada para ",
+		conversionSuccess: "Conversão bem sucedida para ",
+		convertAlreadyExists: "Já há uma conversão de ",
+		conversionCanceled: "Conversão cancelada para ",
+		mediaMetadataSaved: "Novos metadados salvos.",
+		conversionFailed: "Conversão falhou para ",
 		mediaDeletionSuccess: "Media deletada: ",
 		mediaDeletionError: {
 			beforePath: "Erro ao deletar ",
@@ -126,8 +126,8 @@ export const pt_BR_Translations: Translations = {
 
 	decorations: {
 		selected: "selecionadas",
-		medias: "medias",
 		size: "Tamanho",
+		media: "media",
 	},
 
 	pages: {
@@ -139,8 +139,8 @@ export const pt_BR_Translations: Translations = {
 	},
 
 	titles: {
-		convert: "Converter medias para 'mp3'",
 		history: "Histórico dos áudio tocados",
+		convert: "Converter medias para 'mp3'",
 		download: "Baixar media como áudio",
 		favorites: "Meus audios favoritos",
 		home: "Lista de todos os audios",

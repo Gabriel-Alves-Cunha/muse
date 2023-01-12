@@ -25,10 +25,13 @@ export const BaseInput = ({
 /////////////////////////////////////////
 // Helper function:
 
+// TODO: handle on input spacebar
 function handleKeyUp(
 	event: React.KeyboardEvent<HTMLInputElement>,
 	onEscape?: () => void,
 ): void {
+	event.stopPropagation();
+
 	if (event.key === "Escape" && !isAModifierKeyPressed(event))
 		// Close SearchMediaPopover on "Escape":
 		onEscape?.();

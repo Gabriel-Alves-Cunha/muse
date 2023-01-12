@@ -1,5 +1,9 @@
-export const Button = ({ variant, ...props }: Props) => (
-	<button data-variant={variant} data-button {...props} />
+import { forwardRef } from "react";
+
+export const Button = forwardRef<HTMLButtonElement, Props>(
+	({ variant, ...props }, forwardedRef) => (
+		<button data-variant={variant} data-button ref={forwardedRef} {...props} />
+	),
 );
 
 /////////////////////////////////////////////

@@ -13,7 +13,7 @@ import { useTranslation } from "@i18n";
 /////////////////////////////////////////
 // Main function:
 
-export function Controls({ isDisabled, audio }: ControlsProps) {
+export function Controls({ isThereAMedia }: ControlsProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -21,17 +21,17 @@ export function Controls({ isDisabled, audio }: ControlsProps) {
 			<CircleIconButton
 				title={t("tooltips.playPreviousTrack")}
 				onPointerUp={playPreviousMedia}
-				disabled={isDisabled}
+				disabled={!isThereAMedia}
 			>
 				<Previous />
 			</CircleIconButton>
 
-			<PlayPauseButton isDisabled={isDisabled} audio={audio} />
+			<PlayPauseButton isThereAMedia={isThereAMedia} />
 
 			<CircleIconButton
 				title={t("tooltips.playNextTrack")}
 				onPointerUp={playNextMedia}
-				disabled={isDisabled}
+				disabled={!isThereAMedia}
 			>
 				<Next />
 			</CircleIconButton>
@@ -44,7 +44,7 @@ export function Controls({ isDisabled, audio }: ControlsProps) {
 /////////////////////////////////////////
 // Types:
 
-export type ControlsProps = { isDisabled: boolean; audio: Audio };
+export type ControlsProps = { isThereAMedia: boolean };
 
 /////////////////////////////////////////
 

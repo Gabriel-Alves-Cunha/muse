@@ -5,7 +5,6 @@ import { useCurrentPlaying } from "@contexts/useCurrentPlaying";
 import { usePlaylists } from "@contexts/usePlaylists";
 import { Lyrics } from "./Lyrics";
 import { Player } from "./Player";
-import { log } from "@common/log";
 import {
 	logSecurityPolicyViolation,
 	handleAudioCanPlay,
@@ -30,26 +29,22 @@ export function MediaPlayer() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const id = useCurrentPlaying(idSelector);
 
+	const audio = audioRef.current;
 	const media = mainList.get(id);
 
 	useEffect(() => {
 		// Flip media player card to frontCard:
-		log("flip MediaPlayerCard to normal player", audioRef.current?.src);
-
-		document
-			.getElementById(mediaPlayerFlipCardId)
-			?.classList.remove("flip-card-active");
+		document.getElementById(mediaPlayerFlipCardId)?.classList.remove("active");
 	}, [audioRef.current?.src]);
 
+	// Setting event listeners:
 	useEffect(() => {
-		// Setting event listeners:
-
-		const audio = audioRef.current;
 		if (!(audio && media)) return;
 
-		audio.onsecuritypolicyviolation = logSecurityPolicyViolation;
 		// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
-		audio.onloadeddata = handleLoadedData;
+		audio.addEventListener("loadeddata", handleLoadedData);
+
+		audio.onsecuritypolicyviolation = logSecurityPolicyViolation;
 		// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
 		audio.oncanplay = handleAudioCanPlay;
 		audio.oninvalid = logInvalid;
@@ -59,6 +54,11 @@ export function MediaPlayer() {
 		audio.onerror = logError;
 		audio.onabort = logAbort;
 		audio.onclose = logClose;
+
+		return () => {
+			// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
+			audio.removeEventListener("loadeddata", handleLoadedData);
+		};
 	}, [media, id]);
 
 	return (
@@ -66,7 +66,7 @@ export function MediaPlayer() {
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
-				frontCard={<Player audio={audioRef.current} media={media} id={id} />}
+				frontCard={<Player media={media} id={id} />}
 				backCard={<Lyrics media={media} id={id} />}
 			/>
 		</aside>

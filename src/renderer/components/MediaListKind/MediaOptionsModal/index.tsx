@@ -130,7 +130,7 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 				<>
 					<button
 						onPointerUp={() => setIsDeleteMediaModalOpen(true)}
-						className="remove-media"
+						data-remove-media
 					>
 						{t("buttons.deleteMedia")}
 

@@ -10,7 +10,7 @@
 			100vh - var(--top-decorations-height) - var(--down-decorations-height)
 		);
 
-		/* Default theme: light */
+		/************************** Default theme: light *************************/
 		/* Colors */
 		--accent-light: #9381ff;
 		--separator: #d7d3e2;
@@ -183,7 +183,7 @@
 	}
 
 	html {
-		@apply caret-accent selection:bg-accent selection:text-white overflow-hidden;
+		@apply caret-accent selection:bg-accent selection:text-white;
 	}
 
 	body {
@@ -315,7 +315,7 @@
 		@apply text-icon-deactivated flex flex-col py-4 justify-between items-center sm:w-11 md:w-16 bg-navbar no-transition grid-area-nav;
 	}
 
-	.nav > button:is(:focus, :focus-within, :hover) {
+	.nav > button:is(:focus, :hover) {
 		@apply text-active;
 	}
 
@@ -324,11 +324,10 @@
 	}
 
 	.buttons-for-pages button {
-		@apply flex justify-center items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
+		@apply flex justify-center outline-none items-center h-11 w-11 bg-none border-none text-icon-deactivated text-base;
 	}
 
-	.buttons-for-pages
-		button:is(:focus, :focus-within, :hover, [data-active="true"]) {
+	.buttons-for-pages button:is(:focus, :hover, [data-active="true"]) {
 		@apply text-icon-active;
 	}
 
@@ -360,6 +359,7 @@
 		@apply text-active;
 	}
 
+	/* This is to make the RightSlot disappear when element is focused: */
 	[data-base-input]:is(:has(+ span div), :focus-within, :focus, :hover)
 		#searcher-right-slot {
 		@apply hidden;
@@ -410,22 +410,6 @@
 		@apply invisible fixed inset-0 z-40 flex items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] no-transition;
 	}
 
-	.outside-dialog {
-		@apply inset-0 fixed;
-	}
-
-	.modal-state {
-		@apply hidden;
-	}
-
-	label .modal-state:disabled {
-		@apply text-disabled pointer-events-none;
-	}
-
-	.modal-state:checked + .modal-content-wrapper {
-		@apply visible;
-	}
-
 	[data-modal-content] {
 		@apply relative h-max max-h-[90%] max-w-md rounded-xl bg-popover scroll scroll-1;
 	}
@@ -440,7 +424,7 @@
 		@apply relative flex justify-center mx-auto items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
 	}
 
-	.icon-circle-modal-trigger:is(:focus, :focus-within, :hover) {
+	.icon-circle-modal-trigger:is(:focus, :hover) {
 		@apply text-normal bg-icon-button-hovered;
 	}
 
@@ -497,10 +481,6 @@
 	/* ********************************** */
 
 	/* Utils */
-
-	.unset-all {
-		all: unset;
-	}
 
 	.center {
 		transform: translate(-50%, -50%);
@@ -587,51 +567,44 @@
 		@apply appearance-none border-none transition-[width] duration-300 ease-linear w-48 h-1;
 	}
 
-	.seeker-container {
-		@apply flex flex-col w-full gap-2;
+	.timeline-container {
+		@apply flex flex-col w-full gap-2 no-transition;
 	}
 
-	.seeker-wrapper {
-		@apply relative block w-full cursor-default;
+	.timeline {
+		@apply appearance-none relative w-full h-1 bg-main cursor-pointer;
 	}
 
-	.seeker-wrapper:hover > span {
-		@apply absolute flex justify-center items-center bottom-3 h-5 w-9 transition-none bg-main rounded-sm font-primary text-center text-sm text-normal font-medium;
+	/* Tooltip */
+	.timeline::after {
+		@apply hidden content-[attr(data-tooltip-time)] absolute justify-center items-center bottom-3 h-5 w-9 transition-none bg-main rounded-sm font-primary text-center text-sm text-normal font-medium;
 	}
 
-	.seeker-wrapper[data-is-duration-valid="true"] {
-		@apply cursor-pointer;
+	.timeline:hover::after {
+		@apply flex;
+
+		left: var(--tooltip-position);
 	}
 
-	input[type="range"] {
-		@apply appearance-none w-full h-1 bg-main;
+	/* Progress background */
+	.timeline::before {
+		@apply content-[""] absolute h-full bg-accent;
+
+		width: var(--bg-handle-width);
 	}
 
-	/* TODO: Have to see this */
-	input[type="range"]::-webkit-slider-runnable-track {
-		@apply appearance-none;
+	/* Progress handle */
+	.timeline > div {
+		@apply absolute bg-white w-[2px] h-4 -mt-[6px] -z-10;
 
-		--max: 100;
-		--min: 0;
-		--value: 79;
-		--range: calc(var(--max) - var(--min));
-		--ratio: calc((var(--value) - var(--min)) / var(--range));
-		--sx: calc(0.5 * 2em + var(--ratio) * (100% - 2em));
-
-		background: linear-gradient(blue, blue) 0 / var(--sx) 100% no-repeat, white;
+		left: var(--handle-position);
 	}
 
-	input[type="range"]::-webkit-slider-thumb {
-		all: unset;
-
-		@apply w-[2px] h-4 bg-white mt-[6px];
+	[data-is-duration-valid="false"] {
+		@apply pointer-events-none;
 	}
 
-	span[data-hidden="true"] {
-		@apply hidden;
-	}
-
-	.seeker-info {
+	.timeline-info {
 		@apply flex justify-between items-center text-icon-media-player font-primary text-center text-lg;
 	}
 
@@ -661,7 +634,7 @@
 	}
 
 	[data-flip-card] > div > div {
-		@apply absolute w-full h-full bg-transparent z-10;
+		@apply absolute w-full h-full bg-transparent;
 
 		backface-visibility: hidden;
 	}
@@ -676,7 +649,7 @@
 		@apply flex justify-center items-center h-12 w-full mt-5 mx-auto mb-0 p-3 gap-4 whitespace-nowrap font-secondary tracking-wider font-medium border-accent border-solid cursor-pointer border-2 bg-none rounded-md text-decorations-down text-lg;
 	}
 
-	[data-button]:is(:focus, :focus-within, :hover) {
+	[data-button]:is(:focus, :hover) {
 		@apply bg-accent text-white;
 	}
 
@@ -725,7 +698,7 @@
 		@apply relative flex justify-center items-center bg-button-hover border-none px-5 h-9 transition-colors ease-linear cursor-pointer active:scale-95 first:rounded-l-xl last:rounded-r-xl;
 	}
 
-	[data-grouped-button]:is(:focus, :focus-within, :hover) {
+	[data-grouped-button]:is(:focus, :hover) {
 		@apply opacity-80;
 	}
 
@@ -743,11 +716,11 @@
 		@apply text-icon-active;
 	}
 
-	[data-has-items] span {
+	[data-has-items="true"] span {
 		@apply absolute w-[1.1rem] h-[1.1rem] -right-2 top-0 bg-green-700 rounded-full;
 	}
 
-	[data-has-items] span::before {
+	[data-has-items="true"] span::before {
 		@apply content-[attr(data-length)] relative flex justify-center items-center w-full h-full font-secondary tracking-wide text-white font-medium text-xs;
 	}
 
@@ -760,9 +733,11 @@
 	[data-row-wrapper] {
 		/* Because of Virtuoso, this can't have margins! */
 		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 rounded-lg p-2 transition-shadow;
+
+		margin: unset;
 	}
 
-	[data-row-wrapper] > button {
+	[data-row-wrapper] > button:first-child {
 		@apply relative flex items-center h-full w-[90%] cursor-pointer bg-none border-none;
 	}
 
@@ -806,7 +781,7 @@
 		@apply absolute right-2 top-2 flex justify-center items-center h-6 cursor-pointer px-4 rounded-full [&_svg]:fill-accent-light;
 	}
 
-	.close-media-options-modal:is(:focus, :focus-within, :hover) {
+	.close-media-options-modal:is(:focus, :hover) {
 		@apply bg-icon-button-hovered [&_svg]:fill-black;
 	}
 
@@ -821,10 +796,6 @@
 	#form > fieldset > input,
 	#form textarea {
 		@apply box-border inline-flex flex-1 justify-center items-center w-full h-9 border-2 border-solid border-input px-3 rounded-xl outline-none whitespace-nowrap text-input font-secondary tracking-wider text-base font-medium hover:border-active focus:border-active read-only:text-accent-light read-only:cursor-default read-only:border-none scroll scroll-1;
-	}
-
-	.remove-media {
-		@apply flex justify-between items-center h-9 gap-4 cursor-pointer bg-[#bb2b2e] py-0 px-4 rounded tracking-wider text-white font-semibold leading-9 hover:bg-[#821e20] focus:bg-[#821e20];
 	}
 
 	[data-remove-media] {
@@ -869,30 +840,9 @@
 		@apply flex justify-end gap-5 mt-4;
 	}
 
-	.single-button {
-		@apply h-10 w-10 rounded-full p-0;
-	}
-
 	.reflect-img {
 		-webkit-box-reflect: below 10px
 			linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.4));
-	}
-
-	.active-icon {
-		@apply text-icon-active;
-	}
-
-	.delete-media {
-		background: #bb2b2e;
-		color: white;
-	}
-
-	.delete-media:is(:focus, :focus-within, :hover) {
-		background: #821e20;
-	}
-
-	.delete-media-overlay {
-		@apply w-80 h-5;
 	}
 
 	header[data-main-area-header] {
@@ -924,15 +874,13 @@
 		animation: 2s linear 0s infinite normal none running;
 	}
 
-	[data-ring-loader] > span:first-child {
+	[data-ring-loader] > span {
 		@apply side-ring-loader;
 
 		animation-name: anim-right-ring-loader;
 	}
 
 	[data-ring-loader] > span:last-child {
-		@apply side-ring-loader;
-
 		animation-name: anim-left-ring-loader;
 	}
 
@@ -961,15 +909,11 @@
 	/* Context Menu */
 
 	[data-ctx-menu-wrapper] {
-		@apply w-full h-full no-transition;
+		@apply w-full h-full;
 	}
 
 	[data-ctx-menu-content] {
-		@apply fixed invisible select-content w-min z-50;
-	}
-
-	[data-ctx-menu-content][data-is-open="true"] {
-		@apply visible;
+		@apply relative p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md w-min z-50;
 	}
 
 	/* ********************************** */
@@ -998,7 +942,7 @@
 		@apply flex items-center justify-center w-5 h-5 cursor-pointer rounded-full no-transition [&_svg]:fill-[var(--text-alternative)];
 	}
 
-	.box > .right button:is(:focus, :focus-within, :hover) {
+	.box > .right button:is(:focus, :hover) {
 		@apply bg-icon-button-hovered [&_svg]:fill-[var(--text-oposite)];
 	}
 
@@ -1058,7 +1002,7 @@
 		@apply flex justify-center items-center w-11 h-11 bg-none border-none text-icon-deactivated;
 	}
 
-	[data-toggle-theme-button]:is(:focus, :focus-within, :hover) {
+	[data-toggle-theme-button]:is(:focus, :hover) {
 		@apply hover:text-icon-active focus:text-icon-active;
 	}
 
@@ -1066,22 +1010,10 @@
 	/* ********************************** */
 	/* ********************************** */
 
-	/* New Select */
-
-	.select-state {
-		@apply hidden;
-	}
-
-	.select-state:checked + .select-content-wrapper {
-		@apply visible;
-	}
-
-	.select-content-wrapper {
-		@apply fixed invisible z-30 no-transition;
-	}
+	/* Select */
 
 	[data-select-content] {
-		@apply relative p-1 h-fit w-fit rounded-md bg-select no-transition overflow-hidden shadow-md;
+		@apply fixed p-1 h-fit w-fit rounded-md bg-select no-transition overflow-hidden shadow-md;
 	}
 
 	/* ********************************** */
@@ -1099,7 +1031,7 @@
 	}
 
 	[data-circle-icon-button]:disabled {
-		@apply bg-none cursor-default pointer-events-none;
+		@apply pointer-events-none;
 	}
 
 	[data-circle-icon-button] svg {
@@ -1126,17 +1058,13 @@
 
 	/* Popover */
 
-	.popover {
+	/* .popover {
 		@apply flex flex-col p-1 gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1;
-	}
-
-	.popover:is(:focus, :focus-within, :hover) {
-		@apply shadow-popover outline-none;
 	}
 
 	.popover > p {
 		@apply relative text-icon-deactivated font-secondary tracking-wide text-center font-medium;
-	}
+	} */
 
 	[data-popover-content] {
 		@apply relative p-1 no-transition scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover;
@@ -1171,7 +1099,7 @@
 	/* Media Player */
 
 	.aside {
-		@apply grid-area-media-player relative inline-block justify-items-center items-center w-full justify-self-center self-start p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom;
+		@apply grid-area-media-player relative inline-block justify-items-center w-full justify-self-center p-3 bg-gradient-to-br from-lingrad-top to-lingrad-bottom;
 	}
 
 	.aside svg {
@@ -1235,7 +1163,7 @@
 	}
 
 	.result img {
-		@apply object-cover h-44 w-80 mx-auto shadow-reflect reflect-img transition-transform hover:transition-scale hover:scale-110 focus:scale-x-110;
+		@apply object-cover h-44 w-80 mx-auto shadow-reflect reflect-img hover:transition-[scale] hover:scale-110 focus:scale-x-110;
 	}
 
 	.result p {

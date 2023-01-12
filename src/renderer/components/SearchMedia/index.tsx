@@ -66,7 +66,7 @@ export function SearchMedia() {
 				value={searchTerm}
 				spellCheck="false"
 				autoCorrect="off"
-				id="search-songs"
+				// id="search-songs"
 				accessKey="s"
 			/>
 

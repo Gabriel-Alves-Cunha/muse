@@ -56,7 +56,7 @@ const Row = memo(
 			<div
 				data-is-selected-row={getAllSelectedMedias().has(id)}
 				data-is-playing-row={getCurrentPlaying().id === id}
-				className="row-wrapper"
+				data-row-wrapper
 				data-id={id}
 			>
 				<button

@@ -29,7 +29,6 @@ export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 ////////////////////////////////////////////////
 // Helper functions:
 
-const { t } = useTranslation();
 
 export function downloadMedia(): void {
 	const {
@@ -75,6 +74,8 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 		setSearchInfo({ isLoading: false, result });
 	} catch (err) {
+const { t } = useTranslation();
+
 		setSearchInfo({
 			result: defaultSearchInfo.result,
 			isLoading: false,

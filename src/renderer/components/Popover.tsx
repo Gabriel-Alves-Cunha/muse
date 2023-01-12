@@ -41,12 +41,12 @@ export function Popover({
 			setTimeout(() => {
 				// If I don't put a setTimeout, it just opens and closes!
 				once("pointerup", closeOnClickOutside);
-				once("keypress", closeOnEscape);
+				once("keyup", closeOnEscape);
 			}, 200);
 
 		return () => {
 			removeOn("pointerup", closeOnClickOutside);
-			removeOn("keypress", closeOnEscape);
+			removeOn("keyup", closeOnEscape);
 		};
 	}, [isOpen, setIsOpen]);
 

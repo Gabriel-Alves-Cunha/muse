@@ -54,7 +54,7 @@ export const en_US_Translations: Translations = {
 	},
 
 	labels: {
-		pasteVideoURL: "Paste YouTube url here",
+		pasteVideoURL: "Paste YouTube URL here",
 		searchForSongs: "Search for songs",
 		duration: "Duration",
 		genres: "Genres",
@@ -70,9 +70,9 @@ export const en_US_Translations: Translations = {
 		mediaMetadataNotSaved:
 			"Unable to save new metadata. See console by pressing Ctrl+Shift+i.",
 		assureMediaHasArtistMetadata: "Make sure that media has artist metadata!",
+		downloadAlreadyExists: "There is already one download of ",
 		mediaMetadataSaved: "New media metadata has been saved.",
 		convertAlreadyExists: "There is already one convert of ",
-		downloadAlreadyExists: "There is already one download of ",
 		conversionCanceled: "Conversion cancelled for ",
 		conversionSuccess: "Conversion  succeded for ",
 		downloadCanceled: "Download cancelled for ",
@@ -123,7 +123,7 @@ export const en_US_Translations: Translations = {
 		converted: "Converted",
 	},
 
-	decorations: { size: "Size", medias: "medias", selected: "selected" },
+	decorations: { size: "Size", media: "media", selected: "selected" },
 
 	pages: {
 		Favorites: "Favorites",

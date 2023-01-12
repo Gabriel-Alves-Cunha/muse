@@ -28,7 +28,6 @@ export const useNewConvertions = create<NewConvertions>(() => ({
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-const { t } = useTranslation();
 
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
@@ -39,6 +38,8 @@ export function createNewConvertion(
 	dbg("Trying to create a new conversion...", { convertingList });
 
 	if (convertingList.has(path)) {
+const { t } = useTranslation();
+
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		error(info, convertingList);
@@ -137,6 +138,9 @@ function handleUpdateConvertingList(
 	setConvertingList(
 		new Map(convertingList).set(path, { ...thisConversion, ...data }),
 	);
+
+const { t } = useTranslation();
+
 
 	// Handle status:
 	switch (data.status) {

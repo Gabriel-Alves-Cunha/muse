@@ -3,8 +3,8 @@ import type { ControlsProps } from "./Controls";
 import { IoPauseSharp as Pause, IoPlaySharp as Play } from "react-icons/io5";
 import { useEffect, useState } from "react";
 
+import { getAudio, togglePlayPause } from "@contexts/useCurrentPlaying";
 import { CircleIconButton } from "@components/CircleIconButton";
-import { togglePlayPause } from "@contexts/useCurrentPlaying";
 import { useTranslation } from "@i18n";
 
 /////////////////////////////////////////
@@ -12,7 +12,7 @@ import { useTranslation } from "@i18n";
 /////////////////////////////////////////
 // Main function:
 
-export function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
+export function PlayPauseButton({ isThereAMedia }: ControlsProps) {
 	const [isPaused, setIsPaused] = useState(true);
 	const { t } = useTranslation();
 
@@ -20,17 +20,18 @@ export function PlayPauseButton({ isDisabled, audio }: ControlsProps) {
 	const setIsPausedToTrue = () => setIsPaused(true);
 
 	useEffect(() => {
+		const audio = getAudio();
 		if (!audio) return;
 
 		audio.addEventListener("pause", setIsPausedToTrue);
 		audio.addEventListener("play", setIsPausedToFalse);
-	}, [audio]);
+	}, [isThereAMedia]);
 
 	return (
 		<CircleIconButton
 			title={t("tooltips.playPause")}
 			onPointerUp={togglePlayPause}
-			disabled={isDisabled}
+			disabled={!isThereAMedia}
 			variant="large"
 		>
 			{isPaused ? <Play size={25} /> : <Pause size={25} />}

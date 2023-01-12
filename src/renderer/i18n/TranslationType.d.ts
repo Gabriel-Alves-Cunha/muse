@@ -97,7 +97,7 @@ export type Translations = {
 		converted: string;
 	};
 
-	decorations: { size: string; medias: string; selected: string };
+	decorations: { size: string; media: string; selected: string };
 
 	pages: Record<Page, string>;
 

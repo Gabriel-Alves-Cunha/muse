@@ -6,7 +6,7 @@ import { ControlsAndSeeker } from "./ControlsAndSeeker";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { Header } from "./Header";
 
-export const Player = ({ media, audio, id }: PlayerProps) => (
+export const Player = ({ media, id }: PlayerProps) => (
 	<>
 		<Header media={media} id={id} />
 
@@ -24,7 +24,7 @@ export const Player = ({ media, audio, id }: PlayerProps) => (
 			<span className="text-sm font-normal">{media?.artist}</span>
 		</div>
 
-		<ControlsAndSeeker audio={audio} />
+		<ControlsAndSeeker isThereAMedia={Boolean(id)} />
 	</>
 );
 
@@ -34,7 +34,6 @@ export const Player = ({ media, audio, id }: PlayerProps) => (
 // Types:
 
 type PlayerProps = {
-	audio: HTMLAudioElement | null;
 	media: Media | undefined;
 	id: ID;
 };

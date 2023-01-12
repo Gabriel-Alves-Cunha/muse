@@ -99,16 +99,11 @@ function CtxMenuContent({
 		[isOpen],
 	);
 
-	return (
-		<div
-			data-ctx-menu-content
-			data-is-open={isOpen}
-			ref={contentRef}
-			{...props}
-		>
+	return isOpen ? (
+		<div data-ctx-menu-content ref={contentRef} {...props}>
 			{ctxMenuContent}
 		</div>
-	);
+	) : null;
 }
 
 /////////////////////////////////////////

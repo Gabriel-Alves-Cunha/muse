@@ -24,6 +24,7 @@ import {
 	getMedia,
 	History,
 } from "./usePlaylists";
+import { isAModifierKeyPressed } from "@utils/keyboard";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -65,7 +66,12 @@ export const getAudio = () =>
 
 ////////////////////////////////////////////////
 
-export const togglePlayPause = () => (getAudio()?.paused ? play() : pause());
+export function togglePlayPause() {
+	const audio = getAudio();
+	if (!audio?.src) return;
+
+	audio?.paused ? play() : pause();
+}
 
 ////////////////////////////////////////////////
 
@@ -75,7 +81,7 @@ export const play = () => getAudio()?.play().then();
 
 export function pause(): void {
 	const audio = getAudio();
-	if (!audio) return;
+	if (!audio?.src) return;
 
 	audio.pause();
 	const lastStoppedTime = audio.currentTime;
@@ -292,6 +298,16 @@ function changeMediaSessionMetadata(media: Media): void {
 		album: media.album,
 	});
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+function playOrPauseOnSpaceKey(e: KeyboardEvent): void {
+	if (e.key === " " && !isAModifierKeyPressed(e)) togglePlayPause();
+}
+
+window.addEventListener("keyup", playOrPauseOnSpaceKey);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

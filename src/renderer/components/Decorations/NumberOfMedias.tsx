@@ -12,7 +12,7 @@ export function NumberOfMedias() {
 
 	return (
 		<p>
-			{numberOfMedias} {t("decorations.medias")}
+			{numberOfMedias} {t("decorations.media")}
 			{plural ? "s" : ""}
 		</p>
 	);

@@ -34,7 +34,7 @@ export function SortBy() {
 				<SortIcon size="19" className="fill-white" />
 			</ButtonOfGroup>
 
-			<Select isOpen={isOpen}>
+			<Select isOpen={isOpen} setIsOpen={setIsOpen}>
 				<MenuItem
 					onPointerUp={() => {
 						setSelectedList("Name");

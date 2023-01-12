@@ -11,7 +11,7 @@ export const FlipCard = ({ frontCard, backCard }: Props) => (
 		<div>
 			<div className="z-20">{frontCard}</div>
 
-			<div>{backCard}</div>
+			<div className="z-10">{backCard}</div>
 		</div>
 	</div>
 );

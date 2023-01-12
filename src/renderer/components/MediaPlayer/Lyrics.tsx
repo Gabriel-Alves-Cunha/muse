@@ -35,7 +35,6 @@ export const flipMediaPlayerCard = (): void =>
 
 /////////////////////////////////////////
 
-const { t } = useTranslation();
 
 export async function searchAndOpenLyrics(
 	mediaID: ID,
@@ -46,8 +45,11 @@ export async function searchAndOpenLyrics(
 	const media = getMedia(mediaID);
 
 	if (!media) return warn(`No media with id = "${mediaID}" found!`);
-
+	
+	const { t } = useTranslation();
+	
 	if (!media.artist) {
+
 		infoToast(t("toasts.assureMediaHasArtistMetadata"));
 		return;
 	}

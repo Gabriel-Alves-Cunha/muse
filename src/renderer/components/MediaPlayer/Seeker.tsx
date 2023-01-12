@@ -1,132 +1,179 @@
-import type { RefToAudio } from "./ControlsAndSeeker";
+import { useEffect, useRef, useState } from "react";
 
-import { useEffect, useMemo, useRef } from "react";
-
-import { formatDuration, mapTo } from "@common/utils";
+import { formatDuration } from "@common/utils";
+import { ControlsProps } from "./ControlsAndSeeker/Controls";
+import { getAudio } from "@contexts/useCurrentPlaying";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function SeekerWrapper({ audio }: RefToAudio) {
+let timeUpdate: NodeJS.Timer | undefined;
+
+export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 	const currentTimeRef = useRef<HTMLParagraphElement>(null);
-	const progressElementRef = useRef<HTMLInputElement>(null);
-	const progressWrapperRef = useRef<HTMLDivElement>(null);
-	const timeTooltipRef = useRef<HTMLSpanElement>(null);
-	const isPointerOnSlider = useRef(false);
-
-	const { formatedDuration, isDurationValid } = useMemo(
-		() => ({
-			formatedDuration: formatDuration(audio?.duration),
-			// @ts-ignore => It will give false if duration is undefined:
-			isDurationValid: audio?.duration > 0,
-		}),
-		[audio?.duration],
-	);
+	const timelineRef = useRef<HTMLInputElement>(null);
+	const [[formatedDuration, isDurationValid], setIsAudioAvailable] = useState([
+		"00:00",
+		false,
+	]);
 
 	useEffect(() => {
-		// 		const progressElement = progressElementRef.current;
-		// 		const timerTooltip = timeTooltipRef.current;
-		const timeline = progressWrapperRef.current;
-		//
-		// 		if (!(timeline && timerTooltip && audio?.src && progressElement)) return;
-		if (!(audio?.duration && timeline)) return;
+		const timeline = timelineRef.current;
+		const audio = getAudio();
+		if (!(audio && timeline)) return;
 
-		audio.ontimeupdate = () => {
-			const progressElement = progressElementRef.current;
-			const currentTimeElement = currentTimeRef.current;
-			if (!(currentTimeElement && progressElement)) return;
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-			if (!isPointerOnSlider)
-				progressElement.value = `${(audio.currentTime / audio.duration) * 100}`;
+		audio.addEventListener("loadeddata", setAudioAvailability);
+		audio.addEventListener("pause", onPause);
+		audio.addEventListener("playing", onPlaying);
 
-			currentTimeElement.textContent = formatDuration(audio.currentTime);
+		timeline.addEventListener("pointerdown", handleOnPointerDown);
+		timeline.addEventListener("pointerenter", setTooltipTimeOnHover);
+
+		return () => {
+			audio.removeEventListener("loadeddata", setAudioAvailability);
+			audio.removeEventListener("pause", onPause);
+			audio.removeEventListener("playing", onPlaying);
+
+			timeline.removeEventListener("pointerdown", handleOnPointerDown);
+			timeline.removeEventListener("pointerenter", setTooltipTimeOnHover);
 		};
 
-		audio.onchange = () => {
-			const progressElement = progressElementRef.current;
-			if (!progressElement) return;
+		/////////////////////////////////////////
+		/////////////////////////////////////////
 
-			const percentage = Number(progressElement.value) / 100;
-
-			audio.currentTime = (audio.duration || 0) * percentage;
-		};
-
-		function setTimerTooltip({ offsetX }: PointerEvent): void {
-			const timerTooltip = timeTooltipRef.current;
-			if (!(audio?.duration && timeline && timerTooltip)) return;
-
-			const time =
-				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-			const left = offsetX - 17.5; // 17.5 is half the width of the tooltip.
-
-			timerTooltip.textContent = formatDuration(time);
-			timerTooltip.style.left = `${left}px`;
+		function onPause() {
+			clearInterval(timeUpdate);
 		}
 
-		// 		function seek({ offsetX }: PointerEvent): void {
-		// 			if (!(audio && isFinite(audio.duration))) return;
-		//
-		// 			const desiredTime =
-		// 				(offsetX / timeline.getBoundingClientRect().width) * audio.duration;
-		// 			const percentage = mapTo(desiredTime, [0, audio.duration], [0, 100]);
-		//
-		// 			useProgress.setState({ percentage });
-		// 		}
+		function onPlaying(): void {
+			// The playing event is fired after playback is first started, and whenever it is restarted. For example it is fired when playback resumes after having been paused or delayed due to lack of data.
 
-		timeline.addEventListener("pointermove", setTimerTooltip);
+			clearInterval(timeUpdate);
 
-		timeline.addEventListener("pointerdown", (e) => {
-			// Make sure that event is captured even if pointer moves away from timeline rect bounds:
-			timeline.setPointerCapture(e.pointerId);
+			timeUpdate = setInterval(setTimeText, 1_000);
+		}
 
-			isPointerOnSlider.current = true;
-			// seek(e);
+		function setTimeText(): void {
+			const timeElement = currentTimeRef.current;
+			if (!(timeElement && timeline && audio)) return;
 
-			// timeline.addEventListener("pointermove", seek);
+			const percentage = `${(audio.currentTime / audio.duration) * 100}%`;
+
+			timeline.style.setProperty("--bg-handle-width", percentage);
+			timeline.style.setProperty("--handle-position", percentage);
+
+			timeElement.textContent = formatDuration(audio.currentTime);
+		}
+
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+
+		function setTooltipTimeOnHover(event: PointerEvent): void {
+			if (!timeline) return;
+
+			// Make so that all and any poiter events on the entire screen happens on timeline:
+			timeline.setPointerCapture(event.pointerId);
+
+			timeline.addEventListener("pointermove", seek);
+
 			timeline.addEventListener(
-				"pointerup",
-				(e) => {
-					// timeline.removeEventListener("pointermove", seek);
-
-					isPointerOnSlider.current = false;
-
-					const desiredTime =
-						(e.offsetX / timeline.getBoundingClientRect().width) *
-						audio.duration;
-
-					audio.currentTime = desiredTime;
+				"pointerleave",
+				() => {
+					timeline.removeEventListener("pointermove", seek);
 				},
 				{ once: true },
 			);
-		});
-	}, [audio]);
+		}
+
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+
+		function setAudioAvailability() {
+			const formatedDuration = formatDuration(audio?.duration);
+			// @ts-ignore => It will give false if duration is undefined:
+			const isDurationValid = audio?.duration > 0;
+
+			setIsAudioAvailable([formatedDuration, isDurationValid]);
+		}
+
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+
+		function setTimelinePosition({ offsetX }: PointerEvent): void {
+			if (!(timeline && audio)) return;
+
+			const { width } = timeline!.getBoundingClientRect();
+
+			const progress = offsetX / width;
+			const percentage = `${progress * 100}%`;
+
+			timeline.style.setProperty("--bg-handle-width", percentage);
+			timeline.style.setProperty("--handle-position", percentage);
+
+			audio.currentTime = progress * audio.duration;
+
+			setTimeText();
+		}
+
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+
+		function seek({ offsetX }: PointerEvent): void {
+			if (!(timeline && audio?.duration)) return;
+
+			const { width } = timeline.getBoundingClientRect();
+
+			const left = `${offsetX - 17.5}px`; // 17.5 is half the width of the tooltip.
+			const time = (offsetX / width) * audio.duration;
+
+			timeline.setAttribute("data-tooltip-time", formatDuration(time));
+			timeline.style.setProperty("--tooltip-position", left);
+		}
+
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+
+		function handleOnPointerDown(event: PointerEvent): void {
+			if (!timeline) return;
+
+			// Make so that all and any poiter events on the entire screen happens on timeline:
+			timeline.setPointerCapture(event.pointerId);
+
+			timeline.addEventListener("pointermove", seek);
+
+			timeline.addEventListener(
+				"pointerup",
+				() => {
+					timeline.removeEventListener("pointermove", seek);
+
+					setTimelinePosition(event);
+				},
+				{ once: true },
+			);
+		}
+	}, [isThereAMedia]);
+
+	/////////////////////////////////////////
+	/////////////////////////////////////////
+	/////////////////////////////////////////
 
 	return (
-		<div className="seeker-container">
+		<div className="timeline-container">
 			<div
-				data-is-duration-valid={isDurationValid}
 				// onPointerUp={e => seek(e, audio)}
 				// onPointerMove={setTimerTooltip}
-				className="seeker-wrapper"
-				ref={progressWrapperRef}
+				data-is-duration-valid={isDurationValid}
+				className="timeline"
+				ref={timelineRef}
 			>
-				<span // Timer tooltip
-					data-hidden={isDurationValid}
-					ref={timeTooltipRef}
-				/>
-
-				<input
-					ref={progressElementRef}
-					defaultValue="0"
-					type="range"
-					max="100"
-					step="1"
-					min="0"
-				/>
+				<div />
 			</div>
 
-			<div className="seeker-info">
+			<div className="timeline-info">
 				<p ref={currentTimeRef}>00:00</p>
 
 				<p>{formatedDuration}</p>

@@ -5,10 +5,10 @@ import {
 	MdRepeat as Repeat,
 } from "react-icons/md";
 
-import { type Audio, Controls } from "./Controls";
 import { CircleIconButton } from "@components/CircleIconButton";
 import { useTranslation } from "@i18n";
 import { SeekerWrapper } from "../Seeker";
+import { Controls } from "./Controls";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
@@ -20,31 +20,29 @@ import {
 /////////////////////////////////////////
 // Main function:
 
-export function ControlsAndSeeker({ audio }: RefToAudio) {
+export function ControlsAndSeeker({ isThereAMedia }: Props) {
 	const { isRandom, loopThisMedia } = usePlayOptions();
 	const { t } = useTranslation();
 
-	const isThereAMedia = !!audio?.src;
-
 	return (
 		<div className="media-player-seeker">
-			<SeekerWrapper audio={audio} />
+			<SeekerWrapper isThereAMedia={isThereAMedia} />
 
 			<div>
 				<CircleIconButton
 					title={t("tooltips.toggleLoopThisMedia")}
 					onPointerUp={toggleLoopMedia}
-					disabled={isThereAMedia}
+					disabled={!isThereAMedia}
 				>
 					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
 				</CircleIconButton>
 
-				<Controls audio={audio} isDisabled={isThereAMedia} />
+				<Controls isThereAMedia={isThereAMedia} />
 
 				<CircleIconButton
 					title={t("tooltips.toggleRandom")}
 					onPointerUp={toggleRandom}
-					disabled={isThereAMedia}
+					disabled={!isThereAMedia}
 				>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 				</CircleIconButton>
@@ -58,6 +56,6 @@ export function ControlsAndSeeker({ audio }: RefToAudio) {
 /////////////////////////////////////////
 // Types:
 
-export type RefToAudio = {
-	audio: Audio;
+type Props = {
+	isThereAMedia: boolean;
 };
