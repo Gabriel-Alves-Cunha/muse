@@ -16,6 +16,8 @@ import {
 	getMainList,
 	removeMedia,
 } from "@contexts/usePlaylists";
+import { togglePlayPause } from "@contexts/useCurrentPlaying";
+import { isAModifierKeyPressed } from "./keyboard";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -54,6 +56,14 @@ function listenToDropEvent(event: DragEvent): void {
 
 window.addEventListener("dragover", listenToDragoverEvent);
 window.addEventListener("drop", listenToDropEvent);
+
+//////////////////////////////////////////
+
+function playOrPauseOnSpaceKey(e: KeyboardEvent): void {
+	if (e.key === " " && !isAModifierKeyPressed(e)) togglePlayPause();
+}
+
+window.addEventListener("keyup", playOrPauseOnSpaceKey);
 
 //////////////////////////////////////////
 //////////////////////////////////////////

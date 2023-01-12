@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { once, removeOn } from "@utils/window";
+import { on, removeOn } from "@utils/window";
 import { leftClick } from "./MediaListKind/Row";
 
 export function CenteredModal({
@@ -15,6 +15,18 @@ export function CenteredModal({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
+		function closeOnEscape(event: KeyboardEvent): void {
+			// Assume that isOpen === true.
+
+			if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
+				event.stopImmediatePropagation();
+				event.stopPropagation();
+
+				setIsOpen?.(false);
+				onEscape?.();
+			}
+		}
+
 		function closeOnClickOutside(event: PointerEvent): void {
 			// Assume that isOpen === true.
 
@@ -26,36 +38,28 @@ export function CenteredModal({
 			)
 				return;
 
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+
 			onPointerDownOutside?.(event);
-
 			setIsOpen?.(false);
-		}
-
-		function closeOnEscape(event: KeyboardEvent): void {
-			// Assume that isOpen === true.
-
-			if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
-				setIsOpen?.(false);
-				onEscape?.();
-			}
 		}
 
 		isOpen &&
 			setTimeout(() => {
-				// If I don't put a setTimeout, it just opens and closes!
-				once("pointerup", closeOnClickOutside);
-				once("keyup", closeOnEscape);
+				on("pointerup", closeOnClickOutside);
+				on("keyup", closeOnEscape);
 			}, 200);
 
 		return () => {
 			removeOn("pointerup", closeOnClickOutside);
 			removeOn("keyup", closeOnEscape);
 		};
-	}, [isOpen, setIsOpen]);
+	}, [isOpen]);
 
 	return isOpen ? (
-		<div ref={contentRef} data-modal-content-wrapper {...wrapperProps}>
-			<div data-modal-content {...contentProps} />
+		<div data-modal-content-wrapper {...wrapperProps}>
+			<div ref={contentRef} data-modal-content {...contentProps} />
 		</div>
 	) : null;
 }

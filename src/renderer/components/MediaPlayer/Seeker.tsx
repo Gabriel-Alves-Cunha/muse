@@ -12,7 +12,7 @@ let timeUpdate: NodeJS.Timer | undefined;
 
 export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 	const currentTimeRef = useRef<HTMLParagraphElement>(null);
-	const timelineRef = useRef<HTMLInputElement>(null);
+	const timelineRef = useRef<HTMLDivElement>(null);
 	const [[formatedDuration, isDurationValid], setIsAudioAvailable] = useState([
 		"00:00",
 		false,
@@ -52,7 +52,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		function onPlaying(): void {
 			// The playing event is fired after playback is first started, and whenever it is restarted. For example it is fired when playback resumes after having been paused or delayed due to lack of data.
 
-			clearInterval(timeUpdate);
+			onPause();
 
 			timeUpdate = setInterval(setTimeText, 1_000);
 		}
@@ -106,15 +106,18 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		function setTimelinePosition({ offsetX }: PointerEvent): void {
 			if (!(timeline && audio)) return;
 
-			const { width } = timeline!.getBoundingClientRect();
+			const { width } = timeline.getBoundingClientRect();
 
-			const progress = offsetX / width;
-			const percentage = `${progress * 100}%`;
+			if (offsetX > width) offsetX = width;
+			if (offsetX < 0) offsetX = 0;
 
-			timeline.style.setProperty("--bg-handle-width", percentage);
-			timeline.style.setProperty("--handle-position", percentage);
+			const progress_0_to_1 = offsetX / width;
+			const percentageString = `${progress_0_to_1 * 100}%`;
 
-			audio.currentTime = progress * audio.duration;
+			timeline.style.setProperty("--bg-handle-width", percentageString);
+			timeline.style.setProperty("--handle-position", percentageString);
+
+			audio.currentTime = progress_0_to_1 * audio.duration;
 
 			setTimeText();
 		}
@@ -127,11 +130,18 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 
 			const { width } = timeline.getBoundingClientRect();
 
-			const left = `${offsetX - 17.5}px`; // 17.5 is half the width of the tooltip.
-			const time = (offsetX / width) * audio.duration;
+			if (offsetX > width) offsetX = width;
+			if (offsetX < 0) offsetX = 0;
 
-			timeline.setAttribute("data-tooltip-time", formatDuration(time));
+			const left = `${offsetX - 17.5}px`; // 17.5 is half the width of the tooltip.
+			const time_ms = (offsetX / width) * audio.duration;
+
+			timeline.setAttribute("data-tooltip-time", formatDuration(time_ms));
 			timeline.style.setProperty("--tooltip-position", left);
+			(timeline.firstElementChild as HTMLDivElement).style.setProperty(
+				"--handle-position-when-seeking",
+				`${offsetX}px`,
+			);
 		}
 
 		/////////////////////////////////////////
@@ -147,10 +157,10 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 
 			timeline.addEventListener(
 				"pointerup",
-				() => {
+				(e) => {
 					timeline.removeEventListener("pointermove", seek);
 
-					setTimelinePosition(event);
+					setTimelinePosition(e);
 				},
 				{ once: true },
 			);
@@ -164,8 +174,6 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 	return (
 		<div className="timeline-container">
 			<div
-				// onPointerUp={e => seek(e, audio)}
-				// onPointerMove={setTimerTooltip}
 				data-is-duration-valid={isDurationValid}
 				className="timeline"
 				ref={timelineRef}

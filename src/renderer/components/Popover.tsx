@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { once, removeOn } from "@utils/window";
+import { on, removeOn } from "@utils/window";
 import { leftClick } from "./MediaListKind/Row";
 
 export function Popover({
 	onPointerDownOutside,
 	setIsOpen,
+	onEscape,
 	isOpen,
 	size,
 	...contentProps
@@ -14,6 +15,18 @@ export function Popover({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
+		function closeOnEscape(event: KeyboardEvent): void {
+			// Assume that isOpen === true.
+
+			if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
+				event.stopImmediatePropagation();
+				event.stopPropagation();
+
+				setIsOpen?.(false);
+				onEscape?.();
+			}
+		}
+
 		function closeOnClickOutside(event: PointerEvent): void {
 			// Assume that isOpen === true.
 
@@ -25,30 +38,24 @@ export function Popover({
 			)
 				return;
 
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+
 			onPointerDownOutside?.(event);
-
 			setIsOpen?.(false);
-		}
-
-		function closeOnEscape(event: KeyboardEvent): void {
-			// Assume that isOpen === true.
-
-			if (event.key === "Escape" && !isAModifierKeyPressed(event))
-				setIsOpen?.(false);
 		}
 
 		isOpen &&
 			setTimeout(() => {
-				// If I don't put a setTimeout, it just opens and closes!
-				once("pointerup", closeOnClickOutside);
-				once("keyup", closeOnEscape);
+				on("pointerup", closeOnClickOutside);
+				on("keyup", closeOnEscape);
 			}, 200);
 
 		return () => {
 			removeOn("pointerup", closeOnClickOutside);
 			removeOn("keyup", closeOnEscape);
 		};
-	}, [isOpen, setIsOpen]);
+	}, []);
 
 	return isOpen ? (
 		<div
@@ -77,5 +84,6 @@ interface PopoverProps
 		| "search-media-results";
 	setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 	onPointerDownOutside?(event: PointerEvent): void;
+	onEscape?(): void;
 	isOpen: boolean;
 }

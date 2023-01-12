@@ -43,7 +43,7 @@ export default function MediaOptionsCtxMenu() {
 				</button>
 
 				<CenteredModal isOpen={isOpen} setIsOpen={setIsOpen}>
-					<DeleteMediaDialogContent deleteMediaPlusCloseDialog={deleteMedias} />
+					<DeleteMediaDialogContent handleDeleteMedia={deleteMedias} />
 				</CenteredModal>
 			</>
 

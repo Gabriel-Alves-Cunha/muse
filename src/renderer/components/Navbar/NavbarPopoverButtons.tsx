@@ -21,7 +21,7 @@ export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
 			</button>
 
 			<Popover
-				className="left-8 translate-x-1/2 -translate-y-1/2"
+				className="translate-x-[61%] -translate-y-1/2"
 				setIsOpen={setIsOpen}
 				isOpen={isOpen}
 				size={

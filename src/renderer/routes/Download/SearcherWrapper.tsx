@@ -29,8 +29,8 @@ export function SearcherWrapper() {
 				label={t("labels.pasteVideoURL")}
 				autoCapitalize="off"
 				spellCheck="false"
-				onChange={setUrl}
 				autoCorrect="off"
+				onChange={setUrl}
 				value={url}
 			/>
 

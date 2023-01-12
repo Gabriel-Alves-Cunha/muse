@@ -1,17 +1,17 @@
 import type { Media, Path } from "@common/@types/generalTypes";
 
-import { Suspense, useEffect, useRef, useState } from "react";
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as CloseIcon } from "react-icons/md";
 
 import { DeleteMediaDialogContent } from "../../DeleteMediaDialog";
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { once, removeOn } from "@utils/window";
 import { useTranslation } from "@i18n";
-import { CenteredModal } from "@components/CenteredModal";
+import { CenteredModal } from "../../CenteredModal";
+import { on, removeOn } from "@utils/window";
 import { deleteFile } from "@utils/deleteFile";
-import { Button } from "@components/Button";
+import { Button } from "../../Button";
 import { dbg } from "@common/debug";
 import {
 	type VisibleData,
@@ -26,6 +26,8 @@ import {
 /////////////////////////////////////////////
 // Main function:
 
+const filePresentClassName = "file-present";
+
 export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 	const [isDeleteMediaModalOpen, setIsDeleteMediaModalOpen] = useState(false);
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
@@ -39,11 +41,13 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 	function handleSelectedFile({
 		target: { files },
 	}: React.ChangeEvent<HTMLInputElement>) {
+		console.log("on handleSelectedFile");
+
 		if (
 			!(imageButtonRef.current && imageInputRef.current && files) ||
 			files.length === 0
 		)
-			return;
+			return imageButtonRef.current?.classList.remove(filePresentClassName);
 
 		const [file] = files;
 
@@ -52,23 +56,24 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 		dbg("imageFilePath =", imageFilePathRef.current);
 
 		// Change button color to indicate that selection was successfull:
-		imageButtonRef.current.classList.add("file-present");
+		imageButtonRef.current.classList.add(filePresentClassName);
 	}
 
 	useEffect(() => {
 		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
-			if (event.key === "Enter" && !isAModifierKeyPressed(event))
+			if (event.key === "Enter" && !isAModifierKeyPressed(event)) {
 				changeMediaMetadata(imageFilePathRef.current, path, media);
+			}
 		}
 
-		once("keyup", changeMediaMetadataOnEnter);
+		on("keyup", changeMediaMetadataOnEnter);
 
 		return () => removeOn("keyup", changeMediaMetadataOnEnter);
-	}, [media, path]);
+	}, []);
 
 	return (
 		<>
-			<h1 className="title text-center">{t("dialogs.mediaOptions.title")}</h1>
+			<h1 className="title">{t("dialogs.mediaOptions.title")}</h1>
 
 			<h2 className="subtitle">{t("dialogs.mediaOptions.description")}</h2>
 
@@ -91,12 +96,11 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 						{option === "image" ? (
 							/////////////////////////////////////////////
 							// Handle file input for image:
+							// TODO: for god knows why, clicking the input makes electron reload the window!!
 							<Button
 								onPointerUp={openNativeUI_ChooseFiles}
-								className="no-transition"
 								ref={imageButtonRef}
 								variant="input"
-								id={option}
 							>
 								<SearchImage size={18} />
 
@@ -112,11 +116,22 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 						) : /////////////////////////////////////////////
 						// Handle text input with line feeds:
 						option === "lyrics" ? (
-							<textarea defaultValue={value} id={option} />
+							<textarea
+								onKeyUp={(e) => {
+									// stopping propagation so the space key doesn't toggle play state.
+									e.stopPropagation();
+								}}
+								defaultValue={value}
+								id={option}
+							/>
 						) : (
 							/////////////////////////////////////////////
 							// Else:
 							<input
+								// stopping propagation so the space key doesn't toggle play state.
+								onKeyUp={(e) => {
+									e.stopPropagation();
+								}}
 								readOnly={!isChangeable(option)}
 								defaultValue={format(value)}
 								id={option}
@@ -138,19 +153,19 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 					</button>
 
 					<CenteredModal
+						setIsOpen={setIsDeleteMediaModalOpen}
 						className="confirm-remove-media"
 						isOpen={isDeleteMediaModalOpen}
 					>
-						<Suspense>
-							<DeleteMediaDialogContent
-								deleteMediaPlusCloseDialog={() => {
-									setIsDeleteMediaModalOpen(false);
-									setIsOpen(false);
+						<DeleteMediaDialogContent
+							handleDeleteMedia={() => {
+								setIsDeleteMediaModalOpen(false);
+								setIsOpen(false);
 
-									deleteFile(path).then();
-								}}
-							/>
-						</Suspense>
+								deleteFile(path).then();
+							}}
+							closeDialog={() => setIsDeleteMediaModalOpen(false)}
+						/>
 					</CenteredModal>
 				</>
 

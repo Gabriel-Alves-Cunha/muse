@@ -7,7 +7,8 @@ import { WarningSign } from "./WarningSign";
 // Main function:
 
 export function DeleteMediaDialogContent({
-	deleteMediaPlusCloseDialog,
+	handleDeleteMedia,
+	closeDialog,
 }: Props) {
 	const { t } = useTranslation();
 
@@ -20,11 +21,11 @@ export function DeleteMediaDialogContent({
 			</h1>
 
 			<div data-flex-row>
-				<button onPointerUp={deleteMediaPlusCloseDialog} data-remove-media>
+				<button onPointerUp={handleDeleteMedia} data-remove-media>
 					{t("buttons.confirm")}
 				</button>
 
-				<button className="save-media-options-modal bg-transparent">
+				<button className="save-media-options-modal bg-transparent" onPointerUp={closeDialog}>
 					{t("buttons.cancel")}
 				</button>
 			</div>
@@ -38,5 +39,6 @@ export function DeleteMediaDialogContent({
 // Types:
 
 type Props = {
-	deleteMediaPlusCloseDialog(): void;
+	handleDeleteMedia(): void;
+	closeDialog(): void;
 };

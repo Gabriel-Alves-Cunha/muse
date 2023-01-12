@@ -37,11 +37,15 @@ export const { setState: setSearcher, getState: getSearcher } = useSearcher;
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const setSearchTerm = (e: InputChange) =>
+export function setSearchTerm(e: InputChange): void {
+	// stopping propagation so the space key doesn't toggle play state.
+	e.stopPropagation();
+
 	setSearcher({
 		highlight: unDiacritic(e.target.value),
 		searchTerm: e.target.value,
 	});
+}
 
 /////////////////////////////////////////
 /////////////////////////////////////////

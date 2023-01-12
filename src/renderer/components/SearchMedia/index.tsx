@@ -3,9 +3,7 @@ import { useEffect, useRef } from "react";
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
 import { MediaSearchRow } from "./MediaSearchRow";
-import { once, removeOn } from "@utils/window";
 import { useTranslation } from "@i18n";
-import { leftClick } from "../MediaListKind/Row";
 import { RightSlot } from "../RightSlot";
 import { BaseInput } from "../BaseInput";
 import { Popover } from "../Popover";
@@ -15,6 +13,7 @@ import {
 	SearchStatus,
 	useSearcher,
 } from "./state";
+import { on } from "@utils/window";
 
 export function SearchMedia() {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
@@ -35,26 +34,10 @@ export function SearchMedia() {
 		resultsJSXs.push(
 			<MediaSearchRow highlight={highlight} media={media} key={id} id={id} />,
 		);
-
+	// onPointerDownOutside = { setDefaultSearch };
 	/////////////////////////////////////////
 
-	useEffect(() => {
-		function onClickOutside(event: PointerEvent): void {
-			// Check if click happened outside:
-			if (
-				event.button !== leftClick ||
-				!searchWrapperRef.current ||
-				searchWrapperRef.current.contains(event.target as Node)
-			)
-				return;
-
-			setDefaultSearch();
-		}
-
-		once("pointerup", onClickOutside);
-
-		return () => removeOn("pointerup", onClickOutside);
-	}, []);
+	useEffect(() => {}, []);
 
 	return (
 		<div ref={searchWrapperRef}>
@@ -66,7 +49,6 @@ export function SearchMedia() {
 				value={searchTerm}
 				spellCheck="false"
 				autoCorrect="off"
-				// id="search-songs"
 				accessKey="s"
 			/>
 
@@ -83,6 +65,7 @@ export function SearchMedia() {
 								: "search-media-results"
 						}
 						onPointerDownOutside={setDefaultSearch}
+						onEscape={setDefaultSearch}
 						isOpen
 					>
 						{nothingFound ? (

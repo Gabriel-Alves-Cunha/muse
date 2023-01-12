@@ -46,7 +46,7 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 				</button>
 
 				<CenteredModal isOpen={isOpen} setIsOpen={setIsOpen}>
-					<DeleteMediaDialogContent deleteMediaPlusCloseDialog={deleteMedias} />
+					<DeleteMediaDialogContent handleDeleteMedia={deleteMedias} />
 				</CenteredModal>
 			</>
 

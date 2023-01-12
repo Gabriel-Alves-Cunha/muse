@@ -353,14 +353,14 @@
 		@apply text-active;
 	}
 
-	[data-base-input]:is(:has(+ span div), :focus-within, :focus, :hover) label {
+	[data-base-input]:is(:has(+ div), :focus-within, :focus, :hover) label {
 		transform: translate(-44px, -31px);
 
 		@apply text-active;
 	}
 
 	/* This is to make the RightSlot disappear when element is focused: */
-	[data-base-input]:is(:has(+ span div), :focus-within, :focus, :hover)
+	[data-base-input]:is(:has(+ div), :focus-within, :focus, :hover)
 		#searcher-right-slot {
 		@apply hidden;
 	}
@@ -385,15 +385,27 @@
 	/* Media Search Row */
 
 	.media-search-row {
-		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 transition-none rounded-md transition-shadow;
+		@apply box-border relative flex justify-start items-center w-full h-16 rounded-md transition-shadow;
+	}
+
+	.media-search-row > button:first-child {
+		@apply relative flex items-center h-full w-[85%] bg-none border-none;
+	}
+
+	.media-search-row > button:first-child > div:first-child {
+		@apply aspect-square h-full flex justify-center items-center;
 	}
 
 	.highlight {
-		@apply flex flex-col items-start justify-center flex-1 m-1 overflow-hidden;
+		@apply flex flex-col items-start justify-center flex-1 mx-2 overflow-ellipsis;
 	}
 
 	.highlight p {
-		@apply pl-1 overflow-ellipsis text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium;
+		@apply text-alternative whitespace-nowrap font-secondary tracking-wide text-left text-base font-medium;
+	}
+
+	.highlight p:last-child {
+		@apply text-normal text-sm;
 	}
 
 	.highlight span {
@@ -407,7 +419,7 @@
 	/* Modal */
 
 	[data-modal-content-wrapper] {
-		@apply invisible fixed inset-0 z-40 flex items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] no-transition;
+		@apply fixed inset-0 z-40 flex items-center justify-center overscroll-none overflow-hidden bg-[rgba(0,0,0,0.6)] no-transition;
 	}
 
 	[data-modal-content] {
@@ -416,7 +428,7 @@
 
 	/* 2) modal-close (a button) */
 	[data-modal-close-reset] {
-		@apply transition-none cursor-pointer flex justify-center items-center bg-cyan-500 text-slate-800 text-base rounded-md w-full h-8 mt-3 hover:bg-cyan-400 focus:bg-cyan-400;
+		@apply cursor-pointer flex justify-center items-center bg-cyan-500 text-slate-800 text-base rounded-md w-full h-8 mt-3 hover:bg-cyan-400 focus:bg-cyan-400;
 	}
 
 	/* 3) modal-trigger (a circled button with only an icon) */
@@ -600,6 +612,10 @@
 		left: var(--handle-position);
 	}
 
+	.timeline:hover:active > div {
+		left: var(--handle-position-when-seeking);
+	}
+
 	[data-is-duration-valid="false"] {
 		@apply pointer-events-none;
 	}
@@ -732,13 +748,13 @@
 
 	[data-row-wrapper] {
 		/* Because of Virtuoso, this can't have margins! */
-		@apply box-border relative flex justify-start items-center w-[98%] h-16 left-2 rounded-lg p-2 transition-shadow;
+		@apply box-border relative flex justify-start items-center w-[98%] h-16 rounded-lg p-2 transition-shadow;
 
 		margin: unset;
 	}
 
 	[data-row-wrapper] > button:first-child {
-		@apply relative flex items-center h-full w-[90%] cursor-pointer bg-none border-none;
+		@apply relative flex items-center h-full w-[90%] bg-none border-none;
 	}
 
 	.row-info {
@@ -864,12 +880,13 @@
 	/* Ring loader */
 
 	[data-ring-loader] {
-		@apply relative block h-[100px] w-[100px];
+		@apply block w-full h-full;
 	}
 
 	.side-ring-loader {
-		@apply absolute block top-0 left-0 w-[100px] h-[100px] border-[10px] border-solid border-white opacity-40 rounded-full;
+		@apply absolute block top-0 left-0 w-full h-full opacity-40 rounded-full;
 
+		border: 10px solid white;
 		perspective: 800px;
 		animation: 2s linear 0s infinite normal none running;
 	}
@@ -909,11 +926,11 @@
 	/* Context Menu */
 
 	[data-ctx-menu-wrapper] {
-		@apply w-full h-full;
+		@apply relative w-full h-full;
 	}
 
 	[data-ctx-menu-content] {
-		@apply relative p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md w-min z-50;
+		@apply absolute p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md w-min z-50;
 	}
 
 	/* ********************************** */
@@ -1045,11 +1062,11 @@
 	/* CircleIconButton variants */
 
 	[data-circle-icon-button][data-variant="small"] {
-		@apply h-8 w-8;
+		@apply h-8 aspect-square;
 	}
 
 	[data-circle-icon-button][data-variant="large"] {
-		@apply h-12 w-12;
+		@apply h-12 aspect-square;
 	}
 
 	/* ********************************** */
@@ -1058,22 +1075,14 @@
 
 	/* Popover */
 
-	/* .popover {
-		@apply flex flex-col p-1 gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-10 scroll scroll-1;
-	}
-
-	.popover > p {
-		@apply relative text-icon-deactivated font-secondary tracking-wide text-center font-medium;
-	} */
-
 	[data-popover-content] {
-		@apply relative p-1 no-transition scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover;
+		@apply absolute p-2 no-transition scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-40;
 	}
 
 	/* Popover sizes */
 
 	[data-popover-size="nothing-found-for-convertions-or-downloads"] {
-		@apply flex items-center justify-center h-28 w-64 overflow-hidden;
+		@apply items-center justify-center h-28 w-64;
 	}
 
 	[data-popover-size="nothing-found-for-search-media"] {
@@ -1089,7 +1098,7 @@
 	}
 
 	[data-popover-size="search-media-results"] {
-		@apply absolute h-64 w-80 top-24;
+		@apply h-64 w-80 mt-2;
 	}
 
 	/* ********************************** */
@@ -1137,7 +1146,7 @@
 	}
 
 	.media-player-header > div {
-		@apply w-[calc(100%-52px)] text-icon-media-player font-secondary tracking-wider text-center text-base font-medium;
+		@apply w-full h-full text-icon-media-player font-secondary tracking-wider text-center text-base font-medium;
 	}
 
 	.media-player-controls {

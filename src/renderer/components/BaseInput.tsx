@@ -25,19 +25,21 @@ export const BaseInput = ({
 /////////////////////////////////////////
 // Helper function:
 
-// TODO: handle on input spacebar
 function handleKeyUp(
 	event: React.KeyboardEvent<HTMLInputElement>,
 	onEscape?: () => void,
 ): void {
-	event.stopPropagation();
-
-	if (event.key === "Escape" && !isAModifierKeyPressed(event))
+	if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
 		// Close SearchMediaPopover on "Escape":
 		onEscape?.();
-	else if (event.ctrlKey && event.key === "a")
+	} else if (event.ctrlKey && event.key === "a") {
 		// Select all text on "Ctrl + a":
-		(event.target as HTMLInputElement).select();
+		(event.target as HTMLInputElement)?.select();
+	}
+}
+
+function prevent(event: React.KeyboardEvent<HTMLInputElement>): void {
+	event.stopPropagation();
 }
 
 /////////////////////////////////////////

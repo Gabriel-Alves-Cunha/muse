@@ -29,7 +29,6 @@ export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
 ////////////////////////////////////////////////
 // Helper functions:
 
-
 export function downloadMedia(): void {
 	const {
 		result: { artist, imageURL, title },
@@ -48,8 +47,12 @@ export function downloadMedia(): void {
 
 ////////////////////////////////////////////////
 
-export const setUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
+export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
+	// stopping propagation so the space key doesn't toggle play state.
+	e.stopPropagation();
+
 	setSearchInfo({ url: e.target.value });
+}
 
 ////////////////////////////////////////////////
 
@@ -74,7 +77,7 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 		setSearchInfo({ isLoading: false, result });
 	} catch (err) {
-const { t } = useTranslation();
+		const { t } = useTranslation();
 
 		setSearchInfo({
 			result: defaultSearchInfo.result,

@@ -36,7 +36,7 @@ export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
 			{lyrics ? (
 				<LyricsPresent size={16} />
 			) : isLoadingLyrics ? (
-				<RingLoader className="absolute text-white w-8 h-8" />
+				<RingLoader className="absolute" />
 			) : (
 				<NoLyrics size={16} />
 			)}

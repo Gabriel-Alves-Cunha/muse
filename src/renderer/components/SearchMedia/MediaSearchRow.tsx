@@ -4,9 +4,10 @@ import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { Suspense, lazy, useState } from "react";
 
+import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
+import { getAllSelectedMedias } from "@contexts/useAllSelectedMedias";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { useTranslation } from "@i18n";
-import { playThisMedia } from "@contexts/useCurrentPlaying";
 import { CenteredModal } from "../CenteredModal";
 import { unDiacritic } from "@contexts/usePlaylists";
 
@@ -26,14 +27,19 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (
-		<div className="media-search-row" data-id={id}>
+		<div
+			data-is-selected-row={getAllSelectedMedias().has(id)}
+			data-is-playing-row={getCurrentPlaying().id === id}
+			className="media-search-row"
+			data-id={id}
+		>
 			<button
 				onPointerUp={() => playThisMedia(id)}
 				title={t("tooltips.playThisMedia")}
 			>
 				<div>
 					<ImgWithFallback
-						Fallback={<MusicNote size={13} />}
+						Fallback={<MusicNote size={17} />}
 						mediaImg={media.image}
 						mediaID={id}
 					/>
@@ -47,6 +53,8 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 
 						{media.title.slice(index + highlight.length)}
 					</p>
+
+					<p>{media.artist}</p>
 				</div>
 			</button>
 
@@ -60,7 +68,8 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 				</button>
 
 				<CenteredModal
-					className="grid center max-w-md min-w-[300px] p-8 bg-dialog"
+					className="grid max-w-md min-w-[300px] p-8 bg-dialog"
+					setIsOpen={setIsOpen}
 					isOpen={isOpen}
 				>
 					<Suspense>
