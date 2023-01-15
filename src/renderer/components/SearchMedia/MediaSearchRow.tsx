@@ -1,4 +1,4 @@
-import type { ID, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/generalTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdMusicNote as MusicNote } from "react-icons/md";
@@ -20,7 +20,11 @@ const MediaOptionsModal = lazy(
 /////////////////////////////////////////
 // Main function:
 
-export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
+export function MediaSearchRow({
+	highlight,
+	media,
+	path,
+}: MediaSearchRowProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const { t } = useTranslation();
 
@@ -28,20 +32,20 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 
 	return (
 		<div
-			data-is-selected-row={getAllSelectedMedias().has(id)}
-			data-is-playing-row={getCurrentPlaying().id === id}
+			data-is-selected-row={getAllSelectedMedias().has(path)}
+			data-is-playing-row={getCurrentPlaying().path === path}
 			className="media-search-row"
-			data-id={id}
+			data-path={path}
 		>
 			<button
-				onPointerUp={() => playThisMedia(id)}
+				onPointerUp={() => playThisMedia(path)}
 				title={t("tooltips.playThisMedia")}
 			>
 				<div>
 					<ImgWithFallback
 						Fallback={<MusicNote size={17} />}
 						mediaImg={media.image}
-						mediaID={id}
+						mediaPath={path}
 					/>
 				</div>
 
@@ -73,7 +77,11 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 					isOpen={isOpen}
 				>
 					<Suspense>
-						<MediaOptionsModal setIsOpen={setIsOpen} media={media} path={id} />
+						<MediaOptionsModal
+							setIsOpen={setIsOpen}
+							media={media}
+							path={path}
+						/>
 					</Suspense>
 				</CenteredModal>
 			</>
@@ -89,5 +97,5 @@ export function MediaSearchRow({ highlight, media, id }: MediaSearchRowProps) {
 type MediaSearchRowProps = {
 	highlight: string;
 	media: Media;
-	id: ID;
+	path: Path;
 };

@@ -1,7 +1,6 @@
-import type { Base64, ID, Media, Path } from "@common/@types/generalTypes";
+import type { Base64, Media, Path } from "@common/@types/generalTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
-import { randomUUID } from "node:crypto";
 import { statSync } from "node:fs";
 
 import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
@@ -23,13 +22,12 @@ const createMedia = async (
 	path: Path,
 	assureMediaSizeIsGreaterThan60KB: boolean,
 	ignoreMediaWithLessThan60Seconds: boolean,
-): Promise<[ID, Media]> =>
+): Promise<[Path, Media]> =>
 	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
 		time(() => {
 			const {
-				fileAbstraction: { readStream: { length } },
 				properties: { durationMilliseconds },
 				tag: {
 					title = basename,
@@ -42,6 +40,7 @@ const createMedia = async (
 			} = MediaFile.createFromPath(path);
 
 			const durationInSeconds = durationMilliseconds / 1_000;
+			const { birthtimeMs, mtimeMs, size } = statSync(path);
 
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////
@@ -53,9 +52,9 @@ const createMedia = async (
 					)} s (less than 60 s)!`,
 				);
 
-			if (assureMediaSizeIsGreaterThan60KB && length < 60_000)
+			if (assureMediaSizeIsGreaterThan60KB && size < 60_000)
 				return reject(
-					`Skipping "${path}" because size is ${length} bytes! (< 60 KB)`,
+					`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`,
 				);
 
 			/////////////////////////////////////////////
@@ -78,18 +77,18 @@ const createMedia = async (
 						: "",
 				duration: formatDuration(durationInSeconds),
 				artist: albumArtists[0] ?? "",
-				birthTime: statSync(path).birthtimeMs,
-				size: length,
+				birthTime: birthtimeMs,
+				lastModified: mtimeMs,
 				lyrics,
 				genres,
 				title,
 				album,
-				path,
+				size,
 			};
 
 			dbg(`%c${basename}`, randomColor(), { media, picture, mimeType, error });
 
-			resolve([randomUUID(), media]);
+			resolve([path, media]);
 		}, `createMedia('${basename}')`);
 	});
 
@@ -97,23 +96,18 @@ export const transformPathsToMedias = (
 	path: Path,
 	assureMediaSizeIsGreaterThan60KB = true,
 	ignoreMediaWithLessThan60Seconds = true,
-): Promise<[ID, Media][]> =>
+): Promise<[Path, Media][]> =>
 	time(async () => {
 		groupCollapsed("Creating medias...");
 
-		const medias: [ID, Media][] = [];
+		const medias: [Path, Media][] = [];
 
 		if (path) {
 			const media = await createMedia(
 				path,
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			).catch((e) =>
-				error(
-					`There was a possible error creating media of path: "${path}".\n\n`,
-					e,
-				),
-			);
+			).catch((e) => error(`Error on "${path}".\n\n`, e));
 
 			if (media) medias.push(media);
 		} else {
@@ -126,12 +120,7 @@ export const transformPathsToMedias = (
 						path,
 						assureMediaSizeIsGreaterThan60KB,
 						ignoreMediaWithLessThan60Seconds,
-					).catch((e) =>
-						error(
-							`There was a possible error creating media of path: "${path}".\n\n`,
-							e,
-						),
-					),
+					).catch((e) => error(`Error on "${path}".\n\n`, e)),
 				);
 
 			// Run promises in parallel:
@@ -139,7 +128,7 @@ export const transformPathsToMedias = (
 
 			for (const fulfilled of fulfilledPromises)
 				fulfilled.status === "fulfilled" &&
-					medias.push(fulfilled.value as [ID, Media]);
+					medias.push(fulfilled.value as [Path, Media]);
 		}
 
 		groupEnd();

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { once, removeOn } from "@utils/window";
+import { on, removeOn } from "@utils/window";
 import { leftClick } from "./MediaListKind/Row";
 
 export function Select({
@@ -25,6 +25,8 @@ export function Select({
 			)
 				return;
 
+			event.stopImmediatePropagation();
+
 			onPointerDownOutside?.(event);
 			setIsOpen?.(false);
 		}
@@ -33,6 +35,8 @@ export function Select({
 			// Assume that isOpen === true.
 
 			if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
+				event.stopImmediatePropagation();
+
 				setIsOpen?.(false);
 				onEscape?.();
 			}
@@ -41,8 +45,8 @@ export function Select({
 		isOpen &&
 			setTimeout(() => {
 				// If I don't put a setTimeout, it just opens and closes!
-				once("pointerup", closeOnClickOutside);
-				once("keyup", closeOnEscape);
+				on("pointerup", closeOnClickOutside);
+				on("keyup", closeOnEscape);
 			}, 200);
 
 		return () => {

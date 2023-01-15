@@ -3,8 +3,7 @@ import type { CurrentPlaying } from "./useCurrentPlaying";
 import type { StateCreator } from "zustand";
 import type { PlayOptions } from "./usePlayOptions";
 
-import { keys, setLocalStorage } from "@utils/localStorage";
-import { areObjectKeysEqual } from "@utils/object";
+import { localStorageKeys, setLocalStorage } from "@utils/localStorage";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -13,21 +12,17 @@ import { areObjectKeysEqual } from "@utils/object";
 export const setCurrentPlayingOnLocalStorage: SetLocalStoragePlugin<
 	CurrentPlaying
 > = (fn) => (set, get, store) => {
-	const newSetter: typeof set = (
+	const newSetStateFunction: typeof set = (
 		newCurrentPlaying: Partial<CurrentPlaying>,
 		replace,
 	) => {
-		const previousState = get();
-		const areStatesEqual = areObjectKeysEqual(newCurrentPlaying, previousState);
-
 		set(newCurrentPlaying, replace);
-
-		if (!areStatesEqual) setLocalStorage(keys.currentPlaying, get());
+		setLocalStorage(localStorageKeys.currentPlaying, get());
 	};
 
-	store.setState = newSetter;
+	store.setState = newSetStateFunction;
 
-	return fn(newSetter, get, store);
+	return fn(newSetStateFunction, get, store);
 };
 
 /////////////////////////////////////////
@@ -36,21 +31,17 @@ export const setCurrentPlayingOnLocalStorage: SetLocalStoragePlugin<
 
 export const setPlayOptionsOnLocalStorage: SetLocalStoragePlugin<PlayOptions> =
 	(fn) => (set, get, store) => {
-		const newSetter: typeof set = (
+		const newSetStateFunction: typeof set = (
 			newPlayOptions: Partial<PlayOptions>,
 			replace,
 		) => {
-			const previousState = get();
-			const areStatesEqual = areObjectKeysEqual(newPlayOptions, previousState);
-
 			set(newPlayOptions, replace);
-
-			if (!areStatesEqual) setLocalStorage(keys.playOptions, get());
+			setLocalStorage(localStorageKeys.playOptions, get());
 		};
 
-		store.setState = newSetter;
+		store.setState = newSetStateFunction;
 
-		return fn(newSetter, get, store);
+		return fn(newSetStateFunction, get, store);
 	};
 
 /////////////////////////////////////////
@@ -60,19 +51,20 @@ export const setPlayOptionsOnLocalStorage: SetLocalStoragePlugin<PlayOptions> =
 export const setPlaylistsOnLocalStorage: SetLocalStoragePlugin<
 	UsePlaylistsStatesAndActions
 > = (fn) => (set, get, store) => {
-	const newSetter: typeof set = (
+	const newSetStateFunction: typeof set = (
 		args: PlaylistsToSave, // This is actually of type UsePlaylistsActions, but we don't want to save the whole object
 		replace: boolean,
 	) => {
-		args.favorites && setLocalStorage(keys.favorites, args.favorites);
-		args.history && setLocalStorage(keys.history, args.history);
-
 		set(args, replace);
+
+		args.favorites &&
+			setLocalStorage(localStorageKeys.favorites, args.favorites);
+		args.history && setLocalStorage(localStorageKeys.history, args.history);
 	};
 
-	store.setState = newSetter;
+	store.setState = newSetStateFunction;
 
-	return fn(newSetter, get, store);
+	return fn(newSetStateFunction, get, store);
 };
 
 /////////////////////////////////////////

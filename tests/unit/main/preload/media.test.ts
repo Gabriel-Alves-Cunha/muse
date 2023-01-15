@@ -36,7 +36,7 @@ describe("It should account for the switch possibilities and the message sending
 
 		try {
 			// Changing the title and basename of the file:
-			await writeTags(mediaPath, data);
+			writeTags(mediaPath, data);
 
 			// Here, the file is renamed and the title is changed.
 			// Assuring that the title and basename are changed before closing file:
@@ -95,10 +95,10 @@ describe("It should account for the switch possibilities and the message sending
 	//////////////////////////////////////
 	//////////////////////////////////////
 
-	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
+	it("Should be able to write the tag 'albumArtists' to a file.", () => {
 		const data = Object.freeze({ albumArtists: [makeRandomString()] });
 
-		await writeTags(mediaPath, data);
+		writeTags(mediaPath, data);
 
 		const file = MediaFile.createFromPath(mediaPath);
 		expect(
@@ -140,10 +140,10 @@ describe("It should account for the switch possibilities and the message sending
 	//////////////////////////////////////
 	//////////////////////////////////////
 
-	it("Should be able to write the tag 'album' to a file.", async () => {
+	it("Should be able to write the tag 'album' to a file.", () => {
 		const data = Object.freeze({ album: makeRandomString() });
 
-		await writeTags(mediaPath, data);
+		writeTags(mediaPath, data);
 
 		const file = MediaFile.createFromPath(mediaPath);
 		expect(
@@ -190,7 +190,7 @@ describe("It should account for the switch possibilities and the message sending
 		const imgAsString: Base64 = `data:image/png;base64,${imgContents}`;
 		const data = Object.freeze({ imageURL: imgAsString });
 
-		await writeTags(mediaPath, data);
+		writeTags(mediaPath, data);
 
 		const file = MediaFile.createFromPath(mediaPath);
 		expect(
@@ -219,10 +219,10 @@ describe("It should account for the switch possibilities and the message sending
 			//
 		}
 
-		it("Should be able erase the tag 'pictures' of file.", async () => {
+		it("Should be able erase the tag 'pictures' of file.", () => {
 			const data = Object.freeze({ imageURL: eraseImg });
 
-			await writeTags(mediaPath, data);
+			writeTags(mediaPath, data);
 
 			const file = MediaFile.createFromPath(mediaPath);
 			expect(file.tag.pictures.length).toBe(0);

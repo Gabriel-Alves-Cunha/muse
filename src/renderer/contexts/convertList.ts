@@ -1,7 +1,7 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { Path } from "@common/@types/generalTypes";
 
-import create from "zustand";
+import { create } from "zustand";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

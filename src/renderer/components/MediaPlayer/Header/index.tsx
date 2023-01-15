@@ -1,4 +1,4 @@
-import type { ID, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/generalTypes";
 
 import {
 	MdFavoriteBorder as AddFavorite,
@@ -17,22 +17,22 @@ import { useTranslation } from "@i18n";
 const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.favorites;
 
-export function Header({ media, id, displayTitle = false }: HeaderProps) {
+export function Header({ media, path, displayTitle = false }: HeaderProps) {
 	const favorites = usePlaylists(favoritesSelector);
 	const { t } = useTranslation();
 
-	const isFavorite = favorites.has(id);
+	const isFavorite = favorites.has(path);
 
 	return (
 		<div className="media-player-header">
-			<LoadOrToggleLyrics lyrics={media?.lyrics} id={id} />
+			<LoadOrToggleLyrics lyrics={media?.lyrics} path={path} />
 
 			<div>{displayTitle ? media?.title : media?.album}</div>
 
 			<CircleIconButton
-				onPointerUp={() => toggleFavoriteMedia(id)}
+				onPointerUp={() => toggleFavoriteMedia(path)}
 				title={t("tooltips.toggleFavorite")}
-				disabled={!id}
+				disabled={!path}
 			>
 				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
 			</CircleIconButton>
@@ -48,5 +48,5 @@ export function Header({ media, id, displayTitle = false }: HeaderProps) {
 type HeaderProps = {
 	media: Media | undefined;
 	displayTitle?: boolean;
-	id: ID;
+	path: Path;
 };

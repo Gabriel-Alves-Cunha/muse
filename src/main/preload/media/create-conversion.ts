@@ -29,7 +29,7 @@ const mediasConverting: Map<Path, Readable> = new Map();
 /////////////////////////////////////////////
 
 export function createOrCancelConvert(args: CreateConversion): void {
-	if (!args.path) throwErr(`A path is required. Received: "${args.path}".`);
+	if (!args.path) throwErr(`'path' is required. Received: "${args.path}".`);
 
 	if (!mediasConverting.has(args.path)) {
 		if (!args.electronPort)
@@ -104,7 +104,7 @@ export async function convertToAudio(
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 		.on("progress", ({ targetSize, timemark }: Progress) => {
-			// targetSize: current size of the target file in kilobytes
+			// targetSize: current size of file in kilobytes
 			// timemark: the timestamp of the current frame in seconds
 
 			// To react:

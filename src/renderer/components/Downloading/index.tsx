@@ -3,7 +3,7 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect } from "react";
-import create from "zustand";
+import { create } from "zustand";
 
 import { ReactToElectronMessage } from "@common/enums";
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";

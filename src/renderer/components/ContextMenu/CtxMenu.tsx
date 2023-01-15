@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef } from "react";
 
-import { once, removeOn } from "@utils/window";
+import { on, removeOn } from "@utils/window";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -66,13 +66,16 @@ function CtxMenuContent({
 			event.stopPropagation();
 			event.preventDefault();
 
-			const contentEl = contentRef.current;
-			if (!contentEl) return;
+			const contentElement = contentRef.current;
+			if (!contentElement) return;
 
-			const [normalizedX, normalizedY] = normalizePosition(event, contentEl);
+			const [normalizedX, normalizedY] = normalizePosition(
+				event,
+				contentElement,
+			);
 
-			contentEl.style.left = `${normalizedX}px`;
-			contentEl.style.top = `${normalizedY}px`;
+			contentElement.style.left = `${normalizedX}px`;
+			contentElement.style.top = `${normalizedY}px`;
 
 			onContextMenu?.(event);
 			setIsOpen(true);
@@ -90,7 +93,7 @@ function CtxMenuContent({
 			isOpen &&
 				setTimeout(
 					// If I don't put a setTimeout, it just opens and closes!
-					() => once("pointerup", closeOnClickAnywhere),
+					() => on("pointerup", closeOnClickAnywhere),
 					200,
 				);
 

@@ -1,6 +1,6 @@
 import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
+import type { Path, Media } from "@common/@types/generalTypes";
 import type { PlayOptions } from "@contexts/usePlayOptions";
-import type { ID, Media } from "@common/@types/generalTypes";
 import type { TypeOfMap } from "@common/@types/utils";
 import type { History } from "@contexts/usePlaylists";
 
@@ -11,7 +11,7 @@ import { dbgPlaylists } from "@common/debug";
 ////////////////////////////////////////////////
 // Constants:
 
-export const keys = {
+export const localStorageKeys = {
 	currentPlaying: "@muse:currentPlaying",
 	favorites: "@muse:playlists:favorites",
 	history: "@muse:playlists:history",
@@ -22,8 +22,12 @@ export const keys = {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export const setLocalStorage = (key: Keys, value: Values): void =>
-	setTimeout(() => {
+let setToLocalStorageTimer: NodeJS.Timer | undefined;
+
+export function setLocalStorage(key: LocalStorageKeys, value: Values): void {
+	clearTimeout(setToLocalStorageTimer);
+
+	setToLocalStorageTimer = setTimeout(() => {
 		if (value instanceof Map || value instanceof Set) value = [...value];
 
 		const json = JSON.stringify(value);
@@ -31,13 +35,14 @@ export const setLocalStorage = (key: Keys, value: Values): void =>
 		dbgPlaylists({ key, json, value });
 
 		localStorage.setItem(key, json);
-	}) as unknown as void;
+	}, 500);
+}
 
 ////////////////////////////////////////////////
 
 const emptyArrayString = "[]";
 
-export function getFromLocalStorage(key: Keys): Values | undefined {
+export function getFromLocalStorage(key: LocalStorageKeys): Values | undefined {
 	const value = localStorage.getItem(key) ?? emptyArrayString;
 	const item: unknown = JSON.parse(value);
 
@@ -45,15 +50,15 @@ export function getFromLocalStorage(key: Keys): Values | undefined {
 
 	if (item === emptyArrayString && !value) return undefined;
 
-	if (key === keys.favorites) {
-		const newFavorites = new Set(item as ID[]);
+	if (key === localStorageKeys.favorites) {
+		const newFavorites = new Set(item as Path[]);
 
 		dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
 
 		return newFavorites;
 	}
 
-	if (key === keys.history) {
+	if (key === localStorageKeys.history) {
 		const newHistory: History = new Map(item as HistoryShape);
 
 		dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
@@ -61,7 +66,7 @@ export function getFromLocalStorage(key: Keys): Values | undefined {
 		return newHistory;
 	}
 
-	if (key === keys.currentPlaying) {
+	if (key === localStorageKeys.currentPlaying) {
 		const newCurrentPlaying = item as CurrentPlaying;
 
 		dbgPlaylists("getFromLocalStorage: newCurrentPlaying =", newCurrentPlaying);
@@ -69,7 +74,7 @@ export function getFromLocalStorage(key: Keys): Values | undefined {
 		return newCurrentPlaying;
 	}
 
-	if (key === keys.playOptions) {
+	if (key === localStorageKeys.playOptions) {
 		const newPlayOptions = item as PlayOptions;
 
 		dbgPlaylists("getFromLocalStorage: newPlayOptions =", newPlayOptions);
@@ -85,13 +90,13 @@ export function getFromLocalStorage(key: Keys): Values | undefined {
 //////////////////////////////////////////
 // Types:
 
-type Keys = typeof keys[keyof typeof keys];
+type LocalStorageKeys = typeof localStorageKeys[keyof typeof localStorageKeys];
 
 //////////////////////////////////////////
 
 type Values =
-	| readonly [ID, Media][]
-	| ReadonlySet<ID>
+	| readonly [Path, Media][]
+	| ReadonlySet<Path>
 	| CurrentPlaying
 	| PlayOptions
 	| History;

@@ -1,7 +1,7 @@
-import type { ID } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import { create } from "zustand";
 
 import { getSortedByDate } from "./usePlaylists";
 import { emptySet } from "@common/empty";
@@ -11,13 +11,13 @@ import { time } from "@utils/utils";
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const useAllSelectedMedias = create<{ medias: ReadonlySet<ID> }>()(
+export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path> }>()(
 	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
 );
 
 export const getAllSelectedMedias = () =>
 	useAllSelectedMedias.getState().medias;
-export const setAllSelectedMedias = (medias: ReadonlySet<ID>) =>
+export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 	useAllSelectedMedias.setState({ medias });
 
 ///////////////////////////////////////////////////
@@ -25,8 +25,8 @@ export const setAllSelectedMedias = (medias: ReadonlySet<ID>) =>
 ///////////////////////////////////////////////////
 // Handle media selection:
 
-export const data_id = (id: ID) => `[data-id="${id}"]`;
-const selectedRowDataString = "isSelectedRow";
+export const data_path = (path: Path) => `[data-path="${path}"]`;
+const isSelectedRowDataString = "isSelectedRow";
 
 useAllSelectedMedias.subscribe(
 	(state) => state.medias,
@@ -34,54 +34,54 @@ useAllSelectedMedias.subscribe(
 	(selectedMedias, prevSelectedMedias): void =>
 		time(() => {
 			// Has to be this order:
-			for (const id of prevSelectedMedias)
+			for (const path of prevSelectedMedias)
 				for (const element of document.querySelectorAll(
-					data_id(id),
+					data_path(path),
 				) as NodeListOf<HTMLElement>) {
-					if (selectedMedias.has(id)) continue;
+					if (selectedMedias.has(path)) continue;
 
-					element.dataset[selectedRowDataString] = "false";
+					element.dataset[isSelectedRowDataString] = "false";
 				}
 
-			for (const id of selectedMedias)
+			for (const path of selectedMedias)
 				for (const element of document.querySelectorAll(
-					data_id(id),
+					data_path(path),
 				) as NodeListOf<HTMLElement>)
-					element.dataset[selectedRowDataString] = "true";
+					element.dataset[isSelectedRowDataString] = "true";
 		}, "handleDecorateMediasRow"),
 );
 
 ///////////////////////////////////////////////////
 
-export const toggleSelectedMedia = (id: ID): void => {
+export const toggleSelectedMedia = (path: Path): void => {
 	time(
 		() =>
-			getAllSelectedMedias().has(id)
-				? removeFromAllSelectedMedias(id)
-				: addToAllSelectedMedias(id),
+			getAllSelectedMedias().has(path)
+				? removeFromAllSelectedMedias(path)
+				: addToAllSelectedMedias(path),
 		"toggleSelectedMedia",
 	);
 };
 
 ///////////////////////////////////////////////////
 
-export function addToAllSelectedMedias(id: ID): void {
+export function addToAllSelectedMedias(path: Path): void {
 	const allSelectedMedias = getAllSelectedMedias();
 
-	if (allSelectedMedias.has(id)) return;
+	if (allSelectedMedias.has(path)) return;
 
-	setAllSelectedMedias(new Set(allSelectedMedias).add(id));
+	setAllSelectedMedias(new Set(allSelectedMedias).add(path));
 }
 
 ///////////////////////////////////////////////////
 
-export function removeFromAllSelectedMedias(id: ID): void {
+export function removeFromAllSelectedMedias(path: Path): void {
 	const allSelectedMedias = getAllSelectedMedias();
 
-	if (!allSelectedMedias.has(id)) return;
+	if (!allSelectedMedias.has(path)) return;
 
 	const newSet = new Set(allSelectedMedias);
-	newSet.delete(id);
+	newSet.delete(path);
 
 	setAllSelectedMedias(newSet);
 }

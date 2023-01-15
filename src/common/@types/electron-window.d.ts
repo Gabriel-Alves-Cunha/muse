@@ -40,7 +40,7 @@ export type VisibleElectron = DeepReadonly<{
 	media: {
 		getBasicInfo(url: string): Promise<videoInfo>;
 		transformPathsToMedias(
-			path: Path | undefined,
+			path: Path,
 			assureMediaSizeIsGreaterThan60KB?: boolean,
 			ignoreMediaWithLessThan60Seconds?: boolean,
 		): Promise<[ID, Media][]>;
@@ -78,11 +78,11 @@ export type MsgObjectReactToElectron = Readonly<
 /////////////////////////////////////////////
 
 export type MsgObjectElectronToReact = Readonly<
-	| { type: typeof ElectronToReactMessage.REFRESH_ONE_MEDIA; mediaPath: Path }
+	| { type: typeof ElectronToReactMessage.RESCAN_ONE_MEDIA; mediaPath: Path }
 	| { type: typeof ElectronToReactMessage.REMOVE_ONE_MEDIA; mediaPath: Path }
 	| { type: typeof ElectronToReactMessage.ADD_ONE_MEDIA; mediaPath: Path }
 	| { type: typeof ElectronToReactMessage.ERROR; error: Error }
-	| { type: typeof ElectronToReactMessage.REFRESH_ALL_MEDIA }
+	| { type: typeof ElectronToReactMessage.RESCAN_ALL_MEDIA }
 	| {
 			type: typeof ElectronToReactMessage.DELETE_ONE_MEDIA_FROM_COMPUTER;
 			mediaPath: Path;

@@ -34,7 +34,7 @@ export type AllowedMedias = typeof allowedMedias[number];
 
 /////////////////////////////////////////
 
-export function formatDuration(time: number | undefined): Readonly<string> {
+export function formatDuration(time: number | undefined): string {
 	// isFinite(undefined) === false
 	if (!isFinite(time!)) return "00:00";
 	time = trunc(time!);
@@ -74,7 +74,7 @@ export const stringifyJson = (obj: Json) => JSON.stringify(obj, null, 2);
 
 /** Map a number from range X to range Y. */
 export const mapTo = (
-	value: Readonly<number>,
+	value: number,
 	from: readonly [start: number, end: number],
 	to: readonly [start: number, end: number],
 ): number =>

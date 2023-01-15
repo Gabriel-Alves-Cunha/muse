@@ -39,7 +39,7 @@ autoUpdater
 	.on("update-not-available", (info) => log("Update not available:", info))
 	.on("update-downloaded", (info) => log("Update downloaded:", info))
 	.on("update-available", (info) => log("Update available:", info))
-	.on("checking-for-update", () => log("Checking for update..."))
+	.on("checking-for-update", () => log("Checking for update."))
 	.on("error", (err) => log("Error in auto-updater. ", err));
 
 /////////////////////////////////////////

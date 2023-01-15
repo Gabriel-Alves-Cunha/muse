@@ -9,7 +9,7 @@ import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
 import { useTranslation } from "@i18n";
-import { MediasInfo } from "@components/Decorations/MediasInfo";
+import { MediasInfo } from "../Decorations/MediasInfo";
 import { usePage } from "@contexts/page";
 
 // @ts-ignore => This is ok:

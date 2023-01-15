@@ -1,6 +1,6 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import create from "zustand";
+import { create } from "zustand";
 
 import { emptySet } from "@common/empty";
 

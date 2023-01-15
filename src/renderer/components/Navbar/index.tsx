@@ -1,7 +1,7 @@
 import { ButtonsForPages } from "./ButtonsForPages";
-import { ThemeToggler } from "@components/ThemeToggler";
-import { Downloading } from "@components/Downloading";
-import { Converting } from "@components/Converting";
+import { ThemeToggler } from "../ThemeToggler";
+import { Downloading } from "../Downloading";
+import { Converting } from "../Converting";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

@@ -8,10 +8,9 @@ import { BaseInput } from "@components/BaseInput";
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const errorAndUrlSelectors = ({
-	error,
-	url,
-}: ReturnType<typeof useSearchInfo.getState>) => [error, url] as const;
+const errorAndUrlSelectors = (
+	state: ReturnType<typeof useSearchInfo.getState>,
+) => [state.error, state.url] as const;
 
 export function SearcherWrapper() {
 	const [error, url] = useSearchInfo(errorAndUrlSelectors);
@@ -34,9 +33,7 @@ export function SearcherWrapper() {
 				value={url}
 			/>
 
-			<p className="searcher">
-				{error}
-			</p>
+			<p className="searcher">{error}</p>
 		</>
 	);
 }

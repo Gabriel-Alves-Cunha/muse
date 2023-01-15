@@ -1,7 +1,6 @@
 import type { Media } from "@common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { randomUUID } from "node:crypto";
 
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
@@ -19,7 +18,7 @@ import {
 	addToMainList,
 	cleanAllLists,
 	addToHistory,
-	refreshMedia,
+	rescanMedia,
 	removeMedia,
 } from "@contexts/usePlaylists";
 
@@ -55,12 +54,12 @@ describe("Testing usePlaylists", () => {
 
 	it("playThisMedia() should play a chosen media", () => {
 		for (const _ of arrayFromMainList) {
-			const randomMediaID =
+			const randomMediaPath =
 				arrayFromMainList[getRandomInt(0, numberOfMedias)]![0];
-			expect(randomMediaID).toBeTruthy();
+			expect(randomMediaPath).toBeTruthy();
 
-			playThisMedia(randomMediaID, playlistList.mainList);
-			expect(getCurrentPlaying().id).toBe(randomMediaID);
+			playThisMedia(randomMediaPath, playlistList.mainList);
+			expect(getCurrentPlaying().path).toBe(randomMediaPath);
 		}
 	});
 
@@ -74,12 +73,13 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 
 		it("addToHistory() should add one to the history list", () => {
-			const [mediaIDToAdd] = arrayFromMainList[1]!;
+			const [mediaPathToAdd] = arrayFromMainList[1]!;
 
-			addToHistory(mediaIDToAdd);
+			addToHistory(mediaPathToAdd);
 
 			const newHistory = getHistory();
-			expect(getFirstKey(newHistory)).toBe(mediaIDToAdd);
+
+			expect(getFirstKey(newHistory)).toBe(mediaPathToAdd);
 			expect(newHistory.size).toBe(1);
 		});
 	});
@@ -94,12 +94,13 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 
 		const addOneMediaToFavorites = () => {
-			const [mediaID] = arrayFromMainList[1]!;
+			const [mediaPath] = arrayFromMainList[1]!;
 
-			addToFavorites(mediaID);
+			addToFavorites(mediaPath);
 
 			const newFavorites = getFavorites();
-			expect(newFavorites.has(mediaID)).toBe(true);
+
+			expect(newFavorites.has(mediaPath)).toBe(true);
 			expect(newFavorites.size).toBe(1);
 		};
 
@@ -119,10 +120,10 @@ describe("Testing usePlaylists", () => {
 		it("removeFromFavorites() should remove one media of favorites", () => {
 			addOneMediaToFavorites();
 			expect(getFavorites().size).toBe(1);
-			const [id] = getFavorites();
-			expect(id).toBeTruthy();
+			const [path] = getFavorites();
+			expect(path).toBeTruthy();
 
-			removeFromFavorites(id!);
+			removeFromFavorites(path!);
 
 			expect(getFavorites().size).toBe(0);
 		});
@@ -139,12 +140,12 @@ describe("Testing usePlaylists", () => {
 
 		it("addToMainList() should NOT add one media to mediaList because there already exists one with the same id", () => {
 			const anyIndex = getRandomInt(0, numberOfMedias);
-			const [id, newMedia] = arrayFromMainList[anyIndex]!;
-			expect(id).toBeTruthy();
+			const [path, newMedia] = arrayFromMainList[anyIndex]!;
+			expect(path).toBeTruthy();
 
-			expect(getMainList().has(id)).toBe(true);
+			expect(getMainList().has(path)).toBe(true);
 
-			addToMainList(id, newMedia);
+			addToMainList(path, newMedia);
 
 			expect(getMainList().size).toBe(numberOfMedias);
 		});
@@ -155,10 +156,10 @@ describe("Testing usePlaylists", () => {
 
 		it("addToMainList() should add one media to mediaList", () => {
 			const title = "Test Title - add one media";
-			const newID = randomUUID();
+			const newPath = `~/Music/test/${title}.mp3`;
 			const newMedia: Media = {
-				path: `home/Music/test/${title}.mp3`,
 				duration: formatDuration(100),
+				lastModified: Date.now(),
 				birthTime: Date.now(),
 				size: 3_000,
 				genres: [],
@@ -171,12 +172,12 @@ describe("Testing usePlaylists", () => {
 
 			expect(getMainList().size).toBe(numberOfMedias);
 
-			addToMainList(newID, newMedia);
+			addToMainList(newPath, newMedia);
 
 			const newMainList = getMainList();
 
 			expect(newMainList.size).toBe(numberOfMedias + 1);
-			expect(newMainList.has(newID)).toBe(true);
+			expect(newMainList.has(newPath)).toBe(true);
 		});
 
 		/////////////////////////////////////////////
@@ -189,15 +190,15 @@ describe("Testing usePlaylists", () => {
 			expect(getHistory().size).toBe(0);
 
 			const anyIndex = getRandomInt(0, numberOfMedias);
-			const [id] = arrayFromMainList[anyIndex]!;
-			expect(id).toBeTruthy();
+			const [path] = arrayFromMainList[anyIndex]!;
+			expect(path).toBeTruthy();
 
 			expect(getMainList().size).toBe(numberOfMedias);
 
-			removeMedia(id);
+			removeMedia(path);
 
 			const newMainList = getMainList();
-			expect(newMainList.has(id)).toBe(false);
+			expect(newMainList.has(path)).toBe(false);
 			expect(newMainList.size).toBe(numberOfMedias - 1);
 		});
 
@@ -209,7 +210,7 @@ describe("Testing usePlaylists", () => {
 			cleanAllLists();
 
 			expect(getAllSelectedMedias().size).toBe(0);
-			expect(getCurrentPlaying().id).toBe("");
+			expect(getCurrentPlaying().path).toBe("");
 			expect(getFavorites().size).toBe(0);
 			expect(getMainList().size).toBe(0);
 			expect(getHistory().size).toBe(0);
@@ -220,18 +221,17 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 
 		it("refreshMedia() should refresh one media", () => {
-			const [id, oldMedia] = arrayFromMainList[15]!;
+			const [path, oldMedia] = arrayFromMainList[15]!;
 			const size = getRandomInt(0, 4242043);
 			const title = "I'm an updated title";
-			const newID = randomUUID();
 			const newMedia: Media = { ...oldMedia, title, size };
 
 			expect(getMainList().size).toBe(numberOfMedias);
 
-			refreshMedia(id, newID, newMedia);
+			rescanMedia(path, newMedia);
 
 			const newMainList = getMainList();
-			const refreshedMedia = newMainList.get(newID);
+			const refreshedMedia = newMainList.get(path);
 
 			expect(refreshedMedia).toBeTruthy();
 			expect(newMainList).toHaveLength(numberOfMedias);

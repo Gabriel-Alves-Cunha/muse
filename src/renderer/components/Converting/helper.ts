@@ -3,7 +3,7 @@ import type { ProgressProps } from "../Progress";
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import create from "zustand";
+import { create } from "zustand";
 
 import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { errorToast, infoToast, successToast } from "../toasts";
@@ -28,17 +28,16 @@ export const useNewConvertions = create<NewConvertions>(() => ({
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Path,
 ): MessagePort {
 	const convertingList = getConvertingList();
 
-	dbg("Trying to create a new conversion...", { convertingList });
+	dbg("Trying to create a new conversion.", { convertingList });
 
 	if (convertingList.has(path)) {
-const { t } = useTranslation();
+		const { t } = useTranslation.getState();
 
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
@@ -95,10 +94,7 @@ export function cancelConversionAndOrRemoveItFromList(path: string): void {
 	const mediaBeingConverted = convertingList.get(path);
 
 	if (!mediaBeingConverted)
-		return error(
-			`There should be a convertion with path "${path}"!\nconvertList =`,
-			convertingList,
-		);
+		return error(`"${path}" not found! convertList =`, convertingList);
 
 	// Cancel conversion
 	if (mediaBeingConverted.status === ProgressStatus.ACTIVE)
@@ -139,8 +135,7 @@ function handleUpdateConvertingList(
 		new Map(convertingList).set(path, { ...thisConversion, ...data }),
 	);
 
-const { t } = useTranslation();
-
+	const { t } = useTranslation.getState();
 
 	// Handle status:
 	switch (data.status) {

@@ -62,6 +62,8 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 	useEffect(() => {
 		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
 			if (event.key === "Enter" && !isAModifierKeyPressed(event)) {
+				event.stopImmediatePropagation();
+
 				changeMediaMetadata(imageFilePathRef.current, path, media);
 			}
 		}
@@ -78,8 +80,8 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 			<h2 className="subtitle">{t("dialogs.mediaOptions.description")}</h2>
 
 			<button
-				onPointerUp={() => setIsOpen(false)}
 				className="close-media-options-modal"
+				onPointerUp={() => setIsOpen(false)}
 				title={t("tooltips.closeDialog")}
 				ref={closeButtonRef}
 			>
@@ -117,10 +119,10 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 						// Handle text input with line feeds:
 						option === "lyrics" ? (
 							<textarea
-								onKeyUp={(e) => {
-									// stopping propagation so the space key doesn't toggle play state.
-									e.stopPropagation();
-								}}
+								onKeyUp={(e) =>
+									// stopping propagation so the space and enter key don't do smth other.
+									e.stopPropagation()
+								}
 								defaultValue={value}
 								id={option}
 							/>
@@ -128,10 +130,10 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 							/////////////////////////////////////////////
 							// Else:
 							<input
-								// stopping propagation so the space key doesn't toggle play state.
-								onKeyUp={(e) => {
-									e.stopPropagation();
-								}}
+								onKeyUp={(e) =>
+									// stopping propagation so the space key doesn't toggle play state.
+									e.stopPropagation()
+								}
 								readOnly={!isChangeable(option)}
 								defaultValue={format(value)}
 								id={option}

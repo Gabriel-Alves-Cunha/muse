@@ -4,7 +4,7 @@ import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
 import { useTranslation } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import { playlistList } from "@common/enums";
-import { getFromList } from "@components/MediaListKind/states";
+import { getFromList } from "../MediaListKind/states";
 
 export function Clean() {
 	const { t } = useTranslation();

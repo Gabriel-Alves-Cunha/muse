@@ -16,13 +16,12 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 // Helper functions:
 
-
 export function changeMediaMetadata(
 	imageFilePath: Path,
 	mediaPath: Path,
 	media: Media,
 ): void {
-const { t } = useTranslation();
+	const { t } = useTranslation.getState();
 
 	try {
 		const hasAnythingChanged = changeMetadataIfAllowed(

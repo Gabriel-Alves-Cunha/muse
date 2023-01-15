@@ -1,6 +1,6 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 
-import create from "zustand";
+import { create } from "zustand";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

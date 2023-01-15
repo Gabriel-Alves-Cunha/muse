@@ -1,9 +1,4 @@
-import type {
-	DateAsNumber,
-	Media,
-	Path,
-	ID,
-} from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { memo, Suspense, lazy, useState } from "react";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
@@ -47,27 +42,27 @@ function selectOrPlayMedia(
 /////////////////////////////////////////
 // Main function:
 
-const Row = memo(
-	function Row({ media, id }: RowProps) {
+const Row = memo<RowProps>(
+	({ media, path }) => {
 		const [isOpen, setIsOpen] = useState(false);
 		const { t } = useTranslation();
 
 		return (
 			<div
-				data-is-selected-row={getAllSelectedMedias().has(id)}
-				data-is-playing-row={getCurrentPlaying().id === id}
+				data-is-selected-row={getAllSelectedMedias().has(path)}
+				data-is-playing-row={getCurrentPlaying().path === path}
 				data-row-wrapper
-				data-id={id}
+				data-path={path}
 			>
 				<button
-					onPointerUp={(e) => selectOrPlayMedia(e, id)}
+					onPointerUp={(e) => selectOrPlayMedia(e, path)}
 					title={t("tooltips.playThisMedia")}
 				>
 					<div className="row-img">
 						<ImgWithFallback
 							Fallback={<MusicNote size="1.4rem" />}
 							mediaImg={media.image}
-							mediaID={id}
+							mediaPath={path}
 						/>
 					</div>
 
@@ -100,7 +95,7 @@ const Row = memo(
 							<MediaOptionsModal
 								setIsOpen={setIsOpen}
 								media={media}
-								path={id}
+								path={path}
 							/>
 						</Suspense>
 					</CenteredModal>
@@ -108,19 +103,19 @@ const Row = memo(
 			</div>
 		);
 	},
-	(prev, next) => prev.id === next.id,
+	(prev, next) => prev.media.lastModified === next.media.lastModified,
 );
 
 /////////////////////////////////////////////
 
 export const itemContent = (
 	_index: number,
-	[id, media]: [ID, Media, DateAsNumber],
-) => <Row media={media} id={id} />;
+	[path, media]: [Path, Media, DateAsNumber],
+) => <Row media={media} path={path} />;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-type RowProps = { media: Media; id: ID };
+type RowProps = { media: Media; path: Path };

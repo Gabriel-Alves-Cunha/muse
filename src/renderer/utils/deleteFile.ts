@@ -7,10 +7,9 @@ import { getBasename } from "@common/path";
 
 const { deleteFile: electronDeleteFile } = electron.fs;
 
-
 export async function deleteFile(path: Path): Promise<void> {
 	const wasDeleteSuccessfull = await electronDeleteFile(path);
-	const { t } = useTranslation();
+	const { t } = useTranslation.getState();
 
 	if (wasDeleteSuccessfull) {
 		successToast(`${t("toasts.mediaDeletionSuccess")}"${getBasename(path)}"!`);

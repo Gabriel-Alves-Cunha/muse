@@ -28,8 +28,8 @@ export function ThemeToggler() {
 		theme === availableThemes[0] ? availableThemes[1] : availableThemes[0];
 
 	const toggleTheme = () => {
-		htmlDataset.theme = newTheme;
 		setSettings((prev) => ({ ...prev, theme: newTheme }));
+		htmlDataset.theme = newTheme;
 		setTheme(newTheme);
 	};
 

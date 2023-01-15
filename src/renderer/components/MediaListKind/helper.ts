@@ -1,4 +1,4 @@
-import type { DateAsNumber, Media, ID } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
 import { ElectronIpcMainProcessNotification } from "@common/enums";
 
@@ -21,9 +21,9 @@ export function selectMediaByPointerEvent(
 ): void {
 	const mediaClickedMediaId = (e.target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
-		?.getAttribute("data-id");
+		?.getAttribute("data-path");
 
-	if (!mediaClickedMediaId) return dbg("No 'data-id' found!");
+	if (!mediaClickedMediaId) return dbg("No 'data-path' found!");
 
 	addToAllSelectedMedias(mediaClickedMediaId);
 }
@@ -32,15 +32,15 @@ export function selectMediaByPointerEvent(
 
 export const computeItemKey = (
 	_index: number,
-	[id]: [ID, Media, DateAsNumber],
-): ID => id;
+	[path]: [Path, Media, DateAsNumber],
+): Path => path;
 
 /////////////////////////////////////////
 
 export const computeHistoryItemKey = (
 	_index: number,
-	[id, , date]: [ID, Media, DateAsNumber],
-): `${ID}${DateAsNumber}` => `${id}${date}`;
+	[path, , date]: [Path, Media, DateAsNumber],
+): `${Path}${DateAsNumber}` => `${path}${date}`;
 
 /////////////////////////////////////////
 

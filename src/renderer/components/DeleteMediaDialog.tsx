@@ -25,7 +25,10 @@ export function DeleteMediaDialogContent({
 					{t("buttons.confirm")}
 				</button>
 
-				<button className="save-media-options-modal bg-transparent" onPointerUp={closeDialog}>
+				<button
+					className="save-media-options-modal bg-transparent"
+					onPointerUp={closeDialog}
+				>
 					{t("buttons.cancel")}
 				</button>
 			</div>

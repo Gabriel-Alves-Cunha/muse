@@ -1,7 +1,7 @@
 import type { DotNestedKeys } from "@common/@types/dotNestedKeys";
 import type { OneOf } from "@common/@types/utils";
 
-import create from "zustand";
+import { create } from "zustand";
 
 import { throwErr } from "@common/log";
 

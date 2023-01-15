@@ -15,7 +15,6 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-
 /**
  * This function returns a MessagePort that will be sent to
  * Electron to enable 2 way communication between it
@@ -24,14 +23,14 @@ import { dbg } from "@common/debug";
 export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	const downloadingList = getDownloadingList();
 
-	dbg("Trying to create a new download...", { downloadingList });
+	dbg("Trying to create a new download.", { downloadingList });
 
 	const { imageURL, title, url } = downloadInfo;
 
 	// First, see if there is another one that has the same url
 	// and quit if true:
 	if (downloadingList.has(url)) {
-const { t } = useTranslation();
+		const { t } = useTranslation.getState();
 
 		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
@@ -102,8 +101,7 @@ function handleUpdateDownloadingList(
 		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
 	);
 
-const { t } = useTranslation();
-
+	const { t } = useTranslation.getState();
 
 	// Handle status:
 	switch (data.status) {
@@ -155,10 +153,7 @@ export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 	const download = downloadingList.get(url);
 
 	if (!download)
-		return error(
-			`There should be a download with url "${url}" to be canceled!\ndownloadList =`,
-			downloadingList,
-		);
+		return error(`"${url}" not found! downloadList =`, downloadingList);
 
 	// Cancel download:
 	if (download.status === ProgressStatus.ACTIVE)

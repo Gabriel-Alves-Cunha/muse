@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
@@ -35,13 +35,12 @@ export function downloadMedia(): void {
 		url,
 	} = searchInfo();
 
-	dbg(`Setting \`DownloadInfo\` to download "${url}".`);
 	if (!(title && url)) return;
 
-	// Start download:
+	// Setting 'downloadInfo' will download 'url':
 	setDownloadInfo({ imageURL, title, url, artist });
 
-	// Reset values:
+	// Clear input:
 	setSearchInfo(defaultSearchInfo);
 }
 
@@ -77,7 +76,7 @@ export async function search(url: Readonly<string>): Promise<void> {
 
 		setSearchInfo({ isLoading: false, result });
 	} catch (err) {
-		const { t } = useTranslation();
+		const { t } = useTranslation.getState();
 
 		setSearchInfo({
 			result: defaultSearchInfo.result,

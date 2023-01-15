@@ -1,4 +1,4 @@
-import type { ID, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/generalTypes";
 
 import { ReactToElectronMessage } from "@common/enums";
 import { mediaPlayerFlipCardId } from "../FlipCard";
@@ -13,9 +13,9 @@ const { searchForLyricsAndImage } = electron.lyric;
 
 /////////////////////////////////////////
 
-export const Lyrics = ({ media, id }: Props) => (
+export const Lyrics = ({ media, path }: Props) => (
 	<div className="lyrics-wrapper">
-		<Header media={media} id={id} displayTitle />
+		<Header media={media} path={path} displayTitle />
 
 		<div className="lyrics">
 			<p>{media?.lyrics}</p>
@@ -36,14 +36,14 @@ export const flipMediaPlayerCard = (): void =>
 /////////////////////////////////////////
 
 export async function searchAndOpenLyrics(
-	mediaID: ID,
+	mediaPath: Path,
 	openLyrics: boolean,
 ): Promise<void> {
-	if (!mediaID) return error(`No mediaID provided. Received "${mediaID}"!`);
+	if (!mediaPath) return error("No 'mediaPath' provided");
 
-	const media = getMedia(mediaID);
+	const media = getMedia(mediaPath);
 
-	if (!media) return warn(`No media with id = "${mediaID}" found!`);
+	if (!media) return warn(`Media "${mediaPath}" not found!`);
 
 	const { t } = useTranslation.getState();
 
@@ -63,13 +63,13 @@ export async function searchAndOpenLyrics(
 		);
 
 		sendMsgToBackend({
-			type: ReactToElectronMessage.WRITE_TAG,
 			thingsToChange: [
 				{ whatToChange: "album", newValue: albumName },
 				{ whatToChange: "imageURL", newValue: image },
 				{ whatToChange: "lyrics", newValue: lyric },
 			],
-			mediaPath: media.path,
+			type: ReactToElectronMessage.WRITE_TAG,
+			mediaPath,
 		});
 	} catch (err) {
 		if ((err as Error).message.includes("No lyrics found"))
@@ -86,4 +86,4 @@ export async function searchAndOpenLyrics(
 /////////////////////////////////////////
 // Types:
 
-type Props = { media: Media | undefined; id: ID };
+type Props = { media: Media | undefined; path: Path };

@@ -28,7 +28,7 @@ export async function searchForLyricsAndImage(
 ): Promise<LyricsResponse> {
 	if (!(mediaTitle && mediaArtist))
 		throwErr(
-			`Required argument can't be empty: mediaArtist = "${mediaArtist}"; mediaTitle = "${mediaTitle}"`,
+			`Required arguments: mediaArtist = "${mediaArtist}"; mediaTitle = "${mediaTitle}"`,
 		);
 
 	dbg({ mediaTitle, getImage, mediaArtist });

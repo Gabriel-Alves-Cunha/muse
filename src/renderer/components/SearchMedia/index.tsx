@@ -13,7 +13,6 @@ import {
 	SearchStatus,
 	useSearcher,
 } from "./state";
-import { on } from "@utils/window";
 
 export function SearchMedia() {
 	const { searchStatus, results, searchTerm, highlight } = useSearcher();
@@ -30,9 +29,14 @@ export function SearchMedia() {
 
 	/////////////////////////////////////////
 
-	for (const [id, media] of results)
+	for (const [path, media] of results)
 		resultsJSXs.push(
-			<MediaSearchRow highlight={highlight} media={media} key={id} id={id} />,
+			<MediaSearchRow
+				highlight={highlight}
+				media={media}
+				key={path}
+				path={path}
+			/>,
 		);
 	// onPointerDownOutside = { setDefaultSearch };
 	/////////////////////////////////////////

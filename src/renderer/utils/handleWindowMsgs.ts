@@ -2,7 +2,9 @@ import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { ElectronToReactMessage } from "@common/enums";
+import { isAModifierKeyPressed } from "./keyboard";
 import { assertUnreachable } from "./utils";
+import { togglePlayPause } from "@contexts/useCurrentPlaying";
 import { setDownloadInfo } from "@components/Downloading";
 import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { getSettings } from "@contexts/settings";
@@ -12,12 +14,10 @@ import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
 	addToMainList,
-	refreshMedia,
+	rescanMedia,
 	getMainList,
 	removeMedia,
 } from "@contexts/usePlaylists";
-import { togglePlayPause } from "@contexts/useCurrentPlaying";
-import { isAModifierKeyPressed } from "./keyboard";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -73,8 +73,8 @@ window.addEventListener("keyup", playOrPauseOnSpaceKey);
 const {
 	DELETE_ONE_MEDIA_FROM_COMPUTER,
 	CREATE_A_NEW_DOWNLOAD,
-	REFRESH_ALL_MEDIA,
-	REFRESH_ONE_MEDIA,
+	RESCAN_ALL_MEDIA,
+	RESCAN_ONE_MEDIA,
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
 	ERROR,
@@ -115,7 +115,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			);
 
 			if (!newMedia) {
-				error(`Could not transform "${mediaPath}" to a media.`);
+				error(`Transforming "${mediaPath}" to a media failed!`);
 				break;
 			}
 
@@ -141,7 +141,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		//////////////////////////////////////////
 
-		case REFRESH_ALL_MEDIA: {
+		case RESCAN_ALL_MEDIA: {
 			dbg("[handleWindowMsgs()] Refresh all media.");
 			await searchLocalComputerForMedias();
 			break;
@@ -149,12 +149,12 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		//////////////////////////////////////////
 
-		case REFRESH_ONE_MEDIA: {
+		case RESCAN_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("[handleWindowMsgs()] Refresh one media:", mediaPath);
+			dbg("[handleWindowMsgs()] ReScan one media:", mediaPath);
 
-			await refreshMedia(mediaPath);
+			await rescanMedia(mediaPath);
 			break;
 		}
 
@@ -166,9 +166,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
 			if (!getMainList().has(mediaPath)) {
-				error(
-					`I wasn't able to find this path "${mediaPath}" to a media to be removed!`,
-				);
+				error(`"${mediaPath}" not found!`);
 				break;
 			}
 

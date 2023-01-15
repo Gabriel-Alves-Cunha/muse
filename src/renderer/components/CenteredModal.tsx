@@ -20,7 +20,6 @@ export function CenteredModal({
 
 			if (event.key === "Escape" && !isAModifierKeyPressed(event)) {
 				event.stopImmediatePropagation();
-				event.stopPropagation();
 
 				setIsOpen?.(false);
 				onEscape?.();
@@ -39,7 +38,6 @@ export function CenteredModal({
 				return;
 
 			event.stopImmediatePropagation();
-			event.stopPropagation();
 
 			onPointerDownOutside?.(event);
 			setIsOpen?.(false);

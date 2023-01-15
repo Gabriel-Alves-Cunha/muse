@@ -1,4 +1,4 @@
-import type { ID } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/generalTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
 import { BsJournal as NoLyrics } from "react-icons/bs";
@@ -15,7 +15,7 @@ import { RingLoader } from "@components/RingLoader";
 
 export const openLyrics = true;
 
-export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
+export function LoadOrToggleLyrics({ lyrics, path }: LoadOrToggleLyricsProps) {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
 	const { t } = useTranslation();
 
@@ -23,7 +23,7 @@ export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
 		if (lyrics) return flipMediaPlayerCard();
 
 		setIsLoadingLyrics(true);
-		await searchAndOpenLyrics(id, openLyrics);
+		await searchAndOpenLyrics(path, openLyrics);
 		setIsLoadingLyrics(false);
 	}
 
@@ -31,7 +31,7 @@ export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
 		<CircleIconButton
 			title={t("tooltips.toggleOpenLyrics")}
 			onPointerUp={loadAndOrToggleLyrics}
-			disabled={!id}
+			disabled={!path}
 		>
 			{lyrics ? (
 				<LyricsPresent size={16} />
@@ -51,5 +51,5 @@ export function LoadOrToggleLyrics({ lyrics, id }: LoadOrToggleLyricsProps) {
 
 type LoadOrToggleLyricsProps = {
 	lyrics: string | undefined;
-	id: ID;
+	path: Path;
 };

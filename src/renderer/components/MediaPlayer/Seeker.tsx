@@ -8,7 +8,7 @@ import { getAudio } from "@contexts/useCurrentPlaying";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-let timeUpdate: NodeJS.Timer | undefined;
+let updateCurrentTime_Timer: NodeJS.Timer | undefined;
 
 export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 	const currentTimeRef = useRef<HTMLParagraphElement>(null);
@@ -27,26 +27,26 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 
 		audio.addEventListener("loadeddata", setAudioAvailability);
-		audio.addEventListener("pause", onPause);
 		audio.addEventListener("playing", onPlaying);
+		audio.addEventListener("pause", onPause);
 
-		timeline.addEventListener("pointerdown", handleOnPointerDown);
 		timeline.addEventListener("pointerenter", setTooltipTimeOnHover);
+		timeline.addEventListener("pointerdown", handleOnPointerDown);
 
 		return () => {
 			audio.removeEventListener("loadeddata", setAudioAvailability);
-			audio.removeEventListener("pause", onPause);
 			audio.removeEventListener("playing", onPlaying);
+			audio.removeEventListener("pause", onPause);
 
-			timeline.removeEventListener("pointerdown", handleOnPointerDown);
 			timeline.removeEventListener("pointerenter", setTooltipTimeOnHover);
+			timeline.removeEventListener("pointerdown", handleOnPointerDown);
 		};
 
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
 		function onPause() {
-			clearInterval(timeUpdate);
+			clearInterval(updateCurrentTime_Timer);
 		}
 
 		function onPlaying(): void {
@@ -54,10 +54,10 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 
 			onPause();
 
-			timeUpdate = setInterval(setTimeText, 1_000);
+			updateCurrentTime_Timer = setInterval(setCurrentTimeText, 1_000);
 		}
 
-		function setTimeText(): void {
+		function setCurrentTimeText(): void {
 			const timeElement = currentTimeRef.current;
 			if (!(timeElement && timeline && audio)) return;
 
@@ -119,7 +119,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 
 			audio.currentTime = progress_0_to_1 * audio.duration;
 
-			setTimeText();
+			setCurrentTimeText();
 		}
 
 		/////////////////////////////////////////

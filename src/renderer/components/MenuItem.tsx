@@ -1,8 +1,6 @@
-export const MenuItem = (props: MenuItemProps) => (
-	<button data-menu-item {...props} />
-);
+export const MenuItem = (props: Props) => <button data-menu-item {...props} />;
 
-type MenuItemProps = React.DetailedHTMLProps<
+type Props = React.DetailedHTMLProps<
 	React.ButtonHTMLAttributes<HTMLButtonElement>,
 	HTMLButtonElement
 >;

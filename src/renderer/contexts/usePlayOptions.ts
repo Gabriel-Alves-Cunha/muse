@@ -1,6 +1,7 @@
-import create from "zustand";
+import { create } from "zustand";
 
 import { setPlayOptionsOnLocalStorage } from "./localStorageHelpers";
+import { getAudio } from "./useCurrentPlaying";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -23,9 +24,12 @@ export const { getState: getPlayOptions, setState: setPlayOptions } =
 // Helper functions:
 
 export function toggleLoopMedia(): void {
+	const audio = getAudio();
+	if (!audio) return;
+
 	const loopThisMedia = !getPlayOptions().loopThisMedia;
 
-	(document.getElementById("audio") as HTMLAudioElement).loop = loopThisMedia;
+	audio.loop = loopThisMedia;
 
 	setPlayOptions({ loopThisMedia });
 }

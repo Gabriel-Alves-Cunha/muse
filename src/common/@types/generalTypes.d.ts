@@ -1,18 +1,17 @@
 import type { AllowedMedias, eraseImg } from "../utils";
-import type { DeepReadonly } from "./utils";
 import type { pages } from "@utils/app";
 
-export type Media = DeepReadonly<{
+export type Media = Readonly<{
+	lastModified: DateAsNumber;
+	genres: readonly string[];
 	birthTime: DateAsNumber;
 	image: Base64 | "";
-	genres: string[];
 	duration: string;
 	lyrics: string;
 	artist: string;
 	album: string;
 	title: string;
 	size: number;
-	path: Path;
 }>;
 
 export type DownloadInfo = Readonly<{
@@ -34,5 +33,3 @@ export type Page = typeof pages[number];
 export type DateAsNumber = number;
 
 export type Path = string;
-
-export type ID = string;

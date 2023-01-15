@@ -11,7 +11,7 @@ import {
 	handleLoadedData,
 	mainListSelector,
 	handleEnded,
-	idSelector,
+	pathSelector,
 	logInvalid,
 	logStalled,
 	logAbort,
@@ -27,10 +27,10 @@ import {
 export function MediaPlayer() {
 	const mainList = usePlaylists(mainListSelector);
 	const audioRef = useRef<HTMLAudioElement>(null);
-	const id = useCurrentPlaying(idSelector);
+	const path = useCurrentPlaying(pathSelector);
 
 	const audio = audioRef.current;
-	const media = mainList.get(id);
+	const media = mainList.get(path);
 
 	useEffect(() => {
 		// Flip media player card to frontCard:
@@ -59,15 +59,15 @@ export function MediaPlayer() {
 			// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
 			audio.removeEventListener("loadeddata", handleLoadedData);
 		};
-	}, [media, id]);
+	}, [media, path]);
 
 	return (
 		<aside className="aside">
 			<audio id="audio" ref={audioRef} />
 
 			<FlipCard
-				frontCard={<Player media={media} id={id} />}
-				backCard={<Lyrics media={media} id={id} />}
+				frontCard={<Player media={media} path={path} />}
+				backCard={<Lyrics media={media} path={path} />}
 			/>
 		</aside>
 	);

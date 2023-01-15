@@ -271,7 +271,7 @@
 		height: var(--main-grid-height);
 	}
 
-	@media (max-width: 640px) {
+	@media (width <= 600px) {
 		[data-main-grid-container] {
 			grid-template-columns: 0.17fr 1.8fr;
 			grid-template-rows: 1.6fr 0.7fr;
@@ -297,7 +297,9 @@
 		}
 
 		[data-base-input] {
-			width: 15rem !important;
+			background: #0072f5;
+			width: 10rem;
+			color: red;
 		}
 
 		[data-grouped-button] {

@@ -19,7 +19,6 @@ import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
 import { dirs } from "@main/utils";
-import { time } from "@utils/utils";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
@@ -35,7 +34,7 @@ const currentDownloads: Map<MediaUrl, Readable> = new Map();
 // Entry function:
 
 export function createOrCancelDownload(args: CreateDownload): void {
-	if (!args.url) throwErr(`A url is required. Received: "${args.url}".`);
+	if (!args.url) throwErr(`'url' is required. Received: "${args.url}".`);
 
 	if (!currentDownloads.has(args.url)) {
 		if (!args.electronPort)
@@ -47,12 +46,12 @@ export function createOrCancelDownload(args: CreateDownload): void {
 			throwErr(`'toExtension' is required. Received: "${args.extension}".`);
 
 		if (!args.imageURL)
-			throwErr(`An imageURL is required. Received: "${args.imageURL}".`);
+			throwErr(`'imageURL' is required. Received: "${args.imageURL}".`);
 
 		if (!args.title)
-			throwErr(`A title is required. Received: "${args.title}".`);
+			throwErr(`'title' is required. Received: "${args.title}".`);
 
-		if (!args.url) throwErr(`A url is required. Received: "${args.url}".`);
+		if (!args.url) throwErr(`'url' is required. Received: "${args.url}".`);
 
 		createDownload(args as Required<CreateDownload>).then();
 	} else if (args.destroy) currentDownloads.get(args.url)!.emit("destroy");
@@ -102,7 +101,7 @@ export async function createDownload(
 	/////////////////////////////////////////////
 
 	let interval: NodeJS.Timer | undefined;
-	const startTime = Date.now();
+	const startTime = performance.now();
 	let percentageToSend = 0;
 	let prettyTotal = "";
 
@@ -142,7 +141,7 @@ export async function createDownload(
 
 			// Log progress to node console if in development:
 			if (isDev) {
-				const secondsDownloading = (Date.now() - startTime) / 1_000;
+				const secondsDownloading = (performance.now() - startTime) / 1_000;
 				const estimatedDownloadTime = (
 					secondsDownloading / (percentage / 100) -
 					secondsDownloading
@@ -205,17 +204,13 @@ export async function createDownload(
 			electronPort.postMessage(msg);
 
 			// Download media image and put it on the media metadata:
-			time(
-				() =>
-					writeTags(saveSite, {
-						albumArtists: [artist],
-						imageURL: imageURL,
-						downloadImg: true,
-						isNewMedia: true,
-						title: title,
-					}),
-				"writeTags",
-			);
+			writeTags(saveSite, {
+				albumArtists: [artist],
+				imageURL: imageURL,
+				downloadImg: true,
+				isNewMedia: true,
+				title: title,
+			});
 
 			// Tell client to add a new media...
 			sendMsgToClient({

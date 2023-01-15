@@ -12,7 +12,7 @@ const { random, floor } = Math;
 export function getRandomInt(min: number, max: number): number {
 	if (!(isFinite(min) && isFinite(max)))
 		throwErr(
-			`\`getRandomInt()\` can't handle infinite numbers. Received \`min = ${min}\` and \`max = ${max}\`.`,
+			`'getRandomInt()' can't handle infinite numbers. Received 'min = ${min}' and 'max = ${max}'.`,
 		);
 
 	return floor(min + random() * (max - min));
@@ -29,7 +29,7 @@ export function assertUnreachable(received: never): never {
 	const error = stringifyJson(received) ?? received;
 
 	throw throwErr(
-		"I shouldn't get here (on 'assertUnreachable')!\nreceived = " + error,
+		"I shouldn't get here (on 'assertUnreachable')!\nReceived = " + error,
 	);
 }
 

@@ -1,6 +1,4 @@
-import type { ID, Media } from "@common/@types/generalTypes";
-
-import { randomUUID } from "node:crypto";
+import type { Path, Media } from "@common/@types/generalTypes";
 
 import { formatDuration } from "@common/utils";
 
@@ -10,14 +8,14 @@ const { sortByTitle } = await import("@contexts/usePlaylistsHelper");
 export const numberOfMedias = 30;
 
 // Make a test list full of fake medias sorted by path:
-export const testMap: ReadonlyMap<ID, Media> = sortByTitle(
+export const testMap: ReadonlyMap<Path, Media> = sortByTitle(
 	new Map(
 		Array.from({ length: numberOfMedias }, (_: undefined, index) => {
 			const title = `Test Title - ${index}`;
 			const media: Media = {
 				duration: formatDuration(index + 10),
+				lastModified: Date.now(),
 				birthTime: Date.now(),
-				path: `${index}`,
 				size: 3_000,
 				genres: [],
 				artist: "",
@@ -27,14 +25,14 @@ export const testMap: ReadonlyMap<ID, Media> = sortByTitle(
 				title,
 			};
 
-			return [randomUUID(), media] as const;
+			return [`~/Music/${title}`, media] as const;
 		}),
 	),
 );
 
 export const arrayFromMainList = Object.freeze([...testMap]);
 
-export const lastMediaIDFromTestArray = arrayFromMainList.at(-1)![0];
-export const lastMediaIDFromMainList = arrayFromMainList.at(-1)![0];
-export const firstMediaIDFromTestArray = arrayFromMainList[0]![0];
-export const firstMediaIDFromMainList = arrayFromMainList[0]![0];
+export const lastMediaPathFromTestArray = arrayFromMainList.at(-1)![0];
+export const lastMediaPathFromMainList = arrayFromMainList.at(-1)![0];
+export const firstMediaPathFromTestArray = arrayFromMainList[0]![0];
+export const firstMediaPathFromMainList = arrayFromMainList[0]![0];

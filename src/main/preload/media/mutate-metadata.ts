@@ -15,7 +15,7 @@ import {
 import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
-import { error, assert, throwErr } from "@common/log";
+import { error, assert, throwErr, log } from "@common/log";
 import { ElectronToReactMessage } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { isBase64Image } from "@main/utils";
@@ -34,11 +34,12 @@ async function handleImageMetadata(
 ): Promise<void> {
 	if (downloadImg) {
 		try {
-			dbg("Downloading picture...");
+			log("Downloading picture.");
 
 			file.tag.pictures = await downloadThumbnail(imageURL);
+			log("Picture downloaded successfully!", file.tag.pictures[0]);
 		} catch (err) {
-			error("There was an error getting the picture data.", err);
+			error("Error getting picture data:", err);
 
 			// Send error to client:
 			sendMsgToClient({
@@ -77,8 +78,6 @@ async function handleImageMetadata(
 	// else, it's an image file path
 	if (existsSync(imageURL)) {
 		const base64 = (await readFile(imageURL, { encoding: "base64" })) as Base64;
-
-		dbg({ base64 });
 
 		createAndSaveImageOnMedia(base64, file);
 	}
@@ -137,7 +136,7 @@ export function createAndSaveImageOnMedia(
 
 	file.tag.pictures = [picture];
 
-	dbg("At createImage():", {
+	log("At createImage():", {
 		"new file.tag.pictures": file.tag.pictures,
 		picture,
 	});
@@ -201,7 +200,7 @@ function talkToClientSoItCanGetTheNewMedia(
 
 			// Since there was an error, let's at least refresh media:
 			sendMsgToClient({
-				type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
+				type: ElectronToReactMessage.RESCAN_ONE_MEDIA,
 				mediaPath,
 			});
 		} finally {
@@ -220,7 +219,7 @@ function talkToClientSoItCanGetTheNewMedia(
 	// If everything else fails, at least refresh media:
 	else
 		sendMsgToClient({
-			type: ElectronToReactMessage.REFRESH_ONE_MEDIA,
+			type: ElectronToReactMessage.RESCAN_ONE_MEDIA,
 			mediaPath,
 		});
 }

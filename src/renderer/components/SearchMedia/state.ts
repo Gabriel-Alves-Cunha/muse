@@ -1,8 +1,8 @@
-import type { ID, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import { create } from "zustand";
 
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
 import { emptyArray } from "@common/empty";
@@ -87,7 +87,7 @@ useSearcher.subscribe(
 
 type Searcher = {
 	searchStatus: ValuesOf<typeof SearchStatus>;
-	results: readonly [ID, Media][];
+	results: readonly [Path, Media][];
 	searchTerm: string;
 	highlight: string;
 };

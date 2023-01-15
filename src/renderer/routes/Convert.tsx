@@ -59,11 +59,7 @@ export default function Convert() {
 
 	return (
 		<MainArea className="flex justify-center items-center">
-			<Button
-				onPointerUp={openNativeUI_ChooseFiles}
-				className="no-transition"
-				variant="circle"
-			>
+			<Button onPointerUp={openNativeUI_ChooseFiles} variant="circle">
 				<ConvertIcon size={18} />
 
 				<input

@@ -1,4 +1,4 @@
-import { getMedia, refreshMedia, usePlaylists } from "@contexts/usePlaylists";
+import { getMedia, rescanMedia, usePlaylists } from "@contexts/usePlaylists";
 import { formatDuration } from "@common/utils";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
@@ -12,9 +12,9 @@ import {
 ///////////////////////////////////////
 ///////////////////////////////////////
 
-export const idSelector = (
+export const pathSelector = (
 	state: ReturnType<typeof useCurrentPlaying.getState>,
-) => state.id;
+) => state.path;
 
 ///////////////////////////////////////
 
@@ -42,22 +42,22 @@ export const logStalled = (e: Event): void =>
 /////////////////////////////////////////
 
 export function handleLoadedData({ target: audio }: AudioEvent): void {
-	const { lastStoppedTime, id: oldId } = getCurrentPlaying();
+	const { lastStoppedTime, path } = getCurrentPlaying();
 	const formatedDuration = formatDuration(audio.duration);
-	const media = getMedia(oldId)!;
+	const media = getMedia(path);
+
+	if (!media) return error("Media not found!");
 
 	// Updating the duration of media:
 	if (formatedDuration !== media.duration) {
-		const newID = crypto.randomUUID();
-
-		refreshMedia(oldId, newID, {
+		rescanMedia(path, {
 			...media,
 			duration: formatedDuration,
 		}).then();
 	}
 
 	// Maybe set audio.currentTime to last stopped time:
-	if (lastStoppedTime > 30 /* seconds */) audio.currentTime = lastStoppedTime;
+	if (lastStoppedTime > 60 /* seconds */) audio.currentTime = lastStoppedTime;
 }
 
 /////////////////////////////////////////

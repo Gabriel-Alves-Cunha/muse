@@ -1,5 +1,5 @@
 import type { MainList } from "./usePlaylists";
-import type { ID } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/generalTypes";
 
 import { log } from "@common/log";
 
@@ -26,8 +26,8 @@ export function getMediaFiles(fileList: FileList): readonly File[] {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByDate(list: MainList): ReadonlySet<ID> {
-	const listAsArrayOfPaths = Array.from(list)
+export function sortByDateOfBirth(list: MainList): ReadonlySet<Path> {
+	const listAsArrayOfPaths = [...list]
 		.sort(
 			([, { birthTime: prevBirthTime }], [, { birthTime: nextBirthTime }]) =>
 				prevBirthTime > nextBirthTime
@@ -46,7 +46,7 @@ export function sortByDate(list: MainList): ReadonlySet<ID> {
 ////////////////////////////////////////////////
 
 export function sortByTitle(list: MainList): MainList {
-	const listAsArrayOfPaths = Array.from(list).sort(
+	const listAsArrayOfPaths = [...list].sort(
 		([, { title: prevTitle }], [, { title: nextTitle }]) => {
 			prevTitle = prevTitle.toLowerCase();
 			nextTitle = nextTitle.toLowerCase();

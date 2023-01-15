@@ -1,4 +1,4 @@
-import type { ID, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/generalTypes";
 
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 
@@ -6,15 +6,15 @@ import { ControlsAndSeeker } from "./ControlsAndSeeker";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { Header } from "./Header";
 
-export const Player = ({ media, id }: PlayerProps) => (
+export const Player = ({ media, path }: PlayerProps) => (
 	<>
-		<Header media={media} id={id} />
+		<Header media={media} path={path} />
 
 		<div className="media-player-img">
 			<ImgWithFallback
 				Fallback={<MusicNote size={30} />}
 				mediaImg={media?.image}
-				mediaID={id}
+				mediaPath={path}
 			/>
 		</div>
 
@@ -24,7 +24,7 @@ export const Player = ({ media, id }: PlayerProps) => (
 			<span className="text-sm font-normal">{media?.artist}</span>
 		</div>
 
-		<ControlsAndSeeker isThereAMedia={Boolean(id)} />
+		<ControlsAndSeeker isThereAMedia={Boolean(path)} />
 	</>
 );
 
@@ -35,5 +35,5 @@ export const Player = ({ media, id }: PlayerProps) => (
 
 type PlayerProps = {
 	media: Media | undefined;
-	id: ID;
+	path: Path;
 };

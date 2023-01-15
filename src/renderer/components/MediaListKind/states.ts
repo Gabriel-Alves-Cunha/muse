@@ -1,6 +1,6 @@
 import type { ValuesOf } from "@common/@types/utils";
 
-import create from "zustand";
+import { create } from "zustand";
 
 import { playlistList } from "@common/enums";
 

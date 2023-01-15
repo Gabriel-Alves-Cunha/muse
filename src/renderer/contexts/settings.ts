@@ -2,14 +2,14 @@ import type { UserAvailableLanguages } from "@i18n";
 import type { availableThemes } from "@components/ThemeToggler";
 
 import { subscribeWithSelector } from "zustand/middleware";
-import create from "zustand";
+import { create } from "zustand";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Pre work:
 
-const settingsKey = "muse:settings";
+const settingsKey = "@muse:settings";
 const defaultValues: Settings = {
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
@@ -38,14 +38,19 @@ export const { getState: getSettings, setState: setSettings } = useSettings;
 ////////////////////////////////////////////////
 // Helper function:
 
+let setToLocalStorageTimer: NodeJS.Timer | undefined;
+
 useSettings.subscribe(
 	(state) => state,
-	(newSettings) =>
+	(newSettings) => {
+		clearTimeout(setToLocalStorageTimer);
+
 		// Write to LocalStorage:
-		setTimeout(
+		setToLocalStorageTimer = setTimeout(
 			() => localStorage.setItem(settingsKey, JSON.stringify(newSettings)),
 			1_000,
-		),
+		);
+	},
 );
 
 ////////////////////////////////////////////////
