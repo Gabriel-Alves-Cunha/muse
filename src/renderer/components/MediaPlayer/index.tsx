@@ -29,13 +29,13 @@ export function MediaPlayer() {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const path = useCurrentPlaying(pathSelector);
 
-	const audio = audioRef.current;
 	const media = mainList.get(path);
+	const audio = audioRef.current;
 
 	useEffect(() => {
 		// Flip media player card to frontCard:
 		document.getElementById(mediaPlayerFlipCardId)?.classList.remove("active");
-	}, [audioRef.current?.src]);
+	}, [path]);
 
 	// Setting event listeners:
 	useEffect(() => {
