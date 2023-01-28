@@ -435,7 +435,7 @@
 
 	/* 3) modal-trigger (a circled button with only an icon) */
 	.icon-circle-modal-trigger {
-		@apply relative flex justify-center mx-auto items-center w-7 h-7 text-icon-deactivated cursor-pointer bg-none rounded-full;
+		@apply relative flex justify-center mx-auto items-center w-7 h-7 text-icon-deactivated bg-none rounded-full transition-none;
 	}
 
 	.icon-circle-modal-trigger:is(:focus, :hover) {
@@ -749,14 +749,14 @@
 	/* Media List Kind */
 
 	[data-row-wrapper] {
-		/* Because of Virtuoso, this can't have margins! */
-		@apply box-border relative flex justify-start items-center w-[98%] h-16 rounded-lg p-2 transition-shadow;
+		@apply box-border relative flex justify-start items-center w-[98%] h-16 rounded-lg transition-shadow;
 
+		/* Because of Virtuoso, this can't have margins! */
 		margin: unset;
 	}
 
 	[data-row-wrapper] > button:first-child {
-		@apply relative flex items-center h-full w-[90%] bg-none border-none;
+		@apply relative flex items-center h-full w-[90%] bg-none border-none p-2;
 	}
 
 	.row-info {
@@ -784,7 +784,7 @@
 	}
 
 	.list {
-		@apply scroll-2;
+		@apply scroll-2 pl-1;
 	}
 
 	.list-decimal-zero {

@@ -34,13 +34,14 @@ import {
 // Auto updater setup:
 
 autoUpdater.autoInstallOnAppQuit = true;
-autoUpdater.autoDownload = true;
 autoUpdater
 	.on("update-not-available", (info) => log("Update not available:", info))
 	.on("update-downloaded", (info) => log("Update downloaded:", info))
 	.on("update-available", (info) => log("Update available:", info))
 	.on("checking-for-update", () => log("Checking for update."))
-	.on("error", (err) => log("Error in auto-updater. ", err));
+	.on("error", (err) =>
+		log("Error in auto-updater. ", err),
+	).autoDownload = true;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -84,10 +85,7 @@ function createElectronWindow(): BrowserWindow {
 			webSecurity: true,
 			webgl: false,
 		},
-	}).once("ready-to-show", () => {
-		window.show();
-		window.focus();
-	});
+	}).once("ready-to-show", () => window.show);
 
 	/////////////////////////////////////////
 	/////////////////////////////////////////
@@ -207,7 +205,7 @@ app
 		// This will download an update,
 		// then install when the app quits.
 		setTimeout(
-			async () => await autoUpdater.checkForUpdatesAndNotify().catch(error),
+			() => autoUpdater.checkForUpdatesAndNotify().then().catch(error),
 			10_000,
 		);
 	});
@@ -245,7 +243,7 @@ ipcMain
 
 			switch (type) {
 				case ElectronIpcMainProcessNotification.QUIT_APP: {
-					app.quit();
+					focusedWindow?.close();
 					break;
 				}
 
