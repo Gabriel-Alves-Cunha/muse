@@ -1,12 +1,7 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 import type { AllowedMedias } from "@common/utils";
 import type { MediaUrl } from "@contexts/downloadList";
-import type { Readable } from "node:stream";
 
-import { cursorTo, clearLine } from "node:readline";
-import { existsSync } from "node:fs";
-import { stdout } from "node:process";
-import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
@@ -137,26 +132,6 @@ export async function createDownload(
 					status: ProgressStatus.ACTIVE,
 				};
 				electronPort.postMessage(msg);
-			}
-
-			// Log progress to node console if in development:
-			if (isDev) {
-				const secondsDownloading = (performance.now() - startTime) / 1_000;
-				const estimatedDownloadTime = (
-					secondsDownloading / (percentage / 100) -
-					secondsDownloading
-				).toFixed(2);
-
-				cursorTo(stdout, 0);
-				clearLine(stdout, 0);
-
-				stdout.write(
-					`${percentage.toFixed(2)}% downloaded, (${prettyBytes(
-						downloaded,
-					)} / ${prettyTotal}). Running for: ${secondsDownloading.toFixed(
-						2,
-					)} seconds. ETA: ${estimatedDownloadTime} seconds.`,
-				);
 			}
 		})
 		/////////////////////////////////////////////

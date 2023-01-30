@@ -5,15 +5,14 @@ import type {
 } from "@common/@types/electron-window";
 
 import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
-import { contextBridge, ipcRenderer } from "electron";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { searchForLyricsAndImage } from "./preload/getLyrics";
 import { transformPathsToMedias } from "./preload/media/create-media";
 import { assertUnreachable } from "@utils/utils";
-import { ClipboardExtended } from "./preload/clipboardExtended.js";
 import { createServer } from "./preload/share/server";
 import { writeTags } from "./preload/media/mutate-metadata";
+import { clipboard } from "./preload/watchClipboard.js";
 import { error } from "@common/log";
 import { dirs } from "./utils";
 import { dbg } from "@common/debug";
@@ -56,41 +55,35 @@ const visibleElectronAPI: VisibleElectron = {
 	os: { dirs },
 };
 
-contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
-
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// This is to make Electron show a notification
+// This is to show a notification
 // when we copy a link to the clipboard:
 // This has to be imported after app is open.
-(async () => {
-	const extendedClipboard = (await import("./preload/clipboardExtended.js"))
-		.extendedClipboard as ClipboardExtended;
 
-	extendedClipboard
-		.on("text-changed", async () => {
-			const url = extendedClipboard.readText("clipboard");
+clipboard.addEventListener("text-changed", async () => {
+	const url = clipboard.previousText;
 
-			if (!isUrlValid(url)) return;
+	if (!isUrlValid(url)) return;
 
-			const {
-				media: { artist = "" },
-				thumbnails,
-				title,
-			} = (await getBasicInfo(url)).videoDetails;
+	const {
+		media: { artist = "" },
+		thumbnails,
+		title,
+	} = (await getBasicInfo(url)).videoDetails;
 
-			ipcRenderer.invoke(
-				ElectronPreloadToMainElectronMessage.CLIPBOARD_TEXT_CHANGED,
-				{
-					thumbnail: thumbnails.at(-1)?.url ?? "",
-					artist,
-					title,
-					url,
-				} satisfies ClipboardTextChangeNotificationProps,
-			);
-		})
-		.startWatching();
-})();
+	ipcRenderer.invoke(
+		ElectronPreloadToMainElectronMessage.CLIPBOARD_TEXT_CHANGED,
+		{
+			thumbnail: thumbnails.at(-1)?.url ?? "",
+			artist,
+			title,
+			url,
+		} satisfies ClipboardTextChangeNotificationProps,
+	);
+});
+
+clipboard.startWatching();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

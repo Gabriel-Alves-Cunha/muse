@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/generalTypes";
+import type { Media } from "@renderer/common/@types/generalTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -10,7 +10,7 @@ mockElectronPlusNodeGlobalsBeforeTests();
 import { arrayFromMainList, numberOfMedias } from "./fakeTestList";
 import { cleanUpBeforeEachTest } from "./beforeEach";
 import { getAllSelectedMedias } from "@contexts/useAllSelectedMedias";
-import { playlistList } from "@common/enums";
+import { playlistList } from "@renderer/common/enums";
 import {
 	replaceEntireMainList,
 	removeFromFavorites,
@@ -22,7 +22,7 @@ import {
 	removeMedia,
 } from "@contexts/usePlaylists";
 
-const { formatDuration } = await import("@common/utils");
+const { formatDuration } = await import("@renderer/common/utils");
 const { getRandomInt } = await import("@utils/utils");
 const { getFirstKey } = await import("@utils/map-set");
 const { getFavorites, searchMedia, getMainList, getHistory } = await import(

@@ -3,8 +3,6 @@ import type { AllowedMedias } from "@common/utils";
 import type { Readable } from "node:stream";
 import type { Path } from "@common/@types/generalTypes";
 
-import { createReadStream, existsSync } from "node:fs";
-import { dirname, join } from "node:path";
 import sanitize from "sanitize-filename";
 
 import { ElectronToReactMessage } from "@common/enums";

@@ -14,5 +14,5 @@
 		"../renderer/assets/**/*",
 		"../common/**/*",
 		"../main/**/*"
-	]
+, "../utils/log.ts"	]
 }

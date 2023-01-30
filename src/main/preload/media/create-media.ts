@@ -1,7 +1,6 @@
 import type { Base64, Media, Path } from "@common/@types/generalTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
-import { statSync } from "node:fs";
 
 import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
 import { getAllowedMedias, searchDirectoryResult } from "../file";

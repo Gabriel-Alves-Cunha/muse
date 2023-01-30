@@ -9,40 +9,34 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
-		"release:windows-only:test": "yarn add @ffmpeg-installer/win32-x64 --ignore-platform && cross-env DEBUG=electron-builder electron-builder --publish=never --dir --windows -c.asar=false",
-		"release:windows-only": "yarn add @ffmpeg-installer/win32-x64 --ignore-platform && cross-env DEBUG=electron-builder electron-builder --publish=never --windows",
-		"release:linux:test": "cross-env DEBUG=electron-builder electron-builder --publish=never --dir --linux -c.asar=false",
-		"release:linux": "cross-env DEBUG=electron-builder electron-builder --publish=never --linux",
-		"preview": "yarn build && electron --trace-warnings --inspect build/main/index.cjs",
-		"build": "cross-env DEBUG=muse NODE_ENV=production hmr-electron build",
-		"dev": "cross-env DEBUG=muse NODE_ENV=development hmr-electron dev",
+		"release:windows-only:test": "yarn add @ffmpeg-installer/win32-x64 --ignore-platform &&",
+		"release:windows-only": "yarn add @ffmpeg-installer/win32-x64 --ignore-platform &&",
+		"release:linux:test": "",
+		"release:linux": "",
 		"ts:check": "tsc --noEmit --pretty --extendedDiagnostics",
-		"postinstall": "electron-builder install-app-deps",
 		"test": "cross-env DEBUG=muse:tests vitest",
+		"build": "RUST_BACKTRACE=1 tauri build",
 		"coverage": "vitest run --coverage",
+		"dev": "RUST_BACKTRACE=1 tauri dev",
 		"fmt": "rome format . --write",
-		"lint": "rome check ."
+		"build:web": "vite build",
+		"lint": "rome check .",
+		"dev:web": "vite"
 	},
 	"devDependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"@tauri-apps/cli": "^1.2.3",
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/koa": "^2.13.5",
 		"@types/koa-router": "^7.4.4",
-		"@types/node": "^18.11.18",
 		"@types/qrcode": "^1.5.0",
 		"@types/react": "^18.0.27",
 		"@types/react-dom": "^18.0.10",
 		"@vitejs/plugin-react-swc": "^3.0.1",
 		"autoprefixer": "^10.4.13",
 		"cross-env": "^7.0.3",
-		"electron": "^22.1.0",
-		"electron-builder": "^23.6.0",
-		"electron-devtools-installer": "^3.2.0",
-		"electron-updater": "^5.3.0",
-		"esbuild": "^0.17.5",
 		"fluent-ffmpeg": "^2.1.2",
-		"happy-dom": "^8.1.5",
-		"hmr-electron": "^0.1.2",
+		"happy-dom": "^8.2.0",
 		"koa": "^2.14.1",
 		"koa-router": "^12.0.0",
 		"node-taglib-sharp": "^5.0.1",
@@ -70,5 +64,7 @@
 		"windows",
 		"linux"
 	],
-	"dependencies": {}
+	"dependencies": {
+		"@tauri-apps/api": "^1.2.0"
+	}
 }

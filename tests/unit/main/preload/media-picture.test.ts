@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "@renderer/common/@types/generalTypes";
 
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
 
 import { getThumbnail, anotherMediaPath } from "./utils";
-import { eraseImg, makeRandomString } from "@common/utils";
+import { eraseImg, makeRandomString } from "@renderer/common/utils";
 
 const { writeTags } = await import("@main/preload/media/mutate-metadata");
 

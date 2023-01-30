@@ -4,18 +4,6 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { autoUpdater } from "electron-updater";
-import {
-	BrowserWindow,
-	Notification,
-	nativeImage,
-	MenuItem,
-	protocol,
-	ipcMain,
-	Menu,
-	Tray,
-	app,
-} from "electron";
 
 import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
@@ -31,33 +19,8 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-// Auto updater setup:
-
-autoUpdater.autoInstallOnAppQuit = true;
-autoUpdater
-	.on("update-not-available", (info) => log("Update not available:", info))
-	.on("update-downloaded", (info) => log("Update downloaded:", info))
-	.on("update-available", (info) => log("Update available:", info))
-	.on("checking-for-update", () => log("Checking for update."))
-	.on("error", (err) =>
-		log("Error in auto-updater. ", err),
-	).autoDownload = true;
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
 // Variables:
 
-let electronWindow: BrowserWindow | undefined;
-let tray: Tray | undefined;
-
-const logoPath = resolve(
-	app.getAppPath(),
-	"build",
-	"renderer",
-	"assets",
-	"logo.png",
-);
 
 /////////////////////////////////////////
 
@@ -157,30 +120,6 @@ app
 			const url = request.url.substring(7);
 			callback(decodeURI(normalize(url)));
 		});
-
-		/////////////////////////////////////////
-		/////////////////////////////////////////
-
-		// This method will be called when Electron has finished
-		// initialization and is ready to create browser windows.
-		// Some APIs can only be used after this event occurs:
-		if (isDev) {
-			const devtoolsInstaller = await import("electron-devtools-installer");
-			const { REACT_DEVELOPER_TOOLS } = devtoolsInstaller;
-			// @ts-ignore => This error occurs when not bundling.
-			const { default: installExtension } = devtoolsInstaller.default;
-			// const installExtension = devtoolsInstaller.default;
-
-			await installExtension(REACT_DEVELOPER_TOOLS, {
-				loadExtensionOptions: { allowFileAccess: true },
-			})
-				// @ts-ignore => This error occurs when not bundling.
-				.then((name) => dbg(`Added Extension: ${name}`))
-				// @ts-ignore => This error occurs when not bundling.
-				.catch((err) =>
-					error("An error occurred while installing extension: ", err),
-				);
-		}
 
 		/////////////////////////////////////////
 		/////////////////////////////////////////

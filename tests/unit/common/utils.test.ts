@@ -2,12 +2,12 @@
 
 import { expect, it } from "vitest";
 
-import { formatDuration } from "@common/utils";
+import { formatDuration } from "@renderer/common/utils";
 import {
 	getPathWithoutExtension,
 	getLastExtension,
 	getBasename,
-} from "@common/path";
+} from "@renderer/common/path";
 
 //////////////////////////////////////
 //////////////////////////////////////

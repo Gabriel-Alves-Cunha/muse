@@ -33,44 +33,39 @@
 		"pretty": true,
 		"strict": true,
 		"types": [
-			"vitest/importMeta"
+			"vitest/importMeta",
+			"@types/*"
 		],
 		"paths": {
 			"@i18n": [
-				"src/renderer/i18n/index.ts"
+				"src/i18n/index.ts"
 			],
 			"@components/*": [
-				"src/renderer/components/*"
+				"src/components/*"
 			],
 			"@contexts/*": [
-				"src/renderer/contexts/*"
+				"src/contexts/*"
 			],
 			"@modules/*": [
-				"src/renderer/modules/*"
+				"src/modules/*"
 			],
 			"@styles/*": [
-				"src/renderer/styles/*"
+				"src/styles/*"
 			],
 			"@routes/*": [
-				"src/renderer/routes/*"
+				"src/routes/*"
 			],
 			"@assets/*": [
-				"src/renderer/assets/*"
+				"src/assets/*"
 			],
 			"@utils/*": [
-				"src/renderer/utils/*"
+				"src/utils/*"
 			],
 			"@hooks/*": [
-				"src/renderer/hooks/*"
+				"src/hooks/*"
 			],
-			"@renderer/*": [
-				"src/renderer/*"
-			],
-			"@common/*": [
-				"src/common/*"
-			],
-			"@main/*": [
-				"src/main/*"
+			"types/*": [
+				"src/types/*"
 			],
 			"@tests/*": [
 				"tests/*"

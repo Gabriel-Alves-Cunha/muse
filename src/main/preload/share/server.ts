@@ -1,5 +1,4 @@
 import type { Path, QRCodeURL } from "@common/@types/generalTypes";
-import type { AddressInfo } from "node:net";
 
 import Koa from "koa";
 

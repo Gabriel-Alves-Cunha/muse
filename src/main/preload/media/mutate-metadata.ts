@@ -2,10 +2,6 @@ import type { ImageURL, Base64, Path } from "@common/@types/generalTypes";
 import type { Mutable } from "@common/@types/utils";
 import type { Tags } from "@common/@types/electron-window";
 
-import { existsSync, renameSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { readFile } from "node:fs/promises";
-import { get } from "node:https";
 import {
 	File as MediaFile,
 	PictureType,

@@ -1,10 +1,10 @@
-import type { Json } from "@common/@types/utils";
+import type { Json } from "@renderer/common/@types/utils";
 
 import { vi } from "vitest";
 
 import { getObjectLength, withoutProperty } from "@utils/object";
-import { stringifyJson } from "@common/utils";
-import { dbgTests } from "@common/debug";
+import { stringifyJson } from "@renderer/common/utils";
+import { dbgTests } from "@renderer/common/debug";
 
 // Mocking window.localStorage
 class LocalStorageMock {

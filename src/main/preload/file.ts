@@ -1,7 +1,5 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { readdir, unlink } from "node:fs/promises";
-import { join } from "node:path";
 
 import { getLastExtension } from "@common/path";
 import { allowedMedias } from "@common/utils";

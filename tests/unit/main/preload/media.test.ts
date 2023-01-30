@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "@renderer/common/@types/generalTypes";
 
 // Getting everything ready for the tests...
 import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
@@ -14,8 +14,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { mediaPath, mediaPicture, test_assetsDir } from "./utils";
-import { eraseImg, makeRandomString } from "@common/utils";
-import { error } from "@common/log";
+import { eraseImg, makeRandomString } from "@renderer/common/utils";
+import { error } from "@renderer/common/log";
 
 const { writeTags } = await import("@main/preload/media/mutate-metadata");
 

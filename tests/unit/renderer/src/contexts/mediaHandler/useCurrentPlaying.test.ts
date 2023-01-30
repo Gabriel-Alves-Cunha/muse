@@ -8,7 +8,7 @@ mockElectronPlusNodeGlobalsBeforeTests();
 //
 
 import { cleanUpBeforeEachTest } from "./beforeEach";
-import { playlistList } from "@common/enums";
+import { playlistList } from "@renderer/common/enums";
 import {
 	firstMediaPathFromMainList,
 	arrayFromMainList,

@@ -1,0 +1,117 @@
+{
+	"$schema": "../node_modules/@tauri-apps/cli/schema.json",
+	"build": {
+		"beforeBuildCommand": "yarn build:web",
+		"beforeDevCommand": "yarn dev:web",
+		"devPath": "http://localhost:3000",
+		"distDir": "../build"
+	},
+	"package": {
+		"productName": "muse",
+		"version": "0.1.0"
+	},
+	"tauri": {
+		"allowlist": {
+			"clipboard": {
+				"readText": true
+			},
+			"dialog": {
+				"open": true,
+				"save": true
+			},
+			"fs": {
+				"removeFile": true,
+				"renameFile": true,
+				"writeFile": true,
+				"readFile": true,
+				"readDir": true,
+				"exists": true
+			},
+			"http": {
+				"request": true,
+				"scope": []
+			},
+			"notification": {
+				"all": true
+			},
+			"path": {
+				"all": true
+			},
+			"shell": {
+				"execute": true,
+				"open": true
+			},
+			"window": {
+				"setSkipTaskbar": false,
+				"setDecorations": true,
+				"setFullscreen": false,
+				"setCursorGrab": true,
+				"setResizable": false,
+				"startDragging": true,
+				"setMinSize": false,
+				"unmaximize": true,
+				"unminimize": true,
+				"maximize": false,
+				"minimize": false,
+				"setFocus": false,
+				"setSize": false,
+				"setIcon": false,
+				"center": false,
+				"create": false,
+				"close": false,
+				"hide": false,
+				"all": false,
+				"show": true
+			},
+			"all": false
+		},
+		"bundle": {
+			"active": true,
+			"category": "DeveloperTool",
+			"copyright": "",
+			"deb": {
+				"depends": []
+			},
+			"externalBin": [],
+			"icon": [
+				"icons/32x32.png",
+				"icons/128x128.png",
+				"icons/128x128@2x.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			],
+			"identifier": "com.tauri.dev",
+			"longDescription": "",
+			"macOS": {
+				"providerShortName": null,
+				"signingIdentity": null,
+				"exceptionDomain": "",
+				"entitlements": null,
+				"frameworks": []
+			},
+			"resources": [],
+			"shortDescription": "",
+			"targets": "all",
+			"windows": {
+				"certificateThumbprint": null,
+				"digestAlgorithm": "sha256",
+				"timestampUrl": ""
+			}
+		},
+		"security": {
+			"csp": null
+		},
+		"updater": {
+			"active": false
+		},
+		"windows": [
+			{
+				"fullscreen": false,
+				"resizable": true,
+				"title": "Muse",
+				"height": 600,
+				"width": 800
+			}
+		]
+	}
+}

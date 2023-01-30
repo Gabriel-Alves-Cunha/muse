@@ -1,6 +1,6 @@
 import { assert, expect, it } from "vitest";
 
-import { sleep } from "@common/utils";
+import { sleep } from "@renderer/common/utils";
 import {
 	assertUnreachable,
 	getRandomInt,

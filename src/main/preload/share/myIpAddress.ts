@@ -1,5 +1,3 @@
-import { networkInterfaces } from "node:os";
-
 import { throwErr } from "@common/log";
 
 /////////////////////////////////////////////

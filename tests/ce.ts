@@ -1,4 +1,4 @@
-import { makeRandomString } from "@common/utils";
+import { makeRandomString } from "@renderer/common/utils";
 import { getRandomInt } from "@utils/utils";
 
 export const list = new Set(
