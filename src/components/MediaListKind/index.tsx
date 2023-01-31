@@ -1,4 +1,4 @@
-import type { DateAsNumber, Media, Path } from "@renderer/common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "types/generalTypes";
 
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
@@ -11,9 +11,9 @@ import { itemContent, leftClick } from "./Row";
 import { resetAllAppData } from "@utils/app";
 import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 import { on, removeOn } from "@utils/window";
-import { error } from "@renderer/common/log";
+import { error } from "@utils/log";
 import { time } from "@utils/utils";
 import {
 	getAllSelectedMedias,

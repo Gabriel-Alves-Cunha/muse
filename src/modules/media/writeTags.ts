@@ -1,7 +1,10 @@
-import type { ImageURL, Base64, Path } from "@common/@types/generalTypes";
-import type { Mutable } from "@common/@types/utils";
-import type { Tags } from "@common/@types/electron-window";
+import type { ImageURL, Base64, Path } from "types/generalTypes";
+import type { Mutable } from "types/utils";
+import type { Tags } from "types/generalTypes";
 
+import { fetch, ResponseType } from "@tauri-apps/api/http";
+import { dirname } from "@tauri-apps/api/path";
+import { exists, renameFile } from "@tauri-apps/api/fs";
 import {
 	File as MediaFile,
 	PictureType,
@@ -10,13 +13,14 @@ import {
 } from "node-taglib-sharp";
 import sanitize from "sanitize-filename";
 
-import { getBasename, getLastExtension } from "@common/path";
-import { error, assert, throwErr, log } from "@common/log";
-import { ElectronToReactMessage } from "@common/enums";
-import { sendMsgToClient } from "@common/crossCommunication";
-import { isBase64Image } from "@main/utils";
-import { eraseImg } from "@common/utils";
-import { dbg } from "@common/debug";
+import { error, assert, throwErr, log, dbg } from "@utils/log";
+import { getBasename, getLastExtension } from "@utils/path";
+import { MessageToFrontend } from "@utils/enums";
+import { isBase64Image } from "@utils/utils";
+import { eraseImg } from "@utils/utils";
+import { join } from "@utils/file";
+import { rescanMedia } from "@contexts/usePlaylists";
+import { deleteFile } from "@utils/deleteFile";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -33,15 +37,10 @@ async function handleImageMetadata(
 			log("Downloading picture.");
 
 			file.tag.pictures = await downloadThumbnail(imageURL);
+
 			log("Picture downloaded successfully!", file.tag.pictures[0]);
 		} catch (err) {
 			error("Error getting picture data:", err);
-
-			// Send error to client:
-			sendMsgToClient({
-				type: ElectronToReactMessage.ERROR,
-				error: err as Error,
-			});
 		}
 
 		return;
@@ -72,8 +71,10 @@ async function handleImageMetadata(
 	/////////////////////////////////////////////
 
 	// else, it's an image file path
-	if (existsSync(imageURL)) {
+	if (await exists(imageURL)) {
 		const base64 = (await readFile(imageURL, { encoding: "base64" })) as Base64;
+
+		dbg("readFile should be base64[0..100] =", base64.slice(0, 100));
 
 		createAndSaveImageOnMedia(base64, file);
 	}
@@ -81,29 +82,38 @@ async function handleImageMetadata(
 
 /////////////////////////////////////////////
 
-export const downloadThumbnail = async (url: string): Promise<Picture[]> =>
-	new Promise((resolve, reject) =>
-		get(url, async (res) => {
-			const byteVector = await ByteVector.fromStream(res);
-			const mimeType = res.headers["content-type"];
+export async function downloadThumbnail(url: string): Promise<Picture[]> {
+	try {
+		const response = await fetch(url, {
+			responseType: ResponseType.Binary,
+			method: "GET",
+		});
 
-			if (!mimeType) throwErr("No mimeType!");
+		dbg("downloadThumbnail response =", response);
 
-			const picture = Picture.fromFullData(
-				byteVector,
-				PictureType.Media,
-				mimeType,
-				"This thumbnail was downloaded with this media.",
-			);
+		if (!response.ok) throwErr("Fetch failed!");
 
-			dbg("Header of thumbnail download and picture =", { res, picture });
+		const byteVector = ByteVector.fromByteArray(response.data);
+		const mimeType = response.headers["content-type"];
 
-			resolve([picture]);
-		}).on("error", (e) => {
-			error("Got error getting image on Electron side!\n\n", e);
-			return reject(e);
-		}),
-	);
+		if (!mimeType) throwErr("No mimeType!");
+
+		const picture = Picture.fromFullData(
+			byteVector,
+			PictureType.Media,
+			mimeType,
+			"This thumbnail was downloaded with this media.",
+		);
+
+		dbg("Picture =", picture);
+
+		return [picture];
+	} catch (e) {
+		error("Got error getting image!\n\n", e);
+
+		return [];
+	}
+}
 
 /////////////////////////////////////////////
 
@@ -132,7 +142,7 @@ export function createAndSaveImageOnMedia(
 
 	file.tag.pictures = [picture];
 
-	log("At createImage():", {
+	dbg("At createImage():", {
 		"new file.tag.pictures": file.tag.pictures,
 		picture,
 	});
@@ -142,11 +152,11 @@ export function createAndSaveImageOnMedia(
 /////////////////////////////////////////////
 
 /** Returns a new file name if it exists, otherwise, just an empty string. */
-function handleTitle(
+async function handleTitle(
 	file: MediaFile,
 	oldMediaPath: string,
 	title: string,
-): Path {
+): Promise<Path> {
 	const sanitizedTitle = sanitize(title);
 	// If they are the same, there is no need to treat this as a new
 	// file, or if the sanitization left an empty string, return "":
@@ -154,7 +164,7 @@ function handleTitle(
 		return "";
 
 	const newPath = join(
-		dirname(oldMediaPath),
+		await dirname(oldMediaPath),
 		`${sanitizedTitle}.${getLastExtension(oldMediaPath)}`,
 	);
 
@@ -167,14 +177,14 @@ function handleTitle(
 
 /////////////////////////////////////////////
 
-function talkToClientSoItCanGetTheNewMedia(
+async function talkToClientSoItCanGetTheNewMedia(
 	newPathOfFile: string,
 	mediaPath: string,
 	isNewMedia = false,
-): void {
+): Promise<void> {
 	if (newPathOfFile)
 		try {
-			renameSync(mediaPath, newPathOfFile);
+			await renameFile(mediaPath, newPathOfFile);
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
@@ -183,28 +193,18 @@ function talkToClientSoItCanGetTheNewMedia(
 			});
 
 			// and remove old one
-			sendMsgToClient({
-				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
-				mediaPath,
-			});
-		} catch (error) {
-			// Send error to react process: (error renaming file => file has old path)
-			sendMsgToClient({
-				type: ElectronToReactMessage.ERROR,
-				error: error as Error,
-			});
+			await deleteFile(mediaPath);
+		} catch (err) {
+			error(err);
 
 			// Since there was an error, let's at least refresh media:
-			sendMsgToClient({
-				type: ElectronToReactMessage.RESCAN_ONE_MEDIA,
-				mediaPath,
-			});
+			await rescanMedia(mediaPath);
 		} finally {
 			dbg(
 				"Was file renamed?",
-				existsSync(newPathOfFile),
+				await exists(newPathOfFile),
 				"Does old file remains?",
-				existsSync(mediaPath),
+				await exists(mediaPath),
 			);
 		}
 	/////////////////////////////////////////////
@@ -213,11 +213,7 @@ function talkToClientSoItCanGetTheNewMedia(
 		sendMsgToClient({ type: ElectronToReactMessage.ADD_ONE_MEDIA, mediaPath });
 	/////////////////////////////////////////////
 	// If everything else fails, at least refresh media:
-	else
-		sendMsgToClient({
-			type: ElectronToReactMessage.RESCAN_ONE_MEDIA,
-			mediaPath,
-		});
+	else await rescanMedia(mediaPath);
 }
 
 /////////////////////////////////////////////
@@ -225,7 +221,7 @@ function talkToClientSoItCanGetTheNewMedia(
 /////////////////////////////////////////////
 // Main function:
 
-export function writeTags(
+export async function writeTags(
 	mediaPath: Path,
 	{
 		albumArtists,
@@ -237,8 +233,9 @@ export function writeTags(
 		album,
 		title,
 	}: WriteTagsData,
-): void {
+): Promise<void> {
 	// dbgTests("Writing tags to file:", { mediaPath, data });
+
 	if (!mediaPath)
 		throwErr(`A media path is required. Received: "${mediaPath}".`);
 
@@ -246,7 +243,7 @@ export function writeTags(
 
 	// Handle the tags:
 	if (imageURL || downloadImg) {
-		handleImageMetadata(file, downloadImg, imageURL).then();
+		await handleImageMetadata(file, downloadImg, imageURL);
 
 		assert(
 			file.tag.pictures.length === 1,
@@ -255,7 +252,7 @@ export function writeTags(
 		);
 	}
 
-	const newFilePath = title ? handleTitle(file, mediaPath, title) : "";
+	const newFilePath = title ? await handleTitle(file, mediaPath, title) : "";
 
 	if (albumArtists !== undefined)
 		if (albumArtists instanceof Array)
@@ -277,10 +274,16 @@ export function writeTags(
 	file.dispose();
 	//
 
-	talkToClientSoItCanGetTheNewMedia(newFilePath, mediaPath, isNewMedia);
+	await talkToClientSoItCanGetTheNewMedia(newFilePath, mediaPath, isNewMedia);
 }
 
-type WriteTagsData = Tags & {
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
+
+interface WriteTagsData extends Tags {
+	albumArtists?: readonly string[] | string;
 	downloadImg?: boolean;
 	isNewMedia?: boolean;
-};
+}

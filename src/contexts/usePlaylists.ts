@@ -1,5 +1,5 @@
-import type { DateAsNumber, Media, Path } from "@renderer/common/@types/generalTypes";
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { DateAsNumber, Media, Path } from "types/generalTypes";
+import type { ValuesOf } from "types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import { create } from "zustand";
@@ -8,13 +8,13 @@ import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
 import { getFromLocalStorage, localStorageKeys } from "@utils/localStorage";
 import { sortByDateOfBirth, sortByTitle } from "./usePlaylistsHelper";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
-import { emptyMap, emptySet } from "@renderer/common/empty";
-import { dbg, dbgPlaylists } from "@renderer/common/debug";
-import { playlistList } from "@renderer/common/enums";
-import { error, warn } from "@renderer/common/log";
+import { emptyMap, emptySet } from "@utils/empty";
+import { dbg, dbgPlaylists } from "@utils/log";
+import { playlistList } from "@utils/enums";
+import { error, warn } from "@utils/log";
 import { getSettings } from "@contexts/settings";
 import { getFirstKey } from "@utils/map-set";
-import { throwErr } from "@renderer/common/log";
+import { throwErr } from "@utils/log";
 import { time } from "@utils/utils";
 import {
 	getAllSelectedMedias,

@@ -2,11 +2,16 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
 import { _runtimeGlobalsChecker_ } from "@utils/seeLeakedVariables";
+import { setupWindow } from "./setupWindow";
 import { App } from "./App";
 
-// Importing this so vite keeps it when bundled and
-// Electron AppImage can pick it up
-import "@assets/logo.png";
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+await setupWindow();
+
+////////////////////////////////////////////////
 
 if (isDev) {
 	setTimeout(
@@ -17,8 +22,6 @@ if (isDev) {
 	// document.designMode = "on";
 }
 
-////////////////////////////////////////////////
-////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
 createRoot(document.getElementById("root") as HTMLElement).render(

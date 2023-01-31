@@ -5,7 +5,7 @@ import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 import { getDownloadingList, useDownloadingList } from "@contexts/downloadList";
 import { cancelDownloadAndOrRemoveItFromList } from "./helper";
 import { Progress, progressIcons } from "../Progress";
-import { ProgressStatus } from "@renderer/common/enums";
+import { ProgressStatus } from "@utils/enums";
 import { useTranslation } from "@i18n";
 import { Button } from "../Button";
 
@@ -91,7 +91,7 @@ function cleanAllDoneDownloads(): void {
 	for (const [url, download] of getDownloadingList())
 		if (
 			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+				ProgressStatus.WAITING_FOR_CONFIRMATION &&
 			download.status !== ProgressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);

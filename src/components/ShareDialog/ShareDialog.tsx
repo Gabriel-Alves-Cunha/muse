@@ -1,4 +1,4 @@
-import type { Path, QRCodeURL } from "@renderer/common/@types/generalTypes";
+import type { Path, QRCodeURL } from "types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server";
 
 import { useEffect, useReducer } from "react";
@@ -7,11 +7,11 @@ import { toCanvas } from "qrcode";
 
 import { setFilesToShare, useFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
-import { CenteredModal } from "./CenteredModal";
-import { error, assert } from "@renderer/common/log";
+import { CenteredModal } from "../CenteredModal";
+import { error, assert } from "@utils/log";
 import { getMainList } from "@contexts/usePlaylists";
-import { emptySet } from "@renderer/common/empty";
-import { Loading } from "./Loading";
+import { emptySet } from "@utils/empty";
+import { Loading } from "../Loading";
 
 // const { createServer } = electron.share;
 

@@ -1,15 +1,14 @@
-import type { MetadataToChange } from "@renderer/common/@types/electron-window";
-import type { Media, Path } from "@renderer/common/@types/generalTypes";
+import type { MetadataToChange } from "types/generalTypes";
+import type { Media, Path } from "types/generalTypes";
 
-import { separatedByCommaOrSemiColorOrSpace } from "@renderer/common/utils";
+import { separatedByCommaOrSemiColorOrSpace } from "@utils/utils";
 import { errorToast, successToast } from "../../toasts";
-import { ReactToElectronMessage } from "@renderer/common/enums";
 import { areArraysEqualByValue } from "@utils/array";
-import { sendMsgToBackend } from "@renderer/common/crossCommunication";
+// import { sendMsgToBackend } from "@utils/handleMsgToBackend";
+import { MessageToBackend } from "@utils/enums";
+import { log, error, dbg } from "@utils/log";
 import { useTranslation } from "@i18n";
-import { prettyBytes } from "@renderer/common/prettyBytes";
-import { log, error } from "@renderer/common/log";
-import { dbg } from "@renderer/common/debug";
+import { prettyBytes } from "@utils/prettyBytes";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -103,12 +102,12 @@ function changeMetadataIfAllowed(
 	const isThereAnythingToChange = thingsToChange.length > 0;
 
 	// Send message to Electron to execute the function writeTag() in the main process:
-	if (isThereAnythingToChange)
-		sendMsgToBackend({
-			type: ReactToElectronMessage.WRITE_TAG,
-			thingsToChange,
-			mediaPath,
-		});
+	// if (isThereAnythingToChange)
+	// 	sendMsgToBackend({
+	// 		type: MessageToBackend.WRITE_TAG,
+	// 		thingsToChange,
+	// 		mediaPath,
+	// 	});
 
 	return isThereAnythingToChange;
 }

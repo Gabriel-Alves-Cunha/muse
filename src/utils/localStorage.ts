@@ -4,7 +4,7 @@ import type { PlayOptions } from "@contexts/usePlayOptions";
 import type { TypeOfMap } from "types/utils";
 import type { History } from "@contexts/usePlaylists";
 
-import { dbgPlaylists } from "./debug";
+import { dbgPlaylists } from "./log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

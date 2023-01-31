@@ -1,8 +1,8 @@
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { ValuesOf } from "types/utils";
 
 import { create } from "zustand";
 
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

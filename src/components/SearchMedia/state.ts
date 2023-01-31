@@ -1,11 +1,11 @@
-import type { Path, Media } from "@renderer/common/@types/generalTypes";
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { Path, Media } from "types/generalTypes";
+import type { ValuesOf } from "types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import { create } from "zustand";
 
 import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
-import { emptyArray } from "@renderer/common/empty";
+import { emptyArray } from "@utils/empty";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

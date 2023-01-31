@@ -2,14 +2,14 @@ import { MdCompareArrows as ConvertIcon } from "react-icons/md";
 import { useEffect } from "react";
 
 import { useNewConvertions, createNewConvertion } from "./helper";
-import { ReactToElectronMessage } from "@renderer/common/enums";
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { useConvertingList } from "@contexts/convertList";
-import { sendMsgToBackend } from "@renderer/common/crossCommunication";
+// import { sendMsgToBackend } from "@utils/crossCommunication";
+import { MessageToBackend } from "@utils/enums";
 import { useTranslation } from "@i18n";
 import { errorToast } from "../toasts";
-import { emptyMap } from "@renderer/common/empty";
-import { error } from "@renderer/common/log";
+import { emptyMap } from "@utils/empty";
+import { error } from "@utils/log";
 import { Popup } from "./Popup";
 
 /////////////////////////////////////////////
@@ -31,10 +31,10 @@ export function Converting() {
 				const electronPort = createNewConvertion(newConvertion, path);
 
 				// Sending port so we can communicate with electron:
-				sendMsgToBackend(
-					{ type: ReactToElectronMessage.CONVERT_MEDIA },
-					electronPort,
-				);
+				// sendMsgToBackend(
+				// 	{ type: MessageToBackend.CONVERT_MEDIA },
+				// 	electronPort,
+				// );
 			} catch (err) {
 				errorToast(
 					`${t("toasts.conversionError.beforePath")}"${path}"${t(

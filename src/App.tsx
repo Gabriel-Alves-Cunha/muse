@@ -11,7 +11,7 @@ import { Navbar } from "@components/Navbar";
 
 import "react-toastify/dist/ReactToastify.min.css";
 
-const ShareDialog = lazy(() => import("./components/ShareDialog"));
+const ShareDialog = lazy(() => import("./components/ShareDialog/ShareDialog"));
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -78,8 +78,16 @@ function PageToShow() {
 //////////////////////////////////////////
 // Do once on app start:
 
-listenToAllBackendMessages();
+await listenToAllBackendMessages();
 
 //////////////////////////////////////////
 
 await searchLocalComputerForMedias();
+
+//////////////////////////////////////////
+
+setTimeout(
+	() =>
+		import("@modules/watchClipboard").then((m) => m.watchClipboard().then()),
+	2_000,
+);

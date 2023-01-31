@@ -1,7 +1,7 @@
 import type { MainList } from "./usePlaylists";
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { Path } from "types/generalTypes";
 
-import { log } from "@renderer/common/log";
+import { log } from "@utils/log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

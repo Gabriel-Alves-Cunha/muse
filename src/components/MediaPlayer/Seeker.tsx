@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { formatDuration } from "@renderer/common/utils";
+import { formatDuration } from "@utils/utils";
 import { ControlsProps } from "./ControlsAndSeeker/Controls";
 import { getAudio } from "@contexts/useCurrentPlaying";
 
@@ -30,16 +30,16 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		audio.addEventListener("playing", onPlaying);
 		audio.addEventListener("pause", onPause);
 
-		timeline.addEventListener("pointerenter", setTooltipTimeOnHover);
-		timeline.addEventListener("pointerdown", handleOnPointerDown);
+		timeline.addEventListener("mouseenter", setTooltipTimeOnHover);
+		timeline.addEventListener("mousedown", handleOnPointerDown);
 
 		return () => {
 			audio.removeEventListener("loadeddata", setAudioAvailability);
 			audio.removeEventListener("playing", onPlaying);
 			audio.removeEventListener("pause", onPause);
 
-			timeline.removeEventListener("pointerenter", setTooltipTimeOnHover);
-			timeline.removeEventListener("pointerdown", handleOnPointerDown);
+			timeline.removeEventListener("mouseenter", setTooltipTimeOnHover);
+			timeline.removeEventListener("mousedown", handleOnPointerDown);
 		};
 
 		/////////////////////////////////////////
@@ -72,18 +72,18 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		function setTooltipTimeOnHover(event: PointerEvent): void {
+		function setTooltipTimeOnHover(event: MouseEvent): void {
 			if (!timeline) return;
 
 			// Make so that all and any poiter events on the entire screen happens on timeline:
-			timeline.setPointerCapture(event.pointerId);
+			// timeline.setPointerCapture(event.pointerId);
 
-			timeline.addEventListener("pointermove", seek);
+			timeline.addEventListener("mousemove", seek);
 
 			timeline.addEventListener(
-				"pointerleave",
+				"mouseleave",
 				() => {
-					timeline.removeEventListener("pointermove", seek);
+					timeline.removeEventListener("mousemove", seek);
 				},
 				{ once: true },
 			);
@@ -103,7 +103,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		function setTimelinePosition({ offsetX }: PointerEvent): void {
+		function setTimelinePosition({ offsetX }: MouseEvent): void {
 			if (!(timeline && audio)) return;
 
 			const { width } = timeline.getBoundingClientRect();
@@ -125,7 +125,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		function seek({ offsetX }: PointerEvent): void {
+		function seek({ offsetX }: MouseEvent): void {
 			if (!(timeline && audio?.duration)) return;
 
 			const { width } = timeline.getBoundingClientRect();
@@ -147,18 +147,18 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		function handleOnPointerDown(event: PointerEvent): void {
+		function handleOnPointerDown(event: MouseEvent): void {
 			if (!timeline) return;
 
 			// Make so that all and any poiter events on the entire screen happens on timeline:
-			timeline.setPointerCapture(event.pointerId);
+			// timeline.setPointerCapture(event.pointerId);
 
-			timeline.addEventListener("pointermove", seek);
+			timeline.addEventListener("mousemove", seek);
 
 			timeline.addEventListener(
-				"pointerup",
+				"mouseup",
 				(e) => {
-					timeline.removeEventListener("pointermove", seek);
+					timeline.removeEventListener("mousemove", seek);
 
 					setTimelinePosition(e);
 				},

@@ -1,4 +1,4 @@
-import type { Path, Media } from "@renderer/common/@types/generalTypes";
+import type { Path, Media } from "types/generalTypes";
 
 import { IoMdMusicalNote as MusicNote } from "react-icons/io";
 

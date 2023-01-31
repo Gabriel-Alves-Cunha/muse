@@ -11,8 +11,7 @@ import { getMediaFiles } from "@contexts/usePlaylistsHelper";
 import { stringifyJson } from "./utils";
 import { getSettings } from "@contexts/settings";
 import { deleteFile } from "./deleteFile";
-import { error } from "./log";
-import { dbg } from "./debug";
+import { error, dbg } from "./log";
 import { on } from "./window";
 import {
 	searchLocalComputerForMedias,
@@ -103,6 +102,7 @@ export async function listenToAllBackendMessages(): Promise<void> {
 	);
 
 	//////////////////////////////////////////
+	//////////////////////////////////////////
 
 	await listen(
 		ADD_ONE_MEDIA,
@@ -136,6 +136,7 @@ export async function listenToAllBackendMessages(): Promise<void> {
 	);
 
 	//////////////////////////////////////////
+	//////////////////////////////////////////
 
 	await listen(
 		DELETE_ONE_MEDIA_FROM_COMPUTER,
@@ -159,6 +160,7 @@ export async function listenToAllBackendMessages(): Promise<void> {
 	);
 
 	//////////////////////////////////////////
+	//////////////////////////////////////////
 
 	await listen(
 		RESCAN_ALL_MEDIA,
@@ -177,6 +179,7 @@ export async function listenToAllBackendMessages(): Promise<void> {
 	);
 
 	//////////////////////////////////////////
+	//////////////////////////////////////////
 
 	await listen(
 		RESCAN_ONE_MEDIA,
@@ -194,6 +197,7 @@ export async function listenToAllBackendMessages(): Promise<void> {
 		},
 	);
 
+	//////////////////////////////////////////
 	//////////////////////////////////////////
 
 	await listen(
@@ -217,6 +221,7 @@ export async function listenToAllBackendMessages(): Promise<void> {
 		},
 	);
 
+	//////////////////////////////////////////
 	//////////////////////////////////////////
 
 	await listen(

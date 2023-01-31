@@ -1,15 +1,14 @@
 import type { MediaBeingDownloaded } from ".";
-import type { DownloadInfo } from "@renderer/common/@types/generalTypes";
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { DownloadInfo } from "types/generalTypes";
+import type { ValuesOf } from "types/utils";
 
 import { setDownloadingList, getDownloadingList } from "@contexts/downloadList";
 import { errorToast, infoToast, successToast } from "../toasts";
-import { error, assert, throwErr } from "@renderer/common/log";
+import { error, assert, throwErr, dbg } from "@utils/log";
 import { logThatPortIsClosing } from "../Converting/helper";
 import { assertUnreachable } from "@utils/utils";
-import { ProgressStatus } from "@renderer/common/enums";
+import { ProgressStatus } from "@utils/enums";
 import { useTranslation } from "@i18n";
-import { dbg } from "@renderer/common/debug";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -48,7 +47,7 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// Creating a new DownloadingMedia and adding it to the list:
 	setDownloadingList(
 		new Map(downloadingList).set(url, {
-			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			status: ProgressStatus.WAITING_FOR_CONFIRMATION,
 			port: frontEndPort,
 			percentage: 0,
 			imageURL,
@@ -133,7 +132,7 @@ function handleUpdateDownloadingList(
 			break;
 		}
 
-		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+		case ProgressStatus.WAITING_FOR_CONFIRMATION:
 		case ProgressStatus.ACTIVE:
 		case undefined:
 			break;

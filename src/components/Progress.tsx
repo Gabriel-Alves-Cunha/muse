@@ -1,4 +1,4 @@
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { ValuesOf } from "types/utils";
 
 import { RiDownloadFill as DownloadingIcon } from "react-icons/ri";
 import { CgSearchLoading as LoadingIcon } from "react-icons/cg";
@@ -6,7 +6,7 @@ import { AiOutlineCheck as SuccessIcon } from "react-icons/ai";
 import { TiCancel as CanceledIcon } from "react-icons/ti";
 import { MdError as FailedIcon } from "react-icons/md";
 
-import { ProgressStatus } from "@renderer/common/enums";
+import { ProgressStatus } from "@utils/enums";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -31,7 +31,7 @@ export const progressIcons: ReadonlyMap<
 	JSX.Element
 > = new Map([
 	[
-		ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		ProgressStatus.WAITING_FOR_CONFIRMATION,
 		<LoadingIcon
 			className="fill-orange-400"
 			title="Waiting"

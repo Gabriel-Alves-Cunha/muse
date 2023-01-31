@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 import { setFromList } from "@components/MediaListKind/states";
 import { SearchMedia } from "@components/SearchMedia";
 import { MainArea } from "@components/MainArea";

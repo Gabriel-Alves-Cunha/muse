@@ -1,13 +1,15 @@
-import type { Base64, Media, Path } from "@common/@types/generalTypes";
+import type { Base64, Media, Path } from "types/generalTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 
-import { randomBackgroundColorForConsole, formatDuration } from "@common/utils";
-import { getAllowedMedias, searchDirectoryResult } from "../file";
-import { error, groupEnd, groupCollapsed } from "@common/log";
-import { getBasename } from "@common/path";
-import { time } from "@utils/utils";
-import { dbg } from "@common/debug";
+import { getAllowedMedias, searchDirectoryResult } from "@utils/file";
+import { error, groupEnd, groupCollapsed, dbg } from "@utils/log";
+import { getBasename } from "@utils/path";
+import {
+	randomBackgroundColorForConsole,
+	formatDuration,
+	time,
+} from "@utils/utils";
 
 /////////////////////////////////////////////
 
@@ -25,7 +27,7 @@ const createMedia = async (
 	new Promise((resolve, reject) => {
 		const basename = getBasename(path);
 
-		time(() => {
+		time(async () => {
 			const {
 				properties: { durationMilliseconds },
 				tag: {
@@ -39,7 +41,7 @@ const createMedia = async (
 			} = MediaFile.createFromPath(path);
 
 			const durationInSeconds = durationMilliseconds / 1_000;
-			const { birthtimeMs, mtimeMs, size } = statSync(path);
+			const { birthtimeMs, mtimeMs, size } = await stat(path);
 
 			/////////////////////////////////////////////
 			/////////////////////////////////////////////

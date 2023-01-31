@@ -1,4 +1,4 @@
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { Path } from "types/generalTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
 import { BsJournal as NoLyrics } from "react-icons/bs";

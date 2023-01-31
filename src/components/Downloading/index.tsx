@@ -1,19 +1,19 @@
-import type { DownloadInfo } from "@renderer/common/@types/generalTypes";
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { DownloadInfo } from "types/generalTypes";
+import type { ValuesOf } from "types/utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect } from "react";
 import { create } from "zustand";
 
-import { ReactToElectronMessage } from "@renderer/common/enums";
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { useDownloadingList } from "@contexts/downloadList";
 import { createNewDownload } from "./helper";
-import { sendMsgToBackend } from "@renderer/common/crossCommunication";
-import { ProgressStatus } from "@renderer/common/enums";
+import { MessageToBackend } from "@utils/enums";
+// import { sendMsgToBackend } from "@utils/crossCommunication";
+import { ProgressStatus } from "@utils/enums";
 import { useTranslation } from "@i18n";
 import { errorToast } from "../toasts";
-import { error } from "@renderer/common/log";
+import { error } from "@utils/log";
 import { Popup } from "./Popup";
 
 /////////////////////////////////////////////
@@ -53,10 +53,10 @@ export function Downloading() {
 			const electronPort = createNewDownload(downloadInfo);
 
 			// Sending port so we can communicate with Electron:
-			sendMsgToBackend(
-				{ type: ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
-				electronPort,
-			);
+			// sendMsgToBackend(
+			// 	{ type: MessageToBackend.CREATE_A_NEW_DOWNLOAD },
+			// 	electronPort,
+			// );
 		} catch (err) {
 			error(err);
 

@@ -1,14 +1,14 @@
-import type { DateAsNumber, Media, Path } from "@renderer/common/@types/generalTypes";
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { DateAsNumber, Media, Path } from "types/generalTypes";
+import type { ValuesOf } from "types/utils";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import { create } from "zustand";
 
 import { setCurrentPlayingOnLocalStorage } from "./localStorageHelpers";
 import { getRandomInt, time } from "@utils/utils";
-import { warn, error, info } from "@renderer/common/log";
+import { warn, error, info } from "@utils/log";
 import { getPlayOptions } from "./usePlayOptions";
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 import { getFirstKey } from "@utils/map-set";
 import { data_path } from "./useAllSelectedMedias";
 import {

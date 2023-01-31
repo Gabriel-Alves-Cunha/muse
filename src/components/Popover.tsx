@@ -28,8 +28,8 @@ export function Popover({
 		function closeOnClickOutside(event: MouseEvent): void {
 			// Assume that isOpen === true.
 
+			// Check if click happened outside:
 			if (contentRef.current?.contains(event.target as Node))
-				// Check if click happened outside:
 				return;
 
 			event.stopImmediatePropagation();

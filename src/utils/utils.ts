@@ -1,7 +1,8 @@
-import type { Json } from "types/utils";
+import type { Base64 } from "types/generalTypes";
 
-import { throwErr } from "./log";
-import { dbg } from "./debug";
+import { documentDir, downloadDir, audioDir } from "@tauri-apps/api/path";
+
+import { throwErr, dbg } from "./log";
 
 const { trunc, floor, random } = Math;
 
@@ -156,3 +157,23 @@ type Color = readonly [color: string, backgroundColor: string];
 /////////////////////////////////////////
 
 export const eraseImg = "eraseImg";
+
+/////////////////////////////////////////
+
+export const dirs = {
+	documents: await documentDir(),
+	downloads: await downloadDir(),
+	music: await audioDir(),
+} as const;
+
+dbg({ dirs });
+
+/////////////////////////////////////////
+
+export const isBase64Image = (str: string): str is Base64 =>
+	str.includes("data:image/") && str.includes(";base64,");
+
+/////////////////////////////////////////
+
+export const lyricApiKey = process.env.LYRIC_API_KEY;
+export const lyricsAPI = process.env.LYRIC_API;

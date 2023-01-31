@@ -1,4 +1,4 @@
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { Path } from "types/generalTypes";
 
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";

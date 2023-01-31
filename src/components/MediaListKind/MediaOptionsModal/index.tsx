@@ -1,4 +1,4 @@
-import type { Media, Path } from "@renderer/common/@types/generalTypes";
+import type { Media, Path } from "types/generalTypes";
 
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
@@ -12,7 +12,7 @@ import { CenteredModal } from "../../CenteredModal";
 import { on, removeOn } from "@utils/window";
 import { deleteFile } from "@utils/deleteFile";
 import { Button } from "../../Button";
-import { dbg } from "@renderer/common/debug";
+import { dbg } from "@utils/log";
 import {
 	type VisibleData,
 	changeMediaMetadata,

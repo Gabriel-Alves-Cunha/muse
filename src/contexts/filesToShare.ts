@@ -1,8 +1,8 @@
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { Path } from "types/generalTypes";
 
 import { create } from "zustand";
 
-import { emptySet } from "@renderer/common/empty";
+import { emptySet } from "@utils/empty";
 
 export const useFilesToShare = create<{ filesToShare: ReadonlySet<Path> }>(
 	() => ({

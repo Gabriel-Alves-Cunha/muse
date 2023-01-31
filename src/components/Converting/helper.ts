@@ -1,18 +1,17 @@
-import type { AllowedMedias } from "@renderer/common/utils";
+import type { AllowedMedias } from "@utils/utils";
 import type { ProgressProps } from "../Progress";
-import type { ValuesOf } from "@renderer/common/@types/utils";
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { ValuesOf } from "types/utils";
+import type { Path } from "types/generalTypes";
 
 import { create } from "zustand";
 
 import { getConvertingList, setConvertingList } from "@contexts/convertList";
 import { errorToast, infoToast, successToast } from "../toasts";
-import { error, assert, throwErr } from "@renderer/common/log";
+import { error, assert, throwErr, dbg } from "@utils/log";
 import { assertUnreachable } from "@utils/utils";
-import { ProgressStatus } from "@renderer/common/enums";
+import { ProgressStatus } from "@utils/enums";
 import { useTranslation } from "@i18n";
-import { emptyMap } from "@renderer/common/empty";
-import { dbg } from "@renderer/common/debug";
+import { emptyMap } from "@utils/empty";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -54,7 +53,7 @@ export function createNewConvertion(
 	// Add new conversion to the list:
 	setConvertingList(
 		new Map(convertingList).set(path, {
-			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			status: ProgressStatus.WAITING_FOR_CONFIRMATION,
 			toExtension: convertInfo.toExtension,
 			port: frontEndPort,
 			timeConverted: 0,
@@ -167,7 +166,7 @@ function handleUpdateConvertingList(
 			break;
 		}
 
-		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+		case ProgressStatus.WAITING_FOR_CONFIRMATION:
 		case ProgressStatus.ACTIVE:
 		case undefined:
 			break;

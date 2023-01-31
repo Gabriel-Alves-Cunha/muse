@@ -1,8 +1,7 @@
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "types/generalTypes";
 
-import { lyricApiKey, lyricsAPI } from "@main/utils";
-import { error, throwErr } from "@common/log";
-import { dbg } from "@common/debug";
+import { lyricApiKey, lyricsAPI } from "@utils/utils";
+import { error, throwErr, dbg } from "@utils/log";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

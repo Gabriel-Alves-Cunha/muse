@@ -3,7 +3,7 @@ import { FiTrash as CleanIcon } from "react-icons/fi";
 import { clearFavorites, clearHistory } from "@contexts/usePlaylists";
 import { useTranslation } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 import { getFromList } from "../MediaListKind/states";
 
 export function Clean() {

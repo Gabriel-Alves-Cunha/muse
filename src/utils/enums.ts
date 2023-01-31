@@ -1,5 +1,5 @@
 export const ProgressStatus = {
-	WAITING_FOR_CONFIRMATION_FROM_ELECTRON: 2,
+	WAITING_FOR_CONFIRMATION: 2,
 	SUCCESS: 3,
 	ACTIVE: 4,
 	CANCEL: 5,
@@ -9,7 +9,6 @@ export const ProgressStatus = {
 /////////////////////////////////////////////
 
 export const MessageToBackend = {
-	TOGGLE_DEVELOPER_TOOLS: "2",
 	CREATE_A_NEW_DOWNLOAD: "3",
 	TOGGLE_MAXIMIZE: "4",
 	RELOAD_WINDOW: "5",

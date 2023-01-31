@@ -1,12 +1,12 @@
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { ValuesOf } from "types/utils";
 
 import { Suspense, lazy } from "react";
 
 import { CtxMenu, CtxMenuProps } from "./CtxMenu";
 import { deselectAllMedias } from "@contexts/useAllSelectedMedias";
+import { MainCtxMenu } from "./mainCtxMenu";
 
 const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
-const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
 const SearchMediaOptionsCtxMenu = lazy(
 	() => import("./searchMediaOptionsCtxMenu"),
 );

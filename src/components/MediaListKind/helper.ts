@@ -1,9 +1,9 @@
-import type { DateAsNumber, Media, Path } from "@renderer/common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "types/generalTypes";
 
-import { ElectronIpcMainProcessNotification } from "@renderer/common/enums";
+// import { ElectronIpcMainProcessNotification, MessageToFrontend } from "@utils/enums";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { dbg } from "@renderer/common/debug";
+import { dbg } from "@utils/log";
 import {
 	addToAllSelectedMedias,
 	selectAllMedias,
@@ -44,8 +44,8 @@ export const computeHistoryItemKey = (
 
 /////////////////////////////////////////
 
-export const reloadWindow = (): void =>
-	notify(ElectronIpcMainProcessNotification.RELOAD_WINDOW);
+export const reloadWindow = (): void => {}
+	// notify(ElectronIpcMainProcessNotification.RELOAD_WINDOW);
 
 /////////////////////////////////////////
 

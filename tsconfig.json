@@ -34,7 +34,6 @@
 		"strict": true,
 		"types": [
 			"vitest/importMeta",
-			"@types/*"
 		],
 		"paths": {
 			"@i18n": [

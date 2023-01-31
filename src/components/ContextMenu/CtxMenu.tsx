@@ -93,11 +93,11 @@ function CtxMenuContent({
 			isOpen &&
 				setTimeout(
 					// If I don't put a setTimeout, it just opens and closes!
-					() => on("pointerup", closeOnClickAnywhere),
+					() => on("click", closeOnClickAnywhere),
 					200,
 				);
 
-			return () => removeOn("pointerup", closeOnClickAnywhere);
+			return () => removeOn("click", closeOnClickAnywhere);
 		},
 		[isOpen],
 	);

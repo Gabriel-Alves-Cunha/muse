@@ -1,4 +1,4 @@
-import type { DateAsNumber, Media, Path } from "@renderer/common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "types/generalTypes";
 
 import { memo, Suspense, lazy, useState } from "react";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";

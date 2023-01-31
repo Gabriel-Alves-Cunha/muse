@@ -1,26 +1,25 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
-import type { AllowedMedias } from "@common/utils";
-import type { Readable } from "node:stream";
-import type { Path } from "@common/@types/generalTypes";
+import type { AllowedMedias } from "@utils/utils";
+import type { Path } from "types/generalTypes";
 
+import { exists, removeFile } from "@tauri-apps/api/fs";
+import { dirname } from "@tauri-apps/api/path";
 import sanitize from "sanitize-filename";
 
-import { ElectronToReactMessage } from "@common/enums";
-import { log, error, throwErr } from "@common/log";
-import { sendMsgToClient } from "@common/crossCommunication";
-import { ProgressStatus } from "@common/enums";
+import { log, error, throwErr, dbg } from "@utils/log";
+import { ProgressStatus } from "@utils/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
-import { getBasename } from "@common/path";
-import { deleteFile } from "../file";
-import { dirs } from "@main/utils";
-import { dbg } from "@common/debug";
+import { removeMedia } from "@contexts/usePlaylists";
+import { getBasename } from "@utils/path";
+import { dirs } from "@utils/utils";
+import { join } from "@utils/file";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Constants:
 
-const mediasConverting: Map<Path, Readable> = new Map();
+const mediasConverting: Map<Path, ReadableStream> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -30,9 +29,9 @@ export function createOrCancelConvert(args: CreateConversion): void {
 	if (!args.path) throwErr(`'path' is required. Received: "${args.path}".`);
 
 	if (!mediasConverting.has(args.path)) {
-		if (!args.electronPort)
+		if (!args.downloaderPort)
 			throwErr(
-				`'electronPort' is required. Received: \`${args.electronPort}\`.`,
+				`'electronPort' is required. Received: \`${args.downloaderPort}\`.`,
 			);
 
 		if (!args.toExtension)
@@ -50,7 +49,7 @@ export function createOrCancelConvert(args: CreateConversion): void {
 export async function convertToAudio(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
-	{ electronPort, toExtension, path }: Required<CreateConversion>,
+	{ downloaderPort, toExtension, path }: Required<CreateConversion>,
 ): Promise<void> {
 	dbg(`Attempting to convert "${path}".`);
 
@@ -61,10 +60,10 @@ export async function convertToAudio(
 
 	{
 		// Assert files don't have the same extension:
-		const pathWithNewExtension = join(dirname(path), titleWithExtension);
+		const pathWithNewExtension = join(await dirname(path), titleWithExtension);
 
 		// And that there already doesn't exists one:
-		if (path.endsWith(toExtension) || existsSync(pathWithNewExtension)) {
+		if (path.endsWith(toExtension) || (await exists(pathWithNewExtension))) {
 			const err = new Error(
 				`File "${path}" already is "${toExtension}"! Conversion canceled.`,
 			);
@@ -76,10 +75,10 @@ export async function convertToAudio(
 				status: ProgressStatus.FAILED,
 				error: err,
 			};
-			electronPort.postMessage(msg);
+			downloaderPort.postMessage(msg);
 
 			// Don't forget to throw away the MessagePort (clean up):
-			electronPort.close();
+			downloaderPort.close();
 
 			return;
 		}
@@ -110,7 +109,7 @@ export async function convertToAudio(
 				// ^ Only in the firt time this setInterval is called!
 				interval = setInterval(
 					() =>
-						electronPort!.postMessage({
+						downloaderPort!.postMessage({
 							sizeConverted: targetSize,
 							timeConverted: timemark,
 						}),
@@ -121,35 +120,35 @@ export async function convertToAudio(
 				const msg: Partial<MediaBeingConverted> = {
 					status: ProgressStatus.ACTIVE,
 				};
-				electronPort!.postMessage(msg);
+				downloaderPort!.postMessage(msg);
 			}
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("error", (err) => {
+		.on("error", async (err) => {
 			error(`Error converting file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
-			deleteFile(saveSite).then();
+			await removeFile(saveSite);
 
 			// Tell the client the conversion threw an error:
 			const msg: Partial<MediaBeingConverted> & { error: Error } = {
 				status: ProgressStatus.FAILED,
 				error: new Error(err.message),
 			};
-			electronPort.postMessage(msg);
+			downloaderPort.postMessage(msg);
 
 			// Clean up:
 			mediasConverting.delete(path);
 			readStream.destroy(err); // I only found it to work when I send it with an Error:
 			clearInterval(interval);
-			electronPort.close();
+			downloaderPort.close();
 
 			dbg(
 				"Convertion threw an error. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				existsSync(saveSite),
+				await exists(saveSite),
 			);
 		})
 		/////////////////////////////////////////////
@@ -164,7 +163,7 @@ export async function convertToAudio(
 			const msg: Partial<MediaBeingConverted> = {
 				status: ProgressStatus.SUCCESS,
 			};
-			electronPort.postMessage(msg);
+			downloaderPort.postMessage(msg);
 
 			// Treat the successfully converted file as a new media...
 			sendMsgToClient({
@@ -173,10 +172,7 @@ export async function convertToAudio(
 			});
 
 			// ...and remove old one
-			sendMsgToClient({
-				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
-				mediaPath: path,
-			});
+			removeMedia(path);
 
 			dbg(
 				"Convertion successfull. Deleting from mediasConverting:",
@@ -186,25 +182,25 @@ export async function convertToAudio(
 			// Clean up:
 			mediasConverting.delete(path);
 			clearInterval(interval);
-			electronPort.close();
+			downloaderPort.close();
 			readStream.close();
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("destroy", () => {
+		.on("destroy", async () => {
 			log(
 				`%cDestroy was called on readStream for converter! path: ${path}`,
 				"color: blue; font-weight: bold; background-color: yellow; font-size: 0.8rem;",
 			);
 
 			// Delete the file since it was canceled:
-			deleteFile(saveSite).then();
+			await removeFile(saveSite);
 
 			// Tell the client the conversion was successfully canceled:
 			const msg: Partial<MediaBeingConverted> = {
 				status: ProgressStatus.CANCEL,
 			};
-			electronPort.postMessage(msg);
+			downloaderPort.postMessage(msg);
 
 			// Clean up:
 			mediasConverting.delete(path);
@@ -215,13 +211,13 @@ export async function convertToAudio(
 				),
 			);
 			clearInterval(interval);
-			electronPort.close();
+			downloaderPort.close();
 
 			dbg(
 				"Convertion was destroyed. Deleting from mediasConverting:",
 				mediasConverting,
 				"Was file deleted?",
-				existsSync(saveSite),
+				await exists(saveSite),
 			);
 		})
 		/////////////////////////////////////////////
@@ -240,8 +236,8 @@ export async function convertToAudio(
 // Types:
 
 export type CreateConversion = {
+	downloaderPort?: MessagePort;
 	toExtension?: AllowedMedias;
-	electronPort?: MessagePort;
 	destroy?: boolean;
 	path: Path;
 };

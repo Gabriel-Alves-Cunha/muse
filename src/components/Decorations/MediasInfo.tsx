@@ -1,6 +1,6 @@
 import { useTranslation } from "@i18n";
 import { usePlaylists } from "@contexts/usePlaylists";
-import { prettyBytes } from "@renderer/common/prettyBytes";
+import { prettyBytes } from "@utils/prettyBytes";
 
 const mainListSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
 	state.sortedByTitleAndMainList;

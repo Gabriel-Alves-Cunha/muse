@@ -6,10 +6,9 @@
 * ADD: offer the option to turn on debug when ErrorFallback is reached
 * ADD: detect (avail port to share)
 * ADD: select with mouse moving
-* ADD: electron setProgressBar
 * ADD: cut and visualise audio
-* ADD: playback rate
 * ADD: make own toast
+* ADD: playback rate
 
 * FIX: gh-actions is always overwriting latest release
 

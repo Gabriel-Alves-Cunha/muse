@@ -1,12 +1,12 @@
-import type { AllowedMedias } from "@renderer/common/utils";
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { AllowedMedias } from "@utils/utils";
+import type { Path } from "types/generalTypes";
 
 import { useEffect, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
 
 import { useTranslation } from "@i18n";
 import { MainArea } from "@components/MainArea";
-import { emptyMap } from "@renderer/common/empty";
+import { emptyMap } from "@utils/empty";
 import { Button } from "@components/Button";
 import {
 	type ConvertInfo,

@@ -1,11 +1,11 @@
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { ValuesOf } from "types/utils";
+import type { Path } from "types/generalTypes";
 
-import { ReactToElectronMessage } from "@renderer/common/enums";
-import { sendMsgToBackend } from "@renderer/common/crossCommunication";
-import { eraseImg } from "@renderer/common/utils";
-import { ValuesOf } from "@renderer/common/@types/utils";
+// import { sendMsgToBackend } from "@utils/crossCommunication";
+import { MessageToBackend } from "@utils/enums";
+import { eraseImg } from "@utils/utils";
 import { getMedia } from "@contexts/usePlaylists";
-import { error } from "@renderer/common/log";
+import { error } from "@utils/log";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -54,11 +54,11 @@ export function ImgWithFallback({
 					e,
 				});
 
-				sendMsgToBackend({
-					thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
-					type: ReactToElectronMessage.WRITE_TAG,
-					mediaPath,
-				});
+				// sendMsgToBackend({
+				// 	thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
+				// 	type: MessageToBackend.WRITE_TAG,
+				// 	mediaPath,
+				// });
 			}, 1_000);
 
 			cache.set(mediaPath, FAILURE);

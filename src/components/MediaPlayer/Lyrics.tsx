@@ -1,10 +1,10 @@
-import type { Path, Media } from "@renderer/common/@types/generalTypes";
+import type { Path, Media } from "types/generalTypes";
 
-import { ReactToElectronMessage } from "@renderer/common/enums";
 import { mediaPlayerFlipCardId } from "../FlipCard";
-import { sendMsgToBackend } from "@renderer/common/crossCommunication";
+// import { sendMsgToBackend } from "@utils/crossCommunication";
+import { MessageToBackend } from "@utils/enums";
 import { useTranslation } from "@i18n";
-import { error, warn } from "@renderer/common/log";
+import { error, warn } from "@utils/log";
 import { infoToast } from "../toasts";
 import { getMedia } from "@contexts/usePlaylists";
 import { Header } from "./Header";
@@ -62,15 +62,15 @@ export async function searchAndOpenLyrics(
 		// 	getImage,
 		// );
 
-		sendMsgToBackend({
-			thingsToChange: [
-				{ whatToChange: "album", newValue: albumName },
-				{ whatToChange: "imageURL", newValue: image },
-				{ whatToChange: "lyrics", newValue: lyric },
-			],
-			type: ReactToElectronMessage.WRITE_TAG,
-			mediaPath,
-		});
+		// sendMsgToBackend({
+		// 	thingsToChange: [
+		// 		{ whatToChange: "album", newValue: albumName },
+		// 		{ whatToChange: "imageURL", newValue: image },
+		// 		{ whatToChange: "lyrics", newValue: lyric },
+		// 	],
+		// 	type: MessageToBackend.WRITE_TAG,
+		// 	mediaPath,
+		// });
 	} catch (err) {
 		if ((err as Error).message.includes("No lyrics found"))
 			infoToast(`${t("toasts.noLyricsFound")}"${media.title}"!`);

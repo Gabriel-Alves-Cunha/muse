@@ -1,6 +1,6 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
-import { dbg } from "./debug";
+import { dbg } from "./log";
 
 const modifierKeys = [
 	"SymbolLock",

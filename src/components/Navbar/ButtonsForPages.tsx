@@ -1,4 +1,4 @@
-import type { Page } from "@renderer/common/@types/generalTypes";
+import type { Page } from "types/generalTypes";
 
 import {
 	MdOutlineVideoLibrary as Home,

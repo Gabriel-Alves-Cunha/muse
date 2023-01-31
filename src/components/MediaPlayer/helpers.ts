@@ -1,7 +1,6 @@
 import { getMedia, rescanMedia, usePlaylists } from "@contexts/usePlaylists";
-import { formatDuration } from "@renderer/common/utils";
-import { error } from "@renderer/common/log";
-import { dbg } from "@renderer/common/debug";
+import { formatDuration } from "@utils/utils";
+import { error, dbg } from "@utils/log";
 import {
 	getCurrentPlaying,
 	useCurrentPlaying,

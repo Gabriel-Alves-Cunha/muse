@@ -14,7 +14,7 @@ export function Select({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		function closeOnClickOutside(event: PointerEvent): void {
+		function closeOnClickOutside(event: MouseEvent): void {
 			// Assume that isOpen === true.
 
 			// Check if click happened outside:
@@ -45,12 +45,12 @@ export function Select({
 		isOpen &&
 			setTimeout(() => {
 				// If I don't put a setTimeout, it just opens and closes!
-				on("pointerup", closeOnClickOutside);
+				on("click", closeOnClickOutside);
 				on("keyup", closeOnEscape);
 			}, 200);
 
 		return () => {
-			removeOn("pointerup", closeOnClickOutside);
+			removeOn("click", closeOnClickOutside);
 			removeOn("keyup", closeOnEscape);
 		};
 	}, [isOpen]);
@@ -71,7 +71,7 @@ interface SelectProps
 		HTMLDivElement
 	> {
 	setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-	onPointerDownOutside?(event: PointerEvent): void;
+	onPointerDownOutside?(event: MouseEvent): void;
 	onEscape?(): void;
 	isOpen: boolean;
 }

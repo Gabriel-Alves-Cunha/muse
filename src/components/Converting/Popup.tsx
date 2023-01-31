@@ -1,15 +1,15 @@
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { Path } from "types/generalTypes";
 
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 
 import { getConvertingList, useConvertingList } from "@contexts/convertList";
 import { isDownloadList } from "../Downloading/Popup";
-import { ProgressStatus } from "@renderer/common/enums";
-import { formatDuration } from "@renderer/common/utils";
+import { ProgressStatus } from "@utils/enums";
+import { formatDuration } from "@utils/utils";
 import { useTranslation } from "@i18n";
 import { progressIcons } from "@components/Progress";
-import { prettyBytes } from "@renderer/common/prettyBytes";
-import { getBasename } from "@renderer/common/path";
+import { prettyBytes } from "@utils/prettyBytes";
+import { getBasename } from "@utils/path";
 import { Button } from "../Button";
 import {
 	cancelConversionAndOrRemoveItFromList,
@@ -95,7 +95,7 @@ function cleanAllDoneConvertions(): void {
 	for (const [url, download] of getConvertingList())
 		if (
 			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+				ProgressStatus.WAITING_FOR_CONFIRMATION &&
 			download.status !== ProgressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);

@@ -1,9 +1,9 @@
-import type { DotNestedKeys } from "@renderer/common/@types/dotNestedKeys";
-import type { OneOf } from "@renderer/common/@types/utils";
+import type { DotNestedKeys } from "types/dotNestedKeys";
+import type { OneOf } from "types/utils";
 
 import { create } from "zustand";
 
-import { throwErr } from "@renderer/common/log";
+import { throwErr } from "@utils/log";
 
 /**
  * @param translations

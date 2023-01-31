@@ -1,10 +1,10 @@
-import type { Path } from "@renderer/common/@types/generalTypes";
+import type { Path } from "types/generalTypes";
 
 import { subscribeWithSelector } from "zustand/middleware";
 import { create } from "zustand";
 
 import { getSortedByDate } from "./usePlaylists";
-import { emptySet } from "@renderer/common/empty";
+import { emptySet } from "@utils/empty";
 import { time } from "@utils/utils";
 
 ///////////////////////////////////////////////////

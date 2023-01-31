@@ -3,8 +3,7 @@ import { create } from "zustand";
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { useTranslation } from "@i18n";
-import { error } from "@renderer/common/log";
-import { dbg } from "@renderer/common/debug";
+import { error } from "@utils/log";
 
 // const { getBasicInfo } = electron.media;
 

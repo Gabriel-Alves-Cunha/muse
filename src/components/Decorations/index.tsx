@@ -4,9 +4,9 @@ import {
 	VscClose as Close,
 } from "react-icons/vsc";
 
-import { toggleMaximize, minimizeWindow, closeWindow } from "./helper";
+import { toggleMaximize, minimizeWindow, closeWindow } from "@modules/windowHelpers";
 import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
-import { capitalizedAppName } from "@renderer/common/utils";
+import { capitalizedAppName } from "@utils/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
 import { useTranslation } from "@i18n";
 import { MediasInfo } from "./MediasInfo";

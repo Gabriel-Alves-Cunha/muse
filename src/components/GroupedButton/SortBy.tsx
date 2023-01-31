@@ -1,11 +1,11 @@
-import type { ValuesOf } from "@renderer/common/@types/utils";
+import type { ValuesOf } from "types/utils";
 
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 import { setFromList } from "../MediaListKind/states";
 import { MenuItem } from "../MenuItem";
 import { Select } from "../Select";
