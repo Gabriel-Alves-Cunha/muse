@@ -1142,10 +1142,10 @@ glob-parent@^6.0.2:
   dependencies:
     is-glob "^4.0.3"
 
-happy-dom@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-8.2.0.tgz#e97aa2cf0ead13bf69e9aa1829529815e8c87805"
-  integrity sha512-SBMi/ht8zvtXNuSVpXJu+hOEJtNEbM4CxQukcHMm7FCd1sMuitfESwUMX83gl3C2JcEGLcpx/+JnF+rjGl27+A==
+happy-dom@^8.2.2:
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-8.2.2.tgz#56594ac8aa3800011b3ff416f9f4bea88f0078ab"
+  integrity sha512-Glf3mOxTmh0ZdrvoPpbr0kc2Mg6OWCyLf8j36Jyj1EAR3Vs0LLEaZ9HSOWFR9ZwCsBW6YgybT9slJlR9dTxEGA==
   dependencies:
     css.escape "^1.5.1"
     he "^1.2.0"
@@ -1828,10 +1828,10 @@ react-toastify@^9.1.1:
   dependencies:
     clsx "^1.1.1"
 
-react-virtuoso@^4.0.6:
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-4.0.6.tgz#5ee8a72bf0b57d31063cef6343b26e6cde5529e3"
-  integrity sha512-TJ4fyTbre0uTpXE0AXaMG2BOX9PgKfDC7wLhnSmDvBU0WoEUrIAcNJACLJvqyWZMDAuEv3v+b4OyK6jiSkFL9Q==
+react-virtuoso@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-4.0.7.tgz#74ad76a47af9d414e67b446aa869e350bda816f3"
+  integrity sha512-ZDiX9VuXSH9gt9nGiaTmhj3DJ9mZ0bTmfLjEt/f1pkdY3vCXYn8k4Edo7hXumgTFt6UfRpR8G0Q81z28a7282Q==
 
 react@^18.2.0:
   version "18.2.0"

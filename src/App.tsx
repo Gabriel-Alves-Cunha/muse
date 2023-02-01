@@ -1,17 +1,19 @@
-import { lazy, Suspense } from "react";
 import { ToastContainer } from "react-toastify";
+import { lazy, Suspense } from "react";
+import { invoke } from "@tauri-apps/api/tauri";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
 import { listenToAllBackendMessages } from "@utils/handleMsgsToFrontend";
+import { watchClipboard } from "@modules/watchClipboard";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { usePage } from "@contexts/page";
 import { Navbar } from "@components/Navbar";
+import { log } from "@utils/log";
 
 import "react-toastify/dist/ReactToastify.min.css";
-
-const ShareDialog = lazy(() => import("./components/ShareDialog/ShareDialog"));
+import { checkForUpdate } from "./utils/checkForUpdate";
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -31,10 +33,6 @@ export function App() {
 				newestOnTop
 				draggable
 			/>
-
-			<Suspense>
-				<ShareDialog />
-			</Suspense>
 
 			<DecorationsTop />
 
@@ -86,8 +84,13 @@ await searchLocalComputerForMedias();
 
 //////////////////////////////////////////
 
-setTimeout(
-	() =>
-		import("@modules/watchClipboard").then((m) => m.watchClipboard().then()),
-	2_000,
-);
+// This will wait for the window to load:
+window.addEventListener("load", async () => {
+	log("Page is fully loaded.");
+
+	await invoke("close_splashscreen");
+
+	await watchClipboard();
+
+	await checkForUpdate();
+});

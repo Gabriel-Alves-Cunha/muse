@@ -4,13 +4,17 @@
 		"beforeBuildCommand": "yarn build:web",
 		"beforeDevCommand": "yarn dev:web",
 		"devPath": "http://localhost:3000",
-		"distDir": "../build"
+		"distDir": "../build/tauri/"
 	},
 	"package": {
-		"productName": "muse",
+		"productName": "Muse",
 		"version": "0.1.0"
 	},
 	"tauri": {
+		"systemTray": {
+			"iconPath": "../src/assets/logo.png",
+			"iconAsTemplate": true
+		},
 		"allowlist": {
 			"clipboard": {
 				"readText": true
@@ -42,46 +46,44 @@
 				"open": true
 			},
 			"window": {
-				"setSkipTaskbar": false,
-				"setDecorations": true,
-				"setFullscreen": false,
 				"setCursorGrab": true,
-				"setResizable": false,
 				"startDragging": true,
 				"setMinSize": false,
-				"unmaximize": true,
-				"unminimize": true,
-				"maximize": false,
-				"minimize": false,
-				"setFocus": false,
-				"setSize": false,
-				"setIcon": false,
-				"center": false,
-				"create": false,
-				"close": false,
-				"hide": false,
-				"all": false,
-				"show": true
+				"maximize": true,
+				"minimize": true,
+				"close": true,
+				"all": false
 			},
 			"all": false
 		},
 		"bundle": {
 			"active": true,
-			"category": "DeveloperTool",
-			"copyright": "",
+			"category": "Music",
+			"copyright": "MIT",
 			"deb": {
 				"depends": []
 			},
 			"externalBin": [],
 			"icon": [
-				"icons/32x32.png",
-				"icons/128x128.png",
-				"icons/128x128@2x.png",
-				"icons/icon.icns",
-				"icons/icon.ico"
+				"./icons/Square107x107Logo.png",
+				"./icons/Square142x142Logo.png",
+				"./icons/Square150x150Logo.png",
+				"./icons/Square284x284Logo.png",
+				"./icons/Square310x310Logo.png",
+				"./icons/Square30x30Logo.png",
+				"./icons/Square44x44Logo.png",
+				"./icons/Square71x71Logo.png",
+				"./icons/Square89x89Logo.png",
+				"./icons/128x128@2x.png",
+				"./icons/StoreLogo.png",
+				"./icons/128x128.png",
+				"./icons/icon.icns",
+				"./icons/32x32.png",
+				"./icons/icon.ico",
+				"./icons/icon.png"
 			],
-			"identifier": "com.tauri.dev",
-			"longDescription": "",
+			"identifier": "com.muse",
+			"longDescription": "Just an YouTube music downloader and player.",
 			"macOS": {
 				"providerShortName": null,
 				"signingIdentity": null,
@@ -90,7 +92,7 @@
 				"frameworks": []
 			},
 			"resources": [],
-			"shortDescription": "",
+			"shortDescription": "Just an YouTube music downloader and player.",
 			"targets": "all",
 			"windows": {
 				"certificateThumbprint": null,
@@ -106,9 +108,17 @@
 		},
 		"windows": [
 			{
+				"decorations": false,
 				"fullscreen": false,
 				"resizable": true,
 				"title": "Muse",
+				"height": 600,
+				"width": 800
+			},
+			{
+				"url": "./splashscreen.html",
+				"label": "splashscreen",
+				"decorations": false,
 				"height": 600,
 				"width": 800
 			}

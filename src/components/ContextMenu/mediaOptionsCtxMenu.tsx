@@ -1,9 +1,8 @@
-import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
 import { useState } from "react";
 
-import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
+import { searchForLyrics } from "./searchMediaOptionsCtxMenu";
 import { useTranslation } from "@i18n";
 import { CenteredModal } from "../CenteredModal";
 import { deleteFile } from "@utils/deleteFile";
@@ -50,14 +49,6 @@ export default function MediaOptionsCtxMenu() {
 				</CenteredModal>
 			</>
 
-			<MenuItem onPointerUp={shareMedias} disabled={isDisabled}>
-				{t("ctxMenus.shareMedia")}
-
-				<RightSlot>
-					<Share />
-				</RightSlot>
-			</MenuItem>
-
 			<MenuItem onPointerUp={selectAllMedias}>
 				{t("ctxMenus.selectAllMedias")}
 
@@ -79,9 +70,9 @@ export default function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export function deleteMedias(): void {
-	const promises = Array.from(getAllSelectedMedias(), (path) =>
-		deleteFile(path),
-	);
+	const promises: Promise<void>[] = [];
+
+	for (const path of getAllSelectedMedias()) promises.push(deleteFile(path));
 
 	Promise.all(promises).then();
 }

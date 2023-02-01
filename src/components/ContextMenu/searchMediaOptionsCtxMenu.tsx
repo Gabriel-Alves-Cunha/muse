@@ -1,12 +1,8 @@
-import type { Path } from "types/generalTypes";
-
-import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
 import { useState } from "react";
 
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
 import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
-import { setFilesToShare } from "@contexts/filesToShare";
 import { useTranslation } from "@i18n";
 import { CenteredModal } from "../CenteredModal";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
@@ -51,14 +47,6 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 				</CenteredModal>
 			</>
 
-			<MenuItem onPointerUp={shareMedias} disabled={isAllDisabled}>
-				{t("ctxMenus.shareMedia")}
-
-				<RightSlot>
-					<Share />
-				</RightSlot>
-			</MenuItem>
-
 			<MenuItem
 				onPointerUp={selectAllMediasOnSearchResult}
 				disabled={isAllDisabled}
@@ -80,18 +68,10 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 /////////////////////////////////////////////
 // Helper functions:
 
-export function shareMedias() {
-	const filePathsToShare: Set<Path> = new Set();
-
-	for (const path of getAllSelectedMedias()) filePathsToShare.add(path);
-
-	setFilesToShare(filePathsToShare);
-}
-
-/////////////////////////////////////////////
-
 function selectAllMediasOnSearchResult(): void {
-	const paths = getSearcher().results.map(([path]) => path);
+	const paths: string[] = [];
+
+	for (const [path] of getSearcher().results) paths.push(path);
 
 	setAllSelectedMedias(new Set(paths));
 }

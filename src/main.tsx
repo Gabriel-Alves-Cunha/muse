@@ -2,14 +2,14 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
 import { _runtimeGlobalsChecker_ } from "@utils/seeLeakedVariables";
-import { setupWindow } from "./setupWindow";
+import { checkForUpdate } from "./utils/checkForUpdate";
 import { App } from "./App";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-await setupWindow();
+await checkForUpdate();
 
 ////////////////////////////////////////////////
 
