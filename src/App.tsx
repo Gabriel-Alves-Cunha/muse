@@ -6,6 +6,7 @@ import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
 import { listenToAllBackendMessages } from "@utils/handleMsgsToFrontend";
 import { watchClipboard } from "@modules/watchClipboard";
+import { checkForUpdate } from "@utils/checkForUpdate";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { usePage } from "@contexts/page";
@@ -13,7 +14,6 @@ import { Navbar } from "@components/Navbar";
 import { log } from "@utils/log";
 
 import "react-toastify/dist/ReactToastify.min.css";
-import { checkForUpdate } from "./utils/checkForUpdate";
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -80,13 +80,11 @@ await listenToAllBackendMessages();
 
 //////////////////////////////////////////
 
-await searchLocalComputerForMedias();
-
-//////////////////////////////////////////
-
 // This will wait for the window to load:
 window.addEventListener("load", async () => {
 	log("Page is fully loaded.");
+
+	await searchLocalComputerForMedias();
 
 	await invoke("close_splashscreen");
 

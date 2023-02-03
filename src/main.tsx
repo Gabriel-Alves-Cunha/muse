@@ -2,15 +2,10 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
 import { _runtimeGlobalsChecker_ } from "@utils/seeLeakedVariables";
-import { checkForUpdate } from "./utils/checkForUpdate";
 import { App } from "./App";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-await checkForUpdate();
-
 ////////////////////////////////////////////////
 
 if (isDev) {
@@ -24,7 +19,7 @@ if (isDev) {
 
 ////////////////////////////////////////////////
 
-createRoot(document.getElementById("root") as HTMLElement).render(
+createRoot(document.getElementById("root") as HTMLDivElement).render(
 	<StrictMode>
 		<App />
 	</StrictMode>,

@@ -4,7 +4,7 @@
 )]
 
 use tauri::Manager;
-// Create the command:
+
 // This command must be async so that it doesn't run on the main thread.
 #[tauri::command]
 async fn close_splashscreen(window: tauri::Window) {
@@ -21,5 +21,5 @@ fn main() {
 		tauri::Builder::default()
 		.invoke_handler(tauri::generate_handler![close_splashscreen])
     .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .expect("Error while running tauri application!");
 }
