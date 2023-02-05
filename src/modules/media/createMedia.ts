@@ -1,6 +1,6 @@
 import type { Base64, Media, Path } from "types/generalTypes";
 
-import { File as MediaFile, IPicture } from "node-taglib-sharp";
+import { IPicture, parseBlob } from "music-metadata-browser";
 
 import { getAllowedMedias, searchDirectoryResult } from "@utils/file";
 import { error, groupEnd, groupCollapsed, dbg } from "@utils/log";
@@ -28,69 +28,58 @@ const createMedia = async (
 		const basename = getBasename(path);
 
 		time(async () => {
-			const {
-				properties: { durationMilliseconds },
-				tag: {
-					title = basename,
-					albumArtists,
-					lyrics = "",
-					album = "",
-					pictures,
-					genres,
-				},
-			} = MediaFile.createFromPath(path);
-
-			const durationInSeconds = durationMilliseconds / 1_000;
-			const { birthtimeMs, mtimeMs, size } = await stat(path);
-
-			/////////////////////////////////////////////
-			/////////////////////////////////////////////
-
-			if (ignoreMediaWithLessThan60Seconds && durationInSeconds < 60)
-				return reject(
-					`Skipping "${path}" because the duration is ${durationInSeconds.toPrecision(
-						2,
-					)} s (less than 60 s)!`,
-				);
+			const blob = new File([], path);
+			const { size, lastModified } = blob;
 
 			if (assureMediaSizeIsGreaterThan60KB && size < 60_000)
 				return reject(
 					`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`,
 				);
 
-			/////////////////////////////////////////////
-			/////////////////////////////////////////////
+			const {
+				common: { artist = "", album = "", lyrics, picture, genre },
+				format: { duration, creationTime },
+			} = await parseBlob(blob, { duration: true });
 
-			let picture: IPicture | undefined;
+			if (ignoreMediaWithLessThan60Seconds && duration && duration < 60)
+				return reject(
+					`Skipping "${path}" because the duration is ${duration.toPrecision(
+						2,
+					)} s (less than 60 s)!`,
+				);
+
+			let image: IPicture | undefined;
 			let mimeType: string | undefined;
 			let error: Error | undefined;
 			try {
-				picture = pictures[0];
-				mimeType = picture?.mimeType;
+				image = picture?.[0];
+				mimeType = image?.format;
 			} catch (err) {
 				error = err as Error;
 			}
 
 			const media: Media = {
 				image:
-					picture && mimeType
-						? (`data:${mimeType};base64,${picture.data.toBase64String()}` as Base64)
+					image && mimeType
+						? (`data:${mimeType};base64,${image.data.toString(
+								"base64",
+						  )}` as Base64)
 						: "",
-				duration: formatDuration(durationInSeconds),
-				artist: albumArtists[0] ?? "",
-				birthTime: birthtimeMs,
-				lastModified: mtimeMs,
-				lyrics,
-				genres,
-				title,
+				birthTime: creationTime ? creationTime?.getTime() : NaN,
+				duration: formatDuration(duration),
+				lyrics: lyrics?.join(" ") ?? "",
+				genres: genre ?? [],
+				title: basename,
+				lastModified,
+				artist,
 				album,
 				size,
 			};
 
-			dbg(`%c${basename}`, randomColor(), { media, picture, mimeType, error });
+			dbg(`%c${basename}`, randomColor(), media);
 
 			resolve([path, media]);
-		}, `createMedia('${basename}')`);
+		}, `createMedia("${basename}")`);
 	});
 
 export const transformPathsToMedias = (

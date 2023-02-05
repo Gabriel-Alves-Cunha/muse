@@ -1,7 +1,5 @@
 import type { DateAsNumber, Media, Path } from "types/generalTypes";
 
-// import { ElectronIpcMainProcessNotification, MessageToFrontend } from "@utils/enums";
-
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { dbg } from "@utils/log";
 import {
@@ -9,15 +7,12 @@ import {
 	selectAllMedias,
 } from "@contexts/useAllSelectedMedias";
 
-const notify = () => {};
-	// electron.notificationApi.sendNotificationToElectronIpcMainProcess;
-
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
 export function selectMediaByPointerEvent(
-	e: React.PointerEvent<HTMLDivElement>,
+	e: React.MouseEvent<HTMLDivElement>,
 ): void {
 	const mediaClickedMediaId = (e.target as HTMLElement)
 		.closest<HTMLDivElement>(".row-wrapper")
@@ -44,8 +39,7 @@ export const computeHistoryItemKey = (
 
 /////////////////////////////////////////
 
-export const reloadWindow = (): void => {}
-	// notify(ElectronIpcMainProcessNotification.RELOAD_WINDOW);
+export const reloadWindow = (): void => location.reload();
 
 /////////////////////////////////////////
 

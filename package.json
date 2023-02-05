@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"@tauri-apps/api": "^1.2.0",
 		"@tauri-apps/cli": "^1.2.3",
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/koa": "^2.13.5",
@@ -36,9 +37,10 @@
 		"autoprefixer": "^10.4.13",
 		"cross-env": "^7.0.3",
 		"fluent-ffmpeg": "^2.1.2",
-		"happy-dom": "^8.2.3",
+		"happy-dom": "^8.2.6",
 		"koa": "^2.14.1",
 		"koa-router": "^12.0.0",
+		"music-metadata-browser": "^2.5.9",
 		"node-taglib-sharp": "^5.0.1",
 		"postcss": "^8.4.21",
 		"qrcode": "^1.5.1",
@@ -47,16 +49,15 @@
 		"react-error-boundary": "^3.1.4",
 		"react-icons": "^4.7.1",
 		"react-toastify": "^9.1.1",
-		"react-virtuoso": "^4.0.8",
+		"react-virtuoso": "^4.0.9",
 		"rome": "^11.0.0",
 		"sanitize-filename": "^1.6.3",
 		"tailwindcss": "^3.2.4",
 		"typescript": "^4.9.5",
 		"vite": "^4.1.1",
-		"vitest": "^0.28.3",
+		"vitest": "^0.28.4",
 		"ytdl-core": "^4.11.2",
-		"zustand": "4.3.2",
-		"@tauri-apps/api": "^1.2.0"
+		"zustand": "4.3.2"
 	},
 	"cpu": [
 		"x64"

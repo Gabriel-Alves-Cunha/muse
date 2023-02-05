@@ -4,7 +4,6 @@ import type { Media, Path } from "types/generalTypes";
 import { separatedByCommaOrSemiColorOrSpace } from "@utils/utils";
 import { errorToast, successToast } from "../../toasts";
 import { areArraysEqualByValue } from "@utils/array";
-// import { sendMsgToBackend } from "@utils/handleMsgToBackend";
 import { MessageToBackend } from "@utils/enums";
 import { log, error, dbg } from "@utils/log";
 import { useTranslation } from "@i18n";

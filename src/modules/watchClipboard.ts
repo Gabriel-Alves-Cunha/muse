@@ -6,6 +6,7 @@ import {
 	sendNotification,
 } from "@tauri-apps/api/notification";
 
+// @ts-ignore => It's alright:
 import museLogoPath from "@assets/logo.png";
 
 /////////////////////////////////////////

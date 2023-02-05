@@ -67,7 +67,7 @@ useSearcher.subscribe(
 				results: emptyArray,
 			});
 
-		// This is, so far, not needed, cause searching is really fast!
+		// This is, so far, not needed, cause searching is really fast:
 		// setSearcher({ results: emptyArray, searchStatus: SearchStatus.SEARCHING });
 
 		const results = searchMedia(highlight);
