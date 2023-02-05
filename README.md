@@ -1,7 +1,7 @@
 # Muse
 
 <h1 align="center">
- <img src="src/renderer/assets/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
+ <img src="src/assets/logo_with_name.svg" alt="Muse's logo, a donut-like circle with shades of blue.">
 </h1>
 
 > Just a simple, Electron-React app, to download audio from YouTube and play them.
@@ -36,13 +36,11 @@ The following tools were used in this project construction:
 
 - [Koa](https://koajs.com/)
 - [Vite](https://vitejs.dev/)
-- [Dprint](https://dprint.dev/)
+- [Rome](https://rome.tools/)
+- [Tauri](https://tauri.app/)
 - [Vitest](https://vitest.dev/)
-- [Radix UI](https://radix-ui.com/)
-- [Node.js](https://nodejs.org/en/)
 - [React](https://pt-br.reactjs.org/)
 - [Tailwind](https://tailwindcss.com/)
-- [Electron](https://www.electronjs.org/)
 - [Zustand](https://github.com/pmndrs/zustand)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Ytdl Core](https://github.com/fent/node-ytdl-core)
@@ -81,9 +79,6 @@ git clone https://github.com/Gabriel-Alves-Cunha/muse --depth 1
 ```sh
 # Install dependencies
 yarn
-```
-
-```sh
 # Start app:
 yarn dev
 ```

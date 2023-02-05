@@ -90,8 +90,7 @@ function DownloadingBox({
 function cleanAllDoneDownloads(): void {
 	for (const [url, download] of getDownloadingList())
 		if (
-			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION &&
+			download.status !== ProgressStatus.WAITING_FOR_CONFIRMATION &&
 			download.status !== ProgressStatus.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);

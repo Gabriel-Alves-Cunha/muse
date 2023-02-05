@@ -11,7 +11,7 @@ export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
 		<>
 			<button
 				data-converting-downloading-list-popover-trigger
-				onPointerUp={() => setIsOpen(prev => !prev)}
+				onPointerUp={() => setIsOpen((prev) => !prev)}
 				data-has-items={size > 0}
 				title={tooltip}
 			>

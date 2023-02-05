@@ -1,25 +1,27 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { AllowedMedias } from "@utils/utils";
+import type { Readable } from "node:stream";
 import type { Path } from "types/generalTypes";
 
 import { exists, removeFile } from "@tauri-apps/api/fs";
+import { createReadStream } from "node:fs";
 import { dirname } from "@tauri-apps/api/path";
+import { join } from "node:path";
 import sanitize from "sanitize-filename";
 
+import { addToMainList, removeMedia } from "@contexts/usePlaylists";
 import { log, error, throwErr, dbg } from "@utils/log";
 import { ProgressStatus } from "@utils/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
-import { removeMedia } from "@contexts/usePlaylists";
 import { getBasename } from "@utils/path";
 import { dirs } from "@utils/utils";
-import { join } from "@utils/file";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Constants:
 
-const mediasConverting: Map<Path, ReadableStream> = new Map();
+const mediasConverting: Map<Path, Readable> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -46,7 +48,7 @@ export function createOrCancelConvert(args: CreateConversion): void {
 /////////////////////////////////////////////
 // Main function:
 
-export async function convertToAudio(
+async function convertToAudio(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
 	{ downloaderPort, toExtension, path }: Required<CreateConversion>,
@@ -166,10 +168,7 @@ export async function convertToAudio(
 			downloaderPort.postMessage(msg);
 
 			// Treat the successfully converted file as a new media...
-			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
-				mediaPath: saveSite,
-			});
+			addToMainList(saveSite).then();
 
 			// ...and remove old one
 			removeMedia(path);

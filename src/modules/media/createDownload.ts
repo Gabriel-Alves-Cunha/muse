@@ -1,26 +1,26 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 import type { AllowedMedias } from "@utils/utils";
 import type { MediaUrl } from "@contexts/downloadList";
+import type { Readable } from "node:stream";
 
 import { exists, removeFile } from "@tauri-apps/api/fs";
+import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { error, log, throwErr, dbg } from "@utils/log";
-import { MessageToFrontend } from "@utils/enums";
 import { ProgressStatus } from "@utils/enums";
+import { addToMainList } from "@contexts/usePlaylists";
 import { fluent_ffmpeg } from "./ffmpeg";
-import { prettyBytes } from "@utils/prettyBytes";
 import { writeTags } from "./writeTags";
 import { dirs } from "@utils/utils";
-import { join } from "@utils/file";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Constants:
 
-const currentDownloads: Map<MediaUrl, ReadableStream> = new Map();
+const currentDownloads: Map<MediaUrl, Readable> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -54,7 +54,7 @@ export function createOrCancelDownload(args: CreateDownload): void {
 /////////////////////////////////////////////
 // Main function:
 
-export async function createDownload(
+async function createDownload(
 	// Treat args as NotNullable cause argument check was
 	// (has to be) done before calling this function.
 	{
@@ -94,9 +94,8 @@ export async function createDownload(
 
 	/////////////////////////////////////////////
 
-	let interval: NodeJS.Timer | undefined;
+	let timerToNotifyClient: NodeJS.Timer | undefined;
 	let percentageToSend = 0;
-	let prettyTotal = "";
 
 	/////////////////////////////////////////////
 
@@ -112,18 +111,12 @@ export async function createDownload(
 			const percentage = (downloaded / total) * 100;
 			percentageToSend = percentage;
 
-			// To client:
-			if (!interval) {
+			if (!timerToNotifyClient) {
 				// ^ Only in the firt time this 'on progress' fn is called!
-				interval = setInterval(
+				timerToNotifyClient = setInterval(
 					() => downloaderMsgPort.postMessage({ percentage: percentageToSend }),
 					500,
 				);
-
-				// Save download size to prettyTotal to not keep recalculating
-				// it every time (right now, this is used only below for
-				// development, but it can be sent to the client easily):
-				prettyTotal = prettyBytes(total);
 
 				// Send a message to client that we're successfully starting a download:
 				const msg: Partial<MediaBeingDownloaded> = {
@@ -152,7 +145,7 @@ export async function createDownload(
 
 			// Clean up:
 			currentDownloads.delete(url);
-			clearInterval(interval);
+			clearInterval(timerToNotifyClient);
 			downloaderMsgPort.close();
 
 			dbg(
@@ -185,20 +178,16 @@ export async function createDownload(
 				title: title,
 			});
 
-			// Tell client to add a new media...
-			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
-				mediaPath: saveSite,
-			});
+			await addToMainList(saveSite);
 
 			// Clean up:
 			currentDownloads.delete(url);
-			clearInterval(interval);
+			clearInterval(timerToNotifyClient);
 			downloaderMsgPort.close();
 		})
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
-		.on("error",async (err) => {
+		.on("error", async (err) => {
 			error(`Error downloading file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
@@ -212,10 +201,10 @@ export async function createDownload(
 			downloaderMsgPort!.postMessage(msg);
 
 			// Clean up:
+			clearInterval(timerToNotifyClient);
 			currentDownloads.delete(url);
-			readStream.destroy(err); // I only found it to work when I send it with an Error.
-			clearInterval(interval);
 			downloaderMsgPort!.close();
+			readStream.destroy(err); // I only found it to work when I send it with an Error.
 
 			dbg(
 				"Download threw an error. Deleting stream from currentDownloads:",

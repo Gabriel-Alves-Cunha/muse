@@ -1,8 +1,6 @@
-// @vitest-environment node
-
 import { expect, it } from "vitest";
 
-import { prettyBytes } from "@renderer/common/prettyBytes";
+import { prettyBytes } from "@utils/prettyBytes";
 
 it("should return prettyfied bytes", () => {
 	const bytes_1 = [0, 1, 435, 246545, 24564567473];

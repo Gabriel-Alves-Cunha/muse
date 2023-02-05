@@ -3,12 +3,12 @@ import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
-mockElectronPlusNodeGlobalsBeforeTests();
+import { mockWindowBeforeTests } from "./mockWindowBeforeTests";
+mockWindowBeforeTests();
 //
 
 import { cleanUpBeforeEachTest } from "./beforeEach";
-import { playlistList } from "@renderer/common/enums";
+import { playlistList } from "@utils/enums";
 import {
 	firstMediaPathFromMainList,
 	arrayFromMainList,

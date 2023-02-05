@@ -60,6 +60,7 @@ export default defineConfig(({ mode }) => {
 			target:
 				process.env.TAURI_PLATFORM === "windows" ? "chrome105" : "safari13",
 			lib: { entry: "src/main.ts", formats: ["es"] },
+			modulePreload: { polyfill: true },
 			chunkSizeWarningLimit: 1_000,
 			reportCompressedSize: false,
 			emptyOutDir: false,

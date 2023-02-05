@@ -3,8 +3,9 @@ import type { Mutable } from "types/utils";
 import type { Tags } from "types/generalTypes";
 
 import { fetch, ResponseType } from "@tauri-apps/api/http";
-import { dirname } from "@tauri-apps/api/path";
-import { exists, renameFile } from "@tauri-apps/api/fs";
+import { readFile, rename } from "fs/promises";
+import { join, dirname } from "node:path";
+import { existsSync } from "node:fs";
 import {
 	File as MediaFile,
 	PictureType,
@@ -15,12 +16,14 @@ import sanitize from "sanitize-filename";
 
 import { error, assert, throwErr, log, dbg } from "@utils/log";
 import { getBasename, getLastExtension } from "@utils/path";
-import { MessageToFrontend } from "@utils/enums";
 import { isBase64Image } from "@utils/utils";
-import { eraseImg } from "@utils/utils";
-import { join } from "@utils/file";
-import { rescanMedia } from "@contexts/usePlaylists";
 import { deleteFile } from "@utils/deleteFile";
+import { eraseImg } from "@utils/utils";
+import {
+	addToMainList,
+	removeMedia,
+	rescanMedia,
+} from "@contexts/usePlaylists";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -71,7 +74,7 @@ async function handleImageMetadata(
 	/////////////////////////////////////////////
 
 	// else, it's an image file path
-	if (await exists(imageURL)) {
+	if (existsSync(imageURL)) {
 		const base64 = (await readFile(imageURL, { encoding: "base64" })) as Base64;
 
 		dbg("readFile should be base64[0..100] =", base64.slice(0, 100));
@@ -152,11 +155,11 @@ export function createAndSaveImageOnMedia(
 /////////////////////////////////////////////
 
 /** Returns a new file name if it exists, otherwise, just an empty string. */
-async function handleTitle(
+function handleTitle(
 	file: MediaFile,
 	oldMediaPath: string,
 	title: string,
-): Promise<Path> {
+): Path {
 	const sanitizedTitle = sanitize(title);
 	// If they are the same, there is no need to treat this as a new
 	// file, or if the sanitization left an empty string, return "":
@@ -164,7 +167,7 @@ async function handleTitle(
 		return "";
 
 	const newPath = join(
-		await dirname(oldMediaPath),
+		dirname(oldMediaPath),
 		`${sanitizedTitle}.${getLastExtension(oldMediaPath)}`,
 	);
 
@@ -184,16 +187,14 @@ async function talkToClientSoItCanGetTheNewMedia(
 ): Promise<void> {
 	if (newPathOfFile)
 		try {
-			await renameFile(mediaPath, newPathOfFile);
+			await rename(mediaPath, newPathOfFile);
 
 			// Since media has a new path, create a new media...
-			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
-				mediaPath: newPathOfFile,
-			});
+			addToMainList(newPathOfFile);
 
 			// and remove old one
 			await deleteFile(mediaPath);
+			removeMedia(mediaPath);
 		} catch (err) {
 			error(err);
 
@@ -202,15 +203,15 @@ async function talkToClientSoItCanGetTheNewMedia(
 		} finally {
 			dbg(
 				"Was file renamed?",
-				await exists(newPathOfFile),
+				existsSync(newPathOfFile),
 				"Does old file remains?",
-				await exists(mediaPath),
+				existsSync(mediaPath),
 			);
 		}
 	/////////////////////////////////////////////
 	else if (isNewMedia)
 		// Add the new media:
-		sendMsgToClient({ type: ElectronToReactMessage.ADD_ONE_MEDIA, mediaPath });
+		addToMainList(mediaPath);
 	/////////////////////////////////////////////
 	// If everything else fails, at least refresh media:
 	else await rescanMedia(mediaPath);
@@ -252,7 +253,7 @@ export async function writeTags(
 		);
 	}
 
-	const newFilePath = title ? await handleTitle(file, mediaPath, title) : "";
+	const newFilePath = title ? handleTitle(file, mediaPath, title) : "";
 
 	if (albumArtists !== undefined)
 		if (albumArtists instanceof Array)
@@ -282,8 +283,8 @@ export async function writeTags(
 /////////////////////////////////////////////
 // Types:
 
-interface WriteTagsData extends Tags {
+type WriteTagsData = Tags & {
 	albumArtists?: readonly string[] | string;
 	downloadImg?: boolean;
 	isNewMedia?: boolean;
-}
+};

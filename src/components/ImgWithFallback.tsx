@@ -1,11 +1,10 @@
 import type { ValuesOf } from "types/utils";
 import type { Path } from "types/generalTypes";
 
-// import { sendMsgToBackend } from "@utils/crossCommunication";
-import { MessageToBackend } from "@utils/enums";
 import { eraseImg } from "@utils/utils";
 import { getMedia } from "@contexts/usePlaylists";
 import { error } from "@utils/log";
+import { writeTags } from "@modules/media/writeTags";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -50,15 +49,12 @@ export function ImgWithFallback({
 			setTimeout(() => {
 				error("Failed image, going to erasing it...", {
 					media: getMedia(mediaPath),
+					mediaPath,
 					mediaImg,
 					e,
 				});
 
-				// sendMsgToBackend({
-				// 	thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
-				// 	type: MessageToBackend.WRITE_TAG,
-				// 	mediaPath,
-				// });
+				writeTags(mediaPath, { imageURL: eraseImg }).then();
 			}, 1_000);
 
 			cache.set(mediaPath, FAILURE);

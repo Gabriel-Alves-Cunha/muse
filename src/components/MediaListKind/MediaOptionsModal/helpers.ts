@@ -4,10 +4,10 @@ import type { Media, Path } from "types/generalTypes";
 import { separatedByCommaOrSemiColorOrSpace } from "@utils/utils";
 import { errorToast, successToast } from "../../toasts";
 import { areArraysEqualByValue } from "@utils/array";
-import { MessageToBackend } from "@utils/enums";
 import { log, error, dbg } from "@utils/log";
 import { useTranslation } from "@i18n";
 import { prettyBytes } from "@utils/prettyBytes";
+import { writeTags } from "@modules/media/writeTags";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -100,13 +100,8 @@ function changeMetadataIfAllowed(
 
 	const isThereAnythingToChange = thingsToChange.length > 0;
 
-	// Send message to Electron to execute the function writeTag() in the main process:
-	// if (isThereAnythingToChange)
-	// 	sendMsgToBackend({
-	// 		type: MessageToBackend.WRITE_TAG,
-	// 		thingsToChange,
-	// 		mediaPath,
-	// 	});
+	console.log("Still have to work on this");
+	writeTags(mediaPath, {}).then();
 
 	return isThereAnythingToChange;
 }

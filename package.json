@@ -30,6 +30,7 @@
 		"@types/fluent-ffmpeg": "^2.1.20",
 		"@types/koa": "^2.13.5",
 		"@types/koa-router": "^7.4.4",
+		"@types/node": "^18.11.19",
 		"@types/qrcode": "^1.5.0",
 		"@types/react": "^18.0.27",
 		"@types/react-dom": "^18.0.10",
@@ -40,7 +41,6 @@
 		"happy-dom": "^8.2.6",
 		"koa": "^2.14.1",
 		"koa-router": "^12.0.0",
-		"music-metadata-browser": "^2.5.9",
 		"node-taglib-sharp": "^5.0.1",
 		"postcss": "^8.4.21",
 		"qrcode": "^1.5.1",
@@ -63,7 +63,6 @@
 		"x64"
 	],
 	"os": [
-		"windows",
 		"linux"
 	],
 	"dependencies": {}

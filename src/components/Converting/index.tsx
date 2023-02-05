@@ -2,10 +2,9 @@ import { MdCompareArrows as ConvertIcon } from "react-icons/md";
 import { useEffect } from "react";
 
 import { useNewConvertions, createNewConvertion } from "./helper";
+import { createOrCancelConvert } from "@modules/media/convertToAudio";
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { useConvertingList } from "@contexts/convertList";
-// import { sendMsgToBackend } from "@utils/crossCommunication";
-import { MessageToBackend } from "@utils/enums";
 import { useTranslation } from "@i18n";
 import { errorToast } from "../toasts";
 import { emptyMap } from "@utils/empty";
@@ -28,13 +27,9 @@ export function Converting() {
 	useEffect(() => {
 		for (const [path, newConvertion] of newConvertions)
 			try {
-				const electronPort = createNewConvertion(newConvertion, path);
+				const downloaderPort = createNewConvertion(newConvertion, path);
 
-				// Sending port so we can communicate with electron:
-				// sendMsgToBackend(
-				// 	{ type: MessageToBackend.CONVERT_MEDIA },
-				// 	electronPort,
-				// );
+				createOrCancelConvert({ downloaderPort, ...newConvertion, path });
 			} catch (err) {
 				errorToast(
 					`${t("toasts.conversionError.beforePath")}"${path}"${t(

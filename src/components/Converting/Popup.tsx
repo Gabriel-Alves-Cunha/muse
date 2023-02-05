@@ -94,8 +94,7 @@ function ConvertBox({
 function cleanAllDoneConvertions(): void {
 	for (const [url, download] of getConvertingList())
 		if (
-			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION &&
+			download.status !== ProgressStatus.WAITING_FOR_CONFIRMATION &&
 			download.status !== ProgressStatus.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);

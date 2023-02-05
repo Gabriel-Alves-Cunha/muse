@@ -8,6 +8,7 @@ import { defaultCurrentPlaying, setCurrentPlaying } from "./useCurrentPlaying";
 import { getFromLocalStorage, localStorageKeys } from "@utils/localStorage";
 import { sortByDateOfBirth, sortByTitle } from "./usePlaylistsHelper";
 import { setPlaylistsOnLocalStorage } from "./localStorageHelpers";
+import { transformPathsToMedias } from "@modules/media/createMedia";
 import { emptyMap, emptySet } from "@utils/empty";
 import { dbg, dbgPlaylists } from "@utils/log";
 import { playlistList } from "@utils/enums";
@@ -57,8 +58,8 @@ export type UsePlaylistsStatesAndActions = Readonly<{
 		history?: History;
 	};
 	rescanMedia(path: Path, newMedia?: Media): Promise<void>;
-	addToMainList(path: Path, newMedia: Media): void;
 	replaceEntireMainList(list: MainList): void;
+	addToMainList(path: Path): Promise<void>;
 
 	removeMedia(path: Path): void;
 	cleanAllLists(): void;
@@ -193,7 +194,7 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 			///////////////////////////////////////////////////
 			///////////////////////////////////////////////////
 
-			addToMainList(path, newMedia) {
+			async addToMainList(path) {
 				const { sortedByTitleAndMainList: mainList, updateSortedLists } = get();
 
 				if (mainList.has(path))
@@ -201,9 +202,23 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 						`Media "${path}" already exists. So, I'm not gonna add it. If you want to update it, use 'rescanMedia()'.`,
 					);
 
+				const {
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				} = getSettings();
+
+				const [pathAndMedia] = await transformPathsToMedias(
+					path,
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				);
+
+				if (!pathAndMedia)
+					return error(`Transforming "${path}" to a media failed!`);
+
 				const newMainList = new Map(mainList);
 
-				set(updateSortedLists(newMainList.set(path, newMedia)));
+				set(updateSortedLists(newMainList.set(path, pathAndMedia[1])));
 			},
 
 			///////////////////////////////////////////////////
@@ -344,13 +359,13 @@ export const usePlaylists = create<UsePlaylistsStatesAndActions>()(
 					ignoreMediaWithLessThan60Seconds,
 				} = getSettings();
 
-				// const refreshedMediaInArray = await transformPathsToMedias(
-				// 	path,
-				// 	assureMediaSizeIsGreaterThan60KB,
-				// 	ignoreMediaWithLessThan60Seconds,
-				// );
+				const refreshedMediaInArray = await transformPathsToMedias(
+					path,
+					assureMediaSizeIsGreaterThan60KB,
+					ignoreMediaWithLessThan60Seconds,
+				);
 
-				const refreshedMedia = undefined;// refreshedMediaInArray[0]?.[1];
+				const refreshedMedia = refreshedMediaInArray[0]?.[1];
 
 				if (!refreshedMedia) {
 					error(`Transforming "${path}" to a media failed! Refreshing all.`);
@@ -434,11 +449,11 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 		} = getSettings();
 
 		const newMainList: MainList = new Map(
-			// await transformPathsToMedias(
-			// 	"",
-			// 	assureMediaSizeIsGreaterThan60KB,
-			// 	ignoreMediaWithLessThan60Seconds,
-			// ),
+			await transformPathsToMedias(
+				"",
+				assureMediaSizeIsGreaterThan60KB,
+				ignoreMediaWithLessThan60Seconds,
+			),
 		);
 
 		dbgPlaylists("Finished searching, newMainList =", newMainList);

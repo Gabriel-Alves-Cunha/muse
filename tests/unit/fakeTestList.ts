@@ -1,6 +1,6 @@
-import type { Path, Media } from "@renderer/common/@types/generalTypes";
+import type { Path, Media } from "types/generalTypes";
 
-import { formatDuration } from "@renderer/common/utils";
+import { formatDuration } from "@utils/utils";
 
 const { sortByTitle } = await import("@contexts/usePlaylistsHelper");
 

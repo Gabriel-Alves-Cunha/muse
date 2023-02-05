@@ -1,19 +1,18 @@
-// @vitest-environment node
-
-import type { Base64 } from "@renderer/common/@types/generalTypes";
+import type { Base64 } from "types/generalTypes";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
-mockElectronPlusNodeGlobalsBeforeTests();
+import { mockWindowBeforeTests } from "./mockWindowBeforeTests";
+mockWindowBeforeTests();
 //
 
 import { describe, expect, it } from "vitest";
 import { File as MediaFile } from "node-taglib-sharp";
 
 import { getThumbnail, anotherMediaPath } from "./utils";
-import { eraseImg, makeRandomString } from "@renderer/common/utils";
+import { eraseImg, makeRandomString } from "@utils/utils";
+import { dbgTests } from "@utils/log";
 
-const { writeTags } = await import("@main/preload/media/mutate-metadata");
+const { writeTags } = await import("@modules/media/writeTags");
 
 //////////////////////////////////////
 //////////////////////////////////////
@@ -38,7 +37,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	it("Should be able to write the tag 'albumArtists' to a file.", () => {
 		const data = Object.freeze({ albumArtists: [makeRandomString()] });
 
-		writeTags(anotherMediaPath, data);
+		writeTags(anotherMediaPath, data).then();
 
 		const file = MediaFile.createFromPath(anotherMediaPath);
 		expect(file.tag.albumArtists).toStrictEqual(data.albumArtists);
@@ -53,7 +52,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 			// Delete it so that git doesn't trigger a file change:
 			const data = Object.freeze({ albumArtists: [] });
 
-			writeTags(anotherMediaPath, data);
+			writeTags(anotherMediaPath, data).then();
 
 			const file = MediaFile.createFromPath(anotherMediaPath);
 			expect(file.tag.albumArtists.length).toBe(0);
@@ -73,12 +72,12 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	it("Should be able to write the tag 'picture' to a file.", async () => {
 		const imgAsString: Base64 = await getThumbnail();
 
-		writeTags(anotherMediaPath, { imageURL: imgAsString });
+		writeTags(anotherMediaPath, { imageURL: imgAsString }).then();
 
 		const file = MediaFile.createFromPath(anotherMediaPath);
 		expect(file.tag.pictures.length, errorMsg).toBe(1);
 
-		// dbgTests("New file pictures =", file.tag.pictures[0]);
+		dbgTests("New file pictures =", file.tag.pictures[0]);
 
 		// Clean up:
 		// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.
@@ -90,7 +89,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 			// See if picture remains there after closing it:
 			const file = MediaFile.createFromPath(anotherMediaPath);
 
-			// dbgTests("AFTER: New file pictures =", file.tag.pictures);
+			dbgTests("AFTER: New file pictures =", file.tag.pictures);
 
 			expect(file.tag.pictures.length, errorMsg).toBe(1);
 
@@ -103,7 +102,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 
 		{
 			// Delete it so that git doesn't trigger a file change:
-			writeTags(anotherMediaPath, { imageURL: eraseImg });
+			writeTags(anotherMediaPath, { imageURL: eraseImg }).then();
 
 			const file = MediaFile.createFromPath(anotherMediaPath);
 			expect(file.tag.pictures.length, "There should be no pictures.").toBe(0);

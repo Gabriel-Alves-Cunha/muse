@@ -5,15 +5,12 @@ import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useEffect } from "react";
 import { create } from "zustand";
 
+import { createOrCancelDownload } from "@modules/media/createDownload";
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { useDownloadingList } from "@contexts/downloadList";
 import { createNewDownload } from "./helper";
-import { MessageToBackend } from "@utils/enums";
-// import { sendMsgToBackend } from "@utils/crossCommunication";
 import { ProgressStatus } from "@utils/enums";
 import { useTranslation } from "@i18n";
-import { errorToast } from "../toasts";
-import { error } from "@utils/log";
 import { Popup } from "./Popup";
 
 /////////////////////////////////////////////
@@ -49,23 +46,9 @@ export function Downloading() {
 		if (!downloadInfo.url) return;
 
 		// For each new `downloadInfo`, start a new download:
-		try {
-			const electronPort = createNewDownload(downloadInfo);
+		const downloaderMsgPort = createNewDownload(downloadInfo);
 
-			// Sending port so we can communicate with Electron:
-			// sendMsgToBackend(
-			// 	{ type: MessageToBackend.CREATE_A_NEW_DOWNLOAD },
-			// 	electronPort,
-			// );
-		} catch (err) {
-			error(err);
-
-			errorToast(
-				`${t("toasts.downloadError.beforePath")}"${downloadInfo.title}"${t(
-					"toasts.downloadError.afterPath",
-				)}`,
-			);
-		}
+		createOrCancelDownload({ downloaderMsgPort, ...downloadInfo });
 
 		setDownloadInfo(defaultDownloadInfo);
 	}, [downloadInfo.title, downloadInfo]);

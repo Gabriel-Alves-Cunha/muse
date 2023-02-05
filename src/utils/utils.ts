@@ -1,8 +1,10 @@
 import type { Base64 } from "types/generalTypes";
 
 import { documentDir, downloadDir, audioDir } from "@tauri-apps/api/path";
+import { homedir } from "node:os";
 
-import { throwErr, dbg } from "./log";
+import { throwErr, dbg, error } from "./log";
+import { join } from "node:path";
 
 const { trunc, floor, random } = Math;
 
@@ -160,13 +162,21 @@ export const eraseImg = "eraseImg";
 
 /////////////////////////////////////////
 
+const homeDir = homedir();
 export const dirs = {
-	documents: await documentDir(),
-	downloads: await downloadDir(),
-	music: await audioDir(),
+	documents: await documentDir().catch(() => {
+		error("Error: could not get documentDir from tauri.");
+		return join(homeDir, "Documents");
+	}),
+	downloads: await downloadDir().catch(() => {
+		error("Error: could not get downloadDir from tauri.");
+		return join(homeDir, "Downloads");
+	}),
+	music: await audioDir().catch(() => {
+		error("Error: could not get audioDir from tauri.");
+		return join(homeDir, "Music");
+	}),
 } as const;
-
-dbg({ dirs });
 
 /////////////////////////////////////////
 

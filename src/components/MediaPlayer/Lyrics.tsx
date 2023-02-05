@@ -1,13 +1,13 @@
 import type { Path, Media } from "types/generalTypes";
 
 import { mediaPlayerFlipCardId } from "../FlipCard";
-// import { sendMsgToBackend } from "@utils/crossCommunication";
-import { MessageToBackend } from "@utils/enums";
 import { useTranslation } from "@i18n";
 import { error, warn } from "@utils/log";
 import { infoToast } from "../toasts";
 import { getMedia } from "@contexts/usePlaylists";
 import { Header } from "./Header";
+import { searchForLyricsAndImage } from "@modules/getLyrics";
+import { writeTags } from "@modules/media/writeTags";
 
 // const { searchForLyricsAndImage } = electron.lyric;
 
@@ -56,21 +56,17 @@ export async function searchAndOpenLyrics(
 	const getImage = !media.image;
 
 	try {
-		const { lyric, image, albumName } = { lyric: "", image: "", albumName: "" }; // await searchForLyricsAndImage(
-		// 	media.title,
-		// 	media.artist,
-		// 	getImage,
-		// );
+		const { lyric, image, albumName } = await searchForLyricsAndImage(
+			media.title,
+			media.artist,
+			getImage,
+		);
 
-		// sendMsgToBackend({
-		// 	thingsToChange: [
-		// 		{ whatToChange: "album", newValue: albumName },
-		// 		{ whatToChange: "imageURL", newValue: image },
-		// 		{ whatToChange: "lyrics", newValue: lyric },
-		// 	],
-		// 	type: MessageToBackend.WRITE_TAG,
-		// 	mediaPath,
-		// });
+		await writeTags(mediaPath, {
+			album: albumName,
+			imageURL: image,
+			lyrics: lyric,
+		});
 	} catch (err) {
 		if ((err as Error).message.includes("No lyrics found"))
 			infoToast(`${t("toasts.noLyricsFound")}"${media.title}"!`);

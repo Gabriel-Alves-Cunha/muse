@@ -4,9 +4,9 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
-import { listenToAllBackendMessages } from "@utils/handleMsgsToFrontend";
 import { watchClipboard } from "@modules/watchClipboard";
 import { checkForUpdate } from "@utils/checkForUpdate";
+import { listenWindow } from "@utils/listenWindow";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { usePage } from "@contexts/page";
@@ -76,13 +76,11 @@ function PageToShow() {
 //////////////////////////////////////////
 // Do once on app start:
 
-await listenToAllBackendMessages();
-
-//////////////////////////////////////////
-
 // This will wait for the window to load:
 window.addEventListener("load", async () => {
 	log("Page is fully loaded.");
+
+	listenWindow();
 
 	await searchLocalComputerForMedias();
 

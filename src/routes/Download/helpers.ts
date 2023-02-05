@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
+import { getBasicInfo } from "ytdl-core";
+
 import { setDownloadInfo } from "@components/Downloading";
 import { getErrorMessage } from "@utils/error";
 import { useTranslation } from "@i18n";
 import { error } from "@utils/log";
-
-// const { getBasicInfo } = electron.media;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -64,11 +64,11 @@ export async function search(url: Readonly<string>): Promise<void> {
 	});
 
 	try {
-		const { thumbnails, media, title } = {
-			thumbnails: [{ url: "" }],
-			media: { artist: "" },
-			title: "",
-		}; // (await getBasicInfo(url)).videoDetails;
+		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
+		// {
+		// thumbnails: [{ url: "" }],
+		// 		media: { artist: "" },
+		// 		title: "",};
 
 		const result: UrlMediaMetadata = {
 			imageURL: thumbnails.at(-1)?.url ?? "",

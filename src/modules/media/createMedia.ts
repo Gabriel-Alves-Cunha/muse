@@ -1,6 +1,8 @@
 import type { Base64, Media, Path } from "types/generalTypes";
 
-import { IPicture, parseBlob } from "music-metadata-browser";
+// import { parseBlob } from "music-metadata-browser";
+
+import { File as MediaFile } from "node-taglib-sharp";
 
 import { getAllowedMedias, searchDirectoryResult } from "@utils/file";
 import { error, groupEnd, groupCollapsed, dbg } from "@utils/log";
@@ -31,15 +33,21 @@ const createMedia = async (
 			const blob = new File([], path);
 			const { size, lastModified } = blob;
 
+			const mediaFile = MediaFile.createFromPath(path);
+
+			console.log({ mediaFile });
+
+			return reject();
+
 			if (assureMediaSizeIsGreaterThan60KB && size < 60_000)
 				return reject(
 					`Skipping "${path}" because size is ${size} bytes! (< 60 KB)`,
 				);
 
-			const {
-				common: { artist = "", album = "", lyrics, picture, genre },
-				format: { duration, creationTime },
-			} = await parseBlob(blob, { duration: true });
+			// const {
+			// 	common: { artist = "", album = "", lyrics, picture, genre },
+			// 	format: { duration, creationTime },
+			// } = await parseBlob(blob, { duration: true });
 
 			if (ignoreMediaWithLessThan60Seconds && duration && duration < 60)
 				return reject(
@@ -48,15 +56,8 @@ const createMedia = async (
 					)} s (less than 60 s)!`,
 				);
 
-			let image: IPicture | undefined;
-			let mimeType: string | undefined;
-			let error: Error | undefined;
-			try {
-				image = picture?.[0];
-				mimeType = image?.format;
-			} catch (err) {
-				error = err as Error;
-			}
+			const image = picture?.[0];
+			const mimeType = image?.format;
 
 			const media: Media = {
 				image:
@@ -97,7 +98,7 @@ export const transformPathsToMedias = (
 				path,
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			).catch((e) => error(`Error on "${path}".\n\n`, e));
+			).catch((e) => error(`Error on single "${path}".\n\n`, e));
 
 			if (media) medias.push(media);
 		} else {
@@ -110,7 +111,7 @@ export const transformPathsToMedias = (
 						path,
 						assureMediaSizeIsGreaterThan60KB,
 						ignoreMediaWithLessThan60Seconds,
-					).catch((e) => error(`Error on "${path}".\n\n`, e)),
+					).catch(error),
 				);
 
 			// Run promises in parallel:

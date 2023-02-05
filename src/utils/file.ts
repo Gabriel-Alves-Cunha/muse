@@ -1,7 +1,7 @@
 import type { Path } from "types/generalTypes";
 
 import { readDir } from "@tauri-apps/api/fs";
-import { sep } from "@tauri-apps/api/path";
+import { join } from "node:path";
 
 import { allowedMedias, dirs } from "./utils";
 import { getLastExtension } from "./path";
@@ -27,8 +27,6 @@ export async function getFullPathOfFilesForFilesInThisDirectory(
 }
 
 ///////////////////////////////////////////
-
-export const join = (...paths: Path[]) => paths.join(sep);
 
 export async function searchDirectoryResult(): Promise<readonly Path[]> {
 	const resoledPromises = await Promise.allSettled([

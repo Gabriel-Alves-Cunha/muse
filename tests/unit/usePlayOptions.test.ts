@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
-mockElectronPlusNodeGlobalsBeforeTests();
+import { mockWindowBeforeTests } from "./mockWindowBeforeTests";
+mockWindowBeforeTests();
 //
 
 const { getPlayOptions, setPlayOptions, toggleLoopMedia } = await import(
