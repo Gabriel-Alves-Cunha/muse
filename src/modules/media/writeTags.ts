@@ -112,7 +112,7 @@ export async function downloadThumbnail(url: string): Promise<Picture[]> {
 
 		return [picture];
 	} catch (e) {
-		error("Got error getting image!\n\n", e);
+		error("Got error downloading image!\n\n", e);
 
 		return [];
 	}
@@ -193,7 +193,7 @@ async function talkToClientSoItCanGetTheNewMedia(
 			addToMainList(newPathOfFile);
 
 			// and remove old one
-			await deleteFile(mediaPath);
+			// await deleteFile(mediaPath);
 			removeMedia(mediaPath);
 		} catch (err) {
 			error(err);

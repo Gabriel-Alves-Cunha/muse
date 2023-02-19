@@ -138,14 +138,14 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		it.skip("addToMainList() should NOT add one media to mediaList because there already exists one with the same id", () => {
+		it("addToMainList() should NOT add one media to mediaList because there already exists one with the same id", async () => {
 			const anyIndex = getRandomInt(0, numberOfMedias);
 			const [path] = arrayFromMainList[anyIndex]!;
 			expect(path).toBeTruthy();
 
 			expect(getMainList().has(path)).toBe(true);
 
-			addToMainList(path).then();
+			await addToMainList(path);
 
 			expect(getMainList().size).toBe(numberOfMedias);
 		});
@@ -154,13 +154,13 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		it.skip("addToMainList() should add one media to mediaList", () => {
+		it.skip("addToMainList() should add one media to mediaList", async () => {
 			const title = "Test Title - add one media";
 			const newPath = `~/Music/test/${title}.mp3`;
 
 			expect(getMainList().size).toBe(numberOfMedias);
 
-			addToMainList(newPath).then();
+			await addToMainList(newPath);
 
 			const newMainList = getMainList();
 

@@ -114,13 +114,6 @@
 				"title": "Muse",
 				"height": 600,
 				"width": 800
-			},
-			{
-				"url": "./splashscreen.html",
-				"label": "splashscreen",
-				"decorations": false,
-				"height": 600,
-				"width": 800
 			}
 		]
 	}

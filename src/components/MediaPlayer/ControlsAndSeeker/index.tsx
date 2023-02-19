@@ -12,7 +12,7 @@ import { Controls } from "./Controls";
 import {
 	toggleLoopMedia,
 	usePlayOptions,
-	toggleRandom,
+	toggleIsRandom,
 } from "@contexts/usePlayOptions";
 
 /////////////////////////////////////////
@@ -41,7 +41,7 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 
 				<CircleIconButton
 					title={t("tooltips.toggleRandom")}
-					onPointerUp={toggleRandom}
+					onPointerUp={toggleIsRandom}
 					disabled={!isThereAMedia}
 				>
 					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}

@@ -34,10 +34,10 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	//////////////////////////////////////
 	//////////////////////////////////////
 
-	it("Should be able to write the tag 'albumArtists' to a file.", () => {
+	it("Should be able to write the tag 'albumArtists' to a file.", async () => {
 		const data = Object.freeze({ albumArtists: [makeRandomString()] });
 
-		writeTags(anotherMediaPath, data).then();
+		await writeTags(anotherMediaPath, data);
 
 		const file = MediaFile.createFromPath(anotherMediaPath);
 		expect(file.tag.albumArtists).toStrictEqual(data.albumArtists);
@@ -52,7 +52,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 			// Delete it so that git doesn't trigger a file change:
 			const data = Object.freeze({ albumArtists: [] });
 
-			writeTags(anotherMediaPath, data).then();
+			await writeTags(anotherMediaPath, data);
 
 			const file = MediaFile.createFromPath(anotherMediaPath);
 			expect(file.tag.albumArtists.length).toBe(0);
@@ -72,7 +72,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 	it("Should be able to write the tag 'picture' to a file.", async () => {
 		const imgAsString: Base64 = await getThumbnail();
 
-		writeTags(anotherMediaPath, { imageURL: imgAsString }).then();
+		await writeTags(anotherMediaPath, { imageURL: imgAsString });
 
 		const file = MediaFile.createFromPath(anotherMediaPath);
 		expect(file.tag.pictures.length, errorMsg).toBe(1);
@@ -102,7 +102,7 @@ describe("Test suite to get writeTags() to write a picture into a media.", () =>
 
 		{
 			// Delete it so that git doesn't trigger a file change:
-			writeTags(anotherMediaPath, { imageURL: eraseImg }).then();
+			await writeTags(anotherMediaPath, { imageURL: eraseImg });
 
 			const file = MediaFile.createFromPath(anotherMediaPath);
 			expect(file.tag.pictures.length, "There should be no pictures.").toBe(0);

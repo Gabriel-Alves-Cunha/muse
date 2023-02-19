@@ -80,13 +80,13 @@ function PageToShow() {
 window.addEventListener("load", async () => {
 	log("Page is fully loaded.");
 
-	listenWindow();
-
-	await searchLocalComputerForMedias();
-
-	await invoke("close_splashscreen");
-
-	await watchClipboard();
-
-	await checkForUpdate();
+// 	listenWindow();
+// 
+// 	await searchLocalComputerForMedias();
+// 
+// 	await invoke("close_splashscreen");
+// 
+// 	await watchClipboard();
+// 
+// 	await checkForUpdate();
 });

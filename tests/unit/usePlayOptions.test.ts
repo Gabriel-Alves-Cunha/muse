@@ -1,3 +1,4 @@
+import { toggleIsRandom } from "@contexts/usePlayOptions";
 import { describe, expect, it } from "vitest";
 
 // Getting everything ready for the tests...
@@ -46,7 +47,7 @@ describe("Testing usePlayOptions", () => {
 			"playOptions should have { isRandom: true }!",
 		).toHaveProperty("isRandom", true);
 
-		setPlayOptions({ isRandom: false });
+		toggleIsRandom();
 
 		expect(
 			getPlayOptions(),

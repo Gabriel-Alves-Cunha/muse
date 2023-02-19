@@ -15,7 +15,6 @@ if (isDev) {
 	);
 
 	// document.designMode = "on";
-	console.log(window);
 }
 
 ////////////////////////////////////////////////

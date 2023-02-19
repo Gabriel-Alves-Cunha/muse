@@ -23,21 +23,20 @@ export const { getState: getPlayOptions, setState: setPlayOptions } =
 ////////////////////////////////////////////////
 // Helper functions:
 
-export function toggleLoopMedia(): void {
-	const audio = getAudio();
-	if (!audio) return;
+export const toggleLoopMedia = (): void =>
+	setPlayOptions((prev) => {
+		const loopThisMedia = !prev.loopThisMedia;
 
-	const loopThisMedia = !getPlayOptions().loopThisMedia;
+		const audio = getAudio();
+		if (audio) audio.loop = loopThisMedia;
 
-	audio.loop = loopThisMedia;
-
-	setPlayOptions({ loopThisMedia });
-}
+		return { loopThisMedia };
+	});
 
 ////////////////////////////////////////////////
 
-export const toggleRandom = () =>
-	setPlayOptions({ isRandom: !getPlayOptions().isRandom });
+export const toggleIsRandom = () =>
+	setPlayOptions((prev) => ({ isRandom: !prev.isRandom }));
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

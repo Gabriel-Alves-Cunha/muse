@@ -50,8 +50,8 @@ export default defineConfig(({ mode }) => {
 					minifyInternalExports: minify,
 					// entryFileNames: "[name].mjs", // This cannot be set! It overrides the entry name.
 					chunkFileNames: "[name].mjs",
+					dir: "./build/web",
 					sourcemap: false,
-					dir: "./build",
 					format: "esm",
 				},
 			},
@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => {
 			chunkSizeWarningLimit: 1_000,
 			reportCompressedSize: false,
 			emptyOutDir: false,
-			sourcemap: false,
+			sourcemap: true,
 			minify,
 		},
 
@@ -84,21 +84,24 @@ export default defineConfig(({ mode }) => {
 		},
 
 		define: isTest
-			? { isDev: isDev }
-			: {
+			? { isDev }
+			: ({
 					"process.env": process.env ?? "{}",
+					"process.__esModule": "undefined",
 					isDev,
-			  },
+			  } as const),
+		// This dep is not available and Vite tries to preload it anyway, so, ignoring it:
+		optimizeDeps: { exclude: ["./lib-cov/fluent-ffmpeg"] },
 		// Tauri expects a fixed port, fail if that port is not available:
 		server: { port: 3_000, strictPort: true },
-		root: "./src/renderer",
-		plugins: [react()],
 		clearScreen: false, // Prevent vite from obscuring rust errors.
+		plugins: [react()],
+		root: "./src",
 		base: "./",
 
 		// to make use of `TAURI_PLATFORM`, `TAURI_ARCH`, `TAURI_FAMILY`,
 		// `TAURI_PLATFORM_VERSION`, `TAURI_PLATFORM_TYPE` and `TAURI_DEBUG`
-		// env variables
+		// env variables:
 		envPrefix: ["VITE_", "TAURI_"],
 
 		resolve: {
@@ -107,6 +110,9 @@ export default defineConfig(({ mode }) => {
 					find: "@components",
 					replacement: resolve("src/components"),
 				},
+				// This dep is not available but for some reason it's called in the lib
+				// anyway, but this workaround works:
+				{ find: "./lib-cov/fluent-ffmpeg", replacement: "./lib/fluent-ffmpeg" },
 				{ find: "@contexts", replacement: resolve("src/contexts") },
 				{ find: "@modules", replacement: resolve("src/modules") },
 				{ find: "@assets", replacement: resolve("src/assets") },

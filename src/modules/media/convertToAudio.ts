@@ -7,12 +7,12 @@ import { exists, removeFile } from "@tauri-apps/api/fs";
 import { createReadStream } from "node:fs";
 import { dirname } from "@tauri-apps/api/path";
 import { join } from "node:path";
+import fluent_ffmpeg from "fluent-ffmpeg";
 import sanitize from "sanitize-filename";
 
 import { addToMainList, removeMedia } from "@contexts/usePlaylists";
 import { log, error, throwErr, dbg } from "@utils/log";
 import { ProgressStatus } from "@utils/enums";
-import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@utils/path";
 import { dirs } from "@utils/utils";
 

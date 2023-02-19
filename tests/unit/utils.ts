@@ -18,13 +18,6 @@ export const anotherMediaPath = resolve(
 
 export const mediaPicture = resolve(test_assetsDir, "img for tests.png");
 
-// dbgTests("utils.ts", {
-// 	import: import.meta,
-// 	mediaPicture,
-// 	mediaPath,
-// 	__dirname,
-// });
-
 export async function getThumbnail() {
 	const base64 = await readFile(mediaPicture, { encoding: "base64" });
 

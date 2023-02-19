@@ -5,13 +5,13 @@ import type { Readable } from "node:stream";
 
 import { exists, removeFile } from "@tauri-apps/api/fs";
 import { join } from "node:path";
+import fluent_ffmpeg from "fluent-ffmpeg";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { error, log, throwErr, dbg } from "@utils/log";
 import { ProgressStatus } from "@utils/enums";
 import { addToMainList } from "@contexts/usePlaylists";
-import { fluent_ffmpeg } from "./ffmpeg";
 import { writeTags } from "./writeTags";
 import { dirs } from "@utils/utils";
 

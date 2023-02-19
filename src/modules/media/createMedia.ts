@@ -98,7 +98,7 @@ export const transformPathsToMedias = (
 				path,
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			).catch((e) => error(`Error on single "${path}".\n\n`, e));
+			).catch((e) => error(`Error on creating just one media "${path}".\n`, e));
 
 			if (media) medias.push(media);
 		} else {
