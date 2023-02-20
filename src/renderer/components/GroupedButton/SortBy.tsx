@@ -2,26 +2,28 @@ import type { ValuesOf } from "@common/@types/utils";
 
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
+import { useSnapshot } from "valtio";
 
-import { useTranslation } from "@i18n";
+import { PlaylistListEnum } from "@common/enums";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { playlistList } from "@common/enums";
-import { setFromList } from "../MediaListKind/states";
+import { translation } from "@i18n";
+import { fromList } from "../MediaListKind/states";
 import { MenuItem } from "../MenuItem";
 import { Select } from "../Select";
 
 export function SortBy() {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
+	const translationAccessor = useSnapshot(translation);
 	const [isOpen, setIsOpen] = useState(false);
-	const { t } = useTranslation();
+	const t = translationAccessor.t;
 
 	useEffect(() => {
 		// Default value:
-		let homeList: ValuesOf<typeof playlistList> = playlistList.mainList;
+		let homeList: ValuesOf<typeof PlaylistListEnum> = PlaylistListEnum.mainList;
 
-		if (selectedList === "Date") homeList = playlistList.sortedByDate;
+		if (selectedList === "Date") homeList = PlaylistListEnum.sortedByDate;
 
-		setFromList({ homeList });
+		fromList.homeList = homeList;
 	}, [selectedList]);
 
 	return (

@@ -1,47 +1,40 @@
 import type { ValuesOf } from "@common/@types/utils";
 
-import { create } from "zustand";
+import { proxy } from "valtio";
 
-import { playlistList } from "@common/enums";
+import { PlaylistListEnum } from "@common/enums";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const useFromList = create<FromList>(() => ({
-	fromList: playlistList.favorites,
-	homeList: playlistList.mainList,
+export const fromList = proxy<FromList>({
+	homeList: PlaylistListEnum.mainList,
+	curr: PlaylistListEnum.favorites,
 	isHome: true,
-}));
-
-export const { getState: getFromList, setState: setFromList } = useFromList;
+});
 
 /////////////////////////////////////////
 
-const useIsCtxMenuOpen = create(() => ({ isCtxMenuOpen: false }));
-
-export const isCtxMenuOpen = () => useIsCtxMenuOpen.getState().isCtxMenuOpen;
-
-export const setIsCtxMenuOpen = (isCtxMenuOpen: boolean) =>
-	useIsCtxMenuOpen.setState({ isCtxMenuOpen });
+export const isCtxMenuOpen = proxy({ curr: false });
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-type PlaylistList = ValuesOf<typeof playlistList>;
+type PlaylistList = ValuesOf<typeof PlaylistListEnum>;
 
 /////////////////////////////////////////////
 
 type FromList = {
-	fromList: Exclude<
+	curr: Exclude<
 		PlaylistList,
-		typeof playlistList.mainList | typeof playlistList.sortedByDate
+		typeof PlaylistListEnum.mainList | typeof PlaylistListEnum.sortedByDate
 	>;
 	homeList: Extract<
 		PlaylistList,
-		typeof playlistList.mainList | typeof playlistList.sortedByDate
+		typeof PlaylistListEnum.mainList | typeof PlaylistListEnum.sortedByDate
 	>;
 	isHome: boolean;
 };

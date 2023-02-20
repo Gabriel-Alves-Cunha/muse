@@ -1,16 +1,11 @@
 import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 
-import { ElectronIpcMainProcessNotification } from "@common/enums";
-
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { dbg } from "@common/debug";
 import {
 	addToAllSelectedMedias,
 	selectAllMedias,
-} from "@contexts/useAllSelectedMedias";
-
-const notify =
-	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
+} from "@contexts/allSelectedMedias";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -44,8 +39,7 @@ export const computeHistoryItemKey = (
 
 /////////////////////////////////////////
 
-export const reloadWindow = (): void =>
-	notify(ElectronIpcMainProcessNotification.RELOAD_WINDOW);
+export const reloadWindow = (): void => location.reload();
 
 /////////////////////////////////////////
 

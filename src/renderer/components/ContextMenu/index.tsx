@@ -3,7 +3,7 @@ import type { ValuesOf } from "@common/@types/utils";
 import { Suspense, lazy } from "react";
 
 import { CtxMenu, CtxMenuProps } from "./CtxMenu";
-import { deselectAllMedias } from "@contexts/useAllSelectedMedias";
+import { deselectAllMedias } from "@contexts/allSelectedMedias";
 
 const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
 const MainCtxMenu = lazy(() => import("./mainCtxMenu"));

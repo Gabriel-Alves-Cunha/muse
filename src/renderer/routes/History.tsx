@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
+import { PlaylistListEnum } from "@common/enums";
 import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
-import { playlistList } from "@common/enums";
-import { setFromList } from "@components/MediaListKind/states";
 import { SearchMedia } from "@components/SearchMedia";
+import { fromList } from "@components/MediaListKind/states";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
@@ -13,8 +13,10 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export default function History() {
-	useEffect(() => setFromList({ fromList: playlistList.history }), []);
+export function History() {
+	useEffect(() => {
+		fromList.curr = PlaylistListEnum.history;
+	}, []);
 
 	return (
 		<MainArea>

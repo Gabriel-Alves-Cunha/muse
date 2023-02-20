@@ -1,12 +1,13 @@
 import type { MediaBeingDownloaded } from ".";
 
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
+import { useSnapshot } from "valtio";
 
-import { getDownloadingList, useDownloadingList } from "@contexts/downloadList";
 import { cancelDownloadAndOrRemoveItFromList } from "./helper";
 import { Progress, progressIcons } from "../Progress";
+import { downloadingList } from "@contexts/downloadList";
 import { ProgressStatus } from "@common/enums";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 import { Button } from "../Button";
 
 import { handleSingleItemDeleteAnimation } from "./styles";
@@ -16,16 +17,17 @@ import { handleSingleItemDeleteAnimation } from "./styles";
 /////////////////////////////////////////////
 
 export function Popup() {
-	const { downloadingList } = useDownloadingList();
-	const { t } = useTranslation();
+	const downloadingListAccessor = useSnapshot(downloadingList);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
-	return downloadingList.size > 0 ? (
+	return downloadingListAccessor.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
 				{t("buttons.cleanFinished")}
 			</Button>
 
-			{Array.from(downloadingList, ([url, downloadingMedia], index) => (
+			{Array.from(downloadingListAccessor, ([url, downloadingMedia], index) => (
 				<DownloadingBox
 					download={downloadingMedia}
 					downloadingIndex={index}
@@ -48,7 +50,8 @@ function DownloadingBox({
 	download,
 	url,
 }: DownloadingBoxProps) {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<div className="box">
@@ -88,7 +91,7 @@ function DownloadingBox({
 // Helper functions for Popup:
 
 function cleanAllDoneDownloads(): void {
-	for (const [url, download] of getDownloadingList())
+	for (const [url, download] of downloadingList)
 		if (
 			download.status !==
 				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&

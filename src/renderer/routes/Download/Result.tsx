@@ -1,23 +1,26 @@
-import { downloadMedia, useSearchInfo } from "./helpers";
-import { useTranslation } from "@i18n";
+import { useSnapshot } from "valtio";
+
+import { downloadMedia, searchInfo } from "./helpers";
+import { translation } from "@i18n";
 import { Button } from "@components/Button";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-const resultSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
-	state.result;
-
 export function Result() {
-	const { imageURL, title } = useSearchInfo(resultSelector);
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const searchInfoAccessor = useSnapshot(searchInfo);
+	const t = translationAccessor.t;
 
-	return title ? (
+	return searchInfoAccessor.result.title ? (
 		<div className="result">
-			<img alt={t("alts.videoThumbnail")} src={imageURL} />
+			<img
+				src={searchInfoAccessor.result.imageURL}
+				alt={t("alts.videoThumbnail")}
+			/>
 
-			<p>{title}</p>
+			<p>{searchInfoAccessor.result.title}</p>
 
 			<Button variant="large" onPointerUp={downloadMedia}>
 				{t("buttons.download")}

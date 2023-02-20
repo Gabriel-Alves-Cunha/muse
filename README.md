@@ -43,7 +43,7 @@ The following tools were used in this project construction:
 - [React](https://pt-br.reactjs.org/)
 - [Tailwind](https://tailwindcss.com/)
 - [Electron](https://www.electronjs.org/)
-- [Zustand](https://github.com/pmndrs/zustand)
+- [Valtio](https://github.com/pmndrs/valtio)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Ytdl Core](https://github.com/fent/node-ytdl-core)
 - [React Icons](https://react-icons.github.io/react-icons/)

@@ -1,5 +1,7 @@
+import { useSnapshot } from "valtio";
+
 import { SearcherWrapper } from "./SearcherWrapper";
-import { useSearchInfo } from "./helpers";
+import { searchInfo } from "./helpers";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
 import { Header } from "@components/Header";
@@ -10,30 +12,29 @@ import { Result } from "./Result";
 ////////////////////////////////////////////////
 // Main function:
 
-export default function Download() {
-	return (
-		<MainArea>
-			<Header>
-				<SearcherWrapper />
+export const Download = () => (
+	<MainArea>
+		<Header>
+			<SearcherWrapper />
 
-				<IsLoading />
-			</Header>
+			<IsLoading />
+		</Header>
 
-			<Result />
-		</MainArea>
-	);
-}
+		<Result />
+	</MainArea>
+);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Helper functions:
 
-const isLoadingSelector = (state: ReturnType<typeof useSearchInfo.getState>) =>
-	state.isLoading;
-
 function IsLoading() {
-	const isLoading = useSearchInfo(isLoadingSelector);
+	const searchInfoAccessor = useSnapshot(searchInfo);
 
-	return <div className="w-6 h-6 ml-3">{isLoading && <Loading />}</div>;
+	return (
+		<div className="w-6 h-6 ml-3">
+			{searchInfoAccessor.isLoading && <Loading />}
+		</div>
+	);
 }

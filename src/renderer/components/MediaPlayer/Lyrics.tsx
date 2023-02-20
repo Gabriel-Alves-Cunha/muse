@@ -3,10 +3,10 @@ import type { Path, Media } from "@common/@types/generalTypes";
 import { ReactToElectronMessage } from "@common/enums";
 import { mediaPlayerFlipCardId } from "../FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { useTranslation } from "@i18n";
 import { error, warn } from "@common/log";
+import { translation } from "@i18n";
 import { infoToast } from "../toasts";
-import { getMedia } from "@contexts/usePlaylists";
+import { getMedia } from "@contexts/playlists";
 import { Header } from "./Header";
 
 const { searchForLyricsAndImage } = electron.lyric;
@@ -45,7 +45,7 @@ export async function searchAndOpenLyrics(
 
 	if (!media) return warn(`Media "${mediaPath}" not found!`);
 
-	const { t } = useTranslation.getState();
+	const { t } = translation;
 
 	if (!media.artist) {
 		infoToast(t("toasts.assureMediaHasArtistMetadata"));

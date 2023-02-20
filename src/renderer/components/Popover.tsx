@@ -28,7 +28,7 @@ export function Popover({
 
 		function closeOnClickOutside(event: PointerEvent): void {
 			// Assume that isOpen === true.
-
+			console.log("closeOnClickOutside");
 			// Check if click happened outside:
 			if (
 				event.button !== leftClick ||

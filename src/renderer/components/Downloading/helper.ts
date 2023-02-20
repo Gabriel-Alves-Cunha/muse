@@ -2,13 +2,14 @@ import type { MediaBeingDownloaded } from ".";
 import type { DownloadInfo } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { setDownloadingList, getDownloadingList } from "@contexts/downloadList";
+import { ProgressStatus, ReactToElectronMessage } from "@common/enums";
 import { errorToast, infoToast, successToast } from "../toasts";
-import { error, assert, throwErr } from "@common/log";
 import { logThatPortIsClosing } from "../Converting/helper";
 import { assertUnreachable } from "@utils/utils";
-import { ProgressStatus } from "@common/enums";
-import { useTranslation } from "@i18n";
+import { sendMsgToBackend } from "@common/crossCommunication";
+import { downloadingList } from "@contexts/downloadList";
+import { error, assert } from "@common/log";
+import { translation } from "@i18n";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
@@ -20,9 +21,7 @@ import { dbg } from "@common/debug";
  * Electron to enable 2 way communication between it
  * and React.
  */
-export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
-	const downloadingList = getDownloadingList();
-
+export function createNewDownload(downloadInfo: DownloadInfo): void {
 	dbg("Trying to create a new download.", { downloadingList });
 
 	const { imageURL, title, url } = downloadInfo;
@@ -30,13 +29,13 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// First, see if there is another one that has the same url
 	// and quit if true:
 	if (downloadingList.has(url)) {
-		const { t } = useTranslation.getState();
+		const { t } = translation;
 
 		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
-		error(info, downloadingList);
 		infoToast(info);
-		throwErr(info);
+
+		return error(info, downloadingList);
 	}
 
 	// Since this a brand new download, let's create a new one.
@@ -45,16 +44,20 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	// download progress between React and Electron:
 	const { port1: frontEndPort, port2: backEndPort } = new MessageChannel();
 
-	// Creating a new DownloadingMedia and adding it to the list:
-	setDownloadingList(
-		new Map(downloadingList).set(url, {
-			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-			port: frontEndPort,
-			percentage: 0,
-			imageURL,
-			title,
-		}),
+	// Sending port so we can communicate with Electron:
+	sendMsgToBackend(
+		{ type: ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
+		backEndPort,
 	);
+
+	// Creating a new DownloadingMedia and adding it to the list:
+	downloadingList.set(url, {
+		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		port: frontEndPort,
+		percentage: 0,
+		imageURL,
+		title,
+	});
 
 	// Send msg to electronPort to download:
 	frontEndPort.postMessage(downloadInfo);
@@ -70,10 +73,9 @@ export function createNewDownload(downloadInfo: DownloadInfo): MessagePort {
 	);
 
 	frontEndPort.start();
-
-	return backEndPort;
 }
 
+/////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions for `createNewDownload()`
@@ -82,8 +84,6 @@ function handleUpdateDownloadingList(
 	{ data }: MessageEvent<PartialExceptStatus>,
 	url: string,
 ): void {
-	const downloadingList = getDownloadingList();
-
 	dbg(`Received a message from Electron on port for "${url}":`, {
 		downloadingList,
 		data,
@@ -97,11 +97,9 @@ function handleUpdateDownloadingList(
 		);
 
 	// Update React's information about this DownloadingMedia:
-	setDownloadingList(
-		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
-	);
+	downloadingList.set(url, { ...thisDownload, ...data });
 
-	const { t } = useTranslation.getState();
+	const { t } = translation;
 
 	// Handle status:
 	switch (data.status) {
@@ -147,8 +145,6 @@ function handleUpdateDownloadingList(
 /////////////////////////////////////////////
 
 export function cancelDownloadAndOrRemoveItFromList(url: string): void {
-	const downloadingList = getDownloadingList();
-
 	// Assert that the download exists:
 	const download = downloadingList.get(url);
 
@@ -160,11 +156,7 @@ export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 		download.port.postMessage({ destroy: true, url });
 
 	// Update downloading list:
-	const newDownloadingList = new Map(downloadingList);
-	newDownloadingList.delete(url);
-
-	// Make React update:
-	setDownloadingList(newDownloadingList);
+	downloadingList.delete(url);
 }
 
 /////////////////////////////////////////////

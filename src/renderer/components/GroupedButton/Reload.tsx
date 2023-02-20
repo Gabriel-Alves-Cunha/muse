@@ -1,19 +1,14 @@
 import { MdAutorenew as ReloadIcon } from "react-icons/md";
+import { useSnapshot } from "valtio";
 
-import { useTranslation } from "@i18n";
+import { searchLocalComputerForMedias, playlists } from "@contexts/playlists";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import {
-	searchLocalComputerForMedias,
-	usePlaylists,
-} from "@contexts/usePlaylists";
-
-const isLoadingMediasSelector = (
-	state: ReturnType<typeof usePlaylists.getState>,
-) => state.isLoadingMedias;
+import { translation } from "@i18n";
 
 export function Reload() {
-	const isLoadingMedias = usePlaylists(isLoadingMediasSelector);
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const playlistsAccessor = useSnapshot(playlists);
+	const t = translationAccessor.t;
 
 	return (
 		<ButtonOfGroup
@@ -21,7 +16,7 @@ export function Reload() {
 			title={t("tooltips.reloadAllMedias")}
 		>
 			<ReloadIcon
-				data-animate-spin={isLoadingMedias}
+				data-animate-spin={playlistsAccessor.isLoadingMedias}
 				className="fill-white"
 				size={17}
 			/>

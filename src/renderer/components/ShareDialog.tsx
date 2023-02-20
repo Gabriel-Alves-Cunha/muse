@@ -1,16 +1,16 @@
-import type { Path, QRCodeURL } from "@common/@types/generalTypes";
 import type { ClientServerAPI } from "@main/preload/share/server";
+import type { QRCodeURL } from "@common/@types/generalTypes";
 
 import { useEffect, useReducer } from "react";
 import { MdClose as CloseIcon } from "react-icons/md";
+import { useSnapshot } from "valtio";
 import { toCanvas } from "qrcode";
 
-import { setFilesToShare, useFilesToShare } from "@contexts/filesToShare";
-import { useTranslation } from "@i18n";
 import { CenteredModal } from "./CenteredModal";
 import { error, assert } from "@common/log";
-import { getMainList } from "@contexts/usePlaylists";
-import { emptySet } from "@common/empty";
+import { filesToShare } from "@contexts/filesToShare";
+import { translation } from "@i18n";
+import { playlists } from "@contexts/playlists";
 import { Loading } from "./Loading";
 
 const { createServer } = electron.share;
@@ -22,13 +22,14 @@ const { createServer } = electron.share;
 
 const qrID = "qrcode-canvas";
 
-export default function ShareDialog() {
+export function ShareDialog() {
+	const filesToShareAccessor = useSnapshot(filesToShare);
 	const [server, setServer] = useReducer(reducer, null);
-	const { filesToShare } = useFilesToShare();
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
-	const plural = filesToShare.size > 1 ? "s" : "";
-	const shouldModalOpen = filesToShare.size;
+	const plural = filesToShareAccessor.size > 1 ? "s" : "";
+	const shouldModalOpen = filesToShareAccessor.size;
 
 	/////////////////////////////////////////
 
@@ -69,14 +70,14 @@ export default function ShareDialog() {
 		if (!shouldModalOpen) return;
 
 		try {
-			const clientServerApi = createServer([...filesToShare]);
+			const clientServerApi = createServer([...filesToShareAccessor]);
 
 			setServer(clientServerApi);
 		} catch (err) {
 			error(err);
 			closeShareDialog();
 		}
-	}, [filesToShare]);
+	}, [filesToShareAccessor]);
 
 	/////////////////////////////////////////
 
@@ -100,7 +101,7 @@ export default function ShareDialog() {
 					{plural}:
 				</p>
 
-				<ol>{namesOfFilesToShare(filesToShare)}</ol>
+				<ol>{namesOfFilesToShare()}</ol>
 			</div>
 
 			<canvas
@@ -122,13 +123,13 @@ export default function ShareDialog() {
 function closeShareDialog(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
-	setFilesToShare(emptySet);
+	filesToShare.clear();
 }
 
 /////////////////////////////////////////
 
-function namesOfFilesToShare(filesToShare: ReadonlySet<Path>): JSX.Element[] {
-	const mainList = getMainList();
+function namesOfFilesToShare(): JSX.Element[] {
+	const mainList = playlists.sortedByTitleAndMainList;
 
 	return Array.from(filesToShare, (id) => (
 		<li data-files-to-share key={id}>

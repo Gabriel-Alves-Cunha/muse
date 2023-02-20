@@ -1,15 +1,16 @@
 import type { Path } from "@common/@types/generalTypes";
 
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
+import { useSnapshot } from "valtio";
 
-import { getConvertingList, useConvertingList } from "@contexts/convertList";
+import { convertingList } from "@contexts/convertList";
 import { isDownloadList } from "../Downloading/Popup";
 import { ProgressStatus } from "@common/enums";
 import { formatDuration } from "@common/utils";
-import { useTranslation } from "@i18n";
 import { progressIcons } from "@components/Progress";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
+import { translation } from "@i18n";
 import { Button } from "../Button";
 import {
 	cancelConversionAndOrRemoveItFromList,
@@ -23,16 +24,17 @@ import { handleSingleItemDeleteAnimation } from "@components/Downloading/styles"
 /////////////////////////////////////////////
 
 export function Popup() {
-	const { convertingList } = useConvertingList();
-	const { t } = useTranslation();
+	const convertingListAccessor = useSnapshot(convertingList);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
-	return convertingList.size > 0 ? (
+	return convertingListAccessor.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
 				{t("buttons.cleanFinished")}
 			</Button>
 
-			{Array.from(convertingList, ([path, convertingMedia], index) => (
+			{Array.from(convertingListAccessor, ([path, convertingMedia], index) => (
 				<ConvertBox
 					mediaBeingConverted={convertingMedia}
 					convertionIndex={index}
@@ -53,7 +55,8 @@ function ConvertBox({
 	convertionIndex,
 	path,
 }: ConvertBoxProps) {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<div className="box">
@@ -92,7 +95,7 @@ function ConvertBox({
 // Helper functions for Popup:
 
 function cleanAllDoneConvertions(): void {
-	for (const [url, download] of getConvertingList())
+	for (const [url, download] of convertingList)
 		if (
 			download.status !==
 				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&

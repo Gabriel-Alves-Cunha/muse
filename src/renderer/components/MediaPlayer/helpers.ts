@@ -1,26 +1,8 @@
-import { getMedia, rescanMedia, usePlaylists } from "@contexts/usePlaylists";
+import { currentPlaying, playNextMedia } from "@contexts/currentPlaying";
+import { getMedia, rescanMedia } from "@contexts/playlists";
 import { formatDuration } from "@common/utils";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
-import {
-	getCurrentPlaying,
-	useCurrentPlaying,
-	playNextMedia,
-} from "@contexts/useCurrentPlaying";
-
-///////////////////////////////////////
-///////////////////////////////////////
-///////////////////////////////////////
-
-export const pathSelector = (
-	state: ReturnType<typeof useCurrentPlaying.getState>,
-) => state.path;
-
-///////////////////////////////////////
-
-export const mainListSelector = (
-	state: ReturnType<typeof usePlaylists.getState>,
-) => state.sortedByTitleAndMainList;
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -42,7 +24,7 @@ export const logStalled = (e: Event): void =>
 /////////////////////////////////////////
 
 export function handleLoadedData({ target: audio }: AudioEvent): void {
-	const { lastStoppedTime, path } = getCurrentPlaying();
+	const { lastStoppedTime, path } = currentPlaying;
 	const formatedDuration = formatDuration(audio.duration);
 	const media = getMedia(path);
 

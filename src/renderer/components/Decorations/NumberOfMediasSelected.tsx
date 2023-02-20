@@ -1,20 +1,20 @@
-import { useAllSelectedMedias } from "@contexts/useAllSelectedMedias";
-import { useTranslation } from "@i18n";
+import { useSnapshot } from "valtio";
 
-const sizeSelector = (
-	state: ReturnType<typeof useAllSelectedMedias.getState>,
-) => state.medias.size;
+import { allSelectedMedias } from "@contexts/allSelectedMedias";
+import { translation } from "@i18n";
 
 export function NumberOfMediasSelected() {
-	const numberOfMediasSelected = useAllSelectedMedias(sizeSelector);
-	const { t } = useTranslation();
+	const allSelectedMediasAccessor = useSnapshot(allSelectedMedias);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
-	const plural = numberOfMediasSelected > 1;
+	const numberOfMediasSelected = allSelectedMediasAccessor.size;
+	const isPlural = numberOfMediasSelected > 1;
 
 	return numberOfMediasSelected === 0 ? null : (
 		<p>
 			{numberOfMediasSelected} {t("decorations.selected")}
-			{plural ? "s" : ""}
+			{isPlural ? "s" : ""}
 		</p>
 	);
 }

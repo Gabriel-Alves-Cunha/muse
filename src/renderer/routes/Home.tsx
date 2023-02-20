@@ -9,16 +9,14 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export default function Home() {
-	return (
-		<MainArea>
-			<Header>
-				<SearchMedia />
+export const Home = () => (
+	<MainArea>
+		<Header>
+			<SearchMedia />
 
-				<GroupedButton reload sortBy />
-			</Header>
+			<GroupedButton reload sortBy />
+		</Header>
 
-			<MediaListKind isHome />
-		</MainArea>
-	);
-}
+		<MediaListKind isHome />
+	</MainArea>
+);

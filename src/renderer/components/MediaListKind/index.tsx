@@ -3,29 +3,29 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { useSnapshot } from "valtio";
 import { Virtuoso } from "react-virtuoso";
 
-import { isCtxMenuOpen, setIsCtxMenuOpen, useFromList } from "./states";
 import { CtxContentEnum, ContextMenu } from "../ContextMenu";
+import { isCtxMenuOpen, fromList } from "./states";
 import { itemContent, leftClick } from "./Row";
+import { PlaylistListEnum } from "@common/enums";
 import { resetAllAppData } from "@utils/app";
-import { useTranslation } from "@i18n";
 import { ErrorFallback } from "../ErrorFallback";
-import { playlistList } from "@common/enums";
 import { on, removeOn } from "@utils/window";
+import { translation } from "@i18n";
 import { error } from "@common/log";
 import { time } from "@utils/utils";
 import {
-	getAllSelectedMedias,
+	allSelectedMedias,
 	deselectAllMedias,
-} from "@contexts/useAllSelectedMedias";
+} from "@contexts/allSelectedMedias";
 import {
 	type MainList,
 	type History,
-	usePlaylists,
-	getMainList,
 	removeMedia,
-} from "@contexts/usePlaylists";
+	playlists,
+} from "@contexts/playlists";
 import {
 	selectAllMediasOnCtrlPlusA,
 	selectMediaByPointerEvent,
@@ -42,7 +42,7 @@ export const MediaListKind = ({ isHome }: Props) => (
 	<ErrorBoundary
 		FallbackComponent={() => (
 			<ErrorFallback
-				description={useTranslation().t(
+				description={translation.t(
 					"errors.mediaListKind.errorFallbackDescription",
 				)}
 			/>
@@ -62,20 +62,20 @@ export const MediaListKind = ({ isHome }: Props) => (
 // Main function:
 
 function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
-	const { fromList, homeList } = useFromList();
+	const fromListAccessor = useSnapshot(fromList);
 	const listRef = useRef<HTMLDivElement>(null);
 
 	// isHome is used to determine which list to use
 	// when the user is at the home page, the homeList is used
 	// then, cause it will have what the user has last set as the main list:
 	// either sortedByDate or sortedByName, in our current case.
-	const listName = isHome ? homeList : fromList;
-	const { [listName]: list } = usePlaylists();
+	const listName = isHome ? fromListAccessor.homeList : fromListAccessor.curr;
+	const { [listName]: list } = playlists;
 
 	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
 		() =>
 			time(() => {
-				if (listName === playlistList.mainList)
+				if (listName === PlaylistListEnum.mainList)
 					return Array.from(list as MainList, ([path, media]) => [
 						path,
 						media,
@@ -83,11 +83,11 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 					]);
 
 				if (
-					listName === playlistList.sortedByDate ||
-					listName === playlistList.favorites
+					listName === PlaylistListEnum.sortedByDate ||
+					listName === PlaylistListEnum.favorites
 				) {
 					const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = [];
-					const mainList = getMainList();
+					const mainList = playlists.sortedByTitleAndMainList;
 
 					for (const path of list as ReadonlySet<Path>) {
 						const media = mainList.get(path);
@@ -108,7 +108,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 				// Else if (listName === playlistList.history)
 				const unsortedList: [Path, Media, DateAsNumber][] = [];
-				const mainList = getMainList();
+				const mainList = playlists.sortedByTitleAndMainList;
 
 				for (const [path, dates] of list as History) {
 					const media = mainList.get(path);
@@ -134,7 +134,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	);
 
 	useEffect(() => {
-		useFromList.setState({ isHome });
+		fromList.isHome = isHome;
 	}, [isHome]);
 
 	useEffect(() => {
@@ -146,8 +146,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 			if (!isClickOutsideValid) return;
 
-			if (!isCtxMenuOpen() && getAllSelectedMedias().size > 0)
-				deselectAllMedias();
+			if (!isCtxMenuOpen && allSelectedMedias.size > 0) deselectAllMedias();
 		}
 
 		on("pointerup", handleDeselectAllMedias);
@@ -163,13 +162,13 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
 		<ContextMenu
 			wrapperProps={{ className: "max-w-2xl h-[87%]", ref: listRef }}
+			onOpenChange={(newValue) => (isCtxMenuOpen.curr = newValue)}
 			onContextMenu={selectMediaByPointerEvent}
 			content={CtxContentEnum.MEDIA_OPTIONS}
-			onOpenChange={setIsCtxMenuOpen}
 		>
 			<Virtuoso
 				computeItemKey={
-					listName === playlistList.history
+					listName === PlaylistListEnum.history
 						? computeHistoryItemKey
 						: computeItemKey
 				}
@@ -191,15 +190,17 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 /////////////////////////////////////////
 // Helper functions:
 
-const Footer = () => <div className="relative w-2 h-2 bg-none" />;
+const footer = <div className="relative w-2 h-2 bg-none" />;
+const Footer = () => footer;
 
-const EmptyPlaceholder = () => (
+const emptyPlaceholder = (
 	<div className="empty-placeholder">
 		<NoMediaFound className="w-14 h-14 mr-5" />
 
-		{useTranslation().t("alts.noMediasFound")}
+		{translation.t("alts.noMediasFound")}
 	</div>
 );
+const EmptyPlaceholder = () => emptyPlaceholder;
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };
 

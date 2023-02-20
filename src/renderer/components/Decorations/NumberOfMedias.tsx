@@ -1,19 +1,20 @@
-import { useTranslation } from "@i18n";
-import { usePlaylists } from "@contexts/usePlaylists";
+import { useSnapshot } from "valtio";
 
-const sizeSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.sortedByDate.size;
+import { translation } from "@i18n";
+import { playlists } from "@contexts/playlists";
 
 export function NumberOfMedias() {
-	const numberOfMedias = usePlaylists(sizeSelector);
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const playlistsAccessor = useSnapshot(playlists);
+	const t = translationAccessor.t;
 
-	const plural = numberOfMedias > 1;
+	const numberOfMedias = playlistsAccessor.sortedByDate.size;
+	const isPlural = numberOfMedias > 1;
 
 	return (
 		<p>
 			{numberOfMedias} {t("decorations.media")}
-			{plural ? "s" : ""}
+			{isPlural ? "s" : ""}
 		</p>
 	);
 }

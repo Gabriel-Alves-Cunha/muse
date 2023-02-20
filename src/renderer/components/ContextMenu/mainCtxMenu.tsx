@@ -1,6 +1,8 @@
+import { useSnapshot } from "valtio";
+
 import { ElectronIpcMainProcessNotification } from "@common/enums";
-import { selectAllMedias } from "@contexts/useAllSelectedMedias";
-import { useTranslation } from "@i18n";
+import { selectAllMedias } from "@contexts/allSelectedMedias";
+import { translation } from "@i18n";
 import { Separator } from "../Separator";
 import { RightSlot } from "../RightSlot";
 import { MenuItem } from "../MenuItem";
@@ -19,7 +21,8 @@ const toggleDeveloperTools = () =>
 /////////////////////////////////////////////
 
 export default function MainCtxMenu() {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<>

@@ -3,47 +3,34 @@ import type { ProgressProps } from "../Progress";
 import type { ValuesOf } from "@common/@types/utils";
 import type { Path } from "@common/@types/generalTypes";
 
-import { create } from "zustand";
-
-import { getConvertingList, setConvertingList } from "@contexts/convertList";
+import { ProgressStatus, ReactToElectronMessage } from "@common/enums";
 import { errorToast, infoToast, successToast } from "../toasts";
-import { error, assert, throwErr } from "@common/log";
 import { assertUnreachable } from "@utils/utils";
-import { ProgressStatus } from "@common/enums";
-import { useTranslation } from "@i18n";
-import { emptyMap } from "@common/empty";
+import { sendMsgToBackend } from "@common/crossCommunication";
+import { convertingList } from "@contexts/convertList";
+import { error, assert } from "@common/log";
+import { translation } from "@i18n";
 import { dbg } from "@common/debug";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-// Constants:
-
-export const useNewConvertions = create<NewConvertions>(() => ({
-	newConvertions: emptyMap,
-	toExtension: "mp3",
-}));
-
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
+// Main function:
 
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Path,
-): MessagePort {
-	const convertingList = getConvertingList();
-
+): void {
 	dbg("Trying to create a new conversion.", { convertingList });
 
 	if (convertingList.has(path)) {
-		const { t } = useTranslation.getState();
+		const { t } = translation;
 
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
-		error(info, convertingList);
 		infoToast(info);
-		throwErr(info);
+
+		return error(info, convertingList);
 	}
 
 	// MessageChannels are lightweight, it's cheap to create
@@ -51,16 +38,17 @@ export function createNewConvertion(
 	// communicate the progress and status of each download.
 	const { port1: frontEndPort, port2: backEndPort } = new MessageChannel();
 
+	// Sending port so we can communicate with electron:
+	sendMsgToBackend({ type: ReactToElectronMessage.CONVERT_MEDIA }, backEndPort);
+
 	// Add new conversion to the list:
-	setConvertingList(
-		new Map(convertingList).set(path, {
-			status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-			toExtension: convertInfo.toExtension,
-			port: frontEndPort,
-			timeConverted: 0,
-			sizeConverted: 0,
-		}),
-	);
+	convertingList.set(path, {
+		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		toExtension: convertInfo.toExtension,
+		port: frontEndPort,
+		timeConverted: 0,
+		sizeConverted: 0,
+	});
 
 	// On every `postMessage` you have to send the path (as an ID)!
 	frontEndPort.postMessage({ toExtension: convertInfo.toExtension, path });
@@ -73,8 +61,6 @@ export function createNewConvertion(
 	);
 
 	frontEndPort.start();
-
-	return backEndPort;
 }
 
 /////////////////////////////////////////////
@@ -89,8 +75,6 @@ export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
 /////////////////////////////////////////////
 
 export function cancelConversionAndOrRemoveItFromList(path: string): void {
-	const convertingList = getConvertingList();
-
 	const mediaBeingConverted = convertingList.get(path);
 
 	if (!mediaBeingConverted)
@@ -101,11 +85,7 @@ export function cancelConversionAndOrRemoveItFromList(path: string): void {
 		mediaBeingConverted.port.postMessage({ destroy: true, path });
 
 	// Remove from converting list
-	const newConvertingList = new Map(convertingList);
-	newConvertingList.delete(path);
-
-	// Make React update:
-	setConvertingList(newConvertingList);
+	convertingList.delete(path);
 }
 
 /////////////////////////////////////////////
@@ -116,8 +96,6 @@ function handleUpdateConvertingList(
 	{ data }: MessageEvent<PartialExceptStatus>,
 	path: Path,
 ): void {
-	const convertingList = getConvertingList();
-
 	dbg(`Received a message from Electron on port for "${path}":`, {
 		convertingList,
 		data,
@@ -131,11 +109,9 @@ function handleUpdateConvertingList(
 		);
 
 	// Update `convertingList`:
-	setConvertingList(
-		new Map(convertingList).set(path, { ...thisConversion, ...data }),
-	);
+	convertingList.set(path, { ...thisConversion, ...data });
 
-	const { t } = useTranslation.getState();
+	const { t } = translation;
 
 	// Handle status:
 	switch (data.status) {
@@ -199,10 +175,3 @@ export type ConvertInfo = { toExtension: AllowedMedias };
 type PartialExceptStatus = Partial<MediaBeingConverted> & {
 	status: ValuesOf<typeof ProgressStatus>;
 };
-
-/////////////////////////////////////////////
-
-type NewConvertions = Readonly<{
-	newConvertions: ReadonlyMap<Path, ConvertInfo>;
-	toExtension: AllowedMedias;
-}>;

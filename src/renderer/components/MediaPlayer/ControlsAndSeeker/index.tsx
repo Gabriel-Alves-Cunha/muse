@@ -1,3 +1,4 @@
+import { useSnapshot } from "valtio";
 import {
 	MdRepeatOne as RepeatOne,
 	MdShuffleOn as RandomOn,
@@ -6,14 +7,14 @@ import {
 } from "react-icons/md";
 
 import { CircleIconButton } from "@components/CircleIconButton";
-import { useTranslation } from "@i18n";
 import { SeekerWrapper } from "../Seeker";
+import { translation } from "@i18n";
 import { Controls } from "./Controls";
 import {
 	toggleLoopMedia,
-	usePlayOptions,
 	toggleRandom,
-} from "@contexts/usePlayOptions";
+	playOptions,
+} from "@contexts/playOptions";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -21,8 +22,9 @@ import {
 // Main function:
 
 export function ControlsAndSeeker({ isThereAMedia }: Props) {
-	const { isRandom, loopThisMedia } = usePlayOptions();
-	const { t } = useTranslation();
+	const playOptionsAccessor = useSnapshot(playOptions);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<div className="media-player-seeker">
@@ -34,7 +36,11 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 					onPointerUp={toggleLoopMedia}
 					disabled={!isThereAMedia}
 				>
-					{loopThisMedia ? <RepeatOne size="18" /> : <Repeat size="18" />}
+					{playOptionsAccessor.loopThisMedia ? (
+						<RepeatOne size="18" />
+					) : (
+						<Repeat size="18" />
+					)}
 				</CircleIconButton>
 
 				<Controls isThereAMedia={isThereAMedia} />
@@ -44,7 +50,11 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 					onPointerUp={toggleRandom}
 					disabled={!isThereAMedia}
 				>
-					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
+					{playOptionsAccessor.isRandom ? (
+						<RandomOn size="18" />
+					) : (
+						<RandomOff size="18" />
+					)}
 				</CircleIconButton>
 			</div>
 		</div>

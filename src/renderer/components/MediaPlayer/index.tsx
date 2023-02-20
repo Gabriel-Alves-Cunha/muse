@@ -1,17 +1,16 @@
 import { useEffect, useRef } from "react";
+import { useSnapshot } from "valtio";
 
 import { FlipCard, mediaPlayerFlipCardId } from "../FlipCard";
-import { useCurrentPlaying } from "@contexts/useCurrentPlaying";
-import { usePlaylists } from "@contexts/usePlaylists";
+import { currentPlaying } from "@contexts/currentPlaying";
+import { playlists } from "@contexts/playlists";
 import { Lyrics } from "./Lyrics";
 import { Player } from "./Player";
 import {
 	logSecurityPolicyViolation,
 	handleAudioCanPlay,
 	handleLoadedData,
-	mainListSelector,
 	handleEnded,
-	pathSelector,
 	logInvalid,
 	logStalled,
 	logAbort,
@@ -25,11 +24,12 @@ import {
 // Main function:
 
 export function MediaPlayer() {
-	const mainList = usePlaylists(mainListSelector);
+	const currentPlayingAccessor = useSnapshot(currentPlaying);
+	const playlistsAccessor = useSnapshot(playlists);
 	const audioRef = useRef<HTMLAudioElement>(null);
-	const path = useCurrentPlaying(pathSelector);
 
-	const media = mainList.get(path);
+	const path = currentPlayingAccessor.path;
+	const media = playlistsAccessor.sortedByTitleAndMainList.get(path);
 	const audio = audioRef.current;
 
 	useEffect(() => {

@@ -1,59 +1,27 @@
 import type { AllowedMedias } from "@common/utils";
-import type { Path } from "@common/@types/generalTypes";
+import type { ConvertInfo } from "@components/Converting/helper";
 
-import { useEffect, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
+import { useRef, useState } from "react";
+import { useSnapshot } from "valtio";
 
-import { useTranslation } from "@i18n";
+import { createNewConvertion } from "@components/Converting/helper";
+import { translation } from "@i18n";
 import { MainArea } from "@components/MainArea";
-import { emptyMap } from "@common/empty";
 import { Button } from "@components/Button";
-import {
-	type ConvertInfo,
-	useNewConvertions,
-} from "@components/Converting/helper";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main function:
 
-export default function Convert() {
-	const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>(emptyMap);
+export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
-	const { t } = useTranslation();
-
-	////////////////////////////////////////////////
-
-	function handleSelectedFiles({
-		target: { files },
-	}: React.ChangeEvent<HTMLInputElement>) {
-		if (!files?.length) return;
-
-		const map: Map<Path, ConvertInfo> = new Map();
-
-		for (const file of files) map.set(file.webkitRelativePath, { toExtension });
-
-		setSelectedFiles(map);
-	}
-
-	////////////////////////////////////////////////
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	const openNativeUI_ChooseFiles = () => inputRef.current?.click();
-
-	////////////////////////////////////////////////
-
-	// Start converting
-	useEffect(() => {
-		// If there are selected files, convert them:
-		if (selectedFiles.size === 0) return;
-
-		// To start convert, add to the convertInfoList:
-		useNewConvertions.setState({ newConvertions: selectedFiles, toExtension });
-
-		setSelectedFiles(emptyMap);
-	}, [selectedFiles, toExtension]);
 
 	////////////////////////////////////////////////
 
@@ -63,7 +31,7 @@ export default function Convert() {
 				<ConvertIcon size={18} />
 
 				<input
-					onChange={handleSelectedFiles}
+					onChange={(e) => handleSelectedFiles(e, toExtension)}
 					accept="video/*,audio/*"
 					className="hidden"
 					ref={inputRef}
@@ -80,6 +48,18 @@ export default function Convert() {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-// Types:
+// Helper function:
 
-type SelectedFiles = ReadonlyMap<Path, ConvertInfo>;
+function handleSelectedFiles(
+	{ target: { files } }: React.ChangeEvent<HTMLInputElement>,
+	toExtension: AllowedMedias,
+) {
+	if (!files?.length) return;
+
+	for (const file of files) {
+		const convertInfo: ConvertInfo = { toExtension };
+		const path = file.webkitRelativePath;
+
+		createNewConvertion(convertInfo, path);
+	}
+}

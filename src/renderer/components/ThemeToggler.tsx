@@ -1,17 +1,15 @@
-import { useState } from "react";
+import { useSnapshot } from "valtio";
 import {
 	MdLightbulbOutline as Light,
 	MdLightbulb as Dark,
 } from "react-icons/md";
 
-import { useTranslation } from "@i18n";
-import { setSettings } from "@contexts/settings";
+import { translation } from "@i18n";
+import { settings } from "@contexts/settings";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-
-const htmlDataset = document.documentElement.dataset;
 
 export const availableThemes = ["light", "dark"] as const;
 
@@ -21,17 +19,9 @@ export const availableThemes = ["light", "dark"] as const;
 // Main function:
 
 export function ThemeToggler() {
-	const [theme, setTheme] = useState(htmlDataset.theme as Theme);
-	const { t } = useTranslation();
-
-	const newTheme =
-		theme === availableThemes[0] ? availableThemes[1] : availableThemes[0];
-
-	const toggleTheme = () => {
-		setSettings((prev) => ({ ...prev, theme: newTheme }));
-		htmlDataset.theme = newTheme;
-		setTheme(newTheme);
-	};
+	const settingsAccessor = useSnapshot(settings);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<button
@@ -39,7 +29,7 @@ export function ThemeToggler() {
 			onPointerUp={toggleTheme}
 			data-toggle-theme-button
 		>
-			{theme === availableThemes[0] ? (
+			{settingsAccessor.theme === availableThemes[0] ? (
 				<Dark size="20px" />
 			) : (
 				<Light size="20px" />
@@ -48,9 +38,12 @@ export function ThemeToggler() {
 	);
 }
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Types:
+function toggleTheme() {
+	const newTheme =
+		settings.theme === availableThemes[0]
+			? availableThemes[1]
+			: availableThemes[0];
 
-type Theme = typeof availableThemes[number];
+	document.documentElement.dataset.theme = newTheme;
+	settings.theme = newTheme;
+}

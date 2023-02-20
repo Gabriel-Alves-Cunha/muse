@@ -1,7 +1,7 @@
 import type { DotNestedKeys } from "@common/@types/dotNestedKeys";
 import type { OneOf } from "@common/@types/utils";
 
-import { create } from "zustand";
+import { proxy } from "valtio";
 
 import { throwErr } from "@common/log";
 
@@ -19,22 +19,22 @@ import { throwErr } from "@common/log";
  * const locale = "en-US";
  * ```
  */
-export const makeUseTranslation = <TranslationData extends RecursiveObject>(
-	translations: TranslationData,
-	locale: OneOf<TranslationData>,
-) =>
-	create<UseTranslation<TranslationData>>((_set, get) => ({
+export function makeTranslation<Data extends RecursiveObject>(
+	translations: Data,
+	locale: OneOf<Data>,
+): Translation<Data> {
+	const state = proxy({
 		translations,
 		locale,
-		formatArgument: (value) =>
+		formatArgument: (value: string | number) =>
 			typeof value === "number"
-				? new Intl.NumberFormat(get().locale as string).format(value)
+				? new Intl.NumberFormat(state.locale as string).format(value)
 				: value,
-		t: (
-			key: DotNestedKeys<TranslationData[typeof locale]>,
+		t(
+			key: DotNestedKeys<Data[typeof locale]>,
 			// args: TranslationArguments = {},
-		) => {
-			const startObject = get().translations[get().locale];
+		) {
+			const startObject = state.translations[state.locale];
 			const keys = (key as string).split(".");
 			const lastPart = keys.at(-1) as string;
 			const targetObject = keys
@@ -47,7 +47,7 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 			if (typeof targetObject !== "object")
 				throwErr(`Missing translation: "${key}"!`);
 
-			const translation = targetObject[lastPart];
+			const translation = targetObject![lastPart];
 
 			if (typeof translation !== "string")
 				throwErr(`Missing translation: "${key}"!`);
@@ -57,7 +57,7 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 			// 				(prev, [name, value]) =>
 			// 					prev.replace(
 			// 						new RegExp(`{{\\s*${name}\\s*}}`, "g"),
-			// 						get().formatArgument(value),
+			// 						state.formatArgument(value),
 			// 					),
 			// 				translation,
 			// 			);
@@ -66,22 +66,20 @@ export const makeUseTranslation = <TranslationData extends RecursiveObject>(
 
 			return translation as string;
 		},
-	}));
+	});
 
-type RecursiveObject = {
-	[key: string]: RecursiveObject | string;
-};
+	return state;
+}
+
+type RecursiveObject = { [key: string]: RecursiveObject | string };
 
 type TranslationArguments = {
 	[name: string]: string | number;
 };
 
-type UseTranslation<TranslationData extends RecursiveObject> = {
-	formatArgument: (value: string | number) => string;
-	locale: OneOf<TranslationData>;
-	translations: TranslationData;
-	t: (
-		key: DotNestedKeys<TranslationData[OneOf<TranslationData>]>,
-		args?: TranslationArguments,
-	) => string;
+type Translation<Data extends RecursiveObject> = {
+	t(key: DotNestedKeys<Data[OneOf<Data>]>, args?: TranslationArguments): string;
+	formatArgument(value: string | number): string;
+	locale: OneOf<Data>;
+	translations: Data;
 };

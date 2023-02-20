@@ -1,23 +1,19 @@
-import type { Path } from "@common/@types/generalTypes";
-
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
+import { useSnapshot } from "valtio";
 import { useState } from "react";
 
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
 import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
-import { setFilesToShare } from "@contexts/filesToShare";
-import { useTranslation } from "@i18n";
+import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { CenteredModal } from "../CenteredModal";
+import { filesToShare } from "@contexts/filesToShare";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
-import { getSearcher } from "../SearchMedia/state";
+import { translation } from "@i18n";
 import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
 import { RightSlot } from "../RightSlot";
+import { searcher } from "../SearchMedia/state";
 import { MenuItem } from "../MenuItem";
-import {
-	setAllSelectedMedias,
-	getAllSelectedMedias,
-} from "@contexts/useAllSelectedMedias";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -25,8 +21,9 @@ import {
 // Main function:
 
 export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
+	const translationAccessor = useSnapshot(translation);
 	const [isOpen, setIsOpen] = useState(false);
-	const { t } = useTranslation();
+	const t = translationAccessor.t;
 
 	return (
 		<>
@@ -81,25 +78,19 @@ export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 // Helper functions:
 
 export function shareMedias() {
-	const filePathsToShare: Set<Path> = new Set();
-
-	for (const path of getAllSelectedMedias()) filePathsToShare.add(path);
-
-	setFilesToShare(filePathsToShare);
+	for (const path of allSelectedMedias) filesToShare.add(path);
 }
 
 /////////////////////////////////////////////
 
 function selectAllMediasOnSearchResult(): void {
-	const paths = getSearcher().results.map(([path]) => path);
-
-	setAllSelectedMedias(new Set(paths));
+	for (const [path] of searcher.results) allSelectedMedias.add(path);
 }
 
 /////////////////////////////////////////////
 
 export function searchForLyrics(): void {
-	for (const path of getAllSelectedMedias())
+	for (const path of allSelectedMedias)
 		searchAndOpenLyrics(path, !openLyrics).then();
 }
 

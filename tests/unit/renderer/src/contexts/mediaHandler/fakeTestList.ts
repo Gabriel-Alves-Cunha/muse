@@ -1,32 +1,35 @@
 import type { Path, Media } from "@common/@types/generalTypes";
 
+import { sortByTitle } from "@contexts/playlistsHelper";
 import { formatDuration } from "@common/utils";
-
-const { sortByTitle } = await import("@contexts/usePlaylistsHelper");
 
 // Make a test list full of fake medias:
 export const numberOfMedias = 30;
 
 // Make a test list full of fake medias sorted by path:
-export const testMap: ReadonlyMap<Path, Media> = sortByTitle(
+export const testMap: Map<Path, Media> = Object.freeze(
 	new Map(
-		Array.from({ length: numberOfMedias }, (_: undefined, index) => {
-			const title = `Test Title - ${index}`;
-			const media: Media = {
-				duration: formatDuration(index + 10),
-				lastModified: Date.now(),
-				birthTime: Date.now(),
-				size: 3_000,
-				genres: [],
-				artist: "",
-				lyrics: "",
-				album: "",
-				image: "",
-				title,
-			};
+		sortByTitle(
+			new Map(
+				Array.from({ length: numberOfMedias }, (_: undefined, index) => {
+					const title = `Test Title - ${index}`;
+					const media: Media = {
+						duration: formatDuration(index + 10),
+						lastModified: Date.now(),
+						birthTime: Date.now(),
+						size: 3_000,
+						genres: [],
+						artist: "",
+						lyrics: "",
+						album: "",
+						image: "",
+						title,
+					};
 
-			return [`~/Music/${title}`, media] as const;
-		}),
+					return [`~/Music/${title}`, media] as const;
+				}),
+			),
+		),
 	),
 );
 

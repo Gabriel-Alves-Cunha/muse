@@ -43,7 +43,7 @@ export function createOrCancelDownload(args: CreateDownload): void {
 			);
 
 		if (!args.extension)
-			throwErr(`'toExtension' is required. Received: "${args.extension}".`);
+			throwErr(`'extension' is required. Received: "${args.extension}".`);
 
 		if (!args.imageURL)
 			throwErr(`'imageURL' is required. Received: "${args.imageURL}".`);

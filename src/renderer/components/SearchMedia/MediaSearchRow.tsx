@@ -3,13 +3,14 @@ import type { Path, Media } from "@common/@types/generalTypes";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdMusicNote as MusicNote } from "react-icons/md";
 import { Suspense, lazy, useState } from "react";
+import { useSnapshot } from "valtio";
 
-import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
-import { getAllSelectedMedias } from "@contexts/useAllSelectedMedias";
+import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
+import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { ImgWithFallback } from "../ImgWithFallback";
-import { useTranslation } from "@i18n";
 import { CenteredModal } from "../CenteredModal";
-import { unDiacritic } from "@contexts/usePlaylists";
+import { translation } from "@i18n";
+import { unDiacritic } from "@contexts/playlists";
 
 const MediaOptionsModal = lazy(
 	() => import("../MediaListKind/MediaOptionsModal"),
@@ -25,15 +26,16 @@ export function MediaSearchRow({
 	media,
 	path,
 }: MediaSearchRowProps) {
-	const [isOpen, setIsOpen] = useState(false);
-	const { t } = useTranslation();
+	const [isMediaOptionsModalOpen, setIsMediaOptionsModalOpen] = useState(false);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (
 		<div
-			data-is-selected-row={getAllSelectedMedias().has(path)}
-			data-is-playing-row={getCurrentPlaying().path === path}
+			data-is-selected-row={allSelectedMedias.has(path)}
+			data-is-playing-row={currentPlaying.path === path}
 			className="media-search-row"
 			data-path={path}
 		>
@@ -64,21 +66,21 @@ export function MediaSearchRow({
 
 			<>
 				<button
+					onPointerUp={() => setIsMediaOptionsModalOpen(true)}
 					title={t("tooltips.openMediaOptions")}
 					className="icon-circle-modal-trigger"
-					onPointerUp={() => setIsOpen(true)}
 				>
 					<Dots size={17} />
 				</button>
 
 				<CenteredModal
 					className="grid max-w-md min-w-[300px] p-8 bg-dialog"
-					setIsOpen={setIsOpen}
-					isOpen={isOpen}
+					setIsOpen={setIsMediaOptionsModalOpen}
+					isOpen={isMediaOptionsModalOpen}
 				>
 					<Suspense>
 						<MediaOptionsModal
-							setIsOpen={setIsOpen}
+							setIsOpen={setIsMediaOptionsModalOpen}
 							media={media}
 							path={path}
 						/>

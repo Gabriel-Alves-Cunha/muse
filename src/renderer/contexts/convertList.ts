@@ -1,7 +1,7 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { Path } from "@common/@types/generalTypes";
 
-import { create } from "zustand";
+import { proxyMap } from "valtio/utils";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -72,26 +72,4 @@ import { create } from "zustand";
 ////////////////////////////////////////////////
 // Main functions:
 
-export const useConvertingList = create<ConvertingList>(() => ({
-	convertingList: new Map(),
-}));
-
-////////////////////////////////////////////////
-
-export const getConvertingList = () =>
-	useConvertingList.getState().convertingList;
-
-////////////////////////////////////////////////
-
-export const setConvertingList = (
-	convertingList: ConvertingList["convertingList"],
-) => useConvertingList.setState({ convertingList });
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-// Types:
-
-export type ConvertingList = Readonly<{
-	convertingList: ReadonlyMap<Path, MediaBeingConverted>;
-}>;
+export const convertingList = proxyMap<Path, MediaBeingConverted>();

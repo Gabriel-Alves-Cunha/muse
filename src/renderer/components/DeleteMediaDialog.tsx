@@ -1,5 +1,7 @@
-import { useTranslation } from "@i18n";
+import { useSnapshot } from "valtio";
+
 import { WarningSign } from "./WarningSign";
+import { translation } from "@i18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -10,7 +12,8 @@ export function DeleteMediaDialogContent({
 	handleDeleteMedia,
 	closeDialog,
 }: Props) {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<>

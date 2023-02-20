@@ -391,7 +391,7 @@
 	}
 
 	.media-search-row > button:first-child {
-		@apply relative flex items-center h-full w-[85%] bg-none border-none;
+		@apply relative flex items-center h-full w-[85%] bg-none border-none overflow-hidden overflow-ellipsis;
 	}
 
 	.media-search-row > button:first-child > div:first-child {
@@ -1078,7 +1078,7 @@
 	/* Popover */
 
 	[data-popover-content] {
-		@apply absolute p-2 no-transition scroll scroll-1 flex flex-col gap-3 bg-popover overflow-x-hidden rounded-xl shadow-popover z-40;
+		@apply absolute p-2 no-transition scroll scroll-1 flex flex-col gap-2 bg-popover overflow-x-hidden rounded-xl shadow-popover z-40;
 	}
 
 	/* Popover sizes */

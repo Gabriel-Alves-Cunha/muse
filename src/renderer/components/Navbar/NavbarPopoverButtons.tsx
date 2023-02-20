@@ -5,13 +5,13 @@ import { useState } from "react";
 import { Popover } from "@components/Popover";
 
 export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
 	return (
 		<>
 			<button
 				data-converting-downloading-list-popover-trigger
-				onPointerUp={() => setIsOpen(true)}
+				onPointerUp={() => setIsPopoverOpen(true)}
 				data-has-items={size > 0}
 				title={tooltip}
 			>
@@ -22,8 +22,8 @@ export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
 
 			<Popover
 				className="translate-x-[61%] -translate-y-1/2"
-				setIsOpen={setIsOpen}
-				isOpen={isOpen}
+				setIsOpen={setIsPopoverOpen}
+				isOpen={isPopoverOpen}
 				size={
 					size === 0
 						? "nothing-found-for-convertions-or-downloads"

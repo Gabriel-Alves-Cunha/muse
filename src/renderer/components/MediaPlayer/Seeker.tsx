@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { formatDuration } from "@common/utils";
 import { ControlsProps } from "./ControlsAndSeeker/Controls";
-import { getAudio } from "@contexts/useCurrentPlaying";
+import { getAudio } from "@contexts/currentPlaying";
 
 /////////////////////////////////////////
 /////////////////////////////////////////

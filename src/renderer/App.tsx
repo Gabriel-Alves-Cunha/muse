@@ -1,17 +1,24 @@
+import type { Page } from "@common/@types/generalTypes";
+
 import { ToastContainer } from "react-toastify";
-import { lazy, Suspense } from "react";
+import { useSnapshot } from "valtio";
+import { Suspense } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
-import { searchLocalComputerForMedias } from "@contexts/usePlaylists";
+import { searchLocalComputerForMedias } from "@contexts/playlists";
 import { handleWindowMsgs } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
-import { usePage } from "@contexts/page";
+import { ShareDialog } from "@components/ShareDialog";
+import { Favorites } from "./routes/Favorites";
+import { Download } from "./routes/Download";
+import { Convert } from "./routes/Convert";
+import { History } from "./routes/History";
 import { Navbar } from "@components/Navbar";
+import { Home } from "./routes/Home";
+import { page } from "@contexts/page";
 
 import "react-toastify/dist/ReactToastify.min.css";
-
-const ShareDialog = lazy(() => import("./components/ShareDialog"));
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -32,9 +39,7 @@ export function App() {
 				draggable
 			/>
 
-			<Suspense>
-				<ShareDialog />
-			</Suspense>
+			<ShareDialog />
 
 			<DecorationsTop />
 
@@ -57,29 +62,31 @@ export function App() {
 
 //////////////////////////////////////////
 
-const pages = {
-	Favorites: lazy(() => import("./routes/Favorites")),
-	Download: lazy(() => import("./routes/Download")),
-	Convert: lazy(() => import("./routes/Convert")),
-	History: lazy(() => import("./routes/History")),
-	Home: lazy(() => import("./routes/Home")),
+const pages: Readonly<Record<Page, JSX.Element>> = {
+	Favorites: <Favorites />,
+	Download: <Download />,
+	Convert: <Convert />,
+	History: <History />,
+	Home: <Home />,
 } as const;
 
 function PageToShow() {
-	const { page } = usePage();
+	const pageAccessor = useSnapshot(page);
 
-	const Page = pages[page];
-
-	return <Page />;
+	return pages[pageAccessor.curr];
 }
 
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
-// Do once on app start:
+// Do once on window load:
 
-window.addEventListener("message", handleWindowMsgs);
+window.addEventListener(
+	"load",
+	async () => {
+		window.addEventListener("message", handleWindowMsgs);
 
-//////////////////////////////////////////
-
-await searchLocalComputerForMedias();
+		await searchLocalComputerForMedias();
+	},
+	{ once: true },
+);

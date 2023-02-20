@@ -1,31 +1,28 @@
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
+import { useSnapshot } from "valtio";
 import { useState } from "react";
 
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
-import { useTranslation } from "@i18n";
 import { CenteredModal } from "../CenteredModal";
+import { translation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
 import { RightSlot } from "../RightSlot";
 import { MenuItem } from "../MenuItem";
 import {
-	useAllSelectedMedias,
-	getAllSelectedMedias,
+	allSelectedMedias,
 	selectAllMedias,
-} from "@contexts/useAllSelectedMedias";
-
-const sizeSelector = (
-	state: ReturnType<typeof useAllSelectedMedias.getState>,
-) => state.medias.size;
+} from "@contexts/allSelectedMedias";
 
 export default function MediaOptionsCtxMenu() {
 	// If there is none selected, disable:
-	const size = useAllSelectedMedias(sizeSelector);
+	const allSelectedMediasAccessor = useSnapshot(allSelectedMedias);
 	const [isOpen, setIsOpen] = useState(false);
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
-	const isDisabled = size === 0;
+	const isDisabled = allSelectedMediasAccessor.size === 0;
 
 	return (
 		<>
@@ -79,9 +76,9 @@ export default function MediaOptionsCtxMenu() {
 // Helper functions:
 
 export function deleteMedias(): void {
-	const promises = Array.from(getAllSelectedMedias(), (path) =>
-		deleteFile(path),
-	);
+	const promises: Promise<void>[] = [];
+
+	for (const path of allSelectedMedias) promises.push(deleteFile(path));
 
 	Promise.all(promises).then();
 }

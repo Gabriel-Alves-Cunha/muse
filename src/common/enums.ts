@@ -38,14 +38,13 @@ export const ElectronPreloadToMainElectronMessage = {
 export const ElectronIpcMainProcessNotification = {
 	TOGGLE_DEVELOPER_TOOLS: 2,
 	TOGGLE_MAXIMIZE: 3,
-	RELOAD_WINDOW: 4,
 	MINIMIZE: 5,
 	QUIT_APP: 6,
 } as const;
 
 /////////////////////////////////////////////
 
-export const playlistList = {
+export const PlaylistListEnum = {
 	mainList: "sortedByTitleAndMainList",
 	sortedByDate: "sortedByDate",
 	favorites: "favorites",

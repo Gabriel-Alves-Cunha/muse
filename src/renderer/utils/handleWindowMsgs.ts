@@ -3,21 +3,21 @@ import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
 import { ElectronToReactMessage } from "@common/enums";
 import { isAModifierKeyPressed } from "./keyboard";
+import { createNewDownload } from "@components/Downloading/helper";
 import { assertUnreachable } from "./utils";
-import { togglePlayPause } from "@contexts/useCurrentPlaying";
-import { setDownloadInfo } from "@components/Downloading";
-import { getMediaFiles } from "@contexts/usePlaylistsHelper";
-import { getSettings } from "@contexts/settings";
+import { togglePlayPause } from "@contexts/currentPlaying";
+import { getMediaFiles } from "@contexts/playlistsHelper";
 import { deleteFile } from "./deleteFile";
+import { settings } from "@contexts/settings";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
 	addToMainList,
 	rescanMedia,
-	getMainList,
 	removeMedia,
-} from "@contexts/usePlaylists";
+	playlists,
+} from "@contexts/playlists";
 
 const { transformPathsToMedias } = electron.media;
 
@@ -93,7 +93,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 		case CREATE_A_NEW_DOWNLOAD: {
 			dbg("[handleWindowMsgs()] Create a new download:", msg.downloadInfo);
-			setDownloadInfo(msg.downloadInfo);
+			createNewDownload(msg.downloadInfo);
 			break;
 		}
 
@@ -104,7 +104,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 			const {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			} = getSettings();
+			} = settings;
 
 			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
 
@@ -130,7 +130,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
-			if (!getMainList().has(mediaPath)) {
+			if (!playlists.sortedByDate.has(mediaPath)) {
 				error("Could not find media to delete.");
 				break;
 			}
@@ -165,7 +165,7 @@ export async function handleWindowMsgs(event: Event): Promise<void> {
 
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
-			if (!getMainList().has(mediaPath)) {
+			if (!playlists.sortedByDate.has(mediaPath)) {
 				error(`"${mediaPath}" not found!`);
 				break;
 			}

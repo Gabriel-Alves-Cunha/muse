@@ -1,11 +1,10 @@
 import type { Path, Media } from "@common/@types/generalTypes";
 import type { ValuesOf } from "@common/@types/utils";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import { create } from "zustand";
+import { subscribeKey } from "valtio/utils";
+import { proxy } from "valtio";
 
-import { searchMedia, unDiacritic } from "@contexts/usePlaylists";
-import { emptyArray } from "@common/empty";
+import { searchMedia, unDiacritic } from "@contexts/playlists";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -20,18 +19,12 @@ export const SearchStatus = {
 
 /////////////////////////////////////////
 
-const defaultSearcher: Searcher = {
+export const searcher = proxy<Searcher>({
 	searchStatus: SearchStatus.DOING_NOTHING,
-	results: emptyArray,
 	searchTerm: "",
 	highlight: "",
-};
-
-export const useSearcher = create<Searcher>()(
-	subscribeWithSelector((_set, _get, _api) => defaultSearcher),
-);
-
-export const { setState: setSearcher, getState: getSearcher } = useSearcher;
+	results: [],
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -41,44 +34,45 @@ export function setSearchTerm(e: InputChange): void {
 	// stopping propagation so the space key doesn't toggle play state.
 	e.stopPropagation();
 
-	setSearcher({
-		highlight: unDiacritic(e.target.value),
-		searchTerm: e.target.value,
-	});
+	searcher.highlight = unDiacritic(e.target.value);
+	searcher.searchTerm = e.target.value;
 }
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const setDefaultSearch = () => setSearcher(defaultSearcher);
+export const setDefaultSearch = () => {
+	searcher.searchStatus = SearchStatus.DOING_NOTHING;
+	searcher.searchTerm = "";
+	searcher.highlight = "";
+	searcher.results = [];
+};
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Search for medias:
 
-useSearcher.subscribe(
-	(state) => state.highlight,
-	(highlight) => {
-		if (highlight.length < 2)
-			return setSearcher({
-				searchStatus: SearchStatus.DOING_NOTHING,
-				results: emptyArray,
-			});
+subscribeKey(searcher, "highlight", () => {
+	if (searcher.highlight.length < 2) {
+		searcher.searchStatus = SearchStatus.DOING_NOTHING;
+		searcher.results.length = 0;
 
-		// This is, so far, not needed, cause searching is really fast!
-		// setSearcher({ results: emptyArray, searchStatus: SearchStatus.SEARCHING });
+		return;
+	}
 
-		const results = searchMedia(highlight);
-		const searchStatus =
-			results.length > 0
-				? SearchStatus.FOUND_SOMETHING
-				: SearchStatus.NOTHING_FOUND;
+	// This is, so far, not needed, cause searching is really fast!
+	// setSearcher({ results: emptyArray, searchStatus: SearchStatus.SEARCHING });
 
-		setSearcher({ searchStatus, results });
-	},
-);
+	const results = searchMedia(searcher.highlight);
+
+	searcher.results = results;
+	searcher.searchStatus =
+		results.length > 0
+			? SearchStatus.FOUND_SOMETHING
+			: SearchStatus.NOTHING_FOUND;
+});
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -87,7 +81,7 @@ useSearcher.subscribe(
 
 type Searcher = {
 	searchStatus: ValuesOf<typeof SearchStatus>;
-	results: readonly [Path, Media][];
+	results: [Path, Media][];
 	searchTerm: string;
 	highlight: string;
 };

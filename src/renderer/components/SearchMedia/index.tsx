@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useSnapshot } from "valtio";
+import { useRef } from "react";
 
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
 import { selectMediaByPointerEvent } from "../MediaListKind/helper";
 import { MediaSearchRow } from "./MediaSearchRow";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 import { RightSlot } from "../RightSlot";
 import { BaseInput } from "../BaseInput";
 import { Popover } from "../Popover";
@@ -11,46 +12,49 @@ import {
 	setDefaultSearch,
 	setSearchTerm,
 	SearchStatus,
-	useSearcher,
+	searcher,
 } from "./state";
 
 export function SearchMedia() {
-	const { searchStatus, results, searchTerm, highlight } = useSearcher();
+	// By default, state mutations are batched before triggering re-render.
+	// Sometimes, we want to disable the batching. The known use case of this is input.
+	const searcherAccessor = useSnapshot(searcher, { sync: true });
 	const searchWrapperRef = useRef<HTMLDivElement>(null);
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	const resultsJSXs: JSX.Element[] = [];
 
 	/////////////////////////////////////////
 
-	const foundSomething = searchStatus === SearchStatus.FOUND_SOMETHING;
-	const nothingFound = searchStatus === SearchStatus.NOTHING_FOUND;
+	const foundSomething =
+		searcherAccessor.searchStatus === SearchStatus.FOUND_SOMETHING;
+	const nothingFound =
+		searcherAccessor.searchStatus === SearchStatus.NOTHING_FOUND;
 	const shouldPopoverOpen = foundSomething || nothingFound;
 
 	/////////////////////////////////////////
 
-	for (const [path, media] of results)
+	for (const [path, media] of searcherAccessor.results)
 		resultsJSXs.push(
 			<MediaSearchRow
-				highlight={highlight}
+				highlight={searcherAccessor.highlight}
 				media={media}
-				key={path}
 				path={path}
+				key={path}
 			/>,
 		);
-	// onPointerDownOutside = { setDefaultSearch };
-	/////////////////////////////////////////
 
-	useEffect(() => {}, []);
+	/////////////////////////////////////////
 
 	return (
 		<div ref={searchWrapperRef}>
 			<BaseInput
 				RightSlot={<RightSlot id="searcher-right-slot">Alt+s</RightSlot>}
+				value={searcherAccessor.searchTerm}
 				label={t("labels.searchForSongs")}
 				onEscape={setDefaultSearch}
 				onChange={setSearchTerm}
-				value={searchTerm}
 				spellCheck="false"
 				autoCorrect="off"
 				accessKey="s"
@@ -74,7 +78,7 @@ export function SearchMedia() {
 					>
 						{nothingFound ? (
 							<div className="nothing-found">
-								Nothing was found for &quot;{searchTerm}&quot;
+								Nothing was found for &quot;{searcherAccessor.searchTerm}&quot;
 							</div>
 						) : (
 							// foundSomething:

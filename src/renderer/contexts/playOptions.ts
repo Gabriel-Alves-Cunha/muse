@@ -1,22 +1,30 @@
-import { create } from "zustand";
+import { proxy, subscribe } from "valtio";
 
-import { setPlayOptionsOnLocalStorage } from "./localStorageHelpers";
-import { getAudio } from "./useCurrentPlaying";
+import { localStorageKeys, setLocalStorage } from "@utils/localStorage";
+import { getAudio } from "./currentPlaying";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main:
 
-export const usePlayOptions = create<PlayOptions>()(
-	setPlayOptionsOnLocalStorage(() => ({
+let storagedPlayOptions: PlayOptions | undefined;
+const storagedPlayOptionsString = localStorage.getItem(
+	localStorageKeys.playOptions,
+);
+if (storagedPlayOptionsString)
+	storagedPlayOptions = JSON.parse(storagedPlayOptionsString);
+
+export const playOptions = proxy<PlayOptions>(
+	storagedPlayOptions ?? {
 		loopThisMedia: false,
 		isRandom: false,
-	})),
+	},
 );
 
-export const { getState: getPlayOptions, setState: setPlayOptions } =
-	usePlayOptions;
+subscribe(playOptions, () => {
+	setLocalStorage(localStorageKeys.playOptions, playOptions);
+});
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -27,17 +35,16 @@ export function toggleLoopMedia(): void {
 	const audio = getAudio();
 	if (!audio) return;
 
-	const loopThisMedia = !getPlayOptions().loopThisMedia;
+	const loopThisMedia = !playOptions.loopThisMedia;
 
+	playOptions.loopThisMedia = loopThisMedia;
 	audio.loop = loopThisMedia;
-
-	setPlayOptions({ loopThisMedia });
 }
 
 ////////////////////////////////////////////////
 
 export const toggleRandom = () =>
-	setPlayOptions({ isRandom: !getPlayOptions().isRandom });
+	(playOptions.isRandom = !playOptions.isRandom);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

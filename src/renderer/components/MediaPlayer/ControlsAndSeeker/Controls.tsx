@@ -1,12 +1,13 @@
+import { useSnapshot } from "valtio";
 import {
 	IoPlayBackSharp as Previous,
 	IoPlayForwardSharp as Next,
 } from "react-icons/io5";
 
-import { playPreviousMedia, playNextMedia } from "@contexts/useCurrentPlaying";
+import { playPreviousMedia, playNextMedia } from "@contexts/currentPlaying";
 import { CircleIconButton } from "@components/CircleIconButton";
 import { PlayPauseButton } from "./PlayPauseButton";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -14,7 +15,8 @@ import { useTranslation } from "@i18n";
 // Main function:
 
 export function Controls({ isThereAMedia }: ControlsProps) {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<div className="media-player-controls">

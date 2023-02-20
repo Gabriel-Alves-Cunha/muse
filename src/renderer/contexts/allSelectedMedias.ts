@@ -1,9 +1,9 @@
 import type { Path } from "@common/@types/generalTypes";
 
-import { subscribeWithSelector } from "zustand/middleware";
-import { create } from "zustand";
+import { subscribe } from "valtio";
+import { proxySet } from "valtio/utils";
 
-import { getSortedByDate } from "./usePlaylists";
+import { playlists } from "./playlists";
 import { emptySet } from "@common/empty";
 import { time } from "@utils/utils";
 
@@ -11,14 +11,7 @@ import { time } from "@utils/utils";
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const useAllSelectedMedias = create<{ medias: ReadonlySet<Path> }>()(
-	subscribeWithSelector((_set, _get, _api) => ({ medias: emptySet })),
-);
-
-export const getAllSelectedMedias = () =>
-	useAllSelectedMedias.getState().medias;
-export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
-	useAllSelectedMedias.setState({ medias });
+export const allSelectedMedias = proxySet<Path>();
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
@@ -28,22 +21,25 @@ export const setAllSelectedMedias = (medias: ReadonlySet<Path>) =>
 export const data_path = (path: Path) => `[data-path="${path}"]`;
 const isSelectedRowDataString = "isSelectedRow";
 
-useAllSelectedMedias.subscribe(
-	(state) => state.medias,
+subscribe(
+	allSelectedMedias,
 	// Handle decorate medias row
-	(selectedMedias, prevSelectedMedias): void =>
+	(data): void =>
 		time(() => {
+			console.log("data of allSelectedMedias =", data);
+			const [_operation, _path, newSelectedMedias, prevSelectedMedias] = data;
+
 			// Has to be this order:
 			for (const path of prevSelectedMedias)
 				for (const element of document.querySelectorAll(
 					data_path(path),
 				) as NodeListOf<HTMLElement>) {
-					if (selectedMedias.has(path)) continue;
+					if (newSelectedMedias.has(path)) continue;
 
 					element.dataset[isSelectedRowDataString] = "false";
 				}
 
-			for (const path of selectedMedias)
+			for (const path of newSelectedMedias)
 				for (const element of document.querySelectorAll(
 					data_path(path),
 				) as NodeListOf<HTMLElement>)
@@ -56,7 +52,7 @@ useAllSelectedMedias.subscribe(
 export const toggleSelectedMedia = (path: Path): void => {
 	time(
 		() =>
-			getAllSelectedMedias().has(path)
+			allSelectedMedias.has(path)
 				? removeFromAllSelectedMedias(path)
 				: addToAllSelectedMedias(path),
 		"toggleSelectedMedia",
@@ -66,40 +62,31 @@ export const toggleSelectedMedia = (path: Path): void => {
 ///////////////////////////////////////////////////
 
 export function addToAllSelectedMedias(path: Path): void {
-	const allSelectedMedias = getAllSelectedMedias();
-
-	if (allSelectedMedias.has(path)) return;
-
-	setAllSelectedMedias(new Set(allSelectedMedias).add(path));
+	allSelectedMedias.add(path);
 }
 
 ///////////////////////////////////////////////////
 
 export function removeFromAllSelectedMedias(path: Path): void {
-	const allSelectedMedias = getAllSelectedMedias();
-
-	if (!allSelectedMedias.has(path)) return;
-
-	const newSet = new Set(allSelectedMedias);
-	newSet.delete(path);
-
-	setAllSelectedMedias(newSet);
+	allSelectedMedias.delete(path);
 }
 
 ///////////////////////////////////////////////////
 
 export function deselectAllMedias(): void {
-	if (getAllSelectedMedias().size === 0) return;
+	if (allSelectedMedias.size === 0) return;
 
-	setAllSelectedMedias(emptySet);
+	allSelectedMedias.clear();
 }
 
 ///////////////////////////////////////////////////
 
 export function selectAllMedias(): void {
-	const sortedByDate = getSortedByDate();
+	const sortedByDate = playlists.sortedByDate;
 
-	if (getAllSelectedMedias().size === sortedByDate.size) return;
+	if (allSelectedMedias.size === sortedByDate.size) return;
 
-	setAllSelectedMedias(sortedByDate);
+	allSelectedMedias.clear();
+
+	for (const path of sortedByDate) allSelectedMedias.add(path);
 }

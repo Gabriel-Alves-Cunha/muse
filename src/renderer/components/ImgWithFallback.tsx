@@ -4,7 +4,7 @@ import { ReactToElectronMessage } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
 import { ValuesOf } from "@common/@types/utils";
-import { getMedia } from "@contexts/usePlaylists";
+import { getMedia } from "@contexts/playlists";
 import { error } from "@common/log";
 
 /////////////////////////////////////////////

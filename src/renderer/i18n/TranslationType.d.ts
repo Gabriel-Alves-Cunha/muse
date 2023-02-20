@@ -112,4 +112,7 @@ export type Translations = {
 
 /////////////////////////////////////////////
 
-type Labels = Omit<Record<keyof Media, string>, "birthTime" | "path" | "lastModified">;
+type Labels = Omit<
+	Record<keyof Media, string>,
+	"birthTime" | "path" | "lastModified"
+>;

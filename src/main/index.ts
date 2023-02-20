@@ -85,7 +85,7 @@ function createElectronWindow(): BrowserWindow {
 			webSecurity: true,
 			webgl: false,
 		},
-	}).once("ready-to-show", () => window.show);
+	}).once("ready-to-show", () => window.show());
 
 	/////////////////////////////////////////
 	/////////////////////////////////////////
@@ -263,11 +263,6 @@ ipcMain
 
 				case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
 					focusedWindow?.webContents.toggleDevTools();
-					break;
-				}
-
-				case ElectronIpcMainProcessNotification.RELOAD_WINDOW: {
-					focusedWindow?.reload();
 					break;
 				}
 

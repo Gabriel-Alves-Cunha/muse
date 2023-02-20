@@ -1,1 +1,2 @@
-export const Separator = () => <div data-separator />;
+const separator = <div data-separator />;
+export const Separator = () => separator;

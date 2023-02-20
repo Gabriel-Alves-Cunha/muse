@@ -1,15 +1,15 @@
 import type { Path } from "@common/@types/generalTypes";
 
 import { errorToast, successToast } from "@components/toasts";
-import { useTranslation } from "@i18n";
-import { removeMedia } from "@contexts/usePlaylists";
+import { removeMedia } from "@contexts/playlists";
 import { getBasename } from "@common/path";
+import { translation } from "@i18n";
 
 const { deleteFile: electronDeleteFile } = electron.fs;
 
 export async function deleteFile(path: Path): Promise<void> {
 	const wasDeleteSuccessfull = await electronDeleteFile(path);
-	const { t } = useTranslation.getState();
+	const { t } = translation;
 
 	if (wasDeleteSuccessfull) {
 		successToast(`${t("toasts.mediaDeletionSuccess")}"${getBasename(path)}"!`);

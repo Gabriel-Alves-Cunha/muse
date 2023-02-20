@@ -1,13 +1,15 @@
 import type { MetadataToChange } from "@common/@types/electron-window";
 import type { Media, Path } from "@common/@types/generalTypes";
 
+import { useSnapshot } from "valtio";
+
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { errorToast, successToast } from "../../toasts";
 import { ReactToElectronMessage } from "@common/enums";
 import { areArraysEqualByValue } from "@utils/array";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { useTranslation } from "@i18n";
 import { prettyBytes } from "@common/prettyBytes";
+import { translation } from "@i18n";
 import { log, error } from "@common/log";
 import { dbg } from "@common/debug";
 
@@ -21,7 +23,8 @@ export function changeMediaMetadata(
 	mediaPath: Path,
 	media: Media,
 ): void {
-	const { t } = useTranslation.getState();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	try {
 		const hasAnythingChanged = changeMetadataIfAllowed(

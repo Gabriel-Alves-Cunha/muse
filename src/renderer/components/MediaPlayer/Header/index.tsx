@@ -1,27 +1,26 @@
 import type { Path, Media } from "@common/@types/generalTypes";
 
+import { useSnapshot } from "valtio";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdFavorite as Favorite,
 } from "react-icons/md";
 
-import { toggleFavoriteMedia, usePlaylists } from "@contexts/usePlaylists";
+import { toggleFavoriteMedia, playlists } from "@contexts/playlists";
 import { LoadOrToggleLyrics } from "./LoadOrToggleLyrics";
 import { CircleIconButton } from "@components/CircleIconButton";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-
-const favoritesSelector = (state: ReturnType<typeof usePlaylists.getState>) =>
-	state.favorites;
 
 export function Header({ media, path, displayTitle = false }: HeaderProps) {
-	const favorites = usePlaylists(favoritesSelector);
-	const { t } = useTranslation();
+	const playlistsAccessor = useSnapshot(playlists);
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
-	const isFavorite = favorites.has(path);
+	const isFavorite = playlistsAccessor.favorites.has(path);
 
 	return (
 		<div className="media-player-header">

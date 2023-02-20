@@ -3,16 +3,17 @@ import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
 import { memo, Suspense, lazy, useState } from "react";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
+import { useSnapshot } from "valtio";
 
-import { getCurrentPlaying, playThisMedia } from "@contexts/useCurrentPlaying";
+import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
 import { ImgWithFallback } from "../ImgWithFallback";
-import { useTranslation } from "@i18n";
 import { CenteredModal } from "../CenteredModal";
-import { getFromList } from "./states";
+import { translation } from "@i18n";
+import { fromList } from "./states";
 import {
-	getAllSelectedMedias,
 	toggleSelectedMedia,
-} from "@contexts/useAllSelectedMedias";
+	allSelectedMedias,
+} from "@contexts/allSelectedMedias";
 
 const MediaOptionsModal = lazy(() => import("./MediaOptionsModal"));
 
@@ -28,8 +29,8 @@ function selectOrPlayMedia(
 	mediaPath: Path,
 ): void {
 	if (e.button !== leftClick || !e.ctrlKey) {
-		const { fromList, homeList, isHome } = getFromList();
-		const list = isHome ? homeList : fromList;
+		const { curr, homeList, isHome } = fromList;
+		const list = isHome ? homeList : curr;
 
 		return playThisMedia(mediaPath, list);
 	}
@@ -44,13 +45,14 @@ function selectOrPlayMedia(
 
 const Row = memo<RowProps>(
 	({ media, path }) => {
+		const translationAccessor = useSnapshot(translation);
 		const [isOpen, setIsOpen] = useState(false);
-		const { t } = useTranslation();
+		const t = translationAccessor.t;
 
 		return (
 			<div
-				data-is-selected-row={getAllSelectedMedias().has(path)}
-				data-is-playing-row={getCurrentPlaying().path === path}
+				data-is-selected-row={allSelectedMedias.has(path)}
+				data-is-playing-row={currentPlaying.path === path}
 				data-row-wrapper
 				data-path={path}
 			>

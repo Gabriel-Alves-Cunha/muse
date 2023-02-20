@@ -1,5 +1,6 @@
 import type { Page } from "@common/@types/generalTypes";
 
+import { useSnapshot } from "valtio";
 import {
 	MdOutlineVideoLibrary as Home,
 	// MdOutlineSettings as Settings,
@@ -9,9 +10,9 @@ import {
 	MdHistory as History,
 } from "react-icons/md";
 
-import { setPage, usePage } from "@contexts/page";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 import { pages } from "@utils/app";
+import { page } from "@contexts/page";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -28,19 +29,20 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 /////////////////////////////////////////
 
 export function ButtonsForPages() {
-	const currPage = usePage().page;
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const pageAccessor = useSnapshot(page);
+	const t = translationAccessor.t;
 
 	return (
 		<div className="buttons-for-pages">
-			{pages.map((page) => (
+			{pages.map((page_) => (
 				<button
-					title={t("tooltips.goto") + t(`pages.${page}`)}
-					onPointerUp={() => setPage({ page })}
-					data-active={page === currPage}
-					key={page}
+					title={t("tooltips.goto") + t(`pages.${page_}`)}
+					data-active={page_ === pageAccessor.curr}
+					onPointerUp={() => (page.curr = page_)}
+					key={page_}
 				>
-					{icons[page]}
+					{icons[page_]}
 				</button>
 			))}
 		</div>

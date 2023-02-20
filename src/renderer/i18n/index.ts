@@ -1,8 +1,8 @@
-import { makeUseTranslation } from "./useTranslation";
 import { pt_BR_Translations } from "./pt-BR";
 import { en_US_Translations } from "./en-US";
+import { makeTranslation } from "./translation";
 
-export const useTranslation = makeUseTranslation(
+export const translation = makeTranslation(
 	{
 		"pt-BR": pt_BR_Translations,
 		"en-US": en_US_Translations,
@@ -10,6 +10,7 @@ export const useTranslation = makeUseTranslation(
 	"en-US",
 );
 
-export type UserAvailableLanguages = keyof ReturnType<
-	Pick<typeof useTranslation, "getState">["getState"]
+export type UserAvailableLanguages = keyof Pick<
+	typeof translation,
+	"translations"
 >["translations"];

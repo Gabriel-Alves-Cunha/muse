@@ -1,8 +1,8 @@
-import type { CurrentPlaying } from "@contexts/useCurrentPlaying";
+import type { CurrentPlaying } from "@contexts/currentPlaying";
 import type { Path, Media } from "@common/@types/generalTypes";
-import type { PlayOptions } from "@contexts/usePlayOptions";
+import type { PlayOptions } from "@contexts/playOptions";
 import type { TypeOfMap } from "@common/@types/utils";
-import type { History } from "@contexts/usePlaylists";
+import type { History } from "@contexts/playlists";
 
 import { dbgPlaylists } from "@common/debug";
 
@@ -35,7 +35,7 @@ export function setLocalStorage(key: LocalStorageKeys, value: Values): void {
 		dbgPlaylists({ key, json, value });
 
 		localStorage.setItem(key, json);
-	}, 500);
+	}, 1_000);
 }
 
 ////////////////////////////////////////////////

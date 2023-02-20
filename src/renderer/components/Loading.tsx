@@ -1,1 +1,2 @@
-export const Loading = () => <div data-loading />;
+const loading = <div data-loading />;
+export const Loading = () => loading;

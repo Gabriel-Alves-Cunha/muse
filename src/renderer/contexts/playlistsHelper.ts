@@ -1,5 +1,5 @@
-import type { MainList } from "./usePlaylists";
-import type { Path } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/generalTypes";
+import type { MainList } from "./playlists";
 
 import { log } from "@common/log";
 
@@ -26,26 +26,24 @@ export function getMediaFiles(fileList: FileList): readonly File[] {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByDateOfBirth(list: MainList): ReadonlySet<Path> {
-	const listAsArrayOfPaths = [...list]
-		.sort(
-			([, { birthTime: prevBirthTime }], [, { birthTime: nextBirthTime }]) =>
-				prevBirthTime > nextBirthTime
-					? 1
-					: prevBirthTime < nextBirthTime
-					? -1
-					: 0,
-		)
-		.map(([path]) => path);
+export function sortByDateOfBirth(list: MainList): [Path, Media][] {
+	const listAsArrayOfPaths = [...list].sort(
+		([, { birthTime: prevBirthTime }], [, { birthTime: nextBirthTime }]) =>
+			prevBirthTime > nextBirthTime
+				? 1
+				: prevBirthTime < nextBirthTime
+				? -1
+				: 0,
+	);
 
-	return new Set(listAsArrayOfPaths);
+	return listAsArrayOfPaths;
 }
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByTitle(list: MainList): MainList {
+export function sortByTitle(list: MainList): [Path, Media][] {
 	const listAsArrayOfPaths = [...list].sort(
 		([, { title: prevTitle }], [, { title: nextTitle }]) => {
 			prevTitle = prevTitle.toLowerCase();
@@ -55,5 +53,5 @@ export function sortByTitle(list: MainList): MainList {
 		},
 	);
 
-	return new Map(listAsArrayOfPaths);
+	return listAsArrayOfPaths;
 }

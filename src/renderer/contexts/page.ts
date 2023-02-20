@@ -1,9 +1,5 @@
 import type { Page } from "@common/@types/generalTypes";
 
-import { create } from "zustand";
+import { proxy } from "valtio";
 
-export const usePage = create<{ page: Page }>(() => ({
-	page: "Home",
-}));
-
-export const { setState: setPage } = usePage;
+export const page = proxy<{ curr: Page }>({ curr: "Home" });

@@ -2,10 +2,11 @@ import type { ControlsProps } from "./Controls";
 
 import { IoPauseSharp as Pause, IoPlaySharp as Play } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import { useSnapshot } from "valtio";
 
-import { getAudio, togglePlayPause } from "@contexts/useCurrentPlaying";
+import { getAudio, togglePlayPause } from "@contexts/currentPlaying";
 import { CircleIconButton } from "@components/CircleIconButton";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -13,8 +14,9 @@ import { useTranslation } from "@i18n";
 // Main function:
 
 export function PlayPauseButton({ isThereAMedia }: ControlsProps) {
+	const translationAccessor = useSnapshot(translation);
 	const [isPaused, setIsPaused] = useState(true);
-	const { t } = useTranslation();
+	const t = translationAccessor.t;
 
 	const setIsPausedToFalse = () => setIsPaused(false);
 	const setIsPausedToTrue = () => setIsPaused(true);

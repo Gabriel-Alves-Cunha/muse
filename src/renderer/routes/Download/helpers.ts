@@ -1,10 +1,9 @@
-import { create } from "zustand";
+import { proxy } from "valtio";
 
-import { setDownloadInfo } from "@components/Downloading";
+import { createNewDownload } from "@components/Downloading/helper";
 import { getErrorMessage } from "@utils/error";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 import { error } from "@common/log";
-import { dbg } from "@common/debug";
 
 const { getBasicInfo } = electron.media;
 
@@ -13,16 +12,19 @@ const { getBasicInfo } = electron.media;
 ////////////////////////////////////////////////
 // Constants:
 
-const defaultSearchInfo: SearcherInfo = {
+export const searchInfo = proxy<SearcherInfo>({
 	result: { imageURL: "", artist: "", title: "" },
 	isLoading: false,
 	error: "",
 	url: "",
-};
+});
 
-export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
-
-export const { setState: setSearchInfo, getState: searchInfo } = useSearchInfo;
+function setDefaultSearchInfo() {
+	searchInfo.result = { imageURL: "", artist: "", title: "" };
+	searchInfo.isLoading = false;
+	searchInfo.error = "";
+	searchInfo.url = "";
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -33,15 +35,15 @@ export function downloadMedia(): void {
 	const {
 		result: { artist, imageURL, title },
 		url,
-	} = searchInfo();
+	} = searchInfo;
 
 	if (!(title && url)) return;
 
 	// Setting 'downloadInfo' will download 'url':
-	setDownloadInfo({ imageURL, title, url, artist });
+	createNewDownload({ imageURL, title, url, artist, extension: "mp3" });
 
 	// Clear input:
-	setSearchInfo(defaultSearchInfo);
+	setDefaultSearchInfo();
 }
 
 ////////////////////////////////////////////////
@@ -50,7 +52,7 @@ export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
 	// stopping propagation so the space key doesn't toggle play state.
 	e.stopPropagation();
 
-	setSearchInfo({ url: e.target.value });
+	searchInfo.url = e.target.value;
 }
 
 ////////////////////////////////////////////////
@@ -58,11 +60,8 @@ export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
 export async function search(url: Readonly<string>): Promise<void> {
 	if (url.length < 16) return;
 
-	setSearchInfo({
-		result: defaultSearchInfo.result,
-		isLoading: true,
-		error: "",
-	});
+	setDefaultSearchInfo();
+	searchInfo.isLoading = true;
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -74,17 +73,15 @@ export async function search(url: Readonly<string>): Promise<void> {
 			title,
 		};
 
-		setSearchInfo({ isLoading: false, result });
+		searchInfo.isLoading = false;
+		searchInfo.result = result;
 	} catch (err) {
-		const { t } = useTranslation.getState();
+		const { t } = translation;
 
-		setSearchInfo({
-			result: defaultSearchInfo.result,
-			isLoading: false,
-			error: getErrorMessage(err).includes("No video id found")
-				? t("errors.noVideoIdFound")
-				: t("errors.gettingMediaInfo"),
-		});
+		setDefaultSearchInfo();
+		searchInfo.error = getErrorMessage(err).includes("No video id found")
+			? t("errors.noVideoIdFound")
+			: t("errors.gettingMediaInfo");
 
 		error(err);
 	}

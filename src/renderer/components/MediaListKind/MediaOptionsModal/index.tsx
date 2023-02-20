@@ -7,9 +7,9 @@ import { MdClose as CloseIcon } from "react-icons/md";
 
 import { DeleteMediaDialogContent } from "../../DeleteMediaDialog";
 import { isAModifierKeyPressed } from "@utils/keyboard";
-import { useTranslation } from "@i18n";
 import { CenteredModal } from "../../CenteredModal";
 import { on, removeOn } from "@utils/window";
+import { translation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
 import { Button } from "../../Button";
 import { dbg } from "@common/debug";
@@ -20,6 +20,7 @@ import {
 	visibleData,
 	format,
 } from "./helpers";
+import { useSnapshot } from "valtio";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -34,7 +35,9 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef("");
-	const { t } = useTranslation();
+
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 

@@ -3,43 +3,26 @@ import type { Media } from "@common/@types/generalTypes";
 import { beforeEach, describe, expect, it } from "vitest";
 
 // Getting everything ready for the tests...
-import { mockElectronPlusNodeGlobalsBeforeTests } from "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
-mockElectronPlusNodeGlobalsBeforeTests();
-//
+import "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
 
 import { arrayFromMainList, numberOfMedias } from "./fakeTestList";
+import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
 import { cleanUpBeforeEachTest } from "./beforeEach";
-import { getAllSelectedMedias } from "@contexts/useAllSelectedMedias";
-import { playlistList } from "@common/enums";
+import { allSelectedMedias } from "@contexts/allSelectedMedias";
+import { PlaylistListEnum } from "@common/enums";
+import { formatDuration } from "@common/utils";
+import { getRandomInt } from "@utils/utils";
+import { getFirstKey } from "@utils/map-set";
+import { searchMedia } from "@contexts/playlists";
 import {
 	replaceEntireMainList,
-	removeFromFavorites,
-	addToFavorites,
 	addToMainList,
-	cleanAllLists,
+	clearAllLists,
 	addToHistory,
 	rescanMedia,
 	removeMedia,
-} from "@contexts/usePlaylists";
-
-const { formatDuration } = await import("@common/utils");
-const { getRandomInt } = await import("@utils/utils");
-const { getFirstKey } = await import("@utils/map-set");
-const { getFavorites, searchMedia, getMainList, getHistory } = await import(
-	"@contexts/usePlaylists"
-);
-const { getCurrentPlaying, playThisMedia } = await import(
-	"@contexts/useCurrentPlaying"
-);
-
-it("replaceEntireMainList() should update the mediaList and others", () => {
-	replaceEntireMainList(new Map());
-
-	expect(getAllSelectedMedias().size).toEqual(0);
-	expect(getFavorites().size).toEqual(0);
-	expect(getMainList().size).toEqual(0);
-	expect(getHistory().size).toEqual(0);
-});
+	playlists,
+} from "@contexts/playlists";
 
 describe("Testing usePlaylists", () => {
 	/////////////////////////////////////////////
@@ -51,6 +34,18 @@ describe("Testing usePlaylists", () => {
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
+	it("replaceEntireMainList() should update the mediaList and others", () => {
+		replaceEntireMainList(new Map());
+
+		expect(playlists.sortedByTitleAndMainList.size).toEqual(0);
+		expect(playlists.favorites.size).toEqual(0);
+		expect(allSelectedMedias.size).toEqual(0);
+		expect(playlists.history.size).toEqual(0);
+	});
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
 
 	it("playThisMedia() should play a chosen media", () => {
 		for (const _ of arrayFromMainList) {
@@ -58,8 +53,8 @@ describe("Testing usePlaylists", () => {
 				arrayFromMainList[getRandomInt(0, numberOfMedias)]![0];
 			expect(randomMediaPath).toBeTruthy();
 
-			playThisMedia(randomMediaPath, playlistList.mainList);
-			expect(getCurrentPlaying().path).toBe(randomMediaPath);
+			playThisMedia(randomMediaPath, PlaylistListEnum.mainList);
+			expect(currentPlaying.path).toBe(randomMediaPath);
 		}
 	});
 
@@ -77,7 +72,7 @@ describe("Testing usePlaylists", () => {
 
 			addToHistory(mediaPathToAdd);
 
-			const newHistory = getHistory();
+			const newHistory = playlists.history;
 
 			expect(getFirstKey(newHistory)).toBe(mediaPathToAdd);
 			expect(newHistory.size).toBe(1);
@@ -96,9 +91,9 @@ describe("Testing usePlaylists", () => {
 		const addOneMediaToFavorites = () => {
 			const [mediaPath] = arrayFromMainList[1]!;
 
-			addToFavorites(mediaPath);
+			playlists.favorites.add(mediaPath);
 
-			const newFavorites = getFavorites();
+			const newFavorites = playlists.favorites;
 
 			expect(newFavorites.has(mediaPath)).toBe(true);
 			expect(newFavorites.size).toBe(1);
@@ -119,13 +114,13 @@ describe("Testing usePlaylists", () => {
 
 		it("removeFromFavorites() should remove one media of favorites", () => {
 			addOneMediaToFavorites();
-			expect(getFavorites().size).toBe(1);
-			const [path] = getFavorites();
+			expect(playlists.favorites.size).toBe(1);
+			const [path] = playlists.favorites;
 			expect(path).toBeTruthy();
 
-			removeFromFavorites(path!);
+			playlists.favorites.delete(path!);
 
-			expect(getFavorites().size).toBe(0);
+			expect(playlists.favorites.size).toBe(0);
 		});
 	});
 
@@ -143,11 +138,11 @@ describe("Testing usePlaylists", () => {
 			const [path, newMedia] = arrayFromMainList[anyIndex]!;
 			expect(path).toBeTruthy();
 
-			expect(getMainList().has(path)).toBe(true);
+			expect(playlists.sortedByTitleAndMainList.has(path)).toBe(true);
 
 			addToMainList(path, newMedia);
 
-			expect(getMainList().size).toBe(numberOfMedias);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
 		});
 
 		/////////////////////////////////////////////
@@ -170,11 +165,11 @@ describe("Testing usePlaylists", () => {
 				title,
 			};
 
-			expect(getMainList().size).toBe(numberOfMedias);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
 
 			addToMainList(newPath, newMedia);
 
-			const newMainList = getMainList();
+			const newMainList = playlists.sortedByTitleAndMainList;
 
 			expect(newMainList.size).toBe(numberOfMedias + 1);
 			expect(newMainList.has(newPath)).toBe(true);
@@ -185,19 +180,19 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 
 		it("removeMedia() should remove one media of mainList", () => {
-			expect(getMainList().size).toBe(numberOfMedias);
-			expect(getFavorites().size).toBe(0);
-			expect(getHistory().size).toBe(0);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
+			expect(playlists.favorites.size).toBe(0);
+			expect(playlists.history.size).toBe(0);
 
 			const anyIndex = getRandomInt(0, numberOfMedias);
 			const [path] = arrayFromMainList[anyIndex]!;
 			expect(path).toBeTruthy();
 
-			expect(getMainList().size).toBe(numberOfMedias);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
 
 			removeMedia(path);
 
-			const newMainList = getMainList();
+			const newMainList = playlists.sortedByTitleAndMainList;
 			expect(newMainList.has(path)).toBe(false);
 			expect(newMainList.size).toBe(numberOfMedias - 1);
 		});
@@ -207,13 +202,13 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 
 		it("cleanAllLists() should clean all lists", () => {
-			cleanAllLists();
+			clearAllLists();
 
-			expect(getAllSelectedMedias().size).toBe(0);
-			expect(getCurrentPlaying().path).toBe("");
-			expect(getFavorites().size).toBe(0);
-			expect(getMainList().size).toBe(0);
-			expect(getHistory().size).toBe(0);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(0);
+			expect(playlists.favorites.size).toBe(0);
+			expect(allSelectedMedias.size).toBe(0);
+			expect(playlists.history.size).toBe(0);
+			expect(currentPlaying.path).toBe("");
 		});
 
 		/////////////////////////////////////////////
@@ -226,11 +221,11 @@ describe("Testing usePlaylists", () => {
 			const title = "I'm an updated title";
 			const newMedia: Media = { ...oldMedia, title, size };
 
-			expect(getMainList().size).toBe(numberOfMedias);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
 
 			rescanMedia(path, newMedia);
 
-			const newMainList = getMainList();
+			const newMainList = playlists.sortedByTitleAndMainList;
 			const refreshedMedia = newMainList.get(path);
 
 			expect(refreshedMedia).toBeTruthy();

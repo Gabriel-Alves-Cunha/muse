@@ -1,3 +1,4 @@
+import { useSnapshot } from "valtio";
 import {
 	VscChromeMaximize as Maximize,
 	VscChromeMinimize as Minimize,
@@ -8,9 +9,9 @@ import { toggleMaximize, minimizeWindow, closeWindow } from "./helper";
 import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
-import { useTranslation } from "@i18n";
+import { translation } from "@i18n";
 import { MediasInfo } from "../Decorations/MediasInfo";
-import { usePage } from "@contexts/page";
+import { page } from "@contexts/page";
 
 // @ts-ignore => This is ok:
 import imageUrl from "@assets/logo.svg";
@@ -21,7 +22,8 @@ import imageUrl from "@assets/logo.svg";
 
 // Window draggable region:
 export function DecorationsTop() {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<header className="decorations-up">
@@ -59,7 +61,8 @@ const WindowButton = (props: WindowButtonProps) => (
 /////////////////////////////////////////////
 
 function Buttons() {
-	const { t } = useTranslation();
+	const translationAccessor = useSnapshot(translation);
+	const t = translationAccessor.t;
 
 	return (
 		<div className="flex ml-auto h-full bg-transparent">
@@ -91,11 +94,11 @@ function Buttons() {
 /////////////////////////////////////////////
 
 function AppNamePlusFolder() {
-	const { page } = usePage();
+	const pageAccessor = useSnapshot(page);
 
 	return (
 		<div className="app-name-plus-folder">
-			{capitalizedAppName} • {page}
+			{capitalizedAppName} • {pageAccessor.curr}
 		</div>
 	);
 }
