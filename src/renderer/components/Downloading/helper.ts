@@ -1,8 +1,8 @@
 import type { MediaBeingDownloaded } from ".";
-import type { DownloadInfo } from "@common/@types/generalTypes";
-import type { ValuesOf } from "@common/@types/utils";
+import type { DownloadInfo } from "@common/@types/GeneralTypes";
+import type { ValuesOf } from "@common/@types/Utils";
 
-import { ProgressStatus, ReactToElectronMessage } from "@common/enums";
+import { ProgressStatusEnum, ReactToElectronMessageEnum } from "@common/enums";
 import { errorToast, infoToast, successToast } from "../toasts";
 import { logThatPortIsClosing } from "../Converting/helper";
 import { assertUnreachable } from "@utils/utils";
@@ -15,6 +15,8 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+
+const { t } = translation;
 
 /**
  * This function returns a MessagePort that will be sent to
@@ -29,8 +31,6 @@ export function createNewDownload(downloadInfo: DownloadInfo): void {
 	// First, see if there is another one that has the same url
 	// and quit if true:
 	if (downloadingList.has(url)) {
-		const { t } = translation;
-
 		const info = `${t("toasts.downloadAlreadyExists")}"${title}"`;
 
 		infoToast(info);
@@ -46,13 +46,13 @@ export function createNewDownload(downloadInfo: DownloadInfo): void {
 
 	// Sending port so we can communicate with Electron:
 	sendMsgToBackend(
-		{ type: ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD },
+		{ type: ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD },
 		backEndPort,
 	);
 
 	// Creating a new DownloadingMedia and adding it to the list:
 	downloadingList.set(url, {
-		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		status: ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		port: frontEndPort,
 		percentage: 0,
 		imageURL,
@@ -91,6 +91,7 @@ function handleUpdateDownloadingList(
 
 	// Assert that the download exists:
 	const thisDownload = downloadingList.get(url);
+
 	if (!thisDownload)
 		return error(
 			"Received a message from Electron but the url is not in the list!",
@@ -99,11 +100,9 @@ function handleUpdateDownloadingList(
 	// Update React's information about this DownloadingMedia:
 	downloadingList.set(url, { ...thisDownload, ...data });
 
-	const { t } = translation;
-
 	// Handle status:
 	switch (data.status) {
-		case ProgressStatus.FAILED: {
+		case ProgressStatusEnum.FAILED: {
 			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
 			assert(data.error, "data.error should exist!");
 
@@ -117,22 +116,22 @@ function handleUpdateDownloadingList(
 			break;
 		}
 
-		case ProgressStatus.SUCCESS: {
+		case ProgressStatusEnum.SUCCESS: {
 			successToast(`${t("toasts.downloadSuccess")}"${thisDownload.title}"!`);
 
 			cancelDownloadAndOrRemoveItFromList(url);
 			break;
 		}
 
-		case ProgressStatus.CANCEL: {
+		case ProgressStatusEnum.CANCEL: {
 			infoToast(`${t("toasts.downloadCanceled")}"${thisDownload.title}"!`);
 
 			cancelDownloadAndOrRemoveItFromList(url);
 			break;
 		}
 
-		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
-		case ProgressStatus.ACTIVE:
+		case ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+		case ProgressStatusEnum.ACTIVE:
 		case undefined:
 			break;
 
@@ -152,7 +151,7 @@ export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 		return error(`"${url}" not found! downloadList =`, downloadingList);
 
 	// Cancel download:
-	if (download.status === ProgressStatus.ACTIVE)
+	if (download.status === ProgressStatusEnum.ACTIVE)
 		download.port.postMessage({ destroy: true, url });
 
 	// Update downloading list:
@@ -165,5 +164,5 @@ export function cancelDownloadAndOrRemoveItFromList(url: string): void {
 // Types:
 
 interface PartialExceptStatus extends Partial<MediaBeingDownloaded> {
-	status: ValuesOf<typeof ProgressStatus>;
+	status: ValuesOf<typeof ProgressStatusEnum>;
 }

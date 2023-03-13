@@ -1,5 +1,5 @@
-import type { Path, Media } from "@common/@types/generalTypes";
-import type { ValuesOf } from "@common/@types/utils";
+import type { Path, Media } from "@common/@types/GeneralTypes";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { subscribeKey } from "valtio/utils";
 import { proxy } from "valtio";
@@ -10,7 +10,7 @@ import { searchMedia, unDiacritic } from "@contexts/playlists";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const SearchStatus = {
+export const SearchStatusEnum = {
 	FOUND_SOMETHING: 2,
 	DOING_NOTHING: 3,
 	NOTHING_FOUND: 4,
@@ -19,12 +19,14 @@ export const SearchStatus = {
 
 /////////////////////////////////////////
 
-export const searcher = proxy<Searcher>({
-	searchStatus: SearchStatus.DOING_NOTHING,
+const defaultSearcher: Searcher = {
+	searchStatus: SearchStatusEnum.DOING_NOTHING,
 	searchTerm: "",
 	highlight: "",
 	results: [],
-});
+};
+
+export const searcher = proxy<Searcher>({ ...defaultSearcher });
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -42,11 +44,8 @@ export function setSearchTerm(e: InputChange): void {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const setDefaultSearch = () => {
-	searcher.searchStatus = SearchStatus.DOING_NOTHING;
-	searcher.searchTerm = "";
-	searcher.highlight = "";
-	searcher.results = [];
+export const setDefaultSearch = (): void => {
+	Object.assign(searcher, defaultSearcher);
 };
 
 /////////////////////////////////////////
@@ -56,7 +55,7 @@ export const setDefaultSearch = () => {
 
 subscribeKey(searcher, "highlight", () => {
 	if (searcher.highlight.length < 2) {
-		searcher.searchStatus = SearchStatus.DOING_NOTHING;
+		searcher.searchStatus = SearchStatusEnum.DOING_NOTHING;
 		searcher.results.length = 0;
 
 		return;
@@ -70,8 +69,8 @@ subscribeKey(searcher, "highlight", () => {
 	searcher.results = results;
 	searcher.searchStatus =
 		results.length > 0
-			? SearchStatus.FOUND_SOMETHING
-			: SearchStatus.NOTHING_FOUND;
+			? SearchStatusEnum.FOUND_SOMETHING
+			: SearchStatusEnum.NOTHING_FOUND;
 });
 
 /////////////////////////////////////////
@@ -80,7 +79,7 @@ subscribeKey(searcher, "highlight", () => {
 // Types:
 
 type Searcher = {
-	searchStatus: ValuesOf<typeof SearchStatus>;
+	searchStatus: ValuesOf<typeof SearchStatusEnum>;
 	results: [Path, Media][];
 	searchTerm: string;
 	highlight: string;

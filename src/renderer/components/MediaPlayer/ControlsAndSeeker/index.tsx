@@ -3,7 +3,7 @@ import {
 	MdRepeatOne as RepeatOne,
 	MdShuffleOn as RandomOn,
 	MdShuffle as RandomOff,
-	MdRepeat as Repeat,
+	MdRepeat as RepeatAll,
 } from "react-icons/md";
 
 import { CircleIconButton } from "@components/CircleIconButton";
@@ -23,8 +23,7 @@ import {
 
 export function ControlsAndSeeker({ isThereAMedia }: Props) {
 	const playOptionsAccessor = useSnapshot(playOptions);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="media-player-seeker">
@@ -39,7 +38,7 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 					{playOptionsAccessor.loopThisMedia ? (
 						<RepeatOne size="18" />
 					) : (
-						<Repeat size="18" />
+						<RepeatAll size="18" />
 					)}
 				</CircleIconButton>
 

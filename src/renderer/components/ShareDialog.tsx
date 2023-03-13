@@ -1,5 +1,5 @@
 import type { ClientServerAPI } from "@main/preload/share/server";
-import type { QRCodeURL } from "@common/@types/generalTypes";
+import type { QRCodeURL } from "@common/@types/GeneralTypes";
 
 import { useEffect, useReducer } from "react";
 import { MdClose as CloseIcon } from "react-icons/md";
@@ -13,7 +13,7 @@ import { translation } from "@i18n";
 import { playlists } from "@contexts/playlists";
 import { Loading } from "./Loading";
 
-const { createServer } = electron.share;
+const { createServer } = electronApi.share;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -25,8 +25,7 @@ const qrID = "qrcode-canvas";
 export function ShareDialog() {
 	const filesToShareAccessor = useSnapshot(filesToShare);
 	const [server, setServer] = useReducer(reducer, null);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const plural = filesToShareAccessor.size > 1 ? "s" : "";
 	const shouldModalOpen = filesToShareAccessor.size;
@@ -70,9 +69,7 @@ export function ShareDialog() {
 		if (!shouldModalOpen) return;
 
 		try {
-			const clientServerApi = createServer([...filesToShareAccessor]);
-
-			setServer(clientServerApi);
+			setServer(createServer([...filesToShareAccessor]));
 		} catch (err) {
 			error(err);
 			closeShareDialog();
@@ -133,7 +130,7 @@ function namesOfFilesToShare(): JSX.Element[] {
 
 	return Array.from(filesToShare, (id) => (
 		<li data-files-to-share key={id}>
-			{mainList.get(id)?.title}
+			{mainList.get(id)?.title ?? "<Untitled>"}
 		</li>
 	));
 }

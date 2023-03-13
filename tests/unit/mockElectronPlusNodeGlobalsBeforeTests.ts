@@ -3,7 +3,7 @@ import { vi } from "vitest";
 
 (function mockElectronPlusNodeGlobalsBeforeTests() {
 	// Mocking window
-	vi.stubGlobal("electron", {
+	vi.stubGlobal("electronApi", {
 		notificationApi: { sendNotificationToElectronIpcMainProcess: vi.fn() },
 		fs: {
 			getFullPathOfFilesForFilesInThisDirectory: vi.fn(),

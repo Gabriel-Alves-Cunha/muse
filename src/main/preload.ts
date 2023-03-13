@@ -1,11 +1,11 @@
-import type { Mutable } from "@common/@types/utils";
+import type { Mutable } from "@common/@types/Utils";
 import type {
 	MsgObjectReactToElectron,
-	VisibleElectron,
-} from "@common/@types/electron-window";
+	ElectronAPI,
+} from "@common/@types/ElectronApi";
 
-import { validateURL as isUrlValid, getBasicInfo } from "ytdl-core";
 import { contextBridge, ipcRenderer } from "electron";
+import { validateURL, getBasicInfo } from "ytdl-core";
 
 import { sendNotificationToElectronIpcMainProcess } from "./preload/notificationApi";
 import { searchForLyricsAndImage } from "./preload/getLyrics";
@@ -18,9 +18,9 @@ import { error } from "@common/log";
 import { dirs } from "./utils";
 import { dbg } from "@common/debug";
 import {
-	ElectronPreloadToMainElectronMessage,
-	ElectronToReactMessage,
-	ReactToElectronMessage,
+	ElectronPreloadToMainElectronMessageEnum,
+	ElectronToReactMessageEnum,
+	ReactToElectronMessageEnum,
 } from "@common/enums";
 import {
 	type MsgWithSource,
@@ -47,7 +47,7 @@ import {
 
 // Expose methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object:
-const visibleElectronAPI: VisibleElectron = {
+const electronApi: ElectronAPI = {
 	fs: { getFullPathOfFilesForFilesInThisDirectory, deleteFile, readDir },
 	notificationApi: { sendNotificationToElectronIpcMainProcess },
 	media: { transformPathsToMedias, getBasicInfo },
@@ -56,7 +56,7 @@ const visibleElectronAPI: VisibleElectron = {
 	os: { dirs },
 };
 
-contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
+contextBridge.exposeInMainWorld("electronApi", electronApi);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -71,7 +71,7 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 		.on("text-changed", async () => {
 			const url = extendedClipboard.readText("clipboard");
 
-			if (!isUrlValid(url)) return;
+			if (!validateURL(url)) return;
 
 			const {
 				media: { artist = "" },
@@ -79,8 +79,9 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 				title,
 			} = (await getBasicInfo(url)).videoDetails;
 
+			// Make Electron show a message
 			ipcRenderer.invoke(
-				ElectronPreloadToMainElectronMessage.CLIPBOARD_TEXT_CHANGED,
+				ElectronPreloadToMainElectronMessageEnum.CLIPBOARD_TEXT_CHANGED,
 				{
 					thumbnail: thumbnails.at(-1)?.url ?? "",
 					artist,
@@ -97,10 +98,10 @@ contextBridge.exposeInMainWorld("electron", visibleElectronAPI);
 
 // Relay messages from ipcRenderer to the client:
 ipcRenderer.on(
-	ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-	(_event, downloadValues) => sendMsgToClient({
-			type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-			downloadInfo: downloadValues,
+	ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+	(_event, downloadInfo) => sendMsgToClient({
+			type: ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+			downloadInfo,
 		}),
 );
 
@@ -115,7 +116,7 @@ const logThatPortIsClosing = (): void => dbg("Closing ports (electronPort).");
 /////////////////////////////////////////////
 // Handle messages from the renderer process:
 
-window.addEventListener("message", (event: CrossWindowEvent): void => {
+function listenToMessagesFromFrontEnd(event: CrossWindowEvent): void {
 	if (event.data.source !== reactSource) return;
 
 	dbg("Received message from React:", event.data);
@@ -124,7 +125,7 @@ window.addEventListener("message", (event: CrossWindowEvent): void => {
 	const { msg } = event.data;
 
 	switch (msg.type) {
-		case ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD: {
+		case ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD: {
 			if (!electronPort) {
 				error("There should be an electronPort to download a media!");
 				break;
@@ -143,7 +144,7 @@ window.addEventListener("message", (event: CrossWindowEvent): void => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.CONVERT_MEDIA: {
+		case ReactToElectronMessageEnum.CONVERT_MEDIA: {
 			if (!electronPort) {
 				error("There should be an electronPort to convert a media!");
 				break;
@@ -162,7 +163,7 @@ window.addEventListener("message", (event: CrossWindowEvent): void => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.WRITE_TAG: {
+		case ReactToElectronMessageEnum.WRITE_TAG: {
 			const { mediaPath, thingsToChange } = msg;
 
 			const data: Mutable<Parameters<typeof writeTags>[1]> = {};
@@ -181,7 +182,7 @@ window.addEventListener("message", (event: CrossWindowEvent): void => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		case ReactToElectronMessage.ERROR: {
+		case ReactToElectronMessageEnum.ERROR: {
 			error("TODO: maybe do something with this error...?\n", msg.error);
 
 			break;
@@ -201,7 +202,9 @@ window.addEventListener("message", (event: CrossWindowEvent): void => {
 			assertUnreachable(msg);
 		}
 	}
-});
+}
+
+window.addEventListener("message", listenToMessagesFromFrontEnd);
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

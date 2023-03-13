@@ -5,8 +5,7 @@ import { translation } from "@i18n";
 
 export function NumberOfMediasSelected() {
 	const allSelectedMediasAccessor = useSnapshot(allSelectedMedias);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const numberOfMediasSelected = allSelectedMediasAccessor.size;
 	const isPlural = numberOfMediasSelected > 1;

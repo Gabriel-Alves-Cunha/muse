@@ -1,9 +1,9 @@
-import type { ValuesOf } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { ipcRenderer } from "electron";
 
-import { ElectronIpcMainProcessNotification } from "@common/enums";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
 
 export const sendNotificationToElectronIpcMainProcess = (
-	type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
+	type: ValuesOf<typeof ElectronIpcMainProcessNotificationEnum>,
 ): void => ipcRenderer.send("notify", type);

@@ -43,7 +43,7 @@ describe("Testing useCurrentPlaying", () => {
 
 			const expected: CurrentPlaying = {
 				listType: PlaylistListEnum.mainList,
-				lastStoppedTime: 0,
+				lastStoppedTimeInSeconds: 0,
 				path,
 			};
 
@@ -85,7 +85,7 @@ describe("Testing useCurrentPlaying", () => {
 			const expected: CurrentPlaying = {
 				listType: PlaylistListEnum.mainList,
 				path: prevMediaPath,
-				lastStoppedTime: 0,
+				lastStoppedTimeInSeconds: 0,
 			};
 
 			expect(expected, "The expected currentPlaying is wrong!").toEqual(

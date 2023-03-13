@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/GeneralTypes";
 
 // Getting everything ready for the tests...
 import "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";

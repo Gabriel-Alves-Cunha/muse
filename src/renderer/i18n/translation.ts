@@ -1,5 +1,5 @@
-import type { DotNestedKeys } from "@common/@types/dotNestedKeys";
-import type { OneOf } from "@common/@types/utils";
+import type { DotNestedKeys } from "@common/@types/DotNestedKeys";
+import type { OneOf } from "@common/@types/Utils";
 
 import { proxy } from "valtio";
 
@@ -25,11 +25,14 @@ export function makeTranslation<Data extends RecursiveObject>(
 ): Translation<Data> {
 	const state = proxy({
 		translations,
+
 		locale,
+
 		formatArgument: (value: string | number) =>
 			typeof value === "number"
 				? new Intl.NumberFormat(state.locale as string).format(value)
 				: value,
+
 		t(
 			key: DotNestedKeys<Data[typeof locale]>,
 			// args: TranslationArguments = {},
@@ -70,6 +73,11 @@ export function makeTranslation<Data extends RecursiveObject>(
 
 	return state;
 }
+
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+// Types:
 
 type RecursiveObject = { [key: string]: RecursiveObject | string };
 

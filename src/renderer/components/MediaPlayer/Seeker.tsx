@@ -21,6 +21,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 	useEffect(() => {
 		const timeline = timelineRef.current;
 		const audio = getAudio();
+
 		if (!(audio && timeline)) return;
 
 		/////////////////////////////////////////
@@ -59,6 +60,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 
 		function setCurrentTimeText(): void {
 			const timeElement = currentTimeRef.current;
+
 			if (!(timeElement && timeline && audio)) return;
 
 			const percentage = `${(audio.currentTime / audio.duration) * 100}%`;

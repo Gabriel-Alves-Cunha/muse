@@ -1,6 +1,6 @@
-import type { ImageURL, Base64, Path } from "@common/@types/generalTypes";
-import type { Mutable } from "@common/@types/utils";
-import type { Tags } from "@common/@types/electron-window";
+import type { ImageURL, Base64, Path } from "@common/@types/GeneralTypes";
+import type { Mutable } from "@common/@types/Utils";
+import type { Tags } from "@common/@types/ElectronApi";
 
 import { existsSync, renameSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -16,7 +16,7 @@ import sanitize from "sanitize-filename";
 
 import { getBasename, getLastExtension } from "@common/path";
 import { error, assert, throwErr, log } from "@common/log";
-import { ElectronToReactMessage } from "@common/enums";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { isBase64Image } from "@main/utils";
 import { eraseImg } from "@common/utils";
@@ -43,7 +43,7 @@ async function handleImageMetadata(
 
 			// Send error to client:
 			sendMsgToClient({
-				type: ElectronToReactMessage.ERROR,
+				type: ElectronToReactMessageEnum.ERROR,
 				error: err as Error,
 			});
 		}
@@ -182,25 +182,25 @@ function talkToClientSoItCanGetTheNewMedia(
 
 			// Since media has a new path, create a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 				mediaPath: newPathOfFile,
 			});
 
 			// and remove old one
 			sendMsgToClient({
-				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 				mediaPath,
 			});
 		} catch (error) {
 			// Send error to react process: (error renaming file => file has old path)
 			sendMsgToClient({
-				type: ElectronToReactMessage.ERROR,
+				type: ElectronToReactMessageEnum.ERROR,
 				error: error as Error,
 			});
 
 			// Since there was an error, let's at least refresh media:
 			sendMsgToClient({
-				type: ElectronToReactMessage.RESCAN_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.RESCAN_ONE_MEDIA,
 				mediaPath,
 			});
 		} finally {
@@ -214,12 +214,15 @@ function talkToClientSoItCanGetTheNewMedia(
 	/////////////////////////////////////////////
 	else if (isNewMedia)
 		// Add the new media:
-		sendMsgToClient({ type: ElectronToReactMessage.ADD_ONE_MEDIA, mediaPath });
+		sendMsgToClient({
+			type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+			mediaPath,
+		});
 	/////////////////////////////////////////////
 	// If everything else fails, at least refresh media:
 	else
 		sendMsgToClient({
-			type: ElectronToReactMessage.RESCAN_ONE_MEDIA,
+			type: ElectronToReactMessageEnum.RESCAN_ONE_MEDIA,
 			mediaPath,
 		});
 }
@@ -283,6 +286,11 @@ export function writeTags(
 
 	talkToClientSoItCanGetTheNewMedia(newFilePath, mediaPath, isNewMedia);
 }
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Types:
 
 type WriteTagsData = Tags & {
 	downloadImg?: boolean;

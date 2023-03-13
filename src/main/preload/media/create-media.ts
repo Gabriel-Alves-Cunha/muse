@@ -1,4 +1,4 @@
-import type { Base64, Media, Path } from "@common/@types/generalTypes";
+import type { Base64, Media, Path } from "@common/@types/GeneralTypes";
 
 import { File as MediaFile, IPicture } from "node-taglib-sharp";
 import { statSync } from "node:fs";

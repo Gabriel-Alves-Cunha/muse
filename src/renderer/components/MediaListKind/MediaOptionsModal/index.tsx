@@ -1,9 +1,10 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as CloseIcon } from "react-icons/md";
+import { useSnapshot } from "valtio";
 
 import { DeleteMediaDialogContent } from "../../DeleteMediaDialog";
 import { isAModifierKeyPressed } from "@utils/keyboard";
@@ -20,7 +21,6 @@ import {
 	visibleData,
 	format,
 } from "./helpers";
-import { useSnapshot } from "valtio";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -29,15 +29,14 @@ import { useSnapshot } from "valtio";
 
 const filePresentClassName = "file-present";
 
-export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
+export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 	const [isDeleteMediaModalOpen, setIsDeleteMediaModalOpen] = useState(false);
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef("");
 
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
 
@@ -167,7 +166,7 @@ export default function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 								setIsDeleteMediaModalOpen(false);
 								setIsOpen(false);
 
-								deleteFile(path).then();
+								deleteFile(path);
 							}}
 							closeDialog={() => setIsDeleteMediaModalOpen(false)}
 						/>

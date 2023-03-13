@@ -3,22 +3,36 @@ import type { availableThemes } from "@components/ThemeToggler";
 
 import { proxy, subscribe } from "valtio";
 
+import { localStorageKeys } from "@utils/localStorage";
+import { error } from "@common/log";
+
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Pre work:
 
-const settingsKey = "@muse:settings";
-const savedSettings = localStorage.getItem(settingsKey);
-const settingsToApply = savedSettings
-	? (JSON.parse(savedSettings) as Settings)
-	: ({
-			assureMediaSizeIsGreaterThan60KB: true,
-			ignoreMediaWithLessThan60Seconds: true,
-			maxSizeOfHistory: 100,
-			language: "en-US",
-			theme: "light",
-	  } satisfies Settings);
+const storagedSettingsString = localStorage.getItem(localStorageKeys.settings);
+const defaultSettings: Settings = {
+	assureMediaSizeIsGreaterThan60KB: true,
+	ignoreMediaWithLessThan60Seconds: true,
+	maxSizeOfHistory: 100,
+	language: "en-US",
+	theme: "light",
+} as const;
+
+let settingsToApply: Settings | undefined;
+
+try {
+	if (storagedSettingsString)
+		settingsToApply = JSON.parse(storagedSettingsString);
+} catch (err) {
+	error(
+		"Error parsing JSON.parse(storagedSettingsString). Applying default settings.",
+		err,
+	);
+
+	settingsToApply = { ...defaultSettings };
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -27,25 +41,31 @@ const settingsToApply = savedSettings
 
 export const settings = proxy<Settings>(settingsToApply);
 
-export function setDefaultSettings() {
-	settings.assureMediaSizeIsGreaterThan60KB = true;
-	settings.ignoreMediaWithLessThan60Seconds = true;
-	settings.maxSizeOfHistory = 100;
-	settings.language = "en-US";
-	settings.theme = "light";
-}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Listeners:
 
 let setToLocalStorageTimer: NodeJS.Timer | undefined;
 
-subscribe(settings, (newSettings) => {
+subscribe(settings, () => {
 	clearTimeout(setToLocalStorageTimer);
 
-	// Write to LocalStorage:
 	setToLocalStorageTimer = setTimeout(
-		() => localStorage.setItem(settingsKey, JSON.stringify(newSettings)),
+		() =>
+			localStorage.setItem(localStorageKeys.settings, JSON.stringify(settings)),
 		1_000,
 	);
 });
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Helper functions:
+
+export function setDefaultSettings() {
+	Object.assign(settings, defaultSettings);
+}
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

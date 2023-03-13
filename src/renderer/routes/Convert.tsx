@@ -18,8 +18,7 @@ import { Button } from "@components/Button";
 export function Convert() {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const openNativeUI_ChooseFiles = () => inputRef.current?.click();
 

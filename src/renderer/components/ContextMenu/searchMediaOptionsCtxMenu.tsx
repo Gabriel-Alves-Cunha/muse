@@ -20,10 +20,9 @@ import { MenuItem } from "../MenuItem";
 /////////////////////////////////////////////
 // Main function:
 
-export default function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
-	const translationAccessor = useSnapshot(translation);
+export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 	const [isOpen, setIsOpen] = useState(false);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<>
@@ -90,8 +89,7 @@ function selectAllMediasOnSearchResult(): void {
 /////////////////////////////////////////////
 
 export function searchForLyrics(): void {
-	for (const path of allSelectedMedias)
-		searchAndOpenLyrics(path, !openLyrics).then();
+	for (const path of allSelectedMedias) searchAndOpenLyrics(path, !openLyrics);
 }
 
 /////////////////////////////////////////////

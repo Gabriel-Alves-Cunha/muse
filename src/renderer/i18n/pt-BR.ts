@@ -4,30 +4,30 @@ export const pt_BR_Translations: Translations = {
 	dialogs: {
 		mediaOptions: {
 			description:
-				'Faça alterações aos metadados da sua media aqui. Clique em "Salvar" quando terminar.',
-			title: "Edite/Veja informações da media",
+				'Faça alterações aos metadados da sua mídia aqui. Clique em "Salvar" quando terminar.',
+			title: "Edite/Veja informações da mídia",
 		},
 		deleteMedia: {
-			subtitle: "Tem certeza de que quer deletar esta media do seu computador?",
+			subtitle: "Tem certeza de que quer deletar esta mídia do seu computador?",
 		},
-		sharingMedia: "Compartilhando media",
+		sharingMedia: "Compartilhando mídia",
 	},
 
 	tooltips: {
 		closeShareScreen: "Fechar modal de compartilhamento",
-		showAllDownloadingMedias: "Medias sendo baixadas",
+		showAllDownloadingMedias: "Mídias sendo baixadas",
 		cancelDownload: "Cancelar/Remover transferência",
 		cancelConversion: "Cancelar/Remover conversão",
-		showAllConvertingMedias: "Medias convertendo",
-		reloadAllMedias: "Recarregar todas as medias",
-		openMediaOptions: "Metadados desta media",
-		playPreviousTrack: "Tocar media anterior",
+		showAllConvertingMedias: "Mídias convertendo",
+		reloadAllMedias: "Recarregar todas as mídias",
+		openMediaOptions: "Metadados desta mídia",
+		playPreviousTrack: "Tocar mídia anterior",
 		toggleMinimizeWindow: "Minimizar janela",
 		toggleMaximizeWindow: "Maximizar janela",
 		toggleOpenLyrics: "Abrir/Fechar letras",
-		toggleLoopThisMedia: "Repetir media",
-		playNextTrack: "Tocar próxima media",
-		playThisMedia: "Tocar esta media",
+		toggleLoopThisMedia: "Repetir mídia",
+		playNextTrack: "Tocar próxima mídia",
+		playThisMedia: "Tocar esta mídia",
 		closeDialog: "Fechar diálogo",
 		closeWindow: "Fechar janela",
 		toggleTheme: "Alternar tema",
@@ -41,15 +41,15 @@ export const pt_BR_Translations: Translations = {
 
 	buttons: {
 		resetAllAppData: "Resetar todos os dados do aplicativo",
-		convert: "Selecione media(s) para converter",
+		convert: "Selecione mídia(s) para converter",
 		cleanFinished: "Limpar concluídos",
 		reloadWindow: "Recarregar janela",
 		selectImg: "Selecionar imagem",
-		deleteMedia: "Deletar media",
+		deleteMedia: "Deletar mídia",
 		saveChanges: "Salvar",
 		confirm: "Confirmar",
-		download: "Baixar",
 		cancel: "Cancelar",
+		download: "Baixar",
 	},
 
 	labels: {
@@ -62,7 +62,7 @@ export const pt_BR_Translations: Translations = {
 		image: "Imagem",
 		title: "Título",
 		size: "Tamanho",
-		album: "Album",
+		album: "Álbum",
 	},
 
 	toasts: {
@@ -79,7 +79,7 @@ export const pt_BR_Translations: Translations = {
 		conversionCanceled: "Conversão cancelada para ",
 		mediaMetadataSaved: "Novos metadados salvos.",
 		conversionFailed: "Conversão falhou para ",
-		mediaDeletionSuccess: "Media deletada: ",
+		mediaDeletionSuccess: "Mídia deletada: ",
 		mediaDeletionError: {
 			beforePath: "Erro ao deletar ",
 			afterPath: "\nVeja o console pressionando Ctrl+Shift+i!",
@@ -94,17 +94,17 @@ export const pt_BR_Translations: Translations = {
 	errors: {
 		mediaListKind: {
 			errorFallbackDescription:
-				"Erro ao renderizar lista. Isso é um bug. Tente fechar e abrir o aplicativo, se o erro persistir, click no botão abaixo.",
+				"Erro ao renderizar lista. Isso é um bug! Tente fechar e abrir o aplicativo, se o erro persistir, click no botão abaixo.",
 			errorTitle: "Algo deu errado",
 		},
-		gettingMediaInfo: "Erro ao buscar media!",
+		gettingMediaInfo: "Erro ao buscar mídia!",
 		noVideoIdFound: "ID não encontrado!",
 	},
 
 	alts: {
 		museLogo:
 			"Logo da Muse, um círculo semelhante a um donut com tons de azul.",
-		noMediasFound: "Medias não encontradas",
+		noMediasFound: "Mídias não encontradas",
 		videoThumbnail: "Miniatura do video",
 	},
 
@@ -125,9 +125,9 @@ export const pt_BR_Translations: Translations = {
 	},
 
 	decorations: {
-		selected: "selecionadas",
+		selected: "selecionada(s)",
 		size: "Tamanho",
-		media: "media",
+		media: "mídia",
 	},
 
 	pages: {
@@ -139,10 +139,10 @@ export const pt_BR_Translations: Translations = {
 	},
 
 	titles: {
-		history: "Histórico dos áudio tocados",
-		convert: "Converter medias para 'mp3'",
-		download: "Baixar media como áudio",
-		favorites: "Meus audios favoritos",
-		home: "Lista de todos os audios",
+		history: "Histórico das mídias tocadas",
+		convert: "Converter mídias para 'mp3'",
+		download: "Baixar mídia como áudio",
+		home: "Lista de todas as mídiaa",
+		favorites: "Minhas favoritas",
 	},
 };

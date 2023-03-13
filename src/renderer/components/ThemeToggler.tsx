@@ -20,8 +20,7 @@ export const availableThemes = ["light", "dark"] as const;
 
 export function ThemeToggler() {
 	const settingsAccessor = useSnapshot(settings);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<button

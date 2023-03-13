@@ -1,6 +1,6 @@
-import type { Path, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/GeneralTypes";
 
-import { ReactToElectronMessage } from "@common/enums";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { mediaPlayerFlipCardId } from "../FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { error, warn } from "@common/log";
@@ -9,7 +9,7 @@ import { infoToast } from "../toasts";
 import { getMedia } from "@contexts/playlists";
 import { Header } from "./Header";
 
-const { searchForLyricsAndImage } = electron.lyric;
+const { searchForLyricsAndImage } = electronApi.lyric;
 
 /////////////////////////////////////////
 
@@ -53,13 +53,13 @@ export async function searchAndOpenLyrics(
 	}
 
 	// If there is no image already, go get one:
-	const getImage = !media.image;
+	const shouldGetImage = !media.image;
 
 	try {
 		const { lyric, image, albumName } = await searchForLyricsAndImage(
 			media.title,
 			media.artist,
-			getImage,
+			shouldGetImage,
 		);
 
 		sendMsgToBackend({
@@ -68,7 +68,7 @@ export async function searchAndOpenLyrics(
 				{ whatToChange: "imageURL", newValue: image },
 				{ whatToChange: "lyrics", newValue: lyric },
 			],
-			type: ReactToElectronMessage.WRITE_TAG,
+			type: ReactToElectronMessageEnum.WRITE_TAG,
 			mediaPath,
 		});
 	} catch (err) {

@@ -1,17 +1,18 @@
 import type { IconType } from "react-icons/lib";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Popover } from "@components/Popover";
 
 export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<>
+		<div ref={contentRef}>
 			<button
+				onPointerUp={() => setIsPopoverOpen((prev) => !prev)}
 				data-converting-downloading-list-popover-trigger
-				onPointerUp={() => setIsPopoverOpen(true)}
 				data-has-items={size > 0}
 				title={tooltip}
 			>
@@ -20,19 +21,21 @@ export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
 				<Icon className="w-5 h-5" />
 			</button>
 
-			<Popover
-				className="translate-x-[61%] -translate-y-1/2"
-				setIsOpen={setIsPopoverOpen}
-				isOpen={isPopoverOpen}
-				size={
-					size === 0
-						? "nothing-found-for-convertions-or-downloads"
-						: "convertions-or-downloads"
-				}
-			>
-				{children}
-			</Popover>
-		</>
+			{isPopoverOpen && (
+				<Popover
+					className="translate-x-12 -translate-y-[100%]"
+					setIsOpen={setIsPopoverOpen}
+					contentRef={contentRef}
+					size={
+						size === 0
+							? "nothing-found-for-convertions-or-downloads"
+							: "convertions-or-downloads"
+					}
+				>
+					{children}
+				</Popover>
+			)}
+		</div>
 	);
 }
 

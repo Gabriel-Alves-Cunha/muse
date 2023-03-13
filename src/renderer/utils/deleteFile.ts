@@ -1,11 +1,11 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { errorToast, successToast } from "@components/toasts";
 import { removeMedia } from "@contexts/playlists";
 import { getBasename } from "@common/path";
 import { translation } from "@i18n";
 
-const { deleteFile: electronDeleteFile } = electron.fs;
+const { deleteFile: electronDeleteFile } = electronApi.fs;
 
 export async function deleteFile(path: Path): Promise<void> {
 	const wasDeleteSuccessfull = await electronDeleteFile(path);

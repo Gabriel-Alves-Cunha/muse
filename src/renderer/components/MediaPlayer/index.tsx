@@ -1,11 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useSnapshot } from "valtio";
 
-import { FlipCard, mediaPlayerFlipCardId } from "../FlipCard";
-import { currentPlaying } from "@contexts/currentPlaying";
-import { playlists } from "@contexts/playlists";
-import { Lyrics } from "./Lyrics";
-import { Player } from "./Player";
+import { MediaPlayerCards } from "./MediaPlayerCards";
+import { error } from "@common/log";
 import {
 	logSecurityPolicyViolation,
 	handleAudioCanPlay,
@@ -24,22 +20,13 @@ import {
 // Main function:
 
 export function MediaPlayer() {
-	const currentPlayingAccessor = useSnapshot(currentPlaying);
-	const playlistsAccessor = useSnapshot(playlists);
 	const audioRef = useRef<HTMLAudioElement>(null);
-
-	const path = currentPlayingAccessor.path;
-	const media = playlistsAccessor.sortedByTitleAndMainList.get(path);
-	const audio = audioRef.current;
-
-	useEffect(() => {
-		// Flip media player card to frontCard:
-		document.getElementById(mediaPlayerFlipCardId)?.classList.remove("active");
-	}, [path]);
 
 	// Setting event listeners:
 	useEffect(() => {
-		if (!(audio && media)) return;
+		const audio = audioRef.current;
+
+		if (!audio) return error("Audio is not on UI!");
 
 		// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
 		audio.addEventListener("loadeddata", handleLoadedData);
@@ -54,21 +41,18 @@ export function MediaPlayer() {
 		audio.onerror = logError;
 		audio.onabort = logAbort;
 		audio.onclose = logClose;
-
-		return () => {
-			// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
-			audio.removeEventListener("loadeddata", handleLoadedData);
-		};
-	}, [media, path]);
+		//
+		// 		return () => {
+		// 			// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
+		// 			audio.removeEventListener("loadeddata", handleLoadedData);
+		// 		};
+	}, []);
 
 	return (
 		<aside className="aside">
 			<audio id="audio" ref={audioRef} />
 
-			<FlipCard
-				frontCard={<Player media={media} path={path} />}
-				backCard={<Lyrics media={media} path={path} />}
-			/>
+			<MediaPlayerCards />
 		</aside>
 	);
 }

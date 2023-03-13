@@ -12,8 +12,7 @@ import { Popup } from "./Popup";
 
 export function Converting() {
 	const convertingListAccessor = useSnapshot(convertingList);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<NavbarPopoverButtons

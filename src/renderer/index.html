@@ -14,13 +14,17 @@
 			document.documentElement.dataset.theme = storagedOrDefaultTheme;
 		</script>
 
+		<link rel="stylesheet" href="splashscreen.css">
 		<link rel="stylesheet" href="main.css">
 
 		<title>Muse</title>
 	</head>
 
-
 	<body>
+		<div id="splashscreen">
+			<img src="/assets/logo_with_name.svg" alt="Muse's logo and name">
+		</div>
+
 		<div id="root"></div>
 
 		<script type="module" src="/main.tsx"></script>

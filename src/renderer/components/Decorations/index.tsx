@@ -22,8 +22,7 @@ import imageUrl from "@assets/logo.svg";
 
 // Window draggable region:
 export function DecorationsTop() {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<header className="decorations-up">
@@ -61,8 +60,7 @@ const WindowButton = (props: WindowButtonProps) => (
 /////////////////////////////////////////////
 
 function Buttons() {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="flex ml-auto h-full bg-transparent">

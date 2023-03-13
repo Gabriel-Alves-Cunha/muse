@@ -1,4 +1,4 @@
-import type { Path, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/GeneralTypes";
 
 import { sortByTitle } from "@contexts/playlistsHelper";
 import { formatDuration } from "@common/utils";

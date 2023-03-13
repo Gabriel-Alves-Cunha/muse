@@ -1,4 +1,4 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { BsJournalText as LyricsPresent } from "react-icons/bs";
 import { BsJournal as NoLyrics } from "react-icons/bs";
@@ -16,10 +16,9 @@ import { RingLoader } from "@components/RingLoader";
 
 export const openLyrics = true;
 
-export function LoadOrToggleLyrics({ lyrics, path }: LoadOrToggleLyricsProps) {
+export function LoadOrToggleLyrics({ lyrics, path }: Props) {
 	const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	async function loadAndOrToggleLyrics(): Promise<void> {
 		if (lyrics) return flipMediaPlayerCard();
@@ -51,7 +50,7 @@ export function LoadOrToggleLyrics({ lyrics, path }: LoadOrToggleLyricsProps) {
 /////////////////////////////////////////
 // Types:
 
-type LoadOrToggleLyricsProps = {
+type Props = {
 	lyrics: string | undefined;
 	path: Path;
 };

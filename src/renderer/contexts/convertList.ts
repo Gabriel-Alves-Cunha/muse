@@ -1,5 +1,5 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { proxyMap } from "valtio/utils";
 

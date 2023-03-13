@@ -3,8 +3,8 @@ import { useSnapshot } from "valtio";
 import { resetAllAppData } from "@utils/app";
 import { CenteredModal } from "./CenteredModal";
 import { reloadWindow } from "./MediaListKind/helper";
-import { translation } from "@i18n";
 import { WarningSign } from "./WarningSign";
+import { translation } from "@i18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -12,8 +12,7 @@ import { WarningSign } from "./WarningSign";
 // Main function:
 
 export function ErrorFallback({ description }: ErrorBoundaryProps) {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<CenteredModal className="relative flex flex-col items-center" isOpen>

@@ -5,8 +5,7 @@
 		"rules": {
 			"recommended": true,
 			"style": {
-				"useBlockStatements": "off",
-				"noImplicitBoolean": "off"
+				"useBlockStatements": "off"
 			}
 		}
 	},

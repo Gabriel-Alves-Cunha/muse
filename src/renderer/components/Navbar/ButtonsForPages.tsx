@@ -1,4 +1,4 @@
-import type { Page } from "@common/@types/generalTypes";
+import type { Page } from "@common/@types/GeneralTypes";
 
 import { useSnapshot } from "valtio";
 import {
@@ -29,9 +29,8 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 /////////////////////////////////////////
 
 export function ButtonsForPages() {
-	const translationAccessor = useSnapshot(translation);
 	const pageAccessor = useSnapshot(page);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="buttons-for-pages">

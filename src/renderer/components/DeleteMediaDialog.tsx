@@ -12,8 +12,7 @@ export function DeleteMediaDialogContent({
 	handleDeleteMedia,
 	closeDialog,
 }: Props) {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<>

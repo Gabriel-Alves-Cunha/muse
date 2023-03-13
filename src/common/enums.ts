@@ -1,4 +1,4 @@
-export const ProgressStatus = {
+export const ProgressStatusEnum = {
 	WAITING_FOR_CONFIRMATION_FROM_ELECTRON: 2,
 	SUCCESS: 3,
 	ACTIVE: 4,
@@ -8,7 +8,7 @@ export const ProgressStatus = {
 
 /////////////////////////////////////////////
 
-export const ReactToElectronMessage = {
+export const ReactToElectronMessageEnum = {
 	CREATE_A_NEW_DOWNLOAD: 2,
 	CONVERT_MEDIA: 3,
 	WRITE_TAG: 4,
@@ -17,7 +17,7 @@ export const ReactToElectronMessage = {
 
 /////////////////////////////////////////////
 
-export const ElectronToReactMessage = {
+export const ElectronToReactMessageEnum = {
 	DELETE_ONE_MEDIA_FROM_COMPUTER: "DELETE_ONE_MEDIA_FROM_COMPUTER",
 	CREATE_A_NEW_DOWNLOAD: "CREATE_A_NEW_DOWNLOAD",
 	RESCAN_ALL_MEDIA: "REFRESH_ALL_MEDIA",
@@ -29,13 +29,13 @@ export const ElectronToReactMessage = {
 
 /////////////////////////////////////////////
 
-export const ElectronPreloadToMainElectronMessage = {
+export const ElectronPreloadToMainElectronMessageEnum = {
 	CLIPBOARD_TEXT_CHANGED: "CLIPBOARD_TEXT_CHANGED",
 } as const;
 
 /////////////////////////////////////////////
 
-export const ElectronIpcMainProcessNotification = {
+export const ElectronIpcMainProcessNotificationEnum = {
 	TOGGLE_DEVELOPER_TOOLS: 2,
 	TOGGLE_MAXIMIZE: 3,
 	MINIMIZE: 5,

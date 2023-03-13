@@ -1,8 +1,8 @@
-import type { DeepReadonly } from "./@types/utils";
+import type { DeepReadonly } from "./@types/Utils";
 import type {
 	MsgObjectElectronToReact,
 	MsgObjectReactToElectron,
-} from "@common/@types/electron-window";
+} from "@common/@types/ElectronApi";
 
 import { dbg } from "./debug";
 
@@ -14,7 +14,7 @@ export const sendMsgToBackend = (
 	msg: MsgObjectReactToElectron,
 	electronPort?: MessagePort,
 ): void => {
-	dbg("Sending message to backend:", { msg, electronPort });
+	dbg("Sending message to backend:", { msg, electronPort, window });
 
 	electronPort
 		? window.postMessage({ msg, source: reactSource }, "*", [electronPort])
@@ -24,7 +24,7 @@ export const sendMsgToBackend = (
 /////////////////////////////////////////
 
 export const sendMsgToClient = (msg: MsgObjectElectronToReact): void => {
-	dbg("Sending message to client:", msg);
+	dbg("Sending message to client:", { msg });
 
 	window.postMessage({ msg, source: electronSource }, "*");
 };

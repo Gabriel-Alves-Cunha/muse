@@ -1,10 +1,11 @@
 import type { CurrentPlaying } from "@contexts/currentPlaying";
-import type { Path, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/GeneralTypes";
 import type { PlayOptions } from "@contexts/playOptions";
-import type { TypeOfMap } from "@common/@types/utils";
+import type { TypeOfMap } from "@common/@types/Utils";
 import type { History } from "@contexts/playlists";
 
 import { dbgPlaylists } from "@common/debug";
+import { error } from "@common/log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -16,26 +17,38 @@ export const localStorageKeys = {
 	favorites: "@muse:playlists:favorites",
 	history: "@muse:playlists:history",
 	playOptions: "@muse:playOptions",
+	settings: "@muse:settings",
 } as const;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-let setToLocalStorageTimer: NodeJS.Timer | undefined;
+export function setLocalStorage(
+	key: LocalStorageKeys,
+	value: Values,
+	isProxyMapOrSet: boolean,
+	waitTime = 500,
+): void {
+	if (isProxyMapOrSet) {
+		// @ts-ignore => value is of type Map<Path, Media> | Set<Path>
+		value = [...value];
+	}
 
-export function setLocalStorage(key: LocalStorageKeys, value: Values): void {
-	clearTimeout(setToLocalStorageTimer);
-
-	setToLocalStorageTimer = setTimeout(() => {
-		if (value instanceof Map || value instanceof Set) value = [...value];
-
+	try {
 		const json = JSON.stringify(value);
 
-		dbgPlaylists({ key, json, value });
+		dbgPlaylists({ key, json });
 
-		localStorage.setItem(key, json);
-	}, 1_000);
+		setTimeout(() => localStorage.setItem(key, json), waitTime);
+	} catch (err) {
+		error("Error on JSON.stringify(value) at setLocalStorage().", {
+			isProxyMapOrSet,
+			value,
+			err,
+			key,
+		});
+	}
 }
 
 ////////////////////////////////////////////////
@@ -48,7 +61,7 @@ export function getFromLocalStorage(key: LocalStorageKeys): Values | undefined {
 
 	dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
 
-	if (item === emptyArrayString && !value) return undefined;
+	if (item === emptyArrayString && !value) return;
 
 	if (key === localStorageKeys.favorites) {
 		const newFavorites = new Set(item as Path[]);
@@ -95,11 +108,12 @@ type LocalStorageKeys = typeof localStorageKeys[keyof typeof localStorageKeys];
 //////////////////////////////////////////
 
 type Values =
-	| readonly [Path, Media][]
 	| ReadonlySet<Path>
+	| [Path, Media][]
 	| CurrentPlaying
 	| PlayOptions
-	| History;
+	| History
+	| Path[];
 
 //////////////////////////////////////////
 

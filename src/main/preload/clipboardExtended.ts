@@ -87,6 +87,7 @@ export interface ClipboardExtended
 interface ClipboardExtension {
 	watcherId: NodeJS.Timer | undefined;
 	previousText: string;
+
 	startWatching: () => ClipboardExtended;
 	stopWatching: () => ClipboardExtended;
 	off: <T>(

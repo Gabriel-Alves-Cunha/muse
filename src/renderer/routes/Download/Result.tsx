@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
 
-import { downloadMedia, searchInfo } from "./helpers";
+import { downloadMedia, searchResult } from "./helpers";
 import { translation } from "@i18n";
 import { Button } from "@components/Button";
 
@@ -9,18 +9,17 @@ import { Button } from "@components/Button";
 ////////////////////////////////////////////////
 
 export function Result() {
-	const translationAccessor = useSnapshot(translation);
-	const searchInfoAccessor = useSnapshot(searchInfo);
-	const t = translationAccessor.t;
+	const searchResultAccessor = useSnapshot(searchResult);
+	const t = useSnapshot(translation).t;
 
-	return searchInfoAccessor.result.title ? (
+	return searchResultAccessor.result.title ? (
 		<div className="result">
 			<img
-				src={searchInfoAccessor.result.imageURL}
+				src={searchResultAccessor.result.imageURL}
 				alt={t("alts.videoThumbnail")}
 			/>
 
-			<p>{searchInfoAccessor.result.title}</p>
+			<p>{searchResultAccessor.result.title}</p>
 
 			<Button variant="large" onPointerUp={downloadMedia}>
 				{t("buttons.download")}

@@ -1,4 +1,4 @@
-import type { ValuesOf } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { MdOutlineSort as SortIcon } from "react-icons/md";
 import { useEffect, useState } from "react";
@@ -13,9 +13,8 @@ import { Select } from "../Select";
 
 export function SortBy() {
 	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
-	const translationAccessor = useSnapshot(translation);
 	const [isOpen, setIsOpen] = useState(false);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	useEffect(() => {
 		// Default value:

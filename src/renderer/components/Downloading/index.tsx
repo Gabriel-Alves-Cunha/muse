@@ -1,11 +1,11 @@
-import type { ValuesOf } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
 import { useSnapshot } from "valtio";
 
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
 import { downloadingList } from "@contexts/downloadList";
-import { ProgressStatus } from "@common/enums";
+import { ProgressStatusEnum } from "@common/enums";
 import { translation } from "@i18n";
 import { Popup } from "./Popup";
 
@@ -16,8 +16,7 @@ import { Popup } from "./Popup";
 
 export function Downloading() {
 	const downloadingListAccessor = useSnapshot(downloadingList);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<NavbarPopoverButtons
@@ -36,7 +35,7 @@ export function Downloading() {
 // Types:
 
 export type MediaBeingDownloaded = {
-	status: ValuesOf<typeof ProgressStatus>;
+	status: ValuesOf<typeof ProgressStatusEnum>;
 	percentage: number;
 	port: MessagePort;
 	imageURL: string;

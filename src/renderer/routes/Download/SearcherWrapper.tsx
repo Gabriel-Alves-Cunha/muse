@@ -1,7 +1,7 @@
 import { useSnapshot } from "valtio";
 import { useEffect } from "react";
 
-import { search, setUrl, searchInfo } from "./helpers";
+import { search, setUrl, searchResult } from "./helpers";
 import { translation } from "@i18n";
 import { BaseInput } from "@components/BaseInput";
 
@@ -10,31 +10,30 @@ import { BaseInput } from "@components/BaseInput";
 ////////////////////////////////////////////////
 
 export function SearcherWrapper() {
-	const translationAccessor = useSnapshot(translation);
-	const searchInfoAccessor = useSnapshot(searchInfo);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
+	const searchResultAccessor = useSnapshot(searchResult);
 
 	useEffect(() => {
 		const searchTimeout = setTimeout(
-			() => search(searchInfoAccessor.url).then(),
+			() => search(searchResultAccessor.url),
 			300,
 		);
 
 		return () => clearTimeout(searchTimeout);
-	}, [searchInfoAccessor.url]);
+	}, [searchResultAccessor.url]);
 
 	return (
 		<>
 			<BaseInput
 				label={t("labels.pasteVideoURL")}
-				value={searchInfoAccessor.url}
+				value={searchResultAccessor.url}
 				autoCapitalize="off"
 				spellCheck="false"
 				autoCorrect="off"
 				onChange={setUrl}
 			/>
 
-			<p className="searcher">{searchInfoAccessor.error}</p>
+			<p className="searcher">{searchResultAccessor.error}</p>
 		</>
 	);
 }

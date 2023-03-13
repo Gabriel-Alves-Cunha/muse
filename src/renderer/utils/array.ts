@@ -1,5 +1,5 @@
 export function prettyPrintStringArray<T>(arr: readonly T[]): string {
-	const prettyStrings = [];
+	const prettyStrings: string[] = [];
 
 	for (const item of arr) prettyStrings.push(`"${item}"`);
 

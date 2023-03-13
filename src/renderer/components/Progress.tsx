@@ -1,4 +1,4 @@
-import type { ValuesOf } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { RiDownloadFill as DownloadingIcon } from "react-icons/ri";
 import { CgSearchLoading as LoadingIcon } from "react-icons/cg";
@@ -6,7 +6,7 @@ import { AiOutlineCheck as SuccessIcon } from "react-icons/ai";
 import { TiCancel as CanceledIcon } from "react-icons/ti";
 import { MdError as FailedIcon } from "react-icons/md";
 
-import { ProgressStatus } from "@common/enums";
+import { ProgressStatusEnum } from "@common/enums";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -15,7 +15,7 @@ import { ProgressStatus } from "@common/enums";
 
 export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
 	<progress
-		value={status === ProgressStatus.SUCCESS ? 100 : percent_0_to_100}
+		value={status === ProgressStatusEnum.SUCCESS ? 100 : percent_0_to_100}
 		data-progress
 		max="100"
 	/>
@@ -27,11 +27,11 @@ export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
 // Helper function:
 
 export const progressIcons: ReadonlyMap<
-	ValuesOf<typeof ProgressStatus>,
+	ValuesOf<typeof ProgressStatusEnum>,
 	JSX.Element
 > = new Map([
 	[
-		ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		<LoadingIcon
 			className="fill-orange-400"
 			title="Waiting"
@@ -40,7 +40,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		ProgressStatus.ACTIVE,
+		ProgressStatusEnum.ACTIVE,
 		<DownloadingIcon
 			className="fill-teal-600"
 			title="Downloading"
@@ -49,7 +49,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		ProgressStatus.CANCEL,
+		ProgressStatusEnum.CANCEL,
 		<CanceledIcon
 			className="fill-yellow-600"
 			title="Canceled"
@@ -58,7 +58,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		ProgressStatus.SUCCESS,
+		ProgressStatusEnum.SUCCESS,
 		<SuccessIcon
 			className="fill-green-500"
 			title="Success"
@@ -67,7 +67,7 @@ export const progressIcons: ReadonlyMap<
 		/>,
 	],
 	[
-		ProgressStatus.FAILED,
+		ProgressStatusEnum.FAILED,
 		<FailedIcon
 			className="fill-red-500"
 			title="Failed"
@@ -83,6 +83,6 @@ export const progressIcons: ReadonlyMap<
 // Types:
 
 export type ProgressProps = {
-	status: ValuesOf<typeof ProgressStatus>;
+	status: ValuesOf<typeof ProgressStatusEnum>;
 	percent_0_to_100: number;
 };

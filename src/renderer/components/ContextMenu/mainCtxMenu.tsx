@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
 
-import { ElectronIpcMainProcessNotification } from "@common/enums";
+import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
 import { selectAllMedias } from "@contexts/allSelectedMedias";
 import { translation } from "@i18n";
 import { Separator } from "../Separator";
@@ -8,7 +8,7 @@ import { RightSlot } from "../RightSlot";
 import { MenuItem } from "../MenuItem";
 
 const notify =
-	electron.notificationApi.sendNotificationToElectronIpcMainProcess;
+	electronApi.notificationApi.sendNotificationToElectronIpcMainProcess;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -16,13 +16,12 @@ const notify =
 // Helper functions:
 
 const toggleDeveloperTools = () =>
-	notify(ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS);
+	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS);
 
 /////////////////////////////////////////////
 
-export default function MainCtxMenu() {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+export function MainCtxMenu() {
+	const t = useSnapshot(translation).t;
 
 	return (
 		<>

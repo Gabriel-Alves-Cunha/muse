@@ -932,7 +932,7 @@
 	}
 
 	[data-ctx-menu-content] {
-		@apply absolute p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md w-min z-50;
+		@apply fixed p-1 h-fit rounded-md bg-select no-transition overflow-hidden shadow-md w-min z-50;
 	}
 
 	/* ********************************** */

@@ -15,13 +15,12 @@ import {
 	selectAllMedias,
 } from "@contexts/allSelectedMedias";
 
-export default function MediaOptionsCtxMenu() {
-	// If there is none selected, disable:
+export function MediaOptionsCtxMenu() {
 	const allSelectedMediasAccessor = useSnapshot(allSelectedMedias);
 	const [isOpen, setIsOpen] = useState(false);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
+	// If there is none selected, disable:
 	const isDisabled = allSelectedMediasAccessor.size === 0;
 
 	return (
@@ -80,5 +79,5 @@ export function deleteMedias(): void {
 
 	for (const path of allSelectedMedias) promises.push(deleteFile(path));
 
-	Promise.all(promises).then();
+	Promise.allSettled(promises);
 }

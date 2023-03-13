@@ -1,20 +1,16 @@
-import type { Path, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/GeneralTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
-import { MdMusicNote as MusicNote } from "react-icons/md";
-import { Suspense, lazy, useState } from "react";
+import { Suspense, useState } from "react";
 import { useSnapshot } from "valtio";
 
 import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
+import { MediaOptionsModal } from "../MediaListKind/MediaOptionsModal";
 import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { CenteredModal } from "../CenteredModal";
 import { translation } from "@i18n";
 import { unDiacritic } from "@contexts/playlists";
-
-const MediaOptionsModal = lazy(
-	() => import("../MediaListKind/MediaOptionsModal"),
-);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -27,8 +23,7 @@ export function MediaSearchRow({
 	path,
 }: MediaSearchRowProps) {
 	const [isMediaOptionsModalOpen, setIsMediaOptionsModalOpen] = useState(false);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const index = unDiacritic(media.title).indexOf(highlight);
 
@@ -44,11 +39,7 @@ export function MediaSearchRow({
 				title={t("tooltips.playThisMedia")}
 			>
 				<div>
-					<ImgWithFallback
-						Fallback={<MusicNote size={17} />}
-						mediaImg={media.image}
-						mediaPath={path}
-					/>
+					<ImgWithFallback mediaImg={media.image} mediaPath={path} />
 				</div>
 
 				<div className="highlight">

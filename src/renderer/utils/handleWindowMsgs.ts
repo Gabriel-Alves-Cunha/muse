@@ -1,7 +1,7 @@
-import type { MsgObjectElectronToReact } from "@common/@types/electron-window";
+import type { MsgObjectElectronToReact } from "@common/@types/ElectronApi";
 
 import { type MsgWithSource, electronSource } from "@common/crossCommunication";
-import { ElectronToReactMessage } from "@common/enums";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { isAModifierKeyPressed } from "./keyboard";
 import { createNewDownload } from "@components/Downloading/helper";
 import { assertUnreachable } from "./utils";
@@ -19,7 +19,7 @@ import {
 	playlists,
 } from "@contexts/playlists";
 
-const { transformPathsToMedias } = electron.media;
+const { transformPathsToMedias } = electronApi.media;
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -78,11 +78,13 @@ const {
 	REMOVE_ONE_MEDIA,
 	ADD_ONE_MEDIA,
 	ERROR,
-} = ElectronToReactMessage;
+} = ElectronToReactMessageEnum;
 
 //////////////////////////////////////////
 
-export async function handleWindowMsgs(event: Event): Promise<void> {
+export async function handleWindowMsgsFromElectron(
+	event: Event,
+): Promise<void> {
 	if (event.data.source !== electronSource) return;
 
 	dbg("Received message from Electron.\ndata =", event.data);

@@ -1,4 +1,4 @@
-import type { Path } from "./@types/generalTypes";
+import type { Path } from "./@types/GeneralTypes";
 
 /**
  * These are not a bulletproof fns, but for the purpose of

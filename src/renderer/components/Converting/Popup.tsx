@@ -1,11 +1,11 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
 import { useSnapshot } from "valtio";
 
 import { convertingList } from "@contexts/convertList";
 import { isDownloadList } from "../Downloading/Popup";
-import { ProgressStatus } from "@common/enums";
+import { ProgressStatusEnum } from "@common/enums";
 import { formatDuration } from "@common/utils";
 import { progressIcons } from "@components/Progress";
 import { prettyBytes } from "@common/prettyBytes";
@@ -25,8 +25,7 @@ import { handleSingleItemDeleteAnimation } from "@components/Downloading/styles"
 
 export function Popup() {
 	const convertingListAccessor = useSnapshot(convertingList);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return convertingListAccessor.size > 0 ? (
 		<>
@@ -55,8 +54,7 @@ function ConvertBox({
 	convertionIndex,
 	path,
 }: ConvertBoxProps) {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="box">
@@ -98,8 +96,8 @@ function cleanAllDoneConvertions(): void {
 	for (const [url, download] of convertingList)
 		if (
 			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
-			download.status !== ProgressStatus.ACTIVE
+				ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== ProgressStatusEnum.ACTIVE
 		)
 			cancelConversionAndOrRemoveItFromList(url);
 }

@@ -1,4 +1,4 @@
-import type { Page } from "@common/@types/generalTypes";
+import type { Page } from "@common/@types/GeneralTypes";
 
 import { proxy } from "valtio";
 

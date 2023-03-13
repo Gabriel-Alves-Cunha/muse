@@ -125,8 +125,6 @@ As an alternative, consult the docs from GitHub on [how to create a pull request
   </sub>
 </a>
 
-<a href="https://blog.rocketseat.com.br/author/thiago//" title="Rocketseat">🚀</a>
-
 Made with ❤️ by Gabriel Alves Cunha 👋🏽!
 
 [![Linkedin Badge](https://img.shields.io/badge/-Gabriel-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/gabriel-alves-cunha-214178174/)](https://www.linkedin.com/in/gabriel-alves-cunha-214178174/)

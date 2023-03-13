@@ -1,11 +1,11 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
 
-import { memo, Suspense, lazy, useState } from "react";
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
-import { useSnapshot } from "valtio";
+import { memo, Suspense, useState } from "react";
 
 import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
+import { MediaOptionsModal } from "./MediaOptionsModal";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { CenteredModal } from "../CenteredModal";
 import { translation } from "@i18n";
@@ -15,8 +15,6 @@ import {
 	allSelectedMedias,
 } from "@contexts/allSelectedMedias";
 
-const MediaOptionsModal = lazy(() => import("./MediaOptionsModal"));
-
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -24,16 +22,21 @@ const MediaOptionsModal = lazy(() => import("./MediaOptionsModal"));
 export const rightClick = 2;
 export const leftClick = 0;
 
+// First to receive event.
 function selectOrPlayMedia(
 	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
 ): void {
-	if (e.button !== leftClick || !e.ctrlKey) {
-		const { curr, homeList, isHome } = fromList;
-		const list = isHome ? homeList : curr;
+	const isNotClickForCtxMenu = e.button === leftClick;
 
-		return playThisMedia(mediaPath, list);
-	}
+	if (isNotClickForCtxMenu)
+		if (!e.ctrlKey) {
+			// Ctrl also selects a media!
+			const { curr, homeList, isHome } = fromList;
+			const list = isHome ? homeList : curr;
+
+			return playThisMedia(mediaPath, list);
+		}
 
 	toggleSelectedMedia(mediaPath);
 }
@@ -43,18 +46,19 @@ function selectOrPlayMedia(
 /////////////////////////////////////////
 // Main function:
 
+const fallbackImg = <MusicNote size="1.4rem" />;
+const { t } = translation;
+
 const Row = memo<RowProps>(
 	({ media, path }) => {
-		const translationAccessor = useSnapshot(translation);
 		const [isOpen, setIsOpen] = useState(false);
-		const t = translationAccessor.t;
 
 		return (
 			<div
 				data-is-selected-row={allSelectedMedias.has(path)}
 				data-is-playing-row={currentPlaying.path === path}
-				data-row-wrapper
 				data-path={path}
+				data-row-wrapper
 			>
 				<button
 					onPointerUp={(e) => selectOrPlayMedia(e, path)}
@@ -62,7 +66,7 @@ const Row = memo<RowProps>(
 				>
 					<div className="row-img">
 						<ImgWithFallback
-							Fallback={<MusicNote size="1.4rem" />}
+							Fallback={fallbackImg}
 							mediaImg={media.image}
 							mediaPath={path}
 						/>

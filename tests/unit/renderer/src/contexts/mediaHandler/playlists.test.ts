@@ -1,4 +1,4 @@
-import type { Media } from "@common/@types/generalTypes";
+import type { Media } from "@common/@types/GeneralTypes";
 
 import { beforeEach, describe, expect, it } from "vitest";
 

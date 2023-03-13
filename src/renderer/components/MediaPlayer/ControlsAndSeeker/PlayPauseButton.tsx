@@ -14,15 +14,15 @@ import { translation } from "@i18n";
 // Main function:
 
 export function PlayPauseButton({ isThereAMedia }: ControlsProps) {
-	const translationAccessor = useSnapshot(translation);
 	const [isPaused, setIsPaused] = useState(true);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const setIsPausedToFalse = () => setIsPaused(false);
 	const setIsPausedToTrue = () => setIsPaused(true);
 
 	useEffect(() => {
 		const audio = getAudio();
+
 		if (!audio) return;
 
 		audio.addEventListener("pause", setIsPausedToTrue);

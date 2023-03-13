@@ -1,6 +1,6 @@
 import type { ClipboardTextChangeNotificationProps } from "./preload";
-import type { DownloadInfo } from "@common/@types/generalTypes";
-import type { ValuesOf } from "@common/@types/utils";
+import type { DownloadInfo } from "@common/@types/GeneralTypes";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { normalize, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -19,13 +19,12 @@ import {
 
 import { capitalizedAppName } from "@common/utils";
 import { assertUnreachable } from "@utils/utils";
-import { sendMsgToClient } from "@common/crossCommunication";
 import { error, log } from "@common/log";
 import { dbg } from "@common/debug";
 import {
-	ElectronPreloadToMainElectronMessage,
-	ElectronIpcMainProcessNotification,
-	ElectronToReactMessage,
+	ElectronPreloadToMainElectronMessageEnum,
+	ElectronIpcMainProcessNotificationEnum,
+	ElectronToReactMessageEnum,
 } from "@common/enums";
 
 /////////////////////////////////////////
@@ -39,9 +38,7 @@ autoUpdater
 	.on("update-downloaded", (info) => log("Update downloaded:", info))
 	.on("update-available", (info) => log("Update available:", info))
 	.on("checking-for-update", () => log("Checking for update."))
-	.on("error", (err) =>
-		log("Error in auto-updater. ", err),
-	).autoDownload = true;
+	.on("error", (err) => log("Error in auto-updater.", err)).autoDownload = true;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -134,7 +131,7 @@ function createElectronWindow(): BrowserWindow {
 				resolve(app.getAppPath(), "build", "renderer", "index.html"),
 		  ).toString();
 
-	window.loadURL(url).then();
+	window.loadURL(url);
 
 	return window;
 }
@@ -208,106 +205,90 @@ app
 			() => autoUpdater.checkForUpdatesAndNotify().then().catch(error),
 			10_000,
 		);
+
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+		/////////////////////////////////////////
+
+		// Here you can include the rest of your app's specific main process
+		// code. You can also put them in separate files and require them here.
+
+		ipcMain.on(
+			"notify",
+			(
+				event,
+				type: ValuesOf<typeof ElectronIpcMainProcessNotificationEnum>,
+			): void => {
+				const focusedWindow = BrowserWindow.getFocusedWindow();
+
+				switch (type) {
+					case ElectronIpcMainProcessNotificationEnum.QUIT_APP: {
+						focusedWindow?.close();
+						break;
+					}
+
+					case ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE: {
+						if (!focusedWindow) break;
+
+						focusedWindow.isMaximized()
+							? focusedWindow.unmaximize()
+							: focusedWindow.maximize();
+						break;
+					}
+
+					case ElectronIpcMainProcessNotificationEnum.MINIMIZE: {
+						focusedWindow?.minimize();
+						break;
+					}
+
+					case ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS: {
+						focusedWindow?.webContents.toggleDevTools();
+						break;
+					}
+
+					default: {
+						error(
+							"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
+							event,
+						);
+
+						assertUnreachable(type);
+					}
+				}
+			},
+		);
+
+		ipcMain.handle(
+			ElectronPreloadToMainElectronMessageEnum.CLIPBOARD_TEXT_CHANGED,
+			(
+				_event,
+				{ artist, thumbnail, title, url }: ClipboardTextChangeNotificationProps,
+			) =>
+				new Notification({
+					title: "Click to download this media as 'mp3'",
+					timeoutType: "never",
+					urgency: "normal",
+					icon: logoPath,
+					silent: true,
+					body: title,
+				})
+					.on("click", () => {
+						const downloadInfo: DownloadInfo = {
+							imageURL: thumbnail,
+							extension: "mp3",
+							artist,
+							title,
+							url,
+						};
+
+						// Relay message from electronWindow to ipcRenderer:
+						electronWindow?.webContents.send(
+							ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD,
+							downloadInfo,
+						);
+
+						dbg("Clicked notification and sent data:", downloadInfo);
+					})
+					.show(),
+		);
 	});
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-ipcMain
-	.on(
-		// Relay message from electronWindow to ipcRenderer:
-		ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-		(_, downloadValues: DownloadInfo) => {
-			dbg("ipcMain received data from electronWindow:", downloadValues);
-
-			log("Relaying message from on main/index.ts to ipcRenderer");
-
-			ipcMain.emit(
-				ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-				downloadValues,
-			);
-		},
-	)
-	/////////////////////////////////////////
-	.on(
-		"notify",
-		(
-			event,
-			type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
-		): void => {
-			const focusedWindow = BrowserWindow.getFocusedWindow();
-
-			switch (type) {
-				case ElectronIpcMainProcessNotification.QUIT_APP: {
-					focusedWindow?.close();
-					break;
-				}
-
-				case ElectronIpcMainProcessNotification.TOGGLE_MAXIMIZE: {
-					if (!focusedWindow) break;
-
-					focusedWindow.isMaximized()
-						? focusedWindow.unmaximize()
-						: focusedWindow.maximize();
-					break;
-				}
-
-				case ElectronIpcMainProcessNotification.MINIMIZE: {
-					focusedWindow?.minimize();
-					break;
-				}
-
-				case ElectronIpcMainProcessNotification.TOGGLE_DEVELOPER_TOOLS: {
-					focusedWindow?.webContents.toggleDevTools();
-					break;
-				}
-
-				default: {
-					error(
-						"This 'notify' event has no receiver function on 'ipcMain'!\nEvent =",
-						event,
-					);
-
-					assertUnreachable(type);
-				}
-			}
-		},
-	);
-
-ipcMain.handle(
-	ElectronPreloadToMainElectronMessage.CLIPBOARD_TEXT_CHANGED,
-	(
-		_event,
-		{ artist, thumbnail, title, url }: ClipboardTextChangeNotificationProps,
-	) =>
-		new Notification({
-			title: "Click to download this media as 'mp3'",
-			timeoutType: "never",
-			urgency: "normal",
-			icon: logoPath,
-			silent: true,
-			body: title,
-		})
-			.on("click", () => {
-				const downloadInfo: DownloadInfo = {
-					imageURL: thumbnail,
-					extension: "mp3",
-					artist,
-					title,
-					url,
-				};
-
-				// // Send msg to ipcMain, wich in turn will relay to ipcRenderer:
-				sendMsgToClient({
-					type: ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD,
-					downloadInfo,
-				});
-
-				dbg("Clicked notification and sent data:", downloadInfo);
-			})
-			.show(),
-);

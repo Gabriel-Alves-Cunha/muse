@@ -14,6 +14,7 @@ export function handleSingleItemDeleteAnimation(
 	const items = document.querySelectorAll(
 		boxClass,
 	) as NodeListOf<HTMLDivElement>;
+
 	const itemClicked = (e.target as HTMLElement).closest(
 		boxClass,
 	) as HTMLDivElement;
@@ -42,11 +43,11 @@ export function handleSingleItemDeleteAnimation(
 			? cancelDownloadAndOrRemoveItFromList(url)
 			: cancelConversionAndOrRemoveItFromList(url);
 	});
+
 	itemClicked.addEventListener("animationcancel", () => {
 		// This is so users can just click the cancel
 		// button and imediately leave the popup, wich
 		// would cancel the animation!
-
 		isDownloadList
 			? cancelDownloadAndOrRemoveItFromList(url)
 			: cancelConversionAndOrRemoveItFromList(url);

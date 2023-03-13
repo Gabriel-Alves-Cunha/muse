@@ -5,14 +5,14 @@ import { getErrorMessage } from "@utils/error";
 import { translation } from "@i18n";
 import { error } from "@common/log";
 
-const { getBasicInfo } = electron.media;
+const { getBasicInfo } = electronApi.media;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Constants:
 
-export const searchInfo = proxy<SearcherInfo>({
+export const searchResult = proxy<SearcherInfo>({
 	result: { imageURL: "", artist: "", title: "" },
 	isLoading: false,
 	error: "",
@@ -20,10 +20,10 @@ export const searchInfo = proxy<SearcherInfo>({
 });
 
 function setDefaultSearchInfo() {
-	searchInfo.result = { imageURL: "", artist: "", title: "" };
-	searchInfo.isLoading = false;
-	searchInfo.error = "";
-	searchInfo.url = "";
+	searchResult.result = { imageURL: "", artist: "", title: "" };
+	searchResult.isLoading = false;
+	searchResult.error = "";
+	searchResult.url = "";
 }
 
 ////////////////////////////////////////////////
@@ -35,7 +35,7 @@ export function downloadMedia(): void {
 	const {
 		result: { artist, imageURL, title },
 		url,
-	} = searchInfo;
+	} = searchResult;
 
 	if (!(title && url)) return;
 
@@ -49,19 +49,19 @@ export function downloadMedia(): void {
 ////////////////////////////////////////////////
 
 export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
-	// stopping propagation so the space key doesn't toggle play state.
+	// stopping propagation so the space key doesn't toggle play media.
 	e.stopPropagation();
 
-	searchInfo.url = e.target.value;
+	searchResult.url = e.target.value;
 }
 
 ////////////////////////////////////////////////
 
-export async function search(url: Readonly<string>): Promise<void> {
+export async function search(url: string): Promise<void> {
 	if (url.length < 16) return;
 
 	setDefaultSearchInfo();
-	searchInfo.isLoading = true;
+	searchResult.isLoading = true;
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -73,13 +73,13 @@ export async function search(url: Readonly<string>): Promise<void> {
 			title,
 		};
 
-		searchInfo.isLoading = false;
-		searchInfo.result = result;
+		searchResult.isLoading = false;
+		searchResult.result = result;
 	} catch (err) {
 		const { t } = translation;
 
 		setDefaultSearchInfo();
-		searchInfo.error = getErrorMessage(err).includes("No video id found")
+		searchResult.error = getErrorMessage(err).includes("No video id found")
 			? t("errors.noVideoIdFound")
 			: t("errors.gettingMediaInfo");
 

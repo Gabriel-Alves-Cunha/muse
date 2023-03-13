@@ -1,29 +1,58 @@
 import { proxy, subscribe } from "valtio";
 
-import { localStorageKeys, setLocalStorage } from "@utils/localStorage";
+import { localStorageKeys } from "@utils/localStorage";
 import { getAudio } from "./currentPlaying";
+import { error } from "@common/log";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-// Main:
+// Pre work:
 
-let storagedPlayOptions: PlayOptions | undefined;
 const storagedPlayOptionsString = localStorage.getItem(
 	localStorageKeys.playOptions,
 );
-if (storagedPlayOptionsString)
-	storagedPlayOptions = JSON.parse(storagedPlayOptionsString);
 
-export const playOptions = proxy<PlayOptions>(
-	storagedPlayOptions ?? {
-		loopThisMedia: false,
-		isRandom: false,
-	},
-);
+let playOptionsToApply: PlayOptions = {
+	loopThisMedia: false,
+	isRandom: false,
+};
+
+try {
+	if (storagedPlayOptionsString)
+		playOptionsToApply = JSON.parse(storagedPlayOptionsString);
+} catch (err) {
+	error(
+		"Error parsing JSON.parse(storagedPlayOptionsString). Applying default settings.",
+		err,
+	);
+}
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
+export const playOptions = proxy<PlayOptions>(playOptionsToApply);
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Listeners:
+
+let setToLocalStorageTimer: NodeJS.Timer | undefined;
 
 subscribe(playOptions, () => {
-	setLocalStorage(localStorageKeys.playOptions, playOptions);
+	clearTimeout(setToLocalStorageTimer);
+
+	setToLocalStorageTimer = setTimeout(
+		() =>
+			localStorage.setItem(
+				localStorageKeys.playOptions,
+				JSON.stringify(playOptions),
+			),
+		200,
+	);
 });
 
 ////////////////////////////////////////////////

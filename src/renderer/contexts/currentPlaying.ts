@@ -1,5 +1,5 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
-import type { ValuesOf } from "@common/@types/utils";
+import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { subscribeKey } from "valtio/utils";
 import { proxy } from "valtio";
@@ -10,64 +10,79 @@ import { warn, error, info } from "@common/log";
 import { PlaylistListEnum } from "@common/enums";
 import { playOptions } from "./playOptions";
 import { getFirstKey } from "@utils/map-set";
-import { data_path } from "./allSelectedMedias";
+import { selectPath } from "./allSelectedMedias";
 import {
 	type MainList,
-	type History,
+	isProxyMapOrSet,
 	addToHistory,
 	getPlaylist,
 	playlists,
 	getMedia,
 } from "./playlists";
+import { Audio } from "@components/MediaPlayer/ControlsAndSeeker/Controls";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-// Constants:
+// Pre work:
 
-let storagedCurrentPlaying: CurrentPlaying | undefined;
 const storagedCurrentPlayingString = localStorage.getItem(
 	localStorageKeys.currentPlaying,
 );
-if (storagedCurrentPlayingString)
-	storagedCurrentPlaying = JSON.parse(storagedCurrentPlayingString);
+const defaultCurrentPlaying: CurrentPlaying = {
+	listType: PlaylistListEnum.mainList,
+	lastStoppedTimeInSeconds: 0,
+	path: "",
+} as const;
 
-export const currentPlaying = proxy<CurrentPlaying>(
-	storagedCurrentPlaying ?? {
-		listType: PlaylistListEnum.mainList,
-		lastStoppedTime: 0,
-		path: "",
-	},
-);
+let storagedCurrentPlaying: CurrentPlaying | undefined;
 
-export function setDefaultCurrentPlaying() {
-	currentPlaying.listType = PlaylistListEnum.mainList;
-	currentPlaying.lastStoppedTime = 0;
-	currentPlaying.path = "";
+try {
+	if (storagedCurrentPlayingString)
+		storagedCurrentPlaying = JSON.parse(storagedCurrentPlayingString);
+} catch (err) {
+	error(
+		"Error parsing JSON.parse(storagedCurrentPlayingString). Applying default settings.",
+		err,
+	);
+
+	storagedCurrentPlaying = { ...defaultCurrentPlaying };
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main function:
+
+export const currentPlaying = proxy<CurrentPlaying>(storagedCurrentPlaying);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Helper functions:
 
+export function setDefaultCurrentPlaying() {
+	Object.assign(currentPlaying, defaultCurrentPlaying);
+}
+
+////////////////////////////////////////////////
+
 export function playThisMedia(
 	path: Path,
 	listType: ValuesOf<typeof PlaylistListEnum> = PlaylistListEnum.mainList,
 ): void {
-	currentPlaying.lastStoppedTime = 0;
+	currentPlaying.lastStoppedTimeInSeconds = 0;
 	currentPlaying.listType = listType;
 	currentPlaying.path = path;
 }
 
 ////////////////////////////////////////////////
 
-export const getAudio = () =>
-	document.getElementById("audio") as HTMLAudioElement | null;
+export const getAudio = (): Audio => document.getElementById("audio") as Audio;
 
 ////////////////////////////////////////////////
 
-export function togglePlayPause() {
+export function togglePlayPause(): void {
 	const audio = getAudio();
 	if (!audio?.src) return;
 
@@ -76,7 +91,7 @@ export function togglePlayPause() {
 
 ////////////////////////////////////////////////
 
-export const play = () => getAudio()?.play().then();
+export const play = () => getAudio()?.play();
 
 ////////////////////////////////////////////////
 
@@ -85,10 +100,10 @@ export function pause(): void {
 	if (!audio?.src) return;
 
 	audio.pause();
-	const lastStoppedTime = audio.currentTime;
+	const lastStoppedTimeInSeconds = audio.currentTime;
 
-	if (lastStoppedTime > 60 /* seconds */)
-		currentPlaying.lastStoppedTime = lastStoppedTime;
+	if (lastStoppedTimeInSeconds > 60)
+		currentPlaying.lastStoppedTimeInSeconds = lastStoppedTimeInSeconds;
 }
 
 ////////////////////////////////////////////////
@@ -96,13 +111,13 @@ export function pause(): void {
 function sortHistoryByDate() {
 	const unsortedList: [Path, DateAsNumber][] = [];
 
-	for (const [path, dates] of getPlaylist(PlaylistListEnum.history) as History)
+	for (const [path, dates] of playlists.history)
 		for (const date of dates) unsortedList.push([path, date]);
 
 	const mainList = playlists.sortedByTitleAndMainList;
 
 	const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
-		.sort((a, b) => b[1] - a[1]) // sorted by date
+		.sort((a, b) => b[1] - a[1]) // sort by date
 		.map(([id, date]) => [id, mainList.get(id)!, date]);
 
 	return listAsArrayOfMap;
@@ -119,7 +134,7 @@ export function playPreviousMedia(): void {
 				"A media needs to be currently selected to play a previous media!",
 			);
 
-		// We don't play previous media if it's the history list:
+		// We don't play previous media if it's the history list itself:
 		const correctListType =
 			listType === PlaylistListEnum.history
 				? PlaylistListEnum.mainList
@@ -191,7 +206,7 @@ export function playNextMedia(): void {
 			}
 
 			// In case the currently playing is the last media, get the first:
-			if (!nextMediaPath) nextMediaPath = getFirstKey(list)!;
+			if (!nextMediaPath) nextMediaPath = getFirstKey(list) ?? "";
 		}
 
 		if (!nextMediaPath)
@@ -201,8 +216,8 @@ export function playNextMedia(): void {
 				list,
 			});
 
+		currentPlaying.lastStoppedTimeInSeconds = 0;
 		currentPlaying.listType = correctListType;
-		currentPlaying.lastStoppedTime = 0;
 		currentPlaying.path = nextMediaPath;
 	}, "playNextMedia");
 }
@@ -214,27 +229,27 @@ export function playNextMedia(): void {
 
 navigator?.mediaSession?.setActionHandler?.("previoustrack", playPreviousMedia);
 navigator?.mediaSession?.setActionHandler?.("nexttrack", playNextMedia);
-navigator?.mediaSession?.setActionHandler?.("pause", () => pause());
-navigator?.mediaSession?.setActionHandler?.("play", () => play());
+navigator?.mediaSession?.setActionHandler?.("pause", pause);
+navigator?.mediaSession?.setActionHandler?.("play", play);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-let prevPath = "";
+let prevPath = currentPlaying.path;
 
-subscribeKey(
-	currentPlaying,
-	"path",
-	// Update history and set audio source:
-	(newPath) => {
-		if (!newPath) return;
+// Update history and set audio source:
+subscribeKey(currentPlaying, "path", () => {
+	const newPath = currentPlaying.path;
 
-		addToHistory(newPath);
+	if (!newPath || newPath === prevPath) return;
 
-		setAudioSource(newPath, prevPath);
-	},
-);
+	addToHistory(newPath);
+
+	setAudioSource(newPath, prevPath);
+
+	prevPath = newPath;
+});
 
 ////////////////////////////////////////////////
 // Handle what happens when the `currentPlaying.path` changes:
@@ -253,11 +268,16 @@ function setAudioSource(newPath: Path, prevPath: Path) {
 
 	const timerToSetMedia = setTimeout(() => {
 		const audio = getAudio();
+
 		if (!audio) return;
 
 		audio.src = mediaPathSuitableForElectron;
 
-		setLocalStorage(localStorageKeys.currentPlaying, currentPlaying);
+		setLocalStorage(
+			localStorageKeys.currentPlaying,
+			currentPlaying,
+			!isProxyMapOrSet,
+		);
 
 		changeMediaSessionMetadata(media);
 
@@ -280,9 +300,9 @@ const isPlayingRowDatalistString = "isPlayingRow";
  */
 function handleDecorateMediaRow(newPath: Path, prevPath: Path) {
 	const prevElements = prevPath
-		? document.querySelectorAll(data_path(prevPath))
+		? document.querySelectorAll(selectPath(prevPath))
 		: null;
-	const newElements = document.querySelectorAll(data_path(newPath));
+	const newElements = document.querySelectorAll(selectPath(newPath));
 
 	if (!prevElements) info(`No previous media row found for "${prevPath}!"`);
 	if (!newElements) return info(`No media row found for "${newPath}"!`);
@@ -300,8 +320,6 @@ function handleDecorateMediaRow(newPath: Path, prevPath: Path) {
 ////////////////////////////////////////////////
 
 function changeMediaSessionMetadata(media: Media): void {
-	if (!navigator?.mediaSession) return;
-
 	navigator.mediaSession.metadata = new MediaMetadata({
 		artwork: [{ src: media.image }],
 		artist: media.artist,
@@ -317,6 +335,6 @@ function changeMediaSessionMetadata(media: Media): void {
 
 export type CurrentPlaying = {
 	listType: ValuesOf<typeof PlaylistListEnum>;
-	lastStoppedTime: number;
+	lastStoppedTimeInSeconds: number;
 	path: Path;
 };

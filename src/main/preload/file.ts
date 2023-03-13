@@ -1,11 +1,10 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { readdir, unlink } from "node:fs/promises";
 import { join } from "node:path";
 
 import { getLastExtension } from "@common/path";
 import { allowedMedias } from "@common/utils";
-import { emptyArray } from "@common/empty";
 import { error } from "@common/log";
 import { dirs } from "@main/utils";
 
@@ -32,7 +31,7 @@ export async function getFullPathOfFilesForFilesInThisDirectory(
 export const readDir = async (dir: Path): Promise<readonly Path[]> =>
 	await readdir(dir).catch((err) => {
 		error(err);
-		return emptyArray;
+		return [];
 	});
 
 ///////////////////////////////////////////

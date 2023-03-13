@@ -1,7 +1,7 @@
 import { useSnapshot } from "valtio";
 
 import { SearcherWrapper } from "./SearcherWrapper";
-import { searchInfo } from "./helpers";
+import { searchResult } from "./helpers";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
 import { Header } from "@components/Header";
@@ -30,7 +30,7 @@ export const Download = () => (
 // Helper functions:
 
 function IsLoading() {
-	const searchInfoAccessor = useSnapshot(searchInfo);
+	const searchInfoAccessor = useSnapshot(searchResult);
 
 	return (
 		<div className="w-6 h-6 ml-3">

@@ -1,4 +1,4 @@
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 import type { MainList } from "./playlists";
 
 import { log } from "@common/log";

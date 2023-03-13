@@ -1,14 +1,9 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
-import type { ValuesOf } from "@common/@types/utils";
+import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { proxyMap, proxySet } from "valtio/utils";
 import { proxy, subscribe } from "valtio";
 
-import {
-	getFromLocalStorage,
-	localStorageKeys,
-	setLocalStorage,
-} from "@utils/localStorage";
 import { sortByDateOfBirth, sortByTitle } from "./playlistsHelper";
 import { allSelectedMedias } from "./allSelectedMedias";
 import { dbg, dbgPlaylists } from "@common/debug";
@@ -18,8 +13,13 @@ import { error, warn } from "@common/log";
 import { settings } from "@contexts/settings";
 import { throwErr } from "@common/log";
 import { time } from "@utils/utils";
+import {
+	getFromLocalStorage,
+	localStorageKeys,
+	setLocalStorage,
+} from "@utils/localStorage";
 
-const { transformPathsToMedias } = electron.media;
+const { transformPathsToMedias } = electronApi.media;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -41,12 +41,23 @@ export const playlists = proxy<Playlists>({
 	sortedByDate: proxySet(),
 });
 
-subscribe(playlists.favorites, () => {
-	setLocalStorage(localStorageKeys.favorites, playlists.favorites);
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Listeners:
+
+export const isProxyMapOrSet = true;
+
+subscribe(playlists.favorites, (): void => {
+	setLocalStorage(
+		localStorageKeys.favorites,
+		playlists.favorites,
+		isProxyMapOrSet,
+	);
 });
 
-subscribe(playlists.history, () => {
-	setLocalStorage(localStorageKeys.history, playlists.history);
+subscribe(playlists.history, (): void => {
+	setLocalStorage(localStorageKeys.history, playlists.history, isProxyMapOrSet);
 });
 
 ////////////////////////////////////////////////
@@ -62,6 +73,7 @@ export function addToHistory(path: Path): void {
 
 	// Add to history if there isn't one yet:
 	const historyOfDates = history.get(path);
+
 	historyOfDates
 		? dates.unshift(...historyOfDates, Date.now())
 		: dates.unshift(Date.now());
@@ -70,8 +82,8 @@ export function addToHistory(path: Path): void {
 
 	// history has a max size of `maxSizeOfHistory`:
 	if (history.size > maxSizeOfHistory) {
-		const firstPath = getFirstKey(history)!;
-		// remove the first element:
+		const firstPath = getFirstKey(history) ?? "";
+
 		history.delete(firstPath);
 	}
 
@@ -82,7 +94,7 @@ export function addToHistory(path: Path): void {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-function updateSortedLists(newMainList: MainList) {
+function updateSortedLists(newMainList: MainList): void {
 	const { sortedByTitleAndMainList: mainList, sortedByDate } = playlists;
 
 	sortedByDate.clear();
@@ -105,9 +117,7 @@ export function addToMainList(path: Path, newMedia: Media): void {
 			`Media "${path}" already exists. So, I'm not gonna add it. If you want to update it, use 'rescanMedia()'.`,
 		);
 
-	const newMainList = new Map(mainList).set(path, newMedia);
-
-	updateSortedLists(newMainList);
+	updateSortedLists(mainList.set(path, newMedia));
 }
 
 ////////////////////////////////////////////////
@@ -181,7 +191,7 @@ export function replaceEntireMainList(list: MainList): void {
 ////////////////////////////////////////////////
 
 export function clearAllLists(): void {
-	for (const [_key, value] of Object.entries(playlists))
+	for (const value of Object.values(playlists))
 		if (typeof value !== "boolean") value.clear();
 }
 
@@ -195,7 +205,7 @@ export async function rescanMedia(path: Path, newMedia?: Media): Promise<void> {
 	if (!oldMedia) {
 		warn(`There's no "${path}" to be refreshed. Refreshing all.`);
 
-		return await searchLocalComputerForMedias();
+		return searchLocalComputerForMedias();
 	}
 
 	// If a new media was given, just update it:
@@ -215,7 +225,7 @@ export async function rescanMedia(path: Path, newMedia?: Media): Promise<void> {
 	if (!refreshedMedia) {
 		error(`Transforming "${path}" to a media failed! Refreshing all.`);
 
-		return await searchLocalComputerForMedias();
+		return searchLocalComputerForMedias();
 	}
 
 	mainList.set(path, refreshedMedia);

@@ -1,14 +1,14 @@
-import type { DownloadInfo, ID, Media, Path } from "./generalTypes";
-import type { DeepReadonly, ValuesOf } from "./utils";
+import type { DownloadInfo, ID, Media, Path } from "./GeneralTypes";
+import type { DeepReadonly, ValuesOf } from "./Utils";
 import type { ChangeOptionsToSend } from "@components/MediaListKind/MediaOptions";
 import type { ClientServerAPI } from "@main/preload/share";
 import type { LyricsResponse } from "@main/preload/getLyrics.js";
 import type { videoInfo } from "ytdl-core";
 
 import {
-	ElectronIpcMainProcessNotification,
-	ElectronToReactMessage,
-	ReactToElectronMessage,
+	ElectronIpcMainProcessNotificationEnum,
+	ElectronToReactMessageEnum,
+	ReactToElectronMessageEnum,
 } from "../enums";
 
 /////////////////////////////////////////////
@@ -17,17 +17,17 @@ import {
 
 declare global {
 	var runtimeGlobalsChecker: { getRuntimeGlobals: () => string[] };
-	var electron: VisibleElectron;
+	var electronApi: ElectronAPI;
 	var isDev: boolean;
 }
 
 /////////////////////////////////////////////
 
-export type VisibleElectron = DeepReadonly<{
+export type ElectronAPI = DeepReadonly<{
 	os: { dirs: { documents: Path; downloads: Path; music: Path } };
 	notificationApi: {
 		sendNotificationToElectronIpcMainProcess(
-			type: ValuesOf<typeof ElectronIpcMainProcessNotification>,
+			type: ValuesOf<typeof ElectronIpcMainProcessNotificationEnum>,
 		): void;
 	};
 	fs: {
@@ -65,11 +65,11 @@ export type MetadataToChange = Readonly<{
 /////////////////////////////////////////////
 
 export type MsgObjectReactToElectron = Readonly<
-	| { type: typeof ReactToElectronMessage.CREATE_A_NEW_DOWNLOAD }
-	| { type: typeof ReactToElectronMessage.ERROR; error: Error }
-	| { type: typeof ReactToElectronMessage.CONVERT_MEDIA }
+	| { type: typeof ReactToElectronMessageEnum.CREATE_A_NEW_DOWNLOAD }
+	| { type: typeof ReactToElectronMessageEnum.ERROR; error: Error }
+	| { type: typeof ReactToElectronMessageEnum.CONVERT_MEDIA }
 	| {
-			type: typeof ReactToElectronMessage.WRITE_TAG;
+			type: typeof ReactToElectronMessageEnum.WRITE_TAG;
 			thingsToChange: MetadataToChange;
 			mediaPath: Path;
 	  }
@@ -78,17 +78,23 @@ export type MsgObjectReactToElectron = Readonly<
 /////////////////////////////////////////////
 
 export type MsgObjectElectronToReact = Readonly<
-	| { type: typeof ElectronToReactMessage.RESCAN_ONE_MEDIA; mediaPath: Path }
-	| { type: typeof ElectronToReactMessage.REMOVE_ONE_MEDIA; mediaPath: Path }
-	| { type: typeof ElectronToReactMessage.ADD_ONE_MEDIA; mediaPath: Path }
-	| { type: typeof ElectronToReactMessage.ERROR; error: Error }
-	| { type: typeof ElectronToReactMessage.RESCAN_ALL_MEDIA }
 	| {
-			type: typeof ElectronToReactMessage.DELETE_ONE_MEDIA_FROM_COMPUTER;
+			type: typeof ElectronToReactMessageEnum.RESCAN_ONE_MEDIA;
 			mediaPath: Path;
 	  }
 	| {
-			type: typeof ElectronToReactMessage.CREATE_A_NEW_DOWNLOAD;
+			type: typeof ElectronToReactMessageEnum.REMOVE_ONE_MEDIA;
+			mediaPath: Path;
+	  }
+	| { type: typeof ElectronToReactMessageEnum.ADD_ONE_MEDIA; mediaPath: Path }
+	| { type: typeof ElectronToReactMessageEnum.ERROR; error: Error }
+	| { type: typeof ElectronToReactMessageEnum.RESCAN_ALL_MEDIA }
+	| {
+			type: typeof ElectronToReactMessageEnum.DELETE_ONE_MEDIA_FROM_COMPUTER;
+			mediaPath: Path;
+	  }
+	| {
+			type: typeof ElectronToReactMessageEnum.CREATE_A_NEW_DOWNLOAD;
 			downloadInfo: DownloadInfo;
 	  }
 >;

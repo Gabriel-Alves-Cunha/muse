@@ -1,4 +1,4 @@
-import type { ValuesOf } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/Utils";
 
 import { proxy } from "valtio";
 
@@ -13,10 +13,6 @@ export const fromList = proxy<FromList>({
 	curr: PlaylistListEnum.favorites,
 	isHome: true,
 });
-
-/////////////////////////////////////////
-
-export const isCtxMenuOpen = proxy({ curr: false });
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

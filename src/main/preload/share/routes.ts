@@ -1,5 +1,5 @@
 import type { Middleware } from "koa";
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { createReadStream } from "node:fs";
 import Router from "koa-router";

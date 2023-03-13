@@ -1,9 +1,9 @@
 import type { AllowedMedias } from "@common/utils";
 import type { ProgressProps } from "../Progress";
-import type { ValuesOf } from "@common/@types/utils";
-import type { Path } from "@common/@types/generalTypes";
+import type { ValuesOf } from "@common/@types/Utils";
+import type { Path } from "@common/@types/GeneralTypes";
 
-import { ProgressStatus, ReactToElectronMessage } from "@common/enums";
+import { ProgressStatusEnum, ReactToElectronMessageEnum } from "@common/enums";
 import { errorToast, infoToast, successToast } from "../toasts";
 import { assertUnreachable } from "@utils/utils";
 import { sendMsgToBackend } from "@common/crossCommunication";
@@ -17,6 +17,8 @@ import { dbg } from "@common/debug";
 /////////////////////////////////////////////
 // Main function:
 
+const { t } = translation;
+
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Path,
@@ -24,8 +26,6 @@ export function createNewConvertion(
 	dbg("Trying to create a new conversion.", { convertingList });
 
 	if (convertingList.has(path)) {
-		const { t } = translation;
-
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		infoToast(info);
@@ -39,11 +39,14 @@ export function createNewConvertion(
 	const { port1: frontEndPort, port2: backEndPort } = new MessageChannel();
 
 	// Sending port so we can communicate with electron:
-	sendMsgToBackend({ type: ReactToElectronMessage.CONVERT_MEDIA }, backEndPort);
+	sendMsgToBackend(
+		{ type: ReactToElectronMessageEnum.CONVERT_MEDIA },
+		backEndPort,
+	);
 
 	// Add new conversion to the list:
 	convertingList.set(path, {
-		status: ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+		status: ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
 		toExtension: convertInfo.toExtension,
 		port: frontEndPort,
 		timeConverted: 0,
@@ -81,7 +84,7 @@ export function cancelConversionAndOrRemoveItFromList(path: string): void {
 		return error(`"${path}" not found! convertList =`, convertingList);
 
 	// Cancel conversion
-	if (mediaBeingConverted.status === ProgressStatus.ACTIVE)
+	if (mediaBeingConverted.status === ProgressStatusEnum.ACTIVE)
 		mediaBeingConverted.port.postMessage({ destroy: true, path });
 
 	// Remove from converting list
@@ -111,11 +114,9 @@ function handleUpdateConvertingList(
 	// Update `convertingList`:
 	convertingList.set(path, { ...thisConversion, ...data });
 
-	const { t } = translation;
-
 	// Handle status:
 	switch (data.status) {
-		case ProgressStatus.FAILED: {
+		case ProgressStatusEnum.FAILED: {
 			// @ts-ignore => ^ In this case, `data` include an `error: Error` key:
 			assert(data.error, "data.error should exist!");
 
@@ -129,22 +130,22 @@ function handleUpdateConvertingList(
 			break;
 		}
 
-		case ProgressStatus.SUCCESS: {
+		case ProgressStatusEnum.SUCCESS: {
 			successToast(`${t("toasts.conversionSuccess")}"${path}"!`);
 
 			cancelConversionAndOrRemoveItFromList(path);
 			break;
 		}
 
-		case ProgressStatus.CANCEL: {
+		case ProgressStatusEnum.CANCEL: {
 			infoToast(`${t("toasts.conversionCanceled")}"${path}"!`);
 
 			cancelConversionAndOrRemoveItFromList(path);
 			break;
 		}
 
-		case ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
-		case ProgressStatus.ACTIVE:
+		case ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON:
+		case ProgressStatusEnum.ACTIVE:
 		case undefined:
 			break;
 
@@ -173,5 +174,5 @@ export type ConvertInfo = { toExtension: AllowedMedias };
 /////////////////////////////////////////////
 
 type PartialExceptStatus = Partial<MediaBeingConverted> & {
-	status: ValuesOf<typeof ProgressStatus>;
+	status: ValuesOf<typeof ProgressStatusEnum>;
 };

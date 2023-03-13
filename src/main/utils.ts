@@ -1,4 +1,4 @@
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/GeneralTypes";
 
 import { homedir } from "node:os";
 import { join } from "node:path";

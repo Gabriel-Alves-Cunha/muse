@@ -1,4 +1,4 @@
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/GeneralTypes";
 
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";

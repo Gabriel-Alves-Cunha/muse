@@ -26,7 +26,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 		"runtimeGlobalsChecker",
 		"$RefreshReg$",
 		"$RefreshSig$",
-		"electron",
+		"electronApi",
 	];
 
 	/**

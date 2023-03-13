@@ -1,16 +1,16 @@
 import type { MediaBeingConverted } from "@components/Converting/helper";
 import type { AllowedMedias } from "@common/utils";
 import type { Readable } from "node:stream";
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import sanitize from "sanitize-filename";
 
-import { ElectronToReactMessage } from "@common/enums";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { log, error, throwErr } from "@common/log";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { ProgressStatus } from "@common/enums";
+import { ProgressStatusEnum } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
 import { deleteFile } from "../file";
@@ -75,7 +75,7 @@ export async function convertToAudio(
 
 			// Send a msg to the client that the download failed:
 			const msg: Partial<MediaBeingConverted> & { error: Error } = {
-				status: ProgressStatus.FAILED,
+				status: ProgressStatusEnum.FAILED,
 				error: err,
 			};
 			electronPort.postMessage(msg);
@@ -121,7 +121,7 @@ export async function convertToAudio(
 
 				// Send a message to client that we're starting a conversion:
 				const msg: Partial<MediaBeingConverted> = {
-					status: ProgressStatus.ACTIVE,
+					status: ProgressStatusEnum.ACTIVE,
 				};
 				electronPort!.postMessage(msg);
 			}
@@ -136,7 +136,7 @@ export async function convertToAudio(
 
 			// Tell the client the conversion threw an error:
 			const msg: Partial<MediaBeingConverted> & { error: Error } = {
-				status: ProgressStatus.FAILED,
+				status: ProgressStatusEnum.FAILED,
 				error: new Error(err.message),
 			};
 			electronPort.postMessage(msg);
@@ -164,19 +164,19 @@ export async function convertToAudio(
 
 			// Tell the client the download was successfull:
 			const msg: Partial<MediaBeingConverted> = {
-				status: ProgressStatus.SUCCESS,
+				status: ProgressStatusEnum.SUCCESS,
 			};
 			electronPort.postMessage(msg);
 
 			// Treat the successfully converted file as a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 				mediaPath: saveSite,
 			});
 
 			// ...and remove old one
 			sendMsgToClient({
-				type: ElectronToReactMessage.REMOVE_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 				mediaPath: path,
 			});
 
@@ -204,7 +204,7 @@ export async function convertToAudio(
 
 			// Tell the client the conversion was successfully canceled:
 			const msg: Partial<MediaBeingConverted> = {
-				status: ProgressStatus.CANCEL,
+				status: ProgressStatusEnum.CANCEL,
 			};
 			electronPort.postMessage(msg);
 

@@ -6,7 +6,7 @@ import { useSnapshot } from "valtio";
 import { cancelDownloadAndOrRemoveItFromList } from "./helper";
 import { Progress, progressIcons } from "../Progress";
 import { downloadingList } from "@contexts/downloadList";
-import { ProgressStatus } from "@common/enums";
+import { ProgressStatusEnum } from "@common/enums";
 import { translation } from "@i18n";
 import { Button } from "../Button";
 
@@ -18,8 +18,7 @@ import { handleSingleItemDeleteAnimation } from "./styles";
 
 export function Popup() {
 	const downloadingListAccessor = useSnapshot(downloadingList);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return downloadingListAccessor.size > 0 ? (
 		<>
@@ -50,8 +49,7 @@ function DownloadingBox({
 	download,
 	url,
 }: DownloadingBoxProps) {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="box">
@@ -94,8 +92,8 @@ function cleanAllDoneDownloads(): void {
 	for (const [url, download] of downloadingList)
 		if (
 			download.status !==
-				ProgressStatus.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
-			download.status !== ProgressStatus.ACTIVE
+				ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
+			download.status !== ProgressStatusEnum.ACTIVE
 		)
 			cancelDownloadAndOrRemoveItFromList(url);
 }

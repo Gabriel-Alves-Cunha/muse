@@ -1,9 +1,11 @@
-import type { Path } from "@common/@types/generalTypes";
+import type { Path } from "@common/@types/GeneralTypes";
 
-import { ReactToElectronMessage } from "@common/enums";
+import { MdMusicNote as MusicNote } from "react-icons/md";
+
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { eraseImg } from "@common/utils";
-import { ValuesOf } from "@common/@types/utils";
+import { ValuesOf } from "@common/@types/Utils";
 import { getMedia } from "@contexts/playlists";
 import { error } from "@common/log";
 
@@ -12,13 +14,13 @@ import { error } from "@common/log";
 /////////////////////////////////////////////
 // Constants:
 
-const status = { SUCCESS: 2, FAILURE: 3, PENDING: 4 } as const;
+const statusEnum = { SUCCESS: 2, FAILURE: 3, PENDING: 4 } as const;
 
-const { FAILURE, PENDING, SUCCESS } = status;
+const { FAILURE, PENDING, SUCCESS } = statusEnum;
 
 /////////////////////////////////////////////
 
-const cache: Map<Path, ValuesOf<typeof status>> = new Map();
+const cache: Map<Path, ValuesOf<typeof statusEnum>> = new Map();
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -27,8 +29,8 @@ const cache: Map<Path, ValuesOf<typeof status>> = new Map();
 
 export function ImgWithFallback({
 	className = "object-cover h-11 rounded-xl",
+	Fallback = <MusicNote size={17} />,
 	mediaPath,
-	Fallback,
 	mediaImg,
 }: Props): JSX.Element {
 	if (!mediaImg?.length) return Fallback;
@@ -56,7 +58,7 @@ export function ImgWithFallback({
 
 				sendMsgToBackend({
 					thingsToChange: [{ newValue: eraseImg, whatToChange: "imageURL" }],
-					type: ReactToElectronMessage.WRITE_TAG,
+					type: ReactToElectronMessageEnum.WRITE_TAG,
 					mediaPath,
 				});
 			}, 1_000);
@@ -89,7 +91,7 @@ export function ImgWithFallback({
 
 type Props = {
 	mediaImg: string | undefined;
-	Fallback: JSX.Element;
+	Fallback?: JSX.Element;
 	className?: string;
 	mediaPath: Path;
 };

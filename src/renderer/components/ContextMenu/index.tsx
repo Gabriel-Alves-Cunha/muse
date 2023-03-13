@@ -1,15 +1,12 @@
-import type { ValuesOf } from "@common/@types/utils";
+import type { ValuesOf } from "@common/@types/Utils";
 
-import { Suspense, lazy } from "react";
+import { Suspense, type PropsWithoutRef } from "react";
 
+import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
 import { CtxMenu, CtxMenuProps } from "./CtxMenu";
-import { deselectAllMedias } from "@contexts/allSelectedMedias";
-
-const MediaOptionsCtxMenu = lazy(() => import("./mediaOptionsCtxMenu"));
-const MainCtxMenu = lazy(() => import("./mainCtxMenu"));
-const SearchMediaOptionsCtxMenu = lazy(
-	() => import("./searchMediaOptionsCtxMenu"),
-);
+import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
+import { allSelectedMedias } from "@contexts/allSelectedMedias";
+import { MainCtxMenu } from "./mainCtxMenu";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -33,7 +30,7 @@ export const ContextMenu = ({
 	content = MAIN,
 	wrapperProps,
 	...props
-}: Props) => (
+}: PropsWithoutRef<Props>) => (
 	<CtxMenu
 		wrapperProps={wrapperProps}
 		onOpenChange={onOpenChange}
@@ -54,7 +51,7 @@ export const ContextMenu = ({
 
 function onOpenChange(newValue: boolean): void {
 	// On close, deselectAllMedias():
-	if (!newValue) deselectAllMedias();
+	if (!newValue) allSelectedMedias.clear();
 }
 
 /////////////////////////////////////////////

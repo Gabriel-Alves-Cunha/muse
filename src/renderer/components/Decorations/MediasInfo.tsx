@@ -5,9 +5,8 @@ import { translation } from "@i18n";
 import { playlists } from "@contexts/playlists";
 
 export function MediasInfo() {
-	const translationAccessor = useSnapshot(translation);
 	const playlistsAccessor = useSnapshot(playlists);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	let allFilesSize = 0;
 

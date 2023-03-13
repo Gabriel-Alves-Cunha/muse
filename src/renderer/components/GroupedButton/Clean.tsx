@@ -8,8 +8,7 @@ import { playlists } from "@contexts/playlists";
 import { fromList } from "../MediaListKind/states";
 
 export function Clean() {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<ButtonOfGroup

@@ -1,4 +1,4 @@
-import type { Page } from "@common/@types/generalTypes";
+import type { Page } from "@common/@types/GeneralTypes";
 
 import { ToastContainer } from "react-toastify";
 import { useSnapshot } from "valtio";
@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/playlists";
-import { handleWindowMsgs } from "@utils/handleWindowMsgs";
+import { handleWindowMsgsFromElectron } from "@utils/handleWindowMsgs";
 import { ContextMenu } from "@components/ContextMenu";
 import { MediaPlayer } from "@components/MediaPlayer";
 import { ShareDialog } from "@components/ShareDialog";
@@ -81,12 +81,15 @@ function PageToShow() {
 //////////////////////////////////////////
 // Do once on window load:
 
+searchLocalComputerForMedias();
+
 window.addEventListener(
 	"load",
-	async () => {
-		window.addEventListener("message", handleWindowMsgs);
+	() => {
+		window.addEventListener("message", handleWindowMsgsFromElectron);
 
-		await searchLocalComputerForMedias();
+		// Remove splash screen:
+		document.getElementById("splashscreen")?.remove();
 	},
 	{ once: true },
 );

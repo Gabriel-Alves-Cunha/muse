@@ -1,4 +1,4 @@
-import type { Path, Media } from "@common/@types/generalTypes";
+import type { Path, Media } from "@common/@types/GeneralTypes";
 
 import { useSnapshot } from "valtio";
 import {
@@ -16,11 +16,7 @@ import { translation } from "@i18n";
 /////////////////////////////////////////
 
 export function Header({ media, path, displayTitle = false }: HeaderProps) {
-	const playlistsAccessor = useSnapshot(playlists);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
-
-	const isFavorite = playlistsAccessor.favorites.has(path);
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="media-player-header">
@@ -33,10 +29,18 @@ export function Header({ media, path, displayTitle = false }: HeaderProps) {
 				title={t("tooltips.toggleFavorite")}
 				disabled={!path}
 			>
-				{isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />}
+				<IsFavorite path={path} />
 			</CircleIconButton>
 		</div>
 	);
+}
+
+function IsFavorite({ path }: { path: Path }) {
+	const playlistsAccessor = useSnapshot(playlists);
+
+	const isFavorite = playlistsAccessor.favorites.has(path);
+
+	return isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />;
 }
 
 /////////////////////////////////////////

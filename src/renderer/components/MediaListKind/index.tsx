@@ -1,4 +1,4 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/generalTypes";
+import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
 
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
@@ -7,19 +7,16 @@ import { useSnapshot } from "valtio";
 import { Virtuoso } from "react-virtuoso";
 
 import { CtxContentEnum, ContextMenu } from "../ContextMenu";
-import { isCtxMenuOpen, fromList } from "./states";
 import { itemContent, leftClick } from "./Row";
+import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { PlaylistListEnum } from "@common/enums";
 import { resetAllAppData } from "@utils/app";
 import { ErrorFallback } from "../ErrorFallback";
 import { on, removeOn } from "@utils/window";
 import { translation } from "@i18n";
+import { fromList } from "./states";
 import { error } from "@common/log";
 import { time } from "@utils/utils";
-import {
-	allSelectedMedias,
-	deselectAllMedias,
-} from "@contexts/allSelectedMedias";
 import {
 	type MainList,
 	type History,
@@ -28,7 +25,6 @@ import {
 } from "@contexts/playlists";
 import {
 	selectAllMediasOnCtrlPlusA,
-	selectMediaByPointerEvent,
 	computeHistoryItemKey,
 	computeItemKey,
 	reloadWindow,
@@ -37,6 +33,7 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
+// Wrapping main function in an error boundary:
 
 export const MediaListKind = ({ isHome }: Props) => (
 	<ErrorBoundary
@@ -62,15 +59,16 @@ export const MediaListKind = ({ isHome }: Props) => (
 // Main function:
 
 function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
+	const playlistsAccessor = useSnapshot(playlists);
+	const wrapperRef = useRef<HTMLDivElement>(null);
 	const fromListAccessor = useSnapshot(fromList);
-	const listRef = useRef<HTMLDivElement>(null);
 
 	// isHome is used to determine which list to use
 	// when the user is at the home page, the homeList is used
 	// then, cause it will have what the user has last set as the main list:
 	// either sortedByDate or sortedByName, in our current case.
 	const listName = isHome ? fromListAccessor.homeList : fromListAccessor.curr;
-	const { [listName]: list } = playlists;
+	const list = playlistsAccessor[listName];
 
 	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
 		() =>
@@ -139,14 +137,16 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 	useEffect(() => {
 		function handleDeselectAllMedias(event: PointerEvent) {
-			const isClickOutsideValid =
-				event.button !== leftClick ||
-				!listRef.current ||
-				listRef.current.contains(event.target as Node);
+			if (allSelectedMedias.size === 0) return;
 
-			if (!isClickOutsideValid) return;
+			const ignoreBecauseOfLeftClick = event.button !== leftClick;
+			const isClickInside = Boolean(
+				wrapperRef.current?.contains(event.target as Node),
+			);
 
-			if (!isCtxMenuOpen && allSelectedMedias.size > 0) deselectAllMedias();
+			if (ignoreBecauseOfLeftClick || isClickInside) return;
+
+			allSelectedMedias.clear();
 		}
 
 		on("pointerup", handleDeselectAllMedias);
@@ -161,9 +161,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	return (
 		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
 		<ContextMenu
-			wrapperProps={{ className: "max-w-2xl h-[87%]", ref: listRef }}
-			onOpenChange={(newValue) => (isCtxMenuOpen.curr = newValue)}
-			onContextMenu={selectMediaByPointerEvent}
+			wrapperProps={{ className: "max-w-2xl h-[87%]", ref: wrapperRef }}
 			content={CtxContentEnum.MEDIA_OPTIONS}
 		>
 			<Virtuoso
@@ -180,6 +178,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 				className="list"
 				overscan={15}
 				noValidate
+				id="list"
 			/>
 		</ContextMenu>
 	);
@@ -191,6 +190,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 // Helper functions:
 
 const footer = <div className="relative w-2 h-2 bg-none" />;
+
 const Footer = () => footer;
 
 const emptyPlaceholder = (
@@ -200,6 +200,7 @@ const emptyPlaceholder = (
 		{translation.t("alts.noMediasFound")}
 	</div>
 );
+
 const EmptyPlaceholder = () => emptyPlaceholder;
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };

@@ -1,6 +1,6 @@
 import type { UserProvidedConfigProps } from "hmr-electron";
 
-const isDevelopment = process.env.NODE_ENV === "development";
+const isDev = String(process.env.NODE_ENV === "development");
 
 const config: UserProvidedConfigProps = {
 	electronEsbuildExternalPackages: [
@@ -10,7 +10,7 @@ const config: UserProvidedConfigProps = {
 	electronEntryFilePath: "src/main/index.ts",
 	preloadFilePath: "src/main/preload.ts",
 	esbuildConfig: {
-		define: { isDev: String(isDevelopment) },
+		define: { isDev },
 	},
 };
 

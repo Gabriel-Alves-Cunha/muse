@@ -24,7 +24,7 @@ export const logStalled = (e: Event): void =>
 /////////////////////////////////////////
 
 export function handleLoadedData({ target: audio }: AudioEvent): void {
-	const { lastStoppedTime, path } = currentPlaying;
+	const { lastStoppedTimeInSeconds, path } = currentPlaying;
 	const formatedDuration = formatDuration(audio.duration);
 	const media = getMedia(path);
 
@@ -35,11 +35,12 @@ export function handleLoadedData({ target: audio }: AudioEvent): void {
 		rescanMedia(path, {
 			...media,
 			duration: formatedDuration,
-		}).then();
+		});
 	}
 
 	// Maybe set audio.currentTime to last stopped time:
-	if (lastStoppedTime > 60 /* seconds */) audio.currentTime = lastStoppedTime;
+	if (lastStoppedTimeInSeconds > 60)
+		audio.currentTime = lastStoppedTimeInSeconds;
 }
 
 /////////////////////////////////////////
@@ -60,7 +61,7 @@ export function handleEnded({ target: audio }: AudioEvent): void {
 
 export function handleAudioCanPlay({ target: audio }: AudioEvent): void {
 	dbg("Audio can play.");
-	audio.play().then();
+	audio.play();
 }
 
 /////////////////////////////////////////

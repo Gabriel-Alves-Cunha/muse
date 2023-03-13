@@ -1,4 +1,4 @@
-import type { Media, Page } from "@common/@types/generalTypes";
+import type { Media, Page } from "@common/@types/GeneralTypes";
 
 export type Translations = {
 	dialogs: {

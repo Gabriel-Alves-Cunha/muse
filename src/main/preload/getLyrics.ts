@@ -1,4 +1,4 @@
-import type { Base64 } from "@common/@types/generalTypes";
+import type { Base64 } from "@common/@types/GeneralTypes";
 
 import { lyricApiKey, lyricsAPI } from "@main/utils";
 import { error, throwErr } from "@common/log";
@@ -24,21 +24,21 @@ const method = "GET";
 export async function searchForLyricsAndImage(
 	mediaTitle: string,
 	mediaArtist: string,
-	getImage: boolean,
+	shouldGetImage: boolean,
 ): Promise<LyricsResponse> {
 	if (!(mediaTitle && mediaArtist))
 		throwErr(
 			`Required arguments: mediaArtist = "${mediaArtist}"; mediaTitle = "${mediaTitle}"`,
 		);
 
-	dbg({ mediaTitle, getImage, mediaArtist });
+	dbg({ mediaTitle, shouldGetImage, mediaArtist });
 
 	const { albumName, imageURL, lyricURL } = await queryForPossibleLyric(
 		mediaTitle,
 		mediaArtist,
 	);
 
-	const image = getImage ? await queryForImage(imageURL) : "";
+	const image = shouldGetImage ? await queryForImage(imageURL) : "";
 	const lyric = await queryForLyric(lyricURL);
 
 	dbg({ lyric, image, albumName });

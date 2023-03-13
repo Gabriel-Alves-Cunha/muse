@@ -15,8 +15,7 @@ import { translation } from "@i18n";
 // Main function:
 
 export function Controls({ isThereAMedia }: ControlsProps) {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	return (
 		<div className="media-player-controls">

@@ -1,11 +1,11 @@
-import type { MetadataToChange } from "@common/@types/electron-window";
-import type { Media, Path } from "@common/@types/generalTypes";
+import type { MetadataToChange } from "@common/@types/ElectronApi";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 
 import { useSnapshot } from "valtio";
 
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
 import { errorToast, successToast } from "../../toasts";
-import { ReactToElectronMessage } from "@common/enums";
+import { ReactToElectronMessageEnum } from "@common/enums";
 import { areArraysEqualByValue } from "@utils/array";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { prettyBytes } from "@common/prettyBytes";
@@ -23,8 +23,7 @@ export function changeMediaMetadata(
 	mediaPath: Path,
 	media: Media,
 ): void {
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const { t } = translation;
 
 	try {
 		const hasAnythingChanged = changeMetadataIfAllowed(
@@ -108,7 +107,7 @@ function changeMetadataIfAllowed(
 	// Send message to Electron to execute the function writeTag() in the main process:
 	if (isThereAnythingToChange)
 		sendMsgToBackend({
-			type: ReactToElectronMessage.WRITE_TAG,
+			type: ReactToElectronMessageEnum.WRITE_TAG,
 			thingsToChange,
 			mediaPath,
 		});
@@ -221,7 +220,7 @@ export const visibleData = ({
 	title,
 	size,
 }: Media) =>
-	// The order here is the order that will appear!
+	// The order here is the order that will appear:
 	Object.entries({
 		duration,
 		size,
@@ -296,5 +295,3 @@ type ChangeOptions = keyof typeof translatedOptionsToSend;
 /////////////////////////////////////////////
 
 type HasAnythingChanged = boolean;
-
-/////////////////////////////////////////////

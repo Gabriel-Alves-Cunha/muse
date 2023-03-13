@@ -1,4 +1,4 @@
-import type { Json } from "./@types/utils";
+import type { Json } from "./@types/Utils";
 
 const { trunc, floor, random } = Math;
 
@@ -69,16 +69,6 @@ export function sleep(ms = 0, logFn?: () => void): Promise<void> {
 /////////////////////////////////////////
 
 export const stringifyJson = (obj: Json) => JSON.stringify(obj, null, 2);
-
-/////////////////////////////////////////
-
-/** Map a number from range X to range Y. */
-export const mapTo = (
-	value: number,
-	from: readonly [start: number, end: number],
-	to: readonly [start: number, end: number],
-): number =>
-	((value - from[0]) * (to[1] - to[0])) / (from[1] - from[0]) + to[0];
 
 /////////////////////////////////////////
 

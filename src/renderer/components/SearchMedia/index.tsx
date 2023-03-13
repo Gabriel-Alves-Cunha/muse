@@ -2,7 +2,6 @@ import { useSnapshot } from "valtio";
 import { useRef } from "react";
 
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
-import { selectMediaByPointerEvent } from "../MediaListKind/helper";
 import { MediaSearchRow } from "./MediaSearchRow";
 import { translation } from "@i18n";
 import { RightSlot } from "../RightSlot";
@@ -11,7 +10,7 @@ import { Popover } from "../Popover";
 import {
 	setDefaultSearch,
 	setSearchTerm,
-	SearchStatus,
+	SearchStatusEnum,
 	searcher,
 } from "./state";
 
@@ -20,17 +19,16 @@ export function SearchMedia() {
 	// Sometimes, we want to disable the batching. The known use case of this is input.
 	const searcherAccessor = useSnapshot(searcher, { sync: true });
 	const searchWrapperRef = useRef<HTMLDivElement>(null);
-	const translationAccessor = useSnapshot(translation);
-	const t = translationAccessor.t;
+	const t = useSnapshot(translation).t;
 
 	const resultsJSXs: JSX.Element[] = [];
 
 	/////////////////////////////////////////
 
 	const foundSomething =
-		searcherAccessor.searchStatus === SearchStatus.FOUND_SOMETHING;
+		searcherAccessor.searchStatus === SearchStatusEnum.FOUND_SOMETHING;
 	const nothingFound =
-		searcherAccessor.searchStatus === SearchStatus.NOTHING_FOUND;
+		searcherAccessor.searchStatus === SearchStatusEnum.NOTHING_FOUND;
 	const shouldPopoverOpen = foundSomething || nothingFound;
 
 	/////////////////////////////////////////
@@ -63,7 +61,6 @@ export function SearchMedia() {
 			{shouldPopoverOpen ? (
 				<ContextMenu
 					content={CtxContentEnum.SEARCH_MEDIA_OPTIONS}
-					onContextMenu={selectMediaByPointerEvent}
 					isAllDisabled={foundSomething}
 				>
 					<Popover
@@ -73,8 +70,8 @@ export function SearchMedia() {
 								: "search-media-results"
 						}
 						onPointerDownOutside={setDefaultSearch}
+						contentRef={searchWrapperRef}
 						onEscape={setDefaultSearch}
-						isOpen
 					>
 						{nothingFound ? (
 							<div className="nothing-found">

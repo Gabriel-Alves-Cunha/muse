@@ -10,10 +10,10 @@ import { join } from "node:path";
 import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
-import { ElectronToReactMessage } from "@common/enums";
+import { ElectronToReactMessageEnum } from "@common/enums";
 import { error, log, throwErr } from "@common/log";
 import { sendMsgToClient } from "@common/crossCommunication";
-import { ProgressStatus } from "@common/enums";
+import { ProgressStatusEnum } from "@common/enums";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "../file";
@@ -87,7 +87,7 @@ export async function createDownload(
 
 		// Send a msg to the client that the download failed:
 		const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
-			status: ProgressStatus.FAILED,
+			status: ProgressStatusEnum.FAILED,
 			error: err,
 		};
 		electronPort.postMessage(msg);
@@ -124,7 +124,7 @@ export async function createDownload(
 				// ^ Only in the firt time this 'on progress' fn is called!
 				interval = setInterval(
 					() => electronPort.postMessage({ percentage: percentageToSend }),
-					500,
+					250,
 				);
 
 				// Save download size to prettyTotal to not keep recalculating
@@ -134,7 +134,7 @@ export async function createDownload(
 
 				// Send a message to client that we're successfully starting a download:
 				const msg: Partial<MediaBeingDownloaded> = {
-					status: ProgressStatus.ACTIVE,
+					status: ProgressStatusEnum.ACTIVE,
 				};
 				electronPort.postMessage(msg);
 			}
@@ -173,7 +173,7 @@ export async function createDownload(
 
 			// Tell the client the download was successfully canceled:
 			const msg: Partial<MediaBeingDownloaded> = {
-				status: ProgressStatus.CANCEL,
+				status: ProgressStatusEnum.CANCEL,
 			};
 			electronPort.postMessage(msg);
 
@@ -199,7 +199,7 @@ export async function createDownload(
 
 			// Tell the client the download was successfull:
 			const msg: Partial<MediaBeingDownloaded> = {
-				status: ProgressStatus.SUCCESS,
+				status: ProgressStatusEnum.SUCCESS,
 			};
 			electronPort.postMessage(msg);
 
@@ -214,7 +214,7 @@ export async function createDownload(
 
 			// Tell client to add a new media...
 			sendMsgToClient({
-				type: ElectronToReactMessage.ADD_ONE_MEDIA,
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
 				mediaPath: saveSite,
 			});
 
@@ -233,7 +233,7 @@ export async function createDownload(
 
 			// Tell the client the download threw an error:
 			const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
-				status: ProgressStatus.FAILED,
+				status: ProgressStatusEnum.FAILED,
 				error: new Error(err.message),
 			};
 			electronPort!.postMessage(msg);
