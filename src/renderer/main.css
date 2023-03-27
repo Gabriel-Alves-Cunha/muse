@@ -586,7 +586,7 @@
 	}
 
 	.timeline {
-		@apply appearance-none relative w-full h-1 bg-main cursor-pointer;
+		@apply appearance-none relative w-full h-1 bg-main cursor-pointer z-10;
 	}
 
 	/* Tooltip */
@@ -692,7 +692,7 @@
 	}
 
 	[data-button][data-variant="circle"] {
-		@apply w-72 h-72 rounded-full border-[1px];
+		@apply w-72 h-72 rounded-full border-[1px] no-transition;
 	}
 
 	[data-button][data-variant="file-present"] {
@@ -765,6 +765,8 @@
 
 	.row-info p {
 		@apply block align-middle text-alternative font-secondary tracking-wider font-medium overflow-ellipsis overflow-hidden;
+
+		white-space: nowrap; /* Make it one line. */
 	}
 
 	.row-info p:last-child {

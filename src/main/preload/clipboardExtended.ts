@@ -88,18 +88,15 @@ interface ClipboardExtension {
 	watcherId: NodeJS.Timer | undefined;
 	previousText: string;
 
-	startWatching: () => ClipboardExtended;
-	stopWatching: () => ClipboardExtended;
-	off: <T>(
+	on<T>(eventName: string, listener: (...args: T[]) => void): ClipboardExtended;
+	startWatching(): ClipboardExtended;
+	stopWatching(): ClipboardExtended;
+	off<T>(
 		eventName: string,
 		listener?: (...args: T[]) => void,
-	) => ClipboardExtended;
-	on: <T>(
+	): ClipboardExtended;
+	once<T>(
 		eventName: string,
 		listener: (...args: T[]) => void,
-	) => ClipboardExtended;
-	once: <T>(
-		eventName: string,
-		listener: (...args: T[]) => void,
-	) => ClipboardExtended;
+	): ClipboardExtended;
 }

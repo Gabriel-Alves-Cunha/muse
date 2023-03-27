@@ -1,8 +1,6 @@
 import type { CurrentPlaying } from "@contexts/currentPlaying";
-import type { Path, Media } from "@common/@types/GeneralTypes";
 import type { PlayOptions } from "@contexts/playOptions";
-import type { TypeOfMap } from "@common/@types/Utils";
-import type { History } from "@contexts/playlists";
+import type { Path } from "@common/@types/GeneralTypes";
 
 import { dbgPlaylists } from "@common/debug";
 import { error } from "@common/log";
@@ -55,47 +53,22 @@ export function setLocalStorage(
 
 const emptyArrayString = "[]";
 
-export function getFromLocalStorage(key: LocalStorageKeys): Values | undefined {
-	const value = localStorage.getItem(key) ?? emptyArrayString;
-	const item: unknown = JSON.parse(value);
+export function getFromLocalStorage(
+	key: Exclude<LocalStorageKeys, "settings">,
+): Values {
+	try {
+		const value = localStorage.getItem(key) || emptyArrayString;
+		const item: unknown = JSON.parse(value);
 
-	dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
+		dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
 
-	if (item === emptyArrayString && !value) return;
+		if (item === emptyArrayString) return [];
 
-	if (key === localStorageKeys.favorites) {
-		const newFavorites = new Set(item as Path[]);
-
-		dbgPlaylists("getFromLocalStorage: newFavorites =", newFavorites);
-
-		return newFavorites;
+		return item as Values;
+	} catch (err) {
+		error(err);
+		return [];
 	}
-
-	if (key === localStorageKeys.history) {
-		const newHistory: History = new Map(item as HistoryShape);
-
-		dbgPlaylists("getFromLocalStorage: newHistory =", newHistory);
-
-		return newHistory;
-	}
-
-	if (key === localStorageKeys.currentPlaying) {
-		const newCurrentPlaying = item as CurrentPlaying;
-
-		dbgPlaylists("getFromLocalStorage: newCurrentPlaying =", newCurrentPlaying);
-
-		return newCurrentPlaying;
-	}
-
-	if (key === localStorageKeys.playOptions) {
-		const newPlayOptions = item as PlayOptions;
-
-		dbgPlaylists("getFromLocalStorage: newPlayOptions =", newPlayOptions);
-
-		return newPlayOptions;
-	}
-
-	return undefined;
 }
 
 //////////////////////////////////////////
@@ -107,14 +80,4 @@ type LocalStorageKeys = typeof localStorageKeys[keyof typeof localStorageKeys];
 
 //////////////////////////////////////////
 
-type Values =
-	| ReadonlySet<Path>
-	| [Path, Media][]
-	| CurrentPlaying
-	| PlayOptions
-	| History
-	| Path[];
-
-//////////////////////////////////////////
-
-type HistoryShape = TypeOfMap<History>;
+type Values = ReadonlySet<Path> | CurrentPlaying | PlayOptions | Path[];

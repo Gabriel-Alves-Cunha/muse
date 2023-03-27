@@ -12,7 +12,7 @@ import { dbg } from "@common/debug";
 const headers = {
 	"content-type": "application/json",
 	"x-happi-key": lyricApiKey ?? "",
-};
+} as const;
 
 const method = "GET";
 

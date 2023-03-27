@@ -2,9 +2,9 @@ import { expect } from "vitest";
 
 import { playlists, replaceEntireMainList } from "@contexts/playlists";
 import { numberOfMedias, testMap } from "./fakeTestList";
-import { PlaylistListEnum } from "@common/enums";
 import {
 	setDefaultCurrentPlaying,
+	defaultCurrentPlaying,
 	currentPlaying,
 } from "@contexts/currentPlaying";
 
@@ -22,9 +22,9 @@ function setMainListToTestList() {
 /////////////////////////////////////////////
 
 function cleanHistory() {
-	playlists.history.clear();
+	playlists.history.length = 0;
 
-	expect(playlists.history.size).toBe(0);
+	expect(playlists.history.length).toBe(0);
 }
 
 /////////////////////////////////////////////
@@ -38,11 +38,7 @@ function cleanFavorites() {
 function setCurrentPlayingToDefault() {
 	setDefaultCurrentPlaying();
 
-	expect(currentPlaying).toStrictEqual({
-		listType: PlaylistListEnum.mainList,
-		lastStoppedTime: 0,
-		path: "",
-	});
+	expect(currentPlaying).toStrictEqual(defaultCurrentPlaying);
 }
 
 export function cleanUpBeforeEachTest() {

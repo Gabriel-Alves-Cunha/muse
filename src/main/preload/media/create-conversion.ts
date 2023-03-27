@@ -5,15 +5,15 @@ import type { Path } from "@common/@types/GeneralTypes";
 
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
-import sanitize from "sanitize-filename";
 
 import { ElectronToReactMessageEnum } from "@common/enums";
 import { log, error, throwErr } from "@common/log";
-import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatusEnum } from "@common/enums";
+import { sendMsgToClient } from "@common/crossCommunication";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
 import { deleteFile } from "../file";
+import { sanitize } from "@main/sanitizeFilename/sanitizeFilename";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
 
@@ -132,7 +132,7 @@ export async function convertToAudio(
 			error(`Error converting file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
-			deleteFile(saveSite).then();
+			deleteFile(saveSite);
 
 			// Tell the client the conversion threw an error:
 			const msg: Partial<MediaBeingConverted> & { error: Error } = {
@@ -200,7 +200,7 @@ export async function convertToAudio(
 			);
 
 			// Delete the file since it was canceled:
-			deleteFile(saveSite).then();
+			deleteFile(saveSite);
 
 			// Tell the client the conversion was successfully canceled:
 			const msg: Partial<MediaBeingConverted> = {

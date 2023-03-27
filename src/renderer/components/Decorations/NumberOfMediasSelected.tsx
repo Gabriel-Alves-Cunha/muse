@@ -13,7 +13,6 @@ export function NumberOfMediasSelected() {
 	return numberOfMediasSelected === 0 ? null : (
 		<p>
 			{numberOfMediasSelected} {t("decorations.selected")}
-			{isPlural ? "s" : ""}
 		</p>
 	);
 }

@@ -1,5 +1,6 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 import type { ValuesOf } from "@common/@types/Utils";
+import type { Audio } from "@components/MediaPlayer/ControlsAndSeeker/Controls";
 
 import { subscribeKey } from "valtio/utils";
 import { proxy } from "valtio";
@@ -9,17 +10,15 @@ import { getRandomInt, time } from "@utils/utils";
 import { warn, error, info } from "@common/log";
 import { PlaylistListEnum } from "@common/enums";
 import { playOptions } from "./playOptions";
-import { getFirstKey } from "@utils/map-set";
 import { selectPath } from "./allSelectedMedias";
 import {
 	type MainList,
-	isProxyMapOrSet,
+	IS_PROXY_MAP_OR_SET,
 	addToHistory,
 	getPlaylist,
 	playlists,
 	getMedia,
 } from "./playlists";
-import { Audio } from "@components/MediaPlayer/ControlsAndSeeker/Controls";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -29,7 +28,7 @@ import { Audio } from "@components/MediaPlayer/ControlsAndSeeker/Controls";
 const storagedCurrentPlayingString = localStorage.getItem(
 	localStorageKeys.currentPlaying,
 );
-const defaultCurrentPlaying: CurrentPlaying = {
+export const defaultCurrentPlaying: CurrentPlaying = {
 	listType: PlaylistListEnum.mainList,
 	lastStoppedTimeInSeconds: 0,
 	path: "",
@@ -74,6 +73,8 @@ export function playThisMedia(
 	currentPlaying.lastStoppedTimeInSeconds = 0;
 	currentPlaying.listType = listType;
 	currentPlaying.path = path;
+
+	addToHistory(path);
 }
 
 ////////////////////////////////////////////////
@@ -108,23 +109,6 @@ export function pause(): void {
 
 ////////////////////////////////////////////////
 
-function sortHistoryByDate() {
-	const unsortedList: [Path, DateAsNumber][] = [];
-
-	for (const [path, dates] of playlists.history)
-		for (const date of dates) unsortedList.push([path, date]);
-
-	const mainList = playlists.sortedByTitleAndMainList;
-
-	const listAsArrayOfMap: [Path, Media, DateAsNumber][] = unsortedList
-		.sort((a, b) => b[1] - a[1]) // sort by date
-		.map(([id, date]) => [id, mainList.get(id)!, date]);
-
-	return listAsArrayOfMap;
-}
-
-////////////////////////////////////////////////
-
 export function playPreviousMedia(): void {
 	time(() => {
 		const { path, listType } = currentPlaying;
@@ -140,17 +124,13 @@ export function playPreviousMedia(): void {
 				? PlaylistListEnum.mainList
 				: listType;
 
-		const history = sortHistoryByDate();
+		const previousMediaPath = playlists.history.at(-2);
 
-		if (history.length < 2)
+		if (!previousMediaPath || path === previousMediaPath)
 			return error(
 				"There should be at least 2 medias on history to be able to play a previous media, but there isn't!",
 				history,
 			);
-
-		// In the history list, the first is the newest.
-		// @ts-ignore => I garanteed above that a second media is present:
-		const [_firstMedia, [previousMediaPath]] = history;
 
 		playThisMedia(previousMediaPath, correctListType);
 	}, "playPreviousMedia");
@@ -175,7 +155,9 @@ export function playNextMedia(): void {
 				: listType;
 
 		// Get the correct list:
-		const list = getPlaylist(correctListType) as ReadonlySet<Path> | MainList;
+		const list = getPlaylist(correctListType) as
+			| ReadonlySet<Path>
+			| Readonly<MainList>;
 
 		const paths = list.keys();
 		let nextMediaPath = "";
@@ -196,17 +178,27 @@ export function playNextMedia(): void {
 		} else {
 			let found = false;
 
-			for (const newID of paths) {
+			for (const newPath of paths) {
 				if (found) {
-					nextMediaPath = newID;
+					nextMediaPath = newPath;
 					break;
 				}
 
-				if (newID === path) found = true;
+				if (newPath === path) found = true;
 			}
 
 			// In case the currently playing is the last media, get the first:
-			if (!nextMediaPath) nextMediaPath = getFirstKey(list) ?? "";
+			if (!nextMediaPath) {
+				const [firstMedia] = list;
+
+				if (typeof firstMedia === "string") nextMediaPath = firstMedia;
+				else {
+					// @ts-ignore => Checking later.
+					const [firstMediaPath] = firstMedia;
+
+					nextMediaPath = firstMediaPath ?? "";
+				}
+			}
 		}
 
 		if (!nextMediaPath)
@@ -216,9 +208,7 @@ export function playNextMedia(): void {
 				list,
 			});
 
-		currentPlaying.lastStoppedTimeInSeconds = 0;
-		currentPlaying.listType = correctListType;
-		currentPlaying.path = nextMediaPath;
+		playThisMedia(nextMediaPath, correctListType);
 	}, "playNextMedia");
 }
 
@@ -276,7 +266,7 @@ function setAudioSource(newPath: Path, prevPath: Path) {
 		setLocalStorage(
 			localStorageKeys.currentPlaying,
 			currentPlaying,
-			!isProxyMapOrSet,
+			!IS_PROXY_MAP_OR_SET,
 		);
 
 		changeMediaSessionMetadata(media);

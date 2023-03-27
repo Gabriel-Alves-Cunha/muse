@@ -12,13 +12,13 @@ import {
 	ByteVector,
 	Picture,
 } from "node-taglib-sharp";
-import sanitize from "sanitize-filename";
 
-import { getBasename, getLastExtension } from "@common/path";
 import { error, assert, throwErr, log } from "@common/log";
 import { ElectronToReactMessageEnum } from "@common/enums";
+import { getLastExtension } from "@common/path";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { isBase64Image } from "@main/utils";
+import { sanitize } from "@main/sanitizeFilename/sanitizeFilename";
 import { eraseImg } from "@common/utils";
 import { dbg } from "@common/debug";
 
@@ -91,7 +91,8 @@ export const downloadThumbnail = async (url: string): Promise<Picture[]> =>
 			const byteVector = await ByteVector.fromStream(res);
 			const mimeType = res.headers["content-type"];
 
-			if (!mimeType) throwErr("No mimeType!");
+			if (!mimeType)
+				throwErr(`No mimeType on downloadThumbnail() with url = "${url}"!`);
 
 			const picture = Picture.fromFullData(
 				byteVector,
@@ -100,7 +101,12 @@ export const downloadThumbnail = async (url: string): Promise<Picture[]> =>
 				"This thumbnail was downloaded with this media.",
 			);
 
-			dbg("Header of thumbnail download and picture =", { res, picture });
+			dbg("Header of thumbnail download and picture =", {
+				byteVector,
+				mimeType,
+				picture,
+				res,
+			});
 
 			resolve([picture]);
 		}).on("error", (e) => {
@@ -152,10 +158,11 @@ function handleTitle(
 	title: string,
 ): Path {
 	const sanitizedTitle = sanitize(title);
-	// If they are the same, there is no need to treat this as a new
-	// file, or if the sanitization left an empty string, return "":
-	if (getBasename(oldMediaPath) === sanitizedTitle || !sanitizedTitle)
-		return "";
+
+	dbg({ sanitizedTitle, file, oldMediaPath, title });
+
+	// If the sanitization left an empty string, return "":
+	if (!sanitizedTitle) return "";
 
 	const newPath = join(
 		dirname(oldMediaPath),
@@ -164,7 +171,7 @@ function handleTitle(
 
 	file.tag.title = sanitizedTitle;
 
-	dbg({ "new file.tag.title": file.tag.title, title, oldMediaPath, newPath });
+	dbg({ "New 'file.tag.title'": file.tag.title, title, oldMediaPath, newPath });
 
 	return newPath;
 }
@@ -180,16 +187,16 @@ function talkToClientSoItCanGetTheNewMedia(
 		try {
 			renameSync(mediaPath, newPathOfFile);
 
-			// Since media has a new path, create a new media...
-			sendMsgToClient({
-				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
-				mediaPath: newPathOfFile,
-			});
-
-			// and remove old one
+			// FIRST remove old one (order is important!):
 			sendMsgToClient({
 				type: ElectronToReactMessageEnum.REMOVE_ONE_MEDIA,
 				mediaPath,
+			});
+
+			// And, since media has a new path, create a new media:
+			sendMsgToClient({
+				type: ElectronToReactMessageEnum.ADD_ONE_MEDIA,
+				mediaPath: newPathOfFile,
 			});
 		} catch (error) {
 			// Send error to react process: (error renaming file => file has old path)
@@ -245,7 +252,6 @@ export function writeTags(
 		title,
 	}: WriteTagsData,
 ): void {
-	// dbgTests("Writing tags to file:", { mediaPath, data });
 	if (!mediaPath)
 		throwErr(`A media path is required. Received: "${mediaPath}".`);
 
@@ -276,7 +282,7 @@ export function writeTags(
 
 	if (lyrics !== undefined) file.tag.lyrics = lyrics;
 
-	dbg("New file tags =", file.tag);
+	dbg("New file tags =", { "file.tag": file.tag, newFilePath });
 
 	// Clean up:
 	// DO NOT SEPARATE THESE TWO FUNCTIONS!! I found a bug if so.

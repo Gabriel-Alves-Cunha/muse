@@ -62,12 +62,12 @@ subscribe(playOptions, () => {
 
 export function toggleLoopMedia(): void {
 	const audio = getAudio();
-	if (!audio) return;
 
 	const loopThisMedia = !playOptions.loopThisMedia;
 
 	playOptions.loopThisMedia = loopThisMedia;
-	audio.loop = loopThisMedia;
+
+	if (audio) audio.loop = loopThisMedia;
 }
 
 ////////////////////////////////////////////////

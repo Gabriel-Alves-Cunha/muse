@@ -7,17 +7,17 @@ import { cursorTo, clearLine } from "node:readline";
 import { existsSync } from "node:fs";
 import { stdout } from "node:process";
 import { join } from "node:path";
-import sanitize from "sanitize-filename";
 import ytdl from "ytdl-core";
 
 import { ElectronToReactMessageEnum } from "@common/enums";
 import { error, log, throwErr } from "@common/log";
-import { sendMsgToClient } from "@common/crossCommunication";
 import { ProgressStatusEnum } from "@common/enums";
+import { sendMsgToClient } from "@common/crossCommunication";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
 import { deleteFile } from "../file";
 import { writeTags } from "./mutate-metadata";
+import { sanitize } from "@main/sanitizeFilename/sanitizeFilename";
 import { dirs } from "@main/utils";
 import { dbg } from "@common/debug";
 
@@ -53,7 +53,7 @@ export function createOrCancelDownload(args: CreateDownload): void {
 
 		if (!args.url) throwErr(`'url' is required. Received: "${args.url}".`);
 
-		createDownload(args as Required<CreateDownload>).then();
+		createDownload(args as Required<CreateDownload>);
 	} else if (args.destroy) currentDownloads.get(args.url)!.emit("destroy");
 }
 
@@ -169,7 +169,7 @@ export async function createDownload(
 			);
 
 			// Delete the file since it was canceled:
-			deleteFile(saveSite).then();
+			deleteFile(saveSite);
 
 			// Tell the client the download was successfully canceled:
 			const msg: Partial<MediaBeingDownloaded> = {
@@ -229,14 +229,14 @@ export async function createDownload(
 			error(`Error downloading file: "${titleWithExtension}"!`, err);
 
 			// Delete the file since it errored:
-			deleteFile(saveSite).then();
+			deleteFile(saveSite);
 
 			// Tell the client the download threw an error:
 			const msg: Partial<MediaBeingDownloaded> & { error: Error } = {
 				status: ProgressStatusEnum.FAILED,
 				error: new Error(err.message),
 			};
-			electronPort!.postMessage(msg);
+			electronPort.postMessage(msg);
 
 			// Clean up:
 			currentDownloads.delete(url);
@@ -254,7 +254,7 @@ export async function createDownload(
 
 	/////////////////////////////////////////////
 
-	fluent_ffmpeg(readStream).toFormat(extension!).saveToFile(saveSite);
+	fluent_ffmpeg(readStream).toFormat(extension).saveToFile(saveSite);
 
 	/////////////////////////////////////////////
 

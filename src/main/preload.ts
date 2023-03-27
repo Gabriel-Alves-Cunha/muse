@@ -217,9 +217,9 @@ type CrossWindowEvent = Readonly<
 
 /////////////////////////////////////////////
 
-export interface ClipboardTextChangeNotificationProps {
+export type ClipboardTextChangeNotificationProps = {
 	thumbnail: string;
 	artist: string;
 	title: string;
 	url: string;
-}
+};

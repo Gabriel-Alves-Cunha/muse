@@ -12,7 +12,6 @@ import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { PlaylistListEnum } from "@common/enums";
 import { formatDuration } from "@common/utils";
 import { getRandomInt } from "@utils/utils";
-import { getFirstKey } from "@utils/map-set";
 import { searchMedia } from "@contexts/playlists";
 import {
 	replaceEntireMainList,
@@ -24,7 +23,7 @@ import {
 	playlists,
 } from "@contexts/playlists";
 
-describe("Testing usePlaylists", () => {
+describe("Testing playlists", () => {
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
@@ -39,8 +38,8 @@ describe("Testing usePlaylists", () => {
 
 		expect(playlists.sortedByTitleAndMainList.size).toEqual(0);
 		expect(playlists.favorites.size).toEqual(0);
+		expect(playlists.history.length).toEqual(0);
 		expect(allSelectedMedias.size).toEqual(0);
-		expect(playlists.history.size).toEqual(0);
 	});
 
 	/////////////////////////////////////////////
@@ -72,10 +71,8 @@ describe("Testing usePlaylists", () => {
 
 			addToHistory(mediaPathToAdd);
 
-			const newHistory = playlists.history;
-
-			expect(getFirstKey(newHistory)).toBe(mediaPathToAdd);
-			expect(newHistory.size).toBe(1);
+			expect(playlists.history.includes(mediaPathToAdd)).toBeTruthy();
+			expect(playlists.history.length).toBe(1);
 		});
 	});
 
@@ -149,8 +146,8 @@ describe("Testing usePlaylists", () => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		it("addToMainList() should add one media to mediaList", () => {
-			const title = "Test Title - add one media";
+		it("addToMainList() should add one media to mainList", () => {
+			const title = "Test Title - add one media to mainList";
 			const newPath = `~/Music/test/${title}.mp3`;
 			const newMedia: Media = {
 				duration: formatDuration(100),
@@ -169,10 +166,8 @@ describe("Testing usePlaylists", () => {
 
 			addToMainList(newPath, newMedia);
 
-			const newMainList = playlists.sortedByTitleAndMainList;
-
-			expect(newMainList.size).toBe(numberOfMedias + 1);
-			expect(newMainList.has(newPath)).toBe(true);
+			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias + 1);
+			expect(playlists.sortedByTitleAndMainList.has(newPath)).toBe(true);
 		});
 
 		/////////////////////////////////////////////
@@ -182,7 +177,7 @@ describe("Testing usePlaylists", () => {
 		it("removeMedia() should remove one media of mainList", () => {
 			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
 			expect(playlists.favorites.size).toBe(0);
-			expect(playlists.history.size).toBe(0);
+			expect(playlists.history.length).toBe(0);
 
 			const anyIndex = getRandomInt(0, numberOfMedias);
 			const [path] = arrayFromMainList[anyIndex]!;
@@ -206,8 +201,8 @@ describe("Testing usePlaylists", () => {
 
 			expect(playlists.sortedByTitleAndMainList.size).toBe(0);
 			expect(playlists.favorites.size).toBe(0);
+			expect(playlists.history.length).toBe(0);
 			expect(allSelectedMedias.size).toBe(0);
-			expect(playlists.history.size).toBe(0);
 			expect(currentPlaying.path).toBe("");
 		});
 

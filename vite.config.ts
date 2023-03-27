@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
 		define: isTest
 			? { isDev }
 			: {
-					"process.env": process.env ?? "{}",
+					"process.env": process.env || "{}",
 					isDev,
 			  },
 		server: { port: 3_000 },

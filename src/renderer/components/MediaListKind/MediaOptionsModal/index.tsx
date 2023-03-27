@@ -1,7 +1,7 @@
 import type { Media, Path } from "@common/@types/GeneralTypes";
 
+import { useCallback, useRef, useState } from "react";
 import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
-import { useEffect, useRef, useState } from "react";
 import { MdOutlineDelete as Remove } from "react-icons/md";
 import { MdClose as CloseIcon } from "react-icons/md";
 import { useSnapshot } from "valtio";
@@ -9,7 +9,6 @@ import { useSnapshot } from "valtio";
 import { DeleteMediaDialogContent } from "../../DeleteMediaDialog";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { CenteredModal } from "../../CenteredModal";
-import { on, removeOn } from "@utils/window";
 import { translation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
 import { Button } from "../../Button";
@@ -30,50 +29,72 @@ import {
 const filePresentClassName = "file-present";
 
 export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
+	const t = useSnapshot(translation).t;
+
 	const [isDeleteMediaModalOpen, setIsDeleteMediaModalOpen] = useState(false);
+
 	const imageButtonRef = useRef<HTMLButtonElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef("");
 
-	const t = useSnapshot(translation).t;
+	const openNativeUI_ChooseFiles = useCallback(
+		() => imageInputRef.current?.click(),
+		[],
+	);
 
-	const openNativeUI_ChooseFiles = () => imageInputRef.current?.click();
+	const handleSelectedFile = useCallback(
+		({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
+			console.log("on handleSelectedFile");
 
-	function handleSelectedFile({
-		target: { files },
-	}: React.ChangeEvent<HTMLInputElement>) {
-		console.log("on handleSelectedFile");
+			if (
+				!(imageButtonRef.current && imageInputRef.current && files) ||
+				files.length === 0
+			)
+				return imageButtonRef.current?.classList.remove(filePresentClassName);
 
-		if (
-			!(imageButtonRef.current && imageInputRef.current && files) ||
-			files.length === 0
-		)
-			return imageButtonRef.current?.classList.remove(filePresentClassName);
+			const [file] = files;
 
-		const [file] = files;
+			imageFilePathRef.current = file!.webkitRelativePath;
 
-		imageFilePathRef.current = file!.webkitRelativePath;
+			dbg("imageFilePath =", imageFilePathRef.current);
 
-		dbg("imageFilePath =", imageFilePathRef.current);
+			// Change button color to indicate that selection was successfull:
+			imageButtonRef.current.classList.add(filePresentClassName);
+		},
+		[],
+	);
 
-		// Change button color to indicate that selection was successfull:
-		imageButtonRef.current.classList.add(filePresentClassName);
+	const saveChanges = useCallback(() => {
+		setIsOpen(false);
+
+		changeMediaMetadata(imageFilePathRef.current, path, media);
+	}, [path, media]);
+
+	const handleDeleteMedia = useCallback(() => {
+		setIsDeleteMediaModalOpen(false);
+		setIsOpen(false);
+
+		deleteFile(path);
+	}, [path]);
+
+	const closeDeleteMediaDialog = useCallback(
+		() => setIsDeleteMediaModalOpen(false),
+		[],
+	);
+
+	const openDeleteMediaDialog = useCallback(
+		() => setIsDeleteMediaModalOpen(true),
+		[],
+	);
+
+	const closeMediaOptionsModal = useCallback(() => setIsOpen(false), []);
+
+	function changeMediaMetadataOnEnter(event: KeyEvent) {
+		event.stopPropagation();
+
+		if (event.key === "Enter" && !isAModifierKeyPressed(event)) saveChanges();
 	}
-
-	useEffect(() => {
-		function changeMediaMetadataOnEnter(event: KeyboardEvent) {
-			if (event.key === "Enter" && !isAModifierKeyPressed(event)) {
-				event.stopImmediatePropagation();
-
-				changeMediaMetadata(imageFilePathRef.current, path, media);
-			}
-		}
-
-		on("keyup", changeMediaMetadataOnEnter);
-
-		return () => removeOn("keyup", changeMediaMetadataOnEnter);
-	}, []);
 
 	return (
 		<>
@@ -83,7 +104,7 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 
 			<button
 				className="close-media-options-modal"
-				onPointerUp={() => setIsOpen(false)}
+				onPointerUp={closeMediaOptionsModal}
 				title={t("tooltips.closeDialog")}
 				ref={closeButtonRef}
 			>
@@ -100,7 +121,7 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 						{option === "image" ? (
 							/////////////////////////////////////////////
 							// Handle file input for image:
-							// TODO: for god knows why, clicking the input makes electron reload the window!!
+							// TODO: for god knows why, clicking the input makes electron reload the window!! maybe permission stuff??
 							<Button
 								onPointerUp={openNativeUI_ChooseFiles}
 								ref={imageButtonRef}
@@ -113,6 +134,7 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 									ref={imageInputRef}
 									accept="image/*"
 									type="file"
+									id={option}
 								/>
 
 								{t("buttons.selectImg")}
@@ -121,24 +143,25 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 						// Handle text input with line feeds:
 						option === "lyrics" ? (
 							<textarea
-								onKeyUp={(e) =>
-									// stopping propagation so the space and enter key don't do smth other.
-									e.stopPropagation()
-								}
+								// Stopping propagation so the space key doesn't toggle play state:
+								// @ts-ignore
+								onKeyDown={changeMediaMetadataOnEnter}
 								defaultValue={value}
+								name={option}
 								id={option}
 							/>
 						) : (
 							/////////////////////////////////////////////
 							// Else:
 							<input
-								onKeyUp={(e) =>
-									// stopping propagation so the space key doesn't toggle play state.
-									e.stopPropagation()
-								}
+								// Stopping propagation so the space key doesn't toggle play state:
+								// @ts-ignore
+								onKeyDown={changeMediaMetadataOnEnter}
 								readOnly={!isChangeable(option)}
 								defaultValue={format(value)}
+								name={option}
 								id={option}
+								type="text"
 							/>
 						)}
 					</fieldset>
@@ -147,10 +170,7 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 
 			<div data-flex-row>
 				<>
-					<button
-						onPointerUp={() => setIsDeleteMediaModalOpen(true)}
-						data-remove-media
-					>
+					<button onPointerUp={openDeleteMediaDialog} data-remove-media>
 						{t("buttons.deleteMedia")}
 
 						<Remove />
@@ -162,25 +182,13 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 						isOpen={isDeleteMediaModalOpen}
 					>
 						<DeleteMediaDialogContent
-							handleDeleteMedia={() => {
-								setIsDeleteMediaModalOpen(false);
-								setIsOpen(false);
-
-								deleteFile(path);
-							}}
-							closeDialog={() => setIsDeleteMediaModalOpen(false)}
+							handleDeleteMedia={handleDeleteMedia}
+							closeDialog={closeDeleteMediaDialog}
 						/>
 					</CenteredModal>
 				</>
 
-				<button
-					className="save-media-options-modal"
-					onPointerUp={() => {
-						setIsOpen(false);
-
-						changeMediaMetadata(imageFilePathRef.current, path, media);
-					}}
-				>
+				<button className="save-media-options-modal" onPointerUp={saveChanges}>
 					{t("buttons.saveChanges")}
 				</button>
 			</div>
@@ -202,3 +210,7 @@ type Props = {
 /////////////////////////////////////////////
 
 type OptionsForUserToSee = keyof VisibleData;
+
+/////////////////////////////////////////////
+
+type KeyEvent = React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>;

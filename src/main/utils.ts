@@ -6,11 +6,12 @@ import { join } from "node:path";
 /////////////////////////////////////////
 
 const homeDir = homedir();
+
 export const dirs = {
 	documents: join(homeDir, "Documents"),
 	downloads: join(homeDir, "Downloads"),
 	music: join(homeDir, "Music"),
-};
+} as const;
 
 /////////////////////////////////////////
 

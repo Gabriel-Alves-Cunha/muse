@@ -10,25 +10,23 @@ export const numberOfMedias = 30;
 export const testMap: Map<Path, Media> = Object.freeze(
 	new Map(
 		sortByTitle(
-			new Map(
-				Array.from({ length: numberOfMedias }, (_: undefined, index) => {
-					const title = `Test Title - ${index}`;
-					const media: Media = {
-						duration: formatDuration(index + 10),
-						lastModified: Date.now(),
-						birthTime: Date.now(),
-						size: 3_000,
-						genres: [],
-						artist: "",
-						lyrics: "",
-						album: "",
-						image: "",
-						title,
-					};
+			Array.from({ length: numberOfMedias }, (_: undefined, index) => {
+				const title = `Test Title - ${index}`;
+				const media: Media = {
+					duration: formatDuration(index + 10),
+					lastModified: Date.now(),
+					birthTime: Date.now(),
+					size: 3_000,
+					genres: [],
+					artist: "",
+					lyrics: "",
+					album: "",
+					image: "",
+					title,
+				};
 
-					return [`~/Music/${title}`, media] as const;
-				}),
-			),
+				return [`~/Music/${title}`, media];
+			}),
 		),
 	),
 );

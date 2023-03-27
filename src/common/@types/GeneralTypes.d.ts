@@ -30,6 +30,4 @@ export type QRCodeURL = `http://${string}:${number}`;
 
 export type Page = typeof pages[number];
 
-export type DateAsNumber = number;
-
 export type Path = string;

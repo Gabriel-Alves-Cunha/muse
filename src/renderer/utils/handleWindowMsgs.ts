@@ -121,7 +121,9 @@ export async function handleWindowMsgsFromElectron(
 				break;
 			}
 
+			dbg("before =", playlists.sortedByTitleAndMainList);
 			addToMainList(newMedia[0], newMedia[1]);
+			dbg("after =", playlists.sortedByTitleAndMainList);
 			break;
 		}
 
@@ -154,7 +156,7 @@ export async function handleWindowMsgsFromElectron(
 		case RESCAN_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("[handleWindowMsgs()] ReScan one media:", mediaPath);
+			dbg("[handleWindowMsgs()] Rescan one media:", mediaPath);
 
 			await rescanMedia(mediaPath);
 			break;
@@ -167,8 +169,12 @@ export async function handleWindowMsgsFromElectron(
 
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
-			if (!playlists.sortedByDate.has(mediaPath)) {
-				error(`"${mediaPath}" not found!`);
+			if (!playlists.sortedByTitleAndMainList.has(mediaPath)) {
+				error(
+					`Media %c"${mediaPath}" was not found to be removed!`,
+					"color: blue",
+					{ sortedByTitleAndMainList: playlists.sortedByTitleAndMainList },
+				);
 				break;
 			}
 

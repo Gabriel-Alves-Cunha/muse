@@ -48,3 +48,21 @@ export type Json =
 	| null
 	| Json[]
 	| { [key: string]: Json };
+
+////////////////////////////////////////////
+
+export type Widen<T> = T extends string
+	? string
+	: T extends number
+	? number
+	: T extends boolean
+	? boolean
+	: T extends (...args: unknown[]) => unknown
+	? (...args: Parameters<T>) => ReturnType<T>
+	: T extends (infer E)[]
+	? Widen<E>
+	: T extends object
+	? {
+			[K in keyof T]: Widen<T[K]>;
+	  }
+	: T;

@@ -150,11 +150,11 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 		}
 
 		on("pointerup", handleDeselectAllMedias);
-		on("keyup", selectAllMediasOnCtrlPlusA);
+		on("keydown", selectAllMediasOnCtrlPlusA);
 
 		return () => {
 			removeOn("pointerup", handleDeselectAllMedias);
-			removeOn("keyup", selectAllMediasOnCtrlPlusA);
+			removeOn("keydown", selectAllMediasOnCtrlPlusA);
 		};
 	}, []);
 

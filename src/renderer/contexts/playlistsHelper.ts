@@ -26,8 +26,10 @@ export function getMediaFiles(fileList: FileList): readonly File[] {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByDateOfBirth(list: MainList): [Path, Media][] {
-	const listAsArrayOfPaths = [...list].sort(
+export function sortByDateOfBirth(
+	mutableList: [Path, Media][],
+): Readonly<[Path, Media][]> {
+	const sortedList = mutableList.sort(
 		([, { birthTime: prevBirthTime }], [, { birthTime: nextBirthTime }]) =>
 			prevBirthTime > nextBirthTime
 				? 1
@@ -36,15 +38,17 @@ export function sortByDateOfBirth(list: MainList): [Path, Media][] {
 				: 0,
 	);
 
-	return listAsArrayOfPaths;
+	return sortedList;
 }
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function sortByTitle(list: MainList): [Path, Media][] {
-	const listAsArrayOfPaths = [...list].sort(
+export function sortByTitle(
+	mutableList: [Path, Media][],
+): Readonly<[Path, Media][]> {
+	const sortedList = mutableList.sort(
 		([, { title: prevTitle }], [, { title: nextTitle }]) => {
 			prevTitle = prevTitle.toLowerCase();
 			nextTitle = nextTitle.toLowerCase();
@@ -53,5 +57,5 @@ export function sortByTitle(list: MainList): [Path, Media][] {
 		},
 	);
 
-	return listAsArrayOfPaths;
+	return sortedList;
 }

@@ -1,4 +1,4 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 import type { ValuesOf } from "@common/@types/Utils";
 
 import { proxyMap, proxySet } from "valtio/utils";
@@ -8,7 +8,6 @@ import { sortByDateOfBirth, sortByTitle } from "./playlistsHelper";
 import { allSelectedMedias } from "./allSelectedMedias";
 import { dbg, dbgPlaylists } from "@common/debug";
 import { PlaylistListEnum } from "@common/enums";
-import { getFirstKey } from "@utils/map-set";
 import { error, warn } from "@common/log";
 import { settings } from "@contexts/settings";
 import { throwErr } from "@common/log";
@@ -30,13 +29,9 @@ export const playlists = proxy<Playlists>({
 	isLoadingMedias: false,
 
 	favorites: proxySet(
-		getFromLocalStorage(localStorageKeys.favorites) as
-			| ReadonlySet<Path>
-			| undefined,
+		getFromLocalStorage(localStorageKeys.favorites) as Path[],
 	),
-	history: proxyMap(
-		getFromLocalStorage(localStorageKeys.history) as History | undefined,
-	),
+	history: getFromLocalStorage(localStorageKeys.history) as Path[],
 	sortedByTitleAndMainList: proxyMap(),
 	sortedByDate: proxySet(),
 });
@@ -46,18 +41,22 @@ export const playlists = proxy<Playlists>({
 ////////////////////////////////////////////////
 // Listeners:
 
-export const isProxyMapOrSet = true;
+export const IS_PROXY_MAP_OR_SET = true;
 
 subscribe(playlists.favorites, (): void => {
 	setLocalStorage(
 		localStorageKeys.favorites,
 		playlists.favorites,
-		isProxyMapOrSet,
+		IS_PROXY_MAP_OR_SET,
 	);
 });
 
 subscribe(playlists.history, (): void => {
-	setLocalStorage(localStorageKeys.history, playlists.history, isProxyMapOrSet);
+	setLocalStorage(
+		localStorageKeys.history,
+		playlists.history,
+		IS_PROXY_MAP_OR_SET,
+	);
 });
 
 ////////////////////////////////////////////////
@@ -67,28 +66,16 @@ subscribe(playlists.history, (): void => {
 
 export function addToHistory(path: Path): void {
 	const { maxSizeOfHistory } = settings;
-	const { history } = playlists;
 
-	const dates: DateAsNumber[] = [];
-
-	// Add to history if there isn't one yet:
-	const historyOfDates = history.get(path);
-
-	historyOfDates
-		? dates.unshift(...historyOfDates, Date.now())
-		: dates.unshift(Date.now());
-
-	history.set(path, dates);
+	playlists.history.push(path);
 
 	// history has a max size of `maxSizeOfHistory`:
-	if (history.size > maxSizeOfHistory) {
-		const firstPath = getFirstKey(history) ?? "";
+	if (playlists.history.length > maxSizeOfHistory)
+		playlists.history.length = maxSizeOfHistory;
+}
 
-		history.delete(firstPath);
-	}
-
-	for (const [, dates] of history)
-		if (dates.length > maxSizeOfHistory) dates.length = maxSizeOfHistory;
+export function removeFromHistory(path: Path): void {
+	playlists.history = playlists.history.filter((path_) => path_ !== path);
 }
 
 ////////////////////////////////////////////////
@@ -97,13 +84,16 @@ export function addToHistory(path: Path): void {
 function updateSortedLists(newMainList: MainList): void {
 	const { sortedByTitleAndMainList: mainList, sortedByDate } = playlists;
 
+	const newMainListAsArray = [...newMainList];
+
 	sortedByDate.clear();
 	mainList.clear();
 
-	for (const [path, media] of sortByTitle(newMainList))
+	for (const [path, media] of sortByTitle(newMainListAsArray))
 		mainList.set(path, media);
 
-	for (const [path] of sortByDateOfBirth(newMainList)) sortedByDate.add(path);
+	for (const [path] of sortByDateOfBirth(newMainListAsArray))
+		sortedByDate.add(path);
 }
 
 ///////////////////////////////////////////////////
@@ -142,12 +132,12 @@ export const getMedia = (path: Path): Media | undefined =>
 export function removeMedia(path: Path): void {
 	dbg("Removing media with path =", path);
 
-	const { sortedByTitleAndMainList: mainList, favorites, history } = playlists;
+	const { sortedByTitleAndMainList: mainList, favorites } = playlists;
 
 	allSelectedMedias.delete(path);
+	removeFromHistory(path);
 	favorites.delete(path);
 	mainList.delete(path);
-	history.delete(path);
 }
 
 ////////////////////////////////////////////////
@@ -157,31 +147,23 @@ export function replaceEntireMainList(list: MainList): void {
 	time(() => {
 		const { favorites, history } = playlists;
 
-		// If the media in the favorites list is not on the new
-		// list, remove it from all other lists if present:
+		const mediasToDelete: Path[] = [];
+
+		// If the media in the X list is not on the new
+		// list, remove it from all other lists:
 		for (const path of favorites)
-			if (!list.has(path)) {
-				allSelectedMedias.delete(path);
-				favorites.delete(path);
-				history.delete(path);
-			}
+			if (!list.has(path)) mediasToDelete.push(path);
 
-		// If the media in the history list is not on
-		// action.list, remove it from the favorites:
-		for (const [path] of history)
-			if (!list.has(path)) {
-				allSelectedMedias.delete(path);
-				favorites.delete(path);
-				history.delete(path);
-			}
+		for (const path of history) if (!list.has(path)) mediasToDelete.push(path);
 
-		// Update allSelectedMedias:
 		for (const path of allSelectedMedias)
-			if (!list.has(path)) {
-				allSelectedMedias.delete(path);
-				favorites.delete(path);
-				history.delete(path);
-			}
+			if (!list.has(path)) mediasToDelete.push(path);
+
+		for (const path of mediasToDelete) {
+			allSelectedMedias.delete(path);
+			removeFromHistory(path);
+			favorites.delete(path);
+		}
 
 		updateSortedLists(list);
 	}, "replaceEntireMainList");
@@ -192,7 +174,9 @@ export function replaceEntireMainList(list: MainList): void {
 
 export function clearAllLists(): void {
 	for (const value of Object.values(playlists))
-		if (typeof value !== "boolean") value.clear();
+		if (typeof value === "boolean") continue;
+		else if (Array.isArray(value)) value.length = 0;
+		else value.clear();
 }
 
 ////////////////////////////////////////////////
@@ -238,7 +222,7 @@ export async function rescanMedia(path: Path, newMedia?: Media): Promise<void> {
 
 export function getPlaylist(
 	list: ValuesOf<typeof PlaylistListEnum>,
-): ReadonlySet<Path> | MainList | History {
+): ReadonlySet<Path> | MainList | readonly Path[] {
 	if (list === PlaylistListEnum.mainList)
 		return playlists.sortedByTitleAndMainList;
 	if (list === PlaylistListEnum.sortedByDate) return playlists.sortedByDate;
@@ -307,10 +291,6 @@ export const searchMedia = (highlight: string): [Path, Media][] =>
 ///////////////////////////////////////////////////
 // Types:
 
-export type History = Map<Path, DateAsNumber[]>;
-
-///////////////////////////////////////////////////
-
 export type MainList = Map<Path, Media>;
 
 ///////////////////////////////////////////////////
@@ -321,5 +301,5 @@ type Playlists = {
 	sortedByTitleAndMainList: MainList;
 	sortedByDate: Set<Path>;
 	favorites: Set<Path>;
-	history: History;
+	history: Path[];
 };

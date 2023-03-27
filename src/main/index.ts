@@ -9,15 +9,14 @@ import {
 	BrowserWindow,
 	Notification,
 	nativeImage,
-	MenuItem,
 	protocol,
 	ipcMain,
-	Menu,
 	Tray,
 	app,
 } from "electron";
 
 import { capitalizedAppName } from "@common/utils";
+import { setupElectronMenu } from "./setupElectronMenu";
 import { assertUnreachable } from "@utils/utils";
 import { error, log } from "@common/log";
 import { dbg } from "@common/debug";
@@ -65,7 +64,7 @@ function createElectronWindow(): BrowserWindow {
 		icon: logoPath,
 
 		frame: false,
-		show: false,
+		show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
 
 		minHeight: 500,
 		minWidth: 315,
@@ -85,44 +84,9 @@ function createElectronWindow(): BrowserWindow {
 	}).once("ready-to-show", () => window.show());
 
 	/////////////////////////////////////////
-	/////////////////////////////////////////
-	// Setup Electron global keyboard shortcuts:
 
-	const menu = new Menu();
+	setupElectronMenu(window);
 
-	menu.append(
-		new MenuItem({
-			label: "Refresh Page",
-			submenu: [
-				{
-					accelerator: "f5",
-					role: "reload",
-					click() {
-						window.reload();
-					},
-				},
-			],
-		}),
-	);
-
-	menu.append(
-		new MenuItem({
-			label: "Open/close Dev Tools",
-			submenu: [
-				{
-					role: "toggleDevTools",
-					accelerator: "f12",
-					click() {
-						window.webContents.toggleDevTools();
-					},
-				},
-			],
-		}),
-	);
-
-	Menu.setApplicationMenu(menu);
-
-	/////////////////////////////////////////
 	/////////////////////////////////////////
 
 	const url = isDev
@@ -188,8 +152,8 @@ app
 
 		/////////////////////////////////////////
 		/////////////////////////////////////////
-
 		// Tray setup:
+
 		tray = new Tray(
 			nativeImage.createFromPath(resolve(app.getAppPath(), "muse.png")),
 		);
@@ -198,11 +162,12 @@ app
 
 		/////////////////////////////////////////
 		/////////////////////////////////////////
+		// App update:
 
 		// This will download an update,
 		// then install when the app quits.
 		setTimeout(
-			() => autoUpdater.checkForUpdatesAndNotify().then().catch(error),
+			() => autoUpdater.checkForUpdatesAndNotify().catch(error),
 			10_000,
 		);
 

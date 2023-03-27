@@ -27,9 +27,6 @@ export const app = new Koa()
 export function createServer(filepaths: readonly Path[]): ClientServerAPI {
 	if (!myIp) throwErr(unableToShareMediasError);
 
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-
 	app.context["filepaths"] = filepaths;
 	app.context["exampleSet"] = new Set(["test"]);
 

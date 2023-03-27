@@ -77,8 +77,8 @@ const Row = memo<RowProps>(
 
 						<p>
 							{media.duration}
-
-							{media.artist && `&emsp;|&emsp;${media.artist}`}
+							&nbsp;&nbsp;&nbsp;{media.artist && "|"}&nbsp;&nbsp;&nbsp;
+							{media.artist}
 						</p>
 					</div>
 				</button>
