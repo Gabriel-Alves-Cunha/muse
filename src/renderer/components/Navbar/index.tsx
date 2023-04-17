@@ -8,7 +8,7 @@ import { Converting } from "../Converting";
 /////////////////////////////////////////
 // Main function:
 
-export const Navbar = () => (
+export const Navbar = (): JSX.Element => (
 	<nav className="nav">
 		<ThemeToggler />
 

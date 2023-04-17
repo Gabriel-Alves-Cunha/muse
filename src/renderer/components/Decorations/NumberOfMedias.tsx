@@ -1,13 +1,13 @@
-import { useSnapshot } from "valtio";
+import { type Playlists, usePlaylists } from "@contexts/playlists";
+import { selectT, useTranslator } from "@i18n";
 
-import { translation } from "@i18n";
-import { playlists } from "@contexts/playlists";
+const selectSortedByDateSize = (state: Playlists): number =>
+	state.sortedByDate.size;
 
-export function NumberOfMedias() {
-	const playlistsAccessor = useSnapshot(playlists);
-	const t = useSnapshot(translation).t;
+export function NumberOfMedias(): JSX.Element {
+	const numberOfMedias = usePlaylists(selectSortedByDateSize);
+	const t = useTranslator(selectT);
 
-	const numberOfMedias = playlistsAccessor.sortedByDate.size;
 	const isPlural = numberOfMedias > 1;
 
 	return (

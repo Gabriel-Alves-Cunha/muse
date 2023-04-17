@@ -13,7 +13,10 @@ import { ProgressStatusEnum } from "@common/enums";
 //////////////////////////////////////////
 // Main function:
 
-export const Progress = ({ percent_0_to_100, status }: ProgressProps) => (
+export const Progress = ({
+	percent_0_to_100,
+	status,
+}: ProgressProps): JSX.Element => (
 	<progress
 		value={status === ProgressStatusEnum.SUCCESS ? 100 : percent_0_to_100}
 		data-progress

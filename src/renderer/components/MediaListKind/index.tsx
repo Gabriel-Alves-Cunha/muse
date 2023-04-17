@@ -1,28 +1,25 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 
 import { MdSearchOff as NoMediaFound } from "react-icons/md";
 import { useEffect, useMemo, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useSnapshot } from "valtio";
 import { Virtuoso } from "react-virtuoso";
 
 import { CtxContentEnum, ContextMenu } from "../ContextMenu";
-import { itemContent, leftClick } from "./Row";
-import { allSelectedMedias } from "@contexts/allSelectedMedias";
+import { ItemContent, leftClick } from "./Row";
+import { useListTypeToDisplay } from "./states";
 import { PlaylistListEnum } from "@common/enums";
+import { error, throwErr } from "@common/log";
 import { resetAllAppData } from "@utils/app";
 import { ErrorFallback } from "../ErrorFallback";
+import { usePlaylists } from "@contexts/playlists";
 import { on, removeOn } from "@utils/window";
-import { translation } from "@i18n";
-import { fromList } from "./states";
-import { error } from "@common/log";
 import { time } from "@utils/utils";
+import { t } from "@i18n";
 import {
-	type MainList,
-	type History,
-	removeMedia,
-	playlists,
-} from "@contexts/playlists";
+	clearAllSelectedMedias,
+	getAllSelectedMedias,
+} from "@contexts/allSelectedMedias";
 import {
 	selectAllMediasOnCtrlPlusA,
 	computeHistoryItemKey,
@@ -35,21 +32,20 @@ import {
 /////////////////////////////////////////
 // Wrapping main function in an error boundary:
 
-export const MediaListKind = ({ isHome }: Props) => (
-	<ErrorBoundary
-		FallbackComponent={() => (
-			<ErrorFallback
-				description={translation.t(
-					"errors.mediaListKind.errorFallbackDescription",
-				)}
-			/>
-		)}
-		onReset={() => {
-			resetAllAppData();
-			reloadWindow();
-		}}
-	>
-		<MediaListKindWithoutErrorBoundary isHome={isHome} />
+const onReset = (): void => {
+	resetAllAppData();
+	reloadWindow();
+};
+
+const FallbackComponent = (): JSX.Element => (
+	<ErrorFallback
+		description={t("errors.mediaListKind.errorFallbackDescription")}
+	/>
+);
+
+export const MediaListKind = (props: Props): JSX.Element => (
+	<ErrorBoundary FallbackComponent={FallbackComponent} onReset={onReset}>
+		<MediaListKindWithoutErrorBoundary {...props} />
 	</ErrorBoundary>
 );
 
@@ -58,95 +54,77 @@ export const MediaListKind = ({ isHome }: Props) => (
 /////////////////////////////////////////
 // Main function:
 
-function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
-	const playlistsAccessor = useSnapshot(playlists);
+function MediaListKindWithoutErrorBoundary({ isHome }: Props): JSX.Element {
+	const listTypeToDisplay = useListTypeToDisplay();
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const fromListAccessor = useSnapshot(fromList);
+	const playlists = usePlaylists();
 
-	// isHome is used to determine which list to use
-	// when the user is at the home page, the homeList is used
-	// then, cause it will have what the user has last set as the main list:
-	// either sortedByDate or sortedByName, in our current case.
-	const listName = isHome ? fromListAccessor.homeList : fromListAccessor.curr;
-	const list = playlistsAccessor[listName];
+	const wrapperProps = useMemo(
+		() => ({ className: "max-w-2xl h-[87%]", ref: wrapperRef }),
+		[],
+	);
 
-	const listAsArrayOfAMap: readonly [Path, Media, DateAsNumber][] = useMemo(
+	const listName = isHome
+		? listTypeToDisplay.homeListToDisplay
+		: listTypeToDisplay.current;
+
+	const list = playlists[listName];
+
+	const listAsArrayOfAMap: readonly [Path, Media][] = useMemo(
 		() =>
 			time(() => {
-				if (listName === PlaylistListEnum.mainList)
-					return Array.from(list as MainList, ([path, media]) => [
-						path,
-						media,
-						0,
-					]);
+				const mainList = playlists.sortedByTitleAndMainList;
+
+				if (listName === PlaylistListEnum.mainList) return [...mainList];
 
 				if (
 					listName === PlaylistListEnum.sortedByDate ||
 					listName === PlaylistListEnum.favorites
 				) {
-					const listAsArrayOfAMap: [Path, Media, DateAsNumber][] = [];
-					const mainList = playlists.sortedByTitleAndMainList;
+					const listAsArrayOfAMap: [Path, Media][] = [];
 
 					for (const path of list as ReadonlySet<Path>) {
 						const media = mainList.get(path);
 
 						if (!media) {
 							setTimeout(() => {
-								error(`"${path}" not found! Removing from mainList.`);
-								removeMedia(path);
+								error(`"${path}" not found at \`listAsArrayOfAMap\`!`);
 							}, 1_000);
+
 							continue;
 						}
 
-						listAsArrayOfAMap.push([path, media, 0]);
+						listAsArrayOfAMap.push([path, media]);
 					}
 
 					return listAsArrayOfAMap;
 				}
 
-				// Else if (listName === playlistList.history)
-				const unsortedList: [Path, Media, DateAsNumber][] = [];
-				const mainList = playlists.sortedByTitleAndMainList;
+				if (listName === PlaylistListEnum.history) {
+					const listAsArrayOfAMap = [...mainList].sort((a, b) => {
+						if (a[1].lastPlayedAt < b[1].lastPlayedAt) return -1;
+						if (a[1].lastPlayedAt > b[1].lastPlayedAt) return 1;
+						return 0;
+					});
 
-				for (const [path, dates] of list as History) {
-					const media = mainList.get(path);
-
-					if (!media) {
-						setTimeout(() => {
-							error(`"${path}" not found. Removing from mainList.`);
-							removeMedia(path);
-						}, 1_000);
-						continue;
-					}
-
-					for (const date of dates) unsortedList.push([path, media, date]);
+					return listAsArrayOfAMap;
 				}
 
-				const sorted: [Path, Media, DateAsNumber][] = unsortedList.sort(
-					(a, b) => b[2] - a[2],
-				); // sorted by date
-
-				return sorted;
+				throwErr(`"${listName}" not found!`);
 			}, "listAsArrayOfAMap"),
-		[listName, list],
+		[list, listName, playlists.sortedByTitleAndMainList],
 	);
 
 	useEffect(() => {
-		fromList.isHome = isHome;
-	}, [isHome]);
+		function handleDeselectAllMedias(event: PointerEvent): void {
+			if (getAllSelectedMedias().size === 0) return;
 
-	useEffect(() => {
-		function handleDeselectAllMedias(event: PointerEvent) {
-			if (allSelectedMedias.size === 0) return;
+			const isClickInside = wrapperRef.current?.contains(event.target as Node);
+			const shouldIgnoreBecauseItIsLeftClick = event.button !== leftClick;
 
-			const ignoreBecauseOfLeftClick = event.button !== leftClick;
-			const isClickInside = Boolean(
-				wrapperRef.current?.contains(event.target as Node),
-			);
+			if (shouldIgnoreBecauseItIsLeftClick || isClickInside) return;
 
-			if (ignoreBecauseOfLeftClick || isClickInside) return;
-
-			allSelectedMedias.clear();
+			clearAllSelectedMedias();
 		}
 
 		on("pointerup", handleDeselectAllMedias);
@@ -159,10 +137,10 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 	}, []);
 
 	return (
-		// For some reason (CSS) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
+		// For some reason (className at wrapperProps) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
 		<ContextMenu
-			wrapperProps={{ className: "max-w-2xl h-[87%]", ref: wrapperRef }}
 			content={CtxContentEnum.MEDIA_OPTIONS}
+			wrapperProps={wrapperProps}
 		>
 			<Virtuoso
 				computeItemKey={
@@ -171,7 +149,7 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 						: computeItemKey
 				}
 				totalCount={listAsArrayOfAMap.length}
-				itemContent={itemContent}
+				itemContent={ItemContent}
 				data={listAsArrayOfAMap}
 				components={components}
 				fixedItemHeight={64}
@@ -191,23 +169,18 @@ function MediaListKindWithoutErrorBoundary({ isHome = false }: Props) {
 
 const footer = <div className="relative w-2 h-2 bg-none" />;
 
-const Footer = () => footer;
+const Footer = (): JSX.Element => footer;
 
 const emptyPlaceholder = (
 	<div className="empty-placeholder">
 		<NoMediaFound className="w-14 h-14 mr-5" />
 
-		{translation.t("alts.noMediasFound")}
+		{t("alts.noMediasFound")}
 	</div>
 );
 
-const EmptyPlaceholder = () => emptyPlaceholder;
+const EmptyPlaceholder = (): JSX.Element => emptyPlaceholder;
 
 const components = { EmptyPlaceholder, Header: Footer, Footer };
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-// Types:
-
-type Props = { isHome?: boolean | undefined };
+type Props = Readonly<{ isHome?: boolean }>;

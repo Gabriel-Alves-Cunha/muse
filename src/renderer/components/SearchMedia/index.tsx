@@ -1,47 +1,41 @@
-import { useSnapshot } from "valtio";
 import { useRef } from "react";
 
 import { ContextMenu, CtxContentEnum } from "../ContextMenu";
+import { selectT, useTranslator } from "@i18n";
 import { MediaSearchRow } from "./MediaSearchRow";
-import { translation } from "@i18n";
 import { RightSlot } from "../RightSlot";
 import { BaseInput } from "../BaseInput";
 import { Popover } from "../Popover";
 import {
-	setDefaultSearch,
-	setSearchTerm,
+	setDefaultSearchMediaData,
+	useDataOfSearchMedia,
 	SearchStatusEnum,
-	searcher,
+	setSearchTerm,
 } from "./state";
 
-export function SearchMedia() {
-	// By default, state mutations are batched before triggering re-render.
-	// Sometimes, we want to disable the batching. The known use case of this is input.
-	const searcherAccessor = useSnapshot(searcher, { sync: true });
+export function SearchMedia(): JSX.Element {
 	const searchWrapperRef = useRef<HTMLDivElement>(null);
-	const t = useSnapshot(translation).t;
-
-	const resultsJSXs: JSX.Element[] = [];
+	const dataOfSearch = useDataOfSearchMedia();
+	const t = useTranslator(selectT);
 
 	/////////////////////////////////////////
 
 	const foundSomething =
-		searcherAccessor.searchStatus === SearchStatusEnum.FOUND_SOMETHING;
+		dataOfSearch.searchStatus === SearchStatusEnum.FOUND_SOMETHING;
 	const nothingFound =
-		searcherAccessor.searchStatus === SearchStatusEnum.NOTHING_FOUND;
+		dataOfSearch.searchStatus === SearchStatusEnum.NOTHING_FOUND;
 	const shouldPopoverOpen = foundSomething || nothingFound;
 
 	/////////////////////////////////////////
 
-	for (const [path, media] of searcherAccessor.results)
-		resultsJSXs.push(
-			<MediaSearchRow
-				highlight={searcherAccessor.highlight}
-				media={media}
-				path={path}
-				key={path}
-			/>,
-		);
+	const resultsFound = dataOfSearch.results.map(([path, media]) => (
+		<MediaSearchRow
+			highlight={dataOfSearch.highlight}
+			media={media}
+			path={path}
+			key={path}
+		/>
+	));
 
 	/////////////////////////////////////////
 
@@ -49,9 +43,9 @@ export function SearchMedia() {
 		<div ref={searchWrapperRef}>
 			<BaseInput
 				RightSlot={<RightSlot id="searcher-right-slot">Alt+s</RightSlot>}
-				value={searcherAccessor.searchTerm}
+				onEscape={setDefaultSearchMediaData}
 				label={t("labels.searchForSongs")}
-				onEscape={setDefaultSearch}
+				value={dataOfSearch.searchTerm}
 				onChange={setSearchTerm}
 				spellCheck="false"
 				autoCorrect="off"
@@ -69,17 +63,16 @@ export function SearchMedia() {
 								? "nothing-found-for-search-media"
 								: "search-media-results"
 						}
-						onPointerDownOutside={setDefaultSearch}
+						onPointerDownOutside={setDefaultSearchMediaData}
+						onEscape={setDefaultSearchMediaData}
 						contentRef={searchWrapperRef}
-						onEscape={setDefaultSearch}
 					>
 						{nothingFound ? (
 							<div className="nothing-found">
-								Nothing was found for &quot;{searcherAccessor.searchTerm}&quot;
+								Nothing was found for &quot;{dataOfSearch.searchTerm}&quot;
 							</div>
 						) : (
-							// foundSomething:
-							resultsJSXs
+							resultsFound
 						)}
 					</Popover>
 				</ContextMenu>

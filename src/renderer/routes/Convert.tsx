@@ -1,26 +1,36 @@
 import type { AllowedMedias } from "@common/utils";
-import type { ConvertInfo } from "@components/Converting/helper";
 
+import { useCallback, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
-import { useRef, useState } from "react";
-import { useSnapshot } from "valtio";
 
-import { createNewConvertion } from "@components/Converting/helper";
-import { translation } from "@i18n";
+import { selectT, useTranslator } from "@i18n";
 import { MainArea } from "@components/MainArea";
 import { Button } from "@components/Button";
+import {
+	type ConvertInfo,
+	createNewConvertion,
+} from "@components/Converting/helper";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Main function:
 
-export function Convert() {
+export function Convert(): JSX.Element {
 	const [toExtension] = useState<AllowedMedias>("mp3");
 	const inputRef = useRef<HTMLInputElement>(null);
-	const t = useSnapshot(translation).t;
+	const t = useTranslator(selectT);
 
-	const openNativeUI_ChooseFiles = () => inputRef.current?.click();
+	const openNativeUI_ChooseFiles = useCallback(
+		(): void => inputRef.current?.click(),
+		[],
+	);
+
+	const handleSelectedFiles_ = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) =>
+			handleSelectedFiles(e, toExtension),
+		[toExtension],
+	);
 
 	////////////////////////////////////////////////
 
@@ -30,7 +40,7 @@ export function Convert() {
 				<ConvertIcon size={18} />
 
 				<input
-					onChange={(e) => handleSelectedFiles(e, toExtension)}
+					onChange={handleSelectedFiles_}
 					accept="video/*,audio/*"
 					className="hidden"
 					ref={inputRef}
@@ -52,7 +62,7 @@ export function Convert() {
 function handleSelectedFiles(
 	{ target: { files } }: React.ChangeEvent<HTMLInputElement>,
 	toExtension: AllowedMedias,
-) {
+): void {
 	if (!files?.length) return;
 
 	for (const file of files) {

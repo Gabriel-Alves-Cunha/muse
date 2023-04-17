@@ -6,7 +6,7 @@ import { ControlsAndSeeker } from "./ControlsAndSeeker";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { Header } from "./Header";
 
-export const Player = ({ media, path }: PlayerProps) => (
+export const Player = ({ media, path }: Props): JSX.Element => (
 	<>
 		<Header media={media} path={path} />
 
@@ -33,7 +33,7 @@ export const Player = ({ media, path }: PlayerProps) => (
 /////////////////////////////////////////
 // Types:
 
-type PlayerProps = {
+type Props = Readonly<{
 	media: Media | undefined;
 	path: Path;
-};
+}>;

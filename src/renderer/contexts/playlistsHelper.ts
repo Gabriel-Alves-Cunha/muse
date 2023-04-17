@@ -1,5 +1,5 @@
 import type { Media, Path } from "@common/@types/GeneralTypes";
-import type { MainList } from "./playlists";
+import type { Playlists } from "./playlists";
 
 import { log } from "@common/log";
 
@@ -27,9 +27,9 @@ export function getMediaFiles(fileList: FileList): readonly File[] {
 ////////////////////////////////////////////////
 
 export function sortByDateOfBirth(
-	mutableList: [Path, Media][],
-): Readonly<[Path, Media][]> {
-	const sortedList = mutableList.sort(
+	list: Playlists["sortedByTitleAndMainList"],
+): [Path, Media][] {
+	const sorted = [...list].sort(
 		([, { birthTime: prevBirthTime }], [, { birthTime: nextBirthTime }]) =>
 			prevBirthTime > nextBirthTime
 				? 1
@@ -38,7 +38,7 @@ export function sortByDateOfBirth(
 				: 0,
 	);
 
-	return sortedList;
+	return sorted;
 }
 
 ////////////////////////////////////////////////
@@ -46,16 +46,19 @@ export function sortByDateOfBirth(
 ////////////////////////////////////////////////
 
 export function sortByTitle(
-	mutableList: [Path, Media][],
-): Readonly<[Path, Media][]> {
-	const sortedList = mutableList.sort(
-		([, { title: prevTitle }], [, { title: nextTitle }]) => {
+	list: Playlists["sortedByTitleAndMainList"] | [Path, Media][],
+): Playlists["sortedByTitleAndMainList"] {
+	const newList: [Path, Media][] =
+		list instanceof Map ? [...list] : (list as [Path, Media][]);
+
+	const sorted = new Map(
+		newList.sort(([, { title: prevTitle }], [, { title: nextTitle }]) => {
 			prevTitle = prevTitle.toLowerCase();
 			nextTitle = nextTitle.toLowerCase();
 
 			return prevTitle > nextTitle ? 1 : prevTitle < nextTitle ? -1 : 0;
-		},
+		}),
 	);
 
-	return sortedList;
+	return sorted;
 }

@@ -1,39 +1,42 @@
-import { useSnapshot } from "valtio";
 import { useEffect } from "react";
 
-import { search, setUrl, searchResult } from "./helpers";
-import { translation } from "@i18n";
+import { SearcherInfo, search, setUrl, useSearchInfo } from "./helpers";
+import { selectT, useTranslator } from "@i18n";
 import { BaseInput } from "@components/BaseInput";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function SearcherWrapper() {
-	const t = useSnapshot(translation).t;
-	const searchResultAccessor = useSnapshot(searchResult);
+const selectUrlAndError = (
+	state: SearcherInfo,
+): { error: string; url: string } => ({
+	error: state.error,
+	url: state.url,
+});
+
+export function SearcherWrapper(): JSX.Element {
+	const { error, url } = useSearchInfo(selectUrlAndError);
+	const t = useTranslator(selectT);
 
 	useEffect(() => {
-		const searchTimeout = setTimeout(
-			() => search(searchResultAccessor.url),
-			300,
-		);
+		const searchTimeout = setTimeout(() => search(url), 300);
 
 		return () => clearTimeout(searchTimeout);
-	}, [searchResultAccessor.url]);
+	}, [url]);
 
 	return (
 		<>
 			<BaseInput
 				label={t("labels.pasteVideoURL")}
-				value={searchResultAccessor.url}
 				autoCapitalize="off"
 				spellCheck="false"
 				autoCorrect="off"
 				onChange={setUrl}
+				value={url}
 			/>
 
-			<p className="searcher">{searchResultAccessor.error}</p>
+			<p className="searcher">{error}</p>
 		</>
 	);
 }

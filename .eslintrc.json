@@ -1,0 +1,53 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"extends": [
+		"plugin:@typescript-eslint/recommended", "plugin:react-hooks/recommended",
+		"plugin:react/recommended", "eslint:recommended"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"plugins": ["@typescript-eslint", "react-hooks", "react"],
+	"overrides": [],
+	"rules": {
+		"react/jsx-filename-extension": [
+			"warn",
+			{
+				"extensions": [".tsx"]
+			}
+		],
+		"@typescript-eslint/explicit-function-return-type": [
+			"error",
+			{
+				"allowExpressions": true
+			}
+		],
+		"@typescript-eslint/no-use-before-define": "off",
+		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/no-unused-vars": "off",
+		"react-hooks/exhaustive-deps": "error",
+		"import/prefer-default-export": "off",
+		"react-hooks/rules-of-hooks": "error",
+		"react/react-in-jsx-scope": "off",
+		"no-mixed-spaces-and-tabs": "off",
+		"no-duplicate-imports": "error",
+		"no-use-before-define": "off",
+		"no-useless-escape": "off",
+		"no-control-regex": "off",
+		"react/prop-types": "off",
+		"no-unused-vars": "off",
+		"spaced-comment": "off",
+		"camelcase": "off",
+		"no-undef": "off"
+	}
+}

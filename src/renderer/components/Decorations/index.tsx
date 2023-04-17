@@ -1,4 +1,3 @@
-import { useSnapshot } from "valtio";
 import {
 	VscChromeMaximize as Maximize,
 	VscChromeMinimize as Minimize,
@@ -7,11 +6,11 @@ import {
 
 import { toggleMaximize, minimizeWindow, closeWindow } from "./helper";
 import { NumberOfMediasSelected } from "./NumberOfMediasSelected";
+import { selectT, useTranslator } from "@i18n";
 import { capitalizedAppName } from "@common/utils";
 import { NumberOfMedias } from "./NumberOfMedias";
-import { translation } from "@i18n";
 import { MediasInfo } from "../Decorations/MediasInfo";
-import { page } from "@contexts/page";
+import { pageRef } from "@contexts/page";
 
 // @ts-ignore => This is ok:
 import imageUrl from "@assets/logo.svg";
@@ -21,8 +20,8 @@ import imageUrl from "@assets/logo.svg";
 /////////////////////////////////////////////
 
 // Window draggable region:
-export function DecorationsTop() {
-	const t = useSnapshot(translation).t;
+export function DecorationsTop(): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<header className="decorations-up">
@@ -37,7 +36,7 @@ export function DecorationsTop() {
 
 /////////////////////////////////////////////
 
-export const DecorationsDown = () => (
+export const DecorationsDown = (): JSX.Element => (
 	<footer className="decorations-down">
 		<div>
 			<NumberOfMedias />
@@ -53,14 +52,14 @@ export const DecorationsDown = () => (
 
 /////////////////////////////////////////////
 
-const WindowButton = (props: WindowButtonProps) => (
+const WindowButton = (props: WindowButtonProps): JSX.Element => (
 	<button data-window-button {...props} />
 );
 
 /////////////////////////////////////////////
 
-function Buttons() {
-	const t = useSnapshot(translation).t;
+function Buttons(): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<div className="flex ml-auto h-full bg-transparent">
@@ -91,12 +90,12 @@ function Buttons() {
 
 /////////////////////////////////////////////
 
-function AppNamePlusFolder() {
-	const pageAccessor = useSnapshot(page);
+function AppNamePlusFolder(): JSX.Element {
+	const page = pageRef().current;
 
 	return (
 		<div className="app-name-plus-folder">
-			{capitalizedAppName} • {pageAccessor.curr}
+			{capitalizedAppName} • {page}
 		</div>
 	);
 }

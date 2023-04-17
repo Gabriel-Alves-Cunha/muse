@@ -1,7 +1,7 @@
 import type { DotNestedKeys } from "@common/@types/DotNestedKeys";
 import type { OneOf } from "@common/@types/Utils";
 
-import { proxy } from "valtio";
+import { type StoreApi, type UseBoundStore, create } from "zustand";
 
 import { throwErr } from "@common/log";
 
@@ -19,25 +19,25 @@ import { throwErr } from "@common/log";
  * const locale = "en-US";
  * ```
  */
-export function makeTranslation<Data extends RecursiveObject>(
+export const makeUseTranslator = <Data extends RecursiveObject>(
 	translations: Data,
 	locale: OneOf<Data>,
-): Translation<Data> {
-	const state = proxy({
+): UseBoundStore<StoreApi<Translator<Data>>> =>
+	create<Translator<Data>>((_set, get) => ({
 		translations,
 
 		locale,
 
 		formatArgument: (value: string | number) =>
 			typeof value === "number"
-				? new Intl.NumberFormat(state.locale as string).format(value)
+				? new Intl.NumberFormat(get().locale as string).format(value)
 				: value,
 
 		t(
 			key: DotNestedKeys<Data[typeof locale]>,
 			// args: TranslationArguments = {},
 		) {
-			const startObject = state.translations[state.locale];
+			const startObject = get().translations[get().locale];
 			const keys = (key as string).split(".");
 			const lastPart = keys.at(-1) as string;
 			const targetObject = keys
@@ -50,7 +50,7 @@ export function makeTranslation<Data extends RecursiveObject>(
 			if (typeof targetObject !== "object")
 				throwErr(`Missing translation: "${key}"!`);
 
-			const translation = targetObject![lastPart];
+			const translation = targetObject?.[lastPart];
 
 			if (typeof translation !== "string")
 				throwErr(`Missing translation: "${key}"!`);
@@ -69,10 +69,7 @@ export function makeTranslation<Data extends RecursiveObject>(
 
 			return translation as string;
 		},
-	});
-
-	return state;
-}
+	}));
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -81,13 +78,16 @@ export function makeTranslation<Data extends RecursiveObject>(
 
 type RecursiveObject = { [key: string]: RecursiveObject | string };
 
-type TranslationArguments = {
+type TranslatorArguments = {
 	[name: string]: string | number;
 };
 
-type Translation<Data extends RecursiveObject> = {
-	t(key: DotNestedKeys<Data[OneOf<Data>]>, args?: TranslationArguments): string;
+type Translator<Translations extends RecursiveObject> = {
+	t(
+		key: DotNestedKeys<Translations[OneOf<Translations>]>,
+		args?: TranslatorArguments,
+	): string;
 	formatArgument(value: string | number): string;
-	locale: OneOf<Data>;
-	translations: Data;
+	locale: OneOf<Translations>;
+	translations: Translations;
 };

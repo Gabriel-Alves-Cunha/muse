@@ -4,7 +4,12 @@ import { useRef, useState } from "react";
 
 import { Popover } from "@components/Popover";
 
-export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
+export function NavbarPopoverButtons({
+	children,
+	tooltip,
+	size,
+	Icon,
+}: Props): JSX.Element {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
 
@@ -44,9 +49,9 @@ export function NavbarPopoverButtons({ children, tooltip, size, Icon }: Props) {
 /////////////////////////////////////////
 // Types:
 
-type Props = {
+type Props = Readonly<{
 	children: React.ReactNode;
 	tooltip: string;
 	Icon: IconType;
 	size: number;
-};
+}>;

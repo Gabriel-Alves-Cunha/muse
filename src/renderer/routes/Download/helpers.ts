@@ -1,9 +1,9 @@
-import { proxy } from "valtio";
+import { create } from "zustand";
 
 import { createNewDownload } from "@components/Downloading/helper";
 import { getErrorMessage } from "@utils/error";
-import { translation } from "@i18n";
 import { error } from "@common/log";
+import { t } from "@i18n";
 
 const { getBasicInfo } = electronApi.media;
 
@@ -12,30 +12,47 @@ const { getBasicInfo } = electronApi.media;
 ////////////////////////////////////////////////
 // Constants:
 
-export const searchResult = proxy<SearcherInfo>({
+const defaultSearchInfo: SearcherInfo = {
 	result: { imageURL: "", artist: "", title: "" },
 	isLoading: false,
 	error: "",
 	url: "",
-});
+} as const;
 
-function setDefaultSearchInfo() {
-	searchResult.result = { imageURL: "", artist: "", title: "" };
-	searchResult.isLoading = false;
-	searchResult.error = "";
-	searchResult.url = "";
-}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+// Main functions:
+
+export const useSearchInfo = create<SearcherInfo>(() => defaultSearchInfo);
+
+export const { getState: getSearchInfo, setState: setSearchInfo } =
+	useSearchInfo;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Helper functions:
 
+const setDefaultSearchInfo = (): void => setSearchInfo(defaultSearchInfo);
+
+////////////////////////////////////////////////
+
+export const selectIsLoading = (state: SearcherInfo): boolean =>
+	state.isLoading;
+
+////////////////////////////////////////////////
+
+export const selectResult = (state: SearcherInfo): SearcherInfo["result"] =>
+	state.result;
+
+////////////////////////////////////////////////
+
 export function downloadMedia(): void {
 	const {
 		result: { artist, imageURL, title },
 		url,
-	} = searchResult;
+	} = getSearchInfo();
 
 	if (!(title && url)) return;
 
@@ -52,7 +69,7 @@ export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
 	// stopping propagation so the space key doesn't toggle play media.
 	e.stopPropagation();
 
-	searchResult.url = e.target.value;
+	setSearchInfo({ url: e.target.value });
 }
 
 ////////////////////////////////////////////////
@@ -60,8 +77,7 @@ export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
 export async function search(url: string): Promise<void> {
 	if (url.length < 16) return;
 
-	setDefaultSearchInfo();
-	searchResult.isLoading = true;
+	setSearchInfo({ isLoading: true });
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -73,17 +89,16 @@ export async function search(url: string): Promise<void> {
 			title,
 		};
 
-		searchResult.isLoading = false;
-		searchResult.result = result;
+		setSearchInfo({ result, isLoading: false });
 	} catch (err) {
-		const { t } = translation;
-
-		setDefaultSearchInfo();
-		searchResult.error = getErrorMessage(err).includes("No video id found")
-			? t("errors.noVideoIdFound")
-			: t("errors.gettingMediaInfo");
-
 		error(err);
+
+		setSearchInfo({
+			isLoading: false,
+			error: getErrorMessage(err).includes("No video id found")
+				? t("errors.noVideoIdFound")
+				: t("errors.gettingMediaInfo"),
+		});
 	}
 }
 
@@ -100,9 +115,9 @@ type UrlMediaMetadata = {
 
 ////////////////////////////////////////////////
 
-type SearcherInfo = {
+export type SearcherInfo = Readonly<{
 	result: UrlMediaMetadata;
 	isLoading: boolean;
 	error: string;
 	url: string;
-};
+}>;

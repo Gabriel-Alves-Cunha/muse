@@ -1,18 +1,19 @@
+import type { Path } from "@common/@types/GeneralTypes";
+
+import { useCallback, useState } from "react";
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
-import { useSnapshot } from "valtio";
-import { useState } from "react";
 
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
+import { selectT, useTranslator } from "@i18n";
+import { getAllSelectedMedias } from "@contexts/allSelectedMedias";
 import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
-import { allSelectedMedias } from "@contexts/allSelectedMedias";
+import { getDataOfSearchMedia } from "../SearchMedia/state";
+import { setFilesToShare } from "@contexts/filesToShare";
 import { CenteredModal } from "../CenteredModal";
-import { filesToShare } from "@contexts/filesToShare";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
-import { translation } from "@i18n";
-import { openLyrics } from "../MediaPlayer/Header/LoadOrToggleLyrics";
+import { OPEN_LYRICS } from "../MediaPlayer/Header/LoadOrToggleLyrics";
 import { RightSlot } from "../RightSlot";
-import { searcher } from "../SearchMedia/state";
 import { MenuItem } from "../MenuItem";
 
 /////////////////////////////////////////////
@@ -20,15 +21,20 @@ import { MenuItem } from "../MenuItem";
 /////////////////////////////////////////////
 // Main function:
 
-export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
+export function SearchMediaOptionsCtxMenu({
+	isAllDisabled,
+}: Props): JSX.Element {
 	const [isOpen, setIsOpen] = useState(false);
-	const t = useSnapshot(translation).t;
+	const t = useTranslator(selectT);
+
+	const closeMediaOptionsCtxMenu = useCallback(() => setIsOpen(false), []);
+	const openMediaOptionsCtxMenu = useCallback(() => setIsOpen(true), []);
 
 	return (
 		<>
 			<>
 				<button
-					onPointerUp={() => setIsOpen(true)}
+					onPointerUp={openMediaOptionsCtxMenu}
 					disabled={isAllDisabled}
 					data-menu-item
 				>
@@ -41,7 +47,7 @@ export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 
 				<CenteredModal isOpen={isOpen} setIsOpen={setIsOpen}>
 					<DeleteMediaDialogContent
-						closeDialog={() => setIsOpen(false)}
+						closeDialog={closeMediaOptionsCtxMenu}
 						handleDeleteMedia={deleteMedias}
 					/>
 				</CenteredModal>
@@ -76,20 +82,24 @@ export function SearchMediaOptionsCtxMenu({ isAllDisabled }: Props) {
 /////////////////////////////////////////////
 // Helper functions:
 
-export function shareMedias() {
-	for (const path of allSelectedMedias) filesToShare.add(path);
-}
+export const shareMedias = (): void => setFilesToShare(getAllSelectedMedias());
 
 /////////////////////////////////////////////
 
 function selectAllMediasOnSearchResult(): void {
-	for (const [path] of searcher.results) allSelectedMedias.add(path);
+	const newFilesToShare = new Set<Path>();
+
+	for (const [path] of getDataOfSearchMedia().results)
+		newFilesToShare.add(path);
+
+	setFilesToShare(newFilesToShare);
 }
 
 /////////////////////////////////////////////
 
 export function searchForLyrics(): void {
-	for (const path of allSelectedMedias) searchAndOpenLyrics(path, !openLyrics);
+	for (const path of getAllSelectedMedias())
+		searchAndOpenLyrics(path, !OPEN_LYRICS);
 }
 
 /////////////////////////////////////////////

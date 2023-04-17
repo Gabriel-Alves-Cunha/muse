@@ -1,14 +1,14 @@
 import { FiTrash as CleanIcon } from "react-icons/fi";
-import { useSnapshot } from "valtio";
 
+import { selectT, useTranslator } from "@i18n";
+import { getListTypeToDisplay } from "../MediaListKind/states";
+import { emptyMap, emptySet } from "@utils/empty";
 import { PlaylistListEnum } from "@common/enums";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { translation } from "@i18n";
-import { playlists } from "@contexts/playlists";
-import { fromList } from "../MediaListKind/states";
+import { setPlaylists } from "@contexts/playlists";
 
-export function Clean() {
-	const t = useSnapshot(translation).t;
+export function Clean(): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<ButtonOfGroup
@@ -23,8 +23,16 @@ export function Clean() {
 /////////////////////////////////////////////
 // Helper functions:
 
-function cleanProperList() {
-	if (fromList.curr === PlaylistListEnum.favorites) playlists.favorites.clear();
-	else if (fromList.curr === PlaylistListEnum.history)
-		playlists.history.clear();
+function cleanProperList(): void {
+	if (getListTypeToDisplay() === PlaylistListEnum.favorites) {
+		setPlaylists({ favorites: emptySet });
+
+		return;
+	}
+
+	if (getListTypeToDisplay() === PlaylistListEnum.history) {
+		setPlaylists({ history: emptyMap });
+
+		return;
+	}
 }

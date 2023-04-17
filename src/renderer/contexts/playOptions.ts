@@ -1,4 +1,4 @@
-import { proxy, subscribe } from "valtio";
+import { create } from "zustand";
 
 import { localStorageKeys } from "@utils/localStorage";
 import { getAudio } from "./currentPlaying";
@@ -7,33 +7,33 @@ import { error } from "@common/log";
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
-// Pre work:
-
-const storagedPlayOptionsString = localStorage.getItem(
-	localStorageKeys.playOptions,
-);
-
-let playOptionsToApply: PlayOptions = {
-	loopThisMedia: false,
-	isRandom: false,
-};
-
-try {
-	if (storagedPlayOptionsString)
-		playOptionsToApply = JSON.parse(storagedPlayOptionsString);
-} catch (err) {
-	error(
-		"Error parsing JSON.parse(storagedPlayOptionsString). Applying default settings.",
-		err,
-	);
-}
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
 // Main function:
 
-export const playOptions = proxy<PlayOptions>(playOptionsToApply);
+export const usePlayOptions = create<PlayOptions>(() => {
+	const storagedPlayOptionsString = localStorage.getItem(
+		localStorageKeys.playOptions,
+	);
+
+	let playOptionsToApply: PlayOptions = {
+		loopThisMedia: false,
+		isRandom: false,
+	};
+
+	try {
+		if (storagedPlayOptionsString)
+			playOptionsToApply = JSON.parse(storagedPlayOptionsString);
+	} catch (err) {
+		error(
+			"Error parsing JSON.parse(storagedPlayOptionsString). Applying default settings.",
+			err,
+		);
+	}
+
+	return playOptionsToApply;
+});
+
+export const { getState: getPlayOptions, setState: setPlayOptions } =
+	usePlayOptions;
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -42,7 +42,7 @@ export const playOptions = proxy<PlayOptions>(playOptionsToApply);
 
 let setToLocalStorageTimer: NodeJS.Timer | undefined;
 
-subscribe(playOptions, () => {
+usePlayOptions.subscribe((playOptions) => {
 	clearTimeout(setToLocalStorageTimer);
 
 	setToLocalStorageTimer = setTimeout(
@@ -63,21 +63,24 @@ subscribe(playOptions, () => {
 export function toggleLoopMedia(): void {
 	const audio = getAudio();
 
-	const loopThisMedia = !playOptions.loopThisMedia;
+	const loopThisMedia = !getPlayOptions().loopThisMedia;
 
-	playOptions.loopThisMedia = loopThisMedia;
+	setPlayOptions({ loopThisMedia });
 
 	if (audio) audio.loop = loopThisMedia;
 }
 
 ////////////////////////////////////////////////
 
-export const toggleRandom = () =>
-	(playOptions.isRandom = !playOptions.isRandom);
+export const toggleRandom = (): void =>
+	setPlayOptions((prev) => ({ isRandom: !prev.isRandom }));
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 // Types:
 
-export type PlayOptions = { isRandom: boolean; loopThisMedia: boolean };
+export type PlayOptions = Readonly<{
+	loopThisMedia: boolean;
+	isRandom: boolean;
+}>;

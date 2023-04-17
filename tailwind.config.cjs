@@ -9,10 +9,10 @@ module.exports = {
 			},
 			colors: {
 				/* Colors */
-				separator: "var(--separator)",
-				"selected-border": "var(--selected-border)",
 				"input-disabled": "var(--input-disabled-border)",
+				"selected-border": "var(--selected-border)",
 				"playing-border": "var(--playing-border)",
+				separator: "var(--separator)",
 				active: "var(--active)",
 
 				"accent-light": "var(--accent-light)",

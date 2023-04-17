@@ -1,8 +1,9 @@
 import type { AllowedMedias, eraseImg } from "../utils";
 import type { pages } from "@utils/app";
 
-export type Media = Readonly<{
+export type Media = {
 	lastModified: DateAsNumber;
+	lastPlayedAt: DateAsNumber;
 	genres: readonly string[];
 	birthTime: DateAsNumber;
 	image: Base64 | "";
@@ -12,7 +13,7 @@ export type Media = Readonly<{
 	album: string;
 	title: string;
 	size: number;
-}>;
+};
 
 export type DownloadInfo = Readonly<{
 	extension: AllowedMedias;
@@ -29,5 +30,7 @@ export type Base64 = `data:${string};base64,${string}`;
 export type QRCodeURL = `http://${string}:${number}`;
 
 export type Page = typeof pages[number];
+
+export type DateAsNumber = number;
 
 export type Path = string;

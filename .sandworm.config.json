@@ -1,16 +1,16 @@
 {
-  "audit": {
-    "minDisplayedSeverity": "high",
+	"audit": {
+		"minDisplayedSeverity": "high",
 		"loadDataFrom": "registry",
 		"outputPath": "sandworm",
 		"failOn": ["*.critical"],
-    "showVersions": true,
-    "includeDev": true,
-    "maxDepth": 10,
+		"showVersions": true,
+		"includeDev": true,
+		"maxDepth": 10,
 
-    "licensePolicy": {
-      "high": ["cat:Network Protective", "cat:Strongly Protective"],
-      "moderate": ["cat:Weakly Protective"]
-    }
-  }
+		"licensePolicy": {
+			"high": ["cat:Network Protective", "cat:Strongly Protective"],
+			"moderate": ["cat:Weakly Protective"]
+		}
+	}
 }

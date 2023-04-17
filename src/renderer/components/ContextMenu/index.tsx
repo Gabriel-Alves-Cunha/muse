@@ -1,11 +1,9 @@
-import type { ValuesOf } from "@common/@types/Utils";
-
 import { Suspense, type PropsWithoutRef } from "react";
 
 import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
+import { clearAllSelectedMedias } from "@contexts/allSelectedMedias";
 import { CtxMenu, CtxMenuProps } from "./CtxMenu";
 import { MediaOptionsCtxMenu } from "./mediaOptionsCtxMenu";
-import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { MainCtxMenu } from "./mainCtxMenu";
 
 /////////////////////////////////////////////
@@ -30,7 +28,7 @@ export const ContextMenu = ({
 	content = MAIN,
 	wrapperProps,
 	...props
-}: PropsWithoutRef<Props>) => (
+}: PropsWithoutRef<Props>): JSX.Element => (
 	<CtxMenu
 		wrapperProps={wrapperProps}
 		onOpenChange={onOpenChange}
@@ -51,7 +49,7 @@ export const ContextMenu = ({
 
 function onOpenChange(newValue: boolean): void {
 	// On close, deselectAllMedias():
-	if (!newValue) allSelectedMedias.clear();
+	if (!newValue) clearAllSelectedMedias();
 }
 
 /////////////////////////////////////////////
@@ -59,7 +57,11 @@ function onOpenChange(newValue: boolean): void {
 /////////////////////////////////////////////
 // Types:
 
-type Props = Omit<CtxMenuProps, "ctxMenuContent"> & {
-	content?: ValuesOf<typeof CtxContentEnum>;
+type CtxContentEnumType = typeof CtxContentEnum;
+
+type DivProps = Omit<CtxMenuProps, "ctxMenuContent">;
+
+interface Props extends Omit<DivProps, "content"> {
+	content?: CtxContentEnumType[keyof CtxContentEnumType];
 	isAllDisabled?: boolean;
-};
+}

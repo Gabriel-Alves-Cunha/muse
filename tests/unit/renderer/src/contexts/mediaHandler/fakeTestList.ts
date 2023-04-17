@@ -1,7 +1,7 @@
 import type { Path, Media } from "@common/@types/GeneralTypes";
 
-import { sortByTitle } from "@contexts/playlistsHelper";
 import { formatDuration } from "@common/utils";
+import { sortByTitle } from "@contexts/playlistsHelper";
 
 // Make a test list full of fake medias:
 export const numberOfMedias = 30;
@@ -16,6 +16,7 @@ export const testMap: Map<Path, Media> = Object.freeze(
 					duration: formatDuration(index + 10),
 					lastModified: Date.now(),
 					birthTime: Date.now(),
+					lastPlayedAt: NaN,
 					size: 3_000,
 					genres: [],
 					artist: "",
@@ -33,7 +34,7 @@ export const testMap: Map<Path, Media> = Object.freeze(
 
 export const arrayFromMainList = Object.freeze([...testMap]);
 
-export const lastMediaPathFromTestArray = arrayFromMainList.at(-1)![0];
-export const lastMediaPathFromMainList = arrayFromMainList.at(-1)![0];
-export const firstMediaPathFromTestArray = arrayFromMainList[0]![0];
-export const firstMediaPathFromMainList = arrayFromMainList[0]![0];
+export const lastMediaPathFromTestArray = arrayFromMainList.at(-1)?.[0] ?? "";
+export const lastMediaPathFromMainList = arrayFromMainList.at(-1)?.[0] ?? "";
+export const firstMediaPathFromTestArray = arrayFromMainList[0]?.[0] ?? "";
+export const firstMediaPathFromMainList = arrayFromMainList[0]?.[0] ?? "";

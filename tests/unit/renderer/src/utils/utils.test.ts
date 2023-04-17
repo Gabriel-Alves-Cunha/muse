@@ -108,7 +108,7 @@ it("should log a message that code should not have reached that point", () => {
 	type Option = "foo" | "bar";
 	const option: Option = "bar";
 
-	function myTest() {
+	function myTest(): void {
 		switch (option) {
 			case "foo": {
 				break;

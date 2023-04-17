@@ -1,6 +1,8 @@
 import type { MediaBeingDownloaded } from "@components/Downloading";
 
-import { proxyMap } from "valtio/utils";
+import { create } from "zustand";
+
+import { emptyMap } from "@utils/empty";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -64,7 +66,16 @@ import { proxyMap } from "valtio/utils";
 ////////////////////////////////////////////////
 // Main functions:
 
-export const downloadingList = proxyMap<MediaUrl, MediaBeingDownloaded>();
+export const downloadingListRef = create<DownloadingList>(() => ({
+	current: emptyMap,
+}));
+
+export const getDownloadingList = (): DownloadingList["current"] =>
+	downloadingListRef.getState().current;
+
+export const setDownloadingList = (
+	newDownloadingList: DownloadingList["current"],
+): void => downloadingListRef.setState({ current: newDownloadingList });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -72,3 +83,7 @@ export const downloadingList = proxyMap<MediaUrl, MediaBeingDownloaded>();
 // Types:
 
 export type MediaUrl = Readonly<string>;
+
+export type DownloadingList = Readonly<{
+	current: ReadonlyMap<MediaUrl, MediaBeingDownloaded>;
+}>;

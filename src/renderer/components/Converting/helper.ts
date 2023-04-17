@@ -7,30 +7,36 @@ import { ProgressStatusEnum, ReactToElectronMessageEnum } from "@common/enums";
 import { errorToast, infoToast, successToast } from "../toasts";
 import { assertUnreachable } from "@utils/utils";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { convertingList } from "@contexts/convertList";
 import { error, assert } from "@common/log";
-import { translation } from "@i18n";
 import { dbg } from "@common/debug";
+import { t } from "@i18n";
+import {
+	convertingListRef,
+	getConvertingList,
+	setConvertingList,
+} from "@contexts/convertList";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-const { t } = translation;
-
 export function createNewConvertion(
 	convertInfo: ConvertInfo,
 	path: Path,
 ): void {
-	dbg("Trying to create a new conversion.", { convertingList });
+	dbg("Trying to create a new conversion.", { convertingListRef });
+
+	const convertingList = getConvertingList();
 
 	if (convertingList.has(path)) {
 		const info = `${t("toasts.convertAlreadyExists")}"${path}"!`;
 
 		infoToast(info);
 
-		return error(info, convertingList);
+		error(info, convertingList);
+
+		return;
 	}
 
 	// MessageChannels are lightweight, it's cheap to create
@@ -45,13 +51,15 @@ export function createNewConvertion(
 	);
 
 	// Add new conversion to the list:
-	convertingList.set(path, {
-		status: ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-		toExtension: convertInfo.toExtension,
-		port: frontEndPort,
-		timeConverted: 0,
-		sizeConverted: 0,
-	});
+	setConvertingList(
+		new Map(convertingList).set(path, {
+			status: ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			toExtension: convertInfo.toExtension,
+			port: frontEndPort,
+			timeConverted: 0,
+			sizeConverted: 0,
+		}),
+	);
 
 	// On every `postMessage` you have to send the path (as an ID)!
 	frontEndPort.postMessage({ toExtension: convertInfo.toExtension, path });
@@ -71,24 +79,32 @@ export function createNewConvertion(
 /////////////////////////////////////////////
 // Helper functions for `createNewConvertion()`:
 
-export const logThatPortIsClosing = () => dbg("Closing ports (react port).");
+export const logThatPortIsClosing = (): void =>
+	dbg("Closing ports (react port).");
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
 export function cancelConversionAndOrRemoveItFromList(path: string): void {
+	const convertingList = getConvertingList();
 	const mediaBeingConverted = convertingList.get(path);
 
-	if (!mediaBeingConverted)
-		return error(`"${path}" not found! convertList =`, convertingList);
+	if (!mediaBeingConverted) {
+		error(`"${path}" not found! convertList =`, convertingListRef);
+
+		return;
+	}
 
 	// Cancel conversion
 	if (mediaBeingConverted.status === ProgressStatusEnum.ACTIVE)
 		mediaBeingConverted.port.postMessage({ destroy: true, path });
 
 	// Remove from converting list
-	convertingList.delete(path);
+	const newConvertingList = new Map(convertingList);
+	newConvertingList.delete(path);
+
+	setConvertingList(newConvertingList);
 }
 
 /////////////////////////////////////////////
@@ -100,19 +116,24 @@ function handleUpdateConvertingList(
 	path: Path,
 ): void {
 	dbg(`Received a message from Electron on port for "${path}":`, {
-		convertingList,
+		convertingListRef,
 		data,
 	});
 
+	const convertingList = getConvertingList();
+
 	// Assert that the download exists:
 	const thisConversion = convertingList.get(path);
-	if (!thisConversion)
-		return error(
-			"Received a message from Electron but the path is not in the list!",
-		);
+	if (!thisConversion) {
+		error("Received a message from Electron but the path is not in the list!");
+
+		return;
+	}
 
 	// Update `convertingList`:
-	convertingList.set(path, { ...thisConversion, ...data });
+	setConvertingList(
+		new Map(convertingList).set(path, { ...thisConversion, ...data }),
+	);
 
 	// Handle status:
 	switch (data.status) {

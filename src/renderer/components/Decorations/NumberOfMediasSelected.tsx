@@ -1,14 +1,17 @@
-import { useSnapshot } from "valtio";
+import { selectT, useTranslator } from "@i18n";
+import {
+	type AllSelectedMedias,
+	allSelectedMediasRef,
+} from "@contexts/allSelectedMedias";
 
-import { allSelectedMedias } from "@contexts/allSelectedMedias";
-import { translation } from "@i18n";
+const selectAllSelectedMediasSize = (state: AllSelectedMedias): number =>
+	state.current.size;
 
-export function NumberOfMediasSelected() {
-	const allSelectedMediasAccessor = useSnapshot(allSelectedMedias);
-	const t = useSnapshot(translation).t;
-
-	const numberOfMediasSelected = allSelectedMediasAccessor.size;
-	const isPlural = numberOfMediasSelected > 1;
+export function NumberOfMediasSelected(): JSX.Element | null {
+	const numberOfMediasSelected = allSelectedMediasRef(
+		selectAllSelectedMediasSize,
+	);
+	const t = useTranslator(selectT);
 
 	return numberOfMediasSelected === 0 ? null : (
 		<p>

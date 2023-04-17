@@ -1,12 +1,11 @@
 import type { ValuesOf } from "@common/@types/Utils";
 
 import { MdDownloading as DownloadingIcon } from "react-icons/md";
-import { useSnapshot } from "valtio";
 
+import { DownloadingList, downloadingListRef } from "@contexts/downloadList";
+import { selectT, useTranslator } from "@i18n";
 import { NavbarPopoverButtons } from "../Navbar/NavbarPopoverButtons";
-import { downloadingList } from "@contexts/downloadList";
 import { ProgressStatusEnum } from "@common/enums";
-import { translation } from "@i18n";
 import { Popup } from "./Popup";
 
 /////////////////////////////////////////////
@@ -14,15 +13,18 @@ import { Popup } from "./Popup";
 /////////////////////////////////////////////
 // Main function:
 
-export function Downloading() {
-	const downloadingListAccessor = useSnapshot(downloadingList);
-	const t = useSnapshot(translation).t;
+const selectDownloadingListSize = (state: DownloadingList): number =>
+	state.current.size;
+
+export function Downloading(): JSX.Element {
+	const size = downloadingListRef(selectDownloadingListSize);
+	const t = useTranslator(selectT);
 
 	return (
 		<NavbarPopoverButtons
 			tooltip={t("tooltips.showAllDownloadingMedias")}
-			size={downloadingListAccessor.size}
 			Icon={DownloadingIcon}
+			size={size}
 		>
 			<Popup />
 		</NavbarPopoverButtons>
@@ -34,10 +36,10 @@ export function Downloading() {
 /////////////////////////////////////////////
 // Types:
 
-export type MediaBeingDownloaded = {
+export type MediaBeingDownloaded = Readonly<{
 	status: ValuesOf<typeof ProgressStatusEnum>;
 	percentage: number;
 	port: MessagePort;
 	imageURL: string;
 	title: string;
-};
+}>;

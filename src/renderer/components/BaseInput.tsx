@@ -8,7 +8,7 @@ export const BaseInput = ({
 	onEscape,
 	label,
 	...props
-}: Props) => (
+}: Props): JSX.Element => (
 	<div data-base-input>
 		{LeftIcon}
 

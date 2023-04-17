@@ -1,18 +1,18 @@
-import type { DateAsNumber, Media, Path } from "@common/@types/GeneralTypes";
+import type { Media, Path } from "@common/@types/GeneralTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { MdAudiotrack as MusicNote } from "react-icons/md";
 import { memo, Suspense, useState } from "react";
 
-import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
+import { playThisMedia, getCurrentPlaying } from "@contexts/currentPlaying";
+import { getListTypeToDisplay } from "./states";
 import { MediaOptionsModal } from "./MediaOptionsModal";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { CenteredModal } from "../CenteredModal";
-import { translation } from "@i18n";
-import { fromList } from "./states";
+import { t } from "@i18n";
 import {
+	getAllSelectedMedias,
 	toggleSelectedMedia,
-	allSelectedMedias,
 } from "@contexts/allSelectedMedias";
 
 /////////////////////////////////////////
@@ -28,14 +28,14 @@ function selectOrPlayMedia(
 	mediaPath: Path,
 ): void {
 	const isNotClickForCtxMenu = e.button === leftClick;
+	const listTypeToDisplay = getListTypeToDisplay();
 
 	if (isNotClickForCtxMenu)
 		if (!e.ctrlKey) {
 			// Ctrl also selects a media!
-			const { curr, homeList, isHome } = fromList;
-			const list = isHome ? homeList : curr;
+			playThisMedia(mediaPath, listTypeToDisplay);
 
-			return playThisMedia(mediaPath, list);
+			return;
 		}
 
 	toggleSelectedMedia(mediaPath);
@@ -47,7 +47,6 @@ function selectOrPlayMedia(
 // Main function:
 
 const fallbackImg = <MusicNote size="1.4rem" />;
-const { t } = translation;
 
 const Row = memo<RowProps>(
 	({ media, path }) => {
@@ -55,8 +54,8 @@ const Row = memo<RowProps>(
 
 		return (
 			<div
-				data-is-selected-row={allSelectedMedias.has(path)}
-				data-is-playing-row={currentPlaying.path === path}
+				data-is-selected-row={getAllSelectedMedias().has(path)}
+				data-is-playing-row={getCurrentPlaying().path === path}
 				data-path={path}
 				data-row-wrapper
 			>
@@ -112,12 +111,14 @@ const Row = memo<RowProps>(
 	(prev, next) => prev.media.lastModified === next.media.lastModified,
 );
 
+Row.displayName = "Row";
+
 /////////////////////////////////////////////
 
-export const itemContent = (
+export const ItemContent = (
 	_index: number,
-	[path, media]: [Path, Media, DateAsNumber],
-) => <Row media={media} path={path} />;
+	[path, media]: [Path, Media],
+): JSX.Element => <Row media={media} path={path} />;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

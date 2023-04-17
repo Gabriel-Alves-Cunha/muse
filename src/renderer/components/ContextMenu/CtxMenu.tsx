@@ -15,7 +15,7 @@ export const CtxMenu = ({
 	wrapperProps,
 	children,
 	...props
-}: CtxMenuProps) => (
+}: CtxMenuProps): JSX.Element => (
 	<div data-ctx-menu-wrapper {...wrapperProps}>
 		<CtxMenuContent onOpenChange={onOpenChange} {...props} />
 
@@ -29,7 +29,7 @@ function CtxMenuContent({
 	ctxMenuContent,
 	onOpenChange,
 	...props
-}: CtxMenuContentProps) {
+}: CtxMenuContentProps): JSX.Element {
 	const [isOpen, setIsOpen] = useReducer(reducer, false);
 	const [shouldClose, setShouldClose] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
@@ -68,11 +68,15 @@ function CtxMenuContent({
 			setShouldClose(false);
 			setIsOpen(true);
 		};
-	}, [setIsOpen]);
+	}, []);
 
 	useEffect(() => {
 		function closeOnClickAnywhere(): void {
-			if (!shouldClose) return setShouldClose(true);
+			if (!shouldClose) {
+				setShouldClose(true);
+
+				return;
+			}
 
 			setIsOpen(false);
 
@@ -82,7 +86,7 @@ function CtxMenuContent({
 		on("pointerup", closeOnClickAnywhere);
 
 		return () => removeOn("pointerup", closeOnClickAnywhere);
-	}, [shouldClose, isOpen]);
+	}, [shouldClose]);
 
 	return (
 		<div

@@ -11,7 +11,7 @@ export function Popover({
 	onEscape,
 	size,
 	...contentProps
-}: PopoverProps) {
+}: PopoverProps): JSX.Element {
 	useEffect(() => {
 		function closeOnEscape(event: KeyboardEvent): void {
 			// Assume that isOpen === true.
@@ -47,7 +47,7 @@ export function Popover({
 			removeOn("pointerup", closeOnClickOutside);
 			removeOn("keyup", closeOnEscape);
 		};
-	}, []);
+	}, [contentRef, onEscape, onPointerDownOutside, setIsOpen]);
 
 	return (
 		<div data-popover-size={size} data-popover-content {...contentProps} />

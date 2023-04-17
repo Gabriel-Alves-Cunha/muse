@@ -8,9 +8,8 @@ import { getAudio } from "@contexts/currentPlaying";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-let updateCurrentTime_Timer: NodeJS.Timer | undefined;
-
-export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
+export function SeekerWrapper({ isThereAMedia }: ControlsProps): JSX.Element {
+	const updateCurrentTime_TimerRef = useRef<NodeJS.Timer>();
 	const currentTimeRef = useRef<HTMLParagraphElement>(null);
 	const timelineRef = useRef<HTMLDivElement>(null);
 	const [[formatedDuration, isDurationValid], setIsAudioAvailable] = useState([
@@ -46,8 +45,8 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		function onPause() {
-			clearInterval(updateCurrentTime_Timer);
+		function onPause(): void {
+			clearInterval(updateCurrentTime_TimerRef.current);
 		}
 
 		function onPlaying(): void {
@@ -55,7 +54,10 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 
 			onPause();
 
-			updateCurrentTime_Timer = setInterval(setCurrentTimeText, 1_000);
+			updateCurrentTime_TimerRef.current = setInterval(
+				setCurrentTimeText,
+				1_000,
+			);
 		}
 
 		function setCurrentTimeText(): void {
@@ -94,7 +96,7 @@ export function SeekerWrapper({ isThereAMedia }: ControlsProps) {
 		/////////////////////////////////////////
 		/////////////////////////////////////////
 
-		function setAudioAvailability() {
+		function setAudioAvailability(): void {
 			const formatedDuration = formatDuration(audio?.duration);
 			// @ts-ignore => It will give false if duration is undefined:
 			const isDurationValid = audio?.duration > 0;

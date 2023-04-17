@@ -11,7 +11,7 @@ export function CenteredModal({
 	onEscape,
 	isOpen,
 	...contentProps
-}: CenteredModalProps) {
+}: CenteredModalProps): JSX.Element | null {
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -53,7 +53,7 @@ export function CenteredModal({
 			removeOn("pointerup", closeOnClickOutside);
 			removeOn("keyup", closeOnEscape);
 		};
-	}, [isOpen]);
+	}, [isOpen, onEscape, onPointerDownOutside, setIsOpen]);
 
 	return isOpen ? (
 		<div data-modal-content-wrapper {...wrapperProps}>

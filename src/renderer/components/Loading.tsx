@@ -1,3 +1,3 @@
 const loading = <div data-loading />;
 
-export const Loading = () => loading;
+export const Loading = (): JSX.Element => loading;

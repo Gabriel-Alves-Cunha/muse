@@ -1,25 +1,20 @@
-import { useSnapshot } from "valtio";
-
-import { downloadMedia, searchResult } from "./helpers";
-import { translation } from "@i18n";
+import { downloadMedia, useSearchInfo, selectResult } from "./helpers";
+import { selectT, useTranslator } from "@i18n";
 import { Button } from "@components/Button";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-export function Result() {
-	const searchResultAccessor = useSnapshot(searchResult);
-	const t = useSnapshot(translation).t;
+export function Result(): JSX.Element | null {
+	const result = useSearchInfo(selectResult);
+	const t = useTranslator(selectT);
 
-	return searchResultAccessor.result.title ? (
+	return result.title ? (
 		<div className="result">
-			<img
-				src={searchResultAccessor.result.imageURL}
-				alt={t("alts.videoThumbnail")}
-			/>
+			<img src={result.imageURL} alt={t("alts.videoThumbnail")} />
 
-			<p>{searchResultAccessor.result.title}</p>
+			<p>{result.title}</p>
 
 			<Button variant="large" onPointerUp={downloadMedia}>
 				{t("buttons.download")}

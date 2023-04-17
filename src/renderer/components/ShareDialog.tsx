@@ -3,15 +3,18 @@ import type { QRCodeURL } from "@common/@types/GeneralTypes";
 
 import { useEffect, useReducer } from "react";
 import { MdClose as CloseIcon } from "react-icons/md";
-import { useSnapshot } from "valtio";
 import { toCanvas } from "qrcode";
 
+import { selectT, useTranslator } from "@i18n";
 import { CenteredModal } from "./CenteredModal";
 import { error, assert } from "@common/log";
-import { filesToShare } from "@contexts/filesToShare";
-import { translation } from "@i18n";
-import { playlists } from "@contexts/playlists";
+import { getPlaylists } from "@contexts/playlists";
 import { Loading } from "./Loading";
+import {
+	clearAllFilesToShare,
+	filesToShareRef,
+	getFilesToShare,
+} from "@contexts/filesToShare";
 
 const { createServer } = electronApi.share;
 
@@ -22,13 +25,13 @@ const { createServer } = electronApi.share;
 
 const qrID = "qrcode-canvas";
 
-export function ShareDialog() {
-	const filesToShareAccessor = useSnapshot(filesToShare);
+export function ShareDialog(): JSX.Element | null {
 	const [server, setServer] = useReducer(reducer, null);
-	const t = useSnapshot(translation).t;
+	const filesToShare = filesToShareRef().current;
+	const t = useTranslator(selectT);
 
-	const plural = filesToShareAccessor.size > 1 ? "s" : "";
-	const shouldModalOpen = filesToShareAccessor.size;
+	const plural = filesToShare.size > 1 ? "s" : "";
+	const shouldModalOpen = filesToShare.size;
 
 	/////////////////////////////////////////
 
@@ -52,7 +55,7 @@ export function ShareDialog() {
 
 	/////////////////////////////////////////
 
-	function onCanvasElementMakeQRCode(canvas: HTMLCanvasElement | null) {
+	function onCanvasElementMakeQRCode(canvas: HTMLCanvasElement | null): void {
 		if (shouldModalOpen && server && canvas)
 			makeQrcode(server.url)
 				.then()
@@ -69,12 +72,12 @@ export function ShareDialog() {
 		if (!shouldModalOpen) return;
 
 		try {
-			setServer(createServer([...filesToShareAccessor]));
+			setServer(createServer([...filesToShare]));
 		} catch (err) {
 			error(err);
 			closeShareDialog();
 		}
-	}, [filesToShareAccessor]);
+	}, [filesToShare, shouldModalOpen]);
 
 	/////////////////////////////////////////
 
@@ -120,15 +123,15 @@ export function ShareDialog() {
 function closeShareDialog(closeServerFunction?: () => void): void {
 	closeServerFunction?.();
 
-	filesToShare.clear();
+	clearAllFilesToShare();
 }
 
 /////////////////////////////////////////
 
 function namesOfFilesToShare(): JSX.Element[] {
-	const mainList = playlists.sortedByTitleAndMainList;
+	const mainList = getPlaylists().sortedByTitleAndMainList;
 
-	return Array.from(filesToShare, (id) => (
+	return Array.from(getFilesToShare(), (id) => (
 		<li data-files-to-share key={id}>
 			{mainList.get(id)?.title ?? "<Untitled>"}
 		</li>

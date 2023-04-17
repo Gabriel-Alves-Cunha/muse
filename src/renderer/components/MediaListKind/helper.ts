@@ -7,17 +7,15 @@ import { selectAllMedias } from "@contexts/allSelectedMedias";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const computeItemKey = (
-	_index: number,
-	[path]: [Path, Media, DateAsNumber],
-): Path => path;
+export const computeItemKey = (_index: number, [path]: [Path, Media]): Path =>
+	path;
 
 /////////////////////////////////////////
 
 export const computeHistoryItemKey = (
 	_index: number,
-	[path, , date]: [Path, Media, DateAsNumber],
-): `${Path}${DateAsNumber}` => `${path}${date}`;
+	[path, media]: [Path, Media],
+): `${Path}${DateAsNumber}` => `${path}${media.lastModified}`;
 
 /////////////////////////////////////////
 
@@ -25,7 +23,7 @@ export const reloadWindow = (): void => location.reload();
 
 /////////////////////////////////////////
 
-export function selectAllMediasOnCtrlPlusA(e: KeyboardEvent) {
+export function selectAllMediasOnCtrlPlusA(e: KeyboardEvent): void {
 	if (e.ctrlKey && e.key === "a" && !isAModifierKeyPressed(e, ["Control"])) {
 		e.stopPropagation();
 		e.preventDefault();

@@ -2,21 +2,19 @@ import type { MetadataToChange } from "@common/@types/ElectronApi";
 import type { Media, Path } from "@common/@types/GeneralTypes";
 
 import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
-import { errorToast, successToast } from "../../toasts";
 import { ReactToElectronMessageEnum } from "@common/enums";
+import { errorToast, successToast } from "../../toasts";
 import { areArraysEqualByValue } from "@utils/array";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { prettyBytes } from "@common/prettyBytes";
-import { translation } from "@i18n";
 import { log, error } from "@common/log";
 import { dbg } from "@common/debug";
+import { t } from "@i18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Helper functions:
-
-const { t } = translation;
 
 export function changeMediaMetadata(
 	imageFilePath: Path,
@@ -137,7 +135,7 @@ export const visibleData = ({
 	image,
 	title,
 	size,
-}: Media) =>
+}: Media): [string, string | number | readonly string[]][] =>
 	// The order here is the order that will appear:
 	Object.entries({
 		duration,

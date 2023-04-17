@@ -1,8 +1,8 @@
-export function isHighSurrogate(codePoint: number) {
+export function isHighSurrogate(codePoint: number): boolean {
 	return codePoint >= 0xd800 && codePoint <= 0xdbff;
 }
 
-function isLowSurrogate(codePoint: number) {
+function isLowSurrogate(codePoint: number): boolean {
 	return codePoint >= 0xdc00 && codePoint <= 0xdfff;
 }
 
@@ -11,7 +11,7 @@ function getLength(str: string): number {
 }
 
 /** Truncate string by size in bytes. */
-export function truncate(string: string, byteLength: number) {
+export function truncate(string: string, byteLength: number): string {
 	if (typeof string !== "string") throw new Error("Input must be string.");
 
 	const stringLength = string.length;

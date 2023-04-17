@@ -35,9 +35,10 @@ export type AllowedMedias = typeof allowedMedias[number];
 /////////////////////////////////////////
 
 export function formatDuration(time: number | undefined): string {
-	// isFinite(undefined) === false
-	if (!isFinite(time!)) return "00:00";
-	time = trunc(time!);
+	// @ts-ignore => isFinite(undefined) === false
+	if (!isFinite(time)) return "00:00";
+	// @ts-ignore => Here, `time` is defined.
+	time = trunc(time);
 
 	const hour = `0${floor(time / 3_600) % 24}`.slice(-2);
 	const minutes = `0${floor(time / 60) % 60}`.slice(-2);
@@ -68,7 +69,8 @@ export function sleep(ms = 0, logFn?: () => void): Promise<void> {
 
 /////////////////////////////////////////
 
-export const stringifyJson = (obj: Json) => JSON.stringify(obj, null, 2);
+export const stringifyJson = (obj: Json): string =>
+	JSON.stringify(obj, null, 2);
 
 /////////////////////////////////////////
 

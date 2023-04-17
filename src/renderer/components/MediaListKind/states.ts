@@ -1,6 +1,6 @@
 import type { ValuesOf } from "@common/@types/Utils";
 
-import { proxy } from "valtio";
+import { create } from "zustand";
 
 import { PlaylistListEnum } from "@common/enums";
 
@@ -8,29 +8,24 @@ import { PlaylistListEnum } from "@common/enums";
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const fromList = proxy<FromList>({
-	homeList: PlaylistListEnum.mainList,
-	curr: PlaylistListEnum.favorites,
-	isHome: true,
-});
+export const useListTypeToDisplay = create<ListTypeToDisplay>(() => ({
+	homeListToDisplay: PlaylistListEnum.mainList,
+	current: PlaylistListEnum.mainList,
+}));
+
+export const {
+	getState: getListTypeToDisplay,
+	setState: setListTypeToDisplay,
+} = useListTypeToDisplay;
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Types:
 
-type PlaylistList = ValuesOf<typeof PlaylistListEnum>;
+type ListTypes = ValuesOf<typeof PlaylistListEnum>;
 
-/////////////////////////////////////////////
-
-type FromList = {
-	curr: Exclude<
-		PlaylistList,
-		typeof PlaylistListEnum.mainList | typeof PlaylistListEnum.sortedByDate
-	>;
-	homeList: Extract<
-		PlaylistList,
-		typeof PlaylistListEnum.mainList | typeof PlaylistListEnum.sortedByDate
-	>;
-	isHome: boolean;
-};
+type ListTypeToDisplay = Readonly<{
+	homeListToDisplay: ListTypes;
+	current: ListTypes;
+}>;

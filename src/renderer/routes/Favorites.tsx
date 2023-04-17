@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
+import { setListTypeToDisplay } from "@components/MediaListKind/states";
 import { PlaylistListEnum } from "@common/enums";
-import { MediaListKind } from "@components/MediaListKind";
 import { GroupedButton } from "@components/GroupedButton";
+import { MediaListKind } from "@components/MediaListKind";
 import { SearchMedia } from "@components/SearchMedia";
-import { fromList } from "@components/MediaListKind/states";
 import { MainArea } from "@components/MainArea";
 import { Header } from "@components/Header";
 
@@ -13,9 +13,9 @@ import { Header } from "@components/Header";
 ////////////////////////////////////////////////
 // Main function:
 
-export function Favorites() {
+export function Favorites(): JSX.Element {
 	useEffect(() => {
-		fromList.curr = PlaylistListEnum.favorites;
+		setListTypeToDisplay({ current: PlaylistListEnum.favorites });
 	}, []);
 
 	return (

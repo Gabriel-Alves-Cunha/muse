@@ -8,7 +8,9 @@
  * You can check the runtime globals programmatically at any time by invoking
  * "window._runtimeGlobalsChecker_.getRuntimeGlobals()".
  */
-export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
+export const _runtimeGlobalsChecker_ = function createGlobalsChecker(): {
+	getRuntimeGlobals: () => string[];
+} {
 	// Globals on the window object set by default by the browser.
 	// We collect them to then filter them out of from the list of globals (since
 	// we don't care about them).
@@ -35,7 +37,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 	 * adds on it.
 	 * returns list of globals added added by the browser
 	 */
-	function collectBrowserGlobals() {
+	function collectBrowserGlobals(): string[] {
 		const iframe = window.document.createElement("iframe");
 		iframe.src = "about:blank";
 		window.document.body.appendChild(iframe);
@@ -49,7 +51,7 @@ export const _runtimeGlobalsChecker_ = function createGlobalsChecker() {
 	 * Return the list of globals added at runtime (by JavaScript).
 	 * returns list of globals added at runtime (by JavaScript)
 	 */
-	function getRuntimeGlobals() {
+	function getRuntimeGlobals(): string[] {
 		// If we haven't collected the browser globals yet, do it now.
 		if (browserGlobals.length === 0) collectBrowserGlobals();
 

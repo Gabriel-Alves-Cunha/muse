@@ -10,7 +10,7 @@ export function Select({
 	onEscape,
 	isOpen,
 	...contentProps
-}: SelectProps) {
+}: SelectProps): JSX.Element | null {
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -53,7 +53,7 @@ export function Select({
 			removeOn("pointerup", closeOnClickOutside);
 			removeOn("keyup", closeOnEscape);
 		};
-	}, [isOpen, setIsOpen]);
+	}, [isOpen, onEscape, onPointerDownOutside, setIsOpen]);
 
 	return isOpen ? (
 		<div ref={contentRef} data-select-content {...contentProps} />

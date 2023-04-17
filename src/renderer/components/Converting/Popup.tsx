@@ -1,16 +1,16 @@
 import type { Path } from "@common/@types/GeneralTypes";
 
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
-import { useSnapshot } from "valtio";
+import { useCallback } from "react";
 
-import { convertingList } from "@contexts/convertList";
-import { isDownloadList } from "../Downloading/Popup";
+import { convertingListRef, getConvertingList } from "@contexts/convertList";
+import { selectT, useTranslator } from "@i18n";
 import { ProgressStatusEnum } from "@common/enums";
+import { IS_DOWNLOAD_LIST } from "../Downloading/Popup";
 import { formatDuration } from "@common/utils";
 import { progressIcons } from "@components/Progress";
 import { prettyBytes } from "@common/prettyBytes";
 import { getBasename } from "@common/path";
-import { translation } from "@i18n";
 import { Button } from "../Button";
 import {
 	cancelConversionAndOrRemoveItFromList,
@@ -23,17 +23,17 @@ import { handleSingleItemDeleteAnimation } from "@components/Downloading/styles"
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function Popup() {
-	const convertingListAccessor = useSnapshot(convertingList);
-	const t = useSnapshot(translation).t;
+export function Popup(): JSX.Element {
+	const convertingList = convertingListRef().current;
+	const t = useTranslator(selectT);
 
-	return convertingListAccessor.size > 0 ? (
+	return convertingList.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneConvertions}>
 				{t("buttons.cleanFinished")}
 			</Button>
 
-			{Array.from(convertingListAccessor, ([path, convertingMedia], index) => (
+			{Array.from(convertingList, ([path, convertingMedia], index) => (
 				<ConvertBox
 					mediaBeingConverted={convertingMedia}
 					convertionIndex={index}
@@ -53,8 +53,19 @@ function ConvertBox({
 	mediaBeingConverted: { toExtension, timeConverted, sizeConverted, status },
 	convertionIndex,
 	path,
-}: ConvertBoxProps) {
-	const t = useSnapshot(translation).t;
+}: ConvertBoxProps): JSX.Element {
+	const t = useTranslator(selectT);
+
+	const onPointerUp = useCallback(
+		(e: React.PointerEvent<HTMLButtonElement>) =>
+			handleSingleItemDeleteAnimation(
+				e,
+				convertionIndex,
+				!IS_DOWNLOAD_LIST,
+				path,
+			),
+		[convertionIndex, path],
+	);
 
 	return (
 		<div className="box">
@@ -68,15 +79,8 @@ function ConvertBox({
 
 			<div className="right">
 				<button
-					onPointerUp={(e) =>
-						handleSingleItemDeleteAnimation(
-							e,
-							convertionIndex,
-							!isDownloadList,
-							path,
-						)
-					}
 					title={t("tooltips.cancelConversion")}
+					onPointerUp={onPointerUp}
 				>
 					<CancelIcon size={13} />
 				</button>
@@ -93,7 +97,7 @@ function ConvertBox({
 // Helper functions for Popup:
 
 function cleanAllDoneConvertions(): void {
-	for (const [url, download] of convertingList)
+	for (const [url, download] of getConvertingList())
 		if (
 			download.status !==
 				ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&

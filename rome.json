@@ -1,6 +1,6 @@
 {
 	"linter": {
-		"ignore": ["node_modules", "*-lock.json", "dist", "build"],
+		"ignore": ["node_modules", "*-lock.json", "dist", "build", "*.d.ts"],
 		"enabled": true,
 		"rules": {
 			"recommended": true,
@@ -10,6 +10,6 @@
 		}
 	},
 	"formatter": {
-		"ignore": ["node_modules", "*-lock.json", "dist", "build"]
+		"ignore": ["node_modules", "*-lock.json", "dist", "build", "*.d.ts"]
 	}
 }

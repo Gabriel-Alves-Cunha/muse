@@ -1,13 +1,12 @@
 import type { MediaBeingDownloaded } from ".";
 
 import { AiOutlineClose as CancelIcon } from "react-icons/ai";
-import { useSnapshot } from "valtio";
 
+import { downloadingListRef, getDownloadingList } from "@contexts/downloadList";
 import { cancelDownloadAndOrRemoveItFromList } from "./helper";
 import { Progress, progressIcons } from "../Progress";
-import { downloadingList } from "@contexts/downloadList";
+import { selectT, useTranslator } from "@i18n";
 import { ProgressStatusEnum } from "@common/enums";
-import { translation } from "@i18n";
 import { Button } from "../Button";
 
 import { handleSingleItemDeleteAnimation } from "./styles";
@@ -16,17 +15,17 @@ import { handleSingleItemDeleteAnimation } from "./styles";
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function Popup() {
-	const downloadingListAccessor = useSnapshot(downloadingList);
-	const t = useSnapshot(translation).t;
+export function Popup(): JSX.Element {
+	const downloadingList = downloadingListRef().current;
+	const t = useTranslator(selectT);
 
-	return downloadingListAccessor.size > 0 ? (
+	return downloadingList.size > 0 ? (
 		<>
 			<Button variant="medium" onPointerUp={cleanAllDoneDownloads}>
 				{t("buttons.cleanFinished")}
 			</Button>
 
-			{Array.from(downloadingListAccessor, ([url, downloadingMedia], index) => (
+			{Array.from(downloadingList, ([url, downloadingMedia], index) => (
 				<DownloadingBox
 					download={downloadingMedia}
 					downloadingIndex={index}
@@ -42,14 +41,14 @@ export function Popup() {
 
 /////////////////////////////////////////////
 
-export const isDownloadList = true;
+export const IS_DOWNLOAD_LIST = true;
 
 function DownloadingBox({
 	downloadingIndex,
 	download,
 	url,
-}: DownloadingBoxProps) {
-	const t = useSnapshot(translation).t;
+}: DownloadingBoxProps): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<div className="box">
@@ -68,7 +67,7 @@ function DownloadingBox({
 						handleSingleItemDeleteAnimation(
 							e,
 							downloadingIndex,
-							isDownloadList,
+							IS_DOWNLOAD_LIST,
 							url,
 						)
 					}
@@ -89,7 +88,7 @@ function DownloadingBox({
 // Helper functions for Popup:
 
 function cleanAllDoneDownloads(): void {
-	for (const [url, download] of downloadingList)
+	for (const [url, download] of getDownloadingList())
 		if (
 			download.status !==
 				ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON &&
@@ -103,8 +102,8 @@ function cleanAllDoneDownloads(): void {
 /////////////////////////////////////////////
 // Types:
 
-type DownloadingBoxProps = {
+type DownloadingBoxProps = Readonly<{
 	download: MediaBeingDownloaded;
 	downloadingIndex: number;
 	url: string;
-};
+}>;

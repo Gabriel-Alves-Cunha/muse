@@ -1,4 +1,3 @@
-import { useSnapshot } from "valtio";
 import {
 	MdRepeatOne as RepeatOne,
 	MdShuffleOn as RandomOn,
@@ -6,14 +5,14 @@ import {
 	MdRepeat as RepeatAll,
 } from "react-icons/md";
 
+import { selectT, useTranslator } from "@i18n";
 import { CircleIconButton } from "@components/CircleIconButton";
 import { SeekerWrapper } from "../Seeker";
-import { translation } from "@i18n";
 import { Controls } from "./Controls";
 import {
 	toggleLoopMedia,
+	usePlayOptions,
 	toggleRandom,
-	playOptions,
 } from "@contexts/playOptions";
 
 /////////////////////////////////////////
@@ -21,9 +20,9 @@ import {
 /////////////////////////////////////////
 // Main function:
 
-export function ControlsAndSeeker({ isThereAMedia }: Props) {
-	const playOptionsAccessor = useSnapshot(playOptions);
-	const t = useSnapshot(translation).t;
+export function ControlsAndSeeker({ isThereAMedia }: Props): JSX.Element {
+	const { isRandom, loopThisMedia } = usePlayOptions();
+	const t = useTranslator(selectT);
 
 	return (
 		<div className="media-player-seeker">
@@ -35,11 +34,7 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 					onPointerUp={toggleLoopMedia}
 					disabled={!isThereAMedia}
 				>
-					{playOptionsAccessor.loopThisMedia ? (
-						<RepeatOne size="18" />
-					) : (
-						<RepeatAll size="18" />
-					)}
+					{loopThisMedia ? <RepeatOne size="18" /> : <RepeatAll size="18" />}
 				</CircleIconButton>
 
 				<Controls isThereAMedia={isThereAMedia} />
@@ -49,11 +44,7 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 					onPointerUp={toggleRandom}
 					disabled={!isThereAMedia}
 				>
-					{playOptionsAccessor.isRandom ? (
-						<RandomOn size="18" />
-					) : (
-						<RandomOff size="18" />
-					)}
+					{isRandom ? <RandomOn size="18" /> : <RandomOff size="18" />}
 				</CircleIconButton>
 			</div>
 		</div>
@@ -65,6 +56,6 @@ export function ControlsAndSeeker({ isThereAMedia }: Props) {
 /////////////////////////////////////////
 // Types:
 
-type Props = {
+type Props = Readonly<{
 	isThereAMedia: boolean;
-};
+}>;

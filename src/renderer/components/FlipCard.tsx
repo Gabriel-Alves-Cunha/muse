@@ -5,7 +5,7 @@ export const mediaPlayerFlipCardId = "media-player-flip-card";
 /////////////////////////////////////////
 // Main function:
 
-export const FlipCard = ({ frontCard, backCard }: Props) => (
+export const FlipCard = ({ frontCard, backCard }: Props): JSX.Element => (
 	<div data-flip-card id={mediaPlayerFlipCardId}>
 		{/* This container is needed to position the front and back side: */}
 		<div>
@@ -21,7 +21,7 @@ export const FlipCard = ({ frontCard, backCard }: Props) => (
 /////////////////////////////////////////
 // Types:
 
-type Props = {
+type Props = Readonly<{
 	frontCard: React.ReactNode;
 	backCard: React.ReactNode;
-};
+}>;

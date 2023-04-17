@@ -1,7 +1,6 @@
 import type { Page } from "@common/@types/GeneralTypes";
 
 import { ToastContainer } from "react-toastify";
-import { useSnapshot } from "valtio";
 import { Suspense } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
@@ -14,9 +13,9 @@ import { Favorites } from "./routes/Favorites";
 import { Download } from "./routes/Download";
 import { Convert } from "./routes/Convert";
 import { History } from "./routes/History";
+import { pageRef } from "@contexts/page";
 import { Navbar } from "@components/Navbar";
 import { Home } from "./routes/Home";
-import { page } from "@contexts/page";
 
 import "react-toastify/dist/ReactToastify.min.css";
 
@@ -25,7 +24,7 @@ import "react-toastify/dist/ReactToastify.min.css";
 //////////////////////////////////////////
 // Main function:
 
-export function App() {
+export function App(): JSX.Element {
 	return (
 		<>
 			<ToastContainer
@@ -70,10 +69,10 @@ const pages: Readonly<Record<Page, JSX.Element>> = {
 	Home: <Home />,
 } as const;
 
-function PageToShow() {
-	const pageAccessor = useSnapshot(page);
+function PageToShow(): JSX.Element {
+	const page = pageRef().current;
 
-	return pages[pageAccessor.curr];
+	return pages[page];
 }
 
 //////////////////////////////////////////
@@ -85,7 +84,7 @@ searchLocalComputerForMedias();
 
 window.addEventListener(
 	"load",
-	() => {
+	(): void => {
 		window.addEventListener("message", handleWindowMsgsFromElectron);
 
 		// Remove splash screen:

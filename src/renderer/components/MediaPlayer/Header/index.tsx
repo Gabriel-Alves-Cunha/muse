@@ -1,22 +1,29 @@
 import type { Path, Media } from "@common/@types/GeneralTypes";
 
-import { useSnapshot } from "valtio";
 import {
 	MdFavoriteBorder as AddFavorite,
 	MdFavorite as Favorite,
 } from "react-icons/md";
 
-import { toggleFavoriteMedia, playlists } from "@contexts/playlists";
+import { selectT, useTranslator } from "@i18n";
 import { LoadOrToggleLyrics } from "./LoadOrToggleLyrics";
 import { CircleIconButton } from "@components/CircleIconButton";
-import { translation } from "@i18n";
+import {
+	toggleFavoriteMedia,
+	selectFavorites,
+	usePlaylists,
+} from "@contexts/playlists";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export function Header({ media, path, displayTitle = false }: HeaderProps) {
-	const t = useSnapshot(translation).t;
+export function Header({
+	displayTitle = false,
+	media,
+	path,
+}: HeaderProps): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<div className="media-player-header">
@@ -35,10 +42,8 @@ export function Header({ media, path, displayTitle = false }: HeaderProps) {
 	);
 }
 
-function IsFavorite({ path }: { path: Path }) {
-	const playlistsAccessor = useSnapshot(playlists);
-
-	const isFavorite = playlistsAccessor.favorites.has(path);
+function IsFavorite({ path }: { path: Path }): JSX.Element {
+	const isFavorite = usePlaylists(selectFavorites).has(path);
 
 	return isFavorite ? <Favorite size={17} /> : <AddFavorite size={17} />;
 }

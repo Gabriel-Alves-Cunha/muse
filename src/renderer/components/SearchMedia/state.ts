@@ -1,8 +1,8 @@
 import type { Path, Media } from "@common/@types/GeneralTypes";
 import type { ValuesOf } from "@common/@types/Utils";
 
-import { subscribeKey } from "valtio/utils";
-import { proxy } from "valtio";
+import { subscribeWithSelector } from "zustand/middleware";
+import { create } from "zustand";
 
 import { searchMedia, unDiacritic } from "@contexts/playlists";
 
@@ -19,14 +19,21 @@ export const SearchStatusEnum = {
 
 /////////////////////////////////////////
 
-const defaultSearcher: Searcher = {
+const defaultDataOfSearchMedia: SearchMedia = {
 	searchStatus: SearchStatusEnum.DOING_NOTHING,
 	searchTerm: "",
 	highlight: "",
 	results: [],
-};
+} as const;
 
-export const searcher = proxy<Searcher>({ ...defaultSearcher });
+export const useDataOfSearchMedia = create(
+	subscribeWithSelector<SearchMedia>(() => defaultDataOfSearchMedia),
+);
+
+export const {
+	getState: getDataOfSearchMedia,
+	setState: setDataOfSearchMedia,
+} = useDataOfSearchMedia;
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -36,54 +43,62 @@ export function setSearchTerm(e: InputChange): void {
 	// stopping propagation so the space key doesn't toggle play state.
 	e.stopPropagation();
 
-	searcher.highlight = unDiacritic(e.target.value);
-	searcher.searchTerm = e.target.value;
+	setDataOfSearchMedia({
+		highlight: unDiacritic(e.target.value),
+		searchTerm: e.target.value,
+	});
 }
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const setDefaultSearch = (): void => {
-	Object.assign(searcher, defaultSearcher);
-};
+export const setDefaultSearchMediaData = (): void =>
+	setDataOfSearchMedia(defaultDataOfSearchMedia);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Search for medias:
 
-subscribeKey(searcher, "highlight", () => {
-	if (searcher.highlight.length < 2) {
-		searcher.searchStatus = SearchStatusEnum.DOING_NOTHING;
-		searcher.results.length = 0;
+useDataOfSearchMedia.subscribe(
+	(state) => state.searchTerm,
+	(searchTerm) => {
+		if (searchTerm.length < 2) {
+			setDataOfSearchMedia({
+				searchStatus: SearchStatusEnum.DOING_NOTHING,
+				results: [],
+			});
 
-		return;
-	}
+			return;
+		}
 
-	// This is, so far, not needed, cause searching is really fast!
-	// setSearcher({ results: emptyArray, searchStatus: SearchStatus.SEARCHING });
+		// This is, so far, not needed, cause searching is really fast!
+		// setSearcher({ results: emptyArray, searchStatus: SearchStatus.SEARCHING });
 
-	const results = searchMedia(searcher.highlight);
+		const results = searchMedia(searchTerm);
 
-	searcher.results = results;
-	searcher.searchStatus =
-		results.length > 0
-			? SearchStatusEnum.FOUND_SOMETHING
-			: SearchStatusEnum.NOTHING_FOUND;
-});
+		setDataOfSearchMedia({
+			searchStatus:
+				results.length > 0
+					? SearchStatusEnum.FOUND_SOMETHING
+					: SearchStatusEnum.NOTHING_FOUND,
+			results,
+		});
+	},
+);
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Types:
 
-type Searcher = {
+type SearchMedia = Readonly<{
 	searchStatus: ValuesOf<typeof SearchStatusEnum>;
-	results: [Path, Media][];
+	results: readonly [Path, Media][];
 	searchTerm: string;
 	highlight: string;
-};
+}>;
 
 /////////////////////////////////////////
 

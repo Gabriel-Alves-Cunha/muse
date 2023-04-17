@@ -6,21 +6,25 @@ import { beforeEach, describe, expect, it } from "vitest";
 import "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
 
 import { arrayFromMainList, numberOfMedias } from "./fakeTestList";
-import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
+import { getCurrentPlaying, playThisMedia } from "@contexts/currentPlaying";
 import { cleanUpBeforeEachTest } from "./beforeEach";
-import { allSelectedMedias } from "@contexts/allSelectedMedias";
+import {
+	allSelectedMediasRef,
+	getAllSelectedMedias,
+} from "@contexts/allSelectedMedias";
 import { PlaylistListEnum } from "@common/enums";
 import { formatDuration } from "@common/utils";
 import { getRandomInt } from "@utils/utils";
-import { searchMedia } from "@contexts/playlists";
 import {
 	replaceEntireMainList,
 	addToMainList,
 	clearAllLists,
-	addToHistory,
+	searchMedia,
 	rescanMedia,
 	removeMedia,
-	playlists,
+	getPlaylists,
+	addToFavorites,
+	removeFromFavorites,
 } from "@contexts/playlists";
 
 describe("Testing playlists", () => {
@@ -36,10 +40,10 @@ describe("Testing playlists", () => {
 	it("replaceEntireMainList() should update the mediaList and others", () => {
 		replaceEntireMainList(new Map());
 
-		expect(playlists.sortedByTitleAndMainList.size).toEqual(0);
-		expect(playlists.favorites.size).toEqual(0);
-		expect(playlists.history.length).toEqual(0);
-		expect(allSelectedMedias.size).toEqual(0);
+		expect(getPlaylists().sortedByTitleAndMainList.size).toEqual(0);
+		expect(getPlaylists().history.length).toEqual(0);
+		expect(getPlaylists().favorites.size).toEqual(0);
+		expect(getAllSelectedMedias().size).toEqual(0);
 	});
 
 	/////////////////////////////////////////////
@@ -49,11 +53,14 @@ describe("Testing playlists", () => {
 	it("playThisMedia() should play a chosen media", () => {
 		for (const _ of arrayFromMainList) {
 			const randomMediaPath =
-				arrayFromMainList[getRandomInt(0, numberOfMedias)]![0];
+				arrayFromMainList[getRandomInt(0, numberOfMedias)]?.[0];
 			expect(randomMediaPath).toBeTruthy();
 
+			if (!randomMediaPath) throw new Error("No randomMediaPath to play");
+
 			playThisMedia(randomMediaPath, PlaylistListEnum.mainList);
-			expect(currentPlaying.path).toBe(randomMediaPath);
+
+			expect(getCurrentPlaying().path).toBe(randomMediaPath);
 		}
 	});
 
@@ -67,12 +74,15 @@ describe("Testing playlists", () => {
 		/////////////////////////////////////////////
 
 		it("addToHistory() should add one to the history list", () => {
-			const [mediaPathToAdd] = arrayFromMainList[1]!;
+			const mediaPathToAdd = arrayFromMainList[1]?.[0];
 
-			addToHistory(mediaPathToAdd);
+			if (!mediaPathToAdd)
+				throw new Error("No mediaPathToAdd to add to history");
 
-			expect(playlists.history.includes(mediaPathToAdd)).toBeTruthy();
-			expect(playlists.history.length).toBe(1);
+			playThisMedia(mediaPathToAdd, PlaylistListEnum.mainList);
+
+			expect(getPlaylists().history.includes(mediaPathToAdd)).toBeTruthy();
+			expect(getPlaylists().history.length).toBe(1);
 		});
 	});
 
@@ -85,12 +95,14 @@ describe("Testing playlists", () => {
 		/////////////////////////////////////////////
 		/////////////////////////////////////////////
 
-		const addOneMediaToFavorites = () => {
-			const [mediaPath] = arrayFromMainList[1]!;
+		const addOneMediaToFavorites = (): void => {
+			const mediaPath = arrayFromMainList[1]?.[0];
 
-			playlists.favorites.add(mediaPath);
+			if (!mediaPath) throw new Error("No mediaPath to add to favorites");
 
-			const newFavorites = playlists.favorites;
+			addToFavorites(mediaPath);
+
+			const newFavorites = getPlaylists().favorites;
 
 			expect(newFavorites.has(mediaPath)).toBe(true);
 			expect(newFavorites.size).toBe(1);
@@ -111,13 +123,13 @@ describe("Testing playlists", () => {
 
 		it("removeFromFavorites() should remove one media of favorites", () => {
 			addOneMediaToFavorites();
-			expect(playlists.favorites.size).toBe(1);
-			const [path] = playlists.favorites;
+			expect(getPlaylists().favorites.size).toBe(1);
+			const [path] = getPlaylists().favorites;
 			expect(path).toBeTruthy();
 
-			playlists.favorites.delete(path!);
+			removeFromFavorites(path ?? "");
 
-			expect(playlists.favorites.size).toBe(0);
+			expect(getPlaylists().favorites.size).toBe(0);
 		});
 	});
 
@@ -132,14 +144,19 @@ describe("Testing playlists", () => {
 
 		it("addToMainList() should NOT add one media to mediaList because there already exists one with the same id", () => {
 			const anyIndex = getRandomInt(0, numberOfMedias);
-			const [path, newMedia] = arrayFromMainList[anyIndex]!;
+			const data = arrayFromMainList[anyIndex];
+
+			if (!data) throw new Error("`data` is undefined");
+
+			const [path, newMedia] = data;
+
 			expect(path).toBeTruthy();
 
-			expect(playlists.sortedByTitleAndMainList.has(path)).toBe(true);
+			expect(getPlaylists().sortedByTitleAndMainList.has(path)).toBe(true);
 
 			addToMainList(path, newMedia);
 
-			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(numberOfMedias);
 		});
 
 		/////////////////////////////////////////////
@@ -153,6 +170,7 @@ describe("Testing playlists", () => {
 				duration: formatDuration(100),
 				lastModified: Date.now(),
 				birthTime: Date.now(),
+				lastPlayedAt: NaN,
 				size: 3_000,
 				genres: [],
 				artist: "",
@@ -162,12 +180,14 @@ describe("Testing playlists", () => {
 				title,
 			};
 
-			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(numberOfMedias);
 
 			addToMainList(newPath, newMedia);
 
-			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias + 1);
-			expect(playlists.sortedByTitleAndMainList.has(newPath)).toBe(true);
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(
+				numberOfMedias + 1,
+			);
+			expect(getPlaylists().sortedByTitleAndMainList.has(newPath)).toBe(true);
 		});
 
 		/////////////////////////////////////////////
@@ -175,19 +195,20 @@ describe("Testing playlists", () => {
 		/////////////////////////////////////////////
 
 		it("removeMedia() should remove one media of mainList", () => {
-			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
-			expect(playlists.favorites.size).toBe(0);
-			expect(playlists.history.length).toBe(0);
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(numberOfMedias);
+			expect(getPlaylists().favorites.size).toBe(0);
+			expect(getPlaylists().history.length).toBe(0);
 
 			const anyIndex = getRandomInt(0, numberOfMedias);
-			const [path] = arrayFromMainList[anyIndex]!;
+			const path = arrayFromMainList[anyIndex]?.[0] ?? "";
 			expect(path).toBeTruthy();
 
-			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(numberOfMedias);
 
 			removeMedia(path);
 
-			const newMainList = playlists.sortedByTitleAndMainList;
+			const newMainList = getPlaylists().sortedByTitleAndMainList;
+
 			expect(newMainList.has(path)).toBe(false);
 			expect(newMainList.size).toBe(numberOfMedias - 1);
 		});
@@ -199,11 +220,11 @@ describe("Testing playlists", () => {
 		it("cleanAllLists() should clean all lists", () => {
 			clearAllLists();
 
-			expect(playlists.sortedByTitleAndMainList.size).toBe(0);
-			expect(playlists.favorites.size).toBe(0);
-			expect(playlists.history.length).toBe(0);
-			expect(allSelectedMedias.size).toBe(0);
-			expect(currentPlaying.path).toBe("");
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(0);
+			expect(getPlaylists().favorites.size).toBe(0);
+			expect(getPlaylists().history.length).toBe(0);
+			expect(getAllSelectedMedias().size).toBe(0);
+			expect(getCurrentPlaying().path).toBe("");
 		});
 
 		/////////////////////////////////////////////
@@ -211,16 +232,21 @@ describe("Testing playlists", () => {
 		/////////////////////////////////////////////
 
 		it("refreshMedia() should refresh one media", () => {
-			const [path, oldMedia] = arrayFromMainList[15]!;
+			const data = arrayFromMainList[15];
+
+			if (!data) throw new Error("Data at index 15 should exist!");
+
+			const [path, oldMedia] = data;
+
 			const size = getRandomInt(0, 4242043);
 			const title = "I'm an updated title";
 			const newMedia: Media = { ...oldMedia, title, size };
 
-			expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
+			expect(getPlaylists().sortedByTitleAndMainList.size).toBe(numberOfMedias);
 
 			rescanMedia(path, newMedia);
 
-			const newMainList = playlists.sortedByTitleAndMainList;
+			const newMainList = getPlaylists().sortedByTitleAndMainList;
 			const refreshedMedia = newMainList.get(path);
 
 			expect(refreshedMedia).toBeTruthy();

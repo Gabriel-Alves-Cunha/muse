@@ -1,17 +1,18 @@
-import { useSnapshot } from "valtio";
-
+import { type Playlists, usePlaylists } from "@contexts/playlists";
+import { selectT, useTranslator } from "@i18n";
 import { prettyBytes } from "@common/prettyBytes";
-import { translation } from "@i18n";
-import { playlists } from "@contexts/playlists";
 
-export function MediasInfo() {
-	const playlistsAccessor = useSnapshot(playlists);
-	const t = useSnapshot(translation).t;
+const selectMainList = (
+	state: Playlists,
+): Playlists["sortedByTitleAndMainList"] => state.sortedByTitleAndMainList;
+
+export function MediasInfo(): JSX.Element {
+	const mainList = usePlaylists(selectMainList);
+	const t = useTranslator(selectT);
 
 	let allFilesSize = 0;
 
-	for (const [, { size }] of playlistsAccessor.sortedByTitleAndMainList)
-		allFilesSize += size;
+	for (const [, { size }] of mainList) allFilesSize += size;
 
 	return (
 		<p>

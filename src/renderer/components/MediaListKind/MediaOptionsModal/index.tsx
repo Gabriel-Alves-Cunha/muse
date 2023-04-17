@@ -1,15 +1,16 @@
 import type { Media, Path } from "@common/@types/GeneralTypes";
 
 import { useCallback, useRef, useState } from "react";
-import { MdOutlineImageSearch as SearchImage } from "react-icons/md";
-import { MdOutlineDelete as Remove } from "react-icons/md";
-import { MdClose as CloseIcon } from "react-icons/md";
-import { useSnapshot } from "valtio";
+import {
+	MdOutlineImageSearch as SearchImage,
+	MdOutlineDelete as Remove,
+	MdClose as CloseIcon,
+} from "react-icons/md";
 
 import { DeleteMediaDialogContent } from "../../DeleteMediaDialog";
+import { selectT, useTranslator } from "@i18n";
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { CenteredModal } from "../../CenteredModal";
-import { translation } from "@i18n";
 import { deleteFile } from "@utils/deleteFile";
 import { Button } from "../../Button";
 import { dbg } from "@common/debug";
@@ -28,8 +29,12 @@ import {
 
 const filePresentClassName = "file-present";
 
-export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
-	const t = useSnapshot(translation).t;
+export function MediaOptionsModal({
+	setIsOpen,
+	media,
+	path,
+}: Props): JSX.Element {
+	const t = useTranslator(selectT);
 
 	const [isDeleteMediaModalOpen, setIsDeleteMediaModalOpen] = useState(false);
 
@@ -55,7 +60,7 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 
 			const [file] = files;
 
-			imageFilePathRef.current = file!.webkitRelativePath;
+			imageFilePathRef.current = file?.webkitRelativePath ?? "";
 
 			dbg("imageFilePath =", imageFilePathRef.current);
 
@@ -69,14 +74,14 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 		setIsOpen(false);
 
 		changeMediaMetadata(imageFilePathRef.current, path, media);
-	}, [path, media]);
+	}, [setIsOpen, path, media]);
 
 	const handleDeleteMedia = useCallback(() => {
 		setIsDeleteMediaModalOpen(false);
 		setIsOpen(false);
 
 		deleteFile(path);
-	}, [path]);
+	}, [path, setIsOpen]);
 
 	const closeDeleteMediaDialog = useCallback(
 		() => setIsDeleteMediaModalOpen(false),
@@ -88,9 +93,12 @@ export function MediaOptionsModal({ media, path, setIsOpen }: Props) {
 		[],
 	);
 
-	const closeMediaOptionsModal = useCallback(() => setIsOpen(false), []);
+	const closeMediaOptionsModal = useCallback(
+		() => setIsOpen(false),
+		[setIsOpen],
+	);
 
-	function changeMediaMetadataOnEnter(event: KeyEvent) {
+	function changeMediaMetadataOnEnter(event: KeyEvent): void {
 		event.stopPropagation();
 
 		if (event.key === "Enter" && !isAModifierKeyPressed(event)) saveChanges();

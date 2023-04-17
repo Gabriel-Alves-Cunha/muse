@@ -1,68 +1,88 @@
 import type { Path } from "@common/@types/GeneralTypes";
 
-import { subscribe } from "valtio";
-import { proxySet } from "valtio/utils";
+import { create } from "zustand";
 
-import { playlists } from "./playlists";
+import { getPlaylists } from "./playlists";
+import { emptySet } from "@utils/empty";
 import { time } from "@utils/utils";
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 
-export const allSelectedMedias = proxySet<Path>();
+export const allSelectedMediasRef = create<AllSelectedMedias>(() => ({
+	current: emptySet,
+}));
+
+export const getAllSelectedMedias = (): AllSelectedMedias["current"] =>
+	allSelectedMediasRef.getState().current;
+
+export const setAllSelectedMedias = (newAllSelectedMedias: Set<Path>): void =>
+	allSelectedMediasRef.setState({ current: newAllSelectedMedias });
+
+export const clearAllSelectedMedias = (): void =>
+	setAllSelectedMedias(emptySet);
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 // Listeners:
 
-export const selectPath = (path: Path) => `[data-path="${path}"]`;
+export const selectDataPath = (path: Path): string => `[data-path="${path}"]`;
 const isSelectedRowDataString = "isSelectedRow";
-const prevSelectedMedias: Set<Path> = new Set();
 
 // Handle decorate medias row:
-subscribe(allSelectedMedias, (): void =>
+allSelectedMediasRef.subscribe((selectedMediasRef, prevSelectedMediasRef) =>
 	time((): void => {
 		const list = document.getElementById("list");
 
 		if (!list) return;
 
 		// Has to be this order:
-		for (const path of prevSelectedMedias)
+		for (const path of prevSelectedMediasRef.current)
 			for (const element of list.querySelectorAll<HTMLElement>(
-				selectPath(path),
+				selectDataPath(path),
 			)) {
-				if (allSelectedMedias.has(path)) continue;
+				if (selectedMediasRef.current.has(path)) continue;
 
 				element.dataset[isSelectedRowDataString] = "false";
-
-				prevSelectedMedias.delete(path);
 			}
 
-		for (const path of allSelectedMedias)
+		for (const path of selectedMediasRef.current)
 			for (const element of list.querySelectorAll<HTMLElement>(
-				selectPath(path),
-			)) {
+				selectDataPath(path),
+			))
 				element.dataset[isSelectedRowDataString] = "true";
-
-				prevSelectedMedias.add(path);
-			}
 	}, "handleDecorateMediasRow"),
 );
 
 ///////////////////////////////////////////////////
 
-export const toggleSelectedMedia = (path: Path): void => {
-	allSelectedMedias[allSelectedMedias.has(path) ? "delete" : "add"](path);
-};
+export function toggleSelectedMedia(path: Path): void {
+	const allSelectedMedias = getAllSelectedMedias();
+	const newAllSelectedMedias = new Set(allSelectedMedias);
+
+	newAllSelectedMedias[newAllSelectedMedias.has(path) ? "delete" : "add"](path);
+
+	setAllSelectedMedias(newAllSelectedMedias);
+}
 
 ///////////////////////////////////////////////////
 
 export function selectAllMedias(): void {
-	const sortedByDate = playlists.sortedByDate;
+	const allSelectedMedias = getAllSelectedMedias();
+	const sortedByDate = getPlaylists().sortedByDate;
 
 	if (allSelectedMedias.size === sortedByDate.size) return;
 
-	for (const path of sortedByDate) allSelectedMedias.add(path);
+	const newAllSelectedMedias = new Set(sortedByDate);
+
+	setAllSelectedMedias(newAllSelectedMedias);
 }
+
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+// Types:
+
+export type AllSelectedMedias = Readonly<{ current: ReadonlySet<Path> }>;

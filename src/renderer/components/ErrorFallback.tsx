@@ -1,18 +1,18 @@
-import { useSnapshot } from "valtio";
-
+import { selectT, useTranslator } from "@i18n";
 import { resetAllAppData } from "@utils/app";
 import { CenteredModal } from "./CenteredModal";
 import { reloadWindow } from "./MediaListKind/helper";
 import { WarningSign } from "./WarningSign";
-import { translation } from "@i18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-export function ErrorFallback({ description }: ErrorBoundaryProps) {
-	const t = useSnapshot(translation).t;
+export function ErrorFallback({
+	description,
+}: ErrorBoundaryProps): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<CenteredModal className="relative flex flex-col items-center" isOpen>
@@ -27,11 +27,8 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 			</p>
 
 			<button
+				onPointerUp={resetAllAppDataAndReloadWindow}
 				data-modal-close-reset
-				onPointerUp={() => {
-					resetAllAppData();
-					reloadWindow();
-				}}
 			>
 				{t("buttons.resetAllAppData")}
 			</button>
@@ -41,6 +38,16 @@ export function ErrorFallback({ description }: ErrorBoundaryProps) {
 			</button>
 		</CenteredModal>
 	);
+}
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// Helper function:
+
+function resetAllAppDataAndReloadWindow(): void {
+	resetAllAppData();
+	reloadWindow();
 }
 
 /////////////////////////////////////////////

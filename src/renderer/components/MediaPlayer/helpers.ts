@@ -1,4 +1,4 @@
-import { currentPlaying, playNextMedia } from "@contexts/currentPlaying";
+import { playNextMedia, getCurrentPlaying } from "@contexts/currentPlaying";
 import { getMedia, rescanMedia } from "@contexts/playlists";
 import { formatDuration } from "@common/utils";
 import { error } from "@common/log";
@@ -24,11 +24,15 @@ export const logStalled = (e: Event): void =>
 /////////////////////////////////////////
 
 export function handleLoadedData({ target: audio }: AudioEvent): void {
-	const { lastStoppedTimeInSeconds, path } = currentPlaying;
+	const { lastStoppedTimeInSeconds, path } = getCurrentPlaying();
 	const formatedDuration = formatDuration(audio.duration);
 	const media = getMedia(path);
 
-	if (!media) return error("Media not found!");
+	if (!media) {
+		error("Media not found!");
+
+		return;
+	}
 
 	// Updating the duration of media:
 	if (formatedDuration !== media.duration) {

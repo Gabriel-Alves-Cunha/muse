@@ -79,6 +79,7 @@ const createMedia = async (
 				artist: albumArtists[0] ?? "",
 				birthTime: birthtimeMs,
 				lastModified: mtimeMs,
+				lastPlayedAt: NaN,
 				lyrics,
 				genres,
 				title,

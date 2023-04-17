@@ -7,12 +7,16 @@
 * ADD: detect (avail port to share)
 * ADD: select with mouse moving
 * ADD: electron setProgressBar
-* ADD: cut and visualise audio
+* ADD: cut and visualize audio
 * ADD: playback rate
 * ADD: make own toast
 * ADD: splash screen
 
-* FIX: gh-actions is always overwriting latest release
+* FIX: gh-actions is always overwriting the latest release
+
+################ DEV NOTES ################
+
+
 
 ################## NOTES ##################
 

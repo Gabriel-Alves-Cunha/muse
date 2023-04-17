@@ -1,21 +1,20 @@
-import { useSnapshot } from "valtio";
 import {
 	IoPlayBackSharp as Previous,
 	IoPlayForwardSharp as Next,
 } from "react-icons/io5";
 
 import { playPreviousMedia, playNextMedia } from "@contexts/currentPlaying";
+import { selectT, useTranslator } from "@i18n";
 import { CircleIconButton } from "@components/CircleIconButton";
 import { PlayPauseButton } from "./PlayPauseButton";
-import { translation } from "@i18n";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 // Main function:
 
-export function Controls({ isThereAMedia }: ControlsProps) {
-	const t = useSnapshot(translation).t;
+export function Controls({ isThereAMedia }: ControlsProps): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<div className="media-player-controls">
@@ -45,7 +44,7 @@ export function Controls({ isThereAMedia }: ControlsProps) {
 /////////////////////////////////////////
 // Types:
 
-export type ControlsProps = { isThereAMedia: boolean };
+export type ControlsProps = Readonly<{ isThereAMedia: boolean }>;
 
 /////////////////////////////////////////
 

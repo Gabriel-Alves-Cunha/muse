@@ -1,0 +1,16 @@
+/tools/internal-rules/node_modules/**
+/tests/performance/**
+/tests/fixtures/**
+/node_modules/**
+/tests/bench/**
+/templates/**
+!/docs/tools/
+!.eslintrc.js
+/coverage/**
+!/docs/*.js
+/build/**
+/jsdoc/**
+/docs/*
+/tmp/**
+test.js
+*.d.ts

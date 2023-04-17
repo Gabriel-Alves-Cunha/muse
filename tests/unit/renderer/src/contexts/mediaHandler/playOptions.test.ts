@@ -5,8 +5,9 @@ import "@tests/unit/mockElectronPlusNodeGlobalsBeforeTests";
 
 import {
 	toggleLoopMedia,
+	getPlayOptions,
+	setPlayOptions,
 	toggleRandom,
-	playOptions,
 } from "@contexts/playOptions";
 
 /////////////////////////////////////////////
@@ -19,17 +20,17 @@ describe("Testing usePlayOptions", () => {
 	/////////////////////////////////////////////
 
 	it("should get playOptions with 'loopThisMedia' set", () => {
-		playOptions.loopThisMedia = true;
+		setPlayOptions({ loopThisMedia: true });
 
 		expect(
-			playOptions.loopThisMedia,
+			getPlayOptions().loopThisMedia,
 			"playOptions.loopThisMedia should be true.",
 		).toBe(true);
 
 		toggleLoopMedia();
 
 		expect(
-			playOptions.loopThisMedia,
+			getPlayOptions().loopThisMedia,
 			"playOptions.loopThisMedia should be false.",
 		).toBe(false);
 	});
@@ -39,16 +40,18 @@ describe("Testing usePlayOptions", () => {
 	/////////////////////////////////////////////
 
 	it("should get playOptions with .isRandom set", () => {
-		playOptions.isRandom = true;
+		setPlayOptions({ isRandom: true });
 
-		expect(playOptions.isRandom, "playOptions.isRandom should be true.").toBe(
-			true,
-		);
+		expect(
+			getPlayOptions().isRandom,
+			"playOptions.isRandom should be true.",
+		).toBe(true);
 
 		toggleRandom();
 
-		expect(playOptions.isRandom, "playOptions.isRandom should be true.").toBe(
-			false,
-		);
+		expect(
+			getPlayOptions().isRandom,
+			"playOptions.isRandom should be true.",
+		).toBe(false);
 	});
 });

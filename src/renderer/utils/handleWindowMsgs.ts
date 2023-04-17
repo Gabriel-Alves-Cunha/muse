@@ -7,16 +7,16 @@ import { createNewDownload } from "@components/Downloading/helper";
 import { assertUnreachable } from "./utils";
 import { togglePlayPause } from "@contexts/currentPlaying";
 import { getMediaFiles } from "@contexts/playlistsHelper";
+import { getSettings } from "@contexts/settings";
 import { deleteFile } from "./deleteFile";
-import { settings } from "@contexts/settings";
 import { error } from "@common/log";
 import { dbg } from "@common/debug";
 import {
 	searchLocalComputerForMedias,
 	addToMainList,
+	getPlaylists,
 	rescanMedia,
 	removeMedia,
-	playlists,
 } from "@contexts/playlists";
 
 const { transformPathsToMedias } = electronApi.media;
@@ -106,7 +106,7 @@ export async function handleWindowMsgsFromElectron(
 			const {
 				assureMediaSizeIsGreaterThan60KB,
 				ignoreMediaWithLessThan60Seconds,
-			} = settings;
+			} = getSettings();
 
 			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
 
@@ -121,9 +121,9 @@ export async function handleWindowMsgsFromElectron(
 				break;
 			}
 
-			dbg("before =", playlists.sortedByTitleAndMainList);
+			dbg("before =", getPlaylists().sortedByTitleAndMainList);
 			addToMainList(newMedia[0], newMedia[1]);
-			dbg("after =", playlists.sortedByTitleAndMainList);
+			dbg("after =", getPlaylists().sortedByTitleAndMainList);
 			break;
 		}
 
@@ -134,7 +134,7 @@ export async function handleWindowMsgsFromElectron(
 
 			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
 
-			if (!playlists.sortedByDate.has(mediaPath)) {
+			if (!getPlaylists().sortedByDate.has(mediaPath)) {
 				error("Could not find media to delete.");
 				break;
 			}
@@ -169,11 +169,11 @@ export async function handleWindowMsgsFromElectron(
 
 			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
 
-			if (!playlists.sortedByTitleAndMainList.has(mediaPath)) {
+			if (!getPlaylists().sortedByTitleAndMainList.has(mediaPath)) {
 				error(
 					`Media %c"${mediaPath}" was not found to be removed!`,
 					"color: blue",
-					{ sortedByTitleAndMainList: playlists.sortedByTitleAndMainList },
+					{ sortedByTitleAndMainList: getPlaylists().sortedByTitleAndMainList },
 				);
 				break;
 			}

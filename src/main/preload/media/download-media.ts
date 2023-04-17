@@ -9,9 +9,8 @@ import { stdout } from "node:process";
 import { join } from "node:path";
 import ytdl from "ytdl-core";
 
-import { ElectronToReactMessageEnum } from "@common/enums";
+import { ElectronToReactMessageEnum, ProgressStatusEnum } from "@common/enums";
 import { error, log, throwErr } from "@common/log";
-import { ProgressStatusEnum } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { prettyBytes } from "@common/prettyBytes";
@@ -54,7 +53,7 @@ export function createOrCancelDownload(args: CreateDownload): void {
 		if (!args.url) throwErr(`'url' is required. Received: "${args.url}".`);
 
 		createDownload(args as Required<CreateDownload>);
-	} else if (args.destroy) currentDownloads.get(args.url)!.emit("destroy");
+	} else if (args.destroy) currentDownloads.get(args.url)?.emit("destroy");
 }
 
 /////////////////////////////////////////////
@@ -242,7 +241,7 @@ export async function createDownload(
 			currentDownloads.delete(url);
 			readStream.destroy(err); // I only found it to work when I send it with an Error.
 			clearInterval(interval);
-			electronPort!.close();
+			electronPort.close();
 
 			dbg(
 				"Download threw an error. Deleting stream from currentDownloads:",

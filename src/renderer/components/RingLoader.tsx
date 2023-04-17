@@ -1,4 +1,4 @@
-export const RingLoader = (props: Props) => (
+export const RingLoader = (props: Props): JSX.Element => (
 	<span data-ring-loader {...props}>
 		<span />
 		<span />

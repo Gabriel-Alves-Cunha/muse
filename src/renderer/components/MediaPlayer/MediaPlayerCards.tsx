@@ -1,18 +1,14 @@
-import { useSnapshot } from "valtio";
 import { useEffect } from "react";
 
 import { FlipCard, mediaPlayerFlipCardId } from "@components/FlipCard";
-import { currentPlaying } from "@contexts/currentPlaying";
-import { playlists } from "@contexts/playlists";
+import { selectPath, useCurrentPlaying } from "@contexts/currentPlaying";
+import { selectMainList, usePlaylists } from "@contexts/playlists";
 import { Player } from "./Player";
 import { Lyrics } from "./Lyrics";
 
-export function MediaPlayerCards() {
-	const currentPlayingAccessor = useSnapshot(currentPlaying);
-	const playlistsAccessor = useSnapshot(playlists);
-
-	const path = currentPlayingAccessor.path;
-	const media = playlistsAccessor.sortedByTitleAndMainList.get(path);
+export function MediaPlayerCards(): JSX.Element {
+	const path = useCurrentPlaying(selectPath);
+	const media = usePlaylists(selectMainList).get(path);
 
 	useEffect(() => {
 		// Flip media player card to frontCard on new path:

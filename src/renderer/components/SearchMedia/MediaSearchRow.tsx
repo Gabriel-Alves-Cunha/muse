@@ -2,15 +2,18 @@ import type { Path, Media } from "@common/@types/GeneralTypes";
 
 import { HiOutlineDotsVertical as Dots } from "react-icons/hi";
 import { Suspense, useState } from "react";
-import { useSnapshot } from "valtio";
 
-import { currentPlaying, playThisMedia } from "@contexts/currentPlaying";
+import { selectT, useTranslator } from "@i18n";
+import { allSelectedMediasRef } from "@contexts/allSelectedMedias";
 import { MediaOptionsModal } from "../MediaListKind/MediaOptionsModal";
-import { allSelectedMedias } from "@contexts/allSelectedMedias";
 import { ImgWithFallback } from "../ImgWithFallback";
 import { CenteredModal } from "../CenteredModal";
-import { translation } from "@i18n";
 import { unDiacritic } from "@contexts/playlists";
+import {
+	useCurrentPlaying,
+	playThisMedia,
+	selectPath,
+} from "@contexts/currentPlaying";
 
 /////////////////////////////////////////
 /////////////////////////////////////////
@@ -21,16 +24,18 @@ export function MediaSearchRow({
 	highlight,
 	media,
 	path,
-}: MediaSearchRowProps) {
+}: MediaSearchRowProps): JSX.Element {
 	const [isMediaOptionsModalOpen, setIsMediaOptionsModalOpen] = useState(false);
-	const t = useSnapshot(translation).t;
+	const currentPlayingPath = useCurrentPlaying(selectPath);
+	const allSelectedMedias = allSelectedMediasRef().current;
+	const t = useTranslator(selectT);
 
 	const index = unDiacritic(media.title).indexOf(highlight);
 
 	return (
 		<div
 			data-is-selected-row={allSelectedMedias.has(path)}
-			data-is-playing-row={currentPlaying.path === path}
+			data-is-playing-row={currentPlayingPath === path}
 			className="media-search-row"
 			data-path={path}
 		>
@@ -87,8 +92,8 @@ export function MediaSearchRow({
 /////////////////////////////////////////
 // Types:
 
-type MediaSearchRowProps = {
+type MediaSearchRowProps = Readonly<{
 	highlight: string;
 	media: Media;
 	path: Path;
-};
+}>;

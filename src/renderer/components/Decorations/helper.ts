@@ -7,15 +7,15 @@ const notify =
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export const toggleMaximize = () =>
+export const toggleMaximize = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_MAXIMIZE);
 
 /////////////////////////////////////////////
 
-export const minimizeWindow = () =>
+export const minimizeWindow = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.MINIMIZE);
 
 /////////////////////////////////////////////
 
-export const closeWindow = () =>
+export const closeWindow = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.QUIT_APP);

@@ -1,62 +1,59 @@
-import type { ValuesOf } from "@common/@types/Utils";
-
 import { MdOutlineSort as SortIcon } from "react-icons/md";
-import { useEffect, useState } from "react";
-import { useSnapshot } from "valtio";
+import { useCallback, useState } from "react";
 
+import { selectT, useTranslator } from "@i18n";
+import { setListTypeToDisplay } from "../MediaListKind/states";
 import { PlaylistListEnum } from "@common/enums";
 import { ButtonOfGroup } from "./ButtonOfGroup";
-import { translation } from "@i18n";
-import { fromList } from "../MediaListKind/states";
 import { MenuItem } from "../MenuItem";
 import { Select } from "../Select";
 
-export function SortBy() {
-	const [selectedList, setSelectedList] = useState<SelectedList>("Name");
+export function SortBy(): JSX.Element {
 	const [isOpen, setIsOpen] = useState(false);
-	const t = useSnapshot(translation).t;
+	const t = useTranslator(selectT);
 
-	useEffect(() => {
-		// Default value:
-		let homeList: ValuesOf<typeof PlaylistListEnum> = PlaylistListEnum.mainList;
+	const open = useCallback(() => setIsOpen(true), []);
 
-		if (selectedList === "Date") homeList = PlaylistListEnum.sortedByDate;
+	const selectNameAndClose = useCallback(() => {
+		setHomeListToDisplay("Name");
+		setIsOpen(false);
+	}, []);
 
-		fromList.homeList = homeList;
-	}, [selectedList]);
+	const selectDateAndClose = useCallback(() => {
+		setHomeListToDisplay("Date");
+		setIsOpen(false);
+	}, []);
 
 	return (
 		<>
 			<ButtonOfGroup
-				onPointerUp={() => setIsOpen(true)}
 				title={t("tooltips.sortBy")}
 				className="rounded-r-xl" // Same as ButtonOfGroup.
+				onPointerUp={open}
 			>
 				<SortIcon size="19" className="fill-white" />
 			</ButtonOfGroup>
 
 			<Select isOpen={isOpen} setIsOpen={setIsOpen}>
-				<MenuItem
-					onPointerUp={() => {
-						setSelectedList("Name");
-						setIsOpen(false);
-					}}
-				>
+				<MenuItem defaultChecked onPointerUp={selectNameAndClose}>
 					{t("sortTypes.name")}
 				</MenuItem>
 
-				<MenuItem
-					onPointerUp={() => {
-						setSelectedList("Date");
-						setIsOpen(false);
-					}}
-				>
+				<MenuItem onPointerUp={selectDateAndClose}>
 					{t("sortTypes.date")}
 				</MenuItem>
 			</Select>
 		</>
 	);
 }
+
+const setHomeListToDisplay = (list: SelectedList): void =>
+	setListTypeToDisplay({
+		homeListToDisplay:
+			list === "Date"
+				? PlaylistListEnum.sortedByDate
+				: PlaylistListEnum.mainList,
+	});
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////

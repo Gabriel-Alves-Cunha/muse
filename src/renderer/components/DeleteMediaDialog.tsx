@@ -1,7 +1,5 @@
-import { useSnapshot } from "valtio";
-
+import { selectT, useTranslator } from "@i18n";
 import { WarningSign } from "./WarningSign";
-import { translation } from "@i18n";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
@@ -11,8 +9,8 @@ import { translation } from "@i18n";
 export function DeleteMediaDialogContent({
 	handleDeleteMedia,
 	closeDialog,
-}: Props) {
-	const t = useSnapshot(translation).t;
+}: Props): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<>
@@ -43,7 +41,7 @@ export function DeleteMediaDialogContent({
 /////////////////////////////////////////////
 // Types:
 
-type Props = {
+type Props = Readonly<{
 	handleDeleteMedia(): void;
 	closeDialog(): void;
-};
+}>;

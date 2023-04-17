@@ -4,7 +4,7 @@ import { ReactToElectronMessageEnum } from "@common/enums";
 import { mediaPlayerFlipCardId } from "../FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { error, warn } from "@common/log";
-import { translation } from "@i18n";
+import { t, useTranslator } from "@i18n";
 import { infoToast } from "../toasts";
 import { getMedia } from "@contexts/playlists";
 import { Header } from "./Header";
@@ -13,7 +13,7 @@ const { searchForLyricsAndImage } = electronApi.lyric;
 
 /////////////////////////////////////////
 
-export const Lyrics = ({ media, path }: Props) => (
+export const Lyrics = ({ media, path }: Props): JSX.Element => (
 	<div className="lyrics-wrapper">
 		<Header media={media} path={path} displayTitle />
 
@@ -28,10 +28,9 @@ export const Lyrics = ({ media, path }: Props) => (
 /////////////////////////////////////////
 // Helper functions:
 
-export const flipMediaPlayerCard = (): void =>
-	document
-		.getElementById(mediaPlayerFlipCardId)
-		?.classList.toggle("active") as void;
+export function flipMediaPlayerCard(): void {
+	document.getElementById(mediaPlayerFlipCardId)?.classList.toggle("active");
+}
 
 /////////////////////////////////////////
 
@@ -44,8 +43,6 @@ export async function searchAndOpenLyrics(
 	const media = getMedia(mediaPath);
 
 	if (!media) return warn(`Media "${mediaPath}" not found!`);
-
-	const { t } = translation;
 
 	if (!media.artist) {
 		infoToast(t("toasts.assureMediaHasArtistMetadata"));
@@ -86,4 +83,4 @@ export async function searchAndOpenLyrics(
 /////////////////////////////////////////
 // Types:
 
-type Props = { media: Media | undefined; path: Path };
+type Props = Readonly<{ media: Media | undefined; path: Path }>;

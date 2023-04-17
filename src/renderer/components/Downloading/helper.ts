@@ -7,16 +7,18 @@ import { errorToast, infoToast, successToast } from "../toasts";
 import { logThatPortIsClosing } from "../Converting/helper";
 import { assertUnreachable } from "@utils/utils";
 import { sendMsgToBackend } from "@common/crossCommunication";
-import { downloadingList } from "@contexts/downloadList";
 import { error, assert } from "@common/log";
-import { translation } from "@i18n";
 import { dbg } from "@common/debug";
+import { t } from "@i18n";
+import {
+	downloadingListRef,
+	getDownloadingList,
+	setDownloadingList,
+} from "@contexts/downloadList";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
-
-const { t } = translation;
 
 /**
  * This function returns a MessagePort that will be sent to
@@ -24,9 +26,10 @@ const { t } = translation;
  * and React.
  */
 export function createNewDownload(downloadInfo: DownloadInfo): void {
-	dbg("Trying to create a new download.", { downloadingList });
+	dbg("Trying to create a new download.", { downloadingListRef });
 
 	const { imageURL, title, url } = downloadInfo;
+	const downloadingList = getDownloadingList();
 
 	// First, see if there is another one that has the same url
 	// and quit if true:
@@ -35,7 +38,9 @@ export function createNewDownload(downloadInfo: DownloadInfo): void {
 
 		infoToast(info);
 
-		return error(info, downloadingList);
+		error(info, downloadingListRef);
+
+		return;
 	}
 
 	// Since this a brand new download, let's create a new one.
@@ -51,13 +56,15 @@ export function createNewDownload(downloadInfo: DownloadInfo): void {
 	);
 
 	// Creating a new DownloadingMedia and adding it to the list:
-	downloadingList.set(url, {
-		status: ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
-		port: frontEndPort,
-		percentage: 0,
-		imageURL,
-		title,
-	});
+	setDownloadingList(
+		new Map(downloadingList).set(url, {
+			status: ProgressStatusEnum.WAITING_FOR_CONFIRMATION_FROM_ELECTRON,
+			port: frontEndPort,
+			percentage: 0,
+			imageURL,
+			title,
+		}),
+	);
 
 	// Send msg to electronPort to download:
 	frontEndPort.postMessage(downloadInfo);
@@ -85,20 +92,25 @@ function handleUpdateDownloadingList(
 	url: string,
 ): void {
 	dbg(`Received a message from Electron on port for "${url}":`, {
-		downloadingList,
+		downloadingListRef,
 		data,
 	});
+
+	const downloadingList = getDownloadingList();
 
 	// Assert that the download exists:
 	const thisDownload = downloadingList.get(url);
 
-	if (!thisDownload)
-		return error(
-			"Received a message from Electron but the url is not in the list!",
-		);
+	if (!thisDownload) {
+		error("Received a message from Electron but the url is not in the list!");
+
+		return;
+	}
 
 	// Update React's information about this DownloadingMedia:
-	downloadingList.set(url, { ...thisDownload, ...data });
+	setDownloadingList(
+		new Map(downloadingList).set(url, { ...thisDownload, ...data }),
+	);
 
 	// Handle status:
 	switch (data.status) {
@@ -144,18 +156,26 @@ function handleUpdateDownloadingList(
 /////////////////////////////////////////////
 
 export function cancelDownloadAndOrRemoveItFromList(url: string): void {
+	const downloadingList = getDownloadingList();
+
 	// Assert that the download exists:
 	const download = downloadingList.get(url);
 
-	if (!download)
-		return error(`"${url}" not found! downloadList =`, downloadingList);
+	if (!download) {
+		error(`"${url}" not found! downloadList =`, downloadingListRef);
+
+		return;
+	}
 
 	// Cancel download:
 	if (download.status === ProgressStatusEnum.ACTIVE)
 		download.port.postMessage({ destroy: true, url });
 
 	// Update downloading list:
-	downloadingList.delete(url);
+	const newDownloadingList = new Map(downloadingList);
+	newDownloadingList.delete(url);
+
+	setDownloadingList(newDownloadingList);
 }
 
 /////////////////////////////////////////////

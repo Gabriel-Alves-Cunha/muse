@@ -6,9 +6,8 @@ import type { Path } from "@common/@types/GeneralTypes";
 import { createReadStream, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
-import { ElectronToReactMessageEnum } from "@common/enums";
+import { ElectronToReactMessageEnum, ProgressStatusEnum } from "@common/enums";
 import { log, error, throwErr } from "@common/log";
-import { ProgressStatusEnum } from "@common/enums";
 import { sendMsgToClient } from "@common/crossCommunication";
 import { fluent_ffmpeg } from "./ffmpeg";
 import { getBasename } from "@common/path";
@@ -43,7 +42,7 @@ export function createOrCancelConvert(args: CreateConversion): void {
 		if (!args.path) throwErr(`A path is required. Received: "${args.path}".`);
 
 		convertToAudio(args as Required<CreateConversion>).then();
-	} else if (args.destroy) mediasConverting.get(args.path)!.emit("destroy");
+	} else if (args.destroy) mediasConverting.get(args.path)?.emit("destroy");
 }
 
 /////////////////////////////////////////////
@@ -112,7 +111,7 @@ export async function convertToAudio(
 				// ^ Only in the firt time this setInterval is called!
 				interval = setInterval(
 					() =>
-						electronPort!.postMessage({
+						electronPort.postMessage({
 							sizeConverted: targetSize,
 							timeConverted: timemark,
 						}),
@@ -123,7 +122,7 @@ export async function convertToAudio(
 				const msg: Partial<MediaBeingConverted> = {
 					status: ProgressStatusEnum.ACTIVE,
 				};
-				electronPort!.postMessage(msg);
+				electronPort.postMessage(msg);
 			}
 		})
 		/////////////////////////////////////////////

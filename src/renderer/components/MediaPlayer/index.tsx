@@ -19,7 +19,7 @@ import {
 ///////////////////////////////////////
 // Main function:
 
-export function MediaPlayer() {
+export function MediaPlayer(): JSX.Element {
 	const audioRef = useRef<HTMLAudioElement>(null);
 
 	// Setting event listeners:
@@ -41,11 +41,6 @@ export function MediaPlayer() {
 		audio.onerror = logError;
 		audio.onabort = logAbort;
 		audio.onclose = logClose;
-		//
-		// 		return () => {
-		// 			// @ts-ignore => I've just narrowed down the event so that event.target === HTMLAudioElement:
-		// 			audio.removeEventListener("loadeddata", handleLoadedData);
-		// 		};
 	}, []);
 
 	return (

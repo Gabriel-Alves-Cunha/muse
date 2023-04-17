@@ -1,47 +1,52 @@
 import { expect } from "vitest";
 
-import { playlists, replaceEntireMainList } from "@contexts/playlists";
 import { numberOfMedias, testMap } from "./fakeTestList";
+import { emptyArray, emptySet } from "@utils/empty";
+import {
+	replaceEntireMainList,
+	getPlaylists,
+	setPlaylists,
+} from "@contexts/playlists";
 import {
 	setDefaultCurrentPlaying,
 	defaultCurrentPlaying,
-	currentPlaying,
+	getCurrentPlaying,
 } from "@contexts/currentPlaying";
 
-function setMainListToTestList() {
+function setMainListToTestList(): void {
 	expect(testMap.size).toBe(numberOfMedias);
 
 	replaceEntireMainList(testMap);
 
-	expect(playlists.sortedByTitleAndMainList.size).toBe(numberOfMedias);
-	expect(playlists.sortedByTitleAndMainList.entries()).toEqual(
+	expect(getPlaylists().sortedByTitleAndMainList.size).toBe(numberOfMedias);
+	expect(getPlaylists().sortedByTitleAndMainList.entries()).toEqual(
 		testMap.entries(),
 	);
 }
 
 /////////////////////////////////////////////
 
-function cleanHistory() {
-	playlists.history.length = 0;
+function cleanHistory(): void {
+	setPlaylists({ history: emptyArray });
 
-	expect(playlists.history.length).toBe(0);
+	expect(getPlaylists().history.length).toBe(0);
 }
 
 /////////////////////////////////////////////
 
-function cleanFavorites() {
-	playlists.favorites.clear();
+function cleanFavorites(): void {
+	setPlaylists({ favorites: emptySet });
 
-	expect(playlists.favorites.size).toBe(0);
+	expect(getPlaylists().favorites.size).toBe(0);
 }
 
-function setCurrentPlayingToDefault() {
+function setCurrentPlayingToDefault(): void {
 	setDefaultCurrentPlaying();
 
-	expect(currentPlaying).toStrictEqual(defaultCurrentPlaying);
+	expect(getCurrentPlaying()).toStrictEqual(defaultCurrentPlaying);
 }
 
-export function cleanUpBeforeEachTest() {
+export function cleanUpBeforeEachTest(): void {
 	setCurrentPlayingToDefault();
 	setMainListToTestList();
 	cleanFavorites();

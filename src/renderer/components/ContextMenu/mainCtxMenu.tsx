@@ -1,8 +1,6 @@
-import { useSnapshot } from "valtio";
-
 import { ElectronIpcMainProcessNotificationEnum } from "@common/enums";
+import { selectT, useTranslator } from "@i18n";
 import { selectAllMedias } from "@contexts/allSelectedMedias";
-import { translation } from "@i18n";
 import { Separator } from "../Separator";
 import { RightSlot } from "../RightSlot";
 import { MenuItem } from "../MenuItem";
@@ -15,13 +13,13 @@ const notify =
 /////////////////////////////////////////////
 // Helper functions:
 
-const toggleDeveloperTools = () =>
+const toggleDeveloperTools = (): void =>
 	notify(ElectronIpcMainProcessNotificationEnum.TOGGLE_DEVELOPER_TOOLS);
 
 /////////////////////////////////////////////
 
-export function MainCtxMenu() {
-	const t = useSnapshot(translation).t;
+export function MainCtxMenu(): JSX.Element {
+	const t = useTranslator(selectT);
 
 	return (
 		<>
