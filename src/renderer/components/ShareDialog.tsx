@@ -91,6 +91,7 @@ export function ShareDialog(): JSX.Element | null {
 				onPointerUp={() => closeShareDialog(server?.close)}
 				title={t("tooltips.closeShareScreen")}
 				className="share-dialog-trigger"
+				type="button"
 			>
 				<CloseIcon />
 			</button>

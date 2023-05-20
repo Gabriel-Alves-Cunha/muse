@@ -1,7 +1,7 @@
 import type { MetadataToChange } from "@common/@types/ElectronApi";
 import type { Media, Path } from "@common/@types/GeneralTypes";
 
-import { separatedByCommaOrSemiColorOrSpace } from "@common/utils";
+import { SEPARATED_BY_COMMA_OR_SEMI_COLON_OR_SPACE_REGEX } from "@common/utils";
 import { ReactToElectronMessageEnum } from "@common/enums";
 import { errorToast, successToast } from "../../toasts";
 import { areArraysEqualByValue } from "@utils/array";
@@ -62,8 +62,8 @@ function changeMetadataIfAllowed(
 		// We need to handle the case where the key is an array, as in "genres":
 		if (oldValue instanceof Array) {
 			const newValueAsArray = newValue
-				.split(separatedByCommaOrSemiColorOrSpace)
-				.map((v) => v.trim())
+				.split(SEPARATED_BY_COMMA_OR_SEMI_COLON_OR_SPACE_REGEX)
+				.map((str) => str.trim())
 				.filter(Boolean);
 
 			// If newValueAsArray is `[""]`, then we need to remove the empty string:

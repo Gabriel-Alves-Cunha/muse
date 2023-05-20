@@ -45,11 +45,11 @@ function listenToDropEvent(event: DragEvent): void {
 	if (!event.dataTransfer) return;
 
 	const fileList = event.dataTransfer.files;
-	const files = getMediaFiles(fileList);
+	const mediaFiles = getMediaFiles(fileList);
 
-	if (files.length === 0) return;
+	if (mediaFiles.length === 0) return;
 
-	error("@TODO: handle these files droped!", { fileList, files });
+	error("@TODO: handle these files droped!", { fileList, mediaFiles });
 }
 
 //////////////////////////////////////////
@@ -59,8 +59,10 @@ window.addEventListener("drop", listenToDropEvent);
 
 //////////////////////////////////////////
 
+const SPACE_KEY = " ";
+
 function playOrPauseOnSpaceKey(e: KeyboardEvent): void {
-	if (e.key === " " && !isAModifierKeyPressed(e)) togglePlayPause();
+	if (e.key === SPACE_KEY && !isAModifierKeyPressed(e)) togglePlayPause();
 }
 
 window.addEventListener("keyup", playOrPauseOnSpaceKey);
@@ -94,7 +96,10 @@ export async function handleWindowMsgsFromElectron(
 		//////////////////////////////////////////
 
 		case CREATE_A_NEW_DOWNLOAD: {
-			dbg("[handleWindowMsgs()] Create a new download:", msg.downloadInfo);
+			dbg(
+				"[handleWindowMsgsFromElectron] Create a new download:",
+				msg.downloadInfo,
+			);
 			createNewDownload(msg.downloadInfo);
 			break;
 		}
@@ -108,7 +113,7 @@ export async function handleWindowMsgsFromElectron(
 				ignoreMediaWithLessThan60Seconds,
 			} = getSettings();
 
-			dbg("[handleWindowMsgs()] Add one media:", mediaPath);
+			dbg("[handleWindowMsgsFromElectron] Add one media:", mediaPath);
 
 			const [newMedia] = await transformPathsToMedias(
 				mediaPath,
@@ -132,7 +137,10 @@ export async function handleWindowMsgsFromElectron(
 		case DELETE_ONE_MEDIA_FROM_COMPUTER: {
 			const { mediaPath } = msg;
 
-			dbg("[handleWindowMsgs()] Delete one media from computer:", mediaPath);
+			dbg(
+				"[handleWindowMsgsFromElectron] Delete one media from computer:",
+				mediaPath,
+			);
 
 			if (!getPlaylists().sortedByDate.has(mediaPath)) {
 				error("Could not find media to delete.");
@@ -146,7 +154,7 @@ export async function handleWindowMsgsFromElectron(
 		//////////////////////////////////////////
 
 		case RESCAN_ALL_MEDIA: {
-			dbg("[handleWindowMsgs()] Refresh all media.");
+			dbg("[handleWindowMsgsFromElectron] Refresh all media.");
 			await searchLocalComputerForMedias();
 			break;
 		}
@@ -156,7 +164,7 @@ export async function handleWindowMsgsFromElectron(
 		case RESCAN_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("[handleWindowMsgs()] Rescan one media:", mediaPath);
+			dbg("[handleWindowMsgsFromElectron] Rescan one media:", mediaPath);
 
 			await rescanMedia(mediaPath);
 			break;
@@ -167,7 +175,7 @@ export async function handleWindowMsgsFromElectron(
 		case REMOVE_ONE_MEDIA: {
 			const { mediaPath } = msg;
 
-			dbg("[handleWindowMsgs()] Remove one media:", mediaPath);
+			dbg("[handleWindowMsgsFromElectron] Remove one media:", mediaPath);
 
 			if (!getPlaylists().sortedByTitleAndMainList.has(mediaPath)) {
 				error(

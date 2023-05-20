@@ -53,7 +53,7 @@ export const DecorationsDown = (): JSX.Element => (
 /////////////////////////////////////////////
 
 const WindowButton = (props: WindowButtonProps): JSX.Element => (
-	<button data-window-button {...props} />
+	<button data-window-button type="button" {...props} />
 );
 
 /////////////////////////////////////////////

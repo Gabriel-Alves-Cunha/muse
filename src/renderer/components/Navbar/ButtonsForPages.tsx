@@ -38,6 +38,7 @@ export function ButtonsForPages(): JSX.Element {
 					title={t("tooltips.goto") + t(`pages.${page}`)}
 					onPointerUp={() => setPage(page)}
 					data-active={page === currPage}
+					type="button"
 					key={page}
 				>
 					{icons[page]}

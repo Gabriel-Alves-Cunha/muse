@@ -14,7 +14,7 @@ const { getBasicInfo } = electronApi.media;
 
 const defaultSearchInfo: SearcherInfo = {
 	result: { imageURL: "", artist: "", title: "" },
-	isLoading: false,
+	isSearching: false,
 	error: "",
 	url: "",
 } as const;
@@ -38,13 +38,23 @@ const setDefaultSearchInfo = (): void => setSearchInfo(defaultSearchInfo);
 
 ////////////////////////////////////////////////
 
-export const selectIsLoading = (state: SearcherInfo): boolean =>
-	state.isLoading;
+export const selectIsSearching = (
+	state: SearcherInfo,
+): SearcherInfo["isSearching"] => state.isSearching;
 
 ////////////////////////////////////////////////
 
 export const selectResult = (state: SearcherInfo): SearcherInfo["result"] =>
 	state.result;
+
+////////////////////////////////////////////////
+
+export const selectUrlAndError = (
+	state: SearcherInfo,
+): { error: SearcherInfo["error"]; url: SearcherInfo["url"] } => ({
+	error: state.error,
+	url: state.url,
+});
 
 ////////////////////////////////////////////////
 
@@ -77,7 +87,7 @@ export function setUrl(e: React.ChangeEvent<HTMLInputElement>): void {
 export async function search(url: string): Promise<void> {
 	if (url.length < 16) return;
 
-	setSearchInfo({ isLoading: true });
+	setSearchInfo({ isSearching: true });
 
 	try {
 		const { thumbnails, media, title } = (await getBasicInfo(url)).videoDetails;
@@ -89,12 +99,12 @@ export async function search(url: string): Promise<void> {
 			title,
 		};
 
-		setSearchInfo({ result, isLoading: false });
+		setSearchInfo({ result, isSearching: false });
 	} catch (err) {
 		error(err);
 
 		setSearchInfo({
-			isLoading: false,
+			isSearching: false,
 			error: getErrorMessage(err).includes("No video id found")
 				? t("errors.noVideoIdFound")
 				: t("errors.gettingMediaInfo"),
@@ -117,7 +127,7 @@ type UrlMediaMetadata = {
 
 export type SearcherInfo = Readonly<{
 	result: UrlMediaMetadata;
-	isLoading: boolean;
+	isSearching: boolean;
 	error: string;
 	url: string;
 }>;

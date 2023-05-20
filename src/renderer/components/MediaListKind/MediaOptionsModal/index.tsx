@@ -43,10 +43,7 @@ export function MediaOptionsModal({
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef("");
 
-	const openNativeUI_ChooseFiles = useCallback(
-		() => imageInputRef.current?.click(),
-		[],
-	);
+	const openNativeUI_ChooseFiles = (): void => imageInputRef.current?.click();
 
 	const handleSelectedFile = useCallback(
 		({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,36 +64,27 @@ export function MediaOptionsModal({
 			// Change button color to indicate that selection was successfull:
 			imageButtonRef.current.classList.add(filePresentClassName);
 		},
-		[],
+		[]
 	);
 
-	const saveChanges = useCallback(() => {
+	const saveChanges = (): void => {
 		setIsOpen(false);
 
 		changeMediaMetadata(imageFilePathRef.current, path, media);
-	}, [setIsOpen, path, media]);
+	};
 
-	const handleDeleteMedia = useCallback(() => {
+	const handleDeleteMedia = (): void => {
 		setIsDeleteMediaModalOpen(false);
 		setIsOpen(false);
 
 		deleteFile(path);
-	}, [path, setIsOpen]);
+	};
 
-	const closeDeleteMediaDialog = useCallback(
-		() => setIsDeleteMediaModalOpen(false),
-		[],
-	);
+	const closeDeleteMediaDialog = (): void => setIsDeleteMediaModalOpen(false);
 
-	const openDeleteMediaDialog = useCallback(
-		() => setIsDeleteMediaModalOpen(true),
-		[],
-	);
+	const openDeleteMediaDialog = (): void => setIsDeleteMediaModalOpen(true);
 
-	const closeMediaOptionsModal = useCallback(
-		() => setIsOpen(false),
-		[setIsOpen],
-	);
+	const closeMediaOptionsModal = (): void => setIsOpen(false);
 
 	function changeMediaMetadataOnEnter(event: KeyEvent): void {
 		event.stopPropagation();
@@ -115,6 +103,7 @@ export function MediaOptionsModal({
 				onPointerUp={closeMediaOptionsModal}
 				title={t("tooltips.closeDialog")}
 				ref={closeButtonRef}
+				type="button"
 			>
 				<CloseIcon />
 			</button>
@@ -178,7 +167,11 @@ export function MediaOptionsModal({
 
 			<div data-flex-row>
 				<>
-					<button onPointerUp={openDeleteMediaDialog} data-remove-media>
+					<button
+						onPointerUp={openDeleteMediaDialog}
+						data-remove-media
+						type="button"
+					>
 						{t("buttons.deleteMedia")}
 
 						<Remove />
@@ -196,7 +189,11 @@ export function MediaOptionsModal({
 					</CenteredModal>
 				</>
 
-				<button className="save-media-options-modal" onPointerUp={saveChanges}>
+				<button
+					className="save-media-options-modal"
+					onPointerUp={saveChanges}
+					type="button"
+				>
 					{t("buttons.saveChanges")}
 				</button>
 			</div>

@@ -10,12 +10,14 @@ export function prettyBytes(num: number, precision = 3): PrettyBytes {
 		UNITS.length - 1,
 	);
 
-	const n = Number(
+	const number = Number(
 		((num < 0 ? -num : num) / 1_000 ** exponent).toPrecision(precision),
 	);
 
+	const signal = num < 0 ? "-" : "";
+
 	// @ts-ignore => I'm almost sure exponent is a number < UNITS.length >= 0
-	return `${num < 0 ? "-" : ""}${n} ${UNITS[exponent]}`;
+	return `${signal}${number} ${UNITS[exponent] ?? "ERROR"}`;
 }
 
 export type PrettyBytes = `${"" | "-"}${number} ${typeof UNITS[number]}`;

@@ -1,5 +1,5 @@
 import { MdOutlineSort as SortIcon } from "react-icons/md";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 import { selectT, useTranslator } from "@i18n";
 import { setListTypeToDisplay } from "../MediaListKind/states";
@@ -12,17 +12,17 @@ export function SortBy(): JSX.Element {
 	const [isOpen, setIsOpen] = useState(false);
 	const t = useTranslator(selectT);
 
-	const open = useCallback(() => setIsOpen(true), []);
+	const open = (): void => setIsOpen(true);
 
-	const selectNameAndClose = useCallback(() => {
+	const selectNameAndClose = (): void => {
 		setHomeListToDisplay("Name");
 		setIsOpen(false);
-	}, []);
+	};
 
-	const selectDateAndClose = useCallback(() => {
+	const selectDateAndClose = (): void => {
 		setHomeListToDisplay("Date");
 		setIsOpen(false);
-	}, []);
+	};
 
 	return (
 		<>

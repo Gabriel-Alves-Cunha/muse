@@ -31,6 +31,7 @@ export function ThemeToggler(): JSX.Element {
 			title={t("tooltips.toggleTheme")}
 			onPointerUp={toggleTheme}
 			data-toggle-theme-button
+			type="button"
 		>
 			{theme === availableThemes[0] ? (
 				<Dark size="20px" />

@@ -20,6 +20,7 @@ export function NavbarPopoverButtons({
 				data-converting-downloading-list-popover-trigger
 				data-has-items={size > 0}
 				title={tooltip}
+				type="button"
 			>
 				<span data-length={size} />
 

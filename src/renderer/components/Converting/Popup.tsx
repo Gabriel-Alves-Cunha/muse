@@ -81,6 +81,7 @@ function ConvertBox({
 				<button
 					title={t("tooltips.cancelConversion")}
 					onPointerUp={onPointerUp}
+					type="button"
 				>
 					<CancelIcon size={13} />
 				</button>

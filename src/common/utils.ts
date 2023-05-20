@@ -10,8 +10,7 @@ export const capitalizedAppName = "Muse";
 
 /////////////////////////////////////////
 
-export const separatedByCommaOrSemiColorOrSpace = /,|;| /gm;
-// export const separatedByCommaOrSemiColon = /,|;/gm;
+export const SEPARATED_BY_COMMA_OR_SEMI_COLON_OR_SPACE_REGEX = /,|;| /gm;
 
 /////////////////////////////////////////
 
@@ -34,20 +33,20 @@ export type AllowedMedias = typeof allowedMedias[number];
 
 /////////////////////////////////////////
 
-export function formatDuration(time: number | undefined): string {
+export function formatDuration(timeOrUndefined: number | undefined): string {
 	// @ts-ignore => isFinite(undefined) === false
-	if (!isFinite(time)) return "00:00";
+	if (!isFinite(timeOrUndefined)) return "00:00";
 	// @ts-ignore => Here, `time` is defined.
-	time = trunc(time);
+	const time = trunc(timeOrUndefined);
 
 	const hour = `0${floor(time / 3_600) % 24}`.slice(-2);
 	const minutes = `0${floor(time / 60) % 60}`.slice(-2);
 	const seconds = `0${time % 60}`.slice(-2);
-	const days = floor(time / 86_400);
+	const daysNumber = floor(time / 86_400);
+	const days = daysNumber > 0 ? `${daysNumber}d ` : "";
+	const hours = +hour > 0 ? `${hour}:` : "";
 
-	return `${days > 0 ? `${days}d ` : ""}${
-		+hour > 0 ? `${hour}:` : ""
-	}${minutes}:${seconds}`;
+	return `${days}${hours}${minutes}:${seconds}`;
 }
 
 /////////////////////////////////////////

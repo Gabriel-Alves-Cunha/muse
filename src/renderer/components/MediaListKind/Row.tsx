@@ -27,8 +27,8 @@ function selectOrPlayMedia(
 	e: React.PointerEvent<HTMLButtonElement>,
 	mediaPath: Path,
 ): void {
+	const listTypeToDisplay = getListTypeToDisplay().current;
 	const isNotClickForCtxMenu = e.button === leftClick;
-	const listTypeToDisplay = getListTypeToDisplay();
 
 	if (isNotClickForCtxMenu)
 		if (!e.ctrlKey) {
@@ -62,6 +62,7 @@ const Row = memo<RowProps>(
 				<button
 					onPointerUp={(e) => selectOrPlayMedia(e, path)}
 					title={t("tooltips.playThisMedia")}
+					type="button"
 				>
 					<div className="row-img">
 						<ImgWithFallback
@@ -87,6 +88,7 @@ const Row = memo<RowProps>(
 						title={t("tooltips.openMediaOptions")}
 						className="icon-circle-modal-trigger"
 						onPointerUp={() => setIsOpen(true)}
+						type="button"
 					>
 						<Dots size={17} />
 					</button>

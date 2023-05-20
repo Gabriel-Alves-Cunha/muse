@@ -15,7 +15,7 @@ import { Header } from "@components/Header";
 
 export function History(): JSX.Element {
 	useEffect(() => {
-		setListTypeToDisplay({ current: PlaylistListEnum.favorites });
+		setListTypeToDisplay({ current: PlaylistListEnum.history });
 	}, []);
 
 	return (

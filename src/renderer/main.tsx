@@ -9,10 +9,9 @@ import { App } from "./App";
 import "@assets/logo.png";
 
 if (isDev) {
-	setTimeout(
-		() => (globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_()),
-		10_000,
-	);
+	setTimeout(() => {
+		globalThis.runtimeGlobalsChecker = _runtimeGlobalsChecker_();
+	}, 10_000);
 
 	// document.designMode = "on";
 }

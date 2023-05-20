@@ -4,10 +4,10 @@ import { ReactToElectronMessageEnum } from "@common/enums";
 import { mediaPlayerFlipCardId } from "../FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { error, warn } from "@common/log";
-import { t, useTranslator } from "@i18n";
 import { infoToast } from "../toasts";
 import { getMedia } from "@contexts/playlists";
 import { Header } from "./Header";
+import { t } from "@i18n";
 
 const { searchForLyricsAndImage } = electronApi.lyric;
 

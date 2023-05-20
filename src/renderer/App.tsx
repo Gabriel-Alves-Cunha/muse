@@ -1,7 +1,6 @@
 import type { Page } from "@common/@types/GeneralTypes";
 
 import { ToastContainer } from "react-toastify";
-import { Suspense } from "react";
 
 import { DecorationsDown, DecorationsTop } from "@components/Decorations";
 import { searchLocalComputerForMedias } from "@contexts/playlists";
@@ -46,9 +45,7 @@ export function App(): JSX.Element {
 				<div data-main-grid-container>
 					<Navbar />
 
-					<Suspense>
-						<PageToShow />
-					</Suspense>
+					<PageToShow />
 
 					<MediaPlayer />
 				</div>
@@ -88,7 +85,7 @@ window.addEventListener(
 		window.addEventListener("message", handleWindowMsgsFromElectron);
 
 		// Remove splash screen:
-		document.getElementById("splashscreen")?.remove();
+		document.getElementById("splash-screen")?.remove();
 	},
 	{ once: true },
 );

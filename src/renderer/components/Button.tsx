@@ -2,7 +2,13 @@ import { forwardRef } from "react";
 
 export const Button = forwardRef<HTMLButtonElement, Props>(
 	({ variant, ...props }, forwardedRef) => (
-		<button data-variant={variant} data-button ref={forwardedRef} {...props} />
+		<button
+			data-variant={variant}
+			ref={forwardedRef}
+			type="button"
+			data-button
+			{...props}
+		/>
 	),
 );
 

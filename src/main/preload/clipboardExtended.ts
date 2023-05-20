@@ -45,13 +45,12 @@ Object.assign(clipboard, {
 
 	startWatching() {
 		this.watcherId = setInterval(() => {
-			if (
-				isTextDiff(
-					this.previousText,
-					(this.previousText = clipboard.readText()),
-				)
-			)
+			const nextText = clipboard.readText();
+
+			if (isTextDiff(this.previousText, nextText))
 				clipboardEmitter.emit("text-changed");
+
+			this.previousText = nextText;
 		}, 400);
 
 		return clipboard;

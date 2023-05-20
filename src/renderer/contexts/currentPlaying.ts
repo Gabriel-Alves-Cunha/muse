@@ -18,7 +18,7 @@ import { infoToast } from "@components/toasts";
 ////////////////////////////////////////////////
 // Constants:
 
-export const defaultCurrentPlaying: CurrentPlaying = {
+export const DEFAULT_CURRENT_PLAYING: CurrentPlaying = {
 	listType: PlaylistListEnum.mainList,
 	lastStoppedTimeInSeconds: 0,
 	path: "",
@@ -34,7 +34,7 @@ export const useCurrentPlaying = create<CurrentPlaying>(() => {
 		localStorageKeys.currentPlaying,
 	);
 
-	let storagedCurrentPlaying = defaultCurrentPlaying;
+	let storagedCurrentPlaying = DEFAULT_CURRENT_PLAYING;
 
 	try {
 		if (storagedCurrentPlayingString)
@@ -61,7 +61,7 @@ export const selectPath = (): CurrentPlaying["path"] =>
 // Helper functions:
 
 export const setDefaultCurrentPlaying = (): void =>
-	setCurrentPlaying(defaultCurrentPlaying);
+	setCurrentPlaying(DEFAULT_CURRENT_PLAYING);
 
 ////////////////////////////////////////////////
 
@@ -155,6 +155,7 @@ export function playNextMedia(): void {
 		const paths = isArray ? list.values() : list.keys();
 		let nextMediaPath = "";
 
+		// rome-ignore lint/suspicious/noConfusingLabels: <explanation>
 		outer: if (isRandom) {
 			const length = isArray ? list.length : list.size;
 			const randomIndex = getRandomInt(0, length);
@@ -294,7 +295,7 @@ function setAudioSource(newPath: Path): void {
 
 ////////////////////////////////////////////////
 
-const isPlayingRowDatalistString = "isPlayingRow";
+const IS_PLAYING_ROW_DATALIST_STRING = "isPlayingRow";
 
 /**
  * Decorate the rows of current playing medias
@@ -303,31 +304,37 @@ const isPlayingRowDatalistString = "isPlayingRow";
 function handleDecorateMediaRow(newPath: Path): void {
 	const prevPath = getCurrentPlaying().path;
 
-	const prevElements = prevPath
-		? document.querySelectorAll(selectDataPath(prevPath))
-		: null;
-	const newElements = document.querySelectorAll(selectDataPath(newPath));
+	const prevElements = document.querySelectorAll<HTMLElement>(
+		selectDataPath(prevPath),
+	);
+	const newElements = document.querySelectorAll<HTMLElement>(
+		selectDataPath(newPath),
+	);
 
-	if (!prevElements) info(`No previous media row found for "${prevPath}!"`);
-	if (!newElements) {
+	if (prevElements.length === 0)
+		info(`No previous media row found for "${prevPath}!"`);
+	if (newElements.length === 0) {
 		info(`No media row found for "${newPath}"!`);
 
 		return;
 	}
 
-	// Undecorate previous playing media row:
+	// Has to be this order:
+	// 1º) Undecorate previous playing media row:
 	if (prevPath && prevElements)
-		for (const element of prevElements as NodeListOf<HTMLElement>)
-			element.dataset[isPlayingRowDatalistString] = "false";
+		for (const element of prevElements)
+			element.dataset[IS_PLAYING_ROW_DATALIST_STRING] = "false";
 
-	// Decorate new playing media row:
-	for (const element of newElements as NodeListOf<HTMLElement>)
-		element.dataset[isPlayingRowDatalistString] = "true";
+	// 2º) Decorate new playing media row:
+	for (const element of newElements)
+		element.dataset[IS_PLAYING_ROW_DATALIST_STRING] = "true";
 }
 
 ////////////////////////////////////////////////
 
 function changeMediaSessionMetadata(media: Media): void {
+	if (!navigator?.mediaSession) return;
+
 	navigator.mediaSession.metadata = new MediaMetadata({
 		artwork: [{ src: media.image }],
 		artist: media.artist,

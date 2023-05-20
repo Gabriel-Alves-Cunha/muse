@@ -24,20 +24,23 @@ export const localStorageKeys = {
 
 export function setLocalStorage(
 	key: LocalStorageKeys,
-	item: ItemToStore,
+	itemToStore: ItemToStore,
 	waitTime = 500,
 ): void {
-	if (item instanceof Set || item instanceof Map) item = [...item];
+	let possiblyTransformedItemToStore = itemToStore;
+
+	if (itemToStore instanceof Set || itemToStore instanceof Map)
+		possiblyTransformedItemToStore = [...itemToStore];
 
 	try {
-		const json = JSON.stringify(item);
+		const json = JSON.stringify(possiblyTransformedItemToStore);
 
 		dbgPlaylists({ key, json });
 
 		setTimeout(() => localStorage.setItem(key, json), waitTime);
 	} catch (err) {
 		error("Error on JSON.stringify(value) at setLocalStorage().", {
-			item,
+			possiblyTransformedItemToStore,
 			err,
 			key,
 		});
@@ -46,18 +49,18 @@ export function setLocalStorage(
 
 ////////////////////////////////////////////////
 
-const emptyArrayString = "[]";
+const EMPTY_ARRAY_STRING = "[]";
 
 export function getFromLocalStorage(
-	key: Exclude<LocalStorageKeys, "settings">,
+	key: Exclude<LocalStorageKeys, "@muse:settings">,
 ): ItemToStore {
 	try {
-		const value = localStorage.getItem(key) || emptyArrayString;
+		const value = localStorage.getItem(key) || EMPTY_ARRAY_STRING;
 		const item: unknown = JSON.parse(value);
 
 		dbgPlaylists(`getFromLocalStorage("${key}")`, { item, value });
 
-		if (item === emptyArrayString) return [];
+		if (item === EMPTY_ARRAY_STRING) return [];
 
 		return item as ItemToStore;
 	} catch (err) {

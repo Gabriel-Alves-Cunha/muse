@@ -3,7 +3,7 @@ import type { Path } from "@common/@types/GeneralTypes";
 import { create } from "zustand";
 
 import { getPlaylists } from "./playlists";
-import { emptySet } from "@utils/empty";
+import { EMPTY_SET } from "@utils/empty";
 import { time } from "@utils/utils";
 
 ///////////////////////////////////////////////////
@@ -11,7 +11,7 @@ import { time } from "@utils/utils";
 ///////////////////////////////////////////////////
 
 export const allSelectedMediasRef = create<AllSelectedMedias>(() => ({
-	current: emptySet,
+	current: EMPTY_SET,
 }));
 
 export const getAllSelectedMedias = (): AllSelectedMedias["current"] =>
@@ -21,7 +21,7 @@ export const setAllSelectedMedias = (newAllSelectedMedias: Set<Path>): void =>
 	allSelectedMediasRef.setState({ current: newAllSelectedMedias });
 
 export const clearAllSelectedMedias = (): void =>
-	setAllSelectedMedias(emptySet);
+	setAllSelectedMedias(EMPTY_SET);
 
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
@@ -29,7 +29,7 @@ export const clearAllSelectedMedias = (): void =>
 // Listeners:
 
 export const selectDataPath = (path: Path): string => `[data-path="${path}"]`;
-const isSelectedRowDataString = "isSelectedRow";
+const IS_SELECTED_ROW_DATA_STRING = "isSelectedRow";
 
 // Handle decorate medias row:
 allSelectedMediasRef.subscribe((selectedMediasRef, prevSelectedMediasRef) =>
@@ -39,20 +39,22 @@ allSelectedMediasRef.subscribe((selectedMediasRef, prevSelectedMediasRef) =>
 		if (!list) return;
 
 		// Has to be this order:
+		// 1º
 		for (const path of prevSelectedMediasRef.current)
 			for (const element of list.querySelectorAll<HTMLElement>(
 				selectDataPath(path),
 			)) {
 				if (selectedMediasRef.current.has(path)) continue;
 
-				element.dataset[isSelectedRowDataString] = "false";
+				element.dataset[IS_SELECTED_ROW_DATA_STRING] = "false";
 			}
 
+		// 2º
 		for (const path of selectedMediasRef.current)
 			for (const element of list.querySelectorAll<HTMLElement>(
 				selectDataPath(path),
 			))
-				element.dataset[isSelectedRowDataString] = "true";
+				element.dataset[IS_SELECTED_ROW_DATA_STRING] = "true";
 	}, "handleDecorateMediasRow"),
 );
 
@@ -70,12 +72,12 @@ export function toggleSelectedMedia(path: Path): void {
 ///////////////////////////////////////////////////
 
 export function selectAllMedias(): void {
+	const mainList = getPlaylists().sortedByTitleAndMainList;
 	const allSelectedMedias = getAllSelectedMedias();
-	const sortedByDate = getPlaylists().sortedByDate;
 
-	if (allSelectedMedias.size === sortedByDate.size) return;
+	if (allSelectedMedias.size === mainList.size) return;
 
-	const newAllSelectedMedias = new Set(sortedByDate);
+	const newAllSelectedMedias = new Set(mainList.keys());
 
 	setAllSelectedMedias(newAllSelectedMedias);
 }

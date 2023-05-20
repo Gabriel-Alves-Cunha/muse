@@ -4,8 +4,8 @@ import type { ValuesOf } from "@common/@types/Utils";
 import { subscribeWithSelector } from "zustand/middleware";
 import { create } from "zustand";
 
+import { EMPTY_ARRAY, EMPTY_MAP, EMPTY_SET } from "@utils/empty";
 import { error, warn, throwErr } from "@common/log";
-import { emptyArray, emptyMap, emptySet } from "@utils/empty";
 import { dbg, dbgPlaylists } from "@common/debug";
 import { PlaylistListEnum } from "@common/enums";
 import { getSettings } from "@contexts/settings";
@@ -31,8 +31,8 @@ const { transformPathsToMedias } = electronApi.media;
 export const usePlaylists = create(
 	subscribeWithSelector<Playlists>(() => ({
 		history: getFromLocalStorage(localStorageKeys.history) as Path[],
-		sortedByTitleAndMainList: emptyMap,
-		sortedByDate: emptyMap,
+		sortedByTitleAndMainList: EMPTY_MAP,
+		sortedByDate: EMPTY_MAP,
 		favorites: new Set(
 			getFromLocalStorage(localStorageKeys.favorites) as Path[],
 		),
@@ -268,9 +268,9 @@ export function toggleFavorite(path: Path): void {
 
 export function clearAllLists(): void {
 	setPlaylists({
-		sortedByTitleAndMainList: emptyMap,
-		favorites: emptySet,
-		history: emptyArray,
+		sortedByTitleAndMainList: EMPTY_MAP,
+		favorites: EMPTY_SET,
+		history: EMPTY_ARRAY,
 	});
 }
 
@@ -385,9 +385,9 @@ export const searchMedia = (highlight: string): [Path, Media][] =>
 		const mainList = getPlaylists().sortedByTitleAndMainList;
 		const medias: [Path, Media][] = [];
 
-		for (const [path, media] of mainList)
-			if (unDiacritic(media.title).includes(highlight))
-				medias.push([path, media]);
+		for (const entry of mainList)
+			if (unDiacritic(entry[1].title).includes(highlight))
+				medias.push(entry);
 
 		return medias;
 	}, `searchMedia('${highlight}')`);

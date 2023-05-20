@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
+import { useState } from "react";
 
 import { searchForLyrics, shareMedias } from "./searchMediaOptionsCtxMenu";
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
@@ -24,8 +24,8 @@ export function MediaOptionsCtxMenu(): JSX.Element {
 	// If there is none selected, disable:
 	const isDisabled = allSelectedMedias.size === 0;
 
-	const closeMediaOptionsCtxMenu = useCallback(() => setIsOpen(false), []);
-	const openMediaOptionsCtxMenu = useCallback(() => setIsOpen(true), []);
+	const closeMediaOptionsCtxMenu = (): void => setIsOpen(false);
+	const openMediaOptionsCtxMenu = (): void => setIsOpen(true);
 
 	return (
 		<>
@@ -34,6 +34,7 @@ export function MediaOptionsCtxMenu(): JSX.Element {
 					onPointerUp={openMediaOptionsCtxMenu}
 					disabled={isDisabled}
 					data-menu-item
+					type="button"
 				>
 					{t("ctxMenus.deleteMedia")}
 

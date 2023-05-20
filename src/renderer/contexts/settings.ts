@@ -11,7 +11,7 @@ import { error } from "@common/log";
 ////////////////////////////////////////////////
 // Constants:
 
-const defaultSettings: Settings = {
+const DEFAULT_SETTINGS: Settings = {
 	assureMediaSizeIsGreaterThan60KB: true,
 	ignoreMediaWithLessThan60Seconds: true,
 	maxSizeOfHistory: 100,
@@ -29,7 +29,7 @@ export const useSettings = create<Settings>(() => {
 		localStorageKeys.settings,
 	);
 
-	let settingsToApply = defaultSettings;
+	let settingsToApply = DEFAULT_SETTINGS;
 
 	try {
 		if (storagedSettingsString)
@@ -70,7 +70,7 @@ useSettings.subscribe((settings) => {
 ////////////////////////////////////////////////
 // Helper functions:
 
-export const setDefaultSettings = (): void => setSettings(defaultSettings);
+export const setDefaultSettings = (): void => setSettings(DEFAULT_SETTINGS);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

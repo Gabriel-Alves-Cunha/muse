@@ -29,11 +29,12 @@ export function ErrorFallback({
 			<button
 				onPointerUp={resetAllAppDataAndReloadWindow}
 				data-modal-close-reset
+				type="button"
 			>
 				{t("buttons.resetAllAppData")}
 			</button>
 
-			<button data-modal-close-reset onPointerUp={reloadWindow}>
+			<button data-modal-close-reset onPointerUp={reloadWindow} type="button">
 				{t("buttons.reloadWindow")}
 			</button>
 		</CenteredModal>

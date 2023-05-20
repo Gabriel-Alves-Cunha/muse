@@ -2,7 +2,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
 import { dbg } from "@common/debug";
 
-const modifierKeys = [
+const MODIFIER_KEYS = [
 	"SymbolLock",
 	"ScrollLock",
 	"AltGraph",
@@ -21,9 +21,9 @@ const modifierKeys = [
 
 export function isAModifierKeyPressed(
 	event: KeyboardEvent | ReactKeyboardEvent,
-	except: typeof modifierKeys[number][] = [],
+	except: typeof MODIFIER_KEYS[number][] = [],
 ): Readonly<boolean> {
-	for (const key of modifierKeys) {
+	for (const key of MODIFIER_KEYS) {
 		if (except.includes(key)) continue;
 
 		if (event.getModifierState(key)) {

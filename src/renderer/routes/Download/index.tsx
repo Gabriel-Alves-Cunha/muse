@@ -1,4 +1,4 @@
-import { selectIsLoading, useSearchInfo } from "./helpers";
+import { selectIsSearching, useSearchInfo } from "./helpers";
 import { SearcherWrapper } from "./SearcherWrapper";
 import { MainArea } from "@components/MainArea";
 import { Loading } from "@components/Loading";
@@ -28,7 +28,7 @@ export const Download = (): JSX.Element => (
 // Helper functions:
 
 function IsLoading(): JSX.Element {
-	const isLoading = useSearchInfo(selectIsLoading);
+	const isLoading = useSearchInfo(selectIsSearching);
 
 	return <div className="w-6 h-6 ml-3">{isLoading && <Loading />}</div>;
 }

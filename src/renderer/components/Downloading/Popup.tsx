@@ -72,6 +72,7 @@ function DownloadingBox({
 						)
 					}
 					title={t("tooltips.cancelDownload")}
+					type="button"
 				>
 					<CancelIcon size={13} />
 				</button>

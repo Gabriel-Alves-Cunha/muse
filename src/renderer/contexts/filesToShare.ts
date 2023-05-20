@@ -2,10 +2,10 @@ import type { Path } from "@common/@types/GeneralTypes";
 
 import { create } from "zustand";
 
-import { emptySet } from "@utils/empty";
+import { EMPTY_SET } from "@utils/empty";
 
 export const filesToShareRef = create<FilesToShare>(() => ({
-	current: emptySet,
+	current: EMPTY_SET,
 }));
 
 export const getFilesToShare = (): FilesToShare["current"] =>
@@ -15,7 +15,7 @@ export const setFilesToShare = (filesToShare: FilesToShare["current"]): void =>
 	filesToShareRef.setState({ current: filesToShare });
 
 export const clearAllFilesToShare = (): void =>
-	filesToShareRef.setState({ current: emptySet });
+	filesToShareRef.setState({ current: EMPTY_SET });
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////

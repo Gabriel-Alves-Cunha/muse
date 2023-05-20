@@ -21,16 +21,10 @@ export function Convert(): JSX.Element {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const t = useTranslator(selectT);
 
-	const openNativeUI_ChooseFiles = useCallback(
-		(): void => inputRef.current?.click(),
-		[],
-	);
+	const openNativeUI_ChooseFiles = (): void => inputRef.current?.click();
 
-	const handleSelectedFiles_ = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) =>
-			handleSelectedFiles(e, toExtension),
-		[toExtension],
-	);
+	const handleSelectedFiles_ = (e: React.ChangeEvent<HTMLInputElement>): void =>
+		handleSelectedFiles(e, toExtension);
 
 	////////////////////////////////////////////////
 

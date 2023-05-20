@@ -2,7 +2,7 @@ import type { MediaBeingDownloaded } from "@components/Downloading";
 
 import { create } from "zustand";
 
-import { emptyMap } from "@utils/empty";
+import { EMPTY_MAP } from "@utils/empty";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -67,7 +67,7 @@ import { emptyMap } from "@utils/empty";
 // Main functions:
 
 export const downloadingListRef = create<DownloadingList>(() => ({
-	current: emptyMap,
+	current: EMPTY_MAP,
 }));
 
 export const getDownloadingList = (): DownloadingList["current"] =>

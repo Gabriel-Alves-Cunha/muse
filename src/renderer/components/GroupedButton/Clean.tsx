@@ -1,8 +1,8 @@
 import { FiTrash as CleanIcon } from "react-icons/fi";
 
+import { EMPTY_ARRAY, EMPTY_SET } from "@utils/empty";
 import { selectT, useTranslator } from "@i18n";
 import { getListTypeToDisplay } from "../MediaListKind/states";
-import { emptyMap, emptySet } from "@utils/empty";
 import { PlaylistListEnum } from "@common/enums";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import { setPlaylists } from "@contexts/playlists";
@@ -24,14 +24,14 @@ export function Clean(): JSX.Element {
 // Helper functions:
 
 function cleanProperList(): void {
-	if (getListTypeToDisplay() === PlaylistListEnum.favorites) {
-		setPlaylists({ favorites: emptySet });
+	if (getListTypeToDisplay().current === PlaylistListEnum.favorites) {
+		setPlaylists({ favorites: EMPTY_SET });
 
 		return;
 	}
 
-	if (getListTypeToDisplay() === PlaylistListEnum.history) {
-		setPlaylists({ history: emptyMap });
+	if (getListTypeToDisplay().current === PlaylistListEnum.history) {
+		setPlaylists({ history: EMPTY_ARRAY });
 
 		return;
 	}

@@ -1,6 +1,6 @@
 import { type UseBoundStore, type StoreApi, create } from "zustand";
 
-import { emptyArray, emptyMap } from "./empty";
+import { EMPTY_ARRAY, EMPTY_MAP } from "./empty";
 import { error } from "@common/log";
 
 export const MapWithIndex = <Key, Value>(
@@ -43,7 +43,7 @@ export const MapWithIndex = <Key, Value>(
 		},
 
 		clear(): void {
-			set({ map: emptyMap, keysArray: emptyArray });
+			set({ map: EMPTY_MAP, keysArray: EMPTY_ARRAY });
 		},
 
 		delete(key: Key): boolean {

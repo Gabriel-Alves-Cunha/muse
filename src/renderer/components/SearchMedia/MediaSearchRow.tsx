@@ -42,6 +42,7 @@ export function MediaSearchRow({
 			<button
 				onPointerUp={() => playThisMedia(path)}
 				title={t("tooltips.playThisMedia")}
+				type="button"
 			>
 				<div>
 					<ImgWithFallback mediaImg={media.image} mediaPath={path} />
@@ -65,6 +66,7 @@ export function MediaSearchRow({
 					onPointerUp={() => setIsMediaOptionsModalOpen(true)}
 					title={t("tooltips.openMediaOptions")}
 					className="icon-circle-modal-trigger"
+					type="button"
 				>
 					<Dots size={17} />
 				</button>

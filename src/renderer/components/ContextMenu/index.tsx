@@ -1,4 +1,4 @@
-import { Suspense, type PropsWithoutRef } from "react";
+import type { PropsWithoutRef } from "react";
 
 import { SearchMediaOptionsCtxMenu } from "./searchMediaOptionsCtxMenu";
 import { clearAllSelectedMedias } from "@contexts/allSelectedMedias";
@@ -34,15 +34,13 @@ export const ContextMenu = ({
 		onOpenChange={onOpenChange}
 		{...props}
 		ctxMenuContent={
-			<Suspense>
-				{content === SEARCH_MEDIA_OPTIONS ? (
-					<SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />
-				) : content === MEDIA_OPTIONS ? (
-					<MediaOptionsCtxMenu />
-				) : (
-					<MainCtxMenu />
-				)}
-			</Suspense>
+			content === SEARCH_MEDIA_OPTIONS ? (
+				<SearchMediaOptionsCtxMenu isAllDisabled={isAllDisabled} />
+			) : content === MEDIA_OPTIONS ? (
+				<MediaOptionsCtxMenu />
+			) : (
+				<MainCtxMenu />
+			)
 		}
 	/>
 );

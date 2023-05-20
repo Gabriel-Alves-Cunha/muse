@@ -1,7 +1,7 @@
 import { expect } from "vitest";
 
 import { numberOfMedias, testMap } from "./fakeTestList";
-import { emptyArray, emptySet } from "@utils/empty";
+import { EMPTY_ARRAY, EMPTY_SET } from "@utils/empty";
 import {
 	replaceEntireMainList,
 	getPlaylists,
@@ -9,7 +9,7 @@ import {
 } from "@contexts/playlists";
 import {
 	setDefaultCurrentPlaying,
-	defaultCurrentPlaying,
+	DEFAULT_CURRENT_PLAYING,
 	getCurrentPlaying,
 } from "@contexts/currentPlaying";
 
@@ -27,7 +27,7 @@ function setMainListToTestList(): void {
 /////////////////////////////////////////////
 
 function cleanHistory(): void {
-	setPlaylists({ history: emptyArray });
+	setPlaylists({ history: EMPTY_ARRAY });
 
 	expect(getPlaylists().history.length).toBe(0);
 }
@@ -35,7 +35,7 @@ function cleanHistory(): void {
 /////////////////////////////////////////////
 
 function cleanFavorites(): void {
-	setPlaylists({ favorites: emptySet });
+	setPlaylists({ favorites: EMPTY_SET });
 
 	expect(getPlaylists().favorites.size).toBe(0);
 }
@@ -43,7 +43,7 @@ function cleanFavorites(): void {
 function setCurrentPlayingToDefault(): void {
 	setDefaultCurrentPlaying();
 
-	expect(getCurrentPlaying()).toStrictEqual(defaultCurrentPlaying);
+	expect(getCurrentPlaying()).toStrictEqual(DEFAULT_CURRENT_PLAYING);
 }
 
 export function cleanUpBeforeEachTest(): void {

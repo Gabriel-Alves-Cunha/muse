@@ -9,8 +9,10 @@
 		}
 	},
 	"extends": [
-		"plugin:@typescript-eslint/recommended", "plugin:react-hooks/recommended",
-		"plugin:react/recommended", "eslint:recommended"
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:react/recommended",
+		"eslint:recommended"
 	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {

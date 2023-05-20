@@ -1,14 +1,14 @@
 import type { Path } from "@common/@types/GeneralTypes";
 
-import { useCallback, useState } from "react";
 import { BsShareFill as Share } from "react-icons/bs";
 import { FiTrash as Trash } from "react-icons/fi";
+import { useState } from "react";
 
 import { DeleteMediaDialogContent } from "../DeleteMediaDialog";
 import { selectT, useTranslator } from "@i18n";
 import { getAllSelectedMedias } from "@contexts/allSelectedMedias";
-import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { getDataOfSearchMedia } from "../SearchMedia/state";
+import { searchAndOpenLyrics } from "../MediaPlayer/Lyrics";
 import { setFilesToShare } from "@contexts/filesToShare";
 import { CenteredModal } from "../CenteredModal";
 import { deleteMedias } from "./mediaOptionsCtxMenu";
@@ -27,8 +27,8 @@ export function SearchMediaOptionsCtxMenu({
 	const [isOpen, setIsOpen] = useState(false);
 	const t = useTranslator(selectT);
 
-	const closeMediaOptionsCtxMenu = useCallback(() => setIsOpen(false), []);
-	const openMediaOptionsCtxMenu = useCallback(() => setIsOpen(true), []);
+	const closeMediaOptionsCtxMenu = (): void => setIsOpen(false);
+	const openMediaOptionsCtxMenu = (): void => setIsOpen(true);
 
 	return (
 		<>
@@ -37,6 +37,7 @@ export function SearchMediaOptionsCtxMenu({
 					onPointerUp={openMediaOptionsCtxMenu}
 					disabled={isAllDisabled}
 					data-menu-item
+					type="button"
 				>
 					{t("ctxMenus.deleteMedia")}
 

@@ -4,12 +4,11 @@ import { selectT, useTranslator } from "@i18n";
 import { ButtonOfGroup } from "./ButtonOfGroup";
 import {
 	searchLocalComputerForMedias,
-	selectIsLoadingMedias,
-	usePlaylists,
+	useIsLoadingMedias,
 } from "@contexts/playlists";
 
 export function Reload(): JSX.Element {
-	const isLoadingMedias = usePlaylists(selectIsLoadingMedias);
+	const isLoadingMedias = useIsLoadingMedias().current;
 	const t = useTranslator(selectT);
 
 	return (

@@ -3,7 +3,7 @@ import type { Path } from "@common/@types/GeneralTypes";
 
 import { create } from "zustand";
 
-import { emptyMap } from "@utils/empty";
+import { EMPTY_MAP } from "@utils/empty";
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
@@ -75,7 +75,7 @@ import { emptyMap } from "@utils/empty";
 // Main functions:
 
 export const convertingListRef = create<ConvertingList>(() => ({
-	current: emptyMap,
+	current: EMPTY_MAP,
 }));
 
 export const getConvertingList = (): ConvertingList["current"] =>

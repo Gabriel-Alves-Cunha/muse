@@ -21,13 +21,14 @@ export function DeleteMediaDialogContent({
 			</h1>
 
 			<div data-flex-row>
-				<button onPointerUp={handleDeleteMedia} data-remove-media>
+				<button onPointerUp={handleDeleteMedia} data-remove-media type="button">
 					{t("buttons.confirm")}
 				</button>
 
 				<button
 					className="save-media-options-modal bg-transparent"
 					onPointerUp={closeDialog}
+					type="button"
 				>
 					{t("buttons.cancel")}
 				</button>
