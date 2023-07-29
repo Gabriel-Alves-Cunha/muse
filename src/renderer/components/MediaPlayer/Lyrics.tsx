@@ -1,7 +1,7 @@
 import type { Path, Media } from "@common/@types/GeneralTypes";
 
 import { ReactToElectronMessageEnum } from "@common/enums";
-import { mediaPlayerFlipCardId } from "../FlipCard";
+import { MEDIA_PLAYER_FLIP_CARD_ID } from "../FlipCard";
 import { sendMsgToBackend } from "@common/crossCommunication";
 import { error, warn } from "@common/log";
 import { infoToast } from "../toasts";
@@ -29,7 +29,9 @@ export const Lyrics = ({ media, path }: Props): JSX.Element => (
 // Helper functions:
 
 export function flipMediaPlayerCard(): void {
-	document.getElementById(mediaPlayerFlipCardId)?.classList.toggle("active");
+	document
+		.getElementById(MEDIA_PLAYER_FLIP_CARD_ID)
+		?.classList.toggle("active");
 }
 
 /////////////////////////////////////////

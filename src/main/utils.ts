@@ -1,16 +1,18 @@
 import type { Base64 } from "@common/@types/GeneralTypes";
 
-import { homedir } from "node:os";
+import { userInfo } from "node:os";
 import { join } from "node:path";
 
 /////////////////////////////////////////
 
-const homeDir = homedir();
+const { homedir } = userInfo();
+
+console.log({ homedir });
 
 export const dirs = {
-	documents: join(homeDir, "Documents"),
-	downloads: join(homeDir, "Downloads"),
-	music: join(homeDir, "Music"),
+	documents: join(homedir, "Documents"),
+	downloads: join(homedir, "Downloads"),
+	music: join(homedir, "Music"),
 } as const;
 
 /////////////////////////////////////////

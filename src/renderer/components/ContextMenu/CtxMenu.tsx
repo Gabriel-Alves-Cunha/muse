@@ -30,15 +30,17 @@ function CtxMenuContent({
 	onOpenChange,
 	...props
 }: CtxMenuContentProps): JSX.Element {
-	const [isOpen, setIsOpen] = useReducer(reducer, false);
 	const [shouldClose, setShouldClose] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
 
-	function reducer(_prevValue: boolean, newValue: boolean): boolean {
-		onOpenChange?.(newValue);
+	const [isOpen, setIsOpen] = useReducer(
+		(_prevValue: boolean, newValue: boolean): boolean => {
+			onOpenChange?.(newValue);
 
-		return newValue;
-	}
+			return newValue;
+		},
+		false,
+	);
 
 	useEffect(() => {
 		const wrapper = contentRef.current?.parentElement as
@@ -150,7 +152,7 @@ interface CtxMenuContentProps
 		React.HTMLAttributes<HTMLDivElement>,
 		HTMLDivElement
 	> {
-	onOpenChange?(newValue: boolean): void;
+	onOpenChange: ((newValue: boolean) => void) | undefined;
 	ctxMenuContent: React.ReactNode;
 	onContextMenu?: never;
 }

@@ -29,7 +29,7 @@ import {
 } from "@common/crossCommunication";
 import {
 	type CreateConversion,
-	createOrCancelConvert,
+	createOrCancelConversion,
 } from "./preload/media/create-conversion";
 import {
 	type CreateDownload,
@@ -151,7 +151,7 @@ function listenToMessagesFromFrontEnd(event: CrossWindowEvent): void {
 			}
 
 			electronPort.onmessage = ({ data }: { data: CreateConversion }) =>
-				createOrCancelConvert({ ...data, electronPort });
+				createOrCancelConversion({ ...data, electronPort });
 
 			electronPort.addEventListener("close", logThatPortIsClosing);
 

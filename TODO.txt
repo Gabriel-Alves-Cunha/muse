@@ -10,7 +10,6 @@
 * ADD: cut and visualize audio
 * ADD: playback rate
 * ADD: make own toast
-* ADD: splash screen
 
 * FIX: gh-actions is always overwriting the latest release
 
@@ -22,6 +21,4 @@
 
 1. If ever needed, see `last.fm` for lyrics, or lrc
 
-2. If ever needed, make a data structure that has an indexed map.
-
-3. If ever needed, make JSON.stringify/parse concurrent with a library.
+3. If ever needed, make JSON.stringify/parse concurrently with a library.

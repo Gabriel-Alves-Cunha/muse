@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { on, removeOn } from "@utils/window";
-import { leftClick } from "./MediaListKind/Row";
+import { LEFT_CLICK } from "./MediaListKind/Row";
 
 export function CenteredModal({
 	onPointerDownOutside,
@@ -31,7 +31,7 @@ export function CenteredModal({
 
 			// Check if click happened outside:
 			if (
-				event.button !== leftClick ||
+				event.button !== LEFT_CLICK ||
 				!contentRef.current ||
 				contentRef.current.contains(event.target as Node)
 			)

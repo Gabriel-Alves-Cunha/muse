@@ -269,8 +269,8 @@ export function toggleFavorite(path: Path): void {
 export function clearAllLists(): void {
 	setPlaylists({
 		sortedByTitleAndMainList: EMPTY_MAP,
-		favorites: EMPTY_SET,
 		history: EMPTY_ARRAY,
+		favorites: EMPTY_SET,
 	});
 }
 
@@ -368,7 +368,7 @@ export async function searchLocalComputerForMedias(): Promise<void> {
 
 ///////////////////////////////////////////////////
 
-const diacriticRegex = /\p{Diacritic}/gu;
+const DIACRITIC_REGEX = /\p{Diacritic}/gu;
 
 /** normalize()ing to NFD Unicode normal form decomposes
  * combined graphemes into the combination of simple ones.
@@ -378,7 +378,7 @@ const diacriticRegex = /\p{Diacritic}/gu;
  * Combining Diacritical Marks Unicode block.
  */
 export const unDiacritic = (str: string): string =>
-	str.normalize("NFD").toLowerCase().replaceAll(diacriticRegex, "");
+	str.normalize("NFD").toLowerCase().replaceAll(DIACRITIC_REGEX, "");
 
 export const searchMedia = (highlight: string): [Path, Media][] =>
 	time(() => {
@@ -386,8 +386,7 @@ export const searchMedia = (highlight: string): [Path, Media][] =>
 		const medias: [Path, Media][] = [];
 
 		for (const entry of mainList)
-			if (unDiacritic(entry[1].title).includes(highlight))
-				medias.push(entry);
+			if (unDiacritic(entry[1].title).includes(highlight)) medias.push(entry);
 
 		return medias;
 	}, `searchMedia('${highlight}')`);

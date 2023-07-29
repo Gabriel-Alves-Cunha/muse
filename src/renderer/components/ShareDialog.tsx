@@ -23,7 +23,7 @@ const { createServer } = electronApi.share;
 /////////////////////////////////////////
 // Main function:
 
-const qrID = "qrcode-canvas";
+const QR_ID = "qrcode-canvas";
 
 export function ShareDialog(): JSX.Element | null {
 	const [server, setServer] = useReducer(reducer, null);
@@ -72,10 +72,10 @@ export function ShareDialog(): JSX.Element | null {
 		if (!shouldModalOpen) return;
 
 		try {
-			setServer(createServer([...filesToShare]));
+			setServer(createServer(filesToShare));
 		} catch (err) {
-			error(err);
 			closeShareDialog();
+			error(err);
 		}
 	}, [filesToShare, shouldModalOpen]);
 
@@ -108,7 +108,7 @@ export function ShareDialog(): JSX.Element | null {
 			<canvas
 				className="relative w-80 h-80 rounded-xl"
 				ref={onCanvasElementMakeQRCode}
-				id={qrID}
+				id={QR_ID}
 			>
 				<Loading />
 			</canvas>
@@ -134,7 +134,7 @@ function namesOfFilesToShare(): JSX.Element[] {
 
 	return Array.from(getFilesToShare(), (id) => (
 		<li data-files-to-share key={id}>
-			{mainList.get(id)?.title ?? "<Untitled>"}
+			{mainList.get(id)?.title ?? "<untitled>"}
 		</li>
 	));
 }
@@ -142,7 +142,7 @@ function namesOfFilesToShare(): JSX.Element[] {
 /////////////////////////////////////////
 
 async function makeQrcode(url: QRCodeURL): Promise<void> {
-	const canvasElement = document.getElementById(qrID) as HTMLCanvasElement;
+	const canvasElement = document.getElementById(QR_ID) as HTMLCanvasElement;
 
 	assert(canvasElement, "There is no canvas element!");
 

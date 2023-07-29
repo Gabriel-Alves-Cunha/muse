@@ -28,8 +28,8 @@ const icons: Readonly<Record<Page, JSX.Element>> = {
 /////////////////////////////////////////
 
 export function ButtonsForPages(): JSX.Element {
-	const t = useTranslator(selectT);
 	const currPage = pageRef().current;
+	const t = useTranslator(selectT);
 
 	return (
 		<div className="buttons-for-pages">

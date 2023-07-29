@@ -6,7 +6,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Virtuoso } from "react-virtuoso";
 
 import { CtxContentEnum, ContextMenu } from "../ContextMenu";
-import { ItemContent, leftClick } from "./Row";
+import { ItemContent, LEFT_CLICK } from "./Row";
 import { useListTypeToDisplay } from "./states";
 import { PlaylistListEnum } from "@common/enums";
 import { error, throwErr } from "@common/log";
@@ -58,11 +58,6 @@ function MediaListKindWithoutErrorBoundary({ isHome }: Props): JSX.Element {
 	const listTypeToDisplay = useListTypeToDisplay();
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const playlists = usePlaylists();
-
-	const wrapperProps = useMemo(
-		() => ({ className: "max-w-2xl h-[87%]", ref: wrapperRef }),
-		[],
-	);
 
 	const listName = isHome
 		? listTypeToDisplay.homeListToDisplay
@@ -120,7 +115,7 @@ function MediaListKindWithoutErrorBoundary({ isHome }: Props): JSX.Element {
 			if (getAllSelectedMedias().size === 0) return;
 
 			const isClickInside = wrapperRef.current?.contains(event.target as Node);
-			const shouldIgnoreBecauseItIsLeftClick = event.button !== leftClick;
+			const shouldIgnoreBecauseItIsLeftClick = event.button !== LEFT_CLICK;
 
 			if (shouldIgnoreBecauseItIsLeftClick || isClickInside) return;
 
@@ -139,8 +134,8 @@ function MediaListKindWithoutErrorBoundary({ isHome }: Props): JSX.Element {
 	return (
 		// For some reason (className at wrapperProps) 87% is the spot that makes the header above it have it's target size (h-14 === 3.5rem)
 		<ContextMenu
+			wrapperProps={{ className: "max-w-2xl h-[87%]", ref: wrapperRef }}
 			content={CtxContentEnum.MEDIA_OPTIONS}
-			wrapperProps={wrapperProps}
 		>
 			<Virtuoso
 				computeItemKey={

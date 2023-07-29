@@ -19,8 +19,8 @@ import {
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-export const rightClick = 2;
-export const leftClick = 0;
+export const RIGHT_CLICK = 2;
+export const LEFT_CLICK = 0;
 
 // First to receive event.
 function selectOrPlayMedia(
@@ -28,7 +28,7 @@ function selectOrPlayMedia(
 	mediaPath: Path,
 ): void {
 	const listTypeToDisplay = getListTypeToDisplay().current;
-	const isNotClickForCtxMenu = e.button === leftClick;
+	const isNotClickForCtxMenu = e.button === LEFT_CLICK;
 
 	if (isNotClickForCtxMenu)
 		if (!e.ctrlKey) {

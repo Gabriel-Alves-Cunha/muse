@@ -47,7 +47,7 @@ export const ContextMenu = ({
 
 function onOpenChange(newValue: boolean): void {
 	// On close, deselectAllMedias():
-	if (!newValue) clearAllSelectedMedias();
+	if (newValue === false) clearAllSelectedMedias();
 }
 
 /////////////////////////////////////////////

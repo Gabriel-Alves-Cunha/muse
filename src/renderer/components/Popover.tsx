@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { isAModifierKeyPressed } from "@utils/keyboard";
 import { on, removeOn } from "@utils/window";
-import { leftClick } from "./MediaListKind/Row";
+import { LEFT_CLICK } from "./MediaListKind/Row";
 
 export function Popover({
 	onPointerDownOutside,
@@ -27,7 +27,7 @@ export function Popover({
 		function closeOnClickOutside(event: PointerEvent): void {
 			// Assume that isOpen === true.
 
-			const ignoreBecauseOfLeftClick = event.button !== leftClick;
+			const ignoreBecauseOfLeftClick = event.button !== LEFT_CLICK;
 			const wasClickInside = Boolean(
 				contentRef.current?.contains(event.target as Node),
 			);

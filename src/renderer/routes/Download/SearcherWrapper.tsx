@@ -24,8 +24,8 @@ export function SearcherWrapper(): JSX.Element {
 				label={t("labels.pasteVideoURL")}
 				autoCapitalize="off"
 				spellCheck="false"
-				autoCorrect="off"
 				onChange={setUrl}
+				autoCorrect="off"
 				value={url}
 			/>
 

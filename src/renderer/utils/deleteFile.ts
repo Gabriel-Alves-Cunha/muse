@@ -8,9 +8,9 @@ import { t } from "@i18n";
 const { deleteFile: electronDeleteFile } = electronApi.fs;
 
 export async function deleteFile(path: Path): Promise<void> {
-	const wasDeleteSuccessfull = await electronDeleteFile(path);
+	const wasDeleteSuccessfully = await electronDeleteFile(path);
 
-	if (wasDeleteSuccessfull) {
+	if (wasDeleteSuccessfully) {
 		successToast(`${t("toasts.mediaDeletionSuccess")}"${getBasename(path)}"!`);
 
 		removeMedia(path);

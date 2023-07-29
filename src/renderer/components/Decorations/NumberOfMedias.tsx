@@ -2,13 +2,13 @@ import { type Playlists, usePlaylists } from "@contexts/playlists";
 import { selectT, useTranslator } from "@i18n";
 
 const selectSortedByDateSize = (state: Playlists): number =>
-	state.sortedByDate.size;
+	state.sortedByTitleAndMainList.size;
 
 export function NumberOfMedias(): JSX.Element {
 	const numberOfMedias = usePlaylists(selectSortedByDateSize);
 	const t = useTranslator(selectT);
 
-	const isPlural = numberOfMedias > 1;
+	const isPlural = numberOfMedias > 1 || numberOfMedias === 0;
 
 	return (
 		<p>

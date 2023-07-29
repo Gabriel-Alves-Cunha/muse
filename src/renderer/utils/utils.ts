@@ -21,7 +21,7 @@ export function getRandomInt(min: number, max: number): number {
 //////////////////////////////////////////
 
 export const capitalize = (str: string): string =>
-	`${str.charAt(0).toUpperCase()}${str.slice(1)}`;
+	`${str.charAt(0).toLocaleUpperCase()}${str.slice(1)}`;
 
 //////////////////////////////////////////
 

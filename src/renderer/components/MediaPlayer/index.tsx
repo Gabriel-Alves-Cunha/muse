@@ -45,6 +45,7 @@ export function MediaPlayer(): JSX.Element {
 
 	return (
 		<aside className="aside">
+			{/* rome-ignore lint/a11y/useMediaCaption: Doesn't make sense to use media caption here.  */}
 			<audio id="audio" ref={audioRef} />
 
 			<MediaPlayerCards />

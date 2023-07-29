@@ -27,7 +27,7 @@ const mediasConverting: Map<Path, Readable> = new Map();
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 
-export function createOrCancelConvert(args: CreateConversion): void {
+export function createOrCancelConversion(args: CreateConversion): void {
 	if (!args.path) throwErr(`'path' is required. Received: "${args.path}".`);
 
 	if (!mediasConverting.has(args.path)) {

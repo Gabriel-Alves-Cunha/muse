@@ -1,39 +1,51 @@
-import type { Path, QRCodeURL } from "@common/@types/GeneralTypes";
 import type { AddressInfo } from "node:net";
+import type { QRCodeURL } from "@common/@types/GeneralTypes";
 
-import Koa from "koa";
+import { createServer as httpCreateServer } from "node:http";
 
 import { myIp, unableToShareMediasError } from "./myIpAddress";
-import { throwErr, error, log } from "@common/log";
-import { router } from "./routes";
+import { throwErr } from "@common/log";
 import { dbg } from "@common/debug";
 
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-/////////////////////////////////////////////
-// Setup singleton server:
-
-// Exporting for testing porpuses.
-export const app = new Koa()
-	.use(router.routes())
-	.use(router.allowedMethods())
-	.on("error", error);
+import { router } from "./routes";
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 /////////////////////////////////////////////
 // Main function:
 
-export function createServer(filepaths: readonly Path[]): ClientServerAPI {
+export function createServer(filepaths: ReadonlySet<string>): ClientServerAPI {
 	if (!myIp) throwErr(unableToShareMediasError);
 
-	app.context["filepaths"] = filepaths;
-	app.context["exampleSet"] = new Set(["test"]);
-
-	log({ ctx: app.context });
-
 	let url = "" as QRCodeURL;
-	const server = app
+
+	const server = httpCreateServer(
+		{
+			connectionsCheckingInterval: 10_000,
+			requestTimeout: 1_000,
+		},
+		(req, res) => {
+			const { url } = req;
+
+			if (!url) {
+				throwErr("There is no url in the request!");
+			}
+
+			const handler = router(filepaths)[url];
+
+			if (handler) {
+				handler(req, res);
+			} else {
+				res
+					.writeHead(400, {
+						"Content-Type": "text/plain",
+					})
+					.end("404 Not Found");
+
+				throwErr(`There is no handler for url: "${url}"`);
+			}
+		},
+	)
 		.on("close", () => dbg("Closing server"))
 		.on("error", (err: Error) => {
 			throw err;

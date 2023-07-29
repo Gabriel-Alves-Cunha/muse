@@ -1,7 +1,7 @@
 import type { AllowedMedias } from "@common/utils";
 
-import { useCallback, useRef, useState } from "react";
 import { MdSwapHoriz as ConvertIcon } from "react-icons/md";
+import { useRef, useState } from "react";
 
 import { selectT, useTranslator } from "@i18n";
 import { MainArea } from "@components/MainArea";

@@ -1,6 +1,6 @@
 appId: "com.muse"
 productName: Muse
-copyright: Copyright MIT 2022 Gabriel Alves Cunha
+copyright: Copyright MIT 2023 Gabriel Alves Cunha
 
 files: "build/"
 
@@ -18,5 +18,7 @@ win:
     arch: x64
 
 publish:
+  repo: https://github.com/Gabriel-Alves-Cunha/muse
+  owner: Gabriel Alves Cunha
   releaseType: release
   provider: github

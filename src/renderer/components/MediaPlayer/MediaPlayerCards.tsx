@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { FlipCard, mediaPlayerFlipCardId } from "@components/FlipCard";
+import { FlipCard, MEDIA_PLAYER_FLIP_CARD_ID } from "@components/FlipCard";
 import { selectPath, useCurrentPlaying } from "@contexts/currentPlaying";
 import { selectMainList, usePlaylists } from "@contexts/playlists";
 import { Player } from "./Player";
@@ -12,7 +12,9 @@ export function MediaPlayerCards(): JSX.Element {
 
 	useEffect(() => {
 		// Flip media player card to frontCard on new path:
-		document.getElementById(mediaPlayerFlipCardId)?.classList.remove("active");
+		document
+			.getElementById(MEDIA_PLAYER_FLIP_CARD_ID)
+			?.classList.remove("active");
 	}, [path]);
 
 	return (

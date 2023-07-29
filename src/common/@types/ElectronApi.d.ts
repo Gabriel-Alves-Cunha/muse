@@ -45,7 +45,7 @@ export type ElectronAPI = DeepReadonly<{
 			ignoreMediaWithLessThan60Seconds?: boolean,
 		): Promise<[ID, Media][]>;
 	};
-	share: { createServer(filepaths: readonly Path[]): ClientServerAPI };
+	share: { createServer(filepaths: ReadonlySet<string>): ClientServerAPI };
 	lyric: {
 		searchForLyricsAndImage(
 			mediaTitle: string,

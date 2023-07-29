@@ -19,7 +19,7 @@ export const computeHistoryItemKey = (
 
 /////////////////////////////////////////
 
-export const reloadWindow = (): void => location.reload();
+export const reloadWindow = location.reload;
 
 /////////////////////////////////////////
 

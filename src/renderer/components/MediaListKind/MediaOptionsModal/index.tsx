@@ -1,6 +1,6 @@
 import type { Media, Path } from "@common/@types/GeneralTypes";
 
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
 	MdOutlineImageSearch as SearchImage,
 	MdOutlineDelete as Remove,
@@ -27,7 +27,7 @@ import {
 /////////////////////////////////////////////
 // Main function:
 
-const filePresentClassName = "file-present";
+const FILE_PRESENT_CLASS_NAME = "file-present";
 
 export function MediaOptionsModal({
 	setIsOpen,
@@ -43,42 +43,44 @@ export function MediaOptionsModal({
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const imageFilePathRef = useRef("");
 
-	const openNativeUI_ChooseFiles = (): void => imageInputRef.current?.click();
+	function handleSelectedFile({
+		target: { files },
+	}: React.ChangeEvent<HTMLInputElement>): void {
+		console.log("on handleSelectedFile");
 
-	const handleSelectedFile = useCallback(
-		({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
-			console.log("on handleSelectedFile");
+		if (
+			!(imageButtonRef.current && imageInputRef.current && files) ||
+			files.length === 0
+		) {
+			imageButtonRef.current?.classList.remove(FILE_PRESENT_CLASS_NAME);
 
-			if (
-				!(imageButtonRef.current && imageInputRef.current && files) ||
-				files.length === 0
-			)
-				return imageButtonRef.current?.classList.remove(filePresentClassName);
+			return;
+		}
 
-			const [file] = files;
+		const [file] = files;
 
-			imageFilePathRef.current = file?.webkitRelativePath ?? "";
+		imageFilePathRef.current = file?.webkitRelativePath ?? "";
 
-			dbg("imageFilePath =", imageFilePathRef.current);
+		dbg("imageFilePath =", imageFilePathRef.current);
 
-			// Change button color to indicate that selection was successfull:
-			imageButtonRef.current.classList.add(filePresentClassName);
-		},
-		[]
-	);
+		// Change button color to indicate that selection was successfull:
+		imageButtonRef.current.classList.add(FILE_PRESENT_CLASS_NAME);
+	}
 
-	const saveChanges = (): void => {
+	function saveChanges(): void {
 		setIsOpen(false);
 
 		changeMediaMetadata(imageFilePathRef.current, path, media);
-	};
+	}
 
-	const handleDeleteMedia = (): void => {
+	function handleDeleteMedia(): void {
 		setIsDeleteMediaModalOpen(false);
 		setIsOpen(false);
 
 		deleteFile(path);
-	};
+	}
+
+	const openNativeUI_ChooseFiles = (): void => imageInputRef.current?.click();
 
 	const closeDeleteMediaDialog = (): void => setIsDeleteMediaModalOpen(false);
 
